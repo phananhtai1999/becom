@@ -76,6 +76,9 @@ Route::group(['as' => 'campaign.'], function () {
     Route::delete('/campaign/{id}', [CampaignController::class, 'destroy'])->name('destroy');
 });
 
+//Create Increment Campaign total open
+Route::get('/campaign-tracking/increment/total-open', [CampaignController::class, 'incrementCampaignTrackingTotalOpen'])->name('campaignTracking.incrementTotalOpen');
+
 //Email
 Route::group(['as' => 'email.'], function () {
 
