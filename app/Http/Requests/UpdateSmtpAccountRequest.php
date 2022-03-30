@@ -33,7 +33,7 @@ class UpdateSmtpAccountRequest extends AbstractRequest
             'mail_from_address' => ['string'],
             'mail_from_name' => ['string'],
             'scret_key' => ['string'],
-            'website_uuid' => ['string'],
+            'website_uuid' => ['string', 'exists:websites,uuid'],
         ];
     }
 }

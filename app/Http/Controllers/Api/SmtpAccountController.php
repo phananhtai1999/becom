@@ -16,7 +16,6 @@ use App\Http\Resources\SmtpAccountCollection;
 use App\Http\Resources\SmtpAccountResource;
 use App\Mail\SendEmails;
 use App\Models\MailTemplate;
-use App\Models\SmtpAccount;
 use App\Services\SmtpAccountService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Mail;
@@ -63,7 +62,7 @@ class SmtpAccountController extends AbstractRestAPIController
      */
     public function sendTemplate(SendMailUseMailTemplateUuidRequest $request)
     {
-        $mailTemplate = MailTemplate::where('uuid', request()->get('mail_template_uuid'))->first();
+        $mailTemplate = MailTemplate::where('uuid', $request->get('mail_template_uuid'))->first();
 
         $subject = $mailTemplate->subject;
         $body = $mailTemplate->body;
