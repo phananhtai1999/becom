@@ -74,6 +74,9 @@ Route::group(['as' => 'campaign.'], function () {
     Route::get('/campaign/{id}', [CampaignController::class, 'show'])->name('show');
     Route::put('/campaign/{id}', [CampaignController::class, 'edit'])->name('edit');
     Route::delete('/campaign/{id}', [CampaignController::class, 'destroy'])->name('destroy');
+
+    //Upsert-campaign-link-tracking
+    Route::get('/upsert-campaign-link-tracking', [CampaignController::class, 'upsertCampaignLinkTrackingTotalClick'])->name('upsert-campaign-link-tracking');
 });
 
 //Create Increment Campaign total open

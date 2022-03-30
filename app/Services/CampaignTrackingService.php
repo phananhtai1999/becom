@@ -41,4 +41,27 @@ class CampaignTrackingService extends AbstractService
 
         return $model;
     }
+
+    /**
+     * @param $campaignUuid
+     * @return mixed
+     */
+    public function incrementTotalLinkClickByCampaignUuid($campaignUuid)
+    {
+        $model = $this->findByCampaignUuid($campaignUuid);
+
+        if (!empty($model)) {
+            $this->update($model, [
+                'total_link_click' => $model->total_link_click + 1,
+            ]);
+        } else {
+            $model = $this->create([
+                'campaign_uuid' => $campaignUuid,
+                'total_open' => 0,
+                'total_link_click' => 1,
+            ]);
+        }
+
+        return $model;
+    }
 }
