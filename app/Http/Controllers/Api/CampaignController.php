@@ -8,28 +8,61 @@ use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestEditTrait;
 use App\Http\Controllers\Traits\RestStoreTrait;
+use App\Http\Requests\CampaignLinkTrackingRequest;
 use App\Http\Requests\CampaignRequest;
 use App\Http\Requests\IncrementCampaignTrackingRequest;
 use App\Http\Requests\UpdateCampaignRequest;
 use App\Http\Resources\CampaignCollection;
 use App\Http\Resources\CampaignDailyTrackingResource;
+use App\Http\Resources\CampaignLinkDailyTrackingResource;
+use App\Http\Resources\CampaignLinkTrackingResource;
 use App\Http\Resources\CampaignResource;
 use App\Http\Resources\CampaignTrackingResource;
 use App\Services\CampaignDailyTrackingService;
+use App\Services\CampaignLinkDailyTrackingService;
+use App\Services\CampaignLinkTrackingService;
 use App\Services\CampaignService;
 use App\Services\CampaignTrackingService;
+use Illuminate\Http\JsonResponse;
 
 class CampaignController extends AbstractRestAPIController
 {
     use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestStoreTrait, RestEditTrait;
 
+    /**
+     * @var CampaignTrackingService
+     */
     protected $campaignTrackingService;
+
+    /**
+     * @var CampaignDailyTrackingService
+     */
     protected $campaignDailyTrackingService;
 
+    /**
+     * @var CampaignLinkTrackingService
+     */
+    protected $campaignLinkTrackingService;
 
-    public function __construct(CampaignService $service,
-                                CampaignTrackingService $campaignTrackingService,
-                                CampaignDailyTrackingService $campaignDailyTrackingService)
+    /**
+     * @var CampaignLinkDailyTrackingService
+     */
+    protected $campaignLinkDailyTrackingService;
+
+    /**
+     * @param CampaignService $service
+     * @param CampaignTrackingService $campaignTrackingService
+     * @param CampaignDailyTrackingService $campaignDailyTrackingService
+     * @param CampaignLinkDailyTrackingService $campaignLinkDailyTrackingService
+     * @param CampaignLinkTrackingService $campaignLinkTrackingService
+     */
+    public function __construct
+    (CampaignService $service,
+     CampaignTrackingService $campaignTrackingService,
+     CampaignDailyTrackingService $campaignDailyTrackingService,
+     CampaignLinkDailyTrackingService $campaignLinkDailyTrackingService,
+     CampaignLinkTrackingService $campaignLinkTrackingService
+    )
     {
         $this->service = $service;
         $this->resourceCollectionClass = CampaignCollection::class;
@@ -38,11 +71,13 @@ class CampaignController extends AbstractRestAPIController
         $this->editRequest = UpdateCampaignRequest::class;
         $this->campaignTrackingService = $campaignTrackingService;
         $this->campaignDailyTrackingService = $campaignDailyTrackingService;
+        $this->campaignLinkTrackingService = $campaignLinkTrackingService;
+        $this->campaignLinkDailyTrackingService = $campaignLinkDailyTrackingService;
     }
 
     /**
      * @param IncrementCampaignTrackingRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function incrementCampaignTrackingTotalOpen(IncrementCampaignTrackingRequest $request)
     {
@@ -58,6 +93,42 @@ class CampaignController extends AbstractRestAPIController
 
         return $this->sendOkJsonResponse([
             'data' => [
+                'campaignTracking' => $campaignTrackingData['data'],
+                'campaignDailyTracking' => $campaignDailyTrackingData['data'],
+            ]
+        ]);
+    }
+
+    /**
+     * @param CampaignLinkTrackingRequest $request
+     * @return JsonResponse
+     */
+    public function upsertCampaignLinkTrackingTotalClick(CampaignLinkTrackingRequest $request)
+    {
+        $campaignLinkTrackingData = $this->service->resourceToData(
+            CampaignLinkTrackingResource::class,
+            $this->campaignLinkTrackingService->incrementTotalClickByCampaignUuid($request->get('campaign_uuid'))
+        );
+
+        $campaignLinkDailyTrackingData = $this->service->resourceToData(
+            CampaignLinkDailyTrackingResource::class,
+            $this->campaignLinkDailyTrackingService->incrementTotalClickByCampaignUuid($request->get('campaign_uuid'))
+        );
+
+        $campaignTrackingData = $this->service->resourceToData(
+            CampaignTrackingResource::class,
+            $this->campaignTrackingService->incrementTotalLinkClickByCampaignUuid($request->get('campaign_uuid'))
+        );
+
+        $campaignDailyTrackingData = $this->service->resourceToData(
+            CampaignDailyTrackingResource::class,
+            $this->campaignDailyTrackingService->incrementTotalLinkClickByCampaignUuid($request->get('campaign_uuid'))
+        );
+
+        return $this->sendOkJsonResponse([
+            'data' => [
+                'campaignLinkTracking' => $campaignLinkTrackingData['data'],
+                'campaignLinkDailyTracking' => $campaignLinkDailyTrackingData['data'],
                 'campaignTracking' => $campaignTrackingData['data'],
                 'campaignDailyTracking' => $campaignDailyTrackingData['data'],
             ]
