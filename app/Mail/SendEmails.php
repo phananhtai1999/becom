@@ -10,7 +10,14 @@ class SendEmails extends Mailable
 {
     use Queueable, SerializesModels;
 
+    /**
+     * @var
+     */
     public $subject;
+
+    /**
+     * @var
+     */
     public $body;
 
     /**
