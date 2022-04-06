@@ -1,0 +1,19 @@
+<?php
+
+return [
+
+    'success' => 'Success',
+    'unauthorized' => 'Unauthorized',
+    'given_data_invalid' => 'The given data was invalid',
+    'internal_server_error' => 'Internal server error',
+    'secret_key_invalid' => 'Secret_key is invalid',
+    'email_already_verified' => 'Email already was be verified',
+    'pin_invalid' => 'Pin code is invalid',
+    'login_success' => 'Login successfully',
+    'logout_success' => 'Logout successfully',
+    'change_password_success' => 'Change password successfully',
+    'token_does_not_exists' => 'Token does not exists',
+    'register_success' => 'Register successfully',
+    'reset_password' => 'We have e-mailed your password reset link!',
+    'email_does_not_exists' => 'Email does not exists',
+];
