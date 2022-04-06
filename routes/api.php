@@ -5,9 +5,15 @@ use App\Http\Controllers\Api\EmailController;
 use App\Http\Controllers\Api\MailSendingHistoryController;
 use App\Http\Controllers\Api\MailTemplateController;
 use App\Http\Controllers\Api\SmtpAccountController;
-use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\User\UserController;
 use App\Http\Controllers\Api\WebsiteController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\UploadImgController;
+use App\Http\Controllers\Api\RoleController;
+use App\Http\Controllers\Api\User\UserDetailController;
+use App\Http\Controllers\Api\User\UserConfigController;
+use App\Http\Controllers\Api\ConfigController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,15 +26,84 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-//User
-Route::group(['as' => 'user.'], function () {
-
-    Route::get('/users', [UserController::class, 'index'])->name('index');
-    Route::post('/user', [UserController::class, 'store'])->name('store');
-    Route::get('/user/{id}', [UserController::class, 'show'])->name('show');
-    Route::put('/user/{id}', [UserController::class, 'edit'])->name('edit');
-    Route::delete('/user/{id}', [UserController::class, 'destroy'])->name('destroy');
+Route::group(['as' => 'auth.'], function () {
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth:api');
+    Route::get('/me', [AuthController::class, 'me'])->name('me')->middleware('auth:api');
+    Route::post('/register', [AuthController::class, 'register'])->name('register');
+    Route::post('/login', [AuthController::class, 'login'])->name('login');
+    Route::post('/forget-password', [AuthController::class, 'forgetPassword'])->name('forget-password');
+    Route::post('/recovery-password', [AuthController::class, 'recoveryPassword'])->name('recovery-password');
 });
+
+Route::post('/upload-img', [UploadImgController::class, 'upload'])->name('upload')->middleware('auth:api');
+
+Route::group(['middleware' => ['auth:api'], 'as' => 'user.'], function () {
+
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/users', [UserController::class, 'index'])->name('index');
+        Route::post('/user', [UserController::class, 'store'])->name('store');
+        Route::get('/user/{id}', [UserController::class, 'show'])->name('show');
+        Route::put('/user/{id}', [UserController::class, 'edit'])->name('edit');
+        Route::delete('/user/{id}', [UserController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::group(['as' => 'my.'], function () {
+        Route::post('/user/verify-my-email', [UserController::class, 'verifyMyEmail'])->name('verifyMyEmail');
+        Route::put('/user/verify-my-email/{pin}', [UserController::class, 'checkVerificationCode'])->name('checkVerificationCode');
+        Route::put('/my/profile', [UserController::class, 'editMyProfile'])->name('editMyProfile');
+    });
+});
+
+Route::get('/user/show-by-username/{username}', [UserController::class, 'showByUserName'])->name('user.showByUserName');
+
+Route::group(['middleware' => ['auth:api', 'role:admin'], 'as' => 'role.'], function () {
+    Route::get('/roles', [RoleController::class, 'index'])->name('index');
+    Route::post('/role', [RoleController::class, 'store'])->name('store');
+    Route::get('/role/{id}', [RoleController::class, 'show'])->name('show');
+    Route::put('/role/{id}', [RoleController::class, 'edit'])->name('edit');
+    Route::delete('/role/{id}', [RoleController::class, 'destroy'])->name('destroy');
+});
+
+Route::group(['middleware' => ['auth:api'], 'as' => 'user-detail.'], function () {
+
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/user-details', [UserDetailController::class, 'index'])->name('index');
+        Route::post('/user-detail', [UserDetailController::class, 'store'])->name('store');
+        Route::get('/user-detail/{id}', [UserDetailController::class, 'show'])->name('show');
+        Route::put('/user-detail/{id}', [UserDetailController::class, 'edit'])->name('edit');
+        Route::delete('/user-detail/{id}', [UserDetailController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::group(['as' => 'my.'], function () {
+        Route::put('/my/user-detail/upsert', [UserDetailController::class, 'upsertMyUserDetail'])->name('upsertMyUserDetail');
+    });
+});
+
+Route::group(['middleware' => ['auth:api'], 'as' => 'user-config.'], function () {
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/user-configs', [UserConfigController::class, 'index'])->name('index');
+        Route::post('/user-config', [UserConfigController::class, 'store'])->name('store');
+        Route::get('/user-config/{id}', [UserConfigController::class, 'show'])->name('show');
+        Route::put('/user-config/{id}', [UserConfigController::class, 'edit'])->name('edit');
+        Route::delete('/user-config/{id}', [UserConfigController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::group(['as' => 'my.'], function () {
+        //Create “Store my user config”, “Update my user config”, (Upsert) this api only creates the user config for the current user.
+        Route::put('/my/user-config/upsert', [UserConfigController::class, 'upsertMyUserConfig'])->name('upsertMyUserConfig');
+    });
+});
+
+Route::group(['middleware' => ['auth:api', 'role:admin'], 'as' => 'config.admin'], function () {
+    Route::get('/configs', [ConfigController::class, 'index'])->name('index');
+    Route::post('/config', [ConfigController::class, 'store'])->name('store');
+    Route::put('/config/upsert', [ConfigController::class, 'upsertConfig'])->name('upsertConfig');
+    Route::get('/config/{id}', [ConfigController::class, 'show'])->name('show');
+    Route::put('/config/{id}', [ConfigController::class, 'edit'])->name('edit');
+    Route::delete('/config/{id}', [ConfigController::class, 'destroy'])->name('destroy');
+});
+
+Route::get('/configs/all', [ConfigController::class, 'loadAllConfig'])->name('config.loadAllConfig');
 
 //Website
 Route::group(['as' => 'website.'], function () {

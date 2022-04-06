@@ -25,11 +25,14 @@ class UserRequest extends AbstractRequest
     {
         return [
             'username' => ['required', 'string', 'unique:users,username'],
-            'first_name' => ['required', 'string'],
-            'last_name' => ['required', 'string'],
+            'first_name' => ['nullable', 'string'],
+            'last_name' => ['nullable', 'string'],
             'email' => ['required', 'string', 'unique:users,email'],
-            'password' => ['required', 'string'],
-            'banned_at' => ['required', 'date'],
+            'password' => ['required', 'string', 'confirmed'],
+            'avatar_img' => ['nullable', 'string'],
+            'cover_img' => ['nullable', 'string'],
+            'roles' => ['nullable', 'array', 'min:1'],
+            'roles.*' => ['numeric', 'min:1', 'exists:roles,uuid'],
         ];
     }
 }

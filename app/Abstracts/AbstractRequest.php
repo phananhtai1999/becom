@@ -29,7 +29,7 @@ abstract class AbstractRequest extends FormRequest
                         'status' => false,
                         "code" => 0,
                         "locale" => app()->getLocale(),
-                        'message' => __("The given data was invalid."),
+                        'message' => __("messages.given_data_invalid"),
                         'errors' => $validator->getMessageBag()->toArray()
                     ],
                     Response::HTTP_UNPROCESSABLE_ENTITY

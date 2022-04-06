@@ -11,7 +11,9 @@ class Kernel extends ConsoleKernel
      * @var string[]
      */
     protected $commands = [
-        'App\Console\Commands\SendEmail'
+        'App\Console\Commands\SendEmail',
+        'App\Console\Commands\SeedConfig',
+        'App\Console\Commands\CreateUser',
     ];
 
     /**

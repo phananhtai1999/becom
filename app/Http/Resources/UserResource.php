@@ -3,27 +3,56 @@
 namespace App\Http\Resources;
 
 use App\Abstracts\AbstractJsonResource;
+use Illuminate\Http\Request;
 
 class UserResource extends AbstractJsonResource
 {
     /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
+     * @param Request $request
+     * @return array
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function toArray($request)
     {
-        return [
-            'uuid' => $this->uuid,
+        $expand = request()->get('expand', []);
+
+        $data = [
+            'uuid' => $this->getKey(),
             'username' => $this->username,
             'first_name' => $this->first_name,
             'last_name' => $this->last_name,
             'email' => $this->email,
             'banned_at' => $this->banned_at,
+            'avatar_img' => $this->avatar_img,
+            'avatar_img_absolute' => $this->avatar_img_absolute,
+            'cover_img' => $this->cover_img,
+            'cover_img_absolute' => $this->cover_img_absolute,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
         ];
+
+        if (!auth()->guest()) {
+            $data['current_membership'] = $this->currentMemberships;
+        }
+
+        if (\in_array('roles', $expand)) {
+            $data['roles'] = RoleResource::collection($this->roles);
+        }
+
+        if (\in_array('user_link', $expand)) {
+            $data['user_links'] = UserLinkResource::collection($this->userLinks);
+        }
+
+        if (\in_array('user_config', $expand)) {
+            $data['user_config'] = new UserConfigResource($this->userConfig);
+        }
+
+        if (\in_array('user_detail', $expand)) {
+            $data['user_detail'] = new UserDetailResource($this->userDetails);
+        }
+
+        return $data;
     }
 }

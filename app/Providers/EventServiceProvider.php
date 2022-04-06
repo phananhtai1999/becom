@@ -2,10 +2,25 @@
 
 namespace App\Providers;
 
+use App\Events\SendEmailRecoveryPasswordEvent;
+use App\Events\SendEmailVerifyEmailEvent;
+use App\Listeners\SendEmailRecoveryPasswordListener;
+use App\Listeners\SendEmailVerifyEmailListener;
+use App\Models\Config;
+use App\Models\Role;
+use App\Models\User;
+use App\Models\UserAccessToken;
+use App\Models\UserConfig;
+use App\Models\UserDetail;
+use App\Observers\ConfigObserver;
+use App\Observers\RoleObserver;
+use App\Observers\UserAccessTokenObserver;
+use App\Observers\UserConfigObserver;
+use App\Observers\UserDetailObserver;
+use App\Observers\UserObserver;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Event;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -18,6 +33,12 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
+        SendEmailRecoveryPasswordEvent::class => [
+            SendEmailRecoveryPasswordListener::class
+        ],
+        SendEmailVerifyEmailEvent::class => [
+            SendEmailVerifyEmailListener::class
+        ]
     ];
 
     /**
@@ -27,6 +48,11 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        User::observe(UserObserver::class);
+        UserDetail::observe(UserDetailObserver::class);
+        UserConfig::observe(UserConfigObserver::class);
+        UserAccessToken::observe(UserAccessTokenObserver::class);
+        Role::observe(RoleObserver::class);
+        Config::observe(ConfigObserver::class);
     }
 }

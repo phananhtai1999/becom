@@ -7,6 +7,8 @@ use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Auth;
 
@@ -23,6 +25,8 @@ class AbstractRestAPIController extends BaseController
     protected $storeRequest;
 
     protected $editRequest;
+
+    protected $indexRequest;
 
     /**
      * Get the guard to be used during authentication.
@@ -44,7 +48,14 @@ class AbstractRestAPIController extends BaseController
         return Auth::user();
     }
 
-    protected function sendJsonResponse($status = true, $message, $data = [], $httpStatus = 200)
+    /**
+     * @param bool $status
+     * @param $message
+     * @param array $data
+     * @param int $httpStatus
+     * @return JsonResponse
+     */
+    protected function sendJsonResponse($status = true, $message, $data = [], $httpStatus = Response::HTTP_OK)
     {
         $result = [
             'status' => $status,
@@ -59,13 +70,57 @@ class AbstractRestAPIController extends BaseController
         return response()->json($result, $httpStatus);
     }
 
+    /**
+     * @param array $data
+     * @return JsonResponse
+     */
     protected function sendOkJsonResponse($data = [])
     {
-        return $this->sendJsonResponse(true, __('Success'), $data, 200);
+        return $this->sendJsonResponse(true, __('messages.success'), $data);
     }
 
+    /**
+     * @param array $data
+     * @return JsonResponse
+     */
     protected function sendCreatedJsonResponse($data = [])
     {
-        return $this->sendJsonResponse(true, __('Success'), $data, 201);
+        return $this->sendJsonResponse(true, __('messages.success'), $data, Response::HTTP_CREATED);
+    }
+
+    /**
+     * @param array $data
+     * @return JsonResponse
+     */
+    protected function sendUnAuthorizedJsonResponse($data = [])
+    {
+        return $this->sendJsonResponse(false, __('messages.unauthorized'), $data, Response::HTTP_UNAUTHORIZED);
+    }
+
+    /**
+     * @param array $data
+     * @return JsonResponse
+     */
+    public function sendValidationFailedJsonResponse(array $data = [])
+    {
+        return $this->sendJsonResponse(false, __('messages.given_data_invalid'), $data, Response::HTTP_UNPROCESSABLE_ENTITY);
+    }
+
+    /**
+     * @param array $data
+     * @return JsonResponse
+     */
+    public function sendInternalServerErrorJsonResponse(array $data = [])
+    {
+        return $this->sendJsonResponse(false, __('messages.internal_server_error'), $data, Response::HTTP_INTERNAL_SERVER_ERROR);
+    }
+
+    /**
+     * @param array $data
+     * @return JsonResponse
+     */
+    public function sendBadRequestJsonResponse(array $data = [])
+    {
+        return $this->sendJsonResponse(false, __('messages.bad_request'), $data, Response::HTTP_BAD_REQUEST);
     }
 }

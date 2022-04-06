@@ -11,6 +11,8 @@ trait RestIndexTrait
      */
     public function index()
     {
+        app($this->indexRequest);
+
         $models = $this->service->getCollectionWithPagination();
 
         return $this->sendOkJsonResponse(
