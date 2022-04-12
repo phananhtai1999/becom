@@ -106,13 +106,21 @@ Route::group(['middleware' => ['auth:api', 'role:admin'], 'as' => 'config.admin'
 Route::get('/configs/all', [ConfigController::class, 'loadAllConfig'])->name('config.loadAllConfig');
 
 //Website
-Route::group(['as' => 'website.'], function () {
+Route::group(['middleware' => ['auth:api'], 'as' => 'website.'], function () {
 
     Route::get('/websites', [WebsiteController::class, 'index'])->name('index');
     Route::post('/website', [WebsiteController::class, 'store'])->name('store');
     Route::get('/website/{id}', [WebsiteController::class, 'show'])->name('show');
     Route::put('/website/{id}', [WebsiteController::class, 'edit'])->name('edit');
     Route::delete('/website/{id}', [WebsiteController::class, 'destroy'])->name('destroy');
+
+    Route::group(['as' => 'my.'], function () {
+        Route::get('/my/websites', [WebsiteController::class, 'indexMyWebsite'])->name('index');
+        Route::post('/my/website', [WebsiteController::class, 'storeMyWebsite'])->name('store');
+        Route::get('/my/website/{id}', [WebsiteController::class, 'showMyWebsite'])->name('show');
+        Route::put('/my/website/{id}', [WebsiteController::class, 'editMyWebsite'])->name('edit');
+        Route::delete('/my/website/{id}', [WebsiteController::class, 'destroyMyWebsite'])->name('destroy');
+    });
 });
 
 //SmtpAccount
