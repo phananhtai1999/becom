@@ -55,4 +55,20 @@ class Website extends AbstractModel
     {
         return $this->hasMany(Email::class, 'website_uuid', 'uuid');
     }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function smtpAccounts()
+    {
+        return $this->hasMany(SmtpAccount::class, 'website_uuid', 'uuid');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_uuid', 'uuid');
+    }
 }

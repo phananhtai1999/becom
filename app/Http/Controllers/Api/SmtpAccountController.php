@@ -8,15 +8,18 @@ use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestEditTrait;
 use App\Http\Controllers\Traits\RestStoreTrait;
+use App\Http\Requests\MySmtpAccountRequest;
 use App\Http\Requests\SendMailBySmtpAccountUuidRequest;
 use App\Http\Requests\SendMailUseMailTemplateUuidRequest;
 use App\Http\Requests\SmtpAccountRequest;
+use App\Http\Requests\UpdateMySmtpAccountRequest;
 use App\Http\Requests\UpdateSmtpAccountRequest;
 use App\Http\Resources\SmtpAccountCollection;
 use App\Http\Resources\SmtpAccountResource;
 use App\Mail\SendEmails;
 use App\Models\MailTemplate;
 use App\Services\SmtpAccountService;
+use App\Services\WebsiteService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Mail;
 use Psr\Container\ContainerExceptionInterface;
@@ -26,6 +29,9 @@ class SmtpAccountController extends AbstractRestAPIController
 {
     use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestStoreTrait, RestEditTrait;
 
+    /**
+     * @param SmtpAccountService $service
+     */
     public function __construct(SmtpAccountService $service)
     {
         $this->service = $service;
@@ -33,6 +39,76 @@ class SmtpAccountController extends AbstractRestAPIController
         $this->resourceClass = SmtpAccountResource::class;
         $this->storeRequest = SmtpAccountRequest::class;
         $this->editRequest = UpdateSmtpAccountRequest::class;
+    }
+
+    /**
+     * @return JsonResponse
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function indexMySmtpAccount()
+    {
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData(
+                $this->resourceCollectionClass,
+                $this->service->indexMySmtpAccount(request()->get('per_page', 15))
+            )
+        );
+    }
+
+    /**
+     * @param MySmtpAccountRequest $request
+     * @return JsonResponse
+     */
+    public function storeMySmtpAccount(MySmtpAccountRequest $request)
+    {
+        app(WebsiteService::class)->findMyWebsiteByKeyOrAbort($request->get('website_uuid'));
+
+        $model = $this->service->create($request->all());
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
+    public function showMySmtpAccount($id)
+    {
+        $model = $this->service->findMySmtpAccountByKeyOrAbort($id);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    /**
+     * @param UpdateMySmtpAccountRequest $request
+     * @param $id
+     * @return JsonResponse
+     */
+    public function editMySmtpAccount(UpdateMySmtpAccountRequest $request, $id)
+    {
+        $model = $this->service->findMySmtpAccountByKeyOrAbort($id);
+
+        $this->service->update($model, $request->all());
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
+    public function destroyMySmtpAccount($id)
+    {
+        $this->service->deleteMySmtpAccountByKey($id);
+
+        return $this->sendOkJsonResponse();
     }
 
     /**

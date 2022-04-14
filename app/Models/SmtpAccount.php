@@ -52,4 +52,12 @@ class SmtpAccount extends AbstractModel
     {
         return $this->hasMany(Campaign::class, 'smtp_account_uuid', 'uuid');
     }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function website()
+    {
+        return $this->belongsTo(Website::class, 'website_uuid', 'uuid');
+    }
 }

@@ -13,6 +13,59 @@ class SmtpAccountService extends AbstractService
     protected $modelClass = SmtpAccount::class;
 
     /**
+     * @param $perPage
+     * @return mixed
+     */
+    public function indexMySmtpAccount($perPage)
+    {
+        return $this->model->select('smtp_accounts.*')
+            ->join('websites', 'websites.uuid', '=', 'smtp_accounts.website_uuid')
+            ->join('users', 'users.uuid', '=', 'websites.user_uuid')
+            ->where('websites.user_uuid', auth()->user()->getKey())
+            ->paginate($perPage);
+    }
+
+    /**
+     * @param $id
+     * @return mixed
+     */
+    public function findMySmtpAccountByKeyOrAbort($id)
+    {
+        $smtpAccount = $this->model->select('smtp_accounts.*')
+            ->join('websites', 'websites.uuid', '=', 'smtp_accounts.website_uuid')
+            ->join('users', 'users.uuid', '=', 'websites.user_uuid')
+            ->where('websites.user_uuid', auth()->user()->getKey())
+            ->where('smtp_accounts.uuid', $id)
+            ->first();
+
+        if (!empty($smtpAccount)) {
+            return $smtpAccount;
+        } else {
+            abort(403, 'Unauthorized.');
+        }
+    }
+
+    /**
+     * @param $id
+     * @return mixed|void
+     */
+    public function deleteMySmtpAccountByKey($id)
+    {
+        $smtpAccount = $this->model->select('smtp_accounts.*')
+            ->join('websites', 'websites.uuid', '=', 'smtp_accounts.website_uuid')
+            ->join('users', 'users.uuid', '=', 'websites.user_uuid')
+            ->where('websites.user_uuid', auth()->user()->getKey())
+            ->where('smtp_accounts.uuid', $id)
+            ->first();
+
+        if (!empty($smtpAccount)) {
+            return $this->destroy($smtpAccount->getKey());
+        } else {
+            abort(403, 'Unauthorized.');
+        }
+    }
+
+    /**
      * @return mixed
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface

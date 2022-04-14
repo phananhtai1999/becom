@@ -124,13 +124,21 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website.'], function () {
 });
 
 //SmtpAccount
-Route::group(['as' => 'smtp-account.'], function () {
+Route::group(['middleware' => ['auth:api'], 'as' => 'smtp-account.'], function () {
 
     Route::get('/smtp-accounts', [SmtpAccountController::class, 'index'])->name('index');
     Route::post('/smtp-account', [SmtpAccountController::class, 'store'])->name('store');
     Route::get('/smtp-account/{id}', [SmtpAccountController::class, 'show'])->name('show');
     Route::put('/smtp-account/{id}', [SmtpAccountController::class, 'edit'])->name('edit');
     Route::delete('/smtp-account/{id}', [SmtpAccountController::class, 'destroy'])->name('destroy');
+
+    Route::group(['as' => 'my.'], function () {
+        Route::get('/my/smtp-accounts', [SmtpAccountController::class, 'indexMySmtpAccount'])->name('index');
+        Route::post('/my/smtp-account', [SmtpAccountController::class, 'storeMySmtpAccount'])->name('store');
+        Route::get('/my/smtp-account/{id}', [SmtpAccountController::class, 'showMySmtpAccount'])->name('show');
+        Route::put('/my/smtp-account/{id}', [SmtpAccountController::class, 'editMySmtpAccount'])->name('edit');
+        Route::delete('/my/smtp-account/{id}', [SmtpAccountController::class, 'destroyMySmtpAccount'])->name('destroy');
+    });
 
     //This API will use smtp_account from smtp_account_uuid to send emails.
     Route::post('/email/send', [SmtpAccountController::class, 'sendEmail'])->name('sendEmail');

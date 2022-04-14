@@ -120,6 +120,14 @@ class User extends Authenticatable
     }
 
     /**
+     * @return HasMany
+     */
+    public function websites()
+    {
+        return $this->hasMany(Website::class, 'user_uuid', 'uuid');
+    }
+
+    /**
      * @return string
      */
     public function getNameAttribute()
