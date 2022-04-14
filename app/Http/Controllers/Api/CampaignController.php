@@ -11,7 +11,9 @@ use App\Http\Controllers\Traits\RestStoreTrait;
 use App\Http\Requests\CampaignLinkTrackingRequest;
 use App\Http\Requests\CampaignRequest;
 use App\Http\Requests\IncrementCampaignTrackingRequest;
+use App\Http\Requests\MyCampaignRequest;
 use App\Http\Requests\UpdateCampaignRequest;
+use App\Http\Requests\UpdateMyCampaignRequest;
 use App\Http\Resources\CampaignCollection;
 use App\Http\Resources\CampaignDailyTrackingResource;
 use App\Http\Resources\CampaignLinkDailyTrackingResource;
@@ -73,6 +75,74 @@ class CampaignController extends AbstractRestAPIController
         $this->campaignDailyTrackingService = $campaignDailyTrackingService;
         $this->campaignLinkTrackingService = $campaignLinkTrackingService;
         $this->campaignLinkDailyTrackingService = $campaignLinkDailyTrackingService;
+    }
+
+    /**
+     * @return JsonResponse
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     */
+    public function indexMyCampaign()
+    {
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData(
+                $this->resourceCollectionClass,
+                $this->service->indexMyCampaign(request()->get('per_page', 15))
+            )
+        );
+    }
+
+    /**
+     * @param MyCampaignRequest $request
+     * @return JsonResponse
+     */
+    public function storeMyCampaign(MyCampaignRequest $request)
+    {
+        $model = $this->service->create($request->all());
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
+    public function showMyCampaign($id)
+    {
+        $model = $this->service->findMyCampaignByKeyOrAbort($id);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    /**
+     * @param UpdateMyCampaignRequest $request
+     * @param $id
+     * @return JsonResponse
+     */
+    public function editMyCampaign(UpdateMyCampaignRequest $request, $id)
+    {
+        $model = $this->service->findMyCampaignByKeyOrAbort($id);
+
+        $this->service->update($model, $request->all());
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
+    public function destroyMyCampaign($id)
+    {
+        $this->service->deleteMyCampaignByKey($id);
+
+        return $this->sendOkJsonResponse();
     }
 
     /**

@@ -158,13 +158,21 @@ Route::group(['as' => 'mail-template.'], function () {
 });
 
 //Campaign
-Route::group(['as' => 'campaign.'], function () {
+Route::group(['middleware' => ['auth:api'], 'as' => 'campaign.'], function () {
 
     Route::get('/campaigns', [CampaignController::class, 'index'])->name('index');
     Route::post('/campaign', [CampaignController::class, 'store'])->name('store');
     Route::get('/campaign/{id}', [CampaignController::class, 'show'])->name('show');
     Route::put('/campaign/{id}', [CampaignController::class, 'edit'])->name('edit');
     Route::delete('/campaign/{id}', [CampaignController::class, 'destroy'])->name('destroy');
+
+    Route::group(['as' => 'my.'], function () {
+        Route::get('/my/campaigns', [CampaignController::class, 'indexMyCampaign'])->name('index');
+        Route::post('/my/campaign', [CampaignController::class, 'storeMyCampaign'])->name('store');
+        Route::get('/my/campaign/{id}', [CampaignController::class, 'showMyCampaign'])->name('show');
+        Route::put('/my/campaign/{id}', [CampaignController::class, 'editMyCampaign'])->name('edit');
+        Route::delete('/my/campaign/{id}', [CampaignController::class, 'destroyMyCampaign'])->name('destroy');
+    });
 
     //Upsert-campaign-link-tracking
     Route::get('/upsert-campaign-link-tracking', [CampaignController::class, 'upsertCampaignLinkTrackingTotalClick'])->name('upsert-campaign-link-tracking');
