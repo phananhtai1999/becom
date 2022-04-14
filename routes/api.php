@@ -148,13 +148,21 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'smtp-account.'], function (
 });
 
 //MailTemplate
-Route::group(['as' => 'mail-template.'], function () {
+Route::group(['middleware' => ['auth:api'], 'as' => 'mail-template.'], function () {
 
     Route::get('/mail-templates', [MailTemplateController::class, 'index'])->name('index');
     Route::post('/mail-template', [MailTemplateController::class, 'store'])->name('store');
     Route::get('/mail-template/{id}', [MailTemplateController::class, 'show'])->name('show');
     Route::put('/mail-template/{id}', [MailTemplateController::class, 'edit'])->name('edit');
     Route::delete('/mail-template/{id}', [MailTemplateController::class, 'destroy'])->name('destroy');
+
+    Route::group(['as' => 'my.'], function () {
+        Route::get('/my/mail-templates', [MailTemplateController::class, 'indexMyMailTemplate'])->name('index');
+        Route::post('/my/mail-template', [MailTemplateController::class, 'storeMyMailTemplate'])->name('store');
+        Route::get('/my/mail-template/{id}', [MailTemplateController::class, 'showMyMailTemplate'])->name('show');
+        Route::put('/my/mail-template/{id}', [MailTemplateController::class, 'editMyMailTemplate'])->name('edit');
+        Route::delete('/my/mail-template/{id}', [MailTemplateController::class, 'destroyMyMailTemplate'])->name('destroy');
+    });
 });
 
 //Campaign
