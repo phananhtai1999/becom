@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
+use Illuminate\Validation\Rule;
 
 class MySmtpAccountRequest extends AbstractRequest
 {
@@ -33,7 +34,10 @@ class MySmtpAccountRequest extends AbstractRequest
             'mail_from_address' => ['required', 'string'],
             'mail_from_name' => ['required', 'string'],
             'scret_key' => ['required', 'string'],
-            'website_uuid' => ['required', 'numeric', 'min:1', 'exists:websites,uuid'],
+            'website_uuid' => ['required', 'numeric', 'min:1', Rule::exists('websites', 'uuid')->where(function ($query) {
+
+                return $query->where('user_uuid', auth()->user()->getkey())->whereNull('deleted_at');
+            })],
         ];
     }
 }
