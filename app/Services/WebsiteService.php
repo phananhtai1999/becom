@@ -10,24 +10,6 @@ class WebsiteService extends AbstractService
     protected $modelClass = Website::class;
 
     /**
-     * @return mixed
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
-     */
-    public function findMyWebsiteByKeyOrAbort($key)
-    {
-        $website = $this->model->where('user_uuid', auth()->user()->getKey())
-            ->where('uuid', $key)
-            ->first();
-
-        if (!empty($website)) {
-            return $website;
-        } else {
-            abort(403, 'Unauthorized.');
-        }
-    }
-
-    /**
      * @param $perPage
      * @return mixed
      */

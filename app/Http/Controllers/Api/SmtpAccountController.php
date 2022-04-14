@@ -19,7 +19,6 @@ use App\Http\Resources\SmtpAccountResource;
 use App\Mail\SendEmails;
 use App\Models\MailTemplate;
 use App\Services\SmtpAccountService;
-use App\Services\WebsiteService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Mail;
 use Psr\Container\ContainerExceptionInterface;
@@ -62,8 +61,6 @@ class SmtpAccountController extends AbstractRestAPIController
      */
     public function storeMySmtpAccount(MySmtpAccountRequest $request)
     {
-        app(WebsiteService::class)->findMyWebsiteByKeyOrAbort($request->get('website_uuid'));
-
         $model = $this->service->create($request->all());
 
         return $this->sendCreatedJsonResponse(
