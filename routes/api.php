@@ -182,13 +182,21 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'campaign.'], function () {
 Route::get('/campaign-tracking/increment/total-open', [CampaignController::class, 'incrementCampaignTrackingTotalOpen'])->name('campaignTracking.incrementTotalOpen');
 
 //Email
-Route::group(['as' => 'email.'], function () {
+Route::group(['middleware' => ['auth:api'], 'as' => 'email.'], function () {
 
     Route::get('/emails', [EmailController::class, 'index'])->name('index');
     Route::post('/email', [EmailController::class, 'store'])->name('store');
     Route::get('/email/{id}', [EmailController::class, 'show'])->name('show');
     Route::put('/email/{id}', [EmailController::class, 'edit'])->name('edit');
     Route::delete('/email/{id}', [EmailController::class, 'destroy'])->name('destroy');
+
+    Route::group(['as' => 'my.'], function () {
+        Route::get('/my/emails', [EmailController::class, 'indexMyEmail'])->name('index');
+        Route::post('/my/email', [EmailController::class, 'storeMyEmail'])->name('store');
+        Route::get('/my/email/{id}', [EmailController::class, 'showMyEmail'])->name('show');
+        Route::put('/my/email/{id}', [EmailController::class, 'editMyEmail'])->name('edit');
+        Route::delete('/my/email/{id}', [EmailController::class, 'destroyMyEmail'])->name('destroy');
+    });
 });
 
 //MailSendingHistory
