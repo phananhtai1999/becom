@@ -15,6 +15,7 @@ use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestEditTrait;
 use App\Http\Controllers\Traits\RestStoreTrait;
 use App\Services\ConfigService;
+use Illuminate\Http\JsonResponse;
 
 class ConfigController extends AbstractRestAPIController
 {
@@ -34,9 +35,9 @@ class ConfigController extends AbstractRestAPIController
     }
 
     /**
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function loadAllConfig()
+    public function loadAllConfig(): JsonResponse
     {
         $models = $this->service->loadAllConfig();
 
@@ -47,9 +48,7 @@ class ConfigController extends AbstractRestAPIController
 
     /**
      * @param UpsertConfigRequest $request
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
+     * @return JsonResponse
      */
     public function upsertConfig(UpsertConfigRequest $request)
     {

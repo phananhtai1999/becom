@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\User\UserDetailController;
 use App\Http\Controllers\Api\User\UserConfigController;
 use App\Http\Controllers\Api\ConfigController;
+use App\Http\Controllers\Api\AuthBySocialNetworkController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,6 +36,11 @@ Route::group(['as' => 'auth.'], function () {
     Route::post('/recovery-password', [AuthController::class, 'recoveryPassword'])->name('recovery-password');
 });
 
+//Social API
+Route::get('/auth/url/{driver}', [AuthBySocialNetworkController::class, 'loginUrl'])->name('loginUrl');
+Route::get('/auth/callback/google', [AuthBySocialNetworkController::class, 'loginByGoogleCallback'])->name('loginByGoogleCallback');
+Route::get('/auth/callback/facebook', [AuthBySocialNetworkController::class, 'loginByFacebookCallback'])->name('loginByFacebookCallback');
+
 Route::post('/upload-img', [UploadImgController::class, 'upload'])->name('upload')->middleware('auth:api');
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'user.'], function () {
@@ -42,6 +48,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'user.'], function () {
     Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
         Route::get('/users', [UserController::class, 'index'])->name('index');
         Route::post('/user', [UserController::class, 'store'])->name('store');
+        Route::put('/user/ban/{id}', [UserController::class, 'ban'])->name('ban');
         Route::get('/user/{id}', [UserController::class, 'show'])->name('show');
         Route::put('/user/{id}', [UserController::class, 'edit'])->name('edit');
         Route::delete('/user/{id}', [UserController::class, 'destroy'])->name('destroy');
@@ -108,11 +115,13 @@ Route::get('/configs/all', [ConfigController::class, 'loadAllConfig'])->name('co
 //Website
 Route::group(['middleware' => ['auth:api'], 'as' => 'website.'], function () {
 
-    Route::get('/websites', [WebsiteController::class, 'index'])->name('index');
-    Route::post('/website', [WebsiteController::class, 'store'])->name('store');
-    Route::get('/website/{id}', [WebsiteController::class, 'show'])->name('show');
-    Route::put('/website/{id}', [WebsiteController::class, 'edit'])->name('edit');
-    Route::delete('/website/{id}', [WebsiteController::class, 'destroy'])->name('destroy');
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/websites', [WebsiteController::class, 'index'])->name('index');
+        Route::post('/website', [WebsiteController::class, 'store'])->name('store');
+        Route::get('/website/{id}', [WebsiteController::class, 'show'])->name('show');
+        Route::put('/website/{id}', [WebsiteController::class, 'edit'])->name('edit');
+        Route::delete('/website/{id}', [WebsiteController::class, 'destroy'])->name('destroy');
+    });
 
     Route::group(['as' => 'my.'], function () {
         Route::get('/my/websites', [WebsiteController::class, 'indexMyWebsite'])->name('index');
@@ -126,11 +135,13 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website.'], function () {
 //SmtpAccount
 Route::group(['middleware' => ['auth:api'], 'as' => 'smtp-account.'], function () {
 
-    Route::get('/smtp-accounts', [SmtpAccountController::class, 'index'])->name('index');
-    Route::post('/smtp-account', [SmtpAccountController::class, 'store'])->name('store');
-    Route::get('/smtp-account/{id}', [SmtpAccountController::class, 'show'])->name('show');
-    Route::put('/smtp-account/{id}', [SmtpAccountController::class, 'edit'])->name('edit');
-    Route::delete('/smtp-account/{id}', [SmtpAccountController::class, 'destroy'])->name('destroy');
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/smtp-accounts', [SmtpAccountController::class, 'index'])->name('index');
+        Route::post('/smtp-account', [SmtpAccountController::class, 'store'])->name('store');
+        Route::get('/smtp-account/{id}', [SmtpAccountController::class, 'show'])->name('show');
+        Route::put('/smtp-account/{id}', [SmtpAccountController::class, 'edit'])->name('edit');
+        Route::delete('/smtp-account/{id}', [SmtpAccountController::class, 'destroy'])->name('destroy');
+    });
 
     Route::group(['as' => 'my.'], function () {
         Route::get('/my/smtp-accounts', [SmtpAccountController::class, 'indexMySmtpAccount'])->name('index');
@@ -150,11 +161,13 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'smtp-account.'], function (
 //MailTemplate
 Route::group(['middleware' => ['auth:api'], 'as' => 'mail-template.'], function () {
 
-    Route::get('/mail-templates', [MailTemplateController::class, 'index'])->name('index');
-    Route::post('/mail-template', [MailTemplateController::class, 'store'])->name('store');
-    Route::get('/mail-template/{id}', [MailTemplateController::class, 'show'])->name('show');
-    Route::put('/mail-template/{id}', [MailTemplateController::class, 'edit'])->name('edit');
-    Route::delete('/mail-template/{id}', [MailTemplateController::class, 'destroy'])->name('destroy');
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/mail-templates', [MailTemplateController::class, 'index'])->name('index');
+        Route::post('/mail-template', [MailTemplateController::class, 'store'])->name('store');
+        Route::get('/mail-template/{id}', [MailTemplateController::class, 'show'])->name('show');
+        Route::put('/mail-template/{id}', [MailTemplateController::class, 'edit'])->name('edit');
+        Route::delete('/mail-template/{id}', [MailTemplateController::class, 'destroy'])->name('destroy');
+    });
 
     Route::group(['as' => 'my.'], function () {
         Route::get('/my/mail-templates', [MailTemplateController::class, 'indexMyMailTemplate'])->name('index');
@@ -168,11 +181,13 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'mail-template.'], function 
 //Campaign
 Route::group(['middleware' => ['auth:api'], 'as' => 'campaign.'], function () {
 
-    Route::get('/campaigns', [CampaignController::class, 'index'])->name('index');
-    Route::post('/campaign', [CampaignController::class, 'store'])->name('store');
-    Route::get('/campaign/{id}', [CampaignController::class, 'show'])->name('show');
-    Route::put('/campaign/{id}', [CampaignController::class, 'edit'])->name('edit');
-    Route::delete('/campaign/{id}', [CampaignController::class, 'destroy'])->name('destroy');
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/campaigns', [CampaignController::class, 'index'])->name('index');
+        Route::post('/campaign', [CampaignController::class, 'store'])->name('store');
+        Route::get('/campaign/{id}', [CampaignController::class, 'show'])->name('show');
+        Route::put('/campaign/{id}', [CampaignController::class, 'edit'])->name('edit');
+        Route::delete('/campaign/{id}', [CampaignController::class, 'destroy'])->name('destroy');
+    });
 
     Route::group(['as' => 'my.'], function () {
         Route::get('/my/campaigns', [CampaignController::class, 'indexMyCampaign'])->name('index');
@@ -192,11 +207,13 @@ Route::get('/campaign-tracking/increment/total-open', [CampaignController::class
 //Email
 Route::group(['middleware' => ['auth:api'], 'as' => 'email.'], function () {
 
-    Route::get('/emails', [EmailController::class, 'index'])->name('index');
-    Route::post('/email', [EmailController::class, 'store'])->name('store');
-    Route::get('/email/{id}', [EmailController::class, 'show'])->name('show');
-    Route::put('/email/{id}', [EmailController::class, 'edit'])->name('edit');
-    Route::delete('/email/{id}', [EmailController::class, 'destroy'])->name('destroy');
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/emails', [EmailController::class, 'index'])->name('index');
+        Route::post('/email', [EmailController::class, 'store'])->name('store');
+        Route::get('/email/{id}', [EmailController::class, 'show'])->name('show');
+        Route::put('/email/{id}', [EmailController::class, 'edit'])->name('edit');
+        Route::delete('/email/{id}', [EmailController::class, 'destroy'])->name('destroy');
+    });
 
     Route::group(['as' => 'my.'], function () {
         Route::get('/my/emails', [EmailController::class, 'indexMyEmail'])->name('index');
@@ -210,9 +227,11 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'email.'], function () {
 //MailSendingHistory
 Route::group(['as' => 'mail-sending-history.'], function () {
 
-    Route::get('/mail-sending-histories', [MailSendingHistoryController::class, 'index'])->name('index');
-    Route::post('/mail-sending-history', [MailSendingHistoryController::class, 'store'])->name('store');
-    Route::get('/mail-sending-history/{id}', [MailSendingHistoryController::class, 'show'])->name('show');
-    Route::put('/mail-sending-history/{id}', [MailSendingHistoryController::class, 'edit'])->name('edit');
-    Route::delete('/mail-sending-history/{id}', [MailSendingHistoryController::class, 'destroy'])->name('destroy');
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/mail-sending-histories', [MailSendingHistoryController::class, 'index'])->name('index');
+        Route::post('/mail-sending-history', [MailSendingHistoryController::class, 'store'])->name('store');
+        Route::get('/mail-sending-history/{id}', [MailSendingHistoryController::class, 'show'])->name('show');
+        Route::put('/mail-sending-history/{id}', [MailSendingHistoryController::class, 'edit'])->name('edit');
+        Route::delete('/mail-sending-history/{id}', [MailSendingHistoryController::class, 'destroy'])->name('destroy');
+    });
 });
