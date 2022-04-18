@@ -1,0 +1,33 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class RenameScretKeyToSecretKeyInSmtpAccountsTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::table('smtp_accounts', function (Blueprint $table) {
+            $table->renameColumn('scret_key', 'secret_key');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::table('smtp_accounts', function (Blueprint $table) {
+            $table->renameColumn('secret_key', 'scret_key');
+        });
+    }
+
+}
