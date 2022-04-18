@@ -225,7 +225,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'email.'], function () {
 });
 
 //MailSendingHistory
-Route::group(['as' => 'mail-sending-history.'], function () {
+Route::group(['middleware' => ['auth:api'], 'as' => 'mail-sending-history.'], function () {
 
     Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
         Route::get('/mail-sending-histories', [MailSendingHistoryController::class, 'index'])->name('index');
