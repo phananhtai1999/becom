@@ -14,7 +14,10 @@ class EmailResource extends AbstractJsonResource
      */
     public function toArray($request)
     {
-        return [
+
+        $expand = request()->get('expand', []);
+
+        $data = [
             'uuid' => $this->uuid,
             'email' => $this->email,
             'age' => $this->age,
@@ -28,5 +31,11 @@ class EmailResource extends AbstractJsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
         ];
+
+        if(\in_array('email__website', $expand)){
+            $data['website'] = new WebsiteResource($this->website);
+        }
+
+        return $data;
     }
 }
