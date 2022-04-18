@@ -40,10 +40,42 @@ class MailTemplate extends AbstractModel
     ];
 
     /**
+     * @var string[]
+     */
+    protected $appends = [
+        'rendered_body'
+    ];
+
+    /**
+     * @param $body
+     * @return void
+     */
+    public function setRenderedBodyAttribute($body)
+    {
+        $this->rendered_body = $body;
+    }
+
+    /**
+     * @return null|mixed
+     */
+    public function getRenderedBodyAttribute()
+    {
+        return $this->rendered_body ?? null;
+    }
+
+    /**
      * @return HasMany
      */
     public function campaigns()
     {
         return $this->hasMany(Campaign::class, 'mail_template_uuid', 'uuid');
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function website()
+    {
+        return $this->belongsTo(Website::class, 'website_uuid', 'uuid');
     }
 }
