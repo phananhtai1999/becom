@@ -2,8 +2,8 @@
 
 namespace App\Http\Resources;
 
-use App\Abstracts\AbstractJsonResource;
+use App\Abstracts\AbstractJsonResourceCollection;
 
-class CampaignDailyTrackingResourceCollection extends AbstractJsonResource
+class CampaignDailyTrackingResourceCollection extends AbstractJsonResourceCollection
 {
 }
