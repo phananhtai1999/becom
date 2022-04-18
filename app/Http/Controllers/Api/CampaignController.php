@@ -14,7 +14,7 @@ use App\Http\Requests\IncrementCampaignTrackingRequest;
 use App\Http\Requests\MyCampaignRequest;
 use App\Http\Requests\UpdateCampaignRequest;
 use App\Http\Requests\UpdateMyCampaignRequest;
-use App\Http\Resources\CampaignCollection;
+use App\Http\Resources\CampaignResourceCollection;
 use App\Http\Resources\CampaignDailyTrackingResource;
 use App\Http\Resources\CampaignLinkDailyTrackingResource;
 use App\Http\Resources\CampaignLinkTrackingResource;
@@ -67,7 +67,7 @@ class CampaignController extends AbstractRestAPIController
     )
     {
         $this->service = $service;
-        $this->resourceCollectionClass = CampaignCollection::class;
+        $this->resourceCollectionClass = CampaignResourceCollection::class;
         $this->resourceClass = CampaignResource::class;
         $this->storeRequest = CampaignRequest::class;
         $this->editRequest = UpdateCampaignRequest::class;

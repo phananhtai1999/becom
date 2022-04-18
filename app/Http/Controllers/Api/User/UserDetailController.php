@@ -6,7 +6,7 @@ use App\Abstracts\AbstractRestAPIController;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\UpdateUserDetailRequest;
 use App\Http\Requests\UserDetailRequest;
-use App\Http\Resources\UserDetailCollection;
+use App\Http\Resources\UserDetailResourceCollection;
 use App\Http\Resources\UserDetailResource;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
@@ -28,7 +28,7 @@ class UserDetailController extends AbstractRestAPIController
     public function __construct(UserDetailService $service)
     {
         $this->service = $service;
-        $this->resourceCollectionClass = UserDetailCollection::class;
+        $this->resourceCollectionClass = UserDetailResourceCollection::class;
         $this->resourceClass = UserDetailResource::class;
         $this->storeRequest = UserDetailRequest::class;
         $this->editRequest = UpdateUserDetailRequest::class;

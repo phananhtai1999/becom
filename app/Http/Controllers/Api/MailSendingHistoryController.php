@@ -10,7 +10,7 @@ use App\Http\Controllers\Traits\RestEditTrait;
 use App\Http\Controllers\Traits\RestStoreTrait;
 use App\Http\Requests\MailSendingHistoryRequest;
 use App\Http\Requests\UpdateMailSendingHistoryRequest;
-use App\Http\Resources\MailSendingHistoryCollection;
+use App\Http\Resources\MailSendingHistoryResourceCollection;
 use App\Http\Resources\MailSendingHistoryResource;
 use App\Services\MailSendingHistoryService;
 
@@ -21,7 +21,7 @@ class MailSendingHistoryController extends AbstractRestAPIController
     public function __construct(MailSendingHistoryService $service)
     {
         $this->service = $service;
-        $this->resourceCollectionClass = MailSendingHistoryCollection::class;
+        $this->resourceCollectionClass = MailSendingHistoryResourceCollection::class;
         $this->resourceClass = MailSendingHistoryResource::class;
         $this->storeRequest = MailSendingHistoryRequest::class;
         $this->editRequest = UpdateMailSendingHistoryRequest::class;

@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use App\Abstracts\AbstractJsonResourceCollection;
 
-class UserConfigCollection extends AbstractJsonResourceCollection
+class EmailResourceCollection extends AbstractJsonResourceCollection
 {
+    //
 }

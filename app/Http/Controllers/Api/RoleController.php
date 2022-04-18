@@ -12,7 +12,7 @@ use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestEditTrait;
 use App\Http\Controllers\Traits\RestStoreTrait;
 use App\Http\Requests\UpdateRoleRequest;
-use App\Http\Resources\RoleCollection;
+use App\Http\Resources\RoleResourceCollection;
 use App\Services\RoleService;
 
 class RoleController extends AbstractRestAPIController
@@ -22,7 +22,7 @@ class RoleController extends AbstractRestAPIController
     public function __construct(RoleService $service)
     {
         $this->service = $service;
-        $this->resourceCollectionClass = RoleCollection::class;
+        $this->resourceCollectionClass = RoleResourceCollection::class;
         $this->resourceClass = RoleResource::class;
         $this->storeRequest = RoleRequest::class;
         $this->editRequest = UpdateRoleRequest::class;

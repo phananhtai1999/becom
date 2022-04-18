@@ -12,7 +12,7 @@ use App\Http\Requests\EmailRequest;
 use App\Http\Requests\MyEmailRequest;
 use App\Http\Requests\UpdateEmailRequest;
 use App\Http\Requests\UpdateMyEmailRequest;
-use App\Http\Resources\EmailCollection;
+use App\Http\Resources\EmailResourceCollection;
 use App\Http\Resources\EmailResource;
 use App\Services\EmailService;
 
@@ -26,7 +26,7 @@ class EmailController extends AbstractRestAPIController
     public function __construct(EmailService $service)
     {
         $this->service = $service;
-        $this->resourceCollectionClass = EmailCollection::class;
+        $this->resourceCollectionClass = EmailResourceCollection::class;
         $this->resourceClass = EmailResource::class;
         $this->storeRequest = EmailRequest::class;
         $this->editRequest = UpdateEmailRequest::class;
