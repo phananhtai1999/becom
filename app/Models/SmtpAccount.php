@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Abstracts\AbstractModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SmtpAccount extends AbstractModel
@@ -32,7 +33,7 @@ class SmtpAccount extends AbstractModel
         'mail_encryption',
         'mail_from_address',
         'mail_from_name',
-        'scret_key',
+        'secret_key',
         'website_uuid',
     ];
 
@@ -54,7 +55,7 @@ class SmtpAccount extends AbstractModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function website()
     {

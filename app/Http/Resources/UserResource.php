@@ -41,10 +41,6 @@ class UserResource extends AbstractJsonResource
             $data['roles'] = RoleResource::collection($this->roles);
         }
 
-        if (\in_array('user_link', $expand)) {
-            $data['user_links'] = UserLinkResource::collection($this->userLinks);
-        }
-
         if (\in_array('user_config', $expand)) {
             $data['user_config'] = new UserConfigResource($this->userConfig);
         }
