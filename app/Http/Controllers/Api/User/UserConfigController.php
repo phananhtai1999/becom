@@ -6,7 +6,7 @@ use App\Abstracts\AbstractRestAPIController;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\UpdateUserConfigRequest;
 use App\Http\Requests\UserConfigRequest;
-use App\Http\Resources\UserConfigCollection;
+use App\Http\Resources\UserConfigResourceCollection;
 use App\Http\Resources\UserConfigResource;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
@@ -27,7 +27,7 @@ class UserConfigController extends AbstractRestAPIController
     public function __construct(UserConfigService $service)
     {
         $this->service = $service;
-        $this->resourceCollectionClass = UserConfigCollection::class;
+        $this->resourceCollectionClass = UserConfigResourceCollection::class;
         $this->resourceClass = UserConfigResource::class;
         $this->storeRequest = UserConfigRequest::class;
         $this->editRequest = UpdateUserConfigRequest::class;

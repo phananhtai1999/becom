@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
 use App\Http\Resources\UserResource;
-use App\Http\Resources\UserSocialProfileCollection;
+use App\Http\Resources\UserSocialProfileResourceCollection;
 use App\Http\Resources\UserSocialProfileResource;
 use App\Services\AuthenticationService;
 use App\Services\UserAccessTokenService;
@@ -54,7 +54,7 @@ class AuthBySocialNetworkController extends AbstractRestAPIController
         $this->userAccessTokenService = $userAccessTokenService;
         $this->service = $service;
         $this->userService = $userService;
-        $this->resourceCollectionClass = UserSocialProfileCollection::class;
+        $this->resourceCollectionClass = UserSocialProfileResourceCollection::class;
         $this->resourceClass = UserSocialProfileResource::class;
     }
 

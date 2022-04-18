@@ -37,15 +37,15 @@ class UserResource extends AbstractJsonResource
             $data['current_membership'] = $this->currentMemberships;
         }
 
-        if (\in_array('roles', $expand)) {
+        if (\in_array('user__roles', $expand)) {
             $data['roles'] = RoleResource::collection($this->roles);
         }
 
-        if (\in_array('user_config', $expand)) {
+        if (\in_array('user__user_config', $expand)) {
             $data['user_config'] = new UserConfigResource($this->userConfig);
         }
 
-        if (\in_array('user_detail', $expand)) {
+        if (\in_array('user__user_detail', $expand)) {
             $data['user_detail'] = new UserDetailResource($this->userDetails);
         }
 

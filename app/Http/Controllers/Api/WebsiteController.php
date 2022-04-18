@@ -12,7 +12,7 @@ use App\Http\Requests\MyWebsiteRequest;
 use App\Http\Requests\UpdateMyWebsiteRequest;
 use App\Http\Requests\UpdateWebsiteRequest;
 use App\Http\Requests\WebsiteRequest;
-use App\Http\Resources\WebsiteCollection;
+use App\Http\Resources\WebsiteResourceCollection;
 use App\Http\Resources\WebsiteResource;
 use App\Services\WebsiteService;
 
@@ -26,7 +26,7 @@ class WebsiteController extends AbstractRestAPIController
     public function __construct(WebsiteService $service)
     {
         $this->service = $service;
-        $this->resourceCollectionClass = WebsiteCollection::class;
+        $this->resourceCollectionClass = WebsiteResourceCollection::class;
         $this->resourceClass = WebsiteResource::class;
         $this->storeRequest = WebsiteRequest::class;
         $this->editRequest = UpdateWebsiteRequest::class;

@@ -14,7 +14,7 @@ use App\Http\Requests\SendMailUseMailTemplateUuidRequest;
 use App\Http\Requests\SmtpAccountRequest;
 use App\Http\Requests\UpdateMySmtpAccountRequest;
 use App\Http\Requests\UpdateSmtpAccountRequest;
-use App\Http\Resources\SmtpAccountCollection;
+use App\Http\Resources\SmtpAccountResourceCollection;
 use App\Http\Resources\SmtpAccountResource;
 use App\Mail\SendEmails;
 use App\Models\MailTemplate;
@@ -34,7 +34,7 @@ class SmtpAccountController extends AbstractRestAPIController
     public function __construct(SmtpAccountService $service)
     {
         $this->service = $service;
-        $this->resourceCollectionClass = SmtpAccountCollection::class;
+        $this->resourceCollectionClass = SmtpAccountResourceCollection::class;
         $this->resourceClass = SmtpAccountResource::class;
         $this->storeRequest = SmtpAccountRequest::class;
         $this->editRequest = UpdateSmtpAccountRequest::class;

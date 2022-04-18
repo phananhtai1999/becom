@@ -10,7 +10,7 @@ use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Requests\UserRequest;
-use App\Http\Resources\UserCollection;
+use App\Http\Resources\UserResourceCollection;
 use App\Http\Resources\UserResource;
 use App\Services\UserService;
 use Carbon\Carbon;
@@ -33,7 +33,7 @@ class UserController extends AbstractRestAPIController
     )
     {
         $this->service = $service;
-        $this->resourceCollectionClass = UserCollection::class;
+        $this->resourceCollectionClass = UserResourceCollection::class;
         $this->resourceClass = UserResource::class;
         $this->storeRequest = UserRequest::class;
         $this->editRequest = UpdateUserRequest::class;
