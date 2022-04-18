@@ -9,12 +9,15 @@ class SmtpAccountResource extends AbstractJsonResource
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
      */
     public function toArray($request)
     {
-        return [
+
+        $expand = request()->get('expand', []);
+        
+        $data = [
             'uuid' => $this->uuid,
             'mail_mailer' => $this->mail_mailer,
             'mail_host' => $this->mail_host,
@@ -30,5 +33,11 @@ class SmtpAccountResource extends AbstractJsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
         ];
+
+        if (\in_array('smtp_account__website', $expand)) {
+            $data['website'] = new WebsiteResource($this->website);
+        }
+
+        return $data;
     }
 }
