@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Abstracts\AbstractModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CampaignDailyTracking extends AbstractModel
@@ -39,4 +40,12 @@ class CampaignDailyTracking extends AbstractModel
         'deleted_at' => 'datetime',
         'date' => 'datetime',
     ];
+
+    /**
+     * @return BelongsTo
+     */
+    public function campaign()
+    {
+        return $this->belongsTo(Campaign::class, 'campaign_uuid', 'uuid');
+    }
 }
