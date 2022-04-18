@@ -9,12 +9,15 @@ class CampaignResource extends AbstractJsonResource
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
      */
     public function toArray($request)
     {
-        return [
+
+        $expand = request()->get('expand', []);
+
+        $data = [
             'uuid' => $this->uuid,
             'tracking_key' => $this->tracking_key,
             'mail_template_uuid' => $this->mail_template_uuid,
@@ -29,5 +32,19 @@ class CampaignResource extends AbstractJsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
         ];
+
+        if (\in_array('campaign__mail_template', $expand)) {
+            $data['mail_template'] = new MailTemplateResource($this->mailTemplate);
+        }
+
+        if (\in_array('campaign__smtp_account', $expand)) {
+            $data['smtp_account'] = new SmtpAccountResource($this->smtpAccount);
+        }
+
+        if (\in_array('campaign__website', $expand)) {
+            $data['website'] = new WebsiteResource($this->website);
+        }
+
+        return $data;
     }
 }
