@@ -7,10 +7,10 @@ use App\Abstracts\AbstractJsonResource;
 class CampaignLinkDailyTrackingResource extends AbstractJsonResource
 {
     /**
-     * Transform the resource into an array.
-     *
      * @param \Illuminate\Http\Request $request
-     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
+     * @return array|void
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function toArray($request)
     {
@@ -30,7 +30,7 @@ class CampaignLinkDailyTrackingResource extends AbstractJsonResource
         if (\in_array('campaign_link_daily_tracking__campaign', $expand)) {
             $data['campaign'] = new CampaignResource($this->campaign);
         }
-        
+
         return $data;
     }
 }

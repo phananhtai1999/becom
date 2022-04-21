@@ -3,18 +3,20 @@
 namespace App\Http\Resources;
 
 use App\Abstracts\AbstractJsonResource;
+use Illuminate\Http\Request;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 class EmailResource extends AbstractJsonResource
 {
     /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
+     * @param Request $request
+     * @return array
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function toArray($request)
     {
-
         $expand = request()->get('expand', []);
 
         $data = [
@@ -32,7 +34,7 @@ class EmailResource extends AbstractJsonResource
             'updated_at' => $this->updated_at
         ];
 
-        if(\in_array('email__website', $expand)){
+        if (\in_array('email__website', $expand)) {
             $data['website'] = new WebsiteResource($this->website);
         }
 

@@ -34,7 +34,7 @@ class UserResource extends AbstractJsonResource
         ];
 
         if (!auth()->guest()) {
-            $data['current_membership'] = $this->currentMemberships;
+            $data['user__current_membership'] = $this->currentMemberships;
         }
 
         if (\in_array('user__roles', $expand)) {

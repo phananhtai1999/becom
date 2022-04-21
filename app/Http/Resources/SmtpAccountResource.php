@@ -3,20 +3,22 @@
 namespace App\Http\Resources;
 
 use App\Abstracts\AbstractJsonResource;
+use Illuminate\Http\Request;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 class SmtpAccountResource extends AbstractJsonResource
 {
     /**
-     * Transform the resource into an array.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
+     * @param Request $request
+     * @return array
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function toArray($request)
     {
-
         $expand = request()->get('expand', []);
-        
+
         $data = [
             'uuid' => $this->uuid,
             'mail_mailer' => $this->mail_mailer,

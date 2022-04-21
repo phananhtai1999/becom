@@ -3,18 +3,23 @@
 namespace App\Http\Resources;
 
 use App\Abstracts\AbstractJsonResource;
+use Illuminate\Http\Request;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 class WebsiteResource extends AbstractJsonResource
 {
     /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
+     * @param Request $request
+     * @return array
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function toArray($request)
     {
-        return [
+        $expand = request()->get('expand', []);
+
+        $data = [
             'uuid' => $this->uuid,
             'domain' => $this->domain,
             'user_uuid' => $this->user_uuid,
@@ -25,5 +30,11 @@ class WebsiteResource extends AbstractJsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
         ];
+
+        if (\in_array('website__user', $expand)) {
+            $data['user'] = new UserResource($this->user);
+        }
+
+        return $data;
     }
 }

@@ -3,18 +3,20 @@
 namespace App\Http\Resources;
 
 use App\Abstracts\AbstractJsonResource;
+use Illuminate\Http\Request;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 class CampaignDailyTrackingResource extends AbstractJsonResource
 {
     /**
-     * Transform the resource into an array.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
+     * @param Request $request
+     * @return array
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function toArray($request)
     {
-
         $expand = request()->get('expand', []);
 
         $data = [
