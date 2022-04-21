@@ -33,7 +33,7 @@ class SmtpAccount extends AbstractModel
         'mail_encryption',
         'mail_from_address',
         'mail_from_name',
-        'scret_key',
+        'secret_key',
         'website_uuid',
     ];
 

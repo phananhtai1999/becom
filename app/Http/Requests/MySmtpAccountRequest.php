@@ -33,7 +33,7 @@ class MySmtpAccountRequest extends AbstractRequest
             'mail_encryption' => ['required', 'string'],
             'mail_from_address' => ['required', 'string'],
             'mail_from_name' => ['required', 'string'],
-            'scret_key' => ['required', 'string'],
+            'secret_key' => ['required', 'string'],
             'website_uuid' => ['required', 'numeric', 'min:1', Rule::exists('websites', 'uuid')->where(function ($query) {
 
                 return $query->where('user_uuid', auth()->user()->getkey())->whereNull('deleted_at');

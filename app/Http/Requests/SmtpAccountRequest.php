@@ -32,7 +32,7 @@ class SmtpAccountRequest extends AbstractRequest
             'mail_encryption' => ['required', 'string'],
             'mail_from_address' => ['required', 'string'],
             'mail_from_name' => ['required', 'string'],
-            'scret_key' => ['required', 'string'],
+            'secret_key' => ['required', 'string'],
             'website_uuid' => ['required', 'string', 'exists:websites,uuid'],
         ];
     }
