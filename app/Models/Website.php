@@ -71,4 +71,12 @@ class Website extends AbstractModel
     {
         return $this->belongsTo(User::class, 'user_uuid', 'uuid');
     }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function websiteVerifications()
+    {
+        return $this->hasMany(WebsiteVerification::class, 'website_uuid', 'uuid');
+    }
 }
