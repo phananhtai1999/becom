@@ -12,24 +12,36 @@ use App\Http\Requests\MyWebsiteRequest;
 use App\Http\Requests\UpdateMyWebsiteRequest;
 use App\Http\Requests\UpdateWebsiteRequest;
 use App\Http\Requests\WebsiteRequest;
+use App\Http\Requests\WebsiteVerificationRequest;
 use App\Http\Resources\WebsiteResourceCollection;
 use App\Http\Resources\WebsiteResource;
+use App\Http\Resources\WebsiteVerificationResource;
 use App\Services\WebsiteService;
+use App\Services\WebsiteVerificationService;
 
 class WebsiteController extends AbstractRestAPIController
 {
     use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestStoreTrait, RestEditTrait;
 
     /**
-     * @param WebsiteService $service
+     * @var WebsiteVerificationService
      */
-    public function __construct(WebsiteService $service)
+    protected $websiteVerificationService;
+
+    /**
+     * @param WebsiteService $service
+     * @param WebsiteVerificationService $websiteVerificationService
+     */
+    public function __construct(
+        WebsiteService $service,
+        WebsiteVerificationService $websiteVerificationService)
     {
         $this->service = $service;
         $this->resourceCollectionClass = WebsiteResourceCollection::class;
         $this->resourceClass = WebsiteResource::class;
         $this->storeRequest = WebsiteRequest::class;
         $this->editRequest = UpdateWebsiteRequest::class;
+        $this->websiteVerificationService = $websiteVerificationService;
     }
 
     /**
@@ -102,5 +114,23 @@ class WebsiteController extends AbstractRestAPIController
         $this->service->deleteMyWebsite($id);
 
         return $this->sendOkJsonResponse();
+    }
+
+    /**
+     * @param WebsiteVerificationRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function verifyByDnsRecord(WebsiteVerificationRequest $request){
+
+        $website = $this->service->findOneWhereOrFail([
+            'domain' => $request->get('domain')
+        ]);
+
+        $websiteVerify = $this->websiteVerificationService->verifyByDnsRecord($website->getKey());
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData(WebsiteVerificationResource::class, $websiteVerify)
+        );
+
     }
 }

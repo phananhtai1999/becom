@@ -132,6 +132,8 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website.'], function () {
     });
 });
 
+Route::post('/website-verification/dns-record', [WebsiteController::class, 'verifyByDnsRecord'])->name('website.verifyByDnsRecord')->middleware('auth:api');
+
 //SmtpAccount
 Route::group(['middleware' => ['auth:api'], 'as' => 'smtp-account.'], function () {
 
