@@ -26,7 +26,7 @@ class SmtpAccountResource extends AbstractJsonResource
             'mail_port' => $this->mail_port,
             'mail_username' => $this->mail_username,
             'mail_password' => $this->mail_password,
-            'mail_encryption' => $this->mail_encryption,
+            'smtp_mail_encryption_uuid' => $this->smtp_mail_encryption_uuid,
             'mail_from_address' => $this->mail_from_address,
             'mail_from_name' => $this->mail_from_name,
             'secret_key' => $this->secret_key,
@@ -38,6 +38,10 @@ class SmtpAccountResource extends AbstractJsonResource
 
         if (\in_array('smtp_account__website', $expand)) {
             $data['website'] = new WebsiteResource($this->website);
+        }
+
+        if(\in_array('smtp_account__smtp_account_encryption', $expand)){
+            $data['smtp_account_encryption'] = new SmtpAccountEncryptionResource($this->smtpAccountEncryption);
         }
 
         return $data;
