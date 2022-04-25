@@ -30,7 +30,7 @@ class MySmtpAccountRequest extends AbstractRequest
             'mail_port' => ['required', 'string'],
             'mail_username' => ['required', 'string'],
             'mail_password' => ['required', 'string'],
-            'mail_encryption' => ['required', 'string'],
+            'smtp_mail_encryption_uuid' => ['required', 'numeric', 'exists:smtp_account_encryptions,uuid'],
             'mail_from_address' => ['required', 'string'],
             'mail_from_name' => ['required', 'string'],
             'secret_key' => ['required', 'string'],
