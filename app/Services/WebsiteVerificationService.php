@@ -17,7 +17,7 @@ class WebsiteVerificationService extends AbstractService
      */
     public function setVerified($websiteVerification)
     {
-        $this->update($websiteVerification,[
+        $this->update($websiteVerification, [
             'verified_at' => Carbon::now()
         ]);
 
@@ -30,7 +30,7 @@ class WebsiteVerificationService extends AbstractService
      */
     public function setNotVerified($websiteVerification)
     {
-        $this->update($websiteVerification,[
+        $this->update($websiteVerification, [
             'verified_at' => null
         ]);
 
@@ -42,7 +42,7 @@ class WebsiteVerificationService extends AbstractService
      */
     public function generateToken()
     {
-        return config('app.name'). '=' . hash_hmac('sha256', Str::uuid(), config('app.key'));
+        return config('app.name') . '=' . hash_hmac('sha256', Str::uuid(), config('app.key'));
     }
 
     /**
@@ -101,7 +101,39 @@ class WebsiteVerificationService extends AbstractService
     {
         $txtRecordValues = $this->getTxtRecordValue($url);
         $verificationValue = $token;
-        
+
         return in_array($verificationValue, $txtRecordValues);
+    }
+
+    /**
+     * @param $websiteUuid
+     * @return mixed
+     */
+    public function verifyByHtmlTag($websiteUuid)
+    {
+        $record = $this->firstOrCreateByWebsiteUuid($websiteUuid);
+        $domainToken = $this->getMetaTagToken($record->website->domain);
+
+        if ($record->token == $domainToken) {
+            return $this->setVerified($record);
+        } else {
+            return $this->setNotVerified($record);
+        }
+    }
+
+    /**
+     * @param $url
+     * @return mixed|string
+     */
+    public function getMetaTagToken($url)
+    {
+        $metaTag = get_meta_tags($url);
+        $metaTagName = config('app.name') . '-verify-tag';
+
+        if (!isset($metaTag[$metaTagName])) {
+            return '';
+        }
+
+        return $metaTag[$metaTagName];
     }
 }
