@@ -11,6 +11,7 @@ use App\Http\Controllers\Traits\RestStoreTrait;
 use App\Http\Requests\MyWebsiteRequest;
 use App\Http\Requests\UpdateMyWebsiteRequest;
 use App\Http\Requests\UpdateWebsiteRequest;
+use App\Http\Requests\VerifyDomainWebsiteVerificationRequest;
 use App\Http\Requests\WebsiteRequest;
 use App\Http\Requests\WebsiteVerificationRequest;
 use App\Http\Resources\WebsiteResourceCollection;
@@ -33,7 +34,7 @@ class WebsiteController extends AbstractRestAPIController
      * @param WebsiteVerificationService $websiteVerificationService
      */
     public function __construct(
-        WebsiteService $service,
+        WebsiteService             $service,
         WebsiteVerificationService $websiteVerificationService)
     {
         $this->service = $service;
@@ -120,7 +121,8 @@ class WebsiteController extends AbstractRestAPIController
      * @param WebsiteVerificationRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function verifyByDnsRecord(WebsiteVerificationRequest $request){
+    public function verifyByDnsRecord(WebsiteVerificationRequest $request)
+    {
 
         $website = $this->service->findOneWhereOrFail([
             'domain' => $request->get('domain')
@@ -131,6 +133,30 @@ class WebsiteController extends AbstractRestAPIController
         return $this->sendOkJsonResponse(
             $this->service->resourceToData(WebsiteVerificationResource::class, $websiteVerify)
         );
+
+    }
+
+    /**
+     * @param VerifyDomainWebsiteVerificationRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function verifyByHtmlTag(VerifyDomainWebsiteVerificationRequest $request)
+    {
+        $website = $this->service->findOneWhereOrFail([
+            'domain' => $request->get('domain')
+        ]);
+
+        $websiteVerify = $this->websiteVerificationService->verifyByHtmlTag($website->getKey());
+
+        $metaTagName = config('app.name') . '-verify-tag';
+        $HtmlTag = "<meta name='" . $metaTagName . "' content='" . $websiteVerify->token . "'>";
+
+        return $this->sendOkJsonResponse([
+            'data' => [
+                'htmlTag' => $HtmlTag,
+                'websiteVerify' => $this->service->resourceToData(WebsiteVerificationResource::class, $websiteVerify)['data']
+            ]
+        ]);
 
     }
 }

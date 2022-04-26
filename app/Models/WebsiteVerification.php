@@ -41,6 +41,19 @@ class WebsiteVerification extends AbstractModel
     ];
 
     /**
+     * @var string[]
+     */
+    protected $appends = ['was_verified'];
+
+    /**
+     * @return bool
+     */
+    public function getWasVerifiedAttribute()
+    {
+        return !empty($this->verified_at);
+    }
+
+    /**
      * @return BelongsTo
      */
     public function website()

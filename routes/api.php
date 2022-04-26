@@ -131,9 +131,11 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website.'], function () {
         Route::put('/my/website/{id}', [WebsiteController::class, 'editMyWebsite'])->name('edit');
         Route::delete('/my/website/{id}', [WebsiteController::class, 'destroyMyWebsite'])->name('destroy');
     });
+
+    Route::post('/website-verification/dns-record', [WebsiteController::class, 'verifyByDnsRecord'])->name('verifyByDnsRecord');
+    Route::post('/website-verification/html-tag', [WebsiteController::class, 'verifyByHtmlTag'])->name('verifyByHtmlTag');
 });
 
-Route::post('/website-verification/dns-record', [WebsiteController::class, 'verifyByDnsRecord'])->name('website.verifyByDnsRecord')->middleware('auth:api');
 
 //SmtpAccount
 Route::group(['middleware' => ['auth:api'], 'as' => 'smtp-account.'], function () {

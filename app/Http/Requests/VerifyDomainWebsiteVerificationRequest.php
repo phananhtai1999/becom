@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
 
-class WebsiteVerificationRequest extends AbstractRequest
+class VerifyDomainWebsiteVerificationRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,7 +24,7 @@ class WebsiteVerificationRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'domain' => ['required', 'string','regex:/^(?:[-A-Za-z0-9]+\.)+[A-Za-z]{2,6}$/', 'exists:websites,domain']
+            'domain' => ['required','url','exists:websites,domain']
         ];
     }
 }

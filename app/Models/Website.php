@@ -41,6 +41,19 @@ class Website extends AbstractModel
     ];
 
     /**
+     * @var string[]
+     */
+    protected $appends = ['was_verified'];
+
+    /**
+     * @return bool
+     */
+    public function getWasVerifiedAttribute()
+    {
+        return !empty($this->websiteVerification->verified_at);
+    }
+
+    /**
      * @return mixed
      */
     public function campaigns()
@@ -73,10 +86,10 @@ class Website extends AbstractModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function websiteVerifications()
+    public function websiteVerification()
     {
-        return $this->hasMany(WebsiteVerification::class, 'website_uuid', 'uuid');
+        return $this->hasOne(WebsiteVerification::class, 'website_uuid', 'uuid');
     }
 }

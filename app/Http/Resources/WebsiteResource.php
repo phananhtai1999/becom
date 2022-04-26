@@ -28,7 +28,8 @@ class WebsiteResource extends AbstractJsonResource
             'logo' => $this->logo,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at
+            'updated_at' => $this->updated_at,
+            'was_verified' => $this->was_verified
         ];
 
         if (\in_array('website__user', $expand)) {
