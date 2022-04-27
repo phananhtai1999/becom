@@ -17,6 +17,7 @@ use App\Http\Requests\WebsiteVerificationRequest;
 use App\Http\Resources\WebsiteResourceCollection;
 use App\Http\Resources\WebsiteResource;
 use App\Http\Resources\WebsiteVerificationResource;
+use App\Services\FileVerificationService;
 use App\Services\WebsiteService;
 use App\Services\WebsiteVerificationService;
 
@@ -30,12 +31,19 @@ class WebsiteController extends AbstractRestAPIController
     protected $websiteVerificationService;
 
     /**
+     * @var FileVerificationService
+     */
+    protected $fileVerificationService;
+
+    /**
      * @param WebsiteService $service
      * @param WebsiteVerificationService $websiteVerificationService
+     * @param FileVerificationService $fileVerificationService
      */
     public function __construct(
         WebsiteService             $service,
-        WebsiteVerificationService $websiteVerificationService)
+        WebsiteVerificationService $websiteVerificationService,
+        FileVerificationService    $fileVerificationService)
     {
         $this->service = $service;
         $this->resourceCollectionClass = WebsiteResourceCollection::class;
@@ -43,6 +51,7 @@ class WebsiteController extends AbstractRestAPIController
         $this->storeRequest = WebsiteRequest::class;
         $this->editRequest = UpdateWebsiteRequest::class;
         $this->websiteVerificationService = $websiteVerificationService;
+        $this->fileVerificationService = $fileVerificationService;
     }
 
     /**
@@ -158,5 +167,48 @@ class WebsiteController extends AbstractRestAPIController
             ]
         ]);
 
+    }
+
+    /**
+     * @param VerifyDomainWebsiteVerificationRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function verifyByHtmlFile(VerifyDomainWebsiteVerificationRequest $request)
+    {
+        $website = $this->service->findOneWhereOrFail([
+            'domain' => $request->get('domain')
+        ]);
+
+        $websiteVerify = $this->websiteVerificationService->verifyByHtmlFile($website->getKey());
+
+        if ($websiteVerify->verified_at) {
+
+            return $this->sendOkJsonResponse(
+                $this->service->resourceToData(WebsiteVerificationResource::class, $websiteVerify)
+            );
+        } else {
+
+            return $this->sendOkJsonResponse([
+                'linkDownloadHtmlFile' => route('website.downloadHtmlFile', [$websiteVerify->token])
+            ]);
+        }
+    }
+
+    /**
+     * @param $token
+     * @return \Illuminate\Http\Response|mixed
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     */
+    public function downloadHtmlFile($token)
+    {
+        $verificationFileName = $this->fileVerificationService->verificationFileName();
+        $contentFile = $token;
+        $headers = [
+            'Content-type' => 'text/plain',
+            'Content-Disposition' => sprintf('attachment; filename="%s"', $verificationFileName),
+            'Content-Length' => strlen($contentFile),
+        ];
+
+        return response()->make($contentFile, 200, $headers);
     }
 }

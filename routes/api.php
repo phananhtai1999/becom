@@ -134,6 +134,8 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website.'], function () {
 
     Route::post('/website-verification/dns-record', [WebsiteController::class, 'verifyByDnsRecord'])->name('verifyByDnsRecord');
     Route::post('/website-verification/html-tag', [WebsiteController::class, 'verifyByHtmlTag'])->name('verifyByHtmlTag');
+    Route::post('/website-verification/html-file', [WebsiteController::class, 'verifyByHtmlFile'])->name('verifyByHtmlFile');
+    Route::get('/verification-download/{token}', [WebsiteController::class, 'downloadHtmlFile'])->name('downloadHtmlFile');
 });
 
 
