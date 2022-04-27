@@ -136,4 +136,49 @@ class WebsiteVerificationService extends AbstractService
 
         return $metaTag[$metaTagName];
     }
+
+    /**
+     * @param $websiteUuid
+     * @return mixed
+     */
+    public function verifyByHtmlFile($websiteUuid)
+    {
+        $record = $this->firstOrCreateByWebsiteUuid($websiteUuid);
+        $verificationToken = $record->token;
+        $domainToken = $this->getHtmlFileToken($record->website->domain);
+
+        if ($domainToken == $verificationToken) {
+            return $this->setVerified($record);
+        } else {
+            return $this->setNotVerified($record);
+        }
+
+    }
+
+    /**
+     * @param $url
+     * @return false|string
+     */
+    public function getHtmlFileToken($url)
+    {
+        $verificationFileName = app(FileVerificationService::class)->verificationFileName();
+        $urlFile = $url . '/' . $verificationFileName;
+        $urlFileExists = $this->urlFileExists($urlFile);
+        if ($urlFileExists) {
+            $fileGetToken = file_get_contents($urlFile);
+            return $fileGetToken;
+        }
+
+        return $urlFile;
+    }
+
+    /**
+     * @param $urlFile
+     * @return bool
+     */
+    public function urlFileExists($urlFile)
+    {
+        return str_contains(get_headers($urlFile)[0], "200 OK");
+    }
+
 }
