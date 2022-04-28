@@ -26,4 +26,19 @@ class MailSendingHistoryController extends AbstractRestAPIController
         $this->storeRequest = MailSendingHistoryRequest::class;
         $this->editRequest = UpdateMailSendingHistoryRequest::class;
     }
+
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     */
+    public function indexMyMailSendingHistory()
+    {
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData(
+                $this->resourceCollectionClass,
+                $this->service->indexMyMailSendingHistory(request()->get('per_page', 15))
+            )
+        );
+    }
 }
