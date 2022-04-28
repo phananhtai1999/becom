@@ -14,7 +14,7 @@ class AddWasStoppedToCampaignsTable extends Migration
     public function up()
     {
         Schema::table('campaigns', function (Blueprint $table) {
-            $table->boolean('was_stopped')->default(false)->after('was_finished');
+            $table->boolean('was_stopped_by_owner')->default(false)->after('was_finished');
         });
     }
 
@@ -26,7 +26,7 @@ class AddWasStoppedToCampaignsTable extends Migration
     public function down()
     {
         Schema::table('campaigns', function (Blueprint $table) {
-            $table->dropColumn('was_stopped');
+            $table->dropColumn('was_stopped_by_owner');
         });
     }
 }

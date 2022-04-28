@@ -39,7 +39,7 @@ class MyCampaignRequest extends AbstractRequest
             })],
             'is_running' => ['required', 'boolean'],
             'was_finished' => ['required', 'boolean'],
-            'was_stopped' => ['required', 'boolean']
+            'was_stopped_by_owner' => ['required', 'boolean']
         ];
     }
 }

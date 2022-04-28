@@ -37,7 +37,7 @@ class Campaign extends AbstractModel
         'website_uuid',
         'is_running',
         'was_finished',
-        'was_stopped'
+        'was_stopped_by_owner'
     ];
 
     /**
@@ -51,7 +51,7 @@ class Campaign extends AbstractModel
         'to_date' => 'datetime',
         'is_running' => 'boolean',
         'was_finished' => 'boolean',
-        'was_stopped' => 'boolean'
+        'was_stopped_by_owner' => 'boolean'
     ];
 
     /**
