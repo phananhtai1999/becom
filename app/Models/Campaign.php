@@ -36,7 +36,8 @@ class Campaign extends AbstractModel
         'smtp_account_uuid',
         'website_uuid',
         'is_running',
-        'was_finished'
+        'was_finished',
+        'was_stopped'
     ];
 
     /**
@@ -49,7 +50,8 @@ class Campaign extends AbstractModel
         'from_date' => 'datetime',
         'to_date' => 'datetime',
         'is_running' => 'boolean',
-        'was_finished' => 'boolean'
+        'was_finished' => 'boolean',
+        'was_stopped' => 'boolean'
     ];
 
     /**
