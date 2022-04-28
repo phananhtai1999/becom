@@ -5,10 +5,14 @@ namespace App\Abstracts;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 abstract class AbstractService
 {
     protected $modelClass;
+
+    protected $modelQueryBuilderClass;
 
     /**
      * @var Application|mixed
@@ -57,16 +61,23 @@ abstract class AbstractService
     }
 
     /**
-     * @param int $perPage
+     * @param $perPage
+     * @param $page
+     * @param $columns
+     * @param $pageName
      * @return mixed
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
-    public function getCollectionWithPagination($perPage = 15)
+    public function getCollectionWithPagination($perPage = 15, $page = 1, $columns = '*', $pageName = 'page')
     {
         $perPage = request()->get('per_page', $perPage);
+        $page = request()->get('page', $page);
+        $columns = request()->get('columns', $columns);
+        $pageName = request()->get('page_name', $pageName);
 
-        return $this->model->paginate($perPage);
+        return $this->modelQueryBuilderClass::initialQuery()
+            ->paginate($perPage, $columns, $pageName, $page);
     }
 
     /**
