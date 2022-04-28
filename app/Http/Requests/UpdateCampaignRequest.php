@@ -34,7 +34,8 @@ class UpdateCampaignRequest extends AbstractRequest
             'smtp_account_uuid' => ['numeric', 'min:1', 'exists:smtp_accounts,uuid'],
             'website_uuid' => ['numeric', 'min:1', 'exists:websites,uuid'],
             'is_running' => ['boolean'],
-            'was_finished' => ['boolean']
+            'was_finished' => ['boolean'],
+            'was_stopped' => ['boolean']
         ];
     }
 }
