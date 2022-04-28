@@ -37,6 +37,9 @@ class MyCampaignRequest extends AbstractRequest
 
                 return $query->where('user_uuid', auth()->user()->getkey())->whereNull('deleted_at');
             })],
+            'is_running' => ['required', 'boolean'],
+            'was_finished' => ['required', 'boolean'],
+            'was_stopped' => ['required', 'boolean']
         ];
     }
 }
