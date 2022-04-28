@@ -33,7 +33,8 @@ class CampaignRequest extends AbstractRequest
             'status' => ['required', 'string'],
             'smtp_account_uuid' => ['required', 'numeric', 'min:1', 'exists:smtp_accounts,uuid'],
             'website_uuid' => ['required', 'numeric', 'min:1', 'exists:websites,uuid'],
-            'is_running' => ['required', 'boolean']
+            'is_running' => ['required', 'boolean'],
+            'was_finished' => ['required', 'boolean']
         ];
     }
 }
