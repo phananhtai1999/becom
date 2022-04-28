@@ -33,6 +33,7 @@ class UpdateCampaignRequest extends AbstractRequest
             'status' => ['string'],
             'smtp_account_uuid' => ['numeric', 'min:1', 'exists:smtp_accounts,uuid'],
             'website_uuid' => ['numeric', 'min:1', 'exists:websites,uuid'],
+            'is_running' => ['boolean']
         ];
     }
 }
