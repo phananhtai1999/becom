@@ -244,12 +244,13 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'mail-sending-history.'], fu
 
     Route::group(['as' => 'my.'], function () {
         Route::get('/my/mail-sending-histories', [MailSendingHistoryController::class, 'indexMyMailSendingHistory'])->name('index');
+        Route::get('/my/mail-sending-history/{id}', [MailSendingHistoryController::class, 'showMyMailSendingHistory'])->name('show');
     });
 });
 
 //SmtpAccountEncryption
-Route::group(['middleware' => ['auth:api'], 'as' => 'smtp-account-encryption.'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+Route::group(['middleware' => ['auth:api'], 'as' => 'smtp-account-encryption.'], function (){
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function (){
         Route::get('/smtp-account-encryptions', [SmtpAccountEncryptionController::class, 'index'])->name('index');
         Route::post('/smtp-account-encryption', [SmtpAccountEncryptionController::class, 'store'])->name('store');
         Route::get('/smtp-account-encryption/{id}', [SmtpAccountEncryptionController::class, 'show'])->name('show');
