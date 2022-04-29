@@ -41,4 +41,17 @@ class MailSendingHistoryController extends AbstractRestAPIController
             )
         );
     }
+
+    /**
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function showMyMailSendingHistory($id)
+    {
+        $model = $this->service->findMyMailSendingHistoryByKeyOrAbort($id);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
 }
