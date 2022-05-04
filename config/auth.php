@@ -114,7 +114,7 @@ return [
 
     'password_timeout' => 10800,
 
-    'login_succeed_redirect_url' => env('FRONTEND_URL') . '/login/succeed',
+    'login_succeed_redirect_url' => env('FRONTEND_URL') . '/auth/login/success',
 
     'login_failed_redirect_url' => env('FRONTEND_URL') . '/login/failed',
 ];

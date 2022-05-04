@@ -41,6 +41,7 @@ Route::group(['as' => 'auth.'], function () {
 Route::get('/auth/url/{driver}', [AuthBySocialNetworkController::class, 'loginUrl'])->name('loginUrl');
 Route::get('/auth/callback/google', [AuthBySocialNetworkController::class, 'loginByGoogleCallback'])->name('loginByGoogleCallback');
 Route::get('/auth/callback/facebook', [AuthBySocialNetworkController::class, 'loginByFacebookCallback'])->name('loginByFacebookCallback');
+Route::get('/auth/callback/linkedin', [AuthBySocialNetworkController::class, 'loginByLinkedinCallback'])->name('loginByLinkedinCallback');
 
 Route::post('/upload-img', [UploadImgController::class, 'upload'])->name('upload')->middleware('auth:api');
 
