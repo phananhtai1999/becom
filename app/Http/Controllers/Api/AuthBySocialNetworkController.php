@@ -72,6 +72,10 @@ class AuthBySocialNetworkController extends AbstractRestAPIController
             return $this->sendOkJsonResponse([
                 'data' => ['redirect_url' => Socialite::driver('facebook')->stateless()->redirect()->getTargetUrl()]
             ]);
+        } elseif ($driver == 'linkedin') {
+            return $this->sendOkJsonResponse([
+                'data' => ['redirect_url' => Socialite::driver('linkedin')->stateless()->redirect()->getTargetUrl()]
+            ]);
         }
     }
 
@@ -170,6 +174,60 @@ class AuthBySocialNetworkController extends AbstractRestAPIController
             ]);
 
             return $this->loginSocial($newUser);
+        }
+    }
+
+    /**
+     * @return Application|JsonResponse|RedirectResponse|Redirector
+     */
+    public function loginByLinkedinCallback()
+    {
+        try {
+            $linkedinUser = Socialite::driver('linkedin')->stateless()->user();
+
+            $findUserSocial = $this->service->findBySocialProfileEmail('linkedin_' . $linkedinUser->getId());
+
+            $findUser = $this->userService->findByEmail($linkedinUser->getEmail());
+
+            if (!empty($findUserSocial && $findUser)) {
+
+                return $this->loginSocial($findUser);
+            } elseif (!empty($findUser) && empty($findUserSocial)) {
+                $this->service->create([
+                    'social_profile_key' => 'linkedin_' . $linkedinUser->getId(),
+                    'social_network_uuid' => 'linkedin',
+                    'user_uuid' => $findUser->uuid,
+                    'social_profile_name' => $linkedinUser->getName(),
+                    'social_profile_avatar' => $linkedinUser->getAvatar(),
+                    'social_profile_email' => $linkedinUser->getEmail(),
+                    'updated_info_at' => Carbon::now(),
+                ]);
+
+                return $this->loginSocial($findUser);
+            } else {
+                $newUser = $this->userService->create([
+                    'email' => $linkedinUser->getEmail(),
+                    'username' => $linkedinUser->getEmail(),
+                    'password' => Hash::make(Str::random(20)),
+                ]);
+
+                $newUser->roles()->attach([config('user.default_role_uuid')]);
+
+                $this->service->create([
+                    'social_profile_key' => 'linkedin_' . $linkedinUser->getId(),
+                    'social_network_uuid' => 'linkedin',
+                    'user_uuid' => $newUser->uuid,
+                    'social_profile_name' => $linkedinUser->getName(),
+                    'social_profile_avatar' => $linkedinUser->getAvatar(),
+                    'social_profile_email' => $linkedinUser->getEmail(),
+                    'updated_info_at' => Carbon::now(),
+                ]);
+
+                return $this->loginSocial($newUser);
+            }
+        }catch (\Exception $exception ){
+
+            return redirect(URL::to(config('auth.login_failed_redirect_url')));
         }
     }
 
