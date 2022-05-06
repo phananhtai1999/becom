@@ -15,17 +15,28 @@ use App\Http\Requests\UpdateMyEmailRequest;
 use App\Http\Resources\EmailResourceCollection;
 use App\Http\Resources\EmailResource;
 use App\Services\EmailService;
+use App\Services\MyEmailService;
 
 class EmailController extends AbstractRestAPIController
 {
     use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestStoreTrait, RestEditTrait;
 
     /**
-     * @param EmailService $service
+     * @var
      */
-    public function __construct(EmailService $service)
+    protected $myService;
+
+    /**
+     * @param EmailService $service
+     * @param MyEmailService $myService
+     */
+    public function __construct(
+        EmailService $service,
+        MyEmailService $myService
+    )
     {
         $this->service = $service;
+        $this->myService = $myService;
         $this->resourceCollectionClass = EmailResourceCollection::class;
         $this->resourceClass = EmailResource::class;
         $this->storeRequest = EmailRequest::class;
@@ -42,7 +53,12 @@ class EmailController extends AbstractRestAPIController
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData(
                 $this->resourceCollectionClass,
-                $this->service->indexMyEmail(request()->get('per_page', 15))
+                $this->myService->getCollectionWithPagination(
+                    request()->get('per_page', '15'),
+                    request()->get('page', '1'),
+                    request()->get('columns', '*'),
+                    request()->get('page_name', 'page')
+                )
             )
         );
     }
@@ -66,7 +82,7 @@ class EmailController extends AbstractRestAPIController
      */
     public function showMyEmail($id)
     {
-        $model = $this->service->findMyEmailByKeyOrAbort($id);
+        $model = $this->myService->findMyEmailByKeyOrAbort($id);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -80,7 +96,7 @@ class EmailController extends AbstractRestAPIController
      */
     public function editMyEmail(UpdateMyEmailRequest $request, $id)
     {
-        $model = $this->service->findMyEmailByKeyOrAbort($id);
+        $model = $this->myService->findMyEmailByKeyOrAbort($id);
 
         $this->service->update($model, $request->all());
 
@@ -95,7 +111,7 @@ class EmailController extends AbstractRestAPIController
      */
     public function destroyMyEmail($id)
     {
-        $this->service->deleteMyEmailByKey($id);
+        $this->myService->deleteMyEmailByKey($id);
 
         return $this->sendOkJsonResponse();
     }

@@ -18,6 +18,7 @@ use App\Http\Resources\SmtpAccountResourceCollection;
 use App\Http\Resources\SmtpAccountResource;
 use App\Mail\SendEmails;
 use App\Models\MailTemplate;
+use App\Services\MySmtpAccountService;
 use App\Services\SmtpAccountService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Mail;
@@ -29,11 +30,21 @@ class SmtpAccountController extends AbstractRestAPIController
     use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestStoreTrait, RestEditTrait;
 
     /**
-     * @param SmtpAccountService $service
+     * @var MySmtpAccountService
      */
-    public function __construct(SmtpAccountService $service)
+    protected $myService;
+
+    /**
+     * @param SmtpAccountService $service
+     * @param MySmtpAccountService $myService
+     */
+    public function __construct(
+        SmtpAccountService $service,
+        MySmtpAccountService $myService
+    )
     {
         $this->service = $service;
+        $this->myService = $myService;
         $this->resourceCollectionClass = SmtpAccountResourceCollection::class;
         $this->resourceClass = SmtpAccountResource::class;
         $this->storeRequest = SmtpAccountRequest::class;
@@ -50,7 +61,12 @@ class SmtpAccountController extends AbstractRestAPIController
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData(
                 $this->resourceCollectionClass,
-                $this->service->indexMySmtpAccount(request()->get('per_page', 15))
+                $this->myService->getCollectionWithPagination(
+                    request()->get('per_page', '15'),
+                    request()->get('page', '1'),
+                    request()->get('columns', '*'),
+                    request()->get('page_name', 'page')
+                )
             )
         );
     }
@@ -74,7 +90,7 @@ class SmtpAccountController extends AbstractRestAPIController
      */
     public function showMySmtpAccount($id)
     {
-        $model = $this->service->findMySmtpAccountByKeyOrAbort($id);
+        $model = $this->myService->findMySmtpAccountByKeyOrAbort($id);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -88,7 +104,7 @@ class SmtpAccountController extends AbstractRestAPIController
      */
     public function editMySmtpAccount(UpdateMySmtpAccountRequest $request, $id)
     {
-        $model = $this->service->findMySmtpAccountByKeyOrAbort($id);
+        $model = $this->myService->findMySmtpAccountByKeyOrAbort($id);
 
         $this->service->update($model, $request->all());
 
@@ -103,7 +119,7 @@ class SmtpAccountController extends AbstractRestAPIController
      */
     public function destroyMySmtpAccount($id)
     {
-        $this->service->deleteMySmtpAccountByKey($id);
+        $this->myService->deleteMySmtpAccountByKey($id);
 
         return $this->sendOkJsonResponse();
     }

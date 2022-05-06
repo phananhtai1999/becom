@@ -25,11 +25,17 @@ use App\Services\CampaignLinkDailyTrackingService;
 use App\Services\CampaignLinkTrackingService;
 use App\Services\CampaignService;
 use App\Services\CampaignTrackingService;
+use App\Services\MyCampaignService;
 use Illuminate\Http\JsonResponse;
 
 class CampaignController extends AbstractRestAPIController
 {
     use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestStoreTrait, RestEditTrait;
+
+    /**
+     * @var
+     */
+    protected $myService;
 
     /**
      * @var CampaignTrackingService
@@ -53,6 +59,7 @@ class CampaignController extends AbstractRestAPIController
 
     /**
      * @param CampaignService $service
+     * @param MyCampaignService $myService
      * @param CampaignTrackingService $campaignTrackingService
      * @param CampaignDailyTrackingService $campaignDailyTrackingService
      * @param CampaignLinkDailyTrackingService $campaignLinkDailyTrackingService
@@ -60,6 +67,7 @@ class CampaignController extends AbstractRestAPIController
      */
     public function __construct
     (CampaignService $service,
+     MyCampaignService $myService,
      CampaignTrackingService $campaignTrackingService,
      CampaignDailyTrackingService $campaignDailyTrackingService,
      CampaignLinkDailyTrackingService $campaignLinkDailyTrackingService,
@@ -67,6 +75,7 @@ class CampaignController extends AbstractRestAPIController
     )
     {
         $this->service = $service;
+        $this->myService = $myService;
         $this->resourceCollectionClass = CampaignResourceCollection::class;
         $this->resourceClass = CampaignResource::class;
         $this->storeRequest = CampaignRequest::class;
@@ -87,7 +96,12 @@ class CampaignController extends AbstractRestAPIController
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData(
                 $this->resourceCollectionClass,
-                $this->service->indexMyCampaign(request()->get('per_page', 15))
+                $this->myService->getCollectionWithPagination(
+                    request()->get('per_page', '15'),
+                    request()->get('page', '1'),
+                    request()->get('columns', '*'),
+                    request()->get('page_name', 'page')
+                )
             )
         );
     }
@@ -111,7 +125,7 @@ class CampaignController extends AbstractRestAPIController
      */
     public function showMyCampaign($id)
     {
-        $model = $this->service->findMyCampaignByKeyOrAbort($id);
+        $model = $this->myService->findMyCampaignByKeyOrAbort($id);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -125,7 +139,7 @@ class CampaignController extends AbstractRestAPIController
      */
     public function editMyCampaign(UpdateMyCampaignRequest $request, $id)
     {
-        $model = $this->service->findMyCampaignByKeyOrAbort($id);
+        $model = $this->myService->findMyCampaignByKeyOrAbort($id);
 
         $this->service->update($model, $request->all());
 
@@ -140,7 +154,7 @@ class CampaignController extends AbstractRestAPIController
      */
     public function destroyMyCampaign($id)
     {
-        $this->service->deleteMyCampaignByKey($id);
+        $this->myService->deleteMyCampaignByKey($id);
 
         return $this->sendOkJsonResponse();
     }
