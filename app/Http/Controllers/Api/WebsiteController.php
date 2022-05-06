@@ -18,12 +18,18 @@ use App\Http\Resources\WebsiteResourceCollection;
 use App\Http\Resources\WebsiteResource;
 use App\Http\Resources\WebsiteVerificationResource;
 use App\Services\FileVerificationService;
+use App\Services\MyWebsiteService;
 use App\Services\WebsiteService;
 use App\Services\WebsiteVerificationService;
 
 class WebsiteController extends AbstractRestAPIController
 {
     use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestStoreTrait, RestEditTrait;
+
+    /**
+     * @var MyWebsiteService
+     */
+    protected $myService;
 
     /**
      * @var WebsiteVerificationService
@@ -39,13 +45,17 @@ class WebsiteController extends AbstractRestAPIController
      * @param WebsiteService $service
      * @param WebsiteVerificationService $websiteVerificationService
      * @param FileVerificationService $fileVerificationService
+     * @param MyWebsiteService $myService
      */
     public function __construct(
-        WebsiteService             $service,
+        WebsiteService $service,
         WebsiteVerificationService $websiteVerificationService,
-        FileVerificationService    $fileVerificationService)
+        FileVerificationService $fileVerificationService,
+        MyWebsiteService $myService
+    )
     {
         $this->service = $service;
+        $this->myService = $myService;
         $this->resourceCollectionClass = WebsiteResourceCollection::class;
         $this->resourceClass = WebsiteResource::class;
         $this->storeRequest = WebsiteRequest::class;
@@ -64,7 +74,12 @@ class WebsiteController extends AbstractRestAPIController
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData(
                 $this->resourceCollectionClass,
-                $this->service->indexMyWebsite(request()->get('per_page', 15))
+                $this->myService->getCollectionWithPagination(
+                    request()->get('per_page', '15'),
+                    request()->get('page', '1'),
+                    request()->get('columns', '*'),
+                    request()->get('page_name', 'page')
+                )
             )
         );
     }
@@ -90,7 +105,7 @@ class WebsiteController extends AbstractRestAPIController
      */
     public function showMyWebsite($id)
     {
-        $model = $this->service->showMyWebsite($id);
+        $model = $this->myService->showMyWebsite($id);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -121,7 +136,7 @@ class WebsiteController extends AbstractRestAPIController
      */
     public function destroyMyWebsite($id)
     {
-        $this->service->deleteMyWebsite($id);
+        $this->myService->deleteMyWebsite($id);
 
         return $this->sendOkJsonResponse();
     }

@@ -15,17 +15,28 @@ use App\Http\Requests\UpdateMyMailTemplateRequest;
 use App\Http\Resources\MailTemplateResourceCollection;
 use App\Http\Resources\MailTemplateResource;
 use App\Services\MailTemplateService;
+use App\Services\MyMailTemplateService;
 
 class MailTemplateController extends AbstractRestAPIController
 {
     use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestStoreTrait, RestEditTrait;
 
     /**
-     * @param MailTemplateService $service
+     * @var
      */
-    public function __construct(MailTemplateService $service)
+    protected $myService;
+
+    /**
+     * @param MailTemplateService $service
+     * @param MyMailTemplateService $myService
+     */
+    public function __construct(
+        MailTemplateService $service,
+        MyMailTemplateService $myService
+    )
     {
         $this->service = $service;
+        $this->myService = $myService;
         $this->resourceCollectionClass = MailTemplateResourceCollection::class;
         $this->resourceClass = MailTemplateResource::class;
         $this->storeRequest = MailTemplateRequest::class;
@@ -42,7 +53,12 @@ class MailTemplateController extends AbstractRestAPIController
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData(
                 $this->resourceCollectionClass,
-                $this->service->indexMyMailTemplate(request()->get('per_page', 15))
+                $this->myService->getCollectionWithPagination(
+                    request()->get('per_page', '15'),
+                    request()->get('page', '1'),
+                    request()->get('columns', '*'),
+                    request()->get('page_name', 'page')
+                )
             )
         );
     }
@@ -66,7 +82,7 @@ class MailTemplateController extends AbstractRestAPIController
      */
     public function showMyMailTemplate($id)
     {
-        $model = $this->service->findMyMailTemplateByKeyOrAbort($id);
+        $model = $this->myService->findMyMailTemplateByKeyOrAbort($id);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -80,7 +96,7 @@ class MailTemplateController extends AbstractRestAPIController
      */
     public function editMyMailTemplate(UpdateMyMailTemplateRequest $request, $id)
     {
-        $model = $this->service->findMyMailTemplateByKeyOrAbort($id);
+        $model = $this->myService->findMyMailTemplateByKeyOrAbort($id);
 
         $this->service->update($model, $request->all());
 
@@ -95,7 +111,7 @@ class MailTemplateController extends AbstractRestAPIController
      */
     public function destroyMyMailTemplate($id)
     {
-        $this->service->deleteMyMailTemplateByKey($id);
+        $this->myService->deleteMyMailTemplateByKey($id);
 
         return $this->sendOkJsonResponse();
     }

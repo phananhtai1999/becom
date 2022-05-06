@@ -13,14 +13,28 @@ use App\Http\Requests\UpdateMailSendingHistoryRequest;
 use App\Http\Resources\MailSendingHistoryResourceCollection;
 use App\Http\Resources\MailSendingHistoryResource;
 use App\Services\MailSendingHistoryService;
+use App\Services\MyMailSendingHistoryService;
 
 class MailSendingHistoryController extends AbstractRestAPIController
 {
     use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestStoreTrait, RestEditTrait;
 
-    public function __construct(MailSendingHistoryService $service)
+    /**
+     * @var
+     */
+    protected $myService;
+
+    /**
+     * @param MailSendingHistoryService $service
+     * @param MyMailSendingHistoryService $myService
+     */
+    public function __construct(
+        MailSendingHistoryService $service,
+        MyMailSendingHistoryService $myService
+    )
     {
         $this->service = $service;
+        $this->myService = $myService;
         $this->resourceCollectionClass = MailSendingHistoryResourceCollection::class;
         $this->resourceClass = MailSendingHistoryResource::class;
         $this->storeRequest = MailSendingHistoryRequest::class;
@@ -37,7 +51,12 @@ class MailSendingHistoryController extends AbstractRestAPIController
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData(
                 $this->resourceCollectionClass,
-                $this->service->indexMyMailSendingHistory(request()->get('per_page', 15))
+                $this->myService->getCollectionWithPagination(
+                    request()->get('per_page', '15'),
+                    request()->get('page', '1'),
+                    request()->get('columns', '*'),
+                    request()->get('page_name', 'page')
+                )
             )
         );
     }
@@ -48,7 +67,7 @@ class MailSendingHistoryController extends AbstractRestAPIController
      */
     public function showMyMailSendingHistory($id)
     {
-        $model = $this->service->findMyMailSendingHistoryByKeyOrAbort($id);
+        $model = $this->myService->findMyMailSendingHistoryByKeyOrAbort($id);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
