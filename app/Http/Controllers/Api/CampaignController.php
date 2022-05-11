@@ -11,9 +11,11 @@ use App\Http\Controllers\Traits\RestStoreTrait;
 use App\Http\Requests\CampaignLinkTrackingRequest;
 use App\Http\Requests\CampaignRequest;
 use App\Http\Requests\IncrementCampaignTrackingRequest;
+use App\Http\Requests\LoadAnalyticDataRequest;
 use App\Http\Requests\MyCampaignRequest;
 use App\Http\Requests\UpdateCampaignRequest;
 use App\Http\Requests\UpdateMyCampaignRequest;
+use App\Http\Resources\CampaignDailyTrackingResourceCollection;
 use App\Http\Resources\CampaignResourceCollection;
 use App\Http\Resources\CampaignDailyTrackingResource;
 use App\Http\Resources\CampaignLinkDailyTrackingResource;
@@ -25,6 +27,7 @@ use App\Services\CampaignLinkDailyTrackingService;
 use App\Services\CampaignLinkTrackingService;
 use App\Services\CampaignService;
 use App\Services\CampaignTrackingService;
+use Carbon\Carbon;
 use App\Services\MyCampaignService;
 use Illuminate\Http\JsonResponse;
 
@@ -186,6 +189,8 @@ class CampaignController extends AbstractRestAPIController
     /**
      * @param CampaignLinkTrackingRequest $request
      * @return JsonResponse
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function upsertCampaignLinkTrackingTotalClick(CampaignLinkTrackingRequest $request)
     {
@@ -217,5 +222,26 @@ class CampaignController extends AbstractRestAPIController
                 'campaignDailyTracking' => $campaignDailyTrackingData['data'],
             ]
         ]);
+    }
+
+    /**
+     * @param LoadAnalyticDataRequest $request
+     * @return JsonResponse|void
+     */
+    public function loadAnalyticData(LoadAnalyticDataRequest $request)
+    {
+        $type = $request->get('type', 'daily');
+        $toDate = $request->get('to_date', Carbon::today());
+        $fromDate = $request->get('from_date', Carbon::today()->subMonth(12));
+
+        if ($type == 'daily') {
+
+            return $this->sendOkJsonResponse(
+                $this->service->resourceCollectionToData(
+                    CampaignDailyTrackingResourceCollection::class,
+                    $this->campaignDailyTrackingService->loadCampaignDailyTrackingAnalytic($fromDate, $toDate)
+                )
+            );
+        }
     }
 }

@@ -24,6 +24,8 @@ class CampaignLinkDailyTrackingService extends AbstractService
     /**
      * @param $campaignUuid
      * @return mixed
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function incrementTotalClickByCampaignUuid($campaignUuid)
     {

@@ -207,6 +207,8 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'campaign.'], function () {
 
     //Upsert-campaign-link-tracking
     Route::get('/upsert-campaign-link-tracking', [CampaignController::class, 'upsertCampaignLinkTrackingTotalClick'])->name('upsert-campaign-link-tracking');
+    //Load-campaign-tracking analytic
+    Route::get('/campaign-tracking/analytic', [CampaignController::class, 'loadAnalyticData'])->name('loadAnalyticData');
 });
 
 //Create Increment Campaign total open
