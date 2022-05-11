@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\Events\SendCampaignByEmailEvent;
 use App\Events\SendEmailRecoveryPasswordEvent;
 use App\Events\SendEmailVerifyEmailEvent;
+use App\Listeners\SendCampaignByEmailListener;
 use App\Listeners\SendEmailRecoveryPasswordListener;
 use App\Listeners\SendEmailVerifyEmailListener;
 use App\Models\Config;
@@ -38,6 +40,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         SendEmailVerifyEmailEvent::class => [
             SendEmailVerifyEmailListener::class
+        ],
+        SendCampaignByEmailEvent::class => [
+            SendCampaignByEmailListener::class
         ]
     ];
 

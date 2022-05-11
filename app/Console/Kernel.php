@@ -14,17 +14,20 @@ class Kernel extends ConsoleKernel
         'App\Console\Commands\SendEmail',
         'App\Console\Commands\SeedConfig',
         'App\Console\Commands\CreateUser',
+        'App\Console\Commands\SendCampaignByEmail',
     ];
 
     /**
      * Define the application's command schedule.
      *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
+     * @param \Illuminate\Console\Scheduling\Schedule $schedule
      * @return void
      */
     protected function schedule(Schedule $schedule)
     {
-         $schedule->command('Send:Email')->everyMinute();
+//        $schedule->command('Send:Email')->everyMinute();
+        $schedule->command('send:campaign')->dailyAt('8:00');
+
     }
 
     /**
