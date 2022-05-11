@@ -11,4 +11,13 @@ class EmailService extends AbstractService
     protected $modelClass = Email::class;
 
     protected $modelQueryBuilderClass = EmailQueryBuilder::class;
+
+    /**
+     * @param $emails
+     * @return mixed
+     */
+    public function getEmailInArray($emails)
+    {
+        return $this->model->whereIn('email', $emails)->get();
+    }
 }
