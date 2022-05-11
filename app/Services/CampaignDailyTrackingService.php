@@ -68,4 +68,16 @@ class CampaignDailyTrackingService extends AbstractService
 
         return $model;
     }
+
+    /**
+     * @param $fromDate
+     * @param $toDate
+     * @return mixed
+     */
+    public function loadCampaignDailyTrackingAnalytic($fromDate, $toDate)
+    {
+        return $this->model
+            ->whereBetween('date', [$fromDate, $toDate])
+            ->get();
+    }
 }
