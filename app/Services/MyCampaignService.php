@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Abstracts\AbstractService;
 use App\Models\Campaign;
 use App\Models\QueryBuilders\MyCampaignQueryBuilder;
+use Carbon\Carbon;
 
 class MyCampaignService extends AbstractService
 {
@@ -50,5 +51,22 @@ class MyCampaignService extends AbstractService
         } else {
             abort(403, 'Unauthorized.');
         }
+    }
+
+    /**
+     * @return mixed
+     */
+    public function loadActiveMyCampaign()
+    {
+        return $this->model->select('campaigns.*')
+            ->join('websites', 'websites.uuid', '=', 'campaigns.website_uuid')
+            ->where([
+                ['websites.user_uuid', auth()->user()->getKey()],
+                ['campaigns.from_date', '<=', Carbon::now()],
+                ['campaigns.to_date', '>=', Carbon::now()],
+                ['campaigns.was_finished', false],
+                ['campaigns.was_stopped_by_owner', false],
+                ['campaigns.is_running', false]
+            ])->first();
     }
 }
