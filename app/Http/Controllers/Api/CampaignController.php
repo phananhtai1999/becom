@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
-use App\Events\SendEmailByCampaignEvent;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
@@ -28,8 +27,6 @@ use App\Services\CampaignLinkDailyTrackingService;
 use App\Services\CampaignLinkTrackingService;
 use App\Services\CampaignService;
 use App\Services\CampaignTrackingService;
-use App\Services\EmailService;
-use App\Services\MailSendingHistoryService;
 use App\Services\SendEmailByCampaignService;
 use Carbon\Carbon;
 use App\Services\MyCampaignService;
@@ -65,16 +62,6 @@ class CampaignController extends AbstractRestAPIController
     protected $campaignLinkDailyTrackingService;
 
     /**
-     * @var EmailService
-     */
-    protected $emailService;
-
-    /**
-     * @var MailSendingHistoryService
-     */
-    protected $mailSendingHistoryService;
-
-    /**
      * @var SendEmailByCampaignService
      */
     protected $sendEmailByCampaignService;
@@ -86,6 +73,7 @@ class CampaignController extends AbstractRestAPIController
      * @param CampaignDailyTrackingService $campaignDailyTrackingService
      * @param CampaignLinkDailyTrackingService $campaignLinkDailyTrackingService
      * @param CampaignLinkTrackingService $campaignLinkTrackingService
+     * @param SendEmailByCampaignService $sendEmailByCampaignService
      */
     public function __construct
     (CampaignService $service,
@@ -94,8 +82,6 @@ class CampaignController extends AbstractRestAPIController
      CampaignDailyTrackingService $campaignDailyTrackingService,
      CampaignLinkDailyTrackingService $campaignLinkDailyTrackingService,
      CampaignLinkTrackingService $campaignLinkTrackingService,
-     EmailService $emailService,
-     MailSendingHistoryService $mailSendingHistoryService,
      SendEmailByCampaignService $sendEmailByCampaignService
     )
     {
@@ -109,8 +95,6 @@ class CampaignController extends AbstractRestAPIController
         $this->campaignDailyTrackingService = $campaignDailyTrackingService;
         $this->campaignLinkTrackingService = $campaignLinkTrackingService;
         $this->campaignLinkDailyTrackingService = $campaignLinkDailyTrackingService;
-        $this->emailService = $emailService;
-        $this->mailSendingHistoryService = $mailSendingHistoryService;
         $this->sendEmailByCampaignService = $sendEmailByCampaignService;
     }
 
@@ -277,5 +261,20 @@ class CampaignController extends AbstractRestAPIController
         $this->sendEmailByCampaignService->sendEmailByActiveCampaign($activeCampaign);
 
         return $this->sendOkJsonResponse(["message" => "Send Email By Campaign Success"]);
+    }
+
+    public function sendEmailByMyCampaign()
+    {
+        $activeCampaign = $this->myService->loadActiveMyCampaign();
+
+        if($activeCampaign){
+            $this->sendEmailByCampaignService->sendEmailByActiveCampaign($activeCampaign);
+
+            return $this->sendOkJsonResponse(["message" => "Send Email By My Campaign Success"]);
+        }else{
+
+            return $this->sendOkJsonResponse(["message" => "Success but no campaign to send"]);
+        }
+
     }
 }

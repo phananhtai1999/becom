@@ -204,6 +204,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'campaign.'], function () {
         Route::get('/my/campaign/{id}', [CampaignController::class, 'showMyCampaign'])->name('show');
         Route::put('/my/campaign/{id}', [CampaignController::class, 'editMyCampaign'])->name('edit');
         Route::delete('/my/campaign/{id}', [CampaignController::class, 'destroyMyCampaign'])->name('destroy');
+        Route::get('/my/emails/send-campaign', [CampaignController::class, 'sendEmailByMyCampaign'])->name('sendEmailByMyCampaign');
     });
 
     //Upsert-campaign-link-tracking
