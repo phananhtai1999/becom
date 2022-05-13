@@ -2,7 +2,7 @@
 
 namespace App\Listeners;
 
-use App\Events\SendCampaignByEmailEvent;
+use App\Events\SendEmailByCampaignEvent;
 use App\Mail\SendCampaign;
 use App\Services\CampaignService;
 use App\Services\MailSendingHistoryService;
@@ -12,7 +12,7 @@ use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Mail;
 
-class SendCampaignByEmailListener implements ShouldQueue
+class SendEmailByCampaignListener implements ShouldQueue
 {
     /**
      * @var MailTemplateVariableService
@@ -58,11 +58,11 @@ class SendCampaignByEmailListener implements ShouldQueue
     /**
      * Handle the event.
      *
-     * @param SendCampaignByEmailEvent $event
+     * @param SendEmailByCampaignEvent $event
      * @return void
      * @throws \Throwable
      */
-    public function handle(SendCampaignByEmailEvent $event)
+    public function handle(SendEmailByCampaignEvent $event)
     {
         $activeCampaign = $event->campaign;
         $emails = $event->emails;
@@ -70,13 +70,19 @@ class SendCampaignByEmailListener implements ShouldQueue
 
         $this->smtpAccountService->setSmtpAccountForCampaign($activeCampaign->smtpAccount);
 
-        $this->sendActiveCampaignByEmail($activeCampaign, $emails, $quantityEmailWasSentPerUser);
+        $this->sendEmailByActiveCampaign($activeCampaign, $emails, $quantityEmailWasSentPerUser);
 
         $this->campaignService->update($activeCampaign, ['is_running' => false]);
 
     }
 
-    public function sendActiveCampaignByEmail($campaign, $emails, $quantityEmailWasSentPerUser)
+    /**
+     * @param $campaign
+     * @param $emails
+     * @param $quantityEmailWasSentPerUser
+     * @return void
+     */
+    public function sendEmailByActiveCampaign($campaign, $emails, $quantityEmailWasSentPerUser)
     {
         for ($i = 1; $i <= $campaign->number_email_per_date; $i++) {
 
