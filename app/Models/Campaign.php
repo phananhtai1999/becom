@@ -85,4 +85,12 @@ class Campaign extends AbstractModel
     {
         return $this->hasMany(MailSendingHistory::class, 'campaign_uuid', 'uuid');
     }
+
+    /**
+     * @return HasMany
+     */
+    public function sendEmailScheduleLogs()
+    {
+        return $this->hasMany(SendEmailScheduleLog::class, 'campaign_uuid', 'uuid');
+    }
 }
