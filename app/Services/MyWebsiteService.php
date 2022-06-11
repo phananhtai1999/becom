@@ -19,7 +19,7 @@ class MyWebsiteService extends AbstractService
     public function showMyWebsite($id)
     {
         return  $this->findOneWhereOrFail([
-            ['from_user_uuid', auth()->user()->getkey()],
+            ['user_uuid', auth()->user()->getkey()],
             ['uuid', $id]
         ]);
     }

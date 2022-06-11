@@ -119,7 +119,7 @@ class WebsiteController extends AbstractRestAPIController
      */
     public function editMyWebsite(UpdateMyWebsiteRequest $request, $id)
     {
-        $model = $this->service->findOrFailById($id);
+        $model = $this->myService->showMyWebsite($id);
 
         $this->service->update($model, array_merge($request->all(), [
             'user_uuid' => auth()->user()->getkey(),
