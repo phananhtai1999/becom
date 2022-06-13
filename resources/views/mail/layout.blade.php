@@ -384,8 +384,6 @@
                                         @yield('content')
                                         <p>{{ __('mail.thanks') }}</p>
                                         <p>{{ __('mail.best_regards') }}</p>
-                                        <p>{{ __('Thank you for using our application.') }}</p>
-                                        <p>{{ __('Best Regards, ') }}</p>
                                         <p>{{ config('app.name').' '. __('Team.') }}</p>
                                     </td>
                                 </tr>
