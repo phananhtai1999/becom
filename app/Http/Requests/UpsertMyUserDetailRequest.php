@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
 
-class UpsertUserDetailRequest extends AbstractRequest
+class UpsertMyUserDetailRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.

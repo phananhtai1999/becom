@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Api\User;
 
 use App\Abstracts\AbstractRestAPIController;
 use App\Http\Requests\IndexRequest;
-use App\Http\Requests\UpdateMyUserDetailRequest;
-use App\Http\Requests\UpsertUserDetailRequest;
+use App\Http\Requests\UpdateUserDetailRequest;
+use App\Http\Requests\UpsertMyUserDetailRequest;
 use App\Http\Requests\UserDetailRequest;
 use App\Http\Resources\UserDetailResourceCollection;
 use App\Http\Resources\UserDetailResource;
@@ -32,14 +32,14 @@ class UserDetailController extends AbstractRestAPIController
         $this->resourceCollectionClass = UserDetailResourceCollection::class;
         $this->resourceClass = UserDetailResource::class;
         $this->storeRequest = UserDetailRequest::class;
-        $this->editRequest = UpdateMyUserDetailRequest::class;
+        $this->editRequest = UpdateUserDetailRequest::class;
         $this->indexRequest = IndexRequest::class;
     }
 
     /**
      * @return JsonResponse
      */
-    public function upsertMyUserDetail(UpsertUserDetailRequest $request)
+    public function upsertMyUserDetail(UpsertMyUserDetailRequest $request)
     {
         $model = $this->service->myUserDetail();
 
