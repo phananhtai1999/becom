@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api\User;
 
 use App\Abstracts\AbstractRestAPIController;
 use App\Http\Requests\IndexRequest;
+use App\Http\Requests\MyUserConfigRequest;
+use App\Http\Requests\UpdateMyUserConfigRequest;
 use App\Http\Requests\UpdateUserConfigRequest;
 use App\Http\Requests\UserConfigRequest;
 use App\Http\Resources\UserConfigResourceCollection;
@@ -42,13 +44,13 @@ class UserConfigController extends AbstractRestAPIController
         $model = $this->service->myUserConfig();
 
         if (empty($model)) {
-            $request = app($this->storeRequest);
+            $request = app(MyUserConfigRequest::class);
 
             $model = $this->service->create(array_merge($request->all(), [
                 'user_uuid' => auth()->user()->getkey()
             ]));
         } else {
-            $request = app($this->editRequest);
+            $request = app(UpdateMyUserConfigRequest::class);
 
             $this->service->update($model, array_merge($request->all(), [
                 'user_uuid' => auth()->user()->getkey()
