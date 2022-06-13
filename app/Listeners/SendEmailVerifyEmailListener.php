@@ -38,11 +38,10 @@ class SendEmailVerifyEmailListener
             'email', $user->email
         ]]);
 
-        $verifyEmail = $this->userService->update($model, array_merge(json_decode($user->all()), [
+        $verifyEmail = $this->userService->update($model,[
             'email_verification_code' => rand(100000, 999999)
-        ]));
+        ]);
 
-        Mail::to($user->email)->send(new SendVerifyEmailToUser($user, $verifyEmail));
-
+        Mail::to($user->email)->send(new SendVerifyEmailToUser($model));
     }
 }

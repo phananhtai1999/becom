@@ -352,11 +352,12 @@
                 border-color: #34495e !important;
             }
 
-            .verify_code_2 {
+            .mid_content {
                 background-color: #ffffff !important;
+                text-align: left !important;
             }
 
-            .verify_code_2 {
+            .mid_content {
                 pointer-events: none;
             }
         }
@@ -364,7 +365,7 @@
     </style>
 </head>
 <body class="">
-<span class="preheader">{{ __('This is an email from ') }}</span>
+<span class="preheader">{{ __('mail.title').' '.config('app.name') }}</span>
 <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="body">
     <tr>
         <td>&nbsp;</td>
@@ -381,6 +382,8 @@
                                 <tr>
                                     <td>
                                         @yield('content')
+                                        <p>{{ __('mail.thanks') }}</p>
+                                        <p>{{ __('mail.best_regards') }}</p>
                                         <p>{{ __('Thank you for using our application.') }}</p>
                                         <p>{{ __('Best Regards, ') }}</p>
                                         <p>{{ config('app.name').' '. __('Team.') }}</p>
