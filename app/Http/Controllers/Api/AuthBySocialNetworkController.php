@@ -76,6 +76,10 @@ class AuthBySocialNetworkController extends AbstractRestAPIController
             return $this->sendOkJsonResponse([
                 'data' => ['redirect_url' => Socialite::driver('linkedin')->stateless()->redirect()->getTargetUrl()]
             ]);
+        } elseif ($driver == 'github') {
+            return $this->sendOkJsonResponse([
+                'data' => ['redirect_url' => Socialite::driver('github')->stateless()->redirect()->getTargetUrl()]
+            ]);
         }
     }
 
@@ -230,6 +234,61 @@ class AuthBySocialNetworkController extends AbstractRestAPIController
             return redirect(URL::to(config('auth.login_failed_redirect_url')));
         }
     }
+
+    /**
+     * @return Application|JsonResponse|RedirectResponse|Redirector
+     */
+    public function loginByGithubCallback()
+    {
+        try {
+            $githubUser = Socialite::driver('github')->stateless()->user();
+
+            $findUserSocial = $this->service->findBySocialProfileEmail('github_' . $githubUser->getId());
+
+            $findUser = $this->userService->findByEmail($githubUser->email);
+
+            if (!empty($findUserSocial && $findUser)) {
+
+                return $this->loginSocial($findUser);
+            } elseif (!empty($findUser) && empty($findUserSocial)) {
+                $this->service->create([
+                    'social_profile_key' => 'github_' . $githubUser->getId(),
+                    'social_network_uuid' => 'github',
+                    'user_uuid' => $findUser->uuid,
+                    'social_profile_name' => $githubUser->getName(),
+                    'social_profile_avatar' => $githubUser->avatar,
+                    'social_profile_email' => $githubUser->email,
+                    'updated_info_at' => Carbon::now(),
+                ]);
+
+                return $this->loginSocial($findUser);
+            } else {
+                $newUser = $this->userService->create([
+                    'email' => $githubUser->email,
+                    'username' => $githubUser->email,
+                    'password' => Hash::make(Str::random(20)),
+                ]);
+
+                $newUser->roles()->attach([config('user.default_role_uuid')]);
+
+                $this->service->create([
+                    'social_profile_key' => 'github_' . $githubUser->getId(),
+                    'social_network_uuid' => 'github',
+                    'user_uuid' => $newUser->uuid,
+                    'social_profile_name' => $githubUser->getName(),
+                    'social_profile_avatar' => $githubUser->avatar,
+                    'social_profile_email' => $githubUser->email,
+                    'updated_info_at' => Carbon::now(),
+                ]);
+
+                return $this->loginSocial($newUser);
+            }
+        }catch (\Exception $exception ){
+
+            return redirect(URL::to(config('auth.login_failed_redirect_url')));
+        }
+    }
+
 
     /**
      * @param $userSocial

@@ -42,6 +42,7 @@ Route::get('/auth/url/{driver}', [AuthBySocialNetworkController::class, 'loginUr
 Route::get('/auth/callback/google', [AuthBySocialNetworkController::class, 'loginByGoogleCallback'])->name('loginByGoogleCallback');
 Route::get('/auth/callback/facebook', [AuthBySocialNetworkController::class, 'loginByFacebookCallback'])->name('loginByFacebookCallback');
 Route::get('/auth/callback/linkedin', [AuthBySocialNetworkController::class, 'loginByLinkedinCallback'])->name('loginByLinkedinCallback');
+Route::get('/auth/callback/github', [AuthBySocialNetworkController::class, 'loginByGithubCallback'])->name('loginByGithubCallback');
 
 Route::post('/upload-img', [UploadImgController::class, 'upload'])->name('upload')->middleware('auth:api');
 
