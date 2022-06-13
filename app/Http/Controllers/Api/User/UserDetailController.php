@@ -4,7 +4,8 @@ namespace App\Http\Controllers\Api\User;
 
 use App\Abstracts\AbstractRestAPIController;
 use App\Http\Requests\IndexRequest;
-use App\Http\Requests\UpdateUserDetailRequest;
+use App\Http\Requests\UpdateMyUserDetailRequest;
+use App\Http\Requests\UpsertUserDetailRequest;
 use App\Http\Requests\UserDetailRequest;
 use App\Http\Resources\UserDetailResourceCollection;
 use App\Http\Resources\UserDetailResource;
@@ -31,26 +32,22 @@ class UserDetailController extends AbstractRestAPIController
         $this->resourceCollectionClass = UserDetailResourceCollection::class;
         $this->resourceClass = UserDetailResource::class;
         $this->storeRequest = UserDetailRequest::class;
-        $this->editRequest = UpdateUserDetailRequest::class;
+        $this->editRequest = UpdateMyUserDetailRequest::class;
         $this->indexRequest = IndexRequest::class;
     }
 
     /**
      * @return JsonResponse
      */
-    public function upsertMyUserDetail()
+    public function upsertMyUserDetail(UpsertUserDetailRequest $request)
     {
         $model = $this->service->myUserDetail();
 
         if (empty($model)) {
-            $request = app($this->storeRequest);
-
             $model = $this->service->create(array_merge($request->all(), [
                 'user_uuid' => auth()->user()->getkey()
             ]));
         } else {
-            $request = app($this->editRequest);
-
             $this->service->update($model, array_merge($request->all(), [
                 'user_uuid' => auth()->user()->getkey()
             ]));

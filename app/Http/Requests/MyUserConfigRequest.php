@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
 
-class UpdateUserDetailRequest extends AbstractRequest
+class MyUserConfigRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,9 +24,9 @@ class UpdateUserDetailRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'about' => ['nullable', 'string'],
-            'gender' => ['numeric', 'max:1'],
-            'date_of_birth' => ['nullable', 'date_format:Y-m-d'],
+            'app_language' => ['required', 'string'],
+            'user_language' => ['required', 'string'],
+            'display_name_style' => ['required', 'numeric', 'min:1', 'max:127'],
         ];
     }
 }

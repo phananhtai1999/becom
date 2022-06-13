@@ -24,6 +24,7 @@ class UpdateUserConfigRequest extends AbstractRequest
     public function rules()
     {
         return [
+            'user_uuid' => ['numeric', 'min:1', 'exists:users,uuid'],
             'app_language' => ['string'],
             'user_language' => ['string'],
             'display_name_style' => ['numeric', 'min:1'],

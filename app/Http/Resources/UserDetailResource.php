@@ -20,8 +20,6 @@ class UserDetailResource extends AbstractJsonResource
             'about' => $this->about,
             'gender' => $this->gender,
             'date_of_birth' => $this->date_of_birth,
-            'shipping_address' => $this->shipping_address,
-            'billing_address' => $this->billing_address,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at

@@ -32,8 +32,6 @@ class UserDetailQueryBuilder extends AbstractQueryBuilder
                 'gender',
                 'date_of_birth',
                 'user_uuid',
-                'shipping_address',
-                'billing_address'
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -42,8 +40,6 @@ class UserDetailQueryBuilder extends AbstractQueryBuilder
                 'gender',
                 'date_of_birth',
                 'user_uuid',
-                'shipping_address',
-                'billing_address'
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -56,10 +52,6 @@ class UserDetailQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__date_of_birth', 'date_of_birth'),
                 'user_uuid',
                 AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
-                'shipping_address',
-                AllowedFilter::exact('exact__shipping_address', 'shipping_address'),
-                'billing_address',
-                AllowedFilter::exact('exact__billing_address', 'billing_address'),
             ]);
     }
 }

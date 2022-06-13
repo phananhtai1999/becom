@@ -6,5 +6,4 @@ use App\Abstracts\AbstractJsonResourceCollection;
 
 class UserDetailResourceCollection extends AbstractJsonResourceCollection
 {
-
 }
