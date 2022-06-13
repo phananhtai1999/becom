@@ -175,11 +175,11 @@ class AuthController extends AbstractRestAPIController
                     'password' => Hash::make($request->get('password'))
                 ]);
 
-                return $this->sendOkJsonResponse(['message' => 'messages.change_password_success']);
+                return $this->sendOkJsonResponse(['message' => __('messages.change_password_success')]);
             }
         }
 
-        return $this->sendValidationFailedJsonResponse(['token' => 'messages.token_does_not_exists']);
+        return $this->sendValidationFailedJsonResponse(['token' => __('messages.token_does_not_exists')]);
     }
 
     /**
@@ -232,9 +232,9 @@ class AuthController extends AbstractRestAPIController
         if ($user) {
             Event::dispatch(new SendEmailRecoveryPasswordEvent($user));
 
-            return $this->sendOkJsonResponse(['message' => 'messages.reset_password']);
+            return $this->sendOkJsonResponse(['message' => __('messages.reset_password')]);
         }
 
-        return $this->sendValidationFailedJsonResponse(['email' => 'messages.email_does_not_exists']);
+        return $this->sendValidationFailedJsonResponse(['email' => __('messages.email_does_not_exists')]);
     }
 }

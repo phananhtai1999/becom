@@ -24,7 +24,7 @@ class UpdateSmtpAccountEncryptionRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'name' => ['string', 'unique:smtp_account_encryptions, name'],
+            'name' => ['string', 'unique:smtp_account_encryptions,name'],
         ];
     }
 }
