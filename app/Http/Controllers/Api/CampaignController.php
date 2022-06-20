@@ -13,6 +13,7 @@ use App\Http\Requests\CampaignRequest;
 use App\Http\Requests\IncrementCampaignTrackingRequest;
 use App\Http\Requests\LoadAnalyticDataRequest;
 use App\Http\Requests\MyCampaignRequest;
+use App\Http\Requests\SendEmailByCampaignRequest;
 use App\Http\Requests\UpdateCampaignRequest;
 use App\Http\Requests\UpdateMyCampaignRequest;
 use App\Http\Resources\CampaignDailyTrackingResourceCollection;
@@ -22,15 +23,19 @@ use App\Http\Resources\CampaignLinkDailyTrackingResource;
 use App\Http\Resources\CampaignLinkTrackingResource;
 use App\Http\Resources\CampaignResource;
 use App\Http\Resources\CampaignTrackingResource;
+use App\Mail\SendCampaign;
 use App\Services\CampaignDailyTrackingService;
 use App\Services\CampaignLinkDailyTrackingService;
 use App\Services\CampaignLinkTrackingService;
 use App\Services\CampaignService;
 use App\Services\CampaignTrackingService;
+use App\Services\MailTemplateVariableService;
 use App\Services\SendEmailByCampaignService;
+use App\Services\SmtpAccountService;
 use Carbon\Carbon;
 use App\Services\MyCampaignService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Mail;
 
 class CampaignController extends AbstractRestAPIController
 {
@@ -67,6 +72,16 @@ class CampaignController extends AbstractRestAPIController
     protected $sendEmailByCampaignService;
 
     /**
+     * @var SmtpAccountService
+     */
+    protected $smtpAccountService;
+
+    /**
+     * @var MailTemplateVariableService
+     */
+    protected $mailTemplateVariableService;
+
+    /**
      * @param CampaignService $service
      * @param MyCampaignService $myService
      * @param CampaignTrackingService $campaignTrackingService
@@ -74,15 +89,20 @@ class CampaignController extends AbstractRestAPIController
      * @param CampaignLinkDailyTrackingService $campaignLinkDailyTrackingService
      * @param CampaignLinkTrackingService $campaignLinkTrackingService
      * @param SendEmailByCampaignService $sendEmailByCampaignService
+     * @param SmtpAccountService $smtpAccountService
+     * @param MailTemplateVariableService $mailTemplateVariableService
      */
     public function __construct
-    (CampaignService $service,
-     MyCampaignService $myService,
-     CampaignTrackingService $campaignTrackingService,
-     CampaignDailyTrackingService $campaignDailyTrackingService,
-     CampaignLinkDailyTrackingService $campaignLinkDailyTrackingService,
-     CampaignLinkTrackingService $campaignLinkTrackingService,
-     SendEmailByCampaignService $sendEmailByCampaignService
+    (
+        CampaignService $service,
+        MyCampaignService $myService,
+        CampaignTrackingService $campaignTrackingService,
+        CampaignDailyTrackingService $campaignDailyTrackingService,
+        CampaignLinkDailyTrackingService $campaignLinkDailyTrackingService,
+        CampaignLinkTrackingService $campaignLinkTrackingService,
+        SendEmailByCampaignService $sendEmailByCampaignService,
+        SmtpAccountService $smtpAccountService,
+        MailTemplateVariableService $mailTemplateVariableService
     )
     {
         $this->service = $service;
@@ -96,6 +116,8 @@ class CampaignController extends AbstractRestAPIController
         $this->campaignLinkTrackingService = $campaignLinkTrackingService;
         $this->campaignLinkDailyTrackingService = $campaignLinkDailyTrackingService;
         $this->sendEmailByCampaignService = $sendEmailByCampaignService;
+        $this->smtpAccountService = $smtpAccountService;
+        $this->mailTemplateVariableService = $mailTemplateVariableService;
     }
 
     /**
@@ -276,5 +298,24 @@ class CampaignController extends AbstractRestAPIController
             return $this->sendOkJsonResponse(["message" => "Success but no campaign to send"]);
         }
 
+    }
+
+    /**
+     * @param SendEmailByCampaignRequest $request
+     * @return JsonResponse
+     */
+    public function sendEmailByCampaign(SendEmailByCampaignRequest $request)
+    {
+        $campaignUuid = $request->get('campaign_uuid');
+        $campaign = $this->service->findOrFailById($campaignUuid);
+        $toEmail = $request->get('to_email');
+
+        $this->smtpAccountService->setSmtpAccountForCampaign($campaign->smtpAccount);
+
+        $mailTemplate = $this->mailTemplateVariableService->renderBody($campaign->mailTemplate, $toEmail, $campaign->smtpAccount, $campaign);
+
+        Mail::to($toEmail)->send(new SendCampaign($mailTemplate));
+
+        return response()->json(['message' => 'Mail Sent Successfully'], 200);
     }
 }
