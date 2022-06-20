@@ -18,15 +18,15 @@ class MailTemplateVariableService extends AbstractService
     public function renderBody($mailTemplate, $email, $smtpAccount, $campaign = null)
     {
         $fromEmail = $smtpAccount->mail_from_address;
-        $websiteName = $email->website->name;
-        $websiteDomain = $email->website->domain;
-        $websiteDescription = $email->website->description;
-        $toEmail = $email->email;
-        $emailFirstName = $email->first_name;
-        $emailLastName = $email->last_name;
-        $emailAge = $email->age;
-        $emailCountry = $email->country;
-        $emailJob = $email->job;
+        $websiteName = !empty($campaign) ? $campaign->website->name : $email->website->name;
+        $websiteDomain = !empty($campaign) ? $campaign->website->domain : $email->website->domain;
+        $websiteDescription = !empty($campaign) ? $campaign->website->description : $email->website->description;
+        $toEmail = $email->email ?? $email;
+        $emailFirstName = $email->first_name ?? '';
+        $emailLastName = $email->last_name ?? '';
+        $emailAge = $email->age ?? '';
+        $emailCountry = $email->country ?? '';
+        $emailJob = $email->job ?? '';
         $current = Carbon::now('Asia/Ho_Chi_Minh');
         $currentDay = $current->toDateString();
         $currentTime = $current->toTimeString();
