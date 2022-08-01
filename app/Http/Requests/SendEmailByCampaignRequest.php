@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
+use Carbon\Carbon;
+use Illuminate\Validation\Rule;
 
 class SendEmailByCampaignRequest extends AbstractRequest
 {
@@ -24,8 +26,19 @@ class SendEmailByCampaignRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'campaign_uuid' => ['required', 'numeric', 'min:1', 'exists:campaigns,uuid'],
-            'to_email' => ['required', 'email:rfc,dns']
+            'campaign_uuid' => ['required', 'numeric', 'min:1', Rule::exists('campaigns', 'uuid')->where(function ($query){
+                return $query->where([
+                    ['uuid', $this->request->get('campaign_uuid')],
+                    ['from_date', '<=', Carbon::now()],
+                    ['to_date', '>=', Carbon::now()],
+                    ['was_finished', false],
+                    ['was_stopped_by_owner', false],
+                    ['is_running', false],
+                ]);
+            })],
+            'to_emails' => ['required', 'array'],
+            'to_emails.*' => ['required', 'email:rfc,dns'],
+            'is_save_history' => ['required', 'boolean']
         ];
     }
 }

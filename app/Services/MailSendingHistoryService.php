@@ -24,4 +24,17 @@ class MailSendingHistoryService extends AbstractService
             ->groupBy('email')
             ->first();
     }
+
+    /**
+     * @param $campaignUuid
+     * @param $email
+     * @return mixed
+     */
+    public function getNumberEmailSentPerUser($campaignUuid, $email)
+    {
+        return $this->model->where('campaign_uuid', $campaignUuid)
+            ->where('email', $email)
+            ->groupBy('email')
+            ->count();
+    }
 }

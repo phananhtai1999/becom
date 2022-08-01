@@ -5,6 +5,7 @@ namespace App\Listeners;
 use App\Events\SendEmailByCampaignEvent;
 use App\Mail\SendCampaign;
 use App\Services\CampaignService;
+use App\Services\EmailService;
 use App\Services\MailSendingHistoryService;
 use App\Services\MailTemplateVariableService;
 use App\Services\SmtpAccountService;
@@ -35,23 +36,30 @@ class SendEmailByCampaignListener implements ShouldQueue
     private $campaignService;
 
     /**
-     * Create the event listener.
-     *
+     * @var EmailService
+     */
+    private $emailService;
+
+    /**
      * @param MailTemplateVariableService $mailTemplateVariableService
      * @param MailSendingHistoryService $mailSendingHistoryService
      * @param SmtpAccountService $smtpAccountService
+     * @param CampaignService $campaignService
+     * @param EmailService $emailService
      */
     public function __construct(
         MailTemplateVariableService $mailTemplateVariableService,
         MailSendingHistoryService   $mailSendingHistoryService,
         SmtpAccountService          $smtpAccountService,
-        CampaignService $campaignService
+        CampaignService $campaignService,
+        EmailService $emailService
     )
     {
         $this->mailTemplateVariableService = $mailTemplateVariableService;
         $this->mailSendingHistoryService = $mailSendingHistoryService;
         $this->smtpAccountService = $smtpAccountService;
         $this->campaignService = $campaignService;
+        $this->emailService = $emailService;
 
     }
 
@@ -64,31 +72,42 @@ class SendEmailByCampaignListener implements ShouldQueue
      */
     public function handle(SendEmailByCampaignEvent $event)
     {
-        $activeCampaign = $event->campaign;
-        $emails = $event->emails;
-        $quantityEmailWasSentPerUser = $event->quantityEmailWasSentPerUser;
+        $campaign = $event->campaign;
+        $toEmails = $event->toEmails;
+        $isSaveHistory = $event->isSaveHistory;
 
-        $this->smtpAccountService->setSmtpAccountForCampaign($activeCampaign->smtpAccount);
+        $this->smtpAccountService->setSmtpAccountForCampaign($campaign->smtpAccount);
+        if($isSaveHistory){
+            $this->campaignService->update($campaign, ['is_running' => true]);
+            $this->sendEmailByCampaign($campaign, $toEmails);
+            $this->campaignService->update($campaign, ['is_running' => false]);
+        }else{
+            $emails = $this->emailService->getEmailInArray($toEmails);
+            foreach ($emails as $email){
+                $mailTemplate = $this->mailTemplateVariableService->renderBody($campaign->mailTemplate, $email, $campaign->smtpAccount, $campaign);
 
-        $this->sendEmailByActiveCampaign($activeCampaign, $emails, $quantityEmailWasSentPerUser);
-
-        $this->campaignService->update($activeCampaign, ['is_running' => false]);
-
+                Mail::to($email->email)->send(new SendCampaign($mailTemplate));
+            }
+        }
     }
 
     /**
      * @param $campaign
-     * @param $emails
-     * @param $quantityEmailWasSentPerUser
+     * @param $toEmails
      * @return void
      */
-    public function sendEmailByActiveCampaign($campaign, $emails, $quantityEmailWasSentPerUser)
+    public function sendEmailByCampaign($campaign, $toEmails)
     {
+        if(empty($toEmails)){
+            $emails = $campaign->website->emails;
+        }else{
+            $emails = $this->emailService->getEmailInArray($toEmails);
+        }
         for ($i = 1; $i <= $campaign->number_email_per_date; $i++) {
+            foreach ($emails as $email){
+                $quantityEmailWasSentPerUser = $this->mailSendingHistoryService->getNumberEmailSentPerUser($campaign->uuid, $email->email);
 
-            if ($quantityEmailWasSentPerUser < $campaign->number_email_per_user) {
-
-                foreach ($emails as $email) {
+                if($quantityEmailWasSentPerUser < $campaign->number_email_per_user){
                     $mailTemplate = $this->mailTemplateVariableService->renderBody($campaign->mailTemplate, $email, $campaign->smtpAccount, $campaign);
 
                     Mail::to($email->email)->send(new SendCampaign($mailTemplate));
@@ -99,14 +118,28 @@ class SendEmailByCampaignListener implements ShouldQueue
                         'time' => Carbon::now()
                     ]);
                 }
-
-                $quantityEmailWasSentPerUser++;
-
             }
         }
 
-        if ($quantityEmailWasSentPerUser === $campaign->number_email_per_user) {
+        if($this->checkWasFinishedCampaign($campaign)){
             $this->campaignService->update($campaign, ['was_finished' => true]);
         }
+
     }
+
+    /**
+     * @param $campaign
+     * @return bool
+     */
+    public function checkWasFinishedCampaign($campaign)
+    {
+        $emails = $this->emailService->findAllWhere(['website_uuid' => $campaign->website_uuid]);
+        foreach ($emails as $email){
+            if($this->mailSendingHistoryService->getNumberEmailSentPerUser($campaign->uuid, $email->email) !== $campaign->number_email_per_user){
+                return false;
+            }
+        }
+        return true;
+    }
+
 }

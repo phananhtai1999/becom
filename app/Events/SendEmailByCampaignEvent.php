@@ -11,6 +11,7 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use phpDocumentor\Reflection\Types\Boolean;
 
 class SendEmailByCampaignEvent
 {
@@ -22,27 +23,27 @@ class SendEmailByCampaignEvent
     public $campaign;
 
     /**
-     * @var Email
+     * @var array
      */
-    public $emails;
+    public $toEmails;
 
     /**
-     * @var $quantityEmailWasSentPerUser
+     * @var Boolean
      */
-    public $quantityEmailWasSentPerUser;
+    public $isSaveHistory;
 
     /**
      * Create a new event instance.
      *
      * @param $campaign
-     * @param $emails
-     * @param $quantityEmailWasSentPerUser
+     * @param $toEmails
+     * @param $isSaveHistory
      */
-    public function __construct($campaign, $emails, $quantityEmailWasSentPerUser)
+    public function __construct($campaign, $toEmails, $isSaveHistory)
     {
         $this->campaign = $campaign;
-        $this->emails = $emails;
-        $this->quantityEmailWasSentPerUser = $quantityEmailWasSentPerUser;
+        $this->toEmails = $toEmails;
+        $this->isSaveHistory = $isSaveHistory;
     }
 
     /**
