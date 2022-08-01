@@ -196,7 +196,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'campaign.'], function () {
         Route::get('/campaign/{id}', [CampaignController::class, 'show'])->name('show');
         Route::put('/campaign/{id}', [CampaignController::class, 'edit'])->name('edit');
         Route::delete('/campaign/{id}', [CampaignController::class, 'destroy'])->name('destroy');
-        Route::get('/emails/send-campaign', [CampaignController::class, 'sendEmailsByCampaign'])->name('sendEmailsByCampaign');
+        Route::post('/emails/send-campaign', [CampaignController::class, 'sendEmailsByCampaign'])->name('sendEmailsByCampaign');
     });
 
     Route::group(['as' => 'my.'], function () {
@@ -212,8 +212,6 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'campaign.'], function () {
     Route::get('/upsert-campaign-link-tracking', [CampaignController::class, 'upsertCampaignLinkTrackingTotalClick'])->name('upsert-campaign-link-tracking');
     //Load-campaign-tracking analytic
     Route::get('/campaign-tracking/analytic', [CampaignController::class, 'loadAnalyticData'])->name('loadAnalyticData');
-    //This api will use to_email and campaign_uuid from campaigns table to send email by campaign
-    Route::post('campaign/send-email', [CampaignController::class, 'sendEmailByCampaign'])->name('sendEmailByCampaign');
 });
 
 //Create Increment Campaign total open

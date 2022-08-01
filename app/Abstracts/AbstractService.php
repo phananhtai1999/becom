@@ -136,4 +136,13 @@ abstract class AbstractService
     {
         return $this->model->where($where)->firstOrFail();
     }
+
+    /**
+     * @param $where
+     * @return mixed
+     */
+    public function findAllWhere($where)
+    {
+        return $this->model->where($where)->get();
+    }
 }

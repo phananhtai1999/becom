@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Abstracts\AbstractService;
 use App\Models\Email;
 use App\Models\QueryBuilders\EmailQueryBuilder;
+use phpDocumentor\Reflection\Types\Boolean;
 
 class EmailService extends AbstractService
 {
@@ -19,5 +20,25 @@ class EmailService extends AbstractService
     public function getEmailInArray($emails)
     {
         return $this->model->whereIn('email', $emails)->get();
+    }
+
+    /**
+     * @param $toEmails
+     * @param $websiteUuid
+     * @return bool
+     */
+    public function checkEmailValid($toEmails, $websiteUuid)
+    {
+        foreach ($toEmails as $toEmail){
+            $email = $this->findOneWhere([
+                ['email', $toEmail],
+                ['website_uuid', $websiteUuid]
+            ]);
+           if(!$email){
+               return false;
+           }
+        }
+
+        return true;
     }
 }
