@@ -131,17 +131,22 @@ class SmtpAccountController extends AbstractRestAPIController
      */
     public function sendEmail(SendMailBySmtpAccountUuidRequest $request)
     {
-        $subject = $request->get('subject');
-        $body = $request->get('body');
-        $toEmails = $request->get('to_emails');
+        try {
+            $subject = $request->get('subject');
+            $body = $request->get('body');
+            $toEmails = $request->get('to_emails');
 
-        $this->service->sendEmailsBySmtpAccount();
+            $this->service->sendEmailsBySmtpAccount();
 
-        foreach ($toEmails as $emails) {
-            Mail::to($emails)->send(new SendEmails($subject, $body));
+            foreach ($toEmails as $emails) {
+                Mail::to($emails)->send(new SendEmails($subject, $body));
+            }
+
+            return response()->json(['message' => 'Mail Sent Successfully'], 200);
+        }catch (\Exception $e){
+            return $this->sendInternalServerErrorJsonResponse(["error" => $e->getMessage()]);
         }
 
-        return response()->json(['message' => 'Mail Sent Successfully'], 200);
     }
 
     /**
@@ -151,18 +156,23 @@ class SmtpAccountController extends AbstractRestAPIController
      */
     public function sendTemplate(SendMailUseMailTemplateUuidRequest $request)
     {
-        $mailTemplate = MailTemplate::where('uuid', $request->get('mail_template_uuid'))->first();
+        try {
+            $mailTemplate = MailTemplate::where('uuid', $request->get('mail_template_uuid'))->first();
 
-        $subject = $mailTemplate->subject;
-        $body = $mailTemplate->body;
-        $toEmails = $request->get('to_emails');
+            $subject = $mailTemplate->subject;
+            $body = $mailTemplate->body;
+            $toEmails = $request->get('to_emails');
 
-        $this->service->sendEmailsBySmtpAccount();
+            $this->service->sendEmailsBySmtpAccount();
 
-        foreach ($toEmails as $emails) {
-            Mail::to($emails)->send(new SendEmails($subject, $body));
+            foreach ($toEmails as $emails) {
+                Mail::to($emails)->send(new SendEmails($subject, $body));
+            }
+
+            return response()->json(['message' => 'Mail Sent Successfully'], 200);
+        }catch (\Exception $e){
+            return $this->sendInternalServerErrorJsonResponse(["error" => $e->getMessage()]);
         }
 
-        return response()->json(['message' => 'Mail Sent Successfully'], 200);
     }
 }
