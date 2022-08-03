@@ -34,21 +34,12 @@ class MySmtpAccountService extends AbstractService
 
     /**
      * @param $id
-     * @return mixed|void
+     * @return mixed
      */
     public function deleteMySmtpAccountByKey($id)
     {
-        $smtpAccount = $this->model->select('smtp_accounts.*')
-            ->join('websites', 'websites.uuid', '=', 'smtp_accounts.website_uuid')
-            ->where([
-                ['websites.user_uuid', auth()->user()->getKey()],
-                ['smtp_accounts.uuid', $id]
-            ])->first();
+        $smtpAccount = $this->findMySmtpAccountByKeyOrAbort($id);
 
-        if (!empty($smtpAccount)) {
-            return $this->destroy($smtpAccount->getKey());
-        } else {
-            abort(403, 'Unauthorized.');
-        }
+        return $this->destroy($smtpAccount->getKey());
     }
 }

@@ -35,22 +35,13 @@ class MyCampaignService extends AbstractService
 
     /**
      * @param $id
-     * @return mixed|void
+     * @return mixed
      */
     public function deleteMyCampaignByKey($id)
     {
-        $campaign = $this->model->select('campaigns.*')
-            ->join('websites', 'websites.uuid', '=', 'campaigns.website_uuid')
-            ->where([
-                ['websites.user_uuid', auth()->user()->getKey()],
-                ['campaigns.uuid', $id]
-            ])->first();
+        $campaign = $this->findMyCampaignByKeyOrAbort($id);
 
-        if (!empty($campaign)) {
-            return $this->destroy($campaign->getKey());
-        } else {
-            abort(403, 'Unauthorized.');
-        }
+        return $this->destroy($campaign->getKey());
     }
 
     /**
