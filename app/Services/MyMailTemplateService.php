@@ -34,21 +34,12 @@ class MyMailTemplateService extends AbstractService
 
     /**
      * @param $id
-     * @return mixed|void
+     * @return mixed
      */
     public function deleteMyMailTemplateByKey($id)
     {
-        $mailTemplate = $this->model->select('mail_templates.*')
-            ->join('websites', 'websites.uuid', '=', 'mail_templates.website_uuid')
-            ->where([
-                ['websites.user_uuid', auth()->user()->getKey()],
-                ['mail_templates.uuid', $id]
-            ])->first();
+        $mailTemplate = $this->findMyMailTemplateByKeyOrAbort($id);
 
-        if (!empty($mailTemplate)) {
-            return $this->destroy($mailTemplate->getKey());
-        } else {
-            abort(403, 'Unauthorized.');
-        }
+        return $this->destroy($mailTemplate->getKey());
     }
 }

@@ -34,21 +34,12 @@ class MyEmailService extends AbstractService
 
     /**
      * @param $id
-     * @return mixed|void
+     * @return mixed
      */
     public function deleteMyEmailByKey($id)
     {
-        $smtpAccount = $this->model->select('emails.*')
-            ->join('websites', 'websites.uuid', '=', 'emails.website_uuid')
-            ->where([
-                ['websites.user_uuid', auth()->user()->getKey()],
-                ['emails.uuid', $id]
-            ])->first();
+        $smtpAccount = $this->findMyEmailByKeyOrAbort($id);
 
-        if (!empty($smtpAccount)) {
-            return $this->destroy($smtpAccount->getKey());
-        } else {
-            abort(403, 'Unauthorized.');
-        }
+        return $this->destroy($smtpAccount->getKey());
     }
 }
