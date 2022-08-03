@@ -144,7 +144,7 @@ class SmtpAccountController extends AbstractRestAPIController
 
             return response()->json(['message' => 'Mail Sent Successfully'], 200);
         }catch (\Exception $e){
-            return $this->sendInternalServerErrorJsonResponse(["error" => $e->getMessage()]);
+            return $this->sendValidationFailedJsonResponse(["smtp_account" => $e->getMessage()]);
         }
 
     }
@@ -171,7 +171,7 @@ class SmtpAccountController extends AbstractRestAPIController
 
             return response()->json(['message' => 'Mail Sent Successfully'], 200);
         }catch (\Exception $e){
-            return $this->sendInternalServerErrorJsonResponse(["error" => $e->getMessage()]);
+            return $this->sendValidationFailedJsonResponse(["smtp_account" => $e->getMessage()]);
         }
 
     }
