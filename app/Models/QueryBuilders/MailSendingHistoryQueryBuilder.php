@@ -48,6 +48,8 @@ class MailSendingHistoryQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__email', 'email'),
                 'time',
                 AllowedFilter::exact('exact__time', 'time'),
+                'campaign.tracking_key',
+                AllowedFilter::exact('exact__campaign.tracking_key', 'campaign.tracking_key'),
             ]);
     }
 }

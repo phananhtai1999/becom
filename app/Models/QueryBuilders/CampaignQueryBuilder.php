@@ -84,6 +84,12 @@ class CampaignQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__was_finished', 'was_finished'),
                 'was_stopped_by_owner',
                 AllowedFilter::exact('exact__was_stopped_by_owner', 'was_stopped_by_owner'),
+                'mailTemplate.subject',
+                AllowedFilter::exact('exact__mailTemplate.subject', 'mailTemplate.subject'),
+                'smtpAccount.mail_username',
+                AllowedFilter::exact('exact__smtpAccount.mail_username', 'smtpAccount.mail_username'),
+                'website.domain',
+                AllowedFilter::exact('exact__website.domain', 'website.domain'),
             ]);
     }
 }

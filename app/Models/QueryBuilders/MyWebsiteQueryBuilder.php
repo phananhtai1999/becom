@@ -56,6 +56,8 @@ class MyWebsiteQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__description', 'description'),
                 'logo',
                 AllowedFilter::exact('exact__logo', 'logo'),
+                'user.username',
+                AllowedFilter::exact('exact__user.username', 'user.username'),
             ]);
     }
 }

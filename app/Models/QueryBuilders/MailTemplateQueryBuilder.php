@@ -48,6 +48,8 @@ class MailTemplateQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__body', 'body'),
                 'website_uuid',
                 AllowedFilter::exact('exact__website_uuid', 'website_uuid'),
+                'website.domain',
+                AllowedFilter::exact('exact__website.domain', 'website.domain'),
             ]);
     }
 }
