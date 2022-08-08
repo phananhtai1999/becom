@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Abstracts\AbstractService;
+use App\Models\QueryBuilders\WebsiteVerificationQueryBuilder;
 use App\Models\WebsiteVerification;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
@@ -10,6 +11,8 @@ use Illuminate\Support\Str;
 class WebsiteVerificationService extends AbstractService
 {
     protected $modelClass = WebsiteVerification::class;
+
+    protected $modelQueryBuilderClass = WebsiteVerificationQueryBuilder::class;
 
     /**
      * @param $websiteVerification

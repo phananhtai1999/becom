@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\MailTemplateController;
 use App\Http\Controllers\Api\SmtpAccountController;
 use App\Http\Controllers\Api\User\UserController;
 use App\Http\Controllers\Api\WebsiteController;
+use App\Http\Controllers\Api\WebsiteVerificationController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\UploadImgController;
@@ -262,5 +263,14 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'smtp-account-encryption.'],
         Route::get('/smtp-account-encryption/{id}', [SmtpAccountEncryptionController::class, 'show'])->name('show');
         Route::put('/smtp-account-encryption/{id}', [SmtpAccountEncryptionController::class, 'edit'])->name('edit');
         Route::delete('/smtp-account-encryption/{id}', [SmtpAccountEncryptionController::class, 'destroy'])->name('destroy');
+    });
+});
+
+//WebsiteVerification
+Route::group(['middleware' => ['auth:api'], 'as' => 'website-verification.'], function (){
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function (){
+        Route::get('/website-verifications', [WebsiteVerificationController::class, 'index'])->name('index');
+        Route::get('/website-verification/{id}', [WebsiteVerificationController::class, 'show'])->name('show');
+        Route::delete('/website-verification/{id}', [WebsiteVerificationController::class, 'destroy'])->name('destroy');
     });
 });
