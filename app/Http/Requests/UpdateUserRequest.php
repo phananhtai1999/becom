@@ -25,7 +25,7 @@ class UpdateUserRequest extends AbstractRequest
     {
         return [
             'username' => ['string', 'unique:users,username'],
-            'email' => ['string', 'unique:users,email'],
+            'email' => ['string', 'email:rfc,dns', 'unique:users,email'],
             'password' => ['string', 'confirmed'],
             'first_name' => ['nullable', 'string'],
             'last_name' => ['nullable', 'string'],

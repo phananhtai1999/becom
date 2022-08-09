@@ -25,7 +25,7 @@ class MailSendingHistoryRequest extends AbstractRequest
     {
         return [
             'campaign_uuid' => ['required', 'numeric', 'min:1', 'exists:campaigns,uuid'],
-            'email' => ['required', 'string'],
+            'email' => ['required', 'string', 'email:rfc,dns'],
             'time' => ['required', 'date'],
         ];
     }
