@@ -27,7 +27,7 @@ class UserRequest extends AbstractRequest
             'username' => ['required', 'string', 'unique:users,username'],
             'first_name' => ['nullable', 'string'],
             'last_name' => ['nullable', 'string'],
-            'email' => ['required', 'string', 'unique:users,email'],
+            'email' => ['required', 'string', 'email:rfc,dns', 'unique:users,email'],
             'password' => ['required', 'string', 'confirmed'],
             'avatar_img' => ['nullable', 'string'],
             'cover_img' => ['nullable', 'string'],
