@@ -18,13 +18,17 @@ class CampaignService extends AbstractService
      */
     public function loadActiveCampaign()
     {
-        return $this->findOneWhereOrFail([
-            ['from_date', '<=', Carbon::now()],
-            ['to_date', '>=', Carbon::now()],
-            ['was_finished', false],
-            ['was_stopped_by_owner', false],
-            ['is_running', false],
-        ]);
+        return $this->model->select('campaigns.*')
+                ->whereNotIn('uuid', function ($query){
+                    $query->select('campaigns.uuid')
+                        ->from('campaigns')
+                        ->join('send_email_schedule_logs', 'send_email_schedule_logs.campaign_uuid', '=', 'campaigns.uuid')
+                        ->where('send_email_schedule_logs.is_running', true);
+                })->where([
+                ['campaigns.from_date', '<=', Carbon::now()],
+                ['campaigns.to_date', '>=', Carbon::now()],
+                ['campaigns.was_finished', false],
+                ['campaigns.was_stopped_by_owner', false],
+            ])->firstOrFail();
     }
-
 }

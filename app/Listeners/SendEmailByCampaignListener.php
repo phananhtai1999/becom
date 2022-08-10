@@ -8,6 +8,7 @@ use App\Services\CampaignService;
 use App\Services\EmailService;
 use App\Services\MailSendingHistoryService;
 use App\Services\MailTemplateVariableService;
+use App\Services\SendEmailScheduleLogService;
 use App\Services\SmtpAccountService;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -41,18 +42,25 @@ class SendEmailByCampaignListener implements ShouldQueue
     private $emailService;
 
     /**
+     * @var SendEmailScheduleLogService
+     */
+    private $sendEmailScheduleLogService;
+
+    /**
      * @param MailTemplateVariableService $mailTemplateVariableService
      * @param MailSendingHistoryService $mailSendingHistoryService
      * @param SmtpAccountService $smtpAccountService
      * @param CampaignService $campaignService
      * @param EmailService $emailService
+     * @param SendEmailScheduleLogService $sendEmailScheduleLogService
      */
     public function __construct(
         MailTemplateVariableService $mailTemplateVariableService,
         MailSendingHistoryService   $mailSendingHistoryService,
         SmtpAccountService          $smtpAccountService,
         CampaignService $campaignService,
-        EmailService $emailService
+        EmailService $emailService,
+        SendEmailScheduleLogService $sendEmailScheduleLogService
     )
     {
         $this->mailTemplateVariableService = $mailTemplateVariableService;
@@ -60,6 +68,7 @@ class SendEmailByCampaignListener implements ShouldQueue
         $this->smtpAccountService = $smtpAccountService;
         $this->campaignService = $campaignService;
         $this->emailService = $emailService;
+        $this->sendEmailScheduleLogService = $sendEmailScheduleLogService;
 
     }
 
@@ -78,15 +87,27 @@ class SendEmailByCampaignListener implements ShouldQueue
 
         $this->smtpAccountService->setSmtpAccountForCampaign($campaign->smtpAccount);
         if($isSaveHistory){
-            $this->campaignService->update($campaign, ['is_running' => true]);
-            $this->sendEmailByCampaign($campaign, $toEmails);
-            $this->campaignService->update($campaign, ['is_running' => false]);
+            $sendEmailScheduleLog = $this->sendEmailScheduleLogService->create([
+                'campaign_uuid' => $campaign->getKey(),
+                'start_time' => Carbon::now()
+            ]);
+            try {
+                $this->sendEmailByCampaign($campaign, $toEmails);
+                $this->sendEmailScheduleLogService->update($sendEmailScheduleLog, [
+                    'end_time' => Carbon::now(),
+                    'is_running' => false
+                ]);
+            }catch (\Exception $e){
+                $this->sendEmailScheduleLogService->update($sendEmailScheduleLog, [
+                    'is_running' => false,
+                    'was_crashed' => true,
+                    'log' => $e->getMessage()
+                ]);
+            }
         }else{
-            $emails = $this->emailService->getEmailInArray($toEmails);
-            foreach ($emails as $email){
+            foreach ($toEmails as $email){
                 $mailTemplate = $this->mailTemplateVariableService->renderBody($campaign->mailTemplate, $email, $campaign->smtpAccount, $campaign);
-
-                Mail::to($email->email)->send(new SendCampaign($mailTemplate));
+                Mail::to($email)->send(new SendCampaign($mailTemplate));
             }
         }
     }
@@ -103,6 +124,7 @@ class SendEmailByCampaignListener implements ShouldQueue
         }else{
             $emails = $this->emailService->getEmailInArray($toEmails);
         }
+
         for ($i = 1; $i <= $campaign->number_email_per_date; $i++) {
             foreach ($emails as $email){
                 $quantityEmailWasSentPerUser = $this->mailSendingHistoryService->getNumberEmailSentPerUser($campaign->uuid, $email->email);

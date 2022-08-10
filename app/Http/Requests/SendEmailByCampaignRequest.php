@@ -33,7 +33,6 @@ class SendEmailByCampaignRequest extends AbstractRequest
                     ['to_date', '>=', Carbon::now()],
                     ['was_finished', false],
                     ['was_stopped_by_owner', false],
-                    ['is_running', false],
                 ]);
             })],
             'to_emails' => ['required', 'array'],

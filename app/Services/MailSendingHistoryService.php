@@ -5,7 +5,9 @@ namespace App\Services;
 use App\Abstracts\AbstractService;
 use App\Models\MailSendingHistory;
 use App\Models\QueryBuilders\MailSendingHistoryQueryBuilder;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use phpDocumentor\Reflection\Types\True_;
 
 class MailSendingHistoryService extends AbstractService
 {
@@ -36,5 +38,26 @@ class MailSendingHistoryService extends AbstractService
             ->where('email', $email)
             ->groupBy('email')
             ->count();
+    }
+
+    /**
+     * @param $campaign
+     * @param $emails
+     * @return bool
+     */
+    public function checkTodayNumberEmailSentUser($campaign, $toEmails){
+        foreach($toEmails as $email){
+            $numberEmailSent =  $this->model->where('campaign_uuid', $campaign->uuid)
+                ->where('email', $email)
+                ->whereDate('time', Carbon::now())
+                ->groupBy('email')
+                ->count();
+
+            if($numberEmailSent >= $campaign->number_email_per_date){
+                return false;
+            }
+        }
+
+        return true;
     }
 }
