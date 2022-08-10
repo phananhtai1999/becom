@@ -51,13 +51,17 @@ class MyCampaignService extends AbstractService
     {
         return $this->model->select('campaigns.*')
             ->join('websites', 'websites.uuid', '=', 'campaigns.website_uuid')
-            ->where([
+            ->whereNotIn('campaigns.uuid', function ($query){
+                $query->select('campaigns.uuid')
+                    ->from('campaigns')
+                    ->join('send_email_schedule_logs', 'send_email_schedule_logs.campaign_uuid', '=', 'campaigns.uuid')
+                    ->where('send_email_schedule_logs.is_running', true);
+            })->where([
                 ['websites.user_uuid', auth()->user()->getKey()],
                 ['campaigns.from_date', '<=', Carbon::now()],
                 ['campaigns.to_date', '>=', Carbon::now()],
                 ['campaigns.was_finished', false],
                 ['campaigns.was_stopped_by_owner', false],
-                ['campaigns.is_running', false]
-            ])->first();
+            ])->firstOrFail();
     }
 }

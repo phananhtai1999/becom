@@ -31,7 +31,6 @@ class CampaignResource extends AbstractJsonResource
             'status' => $this->status,
             'smtp_account_uuid' => $this->smtp_account_uuid,
             'website_uuid' => $this->website_uuid,
-            'is_running' => $this->is_running,
             'was_finished' => $this->was_finished,
             'was_stopped_by_owner' => $this->was_stopped_by_owner,
             'deleted_at' => $this->deleted_at,
