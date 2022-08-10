@@ -78,6 +78,10 @@ class MySmtpAccountQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__secret_key', 'secret_key'),
                 'website_uuid',
                 AllowedFilter::exact('exact__website_uuid', 'website_uuid'),
+                'website.domain',
+                AllowedFilter::exact('exact__website.domain', 'website.domain'),
+                'smtpAccountEncryption.name',
+                AllowedFilter::exact('exact__smtpAccountEncryption.name', 'smtpAccountEncryption.name'),
             ]);
     }
 }
