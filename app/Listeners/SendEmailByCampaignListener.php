@@ -83,33 +83,27 @@ class SendEmailByCampaignListener implements ShouldQueue
     {
         $campaign = $event->campaign;
         $toEmails = $event->toEmails;
-        $isSaveHistory = $event->isSaveHistory;
 
-        $this->smtpAccountService->setSmtpAccountForCampaign($campaign->smtpAccount);
-        if($isSaveHistory){
-            $sendEmailScheduleLog = $this->sendEmailScheduleLogService->create([
-                'campaign_uuid' => $campaign->getKey(),
-                'start_time' => Carbon::now()
+        $this->smtpAccountService->setSmtpAccountForSendEmail($campaign->smtpAccount);
+
+        $sendEmailScheduleLog = $this->sendEmailScheduleLogService->create([
+            'campaign_uuid' => $campaign->getKey(),
+            'start_time' => Carbon::now()
+        ]);
+        try {
+            $this->sendEmailByCampaign($campaign, $toEmails);
+            $this->sendEmailScheduleLogService->update($sendEmailScheduleLog, [
+                'end_time' => Carbon::now(),
+                'is_running' => false
             ]);
-            try {
-                $this->sendEmailByCampaign($campaign, $toEmails);
-                $this->sendEmailScheduleLogService->update($sendEmailScheduleLog, [
-                    'end_time' => Carbon::now(),
-                    'is_running' => false
-                ]);
-            }catch (\Exception $e){
-                $this->sendEmailScheduleLogService->update($sendEmailScheduleLog, [
-                    'is_running' => false,
-                    'was_crashed' => true,
-                    'log' => $e->getMessage()
-                ]);
-            }
-        }else{
-            foreach ($toEmails as $email){
-                $mailTemplate = $this->mailTemplateVariableService->renderBody($campaign->mailTemplate, $email, $campaign->smtpAccount, $campaign);
-                Mail::to($email)->send(new SendCampaign($mailTemplate));
-            }
+        }catch (\Exception $e){
+            $this->sendEmailScheduleLogService->update($sendEmailScheduleLog, [
+                'is_running' => false,
+                'was_crashed' => true,
+                'log' => $e->getMessage()
+            ]);
         }
+
     }
 
     /**

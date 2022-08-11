@@ -59,7 +59,6 @@ class SendEmailByCampaign extends Command
     {
         $activeCampaign = $this->service->loadActiveCampaign();
         $toEmails = null;
-        $isSaveHistory = true;
-        SendEmailByCampaignEvent::dispatch($activeCampaign, $toEmails, $isSaveHistory);
+        SendEmailByCampaignEvent::dispatch($activeCampaign, $toEmails);
     }
 }

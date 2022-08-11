@@ -136,7 +136,8 @@ class SmtpAccountController extends AbstractRestAPIController
             $body = $request->get('body');
             $toEmails = $request->get('to_emails');
 
-            $this->service->sendEmailsBySmtpAccount($request->get('smtp_account_uuid'));
+            $smtpAccount = $this->service->findOneById($request->get('smtp_account_uuid'));
+            $this->service->setSmtpAccountForSendEmail($smtpAccount);
 
             foreach ($toEmails as $emails) {
                 Mail::to($emails)->send(new SendEmails($subject, $body));
@@ -163,7 +164,8 @@ class SmtpAccountController extends AbstractRestAPIController
             $body = $mailTemplate->body;
             $toEmails = $request->get('to_emails');
 
-            $this->service->sendEmailsBySmtpAccount();
+            $smtpAccount = $this->service->findOneById($request->get('smtp_account_uuid'));
+            $this->service->setSmtpAccountForSendEmail($smtpAccount);
 
             foreach ($toEmails as $emails) {
                 Mail::to($emails)->send(new SendEmails($subject, $body));
