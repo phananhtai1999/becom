@@ -24,6 +24,7 @@ use App\Http\Resources\CampaignLinkDailyTrackingResource;
 use App\Http\Resources\CampaignLinkTrackingResource;
 use App\Http\Resources\CampaignResource;
 use App\Http\Resources\CampaignTrackingResource;
+use App\Mail\SendCampaign;
 use App\Services\CampaignDailyTrackingService;
 use App\Services\CampaignLinkDailyTrackingService;
 use App\Services\CampaignLinkTrackingService;
@@ -38,6 +39,7 @@ use App\Services\SmtpAccountService;
 use Carbon\Carbon;
 use App\Services\MyCampaignService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Mail;
 
 class CampaignController extends AbstractRestAPIController
 {
@@ -308,12 +310,12 @@ class CampaignController extends AbstractRestAPIController
      */
     public function sendEmailsByCampaign(SendEmailByCampaignRequest $request)
     {
-        if($this->sendEmailScheduleLogService->checkActiveCampaignbyCampaignUuid($request->get('campaign_uuid'))){
-            $campaign = $this->service->findOneById($request->get('campaign_uuid'));
-            if($request->get('is_save_history')){
+        $campaign = $this->service->findOneById($request->get('campaign_uuid'));
+        if($request->get('is_save_history')){
+            if($this->sendEmailScheduleLogService->checkActiveCampaignbyCampaignUuid($request->get('campaign_uuid'))){
                 if($this->emailService->checkEmailValid($request->get('to_emails'), $campaign->website_uuid)){
                     if($this->mailSendingHistoryService->checkTodayNumberEmailSentUser($campaign, $request->get('to_emails'))){
-                        SendEmailByCampaignEvent::dispatch($campaign, $request->get('to_emails'), $request->get('is_save_history'));
+                        SendEmailByCampaignEvent::dispatch($campaign, $request->get('to_emails'));
 
                         return $this->sendOkJsonResponse(["message" => "Send Email By Campaign Success"]);
                     }
@@ -323,13 +325,22 @@ class CampaignController extends AbstractRestAPIController
 
                 return $this->sendValidationFailedJsonResponse(["errors" => ['to_emails' => 'The selected to emails is invalid']]);
             }
-            SendEmailByCampaignEvent::dispatch($campaign, $request->get('to_emails'), $request->get('is_save_history'));
 
-            return $this->sendOkJsonResponse(["message" => "Test Send Email By Campaign Success"]);
+            return $this->sendValidationFailedJsonResponse(["errors" => ['campaign_uuid' => 'The selected campaign uuid is invalid']]);
+
+        }else{
+            try {
+                $this->smtpAccountService->setSmtpAccountForSendEmail($campaign->smtpAccount);
+                foreach ($request->get('to_emails') as $email){
+                    $mailTemplate = $this->mailTemplateVariableService->renderBody($campaign->mailTemplate, $email, $campaign->smtpAccount, $campaign);
+                    Mail::to($email)->send(new SendCampaign($mailTemplate));
+                }
+
+                return $this->sendOkJsonResponse(["message" => "Test Send Email By Campaign Success"]);
+            }catch (\Exception $e){
+                return $this->sendValidationFailedJsonResponse(["smtp_account" => $e->getMessage()]);
+            }
         }
-
-        return $this->sendValidationFailedJsonResponse(["errors" => ['campaign_uuid' => 'The selected campaign uuid is invalid']]);
-
     }
 
     public function sendEmailByMyCampaign()

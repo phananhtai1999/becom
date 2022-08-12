@@ -28,22 +28,15 @@ class SendEmailByCampaignEvent
     public $toEmails;
 
     /**
-     * @var Boolean
-     */
-    public $isSaveHistory;
-
-    /**
      * Create a new event instance.
      *
      * @param $campaign
      * @param $toEmails
-     * @param $isSaveHistory
      */
-    public function __construct($campaign, $toEmails, $isSaveHistory)
+    public function __construct($campaign, $toEmails)
     {
         $this->campaign = $campaign;
         $this->toEmails = $toEmails;
-        $this->isSaveHistory = $isSaveHistory;
     }
 
     /**
