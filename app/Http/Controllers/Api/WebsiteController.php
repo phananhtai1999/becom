@@ -8,6 +8,7 @@ use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestEditTrait;
 use App\Http\Controllers\Traits\RestStoreTrait;
+use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyWebsiteRequest;
 use App\Http\Requests\UpdateMyWebsiteRequest;
 use App\Http\Requests\UpdateWebsiteRequest;
@@ -60,6 +61,7 @@ class WebsiteController extends AbstractRestAPIController
         $this->resourceClass = WebsiteResource::class;
         $this->storeRequest = WebsiteRequest::class;
         $this->editRequest = UpdateWebsiteRequest::class;
+        $this->indexRequest = IndexRequest::class;
         $this->websiteVerificationService = $websiteVerificationService;
         $this->fileVerificationService = $fileVerificationService;
     }
@@ -69,16 +71,16 @@ class WebsiteController extends AbstractRestAPIController
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */
-    public function indexMyWebsite()
+    public function indexMyWebsite(IndexRequest $request)
     {
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData(
                 $this->resourceCollectionClass,
                 $this->myService->getCollectionWithPagination(
-                    request()->get('per_page', '15'),
-                    request()->get('page', '1'),
-                    request()->get('columns', '*'),
-                    request()->get('page_name', 'page')
+                    $request->get('per_page', '15'),
+                    $request->get('page', '1'),
+                    $request->get('columns', '*'),
+                    $request->get('page_name', 'page'),
                 )
             )
         );

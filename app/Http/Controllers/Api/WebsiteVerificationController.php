@@ -6,6 +6,7 @@ use App\Abstracts\AbstractRestAPIController;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
+use App\Http\Requests\IndexRequest;
 use App\Http\Resources\WebsiteVerificationResource;
 use App\Http\Resources\WebsiteVerificationResourceCollection;
 use App\Services\WebsiteVerificationService;
@@ -22,5 +23,6 @@ class WebsiteVerificationController extends AbstractRestAPIController
         $this->service = $service;
         $this->resourceClass = WebsiteVerificationResource::class;
         $this->resourceCollectionClass = WebsiteVerificationResourceCollection::class;
+        $this->indexRequest = IndexRequest::class;
     }
 }
