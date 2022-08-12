@@ -8,6 +8,7 @@ use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestEditTrait;
 use App\Http\Controllers\Traits\RestStoreTrait;
+use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MailTemplateRequest;
 use App\Http\Requests\MyMailTemplateRequest;
 use App\Http\Requests\UpdateMailTemplateRequest;
@@ -41,6 +42,7 @@ class MailTemplateController extends AbstractRestAPIController
         $this->resourceClass = MailTemplateResource::class;
         $this->storeRequest = MailTemplateRequest::class;
         $this->editRequest = UpdateMailTemplateRequest::class;
+        $this->indexRequest = IndexRequest::class;
     }
 
     /**
@@ -48,16 +50,16 @@ class MailTemplateController extends AbstractRestAPIController
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */
-    public function indexMyMailTemplate()
+    public function indexMyMailTemplate(IndexRequest $request)
     {
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData(
                 $this->resourceCollectionClass,
                 $this->myService->getCollectionWithPagination(
-                    request()->get('per_page', '15'),
-                    request()->get('page', '1'),
-                    request()->get('columns', '*'),
-                    request()->get('page_name', 'page')
+                    $request->get('per_page', '15'),
+                    $request->get('page', '1'),
+                    $request->get('columns', '*'),
+                    $request->get('page_name', 'page'),
                 )
             )
         );

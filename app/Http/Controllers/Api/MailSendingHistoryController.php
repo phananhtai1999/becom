@@ -8,6 +8,7 @@ use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestEditTrait;
 use App\Http\Controllers\Traits\RestStoreTrait;
+use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MailSendingHistoryRequest;
 use App\Http\Requests\UpdateMailSendingHistoryRequest;
 use App\Http\Resources\MailSendingHistoryResourceCollection;
@@ -39,6 +40,7 @@ class MailSendingHistoryController extends AbstractRestAPIController
         $this->resourceClass = MailSendingHistoryResource::class;
         $this->storeRequest = MailSendingHistoryRequest::class;
         $this->editRequest = UpdateMailSendingHistoryRequest::class;
+        $this->indexRequest = IndexRequest::class;
     }
 
     /**
@@ -46,16 +48,16 @@ class MailSendingHistoryController extends AbstractRestAPIController
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */
-    public function indexMyMailSendingHistory()
+    public function indexMyMailSendingHistory(IndexRequest $request)
     {
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData(
                 $this->resourceCollectionClass,
                 $this->myService->getCollectionWithPagination(
-                    request()->get('per_page', '15'),
-                    request()->get('page', '1'),
-                    request()->get('columns', '*'),
-                    request()->get('page_name', 'page')
+                    $request->get('per_page', '15'),
+                    $request->get('page', '1'),
+                    $request->get('columns', '*'),
+                    $request->get('page_name', 'page'),
                 )
             )
         );

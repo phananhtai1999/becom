@@ -26,7 +26,10 @@ class IndexRequest extends AbstractRequest
         return [
             'per_page' => 'integer|min:1|max:100',
             'page' => 'integer|min:1',
-            'sorted_by' =>  'string|in:ASC,asc,DESC,desc'
+            'sorted_by' =>  'string|in:ASC,asc,DESC,desc',
+            'filter' => ['array'],
+            'filter.*' => ['nullable', 'string'],
+            'sort' => ['nullable', 'string'],
         ];
     }
 }

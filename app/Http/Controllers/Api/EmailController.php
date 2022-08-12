@@ -9,6 +9,7 @@ use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestEditTrait;
 use App\Http\Controllers\Traits\RestStoreTrait;
 use App\Http\Requests\EmailRequest;
+use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyEmailRequest;
 use App\Http\Requests\UpdateEmailRequest;
 use App\Http\Requests\UpdateMyEmailRequest;
@@ -41,6 +42,7 @@ class EmailController extends AbstractRestAPIController
         $this->resourceClass = EmailResource::class;
         $this->storeRequest = EmailRequest::class;
         $this->editRequest = UpdateEmailRequest::class;
+        $this->indexRequest = IndexRequest::class;
     }
 
     /**
@@ -48,16 +50,16 @@ class EmailController extends AbstractRestAPIController
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */
-    public function indexMyEmail()
+    public function indexMyEmail(IndexRequest $request)
     {
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData(
                 $this->resourceCollectionClass,
                 $this->myService->getCollectionWithPagination(
-                    request()->get('per_page', '15'),
-                    request()->get('page', '1'),
-                    request()->get('columns', '*'),
-                    request()->get('page_name', 'page')
+                    $request->get('per_page', '15'),
+                    $request->get('page', '1'),
+                    $request->get('columns', '*'),
+                    $request->get('page_name', 'page'),
                 )
             )
         );

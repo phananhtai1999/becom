@@ -8,6 +8,7 @@ use App\Http\Controllers\Traits\RestEditTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestStoreTrait;
+use App\Http\Requests\IndexRequest;
 use App\Http\Requests\SmtpAccountEncryptionRequest;
 use App\Http\Requests\UpdateSmtpAccountEncryptionRequest;
 use App\Http\Resources\SmtpAccountEncryptionResource;
@@ -28,6 +29,7 @@ class SmtpAccountEncryptionController extends AbstractRestAPIController
         $this->resourceCollectionClass = SmtpAccountEncryptionResourceCollection::class;
         $this->storeRequest = SmtpAccountEncryptionRequest::class;
         $this->editRequest = UpdateSmtpAccountEncryptionRequest::class;
+        $this->indexRequest = IndexRequest::class;
     }
 
 }

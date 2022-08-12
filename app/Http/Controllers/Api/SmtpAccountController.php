@@ -8,6 +8,7 @@ use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestEditTrait;
 use App\Http\Controllers\Traits\RestStoreTrait;
+use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MySmtpAccountRequest;
 use App\Http\Requests\SendMailBySmtpAccountUuidRequest;
 use App\Http\Requests\SendMailUseMailTemplateUuidRequest;
@@ -49,6 +50,7 @@ class SmtpAccountController extends AbstractRestAPIController
         $this->resourceClass = SmtpAccountResource::class;
         $this->storeRequest = SmtpAccountRequest::class;
         $this->editRequest = UpdateSmtpAccountRequest::class;
+        $this->indexRequest = IndexRequest::class;
     }
 
     /**
@@ -56,16 +58,16 @@ class SmtpAccountController extends AbstractRestAPIController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function indexMySmtpAccount()
+    public function indexMySmtpAccount(IndexRequest $request)
     {
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData(
                 $this->resourceCollectionClass,
                 $this->myService->getCollectionWithPagination(
-                    request()->get('per_page', '15'),
-                    request()->get('page', '1'),
-                    request()->get('columns', '*'),
-                    request()->get('page_name', 'page')
+                    $request->get('per_page', '15'),
+                    $request->get('page', '1'),
+                    $request->get('columns', '*'),
+                    $request->get('page_name', 'page'),
                 )
             )
         );

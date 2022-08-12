@@ -12,6 +12,7 @@ use App\Http\Controllers\Traits\RestStoreTrait;
 use App\Http\Requests\CampaignLinkTrackingRequest;
 use App\Http\Requests\CampaignRequest;
 use App\Http\Requests\IncrementCampaignTrackingRequest;
+use App\Http\Requests\IndexRequest;
 use App\Http\Requests\LoadAnalyticDataRequest;
 use App\Http\Requests\MyCampaignRequest;
 use App\Http\Requests\SendEmailByCampaignRequest;
@@ -136,6 +137,7 @@ class CampaignController extends AbstractRestAPIController
         $this->resourceClass = CampaignResource::class;
         $this->storeRequest = CampaignRequest::class;
         $this->editRequest = UpdateCampaignRequest::class;
+        $this->indexRequest = IndexRequest::class;
         $this->campaignTrackingService = $campaignTrackingService;
         $this->campaignDailyTrackingService = $campaignDailyTrackingService;
         $this->campaignLinkTrackingService = $campaignLinkTrackingService;
@@ -153,16 +155,16 @@ class CampaignController extends AbstractRestAPIController
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */
-    public function indexMyCampaign()
+    public function indexMyCampaign(IndexRequest $request)
     {
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData(
                 $this->resourceCollectionClass,
                 $this->myService->getCollectionWithPagination(
-                    request()->get('per_page', '15'),
-                    request()->get('page', '1'),
-                    request()->get('columns', '*'),
-                    request()->get('page_name', 'page')
+                    $request->get('per_page', '15'),
+                    $request->get('page', '1'),
+                    $request->get('columns', '*'),
+                    $request->get('page_name', 'page'),
                 )
             )
         );
