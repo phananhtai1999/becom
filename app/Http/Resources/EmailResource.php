@@ -26,7 +26,7 @@ class EmailResource extends AbstractJsonResource
             'first_name' => $this->first_name,
             'last_name' => $this->last_name,
             'country' => $this->country,
-            'state' => $this->state,
+            'city' => $this->city,
             'job' => $this->job,
             'website_uuid' => $this->website_uuid,
             'deleted_at' => $this->deleted_at,

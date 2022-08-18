@@ -30,7 +30,7 @@ class Email extends AbstractModel
         'first_name',
         'last_name',
         'country',
-        'state',
+        'city',
         'job',
         'website_uuid',
     ];

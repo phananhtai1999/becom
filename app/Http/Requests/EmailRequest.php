@@ -29,7 +29,7 @@ class EmailRequest extends AbstractRequest
             'first_name' => ['nullable', 'string'],
             'last_name' => ['nullable', 'string'],
             'country' => ['nullable', 'string'],
-            'state' => ['nullable', 'string'],
+            'city' => ['nullable', 'string'],
             'job' => ['nullable', 'string'],
             'website_uuid' => ['required', 'numeric', 'min:1', 'exists:websites,uuid'],
         ];
