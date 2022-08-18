@@ -27,6 +27,7 @@ class UpdateMailTemplateRequest extends AbstractRequest
             'subject' => ['string'],
             'body' => ['string'],
             'website_uuid' => ['numeric', 'min:1', 'exists:websites,uuid'],
+            'design' => 'json'
         ];
     }
 }

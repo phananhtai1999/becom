@@ -29,12 +29,14 @@ class MailTemplate extends AbstractModel
         'subject',
         'body',
         'website_uuid',
+        'design'
     ];
 
     /**
      * @var string[]
      */
     protected $casts = [
+        'design' => 'array',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
