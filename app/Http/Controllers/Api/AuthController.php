@@ -75,14 +75,7 @@ class AuthController extends AbstractRestAPIController
      */
     public function login(LoginRequest $loginRequest)
     {
-        $user = $this->userService->findOneWhere([
-            'email' => $loginRequest->get('email')
-        ]);
-
-        if (!$user) {
-            return $this->sendUnAuthorizedJsonResponse();
-        }
-
+        $user = $this->userService->findUserLogin($loginRequest->get('email'));
         $isUserCanLogin = $this->authenticationService->doesUserCanLogin($user);
         if (is_array($isUserCanLogin)) {
             return $this->sendUnAuthorizedJsonResponse($isUserCanLogin);

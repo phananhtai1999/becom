@@ -16,4 +16,6 @@ return [
     'register_success' => 'Register successfully',
     'reset_password' => 'We have e-mailed your password reset link!',
     'email_does_not_exists' => 'Email does not exists',
+    'account_banned' => 'Your account is banned in the system',
+    'account_deleted' => 'Your account is no longer available in the system'
 ];

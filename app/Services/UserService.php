@@ -43,4 +43,11 @@ class UserService extends AbstractService
     {
         return $this->model->where('email', $key)->first();
     }
+
+    public function findUserLogin($email)
+    {
+        return $this->model->withTrashed()->where([
+            'email' => $email
+        ])->first();
+    }
 }
