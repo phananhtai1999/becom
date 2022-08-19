@@ -24,7 +24,7 @@ class UpdateMailTemplateRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'subject' => ['string'],
+            'subject' => ['string', 'unique:mail_templates,subject'],
             'body' => ['string'],
             'website_uuid' => ['numeric', 'min:1', 'exists:websites,uuid'],
         ];

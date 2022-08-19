@@ -24,7 +24,7 @@ class UpdateEmailRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'email' => ['string', 'email:rfc,dns'],
+            'email' => ['string', 'email:rfc,dns', 'unique:emails,email'],
             'age' => ['numeric', 'min:1'],
             'first_name' => ['string'],
             'last_name' => ['string'],

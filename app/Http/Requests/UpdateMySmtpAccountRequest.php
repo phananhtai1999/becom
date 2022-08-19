@@ -28,10 +28,10 @@ class UpdateMySmtpAccountRequest extends AbstractRequest
             'mail_mailer' => ['string'],
             'mail_host' => ['string'],
             'mail_port' => ['string'],
-            'mail_username' => ['string'],
+            'mail_username' => ['string', 'unique:smtp_accounts,mail_username'],
             'mail_password' => ['string'],
             'smtp_mail_encryption_uuid' => ['numeric', 'exists:smtp_account_encryptions,uuid'],
-            'mail_from_address' => ['string'],
+            'mail_from_address' => ['string', 'email', 'unique:smtp_accounts,mail_from_address'],
             'mail_from_name' => ['string'],
             'secret_key' => ['string'],
             'website_uuid' => ['numeric', 'min:1', Rule::exists('websites', 'uuid')->where(function ($query) {
