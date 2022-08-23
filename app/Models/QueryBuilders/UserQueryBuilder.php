@@ -72,6 +72,8 @@ class UserQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__avatar_img', 'avatar_img'),
                 'cover_img',
                 AllowedFilter::exact('exact__cover_img', 'cover_img'),
+                'roles.name',
+                AllowedFilter::exact('exact__roles.name', 'roles.name'),
             ]);
     }
 }

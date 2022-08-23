@@ -33,10 +33,6 @@ class UserResource extends AbstractJsonResource
             'updated_at' => $this->updated_at
         ];
 
-        if (!auth()->guest()) {
-            $data['user__current_membership'] = $this->currentMemberships;
-        }
-
         if (\in_array('user__roles', $expand)) {
             $data['roles'] = RoleResource::collection($this->roles);
         }
