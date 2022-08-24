@@ -16,4 +16,6 @@ return [
     'register_success' => 'Đăng ký thành công',
     'reset_password' => 'Mật khẩu mới đã được gửi đến email của bạn!',
     'email_does_not_exists' => 'Email không tồn tại',
+    'account_banned' => 'Tài khoản của bạn đã bị cấm trong hệ thống',
+    'account_deleted' => 'Tài khoản của bạn không còn trong hệ thống'
 ];

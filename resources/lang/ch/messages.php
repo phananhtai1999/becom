@@ -16,4 +16,6 @@ return [
     'register_success' => '注册成功',
     'reset_password' => '新密码已发送至您的电子邮箱!',
     'email_does_not_exists' => '电子邮件不存在',
+    'account_banned' => '您的帐户在系统中被禁止',
+    'account_deleted' => '您的帐户在系统中不再可用'
 ];

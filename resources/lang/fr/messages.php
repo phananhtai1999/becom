@@ -16,4 +16,6 @@ return [
     'register_success' => 'Inscrivez-vous avec succès',
     'reset_password' => 'Un nouveau mot de passe a été envoyé à votre adresse e-mail!',
     'email_does_not_exists' => 'Le-mail nexiste pas',
+    'account_banned' => 'Votre compte est banni du système',
+    'account_deleted' => "Votre compte n'est plus disponible dans le système"
 ];
