@@ -33,7 +33,7 @@ class EmailQueryBuilder extends AbstractQueryBuilder
                 'first_name',
                 'last_name',
                 'country',
-                'state',
+                'city',
                 'job',
                 'website_uuid',
             ])
@@ -45,7 +45,7 @@ class EmailQueryBuilder extends AbstractQueryBuilder
                 'first_name',
                 'last_name',
                 'country',
-                'state',
+                'city',
                 'job',
                 'website_uuid',
             ])
@@ -62,8 +62,8 @@ class EmailQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__last_name', 'last_name'),
                 'country',
                 AllowedFilter::exact('exact__country', 'country'),
-                'state',
-                AllowedFilter::exact('exact__state', 'state'),
+                'city',
+                AllowedFilter::exact('exact__city', 'city'),
                 'job',
                 AllowedFilter::exact('exact__job', 'job'),
                 'website_uuid',

@@ -26,6 +26,7 @@ class MailTemplateVariableService extends AbstractService
         $emailLastName = $email->last_name ?? '';
         $emailAge = $email->age ?? '';
         $emailCountry = $email->country ?? '';
+        $emailCity = $email->city ?? '';
         $emailJob = $email->job ?? '';
         $current = Carbon::now('Asia/Ho_Chi_Minh');
         $currentDay = $current->toDateString();
@@ -40,6 +41,7 @@ class MailTemplateVariableService extends AbstractService
             '{{ $email_last_name }}',
             '{{ $email_age }}',
             '{{ $email_country }}',
+            '{{ $email_city }}',
             '{{ $email_job }}',
             '{{ $current_day }}',
             '{{ $current_time }}'
@@ -47,7 +49,7 @@ class MailTemplateVariableService extends AbstractService
         ];
         $replace = [
             $websiteName, $websiteDomain, $websiteDescription,
-            $fromEmail, $toEmail, $emailFirstName, $emailLastName, $emailAge, $emailCountry, $emailJob,
+            $fromEmail, $toEmail, $emailFirstName, $emailLastName, $emailAge, $emailCountry, $emailCity, $emailJob,
             $currentDay, $currentTime
         ];
         if (!empty($campaign)) {

@@ -29,7 +29,7 @@ class UpdateEmailRequest extends AbstractRequest
             'first_name' => ['string'],
             'last_name' => ['string'],
             'country' => ['string'],
-            'state' => ['string'],
+            'city' => ['string'],
             'job' => ['string'],
             'website_uuid' => ['numeric', 'min:1', 'exists:websites,uuid'],
         ];
