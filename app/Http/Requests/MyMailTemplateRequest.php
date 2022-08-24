@@ -31,6 +31,7 @@ class MyMailTemplateRequest extends AbstractRequest
 
                 return $query->where('user_uuid', auth()->user()->getkey())->whereNull('deleted_at');
             })],
+            'design' => ['required', 'string'],
         ];
     }
 }
