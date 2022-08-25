@@ -31,7 +31,7 @@ class MySmtpAccountRequest extends AbstractRequest
             'mail_username' => ['required', 'string', 'unique:smtp_accounts,mail_username'],
             'mail_password' => ['required', 'string'],
             'smtp_mail_encryption_uuid' => ['required', 'numeric', 'exists:smtp_account_encryptions,uuid'],
-            'mail_from_address' => ['required', 'string', 'email', 'unique:smtp_accounts,mail_from_address'],
+            'mail_from_address' => ['required', 'string'],
             'mail_from_name' => ['required', 'string'],
             'secret_key' => ['required', 'string'],
             'website_uuid' => ['required', 'numeric', 'min:1', Rule::exists('websites', 'uuid')->where(function ($query) {

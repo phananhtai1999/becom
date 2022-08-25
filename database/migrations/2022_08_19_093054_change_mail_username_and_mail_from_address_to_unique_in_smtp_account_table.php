@@ -15,7 +15,6 @@ class ChangeMailUsernameAndMailFromAddressToUniqueInSmtpAccountTable extends Mig
     {
         Schema::table('smtp_accounts', function (Blueprint $table) {
             $table->string('mail_username')->unique()->change();
-            $table->string('mail_from_address')->unique()->change();
         });
     }
 
@@ -28,7 +27,6 @@ class ChangeMailUsernameAndMailFromAddressToUniqueInSmtpAccountTable extends Mig
     {
         Schema::table('smtp_accounts', function (Blueprint $table) {
             $table->dropUnique(['mail_username']);
-            $table->dropUnique(['mail_from_address']);
         });
     }
 }
