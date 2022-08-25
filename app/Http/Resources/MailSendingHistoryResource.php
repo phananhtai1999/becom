@@ -33,6 +33,18 @@ class MailSendingHistoryResource extends AbstractJsonResource
             $data['campaign'] = new CampaignResource($this->campaign);
         }
 
+        if (\in_array('mail_sending_history__website', $expand)) {
+            $data['website'] = new WebsiteResource($this->campaign->website);
+        }
+
+        if (\in_array('mail_sending_history__mail_template', $expand)) {
+            $data['mail_template'] = new MailTemplateResource($this->campaign->mailTemplate);
+        }
+
+        if (\in_array('mail_sending_history__smtp_account', $expand)) {
+            $data['smtp_account'] = new SmtpAccountResource($this->campaign->smtpAccount);
+        }
+        
         return $data;
     }
 }
