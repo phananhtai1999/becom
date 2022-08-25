@@ -25,7 +25,7 @@ class MyEmailRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'email' => ['required', 'string', 'email:rfc,dns'],
+            'email' => ['required', 'string', 'email:rfc,dns', 'unique:emails,email'],
             'age' => ['nullable', 'numeric', 'min:1'],
             'first_name' => ['nullable', 'string'],
             'last_name' => ['nullable', 'string'],
