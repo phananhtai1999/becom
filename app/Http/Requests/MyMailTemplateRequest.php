@@ -25,7 +25,7 @@ class MyMailTemplateRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'subject' => ['required', 'string', 'unique:mail_templates,subject'],
+            'subject' => ['required', 'string'],
             'body' => ['required', 'string'],
             'website_uuid' => ['required', 'numeric', 'min:1', Rule::exists('websites', 'uuid')->where(function ($query) {
 

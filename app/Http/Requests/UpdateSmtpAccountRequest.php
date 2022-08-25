@@ -30,7 +30,7 @@ class UpdateSmtpAccountRequest extends AbstractRequest
             'mail_username' => ['string', 'unique:smtp_accounts,mail_username'],
             'mail_password' => ['string'],
             'smtp_mail_encryption_uuid' => ['numeric', 'exists:smtp_account_encryptions,uuid'],
-            'mail_from_address' => ['string', 'email', 'unique:smtp_accounts,mail_from_address'],
+            'mail_from_address' => ['string'],
             'mail_from_name' => ['string'],
             'secret_key' => ['string'],
             'website_uuid' => ['string', 'exists:websites,uuid'],
