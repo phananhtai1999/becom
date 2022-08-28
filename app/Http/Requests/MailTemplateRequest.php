@@ -26,7 +26,7 @@ class MailTemplateRequest extends AbstractRequest
         return [
             'subject' => ['required', 'string'],
             'body' => ['required', 'string'],
-            'website_uuid' => ['required', 'numeric', 'min:1', 'exists:websites,uuid'],
+            'website_uuid' => ['nullable', 'numeric', 'min:1', 'exists:websites,uuid'],
             'design' => ['required', 'string'],
         ];
     }

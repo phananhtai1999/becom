@@ -26,7 +26,7 @@ class UpdateMailTemplateRequest extends AbstractRequest
         return [
             'subject' => ['string'],
             'body' => ['string'],
-            'website_uuid' => ['numeric', 'min:1', 'exists:websites,uuid'],
+            'website_uuid' => ['nullable', 'numeric', 'min:1', 'exists:websites,uuid'],
             'design' => ['string']
         ];
     }
