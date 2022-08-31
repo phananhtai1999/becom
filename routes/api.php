@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\User\UserConfigController;
 use App\Http\Controllers\Api\ConfigController;
 use App\Http\Controllers\Api\AuthBySocialNetworkController;
 use App\Http\Controllers\Api\SmtpAccountEncryptionController;
+use App\Http\Controllers\Api\SupportMultipleLanguagesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -274,3 +275,6 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website-verification.'], fu
         Route::delete('/website-verification/{id}', [WebsiteVerificationController::class, 'destroy'])->name('destroy');
     });
 });
+
+Route::get('/support-multiple-languages', [SupportMultipleLanguagesController::class, 'setCookie'])->name('set-cookie');
+
