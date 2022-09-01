@@ -17,7 +17,7 @@ class Localization
     public function handle(Request $request, Closure $next)
     {
         //Check params request and set language defaut
-        $lang = $request->get('lang') ? $request->get('lang') : 'en';
+        $lang = $request->cookie('lang') ? $request->cookie('lang') : 'en';
 
         //Set laravel localization
         app()->setLocale($lang);
