@@ -13,18 +13,18 @@ class SupportMultipleLanguagesController extends AbstractRestAPIController
      */
     public function setCookie(Request $request)
     {
-        $langs = $request->get('langs') ? $request->get('langs') : 'en';
+        $lang = $request->get('lang') ? $request->get('lang') : 'en';
 
         $listLanguages = ['vi', 'en', 'fr', 'ch'];
 
-        if (!in_array($langs, $listLanguages)) {
+        if (!in_array($lang, $listLanguages)) {
             return $this->sendValidationFailedJsonResponse();
         }
 
-        app()->setLocale($langs);
+        app()->setLocale($lang);
 
         return $this->sendOkJsonResponse()->withCookie(
-            cookie('langs', $langs, 3600, null, null, true, false)
+            cookie('lang', $lang, 3600, null, null, true, false)
         );
     }
 }
