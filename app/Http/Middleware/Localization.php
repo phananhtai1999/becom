@@ -22,6 +22,11 @@ class Localization
         //Set laravel localization
         app()->setLocale($lang);
 
+        if($request->get('lang'))
+        {
+            return $next($request);
+        }
+
         return $next($request)->withCookie(cookie('lang' , $lang, 3600, null, null, true, false));
     }
 }
