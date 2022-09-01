@@ -20,6 +20,9 @@ class SupportMultipleLanguagesController extends AbstractRestAPIController
         if (!in_array($langs, $listLanguages)) {
             return $this->sendValidationFailedJsonResponse();
         }
+
+        app()->setLocale($langs);
+
         return $this->sendOkJsonResponse()->withCookie(
             cookie('langs', $langs, 3600, null, null, true, false)
         );
