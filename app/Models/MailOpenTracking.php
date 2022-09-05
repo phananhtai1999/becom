@@ -5,20 +5,19 @@ namespace App\Models;
 use App\Abstracts\AbstractModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class MailSendingHistory extends AbstractModel
+class MailOpenTracking extends AbstractModel
 {
     use HasFactory, SoftDeletes;
 
     /**
-     * @var string[]
+     * @var string
      */
-    protected $table = "mail_sending_history";
+    protected $table = "mail_open_trackings";
 
     /**
-     * @var string[]
+     * @var string
      */
     protected $primaryKey = 'uuid';
 
@@ -26,9 +25,9 @@ class MailSendingHistory extends AbstractModel
      * @var string[]
      */
     protected $fillable = [
-        'campaign_uuid',
-        'email',
-        'time',
+        'mail_sending_history_uuid',
+        'ip',
+        'user_agent',
     ];
 
     /**
@@ -38,22 +37,13 @@ class MailSendingHistory extends AbstractModel
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
-        'time' => 'datetime',
     ];
 
     /**
      * @return BelongsTo
      */
-    public function campaign()
+    public function mailSendingHistory()
     {
-        return $this->belongsTo(Campaign::class, 'campaign_uuid', 'uuid');
-    }
-
-    /**
-     * @return HasMany
-     */
-    public function mailOpenTrackings()
-    {
-        return $this->hasMany(MailOpenTracking::class, 'mail_sending_history_uuid', 'uuid');
+        return $this->belongsTo(MailSendingHistory::class, 'mail_sending_history_uuid', 'uuid');
     }
 }
