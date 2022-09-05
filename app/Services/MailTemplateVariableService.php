@@ -18,9 +18,9 @@ class MailTemplateVariableService extends AbstractService
     public function renderBody($mailTemplate, $email, $smtpAccount, $campaign = null)
     {
         $fromEmail = $smtpAccount->mail_from_address;
-        $websiteName = !empty($campaign) ? $campaign->website->name : $email->website->name;
-        $websiteDomain = !empty($campaign) ? $campaign->website->domain : $email->website->domain;
-        $websiteDescription = !empty($campaign) ? $campaign->website->description : $email->website->description;
+        $websiteName = !empty($campaign) ? $campaign->website->name : '';
+        $websiteDomain = !empty($campaign) ? $campaign->website->domain : '';
+        $websiteDescription = !empty($campaign) ? $campaign->website->description : '';
         $toEmail = $email->email ?? $email;
         $emailFirstName = $email->first_name ?? '';
         $emailLastName = $email->last_name ?? '';

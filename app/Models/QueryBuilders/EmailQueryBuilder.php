@@ -35,7 +35,6 @@ class EmailQueryBuilder extends AbstractQueryBuilder
                 'country',
                 'city',
                 'job',
-                'website_uuid',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -47,7 +46,6 @@ class EmailQueryBuilder extends AbstractQueryBuilder
                 'country',
                 'city',
                 'job',
-                'website_uuid',
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -66,10 +64,8 @@ class EmailQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__city', 'city'),
                 'job',
                 AllowedFilter::exact('exact__job', 'job'),
-                'website_uuid',
-                AllowedFilter::exact('exact__website_uuid', 'website_uuid'),
-                'website.domain',
-                AllowedFilter::exact('exact__website.domain', 'website.domain'),
+                'websites.domain',
+                AllowedFilter::exact('exact__websites.domain', 'websites.domain'),
             ]);
     }
 }

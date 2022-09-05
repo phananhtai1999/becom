@@ -32,8 +32,8 @@ class MyEmailRequest extends AbstractRequest
             'country' => ['nullable', 'string'],
             'city' => ['nullable', 'string'],
             'job' => ['nullable', 'string'],
-            'website_uuid' => ['required', 'numeric', 'min:1', Rule::exists('websites', 'uuid')->where(function ($query) {
-
+            'websites' => ['required', 'array', 'min:1'],
+            'websites.*' => ['required', 'numeric', 'min:1', Rule::exists('websites', 'uuid')->where(function ($query) {
                 return $query->where('user_uuid', auth()->user()->getkey())->whereNull('deleted_at');
             })],
         ];

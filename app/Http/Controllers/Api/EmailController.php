@@ -17,10 +17,13 @@ use App\Http\Resources\EmailResourceCollection;
 use App\Http\Resources\EmailResource;
 use App\Services\EmailService;
 use App\Services\MyEmailService;
+use Illuminate\Http\JsonResponse;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 class EmailController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestStoreTrait, RestEditTrait;
+    use RestIndexTrait, RestShowTrait, RestDestroyTrait;
 
     /**
      * @var
@@ -46,9 +49,48 @@ class EmailController extends AbstractRestAPIController
     }
 
     /**
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
+     * @return JsonResponse
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function store()
+    {
+        $request = app($this->storeRequest);
+
+        $model = $this->service->create($request->all());
+
+        $model->websites()->attach($request->get('websites'));
+
+        return $this->sendCreatedJsonResponse(
+          $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    /**
+     * @param $id
+     * @return JsonResponse
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function edit($id)
+    {
+        $request = app($this->editRequest);
+
+        $model = $this->service->findOrFailById($id);
+
+        $this->service->update($model, $request->all());
+
+        $model->websites()->sync($request->get('websites') ?? $model->websites);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    /**
+     * @return JsonResponse
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function indexMyEmail(IndexRequest $request)
     {
@@ -67,11 +109,13 @@ class EmailController extends AbstractRestAPIController
 
     /**
      * @param MyEmailRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function storeMyEmail(MyEmailRequest $request)
     {
         $model = $this->service->create($request->all());
+
+        $model->websites()->attach($request->get('websites'));
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -80,7 +124,7 @@ class EmailController extends AbstractRestAPIController
 
     /**
      * @param $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function showMyEmail($id)
     {
@@ -94,13 +138,15 @@ class EmailController extends AbstractRestAPIController
     /**
      * @param UpdateMyEmailRequest $request
      * @param $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function editMyEmail(UpdateMyEmailRequest $request, $id)
     {
         $model = $this->myService->findMyEmailByKeyOrAbort($id);
 
         $this->service->update($model, $request->all());
+
+        $model->websites()->sync($request->get('websites') ?? $model->websites);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -109,7 +155,7 @@ class EmailController extends AbstractRestAPIController
 
     /**
      * @param $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function destroyMyEmail($id)
     {
