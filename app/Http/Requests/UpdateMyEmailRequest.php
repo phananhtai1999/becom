@@ -32,7 +32,8 @@ class UpdateMyEmailRequest extends AbstractRequest
             'country' => ['string'],
             'city' => ['string'],
             'job' => ['string'],
-            'website_uuid' => ['numeric', 'min:1', Rule::exists('websites', 'uuid')->where(function ($query) {
+            'websites' => ['required', 'array', 'min:1'],
+            'websites.*' => ['numeric', 'min:1', Rule::exists('websites', 'uuid')->where(function ($query) {
 
                 return $query->where('user_uuid', auth()->user()->getkey())->whereNull('deleted_at');
             })],

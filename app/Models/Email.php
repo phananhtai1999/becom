@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Abstracts\AbstractModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Email extends AbstractModel
@@ -32,7 +33,6 @@ class Email extends AbstractModel
         'country',
         'city',
         'job',
-        'website_uuid',
     ];
 
     /**
@@ -45,10 +45,10 @@ class Email extends AbstractModel
     ];
 
     /**
-     * @return BelongsTo
+     * @return BelongsToMany
      */
-    public function website()
+    public function websites()
     {
-        return $this->belongsTo(Website::class, 'website_uuid', 'uuid');
+        return $this->belongsToMany(Website::class, 'website_email', 'email_uuid', 'website_uuid')->withTimestamps();
     }
 }

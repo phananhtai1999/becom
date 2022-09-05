@@ -31,7 +31,8 @@ class EmailRequest extends AbstractRequest
             'country' => ['nullable', 'string'],
             'city' => ['nullable', 'string'],
             'job' => ['nullable', 'string'],
-            'website_uuid' => ['required', 'numeric', 'min:1', 'exists:websites,uuid'],
+            'websites' => ['required', 'array', 'min:1'],
+            'websites.*' => ['required', 'numeric', 'min:1', 'exists:websites,uuid'],
         ];
     }
 }
