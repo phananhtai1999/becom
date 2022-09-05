@@ -13,8 +13,10 @@ use App\Http\Requests\MailSendingHistoryRequest;
 use App\Http\Requests\UpdateMailSendingHistoryRequest;
 use App\Http\Resources\MailSendingHistoryResourceCollection;
 use App\Http\Resources\MailSendingHistoryResource;
+use App\Services\MailOpenTrackingService;
 use App\Services\MailSendingHistoryService;
 use App\Services\MyMailSendingHistoryService;
+use Illuminate\Http\Request;
 
 class MailSendingHistoryController extends AbstractRestAPIController
 {
@@ -26,16 +28,24 @@ class MailSendingHistoryController extends AbstractRestAPIController
     protected $myService;
 
     /**
+     * @var
+     */
+    protected $mailSendingHistoryService;
+
+    /**
      * @param MailSendingHistoryService $service
      * @param MyMailSendingHistoryService $myService
+     * @param MailOpenTrackingService $mailSendingHistoryService
      */
     public function __construct(
         MailSendingHistoryService $service,
-        MyMailSendingHistoryService $myService
+        MyMailSendingHistoryService $myService,
+        MailOpenTrackingService $mailSendingHistoryService
     )
     {
         $this->service = $service;
         $this->myService = $myService;
+        $this->mailSendingHistoryService = $mailSendingHistoryService;
         $this->resourceCollectionClass = MailSendingHistoryResourceCollection::class;
         $this->resourceClass = MailSendingHistoryResource::class;
         $this->storeRequest = MailSendingHistoryRequest::class;
@@ -74,5 +84,19 @@ class MailSendingHistoryController extends AbstractRestAPIController
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
         );
+    }
+
+    /**
+     * @param Request $request
+     * @param $mailSendingHistoryUuid
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function mailOpenTracking(Request $request, $id)
+    {
+        $ip = $request->ip();
+        $userAgent = $request->header('User-Agent');
+        $this->mailSendingHistoryService->mailOpenTracking($id, $ip, $userAgent);
+
+        return $this->sendOkJsonResponse();
     }
 }

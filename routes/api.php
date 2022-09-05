@@ -277,4 +277,5 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website-verification.'], fu
 });
 
 Route::get('/support-multiple-languages', [SupportMultipleLanguagesController::class, 'setCookie'])->name('set-cookie');
+Route::get('/mail-open-tracking/{id}', [MailSendingHistoryController::class, 'mailOpenTracking'])->name('mail-open-tracking');
 
