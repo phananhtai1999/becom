@@ -149,7 +149,7 @@ class SendEmailByCampaignListener implements ShouldQueue
      */
     public function checkWasFinishedCampaign($campaign)
     {
-        $emails = $this->emailService->findAllWhere(['website_uuid' => $campaign->website_uuid]);
+        $emails = $this->emailService->getAllEmailsByWebsiteUuid($campaign->website_uuid);
         foreach ($emails as $email){
             if($this->mailSendingHistoryService->getNumberEmailSentPerUser($campaign->uuid, $email->email) !== $campaign->number_email_per_user){
                 return false;

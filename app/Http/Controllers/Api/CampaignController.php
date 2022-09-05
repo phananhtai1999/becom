@@ -16,6 +16,7 @@ use App\Http\Requests\IndexRequest;
 use App\Http\Requests\LoadAnalyticDataRequest;
 use App\Http\Requests\MyCampaignRequest;
 use App\Http\Requests\SendEmailByCampaignRequest;
+use App\Http\Requests\SendEmailByMyCampaignRequest;
 use App\Http\Requests\UpdateCampaignRequest;
 use App\Http\Requests\UpdateMyCampaignRequest;
 use App\Http\Resources\CampaignDailyTrackingResourceCollection;
@@ -345,18 +346,45 @@ class CampaignController extends AbstractRestAPIController
         }
     }
 
-    public function sendEmailByMyCampaign()
+    /**
+     * @param SendEmailByMyCampaignRequest $request
+     * @return JsonResponse
+     */
+    public function sendEmailByMyCampaign(SendEmailByMyCampaignRequest $request)
     {
-        $activeCampaign = $this->myService->loadActiveMyCampaign();
+        if($this->myService->CheckMyCampaign($request->get('campaign_uuid'))){
+            $campaign = $this->service->findOneById($request->get('campaign_uuid'));
+            if($request->get('is_save_history')){
+                if($this->sendEmailScheduleLogService->checkActiveCampaignbyCampaignUuid($request->get('campaign_uuid'))){
+                    if($this->emailService->checkEmailValid($request->get('to_emails'), $campaign->website_uuid)){
+                        if($this->mailSendingHistoryService->checkTodayNumberEmailSentUser($campaign, $request->get('to_emails'))){
+                            SendEmailByCampaignEvent::dispatch($campaign, $request->get('to_emails'));
 
-        if($activeCampaign){
-            $this->sendEmailByCampaignService->sendEmailByActiveCampaign($activeCampaign);
+                            return $this->sendOkJsonResponse(["message" => "Send Email By Campaign Success"]);
+                        }
 
-            return $this->sendOkJsonResponse(["message" => "Send Email By My Campaign Success"]);
-        }else{
+                        return $this->sendValidationFailedJsonResponse(["errors" => ['to_emails' => 'There were emails that received the campaign today']]);
+                    }
 
-            return $this->sendOkJsonResponse(["message" => "Success but no campaign to send"]);
+                    return $this->sendValidationFailedJsonResponse(["errors" => ['to_emails' => 'The selected to emails is invalid']]);
+                }
+
+                return $this->sendValidationFailedJsonResponse(["errors" => ['campaign_uuid' => 'The selected campaign uuid is invalid']]);
+
+            }else{
+                try {
+                    $this->smtpAccountService->setSmtpAccountForSendEmail($campaign->smtpAccount);
+                    foreach ($request->get('to_emails') as $email){
+                        $mailTemplate = $this->mailTemplateVariableService->renderBody($campaign->mailTemplate, $email, $campaign->smtpAccount, $campaign);
+                        Mail::to($email)->send(new SendCampaign($mailTemplate));
+                    }
+
+                    return $this->sendOkJsonResponse(["message" => "Test Send Email By Campaign Success"]);
+                }catch (\Exception $e){
+                    return $this->sendValidationFailedJsonResponse(["smtp_account" => $e->getMessage()]);
+                }
+            }
         }
-
+        return $this->sendValidationFailedJsonResponse(["errors" => ['campaign_uuid' => 'The selected campaign uuid is invalid']]);
     }
 }

@@ -30,15 +30,27 @@ class EmailService extends AbstractService
     public function checkEmailValid($toEmails, $websiteUuid)
     {
         foreach ($toEmails as $toEmail){
-            $email = $this->findOneWhere([
-                ['email', $toEmail],
-                ['website_uuid', $websiteUuid]
-            ]);
-           if(!$email){
-               return false;
-           }
+            $email = $this->model->select('emails.*')
+                ->join('website_email', 'emails.uuid', '=', 'website_email.email_uuid')
+                ->where([
+                    ['website_email.website_uuid', $websiteUuid],
+                    ['emails.email', $toEmail]
+                ])->first();
+            if(!$email){
+                return false;
+            }
         }
-
         return true;
+    }
+
+    /**
+     * @param $websiteUuid
+     * @return mixed
+     */
+    public function getAllEmailsByWebsiteUuid($websiteUuid)
+    {
+        return $this->model->select('emails.*')
+            ->join('website_email', 'emails.uuid', '=', 'website_email.email_uuid')
+            ->where('website_email.website_uuid', $websiteUuid)->get();
     }
 }

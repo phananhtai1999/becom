@@ -207,7 +207,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'campaign.'], function () {
         Route::get('/my/campaign/{id}', [CampaignController::class, 'showMyCampaign'])->name('show');
         Route::put('/my/campaign/{id}', [CampaignController::class, 'editMyCampaign'])->name('edit');
         Route::delete('/my/campaign/{id}', [CampaignController::class, 'destroyMyCampaign'])->name('destroy');
-        Route::get('/my/emails/send-campaign', [CampaignController::class, 'sendEmailByMyCampaign'])->name('sendEmailByMyCampaign');
+        Route::post('/my/emails/send-campaign', [CampaignController::class, 'sendEmailByMyCampaign'])->name('sendEmailByMyCampaign');
     });
 
     //Upsert-campaign-link-tracking
@@ -258,13 +258,11 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'mail-sending-history.'], fu
 
 //SmtpAccountEncryption
 Route::group(['middleware' => ['auth:api'], 'as' => 'smtp-account-encryption.'], function (){
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function (){
-        Route::get('/smtp-account-encryptions', [SmtpAccountEncryptionController::class, 'index'])->name('index');
-        Route::post('/smtp-account-encryption', [SmtpAccountEncryptionController::class, 'store'])->name('store');
-        Route::get('/smtp-account-encryption/{id}', [SmtpAccountEncryptionController::class, 'show'])->name('show');
-        Route::put('/smtp-account-encryption/{id}', [SmtpAccountEncryptionController::class, 'edit'])->name('edit');
-        Route::delete('/smtp-account-encryption/{id}', [SmtpAccountEncryptionController::class, 'destroy'])->name('destroy');
-    });
+    Route::get('/smtp-account-encryptions', [SmtpAccountEncryptionController::class, 'index'])->name('index');
+    Route::post('/smtp-account-encryption', [SmtpAccountEncryptionController::class, 'store'])->name('store');
+    Route::get('/smtp-account-encryption/{id}', [SmtpAccountEncryptionController::class, 'show'])->name('show');
+    Route::put('/smtp-account-encryption/{id}', [SmtpAccountEncryptionController::class, 'edit'])->name('edit');
+    Route::delete('/smtp-account-encryption/{id}', [SmtpAccountEncryptionController::class, 'destroy'])->name('destroy');
 });
 
 //WebsiteVerification
