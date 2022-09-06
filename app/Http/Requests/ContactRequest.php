@@ -27,12 +27,12 @@ class ContactRequest extends AbstractRequest
             'email' => ['required', 'string'],
             'first_name' => ['required', 'string'],
             'last_name' => ['required', 'string'],
-            'middle_name' => ['required', 'string'],
-            'phone' => ['required', 'numeric'],
-            'dob' => ['required', 'date_format:Y-m-d'],
-            'sex' => ['required', 'string'],
-            'city' => ['required', 'string'],
-            'country' => ['required', 'string'],
+            'middle_name' => ['nullable', 'string'],
+            'phone' => ['nullable', 'numeric'],
+            'dob' => ['nullable', 'date_format:Y-m-d'],
+            'sex' => ['nullable', 'string'],
+            'city' => ['nullable', 'string'],
+            'country' => ['nullable', 'string'],
         ];
     }
 }
