@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\ConfigController;
 use App\Http\Controllers\Api\AuthBySocialNetworkController;
 use App\Http\Controllers\Api\SmtpAccountEncryptionController;
 use App\Http\Controllers\Api\SupportMultipleLanguagesController;
+use App\Http\Controllers\Api\ContactController;
 
 /*
 |--------------------------------------------------------------------------
@@ -271,6 +272,18 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website-verification.'], fu
         Route::get('/website-verifications', [WebsiteVerificationController::class, 'index'])->name('index');
         Route::get('/website-verification/{id}', [WebsiteVerificationController::class, 'show'])->name('show');
         Route::delete('/website-verification/{id}', [WebsiteVerificationController::class, 'destroy'])->name('destroy');
+    });
+});
+
+//Contact
+Route::group(['middleware' => ['auth:api'], 'as' => 'contact.'], function () {
+
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/contacts', [ContactController::class, 'index'])->name('index');
+        Route::post('/contact', [ContactController::class, 'store'])->name('store');
+        Route::get('/contact/{id}', [ContactController::class, 'show'])->name('show');
+        Route::put('/contact/{id}', [ContactController::class, 'edit'])->name('edit');
+        Route::delete('/contact/{id}', [ContactController::class, 'destroy'])->name('destroy');
     });
 });
 
