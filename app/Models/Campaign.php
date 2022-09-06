@@ -57,7 +57,7 @@ class Campaign extends AbstractModel
      */
     public function smtpAccount()
     {
-        return $this->belongsTo(SmtpAccount::class, 'smtp_account_uuid', 'uuid');
+        return $this->belongsTo(SmtpAccount::class, 'smtp_account_uuid', 'uuid')->withTrashed();
     }
 
     /**
@@ -65,7 +65,7 @@ class Campaign extends AbstractModel
      */
     public function mailTemplate()
     {
-        return $this->belongsTo(MailTemplate::class, 'mail_template_uuid', 'uuid');
+        return $this->belongsTo(MailTemplate::class, 'mail_template_uuid', 'uuid')->withTrashed();
     }
 
     /**
@@ -73,7 +73,7 @@ class Campaign extends AbstractModel
      */
     public function website()
     {
-        return $this->belongsTo(Website::class, 'website_uuid', 'uuid');
+        return $this->belongsTo(Website::class, 'website_uuid', 'uuid')->withTrashed();
     }
 
     /**

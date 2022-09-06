@@ -44,7 +44,7 @@ class MailSendingHistoryResource extends AbstractJsonResource
         if (\in_array('mail_sending_history__smtp_account', $expand)) {
             $data['smtp_account'] = new SmtpAccountResource($this->campaign->smtpAccount);
         }
-        
+
         return $data;
     }
 }
