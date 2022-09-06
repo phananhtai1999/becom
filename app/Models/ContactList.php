@@ -7,14 +7,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Contact extends AbstractModel
+class ContactList extends AbstractModel
 {
     use HasFactory, SoftDeletes;
 
     /**
      * @var string
      */
-    protected $table = "contacts";
+    protected $table = "contact_lists";
 
     /**
      * @var string
@@ -25,15 +25,7 @@ class Contact extends AbstractModel
      * @var string[]
      */
     protected $fillable = [
-        'email',
-        'first_name',
-        'last_name',
-        'middle_name',
-        'phone',
-        'sex',
-        'dob',
-        'city',
-        'country',
+        'name',
     ];
 
     /**
@@ -48,8 +40,8 @@ class Contact extends AbstractModel
     /**
      * @return BelongsToMany
      */
-    public function contactLists()
+    public function contacts()
     {
-        return $this->belongsToMany(ContactList::class, 'contact_contact_list', 'contact_uuid', 'contact_list_uuid');
+        return $this->belongsToMany(Contact::class, 'contact_contact_list', 'contact_list_uuid', 'contact_uuid');
     }
 }
