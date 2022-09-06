@@ -18,6 +18,8 @@ use App\Http\Controllers\Api\ConfigController;
 use App\Http\Controllers\Api\AuthBySocialNetworkController;
 use App\Http\Controllers\Api\SmtpAccountEncryptionController;
 use App\Http\Controllers\Api\SupportMultipleLanguagesController;
+use App\Http\Controllers\Api\ContactController;
+use App\Http\Controllers\Api\ContactListController;
 
 /*
 |--------------------------------------------------------------------------
@@ -257,7 +259,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'mail-sending-history.'], fu
 });
 
 //SmtpAccountEncryption
-Route::group(['middleware' => ['auth:api'], 'as' => 'smtp-account-encryption.'], function (){
+Route::group(['middleware' => ['auth:api'], 'as' => 'smtp-account-encryption.'], function () {
     Route::get('/smtp-account-encryptions', [SmtpAccountEncryptionController::class, 'index'])->name('index');
     Route::post('/smtp-account-encryption', [SmtpAccountEncryptionController::class, 'store'])->name('store');
     Route::get('/smtp-account-encryption/{id}', [SmtpAccountEncryptionController::class, 'show'])->name('show');
@@ -266,12 +268,33 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'smtp-account-encryption.'],
 });
 
 //WebsiteVerification
-Route::group(['middleware' => ['auth:api'], 'as' => 'website-verification.'], function (){
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function (){
+Route::group(['middleware' => ['auth:api'], 'as' => 'website-verification.'], function () {
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
         Route::get('/website-verifications', [WebsiteVerificationController::class, 'index'])->name('index');
         Route::get('/website-verification/{id}', [WebsiteVerificationController::class, 'show'])->name('show');
         Route::delete('/website-verification/{id}', [WebsiteVerificationController::class, 'destroy'])->name('destroy');
     });
+});
+
+//Contact
+Route::group(['middleware' => ['auth:api'], 'as' => 'contact.'], function () {
+
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/contacts', [ContactController::class, 'index'])->name('index');
+        Route::post('/contact', [ContactController::class, 'store'])->name('store');
+        Route::get('/contact/{id}', [ContactController::class, 'show'])->name('show');
+        Route::put('/contact/{id}', [ContactController::class, 'edit'])->name('edit');
+        Route::delete('/contact/{id}', [ContactController::class, 'destroy'])->name('destroy');
+    });
+});
+
+//Contact List
+Route::group(['middleware' => ['auth:api'], 'as' => 'contact-list.'], function () {
+    Route::get('/contact-lists', [ContactListController::class, 'index'])->name('index');
+    Route::post('/contact-list', [ContactListController::class, 'store'])->name('store');
+    Route::get('/contact-list/{id}', [ContactListController::class, 'show'])->name('show');
+    Route::put('/contact-list/{id}', [ContactListController::class, 'edit'])->name('edit');
+    Route::delete('/contact-list/{id}', [ContactListController::class, 'destroy'])->name('destroy');
 });
 
 Route::get('/support-multiple-languages', [SupportMultipleLanguagesController::class, 'setCookie'])->name('set-cookie');
