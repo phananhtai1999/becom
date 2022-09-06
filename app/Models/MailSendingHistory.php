@@ -46,7 +46,7 @@ class MailSendingHistory extends AbstractModel
      */
     public function campaign()
     {
-        return $this->belongsTo(Campaign::class, 'campaign_uuid', 'uuid');
+        return $this->belongsTo(Campaign::class, 'campaign_uuid', 'uuid')->withTrashed();
     }
 
     /**
