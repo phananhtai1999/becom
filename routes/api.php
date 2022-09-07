@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\CampaignController;
 use App\Http\Controllers\Api\EmailController;
+use App\Http\Controllers\Api\MailOpenTrackingController;
 use App\Http\Controllers\Api\MailSendingHistoryController;
 use App\Http\Controllers\Api\MailTemplateController;
 use App\Http\Controllers\Api\SmtpAccountController;
@@ -295,6 +296,11 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'contact-list.'], function (
     Route::get('/contact-list/{id}', [ContactListController::class, 'show'])->name('show');
     Route::put('/contact-list/{id}', [ContactListController::class, 'edit'])->name('edit');
     Route::delete('/contact-list/{id}', [ContactListController::class, 'destroy'])->name('destroy');
+});
+
+Route::group(['middleware' => ['auth:api'], 'as' => 'mail-open-tracking.'], function (){
+    Route::get('/mail-open-tracking/report-campaigns', [MailOpenTrackingController::class, 'reportAnalyticDataCampaigns'])->name('reportAnalyticDataCampaigns');
+    Route::get('/mail-open-tracking/report-campaign/{id}', [MailOpenTrackingController::class, 'reportAnalyticDataCampaign'])->name('reportAnalyticDataCampaign');
 });
 
 Route::get('/support-multiple-languages', [SupportMultipleLanguagesController::class, 'setCookie'])->name('set-cookie');
