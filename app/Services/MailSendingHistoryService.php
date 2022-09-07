@@ -60,4 +60,13 @@ class MailSendingHistoryService extends AbstractService
 
         return true;
     }
+
+    /**
+     * @param $campaignUuid
+     * @return mixed
+     */
+    public function getNumberEmailSentByCampaign($campaignUuid)
+    {
+        return $this->model->where('campaign_uuid', $campaignUuid)->groupBy('campaign_uuid')->count();
+    }
 }

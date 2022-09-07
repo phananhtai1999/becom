@@ -30,22 +30,22 @@ class MailSendingHistoryController extends AbstractRestAPIController
     /**
      * @var
      */
-    protected $mailSendingHistoryService;
+    protected $mailOpenTrackingService;
 
     /**
      * @param MailSendingHistoryService $service
      * @param MyMailSendingHistoryService $myService
-     * @param MailOpenTrackingService $mailSendingHistoryService
+     * @param MailOpenTrackingService $mailOpenTrackingService
      */
     public function __construct(
         MailSendingHistoryService $service,
         MyMailSendingHistoryService $myService,
-        MailOpenTrackingService $mailSendingHistoryService
+        MailOpenTrackingService $mailOpenTrackingService
     )
     {
         $this->service = $service;
         $this->myService = $myService;
-        $this->mailSendingHistoryService = $mailSendingHistoryService;
+        $this->mailOpenTrackingService = $mailOpenTrackingService;
         $this->resourceCollectionClass = MailSendingHistoryResourceCollection::class;
         $this->resourceClass = MailSendingHistoryResource::class;
         $this->storeRequest = MailSendingHistoryRequest::class;
@@ -95,7 +95,7 @@ class MailSendingHistoryController extends AbstractRestAPIController
     {
         $ip = $request->ip();
         $userAgent = $request->header('User-Agent');
-        $this->mailSendingHistoryService->mailOpenTracking($id, $ip, $userAgent);
+        $this->mailOpenTrackingService->mailOpenTracking($id, $ip, $userAgent);
 
         return $this->sendOkJsonResponse();
     }
