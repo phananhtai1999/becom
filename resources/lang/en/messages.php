@@ -17,5 +17,6 @@ return [
     'reset_password' => 'We have e-mailed your password reset link!',
     'email_does_not_exists' => 'Email does not exists',
     'account_banned' => 'Your account is banned in the system',
-    'account_deleted' => 'Your account is no longer available in the system'
+    'account_deleted' => 'Your account is no longer available in the system',
+    'date_format' => 'The dob does not match the format Y-m-d.'
 ];

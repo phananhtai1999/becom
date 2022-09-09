@@ -303,6 +303,10 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'mail-open-tracking.'], func
     Route::get('/mail-open-tracking/report-campaign/{id}', [MailOpenTrackingController::class, 'reportAnalyticDataCampaign'])->name('reportAnalyticDataCampaign');
 });
 
+// Import File
+Route::post('/import-excel-file', [ContactController::class, 'importExcelFile'])->name('import-excel-file');
+// Set Cookie-Change Lang
 Route::get('/support-multiple-languages', [SupportMultipleLanguagesController::class, 'setCookie'])->name('set-cookie');
+// Mail Open Tracking
 Route::get('/mail-open-tracking/{id}', [MailSendingHistoryController::class, 'mailOpenTracking'])->name('mail-open-tracking');
 

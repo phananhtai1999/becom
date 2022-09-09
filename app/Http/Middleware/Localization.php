@@ -24,6 +24,8 @@ class Localization
 
         if($request->get('lang'))
         {
+            app()->setLocale($request->get('lang'));
+
             return $next($request);
         }
 
