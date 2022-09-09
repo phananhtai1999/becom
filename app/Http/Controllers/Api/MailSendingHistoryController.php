@@ -95,7 +95,7 @@ class MailSendingHistoryController extends AbstractRestAPIController
     {
         $ip = $request->ip();
         $userAgent = $request->header('User-Agent');
-        $this->mailSendingHistoryService->mailOpenTracking($id, $ip, $userAgent);
+        $this->mailOpenTrackingService->mailOpenTracking($id, $ip, $userAgent);
 
         return $this->sendOkJsonResponse();
     }

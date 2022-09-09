@@ -31,4 +31,14 @@ class CampaignService extends AbstractService
                 ['campaigns.was_stopped_by_owner', false],
             ])->firstOrFail();
     }
+
+    /**
+     * @param $campaignUuid
+     * @return mixed
+     */
+    public function findCampaignByReport($campaignUuid)
+    {
+        return $this->model->where('uuid', $campaignUuid)->withTrashed()->first();
+    }
+
 }
