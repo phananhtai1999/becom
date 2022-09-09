@@ -16,6 +16,7 @@ class CreateContactListsTable extends Migration
         Schema::create('contact_lists', function (Blueprint $table) {
             $table->id('uuid');
             $table->string('name');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

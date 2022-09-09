@@ -297,6 +297,10 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'contact-list.'], function (
     Route::delete('/contact-list/{id}', [ContactListController::class, 'destroy'])->name('destroy');
 });
 
+// Import File
+Route::post('/import-excel-file', [ContactController::class, 'importExcelFile'])->name('import-excel-file');
+// Set Cookie-Change Lang
 Route::get('/support-multiple-languages', [SupportMultipleLanguagesController::class, 'setCookie'])->name('set-cookie');
+// Mail Open Tracking
 Route::get('/mail-open-tracking/{id}', [MailSendingHistoryController::class, 'mailOpenTracking'])->name('mail-open-tracking');
 
