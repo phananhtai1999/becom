@@ -26,13 +26,19 @@ class MyCampaignRequest extends AbstractRequest
     {
         return [
             'tracking_key' => ['required', 'string'],
-            'mail_template_uuid' => ['required', 'numeric', 'min:1', 'exists:mail_templates,uuid'],
+            'mail_template_uuid' => ['required', 'numeric', 'min:1', Rule::exists('mail_templates', 'uuid')->where(function ($query) {
+
+                return $query->where('user_uuid', auth()->user()->getkey())->whereNull('deleted_at');
+            })],
             'from_date' => ['required', 'date', 'before_or_equal:to_date'],
             'to_date' => ['required', 'date', 'after_or_equal:from_date'],
             'number_email_per_date' => ['required', 'numeric', 'min:1'],
             'number_email_per_user' => ['required', 'numeric', 'min:1'],
             'status' => ['required', 'string'],
-            'smtp_account_uuid' => ['required', 'numeric', 'min:1', 'exists:smtp_accounts,uuid'],
+            'smtp_account_uuid' => ['required', 'numeric', 'min:1', Rule::exists('smtp_accounts', 'uuid')->where(function ($query) {
+
+                return $query->where('user_uuid', auth()->user()->getkey())->whereNull('deleted_at');
+            })],
             'website_uuid' => ['required', 'numeric', 'min:1', Rule::exists('websites', 'uuid')->where(function ($query) {
 
                 return $query->where('user_uuid', auth()->user()->getkey())->whereNull('deleted_at');

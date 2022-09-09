@@ -113,7 +113,9 @@ class EmailController extends AbstractRestAPIController
      */
     public function storeMyEmail(MyEmailRequest $request)
     {
-        $model = $this->service->create($request->all());
+        $model = $this->service->create(array_merge($request->all(), [
+            'user_uuid' => auth()->user()->getkey(),
+        ]));
 
         $model->websites()->attach($request->get('websites'));
 
@@ -144,7 +146,9 @@ class EmailController extends AbstractRestAPIController
     {
         $model = $this->myService->findMyEmailByKeyOrAbort($id);
 
-        $this->service->update($model, $request->all());
+        $this->service->update($model, array_merge($request->all(), [
+            'user_uuid' => auth()->user()->getkey(),
+        ]));
 
         $model->websites()->sync($request->get('websites') ?? $model->websites);
 

@@ -29,6 +29,7 @@ class MailTemplate extends AbstractModel
         'subject',
         'body',
         'website_uuid',
+        'user_uuid',
         'design'
     ];
 
@@ -80,5 +81,13 @@ class MailTemplate extends AbstractModel
     public function website()
     {
         return $this->belongsTo(Website::class, 'website_uuid', 'uuid');
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_uuid', 'uuid');
     }
 }

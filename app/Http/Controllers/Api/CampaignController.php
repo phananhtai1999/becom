@@ -177,7 +177,9 @@ class CampaignController extends AbstractRestAPIController
      */
     public function storeMyCampaign(MyCampaignRequest $request)
     {
-        $model = $this->service->create($request->all());
+        $model = $this->service->create(array_merge($request->all(), [
+            'user_uuid' => auth()->user()->getkey(),
+        ]));
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -206,7 +208,9 @@ class CampaignController extends AbstractRestAPIController
     {
         $model = $this->myService->findMyCampaignByKeyOrAbort($id);
 
-        $this->service->update($model, $request->all());
+        $this->service->update($model, array_merge($request->all(), [
+            'user_uuid' => auth()->user()->getkey(),
+        ]));
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)

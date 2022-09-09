@@ -24,6 +24,7 @@ class MailTemplateResource extends AbstractJsonResource
             'subject' => $this->subject,
             'body' => $this->body,
             'website_uuid' => $this->website_uuid,
+            'user_uuid' => $this->user_uuid,
             'design' => $this->design,
             'rendered_body' => $this->rendered_body,
             'deleted_at' => $this->deleted_at,
@@ -33,6 +34,10 @@ class MailTemplateResource extends AbstractJsonResource
 
         if (\in_array('mail_template__website', $expand)) {
             $data['website'] = new WebsiteResource($this->website);
+        }
+
+        if (\in_array('mail_template__user', $expand)) {
+            $data['user'] = new UserResource($this->user);
         }
 
         return $data;

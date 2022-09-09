@@ -35,6 +35,7 @@ class Campaign extends AbstractModel
         'status',
         'smtp_account_uuid',
         'website_uuid',
+        'user_uuid',
         'was_finished',
         'was_stopped_by_owner'
     ];
@@ -90,5 +91,13 @@ class Campaign extends AbstractModel
     public function sendEmailScheduleLogs()
     {
         return $this->hasMany(SendEmailScheduleLog::class, 'campaign_uuid', 'uuid');
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_uuid', 'uuid');
     }
 }

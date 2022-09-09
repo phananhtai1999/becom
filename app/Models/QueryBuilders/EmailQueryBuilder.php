@@ -35,6 +35,7 @@ class EmailQueryBuilder extends AbstractQueryBuilder
                 'country',
                 'city',
                 'job',
+                'user_uuid',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -46,6 +47,7 @@ class EmailQueryBuilder extends AbstractQueryBuilder
                 'country',
                 'city',
                 'job',
+                'user_uuid',
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -64,6 +66,10 @@ class EmailQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__city', 'city'),
                 'job',
                 AllowedFilter::exact('exact__job', 'job'),
+                'user_uuid',
+                AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
+                'user.username',
+                AllowedFilter::exact('exact__user.username', 'user.username'),
                 'websites.domain',
                 AllowedFilter::exact('exact__websites.domain', 'websites.domain'),
             ]);

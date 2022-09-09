@@ -28,6 +28,7 @@ class EmailResource extends AbstractJsonResource
             'country' => $this->country,
             'city' => $this->city,
             'job' => $this->job,
+            'user_uuid' => $this->user_uuid,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
@@ -35,6 +36,10 @@ class EmailResource extends AbstractJsonResource
 
         if (\in_array('email__websites', $expand)) {
             $data['websites'] = WebsiteResource::collection($this->websites);
+        }
+
+        if (\in_array('email__user', $expand)) {
+            $data['user'] = new UserResource($this->user);
         }
 
         return $data;

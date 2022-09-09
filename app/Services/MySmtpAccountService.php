@@ -18,18 +18,10 @@ class MySmtpAccountService extends AbstractService
      */
     public function findMySmtpAccountByKeyOrAbort($id)
     {
-        $smtpAccount = $this->model->select('smtp_accounts.*')
-            ->join('websites', 'websites.uuid', '=', 'smtp_accounts.website_uuid')
-            ->where([
-                ['websites.user_uuid', auth()->user()->getKey()],
-                ['smtp_accounts.uuid', $id]
-            ])->first();
-
-        if (!empty($smtpAccount)) {
-            return $smtpAccount;
-        } else {
-            abort(403, 'Unauthorized.');
-        }
+        return $this->findOneWhereOrFail([
+            ['user_uuid', auth()->user()->getkey()],
+            ['uuid', $id]
+        ]);
     }
 
     /**

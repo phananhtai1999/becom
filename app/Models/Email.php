@@ -33,6 +33,7 @@ class Email extends AbstractModel
         'country',
         'city',
         'job',
+        'user_uuid',
     ];
 
     /**
@@ -50,5 +51,13 @@ class Email extends AbstractModel
     public function websites()
     {
         return $this->belongsToMany(Website::class, 'website_email', 'email_uuid', 'website_uuid')->withTimestamps();
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_uuid', 'uuid');
     }
 }

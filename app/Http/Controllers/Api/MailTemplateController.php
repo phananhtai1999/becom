@@ -71,7 +71,9 @@ class MailTemplateController extends AbstractRestAPIController
      */
     public function storeMyMailTemplate(MyMailTemplateRequest $request)
     {
-        $model = $this->service->create($request->all());
+        $model = $this->service->create(array_merge($request->all(), [
+            'user_uuid' => auth()->user()->getkey(),
+        ]));
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -100,7 +102,9 @@ class MailTemplateController extends AbstractRestAPIController
     {
         $model = $this->myService->findMyMailTemplateByKeyOrAbort($id);
 
-        $this->service->update($model, $request->all());
+        $this->service->update($model, array_merge($request->all(), [
+            'user_uuid' => auth()->user()->getkey(),
+        ]));
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)

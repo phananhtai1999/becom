@@ -19,18 +19,10 @@ class MyCampaignService extends AbstractService
      */
     public function findMyCampaignByKeyOrAbort($id)
     {
-        $campaign = $this->model->select('campaigns.*')
-            ->join('websites', 'websites.uuid', '=', 'campaigns.website_uuid')
-            ->where([
-                ['websites.user_uuid', auth()->user()->getKey()],
-                ['campaigns.uuid', $id]
-            ])->first();
-
-        if (!empty($campaign)) {
-            return $campaign;
-        } else {
-            abort(403, 'Unauthorized.');
-        }
+        return $this->findOneWhereOrFail([
+            ['user_uuid', auth()->user()->getkey()],
+            ['uuid', $id]
+        ]);
     }
 
     /**
