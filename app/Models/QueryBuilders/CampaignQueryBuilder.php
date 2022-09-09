@@ -37,6 +37,7 @@ class CampaignQueryBuilder extends AbstractQueryBuilder
                 'status',
                 'smtp_account_uuid',
                 'website_uuid',
+                'user_uuid',
                 'was_finished',
                 'was_stopped_by_owner'
             ])
@@ -52,6 +53,7 @@ class CampaignQueryBuilder extends AbstractQueryBuilder
                 'status',
                 'smtp_account_uuid',
                 'website_uuid',
+                'user_uuid',
                 'was_finished',
                 'was_stopped_by_owner'
             ])
@@ -76,6 +78,8 @@ class CampaignQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__smtp_account_uuid', 'smtp_account_uuid'),
                 'website_uuid',
                 AllowedFilter::exact('exact__website_uuid', 'website_uuid'),
+                'user_uuid',
+                AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
                 'was_finished',
                 AllowedFilter::exact('exact__was_finished', 'was_finished'),
                 'was_stopped_by_owner',
@@ -86,6 +90,8 @@ class CampaignQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__smtpAccount.mail_username', 'smtpAccount.mail_username'),
                 'website.domain',
                 AllowedFilter::exact('exact__website.domain', 'website.domain'),
+                'user.username',
+                AllowedFilter::exact('exact__user.username', 'user.username'),
             ]);
     }
 }

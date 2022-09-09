@@ -35,6 +35,7 @@ class SmtpAccount extends AbstractModel
         'mail_from_name',
         'secret_key',
         'website_uuid',
+        'user_uuid'
     ];
 
     /**
@@ -68,5 +69,13 @@ class SmtpAccount extends AbstractModel
     public function smtpAccountEncryption()
     {
         return $this->belongsTo(SmtpAccountEncryption::class, 'smtp_mail_encryption_uuid', 'uuid');
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_uuid', 'uuid');
     }
 }

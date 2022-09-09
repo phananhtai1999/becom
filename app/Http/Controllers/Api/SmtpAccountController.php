@@ -79,7 +79,9 @@ class SmtpAccountController extends AbstractRestAPIController
      */
     public function storeMySmtpAccount(MySmtpAccountRequest $request)
     {
-        $model = $this->service->create($request->all());
+        $model = $this->service->create(array_merge($request->all(), [
+            'user_uuid' => auth()->user()->getkey(),
+        ]));
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -108,7 +110,9 @@ class SmtpAccountController extends AbstractRestAPIController
     {
         $model = $this->myService->findMySmtpAccountByKeyOrAbort($id);
 
-        $this->service->update($model, $request->all());
+        $this->service->update($model, array_merge($request->all(), [
+            'user_uuid' => auth()->user()->getkey(),
+        ]));
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)

@@ -18,20 +18,10 @@ class MyEmailService extends AbstractService
      */
     public function findMyEmailByKeyOrAbort($id)
     {
-
-        $email = $this->model->select('emails.*')
-            ->join('website_email', 'website_email.email_uuid', '=', 'emails.uuid')
-            ->join('websites', 'websites.uuid', '=', 'website_email.website_uuid')
-            ->where([
-                ['websites.user_uuid', auth()->user()->getKey()],
-                ['emails.uuid', $id]
-            ])->first();
-
-        if (!empty($email)) {
-            return $email;
-        } else {
-            abort(403, 'Unauthorized.');
-        }
+        return $this->findOneWhereOrFail([
+            ['user_uuid', auth()->user()->getkey()],
+            ['uuid', $id]
+        ]);
     }
 
     /**

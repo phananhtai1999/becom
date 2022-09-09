@@ -18,18 +18,10 @@ class MyMailTemplateService extends AbstractService
      */
     public function findMyMailTemplateByKeyOrAbort($id)
     {
-        $mailTemplate = $this->model->select('mail_templates.*')
-            ->join('websites', 'websites.uuid', '=', 'mail_templates.website_uuid')
-            ->where([
-                ['websites.user_uuid', auth()->user()->getKey()],
-                ['mail_templates.uuid', $id]
-            ])->first();
-
-        if (!empty($mailTemplate)) {
-            return $mailTemplate;
-        } else {
-            abort(403, 'Unauthorized.');
-        }
+        return $this->findOneWhereOrFail([
+            ['user_uuid', auth()->user()->getkey()],
+            ['uuid', $id]
+        ]);
     }
 
     /**

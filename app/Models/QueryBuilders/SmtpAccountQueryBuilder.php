@@ -38,6 +38,7 @@ class SmtpAccountQueryBuilder extends AbstractQueryBuilder
                 'mail_from_name',
                 'secret_key',
                 'website_uuid',
+                'user_uuid',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -52,6 +53,7 @@ class SmtpAccountQueryBuilder extends AbstractQueryBuilder
                 'mail_from_name',
                 'secret_key',
                 'website_uuid',
+                'user_uuid',
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -76,6 +78,10 @@ class SmtpAccountQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__secret_key', 'secret_key'),
                 'website_uuid',
                 AllowedFilter::exact('exact__website_uuid', 'website_uuid'),
+                'user_uuid',
+                AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
+                'user.username',
+                AllowedFilter::exact('exact__user.username', 'user.username'),
                 'website.domain',
                 AllowedFilter::exact('exact__website.domain', 'website.domain'),
                 'smtpAccountEncryption.name',

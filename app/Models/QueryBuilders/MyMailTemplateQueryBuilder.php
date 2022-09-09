@@ -15,9 +15,7 @@ class MyMailTemplateQueryBuilder extends AbstractQueryBuilder
      */
     public static function baseQuery()
     {
-        return MailTemplate::select('mail_templates.*')
-            ->join('websites', 'websites.uuid', '=', 'mail_templates.website_uuid')
-            ->where('websites.user_uuid', auth()->user()->getKey());
+        return MailTemplate::where('user_uuid', auth()->user()->getKey());
     }
 
     /**
@@ -33,6 +31,7 @@ class MyMailTemplateQueryBuilder extends AbstractQueryBuilder
                 'subject',
                 'body',
                 'website_uuid',
+                'user_uuid',
                 'design',
             ])
             ->defaultSort('-created_at')
@@ -41,6 +40,7 @@ class MyMailTemplateQueryBuilder extends AbstractQueryBuilder
                 'subject',
                 'body',
                 'website_uuid',
+                'user_uuid',
                 'design',
             ])
             ->allowedFilters([
@@ -52,10 +52,14 @@ class MyMailTemplateQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__body', 'body'),
                 'website_uuid',
                 AllowedFilter::exact('exact__website_uuid', 'website_uuid'),
+                'user_uuid',
+                AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
                 'design',
                 AllowedFilter::exact('exact__design', 'design'),
                 'website.domain',
                 AllowedFilter::exact('exact__website.domain', 'website.domain'),
+                'user.username',
+                AllowedFilter::exact('exact__user.username', 'user.username'),
             ]);
     }
 }

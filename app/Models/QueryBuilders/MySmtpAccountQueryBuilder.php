@@ -15,9 +15,7 @@ class MySmtpAccountQueryBuilder extends AbstractQueryBuilder
      */
     public static function baseQuery()
     {
-        return SmtpAccount::select('smtp_accounts.*')
-            ->join('websites', 'websites.uuid', '=', 'smtp_accounts.website_uuid')
-            ->where('websites.user_uuid', auth()->user()->getKey());
+        return SmtpAccount::where('user_uuid', auth()->user()->getKey());
     }
 
     /**
@@ -40,6 +38,7 @@ class MySmtpAccountQueryBuilder extends AbstractQueryBuilder
                 'mail_from_name',
                 'secret_key',
                 'website_uuid',
+                'user_uuid',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -54,6 +53,8 @@ class MySmtpAccountQueryBuilder extends AbstractQueryBuilder
                 'mail_from_name',
                 'secret_key',
                 'website_uuid',
+                'user_uuid',
+
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -78,6 +79,10 @@ class MySmtpAccountQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__secret_key', 'secret_key'),
                 'website_uuid',
                 AllowedFilter::exact('exact__website_uuid', 'website_uuid'),
+                'user_uuid',
+                AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
+                'user.username',
+                AllowedFilter::exact('exact__user.username', 'user.username'),
                 'website.domain',
                 AllowedFilter::exact('exact__website.domain', 'website.domain'),
                 'smtpAccountEncryption.name',

@@ -15,10 +15,7 @@ class MyEmailQueryBuilder extends AbstractQueryBuilder
      */
     public static function baseQuery()
     {
-        return Email::select('emails.*')
-            ->join('website_email', 'website_email.email_uuid', '=', 'emails.uuid')
-            ->join('websites', 'websites.uuid', '=', 'website_email.website_uuid')
-            ->where('websites.user_uuid', auth()->user()->getKey());
+        return Email::where('user_uuid', auth()->user()->getKey());
     }
 
     /**
@@ -38,6 +35,7 @@ class MyEmailQueryBuilder extends AbstractQueryBuilder
                 'country',
                 'city',
                 'job',
+                'user_uuid',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -49,6 +47,7 @@ class MyEmailQueryBuilder extends AbstractQueryBuilder
                 'country',
                 'city',
                 'job',
+                'user_uuid',
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -67,6 +66,10 @@ class MyEmailQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__city', 'city'),
                 'job',
                 AllowedFilter::exact('exact__job', 'job'),
+                'user_uuid',
+                AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
+                'user.username',
+                AllowedFilter::exact('exact__user.username', 'user.username'),
                 'websites.domain',
                 AllowedFilter::exact('exact__websites.domain', 'websites.domain'),
             ]);
