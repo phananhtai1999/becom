@@ -17,5 +17,6 @@ return [
     'reset_password' => 'Un nouveau mot de passe a été envoyé à votre adresse e-mail!',
     'email_does_not_exists' => 'Le-mail nexiste pas',
     'account_banned' => 'Votre compte est banni du système',
-    'account_deleted' => "Votre compte n'est plus disponible dans le système"
+    'account_deleted' => "Votre compte n'est plus disponible dans le système",
+    'date_format' => 'La date de naissance ne correspond pas au format A-m-j.'
 ];

@@ -57,7 +57,7 @@ class ContactController extends AbstractRestAPIController
             return $this->sendValidationFailedJsonResponse([
                 'errors' => [
                     'dob' => [
-                        'The dob does not match the format Y-m-d.'
+                        __('messages.date_format')
                     ]
                 ]
             ]);
