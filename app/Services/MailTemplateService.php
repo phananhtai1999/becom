@@ -11,4 +11,10 @@ class MailTemplateService extends AbstractService
     protected $modelClass = MailTemplate::class;
 
     protected $modelQueryBuilderClass = MailTemplateQueryBuilder::class;
+
+    public function getMailTemplateDefaultWithPagination($perPage, $page, $columns, $pageName)
+    {
+        return MailTemplateQueryBuilder::initialQuery()->whereNull('website_uuid')
+            ->paginate($perPage, $columns, $pageName, $page);
+    }
 }

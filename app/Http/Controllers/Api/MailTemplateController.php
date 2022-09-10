@@ -121,4 +121,22 @@ class MailTemplateController extends AbstractRestAPIController
 
         return $this->sendOkJsonResponse();
     }
+
+    /**
+     * @param IndexRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getMailTemplatesDefault(IndexRequest $request)
+    {
+        $models = $this->service->getMailTemplateDefaultWithPagination(
+            $request->get('per_page', '15'),
+            $request->get('page', '1'),
+            $request->get('columns', '*'),
+            $request->get('page_name', 'page'),
+        );
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+        );
+    }
 }
