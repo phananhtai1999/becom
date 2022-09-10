@@ -191,7 +191,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'mail-template.'], function 
         Route::delete('/my/mail-template/{id}', [MailTemplateController::class, 'destroyMyMailTemplate'])->name('destroy');
     });
 
-    Route::get('/mail-template-defaults', [MailTemplateController::class, 'getMailTemplatesDefault'])->name('getMailTemplatesDefault');
+    Route::get('/mail-templates-default', [MailTemplateController::class, 'getMailTemplatesDefault'])->name('getMailTemplatesDefault');
 });
 
 //Campaign
