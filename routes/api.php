@@ -281,14 +281,11 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website-verification.'], fu
 
 //Contact
 Route::group(['middleware' => ['auth:api'], 'as' => 'contact.'], function () {
-
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
-        Route::get('/contacts', [ContactController::class, 'index'])->name('index');
-        Route::post('/contact', [ContactController::class, 'store'])->name('store');
-        Route::get('/contact/{id}', [ContactController::class, 'show'])->name('show');
-        Route::put('/contact/{id}', [ContactController::class, 'edit'])->name('edit');
-        Route::delete('/contact/{id}', [ContactController::class, 'destroy'])->name('destroy');
-    });
+    Route::get('/contacts', [ContactController::class, 'index'])->name('index');
+    Route::post('/contact', [ContactController::class, 'store'])->name('store');
+    Route::get('/contact/{id}', [ContactController::class, 'show'])->name('show');
+    Route::put('/contact/{id}', [ContactController::class, 'edit'])->name('edit');
+    Route::delete('/contact/{id}', [ContactController::class, 'destroy'])->name('destroy');
 });
 
 //Contact List
@@ -300,7 +297,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'contact-list.'], function (
     Route::delete('/contact-list/{id}', [ContactListController::class, 'destroy'])->name('destroy');
 });
 
-Route::group(['middleware' => ['auth:api'], 'as' => 'mail-open-tracking.'], function (){
+Route::group(['middleware' => ['auth:api'], 'as' => 'mail-open-tracking.'], function () {
     Route::get('/mail-open-tracking/report-campaigns', [MailOpenTrackingController::class, 'reportAnalyticDataCampaigns'])->name('reportAnalyticDataCampaigns');
     Route::get('/mail-open-tracking/report-campaign/{id}', [MailOpenTrackingController::class, 'reportAnalyticDataCampaign'])->name('reportAnalyticDataCampaign');
 });

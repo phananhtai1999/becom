@@ -44,7 +44,9 @@ class UpdateMyCampaignRequest extends AbstractRequest
                 return $query->where('user_uuid', auth()->user()->getkey())->whereNull('deleted_at');
             })],
             'was_finished' => ['boolean'],
-            'was_stopped_by_owner' => ['boolean']
+            'was_stopped_by_owner' => ['boolean'],
+            'contacts' => ['nullable', 'array', 'min:1'],
+            'contacts.*' => ['numeric', 'min:1', 'exists:contacts,uuid'],
         ];
     }
 }

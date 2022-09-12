@@ -45,7 +45,7 @@ use Illuminate\Support\Facades\Mail;
 
 class CampaignController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestStoreTrait, RestEditTrait;
+    use RestIndexTrait, RestShowTrait, RestDestroyTrait;
 
     /**
      * @var
@@ -156,6 +156,52 @@ class CampaignController extends AbstractRestAPIController
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */
+    public function store()
+    {
+        $request = app($this->storeRequest);
+
+        $model = $this->service->create($request->all());
+
+        $model->contacts()->attach($request->get('contacts', []));
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    /**
+     * @param $id
+     * @return JsonResponse
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     */
+    public function edit($id)
+    {
+        $request = app($this->editRequest);
+
+        $model = $this->service->findOrFailById($id);
+
+        $this->service->update($model, $request->all());
+
+        $contactUuid = $this->service->findContactKeyByCampaign($model);
+
+        if ($contactUuid == null)
+        {
+            $model->contacts()->sync($request->get('contacts', []));
+        }
+
+        $model->contacts()->sync($request->get('contacts', $contactUuid));
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    /**
+     * @return JsonResponse
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     */
     public function indexMyCampaign(IndexRequest $request)
     {
         return $this->sendOkJsonResponse(
@@ -180,6 +226,8 @@ class CampaignController extends AbstractRestAPIController
         $model = $this->service->create(array_merge($request->all(), [
             'user_uuid' => auth()->user()->getkey(),
         ]));
+
+        $model->contacts()->attach($request->get('contacts', []));
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -211,6 +259,15 @@ class CampaignController extends AbstractRestAPIController
         $this->service->update($model, array_merge($request->all(), [
             'user_uuid' => auth()->user()->getkey(),
         ]));
+
+        $contactUuid = $this->myService->findContactKeyByMyCampaign($model);
+
+        if ($contactUuid == null)
+        {
+            $model->contacts()->sync($request->get('contacts', []));
+        }
+
+        $model->contacts()->sync($request->get('contacts', $contactUuid));
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)

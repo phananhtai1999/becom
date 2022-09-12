@@ -55,6 +55,10 @@ class CampaignResource extends AbstractJsonResource
             $data['user'] = new UserResource($this->user);
         }
 
+        if (\in_array('campaign__contacts', $expand)) {
+            $data['contacts'] = ContactResource::collection($this->contacts);
+        }
+
         return $data;
     }
 }
