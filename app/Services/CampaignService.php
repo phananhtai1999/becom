@@ -19,12 +19,12 @@ class CampaignService extends AbstractService
     public function loadActiveCampaign()
     {
         return $this->model->select('campaigns.*')
-                ->whereNotIn('uuid', function ($query){
-                    $query->select('campaigns.uuid')
-                        ->from('campaigns')
-                        ->join('send_email_schedule_logs', 'send_email_schedule_logs.campaign_uuid', '=', 'campaigns.uuid')
-                        ->where('send_email_schedule_logs.is_running', true);
-                })->where([
+            ->whereNotIn('uuid', function ($query) {
+                $query->select('campaigns.uuid')
+                    ->from('campaigns')
+                    ->join('send_email_schedule_logs', 'send_email_schedule_logs.campaign_uuid', '=', 'campaigns.uuid')
+                    ->where('send_email_schedule_logs.is_running', true);
+            })->where([
                 ['campaigns.from_date', '<=', Carbon::now()],
                 ['campaigns.to_date', '>=', Carbon::now()],
                 ['campaigns.was_finished', false],
@@ -41,4 +41,23 @@ class CampaignService extends AbstractService
         return $this->model->where('uuid', $campaignUuid)->withTrashed()->first();
     }
 
+    /**
+     * @param $model
+     * @return array|void
+     */
+    public function findContactKeyByCampaign($model)
+    {
+        $contacts = $model->contacts()->get();
+
+        if (empty($contacts)) {
+
+            return [];
+        } else {
+            foreach ($contacts as $contact) {
+                $contactUuid[] = $contact->uuid;
+
+                return $contactUuid;
+            }
+        }
+    }
 }

@@ -57,4 +57,24 @@ class MyCampaignService extends AbstractService
         }
         return false;
     }
+
+    /**
+     * @param $model
+     * @return array
+     */
+    public function findContactKeyByMyCampaign($model)
+    {
+        $contacts = $model->contacts()->get();
+
+        if (empty($contacts)) {
+
+            return [];
+        } else {
+            foreach ($contacts as $contact) {
+                $contactUuid[] = $contact->uuid;
+
+                return $contactUuid;
+            }
+        }
+    }
 }
