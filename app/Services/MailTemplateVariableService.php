@@ -73,5 +73,29 @@ class MailTemplateVariableService extends AbstractService
         return $mailTemplate;
     }
 
+    /**
+     * @param $mailTemplate
+     * @param $mailSendingHistoryUuid
+     * @return mixed
+     */
+    public function injectTrackingImage($mailTemplate, $mailSendingHistoryUuid)
+    {
+        $tracking_image = '<img border=0 width=1 alt="" height=1 src="'.route('mail-open-tracking', $mailSendingHistoryUuid).'" />';
+
+        $linebreak = app(Str::class)->random(32);
+        $html = str_replace("\n", $linebreak, $mailTemplate->rendered_body);
+
+        if (preg_match("/^(.*<body[^>]*>)(.*)$/", $html, $matches)) {
+            $html = $matches[1].$matches[2].$tracking_image;
+        } else {
+            $html = $html . $tracking_image;
+        }
+        $html = str_replace($linebreak, "\n", $html);
+
+        $mailTemplate->setRenderedBodyAttribute($html);
+
+        return $mailTemplate;
+    }
+
 }
 

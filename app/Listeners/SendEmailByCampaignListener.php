@@ -126,13 +126,15 @@ class SendEmailByCampaignListener implements ShouldQueue
                 if($quantityEmailWasSentPerUser < $campaign->number_email_per_user){
                     $mailTemplate = $this->mailTemplateVariableService->renderBody($campaign->mailTemplate, $email, $campaign->smtpAccount, $campaign);
 
-                    Mail::to($email->email)->send(new SendCampaign($mailTemplate));
-
-                    $this->mailSendingHistoryService->create([
+                    $mailSendingHistory = $this->mailSendingHistoryService->create([
                         'email' => $email->email,
                         'campaign_uuid' => $campaign->uuid,
                         'time' => Carbon::now()
                     ]);
+
+                    $emailTracking = $this->mailTemplateVariableService->injectTrackingImage($mailTemplate, $mailSendingHistory->uuid);
+
+                    Mail::to($email->email)->send(new SendCampaign($emailTracking));
                 }
             }
         }
