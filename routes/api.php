@@ -304,7 +304,11 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'mail-open-tracking.'], func
 });
 
 // Import File
-Route::post('/import-excel-file', [ContactController::class, 'importExcelFile'])->name('import-excel-file');
+Route::group(['middleware' => ['auth:api'], 'as' => 'import-file.'], function (){
+    Route::post('/import-excel-file', [ContactController::class, 'importExcelFile'])->name('import-excel-file');
+    Route::post('/import-json-file', [ContactController::class, 'importJsonFile'])->name('import-json-file');
+});
+
 // Set Cookie-Change Lang
 Route::get('/support-multiple-languages', [SupportMultipleLanguagesController::class, 'setCookie'])->name('set-cookie');
 // Mail Open Tracking

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Abstracts\AbstractRestAPIController;
 use App\Http\Requests\ContactRequest;
 use App\Http\Requests\ImportExcelFileRequest;
+use App\Http\Requests\ImportJsonFileRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\UpdateContactRequest;
 use App\Http\Resources\ContactResource;
@@ -31,6 +32,10 @@ class ContactController extends AbstractRestAPIController
         $this->indexRequest = IndexRequest::class;
     }
 
+    /**
+     * @param ImportExcelFileRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function importExcelFile(ImportExcelFileRequest $request)
     {
         try {
@@ -62,5 +67,16 @@ class ContactController extends AbstractRestAPIController
                 ]
             ]);
         }
+    }
+
+    /**
+     * @param ImportJsonFileRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function importJsonFile(ImportJsonFileRequest $request)
+    {
+        $this->service->importJsonFile($request->file);
+
+        return $this->sendOkJsonResponse();
     }
 }
