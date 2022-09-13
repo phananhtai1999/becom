@@ -49,6 +49,10 @@ class MailSendingHistoryResource extends AbstractJsonResource
             $data['user'] = new UserResource($this->campaign->user);
         }
 
+        if (\in_array('mail_sending_history__mail_open_tracking', $expand)) {
+            $data['mail_open_tracking'] = MailOpenTrackingResource::collection($this->mailOpenTrackings);
+        }
+
         return $data;
     }
 }
