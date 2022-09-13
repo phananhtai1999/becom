@@ -25,7 +25,7 @@ use App\Services\WebsiteVerificationService;
 
 class WebsiteController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestStoreTrait, RestEditTrait;
+    use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestEditTrait;
 
     /**
      * @var MyWebsiteService
@@ -64,6 +64,27 @@ class WebsiteController extends AbstractRestAPIController
         $this->indexRequest = IndexRequest::class;
         $this->websiteVerificationService = $websiteVerificationService;
         $this->fileVerificationService = $fileVerificationService;
+    }
+
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function store()
+    {
+        $request = app($this->storeRequest);
+
+        if($request->has('user_uuid')){
+            $data = $request->all();
+        }else{
+            $data = array_merge($request->all(), [
+                'user_uuid' => auth()->user()->getkey(),
+            ]);
+        }
+        $model = $this->service->create($data);
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
     }
 
     /**

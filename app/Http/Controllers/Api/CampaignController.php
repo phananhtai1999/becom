@@ -160,7 +160,14 @@ class CampaignController extends AbstractRestAPIController
     {
         $request = app($this->storeRequest);
 
-        $model = $this->service->create($request->all());
+        if($request->has('user_uuid')){
+            $data = $request->all();
+        }else{
+            $data = array_merge($request->all(), [
+                'user_uuid' => auth()->user()->getkey(),
+            ]);
+        }
+        $model = $this->service->create($data);
 
         $model->contacts()->attach($request->get('contacts', []));
 

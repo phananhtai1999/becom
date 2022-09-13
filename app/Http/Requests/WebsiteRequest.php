@@ -25,7 +25,7 @@ class WebsiteRequest extends AbstractRequest
     {
         return [
             'domain' => ['required', 'string', 'unique:websites,domain'],
-            'user_uuid' => ['required', 'numeric', 'min:1', 'exists:users,uuid'],
+            'user_uuid' => ['numeric', 'min:1', 'exists:users,uuid'],
             'name' => ['required', 'string'],
             'description' => ['required', 'string'],
             'logo' => ['required', 'string'],
