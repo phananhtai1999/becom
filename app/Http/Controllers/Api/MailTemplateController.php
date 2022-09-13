@@ -20,7 +20,7 @@ use App\Services\MyMailTemplateService;
 
 class MailTemplateController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestStoreTrait, RestEditTrait;
+    use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestEditTrait;
 
     /**
      * @var
@@ -43,6 +43,27 @@ class MailTemplateController extends AbstractRestAPIController
         $this->storeRequest = MailTemplateRequest::class;
         $this->editRequest = UpdateMailTemplateRequest::class;
         $this->indexRequest = IndexRequest::class;
+    }
+
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function store()
+    {
+        $request = app($this->storeRequest);
+
+        if($request->has('user_uuid')){
+            $data = $request->all();
+        }else{
+            $data = array_merge($request->all(), [
+                'user_uuid' => auth()->user()->getkey(),
+            ]);
+        }
+        $model = $this->service->create($data);
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
     }
 
     /**
