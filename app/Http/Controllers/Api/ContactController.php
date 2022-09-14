@@ -7,6 +7,7 @@ use App\Http\Requests\ContactRequest;
 use App\Http\Requests\ImportExcelFileRequest;
 use App\Http\Requests\ImportJsonFileRequest;
 use App\Http\Requests\IndexRequest;
+use App\Http\Requests\MyContactRequest;
 use App\Http\Requests\UpdateContactRequest;
 use App\Http\Resources\ContactResource;
 use App\Http\Resources\ContactResourceCollection;
@@ -15,14 +16,28 @@ use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Imports\ContactImport;
 use App\Services\ContactService;
+use App\Services\MyContactService;
 
 class ContactController extends AbstractRestAPIController
 {
     use RestIndexTrait, RestShowTrait, RestDestroyTrait;
 
-    public function __construct(ContactService $service)
+    /**
+     * @var
+     */
+    protected $myService;
+
+    /**
+     * @param ContactService $service
+     * @param MyContactService $myService
+     */
+    public function __construct(
+        ContactService $service,
+        MyContactService $myService
+    )
     {
         $this->service = $service;
+        $this->myService = $myService;
         $this->resourceCollectionClass = ContactResourceCollection::class;
         $this->resourceClass = ContactResource::class;
         $this->storeRequest = ContactRequest::class;
@@ -73,6 +88,94 @@ class ContactController extends AbstractRestAPIController
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
         );
+    }
+
+    /**
+     * @param IndexRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     */
+    public function indexMyContact(IndexRequest $request)
+    {
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData(
+                $this->resourceCollectionClass,
+                $this->myService->getCollectionWithPagination(
+                    $request->get('per_page', '15'),
+                    $request->get('page', '1'),
+                    $request->get('columns', '*'),
+                    $request->get('page_name', 'page'),
+                )
+            )
+        );
+    }
+
+    /**
+     * @param MyContactRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function storeMyContact(MyContactRequest $request)
+    {
+        $model = $this->service->create(array_merge($request->all(), [
+            'user_uuid' => auth()->user()->getkey(),
+        ]));
+
+        $model->contactLists()->attach($request->get('contact_list', []));
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    /**
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function showMyContact($id)
+    {
+        $model = $this->myService->findMyContactByKeyOrAbort($id);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    /**
+     * @param UpdateContactRequest $request
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function editMyContact(UpdateContactRequest $request, $id)
+    {
+        $model = $this->myService->findMyContactByKeyOrAbort($id);
+
+        $this->service->update($model, array_merge($request->all(), [
+            'user_uuid' => auth()->user()->getkey(),
+        ]));
+
+        $contactListUuid = $this->service->findContactListKeyByContact($model);
+
+        if ($contactListUuid == null) {
+            $model->contactLists()->sync($request->get('contact_list', []));
+        } else {
+            $model->contactLists()->sync($request->get('contact_list', $contactListUuid));
+        }
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    /**
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function destroyMyContact($id)
+    {
+        $this->myService->deleteMyContactByKey($id);
+
+        return $this->sendOkJsonResponse();
     }
 
     /**

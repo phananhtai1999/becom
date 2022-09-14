@@ -27,6 +27,7 @@ class ContactResource extends AbstractJsonResource
             'sex' => $this->sex,
             'city' => $this->city,
             'country' => $this->country,
+            'user_uuid' => $this->user_uuid,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
@@ -34,6 +35,10 @@ class ContactResource extends AbstractJsonResource
 
         if (\in_array('contact__contact_lists', $expand)) {
             $data['contact_lists'] = ContactListResource::collection($this->contactLists);
+        }
+
+        if (\in_array('contact__user', $expand)) {
+            $data['user'] = new UserResource($this->user);
         }
 
         return $data;

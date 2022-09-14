@@ -45,6 +45,14 @@ class UserResource extends AbstractJsonResource
             $data['user_detail'] = new UserDetailResource($this->userDetails);
         }
 
+        if (\in_array('user__contacts', $expand)) {
+            $data['contacts'] = ContactResource::collection($this->contacts);
+        }
+
+        if (\in_array('user__contact_lists', $expand)) {
+            $data['contact_lists'] = ContactListResource::collection($this->contactLists);
+        }
+
         return $data;
     }
 }

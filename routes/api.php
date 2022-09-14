@@ -281,20 +281,42 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website-verification.'], fu
 
 //Contact
 Route::group(['middleware' => ['auth:api'], 'as' => 'contact.'], function () {
-    Route::get('/contacts', [ContactController::class, 'index'])->name('index');
-    Route::post('/contact', [ContactController::class, 'store'])->name('store');
-    Route::get('/contact/{id}', [ContactController::class, 'show'])->name('show');
-    Route::put('/contact/{id}', [ContactController::class, 'edit'])->name('edit');
-    Route::delete('/contact/{id}', [ContactController::class, 'destroy'])->name('destroy');
+
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/contacts', [ContactController::class, 'index'])->name('index');
+        Route::post('/contact', [ContactController::class, 'store'])->name('store');
+        Route::get('/contact/{id}', [ContactController::class, 'show'])->name('show');
+        Route::put('/contact/{id}', [ContactController::class, 'edit'])->name('edit');
+        Route::delete('/contact/{id}', [ContactController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::group(['as' => 'my.'], function () {
+        Route::get('/my/contacts', [ContactController::class, 'indexMyContact'])->name('index');
+        Route::post('/my/contact', [ContactController::class, 'storeMyContact'])->name('store');
+        Route::get('/my/contact/{id}', [ContactController::class, 'showMyContact'])->name('show');
+        Route::put('/my/contact/{id}', [ContactController::class, 'editMyContact'])->name('edit');
+        Route::delete('/my/contact/{id}', [ContactController::class, 'destroyMyContact'])->name('destroy');
+    });
 });
 
 //Contact List
 Route::group(['middleware' => ['auth:api'], 'as' => 'contact-list.'], function () {
-    Route::get('/contact-lists', [ContactListController::class, 'index'])->name('index');
-    Route::post('/contact-list', [ContactListController::class, 'store'])->name('store');
-    Route::get('/contact-list/{id}', [ContactListController::class, 'show'])->name('show');
-    Route::put('/contact-list/{id}', [ContactListController::class, 'edit'])->name('edit');
-    Route::delete('/contact-list/{id}', [ContactListController::class, 'destroy'])->name('destroy');
+
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/contact-lists', [ContactListController::class, 'index'])->name('index');
+        Route::post('/contact-list', [ContactListController::class, 'store'])->name('store');
+        Route::get('/contact-list/{id}', [ContactListController::class, 'show'])->name('show');
+        Route::put('/contact-list/{id}', [ContactListController::class, 'edit'])->name('edit');
+        Route::delete('/contact-list/{id}', [ContactListController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::group(['as' => 'my.'], function () {
+        Route::get('/my/contact-lists', [ContactListController::class, 'indexMyContactList'])->name('index');
+        Route::post('/my/contact-list', [ContactListController::class, 'storeMyContactList'])->name('store');
+        Route::get('/my/contact-list/{id}', [ContactListController::class, 'showMyContactList'])->name('show');
+        Route::put('/my/contact-list/{id}', [ContactListController::class, 'editMyContactList'])->name('edit');
+        Route::delete('/my/contact-list/{id}', [ContactListController::class, 'destroyMyContactList'])->name('destroy');
+    });
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'mail-open-tracking.'], function () {
@@ -303,7 +325,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'mail-open-tracking.'], func
 });
 
 // Import File
-Route::group(['middleware' => ['auth:api'], 'as' => 'import-file.'], function (){
+Route::group(['middleware' => ['auth:api'], 'as' => 'import-file.'], function () {
     Route::post('/import-excel-file', [ContactController::class, 'importExcelFile'])->name('import-excel-file');
     Route::post('/import-json-file', [ContactController::class, 'importJsonFile'])->name('import-json-file');
 });
