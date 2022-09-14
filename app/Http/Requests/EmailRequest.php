@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
+use Illuminate\Validation\Rule;
 
 class EmailRequest extends AbstractRequest
 {
@@ -24,7 +25,7 @@ class EmailRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'email' => ['required', 'string', 'email:rfc,dns', 'unique:emails,email'],
+            'email' => ['required', 'string', 'email:rfc,dns', Rule::unique('emails')->whereNull('deleted_at')],
             'age' => ['nullable', 'numeric', 'min:1'],
             'first_name' => ['nullable', 'string'],
             'last_name' => ['nullable', 'string'],
