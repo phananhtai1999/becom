@@ -27,6 +27,7 @@ class ContactListRequest extends AbstractRequest
             'name' => ['required', 'string'],
             'contact' => ['nullable', 'array', 'min:1'],
             'contact.*' => ['numeric', 'min:1', 'exists:contacts,uuid'],
+            'user_uuid' => ['required', 'numeric', 'min:1', 'exists:users,uuid'],
         ];
     }
 }

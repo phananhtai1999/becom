@@ -128,6 +128,22 @@ class User extends Authenticatable
     }
 
     /**
+     * @return HasMany
+     */
+    public function contacts()
+    {
+        return $this->hasMany(Contact::class, 'user_uuid', 'uuid');
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function contactLists()
+    {
+        return $this->hasMany(ContactList::class, 'user_uuid', 'uuid');
+    }
+
+    /**
      * @return string
      */
     public function getNameAttribute()

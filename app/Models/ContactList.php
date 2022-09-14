@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Abstracts\AbstractModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -26,6 +27,7 @@ class ContactList extends AbstractModel
      */
     protected $fillable = [
         'name',
+        'user_uuid'
     ];
 
     /**
@@ -43,5 +45,13 @@ class ContactList extends AbstractModel
     public function contacts()
     {
         return $this->belongsToMany(Contact::class, 'contact_contact_list', 'contact_list_uuid', 'contact_uuid');
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_uuid', 'uuid');
     }
 }

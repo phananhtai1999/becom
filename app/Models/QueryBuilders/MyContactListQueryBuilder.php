@@ -8,14 +8,14 @@ use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\Concerns\SortsQuery;
 use Spatie\QueryBuilder\QueryBuilder;
 
-class ContactListQueryBuilder extends AbstractQueryBuilder
+class MyContactListQueryBuilder extends AbstractQueryBuilder
 {
     /**
      * @return string
      */
     public static function baseQuery()
     {
-        return ContactList::class;
+        return ContactList::where('user_uuid', auth()->user()->getKey());
     }
 
     /**
