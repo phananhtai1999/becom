@@ -24,6 +24,7 @@ class MailSendingHistoryResource extends AbstractJsonResource
             'campaign_uuid' => $this->campaign_uuid,
             'email' => $this->email,
             'time' => $this->time,
+            'status' => $this->status,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at

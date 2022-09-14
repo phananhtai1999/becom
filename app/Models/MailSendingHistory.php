@@ -12,6 +12,11 @@ class MailSendingHistory extends AbstractModel
 {
     use HasFactory, SoftDeletes;
 
+    const SENT = 'sent';
+    const FAIL = 'fail';
+    const RECEIVED = 'received';
+    const OPENED = 'opened';
+
     /**
      * @var string[]
      */
@@ -29,6 +34,7 @@ class MailSendingHistory extends AbstractModel
         'campaign_uuid',
         'email',
         'time',
+        'status'
     ];
 
     /**
