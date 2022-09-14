@@ -27,6 +27,7 @@ class UpdateMailSendingHistoryRequest extends AbstractRequest
             'campaign_uuid' => ['numeric', 'min:1'],
             'email' => ['string', 'email:rfc,dns'],
             'time' => ['date'],
+            'status' => ['in:sent,fail,received,opened']
         ];
     }
 }

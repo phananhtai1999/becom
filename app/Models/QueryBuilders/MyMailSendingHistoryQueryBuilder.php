@@ -34,6 +34,7 @@ class MyMailSendingHistoryQueryBuilder extends AbstractQueryBuilder
                 'campaign_uuid',
                 'email',
                 'time',
+                'status',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -41,6 +42,7 @@ class MyMailSendingHistoryQueryBuilder extends AbstractQueryBuilder
                 'campaign_uuid',
                 'email',
                 'time',
+                'status',
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -51,6 +53,8 @@ class MyMailSendingHistoryQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__email', 'email'),
                 'time',
                 AllowedFilter::exact('exact__time', 'time'),
+                'status',
+                AllowedFilter::exact('exact__status', 'status'),
                 'campaign.tracking_key',
                 AllowedFilter::exact('exact__campaign.tracking_key', 'campaign.tracking_key'),
             ]);
