@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use App\Abstracts\AbstractRequest;
 use Illuminate\Validation\Rule;
 
-class UpdateContactRequest extends AbstractRequest
+class UpdateMyContactRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -35,8 +35,10 @@ class UpdateContactRequest extends AbstractRequest
             'city' => ['nullable', 'string'],
             'country' => ['nullable', 'string'],
             'contact_list' => ['nullable', 'array', 'min:1'],
-            'contact_list.*' => ['numeric', 'min:1', 'exists:contact_lists,uuid'],
-            'user_uuid' => ['numeric', 'min:1', 'exists:users,uuid'],
+            'contact_list.*' => ['numeric', 'min:1', Rule::exists('contact_lists', 'uuid')->where(function ($query) {
+
+                return $query->where('user_uuid', auth()->user()->getkey())->whereNull('deleted_at');
+            })],
         ];
     }
 }
