@@ -13,14 +13,12 @@ use App\Http\Resources\ContactResourceCollection;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
-use App\Http\Controllers\Traits\RestEditTrait;
-use App\Http\Controllers\Traits\RestStoreTrait;
 use App\Imports\ContactImport;
 use App\Services\ContactService;
 
 class ContactController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestEditTrait, RestStoreTrait;
+    use RestIndexTrait, RestShowTrait, RestDestroyTrait;
 
     public function __construct(ContactService $service)
     {
@@ -30,6 +28,51 @@ class ContactController extends AbstractRestAPIController
         $this->storeRequest = ContactRequest::class;
         $this->editRequest = UpdateContactRequest::class;
         $this->indexRequest = IndexRequest::class;
+    }
+
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     */
+    public function store()
+    {
+        $request = app($this->storeRequest);
+
+        $model = $this->service->create($request->all());
+
+        $model->contactLists()->attach($request->get('contact_list', []));
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    /**
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     */
+    public function edit($id)
+    {
+        $request = app($this->editRequest);
+
+        $model = $this->service->findOrFailById($id);
+
+        $this->service->update($model, $request->all());
+
+        $contactListUuid = $this->service->findContactListKeyByContact($model);
+
+        if ($contactListUuid == null) {
+            $model->contactLists()->sync($request->get('contact_list', []));
+        } else {
+            $model->contactLists()->sync($request->get('contact_list', $contactListUuid));
+        }
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
     }
 
     /**

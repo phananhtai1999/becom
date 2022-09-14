@@ -33,6 +33,8 @@ class ContactRequest extends AbstractRequest
             'sex' => ['nullable', 'string'],
             'city' => ['nullable', 'string'],
             'country' => ['nullable', 'string'],
+            'contact_list' => ['nullable', 'array', 'min:1'],
+            'contact_list.*' => ['numeric', 'min:1', 'exists:contact_lists,uuid'],
         ];
     }
 }

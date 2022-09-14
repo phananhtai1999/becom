@@ -38,4 +38,24 @@ class ContactService extends AbstractService
 
         return $contacts;
     }
+
+    /**
+     * @param $model
+     * @return array|void
+     */
+    public function findContactListKeyByContact($model)
+    {
+        $contactLists = $model->contactLists()->get();
+
+        if (empty($contactLists)) {
+
+            return [];
+        } else {
+            foreach ($contactLists as $contactList) {
+                $contactListUuid[] = $contactList->uuid;
+
+                return $contactListUuid;
+            }
+        }
+    }
 }
