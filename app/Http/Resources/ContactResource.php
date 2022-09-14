@@ -7,14 +7,16 @@ use App\Abstracts\AbstractJsonResource;
 class ContactResource extends AbstractJsonResource
 {
     /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
+     * @param $request
+     * @return array
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function toArray($request)
     {
-        return [
+        $expand = request()->get('expand', []);
+
+        $data = [
             'uuid' => $this->getKey(),
             'email' => $this->email,
             'first_name' => $this->first_name,
@@ -29,5 +31,11 @@ class ContactResource extends AbstractJsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
         ];
+
+        if (\in_array('contact__contact_lists', $expand)) {
+            $data['contact_lists'] = ContactListResource::collection($this->contactLists);
+        }
+
+        return $data;
     }
 }

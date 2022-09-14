@@ -7,8 +7,6 @@ use App\Events\SendEmailByCampaignEvent;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
-use App\Http\Controllers\Traits\RestEditTrait;
-use App\Http\Controllers\Traits\RestStoreTrait;
 use App\Http\Requests\CampaignLinkTrackingRequest;
 use App\Http\Requests\CampaignRequest;
 use App\Http\Requests\IncrementCampaignTrackingRequest;
@@ -195,9 +193,10 @@ class CampaignController extends AbstractRestAPIController
         if ($contactUuid == null)
         {
             $model->contacts()->sync($request->get('contacts', []));
+        } else {
+            $model->contacts()->sync($request->get('contacts', $contactUuid));
         }
 
-        $model->contacts()->sync($request->get('contacts', $contactUuid));
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)

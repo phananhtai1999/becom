@@ -25,6 +25,8 @@ class UpdateContactListRequest extends AbstractRequest
     {
         return [
             'name' => ['string'],
+            'contact' => ['nullable', 'array', 'min:1'],
+            'contact.*' => ['numeric', 'min:1', 'exists:contacts,uuid'],
         ];
     }
 }

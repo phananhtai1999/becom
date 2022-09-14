@@ -11,13 +11,11 @@ use App\Http\Resources\ContactListResourceCollection;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
-use App\Http\Controllers\Traits\RestEditTrait;
-use App\Http\Controllers\Traits\RestStoreTrait;
 use App\Services\ContactListService;
 
 class ContactListController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestEditTrait, RestStoreTrait;
+    use RestIndexTrait, RestShowTrait, RestDestroyTrait;
 
     public function __construct(ContactListService $service)
     {
@@ -27,5 +25,50 @@ class ContactListController extends AbstractRestAPIController
         $this->storeRequest = ContactListRequest::class;
         $this->editRequest = UpdateContactListRequest::class;
         $this->indexRequest = IndexRequest::class;
+    }
+
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     */
+    public function store()
+    {
+        $request = app($this->storeRequest);
+
+        $model = $this->service->create($request->all());
+
+        $model->contacts()->attach($request->get('contact', []));
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    /**
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     */
+    public function edit($id)
+    {
+        $request = app($this->editRequest);
+
+        $model = $this->service->findOrFailById($id);
+
+        $this->service->update($model, $request->all());
+
+        $contactUuid = $this->service->findContactKeyByContactList($model);
+
+        if ($contactUuid == null) {
+            $model->contacts()->sync($request->get('contact', []));
+        } else {
+            $model->contacts()->sync($request->get('contact', $contactUuid));
+        }
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
     }
 }
