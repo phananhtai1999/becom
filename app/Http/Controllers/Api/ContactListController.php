@@ -184,4 +184,30 @@ class ContactListController extends AbstractRestAPIController
         return $this->sendOkJsonResponse();
     }
 
+    /**
+     * @param $id
+     * @param $contact_id
+     * @return \Illuminate\Http\JsonResponse
+     * 
+     */
+    public function removeContactFromContactList($id, $contact_id)
+    {
+        $model = $this->service->findOrFailById($id);
+        $model->contacts()->detach($contact_id);
+        return $this->sendOkJsonResponse();
+    }
+
+    /**
+     * @param $id
+     * @param $contact_id
+     * @return \Illuminate\Http\JsonResponse
+     * 
+     */
+    public function removeMyContactFromContactList($id, $contact_id)
+    {
+        $model = $this->myService->findMyContactListByKeyOrAbort($id);
+        $model->contacts()->detach($contact_id);
+        return $this->sendOkJsonResponse();
+    }
+
 }

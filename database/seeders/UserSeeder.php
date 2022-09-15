@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder {
 	/**
@@ -36,7 +37,7 @@ class UserSeeder extends Seeder {
 				}
 				$user = User::factory()->create([
 					'email' => $user['email'],
-					'password' => $user['password'],
+					'password' => Hash::make($user['password']),
 				]);
 				$current_role = $user['role'] === 'admin' ? $roleadmin : $role;
 				$user->roles()->sync([$current_role->uuid]);

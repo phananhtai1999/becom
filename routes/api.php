@@ -308,6 +308,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'contact-list.'], function (
         Route::get('/contact-list/{id}', [ContactListController::class, 'show'])->name('show');
         Route::put('/contact-list/{id}', [ContactListController::class, 'edit'])->name('edit');
         Route::delete('/contact-list/{id}', [ContactListController::class, 'destroy'])->name('destroy');
+        Route::delete('/contact-list/remove-contact/{id}/{contact_id}', [ContactListController::class, 'removeContactFromContactList'])->name('remove-contact');
     });
 
     Route::group(['as' => 'my.'], function () {
@@ -316,6 +317,8 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'contact-list.'], function (
         Route::get('/my/contact-list/{id}', [ContactListController::class, 'showMyContactList'])->name('show');
         Route::put('/my/contact-list/{id}', [ContactListController::class, 'editMyContactList'])->name('edit');
         Route::delete('/my/contact-list/{id}', [ContactListController::class, 'destroyMyContactList'])->name('destroy');
+        Route::delete('/my/contact-list/remove-contact/{id}/{contact_id}', [ContactListController::class, 'removeMyContactFromContactList'])->name('remove-contact');
+
     });
 });
 
