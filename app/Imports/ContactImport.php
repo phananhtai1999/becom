@@ -32,6 +32,7 @@ class ContactImport implements ToModel, WithValidation, WithHeadingRow, SkipsOnF
             'dob' => $rowDob == '1970-01-01' ? null : $rowDob,
             'city' => $row['city'],
             'country' => $row['country'],
+            'user_uuid' => auth()->user()->getKey()
         ]);
     }
 
