@@ -57,14 +57,14 @@ class EmailController extends AbstractRestAPIController
     {
         $request = app($this->storeRequest);
 
-        if($request->has('user_uuid')){
-            $data = $request->all();
-        }else{
+        if(empty($request->get('user_uuid'))){
             $data = array_merge($request->all(), [
                 'user_uuid' => auth()->user()->getkey(),
             ]);
+        }else{
+            $data = $request->all();
         }
-        
+
         $model = $this->service->create($data);
 
         $model->websites()->attach($request->get('websites'));

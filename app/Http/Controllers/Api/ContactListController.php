@@ -52,7 +52,15 @@ class ContactListController extends AbstractRestAPIController
     {
         $request = app($this->storeRequest);
 
-        $model = $this->service->create($request->all());
+        if (empty($request->user_uuid)) {
+            $data = array_merge($request->all(), [
+                'user_uuid' => auth()->user()->getkey(),
+            ]);
+        } else {
+            $data = $request->all();
+        }
+
+        $model = $this->service->create($data);
 
         $model->contacts()->attach($request->get('contact', []));
 
