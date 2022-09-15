@@ -105,8 +105,8 @@ class Campaign extends AbstractModel
     /**
      * @return BelongsToMany
      */
-    public function contacts()
+    public function contactLists()
     {
-        return $this->belongsToMany(Contact::class, 'campaign_contact', 'campaign_uuid', 'contact_uuid')->withTimestamps();
+        return $this->belongsToMany(ContactList::class, 'campaign_contact_list', 'campaign_uuid', 'contact_list_uuid')->withTimestamps();
     }
 }
