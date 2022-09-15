@@ -167,7 +167,7 @@ class CampaignController extends AbstractRestAPIController
         }
         $model = $this->service->create($data);
 
-        $model->contacts()->attach($request->get('contacts', []));
+        $model->contactLists()->attach($request->get('contact_list', []));
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -188,15 +188,14 @@ class CampaignController extends AbstractRestAPIController
 
         $this->service->update($model, $request->all());
 
-        $contactUuid = $this->service->findContactKeyByCampaign($model);
+        $contactListUuid = $this->service->findContactListKeyByCampaign($model);
 
-        if ($contactUuid == null)
+        if ($contactListUuid == null)
         {
-            $model->contacts()->sync($request->get('contacts', []));
+            $model->contactLists()->sync($request->get('contact_list', []));
         } else {
-            $model->contacts()->sync($request->get('contacts', $contactUuid));
+            $model->contactLists()->sync($request->get('contact_list', $contactListUuid));
         }
-
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -233,7 +232,7 @@ class CampaignController extends AbstractRestAPIController
             'user_uuid' => auth()->user()->getkey(),
         ]));
 
-        $model->contacts()->attach($request->get('contacts', []));
+        $model->contactLists()->attach($request->get('contact_list', []));
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -266,14 +265,14 @@ class CampaignController extends AbstractRestAPIController
             'user_uuid' => auth()->user()->getkey(),
         ]));
 
-        $contactUuid = $this->myService->findContactKeyByMyCampaign($model);
+        $contactListUuid = $this->myService->findContactListKeyByMyCampaign($model);
 
-        if ($contactUuid == null)
+        if ($contactListUuid == null)
         {
-            $model->contacts()->sync($request->get('contacts', []));
+            $model->contactLists()->sync($request->get('contact_list', []));
         }
 
-        $model->contacts()->sync($request->get('contacts', $contactUuid));
+        $model->contactLists()->sync($request->get('contact_list', $contactListUuid));
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)

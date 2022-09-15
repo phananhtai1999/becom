@@ -45,8 +45,11 @@ class MyCampaignRequest extends AbstractRequest
             })],
             'was_finished' => ['required', 'boolean'],
             'was_stopped_by_owner' => ['required', 'boolean'],
-            'contacts' => ['nullable', 'array', 'min:1'],
-            'contacts.*' => ['numeric', 'min:1', 'exists:contacts,uuid'],
+            'contact_list' => ['nullable', 'array', 'min:1'],
+            'contact_list.*' => ['numeric', 'min:1', Rule::exists('contact_lists', 'uuid')->where(function ($query) {
+
+                return $query->where('user_uuid', auth()->user()->getkey())->whereNull('deleted_at');
+            })],
         ];
     }
 }

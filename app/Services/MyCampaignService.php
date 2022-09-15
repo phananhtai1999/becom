@@ -62,18 +62,18 @@ class MyCampaignService extends AbstractService
      * @param $model
      * @return array
      */
-    public function findContactKeyByMyCampaign($model)
+    public function findContactListKeyByMyCampaign($model)
     {
-        $contacts = $model->contacts()->get();
+        $contactLists = $model->contactLists()->get();
 
-        if (empty($contacts)) {
+        if (empty($contactLists)) {
 
             return [];
         } else {
-            foreach ($contacts as $contact) {
-                $contactUuid[] = $contact->uuid;
+            foreach ($contactLists as $contactList) {
+                $contactListUuid[] = $contactList->uuid;
 
-                return $contactUuid;
+                return $contactListUuid;
             }
         }
     }
