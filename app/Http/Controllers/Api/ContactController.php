@@ -233,4 +233,18 @@ class ContactController extends AbstractRestAPIController
 
         return $this->sendOkJsonResponse();
     }
+
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function templateExcel()
+    {
+        $url = "template_excel/" . "Contact.xlsx";
+
+        return $this->sendOkJsonResponse([
+            'data' => [
+                "slug" => $url,
+            ]
+        ]);
+    }
 }

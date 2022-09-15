@@ -33,6 +33,7 @@ class ContactService extends AbstractService
                 'dob' => $content->dob,
                 'city' => $content->city,
                 'country' => $content->country,
+                'user_uuid' => auth()->user()->getKey()
             ]);
         }
 
