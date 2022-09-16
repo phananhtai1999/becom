@@ -37,6 +37,7 @@ class UserQueryBuilder extends AbstractQueryBuilder
                 'banned_at',
                 'avatar_img',
                 'cover_img',
+                'credit',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -50,6 +51,7 @@ class UserQueryBuilder extends AbstractQueryBuilder
                 'banned_at',
                 'avatar_img',
                 'cover_img',
+                'credit',
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -74,6 +76,8 @@ class UserQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__cover_img', 'cover_img'),
                 'roles.name',
                 AllowedFilter::exact('exact__roles.name', 'roles.name'),
+                'credit',
+                AllowedFilter::exact('exact__credit', 'credit'),
             ]);
     }
 }

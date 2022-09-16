@@ -37,6 +37,7 @@ class User extends Authenticatable
         'banned_at',
         'avatar_img',
         'cover_img',
+        'credit'
     ];
 
     /**
