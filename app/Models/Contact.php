@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Builder;
 
 class Contact extends AbstractModel
 {
@@ -61,5 +62,29 @@ class Contact extends AbstractModel
     public function user()
     {
         return $this->belongsTo(User::class, 'user_uuid', 'uuid');
+    }
+
+    /**
+     * Scope a query to only uuid not in uuids.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+
+    public function scopeUuidsNotIn(Builder $query, ...$uuids): Builder
+    {
+        return $query->whereNotIn('uuid', $uuids);
+    }
+
+    /**
+     * Scope a query to only uuid in uuids.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+
+    public function scopeUuidsIn(Builder $query, ...$uuids): Builder
+    {
+        return $query->whereIn('uuid', $uuids);
     }
 }
