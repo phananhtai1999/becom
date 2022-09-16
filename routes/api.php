@@ -21,6 +21,8 @@ use App\Http\Controllers\Api\SmtpAccountEncryptionController;
 use App\Http\Controllers\Api\SupportMultipleLanguagesController;
 use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\ContactListController;
+use App\Http\Controllers\Api\CreditHistoryController;
+use App\Http\Controllers\Api\UserCreditHistoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -319,6 +321,28 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'contact-list.'], function (
         Route::delete('/my/contact-list/{id}', [ContactListController::class, 'destroyMyContactList'])->name('destroy');
         Route::delete('/my/contact-list/remove-contact/{id}/{contact_id}', [ContactListController::class, 'removeMyContactFromContactList'])->name('remove-contact');
 
+    });
+});
+
+//Credit History
+Route::group(['middleware' => ['auth:api'], 'as' => 'user-use-credit-history.'], function () {
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/credit-histories', [CreditHistoryController::class, 'index'])->name('index');
+        Route::post('/credit-history', [CreditHistoryController::class, 'store'])->name('store');
+        Route::get('/credit-history/{id}', [CreditHistoryController::class, 'show'])->name('show');
+        Route::put('/credit-history/{id}', [CreditHistoryController::class, 'edit'])->name('edit');
+        Route::delete('/credit-history/{id}', [CreditHistoryController::class, 'destroy'])->name('destroy');
+    });
+});
+
+//User Credit History
+Route::group(['middleware' => ['auth:api'], 'as' => 'user-credit-history.'], function () {
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/user-credit-histories', [UserCreditHistoryController::class, 'index'])->name('index');
+        Route::post('/user-credit-history', [UserCreditHistoryController::class, 'store'])->name('store');
+        Route::get('/user-credit-history/{id}', [UserCreditHistoryController::class, 'show'])->name('show');
+        Route::put('/user-credit-history/{id}', [UserCreditHistoryController::class, 'edit'])->name('edit');
+        Route::delete('/user-credit-history/{id}', [UserCreditHistoryController::class, 'destroy'])->name('destroy');
     });
 });
 
