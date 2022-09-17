@@ -58,7 +58,6 @@ class SendEmailByCampaign extends Command
     public function handle()
     {
         $activeCampaign = $this->service->loadActiveCampaign();
-        $toEmails = null;
-        SendEmailByCampaignEvent::dispatch($activeCampaign, $toEmails);
+        SendEmailByCampaignEvent::dispatch($activeCampaign);
     }
 }

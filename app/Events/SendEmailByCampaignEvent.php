@@ -23,20 +23,14 @@ class SendEmailByCampaignEvent
     public $campaign;
 
     /**
-     * @var array
-     */
-    public $toEmails;
-
-    /**
      * Create a new event instance.
      *
      * @param $campaign
      * @param $toEmails
      */
-    public function __construct($campaign, $toEmails)
+    public function __construct($campaign)
     {
         $this->campaign = $campaign;
-        $this->toEmails = $toEmails;
     }
 
     /**

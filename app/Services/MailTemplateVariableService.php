@@ -10,24 +10,26 @@ class MailTemplateVariableService extends AbstractService
 {
     /**
      * @param $mailTemplate
-     * @param $email
+     * @param $contact
      * @param $smtpAccount
      * @param $campaign
      * @return mixed
      */
-    public function renderBody($mailTemplate, $email, $smtpAccount, $campaign = null)
+    public function renderBody($mailTemplate, $contact, $smtpAccount, $campaign = null)
     {
         $fromEmail = $smtpAccount->mail_from_address;
         $websiteName = !empty($campaign) ? $campaign->website->name : '';
         $websiteDomain = !empty($campaign) ? $campaign->website->domain : '';
         $websiteDescription = !empty($campaign) ? $campaign->website->description : '';
-        $toEmail = $email->email ?? $email;
-        $emailFirstName = $email->first_name ?? '';
-        $emailLastName = $email->last_name ?? '';
-        $emailAge = $email->age ?? '';
-        $emailCountry = $email->country ?? '';
-        $emailCity = $email->city ?? '';
-        $emailJob = $email->job ?? '';
+        $toEmail = $contact->email ?? $contact;
+        $contactFirstName = $contact->first_name ?? '';
+        $contactMiddleName = $contact->middle_name ?? '';
+        $contactLastName = $contact->last_name ?? '';
+        $contactPhone = $contact->phone ?? '';
+        $contactSex = $contact->sex ?? '';
+        $contactDob = $contact->dob ?? '';
+        $contactCountry = $contact->country ?? '';
+        $contactCity = $contact->city ?? '';
         $current = Carbon::now('Asia/Ho_Chi_Minh');
         $currentDay = $current->toDateString();
         $currentTime = $current->toTimeString();
@@ -37,19 +39,21 @@ class MailTemplateVariableService extends AbstractService
             '{{ $website_description }}',
             '{{ $from_email }}',
             '{{ $to_email }}',
-            '{{ $email_first_name }}',
-            '{{ $email_last_name }}',
-            '{{ $email_age }}',
-            '{{ $email_country }}',
-            '{{ $email_city }}',
-            '{{ $email_job }}',
+            '{{ $contact_first_name }}',
+            '{{ $contact_middle_name }}',
+            '{{ $contact_last_name }}',
+            '{{ $contact_phone }}',
+            '{{ $contact_sex }}',
+            '{{ $contact_dob }}',
+            '{{ $contact_country }}',
+            '{{ $contact_city }}',
             '{{ $current_day }}',
             '{{ $current_time }}'
 
         ];
         $replace = [
             $websiteName, $websiteDomain, $websiteDescription,
-            $fromEmail, $toEmail, $emailFirstName, $emailLastName, $emailAge, $emailCountry, $emailCity, $emailJob,
+            $fromEmail, $toEmail, $contactFirstName, $contactMiddleName, $contactLastName, $contactPhone, $contactSex, $contactDob, $contactCountry, $contactCity,
             $currentDay, $currentTime
         ];
         if (!empty($campaign)) {
