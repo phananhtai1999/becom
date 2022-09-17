@@ -15,7 +15,7 @@ use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Mail;
 
-class SendEmailByCampaignListener
+class SendEmailByCampaignListener implements ShouldQueue
 {
     /**
      * @var MailTemplateVariableService
