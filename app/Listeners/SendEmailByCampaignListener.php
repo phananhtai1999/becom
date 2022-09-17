@@ -5,6 +5,7 @@ namespace App\Listeners;
 use App\Events\SendEmailByCampaignEvent;
 use App\Mail\SendCampaign;
 use App\Services\CampaignService;
+use App\Services\ContactService;
 use App\Services\EmailService;
 use App\Services\MailSendingHistoryService;
 use App\Services\MailTemplateVariableService;
@@ -14,7 +15,7 @@ use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Mail;
 
-class SendEmailByCampaignListener implements ShouldQueue
+class SendEmailByCampaignListener
 {
     /**
      * @var MailTemplateVariableService
@@ -47,12 +48,18 @@ class SendEmailByCampaignListener implements ShouldQueue
     private $sendEmailScheduleLogService;
 
     /**
+     * @var ContactService
+     */
+    private $contactService;
+
+    /**
      * @param MailTemplateVariableService $mailTemplateVariableService
      * @param MailSendingHistoryService $mailSendingHistoryService
      * @param SmtpAccountService $smtpAccountService
      * @param CampaignService $campaignService
      * @param EmailService $emailService
      * @param SendEmailScheduleLogService $sendEmailScheduleLogService
+     * @param ContactService $contactService
      */
     public function __construct(
         MailTemplateVariableService $mailTemplateVariableService,
@@ -60,7 +67,8 @@ class SendEmailByCampaignListener implements ShouldQueue
         SmtpAccountService          $smtpAccountService,
         CampaignService $campaignService,
         EmailService $emailService,
-        SendEmailScheduleLogService $sendEmailScheduleLogService
+        SendEmailScheduleLogService $sendEmailScheduleLogService,
+        ContactService $contactService
     )
     {
         $this->mailTemplateVariableService = $mailTemplateVariableService;
@@ -69,6 +77,7 @@ class SendEmailByCampaignListener implements ShouldQueue
         $this->campaignService = $campaignService;
         $this->emailService = $emailService;
         $this->sendEmailScheduleLogService = $sendEmailScheduleLogService;
+        $this->contactService = $contactService;
 
     }
 
@@ -82,7 +91,6 @@ class SendEmailByCampaignListener implements ShouldQueue
     public function handle(SendEmailByCampaignEvent $event)
     {
         $campaign = $event->campaign;
-        $toEmails = $event->toEmails;
 
         $this->smtpAccountService->setSmtpAccountForSendEmail($campaign->smtpAccount);
 
@@ -91,7 +99,7 @@ class SendEmailByCampaignListener implements ShouldQueue
             'start_time' => Carbon::now()
         ]);
         try {
-            $this->sendEmailByCampaign($campaign, $toEmails);
+            $this->sendEmailByCampaign($campaign);
             $this->sendEmailScheduleLogService->update($sendEmailScheduleLog, [
                 'end_time' => Carbon::now(),
                 'is_running' => false
@@ -106,35 +114,64 @@ class SendEmailByCampaignListener implements ShouldQueue
 
     }
 
-    /**
-     * @param $campaign
-     * @param $toEmails
-     * @return void
-     */
-    public function sendEmailByCampaign($campaign, $toEmails)
+//    /**
+//     * @param $campaign
+//     * @return void
+//     */
+//    public function sendEmailByCampaigns($campaign)
+//    {
+//        if(empty($toEmails)){
+//            $emails = $campaign->website->emails;
+//        }else{
+//            $emails = $this->emailService->getEmailInArray($toEmails);
+//        }
+//
+//        for ($i = 1; $i <= $campaign->number_email_per_date; $i++) {
+//            foreach ($emails as $email){
+//                $quantityEmailWasSentPerUser = $this->mailSendingHistoryService->getNumberEmailSentPerUser($campaign->uuid, $email->email);
+//
+//                if($quantityEmailWasSentPerUser < $campaign->number_email_per_user){
+//                    $mailTemplate = $this->mailTemplateVariableService->renderBody($campaign->mailTemplate, $email, $campaign->smtpAccount, $campaign);
+//
+//                    $mailSendingHistory = $this->mailSendingHistoryService->create([
+//                        'email' => $email->email,
+//                        'campaign_uuid' => $campaign->uuid,
+//                        'time' => Carbon::now()
+//                    ]);
+//
+//                    $emailTracking = $this->mailTemplateVariableService->injectTrackingImage($mailTemplate, $mailSendingHistory->uuid);
+//
+//                    Mail::to($email->email)->send(new SendCampaign($emailTracking));
+//                }
+//            }
+//        }
+//
+//        if($this->checkWasFinishedCampaign($campaign)){
+//            $this->campaignService->update($campaign, ['was_finished' => true]);
+//        }
+//
+//    }
+
+    public function sendEmailByCampaign($campaign)
     {
-        if(empty($toEmails)){
-            $emails = $campaign->website->emails;
-        }else{
-            $emails = $this->emailService->getEmailInArray($toEmails);
-        }
+        $contacts = $this->contactService->getContactsSendEmail($campaign->uuid);
 
         for ($i = 1; $i <= $campaign->number_email_per_date; $i++) {
-            foreach ($emails as $email){
-                $quantityEmailWasSentPerUser = $this->mailSendingHistoryService->getNumberEmailSentPerUser($campaign->uuid, $email->email);
+            foreach ($contacts as $contact){
+                $quantityEmailWasSentPerUser = $this->mailSendingHistoryService->getNumberEmailSentPerUser($campaign->uuid, $contact->email);
 
                 if($quantityEmailWasSentPerUser < $campaign->number_email_per_user){
-                    $mailTemplate = $this->mailTemplateVariableService->renderBody($campaign->mailTemplate, $email, $campaign->smtpAccount, $campaign);
+                    $mailTemplate = $this->mailTemplateVariableService->renderBody($campaign->mailTemplate, $contact, $campaign->smtpAccount, $campaign);
 
                     $mailSendingHistory = $this->mailSendingHistoryService->create([
-                        'email' => $email->email,
-                        'campaign_uuid' => $campaign->uuid,
+                        'email' => $contact->email,
+                        'campaign_uuid' =>   $campaign->uuid,
                         'time' => Carbon::now()
                     ]);
 
                     $emailTracking = $this->mailTemplateVariableService->injectTrackingImage($mailTemplate, $mailSendingHistory->uuid);
 
-                    Mail::to($email->email)->send(new SendCampaign($emailTracking));
+                    Mail::to($contact->email)->send(new SendCampaign($emailTracking));
                 }
             }
         }
@@ -151,9 +188,9 @@ class SendEmailByCampaignListener implements ShouldQueue
      */
     public function checkWasFinishedCampaign($campaign)
     {
-        $emails = $this->emailService->getAllEmailsByWebsiteUuid($campaign->website_uuid);
-        foreach ($emails as $email){
-            if($this->mailSendingHistoryService->getNumberEmailSentPerUser($campaign->uuid, $email->email) !== $campaign->number_email_per_user){
+        $contacts = $this->contactService->getContactsSendEmail($campaign->uuid);
+        foreach ($contacts as $contact){
+            if($this->mailSendingHistoryService->getNumberEmailSentPerUser($campaign->uuid, $contact->email) !== $campaign->number_email_per_user){
                 return false;
             }
         }

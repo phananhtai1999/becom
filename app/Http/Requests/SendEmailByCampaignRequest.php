@@ -34,10 +34,7 @@ class SendEmailByCampaignRequest extends AbstractRequest
                     ['was_finished', false],
                     ['was_stopped_by_owner', false],
                 ]);
-            })],
-            'to_emails' => ['required', 'array'],
-            'to_emails.*' => ['required', 'email:rfc,dns'],
-            'is_save_history' => ['required', 'boolean']
+            })]
         ];
     }
 }
