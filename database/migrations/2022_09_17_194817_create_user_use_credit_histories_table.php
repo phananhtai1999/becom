@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateUserCreditHistoryTable extends Migration
+class CreateUserUseCreditHistoriesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,11 @@ class CreateUserCreditHistoryTable extends Migration
      */
     public function up()
     {
-        Schema::create('user_credit_history', function (Blueprint $table) {
+        Schema::create('user_use_credit_histories', function (Blueprint $table) {
             $table->id('uuid');
             $table->unsignedBigInteger('user_uuid');
-            $table->unsignedBigInteger('add_by_uuid');
             $table->integer('credit');
+            $table->unsignedBigInteger('campaign_uuid');
             $table->softDeletes();
             $table->timestamps();
         });
@@ -30,6 +30,6 @@ class CreateUserCreditHistoryTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('user_credit_history');
+        Schema::dropIfExists('user_use_credit_histories');
     }
 }

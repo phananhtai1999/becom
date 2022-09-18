@@ -14,7 +14,8 @@ class UserCreditHistoryResource extends AbstractJsonResource
      */
     public function toArray($request)
     {
-        return [
+        $expand = request()->get('expand', []);
+        $data = [
             'uuid' => $this->getKey(),
             'user_uuid' => $this->user_uuid,
             'add_by_uuid' => $this->add_by_uuid,
@@ -23,5 +24,14 @@ class UserCreditHistoryResource extends AbstractJsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
         ];
+
+        if (\in_array('user_use_credit_history__user', $expand)) {
+            $data['user'] = new UserResource($this->user);
+        }
+
+        if (\in_array('user_use_credit_history__add_by', $expand)) {
+            $data['add_by'] = new UserResource($this->add_by);
+        }
+        return $data;
     }
 }

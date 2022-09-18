@@ -333,6 +333,11 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'user-use-credit-history.'],
         Route::put('/credit-history/{id}', [CreditHistoryController::class, 'edit'])->name('edit');
         Route::delete('/credit-history/{id}', [CreditHistoryController::class, 'destroy'])->name('destroy');
     });
+
+     Route::group(['as' => 'my.'], function () {
+        Route::get('/my/credit-histories', [CreditHistoryController::class, 'indexMyCreditHistory'])->name('index');
+        Route::get('/my/credit-history/{id}', [CreditHistoryController::class, 'showMyCreditHistory'])->name('show');
+    });
 });
 
 //User Credit History
@@ -343,6 +348,11 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'user-credit-history.'], fun
         Route::get('/user-credit-history/{id}', [UserCreditHistoryController::class, 'show'])->name('show');
         Route::put('/user-credit-history/{id}', [UserCreditHistoryController::class, 'edit'])->name('edit');
         Route::delete('/user-credit-history/{id}', [UserCreditHistoryController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::group(['as' => 'my.'], function () {
+        Route::get('/my/user-credit-histories', [UserCreditHistoryController::class, 'indexMyUserCreditHistory'])->name('index');
+        Route::get('/my/user-credit-history/{id}', [UserCreditHistoryController::class, 'showMyUserCreditHistory'])->name('show');
     });
 });
 

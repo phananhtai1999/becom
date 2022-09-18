@@ -13,6 +13,7 @@ use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestEditTrait;
 use App\Services\CreditHistoryService;
+use App\Services\MyCreditHistoryService;
 
 class CreditHistoryController extends AbstractRestAPIController
 {
@@ -21,7 +22,7 @@ class CreditHistoryController extends AbstractRestAPIController
     /**
      * @param CreditHistoryService $service
      */
-    public function __construct(CreditHistoryService $service)
+    public function __construct(CreditHistoryService $service, MyCreditHistoryService $myService)
     {
         $this->service = $service;
         $this->resourceCollectionClass = CreditHistoryResourceCollection::class;
@@ -29,6 +30,7 @@ class CreditHistoryController extends AbstractRestAPIController
         $this->storeRequest = CreditHistoryRequest::class;
         $this->editRequest = UpdateCreditHistoryRequest::class;
         $this->indexRequest = IndexRequest::class;
+        $this->myService = $myService;
     }
 
     /**
@@ -52,4 +54,41 @@ class CreditHistoryController extends AbstractRestAPIController
             $this->service->resourceToData($this->resourceClass, $model)
         );
     }
+
+
+
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     */
+    public function indexMyCreditHistory(IndexRequest $request)
+    {
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData(
+                $this->resourceCollectionClass,
+                $this->myService->getCollectionWithPagination(
+                    $request->get('per_page', '15'),
+                    $request->get('page', '1'),
+                    $request->get('columns', '*'),
+                    $request->get('page_name', 'page'),
+                )
+            )
+        );
+    }
+
+    /**
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function showMyCreditHistory($id)
+    {
+        $model = $this->myService->showMyCreditHistory($id);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    
 }

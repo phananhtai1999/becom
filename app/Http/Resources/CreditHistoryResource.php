@@ -14,7 +14,8 @@ class CreditHistoryResource extends AbstractJsonResource
      */
     public function toArray($request)
     {
-        return [
+        $expand = request()->get('expand', []);
+        $data = [
             'uuid' => $this->getKey(),
             'user_uuid' => $this->user_uuid,
             'campaign_uuid' => $this->campaign_uuid,
@@ -23,5 +24,16 @@ class CreditHistoryResource extends AbstractJsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
         ];
+
+        if (\in_array('credit_history__user', $expand)) {
+
+            $data['user'] = new UserResource($this->user);
+        }
+
+        if (\in_array('credit_history__campaign', $expand)) {
+            $data['campaign'] = new CampaignResource($this->campaign);
+        }
+
+        return $data;
     }
 }
