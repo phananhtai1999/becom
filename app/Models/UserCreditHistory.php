@@ -13,7 +13,7 @@ class UserCreditHistory extends AbstractModel
     /**
      * @var string
      */
-    protected $table = "user_credit_history";
+    protected $table = "user_credit_histories";
 
     /**
      * @var string
@@ -37,4 +37,19 @@ class UserCreditHistory extends AbstractModel
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
     ];
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_uuid', 'uuid');
+    }
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function add_by()
+    {
+        return $this->belongsTo(User::class, 'add_by_uuid', 'uuid');
+    }
 }

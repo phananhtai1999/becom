@@ -3,12 +3,12 @@
 namespace App\Services;
 
 use App\Abstracts\AbstractService;
-use App\Models\QueryBuilders\UserCreditHistoryQueryBuilder;
-use App\Models\UserCreditHistory;
+use App\Models\QueryBuilders\CreditHistoryQueryBuilder;
+use App\Models\CreditHistory;
 
 class CreditHistoryService extends AbstractService
 {
-    protected $modelClass = UserCreditHistory::class;
+    protected $modelClass = CreditHistory::class;
 
-    protected $modelQueryBuilderClass = UserCreditHistoryQueryBuilder::class;
+    protected $modelQueryBuilderClass = CreditHistoryQueryBuilder::class;
 }
