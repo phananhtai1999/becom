@@ -25,11 +25,11 @@ class UserCreditHistoryResource extends AbstractJsonResource
             'updated_at' => $this->updated_at
         ];
 
-        if (\in_array('user_use_credit_history__user', $expand)) {
+        if (\in_array('user_credit_history__user', $expand)) {
             $data['user'] = new UserResource($this->user);
         }
 
-        if (\in_array('user_use_credit_history__add_by', $expand)) {
+        if (\in_array('user_credit_history__add_by', $expand)) {
             $data['add_by'] = new UserResource($this->add_by);
         }
         return $data;
