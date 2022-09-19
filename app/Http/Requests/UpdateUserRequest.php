@@ -33,7 +33,6 @@ class UpdateUserRequest extends AbstractRequest
             'cover_img' => ['nullable', 'string'],
             'roles' => ['array', 'min:1'],
             'roles.*' => ['numeric', 'min:1', 'exists:roles,uuid'],
-            'credit' => ['nullable', 'numeric']
         ];
     }
 }
