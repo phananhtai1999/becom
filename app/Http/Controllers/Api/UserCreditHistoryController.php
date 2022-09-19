@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
 use App\Http\Requests\IndexRequest;
-use App\Http\Requests\UpdateUserCreditHistoryRequest;
 use App\Http\Requests\UserCreditHistoryRequest;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
@@ -43,7 +42,6 @@ class UserCreditHistoryController extends AbstractRestAPIController
         $this->resourceCollectionClass = UserCreditHistoryResourceCollection::class;
         $this->resourceClass = UserCreditHistoryResource::class;
         $this->storeRequest = UserCreditHistoryRequest::class;
-        $this->editRequest = UpdateUserCreditHistoryRequest::class;
         $this->indexRequest = IndexRequest::class;
         $this->myService = $myService;
         $this->userService = $userService;
