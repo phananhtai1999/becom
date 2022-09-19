@@ -15,6 +15,7 @@ use App\Services\SmtpAccountService;
 use App\Services\UserService;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
 class SendEmailByCampaignListener implements ShouldQueue
@@ -118,15 +119,22 @@ class SendEmailByCampaignListener implements ShouldQueue
             'start_time' => Carbon::now()
         ]);
 
-        $this->userService->update($user, [
-            'credit' => $user->credit-$creditNumberSendEmail
-        ]);
+        DB::beginTransaction();
 
-        $this->creditHistoryService->create([
-            'user_uuid' => $campaign->user_uuid,
-            'campaign_uuid' => $campaign->uuid,
-            'credit' => $creditNumberSendEmail
-        ]);
+        try {
+            $this->userService->update($user, [
+                'credit' => $user->credit-$creditNumberSendEmail
+            ]);
+
+            $this->creditHistoryService->create([
+                'user_uuid' => $campaign->user_uuid,
+                'campaign_uuid' => $campaign->uuid,
+                'credit' => $creditNumberSendEmail
+            ]);
+            DB::commit();
+        }catch (\Exception $e) {
+            DB::rollback();
+        }
 
         try {
             $this->sendEmailByCampaign($campaign);

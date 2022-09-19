@@ -405,13 +405,13 @@ class CampaignController extends AbstractRestAPIController
             if($this->userService->checkCreditToSendCEmail($creditNumberSendEmail, $campaign->user_uuid)){
                 SendEmailByCampaignEvent::dispatch($campaign, $creditNumberSendEmail);
 
-                return $this->sendOkJsonResponse(["message" => "Send Email By Campaign Success"]);
+                return $this->sendOkJsonResponse(["message" => __('messages.send_campaign_success')]);
             }
 
-            return $this->sendValidationFailedJsonResponse(["errors" => ['credit' => "User's credit is invalid"]]);
+            return $this->sendValidationFailedJsonResponse(["errors" => ['credit' =>  __('messages.credit_invalid')]]);
         }
 
-        return $this->sendValidationFailedJsonResponse(["errors" => ['campaign_uuid' => 'The selected campaign uuid is invalid']]);
+        return $this->sendValidationFailedJsonResponse(["errors" => ['campaign_uuid' => __('messages.campaign_invalid')]]);
     }
 
     /**
@@ -428,12 +428,12 @@ class CampaignController extends AbstractRestAPIController
             if($this->userService->checkCreditToSendCEmail($creditNumberSendEmail, $campaign->user_uuid)){
                 SendEmailByCampaignEvent::dispatch($campaign, $creditNumberSendEmail);
 
-                return $this->sendOkJsonResponse(["message" => "Send Email By Campaign Success"]);
+                return $this->sendOkJsonResponse(["message" => __('messages.send_campaign_success')]);
             }
 
-            return $this->sendValidationFailedJsonResponse(["errors" => ['credit' => "User's credit is invalid"]]);
+            return $this->sendValidationFailedJsonResponse(["errors" => ['credit' =>  __('messages.credit_invalid')]]);
         }
 
-        return $this->sendValidationFailedJsonResponse(["errors" => ['campaign_uuid' => 'The selected campaign uuid is invalid']]);
+        return $this->sendValidationFailedJsonResponse(["errors" => ['campaign_uuid' => __('messages.campaign_invalid')]]);
     }
 }
