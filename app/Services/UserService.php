@@ -44,10 +44,28 @@ class UserService extends AbstractService
         return $this->model->where('email', $key)->first();
     }
 
+    /**
+     * @param $email
+     * @return mixed
+     */
     public function findUserLogin($email)
     {
         return $this->model->withTrashed()->where([
             'email' => $email
         ])->first();
+    }
+
+    /**
+     * @param $contactsNumberSendEmail
+     * @param $userUuid
+     * @return bool
+     */
+    public function checkCreditToSendCEmail($creditNumberSendEmail, $userUuid)
+    {
+        $user = $this->findOneById($userUuid);
+        if($user->credit < $creditNumberSendEmail) {
+            return false;
+        }
+        return true;
     }
 }

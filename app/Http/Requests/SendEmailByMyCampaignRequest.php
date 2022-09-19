@@ -26,10 +26,16 @@ class SendEmailByMyCampaignRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'campaign_uuid' => ['required', 'numeric', 'min:1', 'exists:campaigns,uuid'],
-            'to_emails' => ['required', 'array'],
-            'to_emails.*' => ['required', 'email:rfc,dns'],
-            'is_save_history' => ['required', 'boolean']
+            'campaign_uuid' => ['required', 'numeric', 'min:1', Rule::exists('campaigns', 'uuid')->where(function ($query){
+                return $query->where([
+                    ['uuid', $this->request->get('campaign_uuid')],
+                    ['user_uuid', auth()->user()->getKey()],
+                    ['from_date', '<=', Carbon::now()],
+                    ['to_date', '>=', Carbon::now()],
+                    ['was_finished', false],
+                    ['was_stopped_by_owner', false],
+                ]);
+            })]
         ];
     }
 }
