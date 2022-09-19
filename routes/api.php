@@ -330,8 +330,6 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'user-use-credit-history.'],
         Route::get('/credit-histories', [CreditHistoryController::class, 'index'])->name('index');
         Route::post('/credit-history', [CreditHistoryController::class, 'store'])->name('store');
         Route::get('/credit-history/{id}', [CreditHistoryController::class, 'show'])->name('show');
-        Route::put('/credit-history/{id}', [CreditHistoryController::class, 'edit'])->name('edit');
-        Route::delete('/credit-history/{id}', [CreditHistoryController::class, 'destroy'])->name('destroy');
     });
 
      Route::group(['as' => 'my.'], function () {

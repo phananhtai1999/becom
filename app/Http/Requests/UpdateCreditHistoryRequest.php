@@ -27,7 +27,7 @@ class UpdateCreditHistoryRequest extends AbstractRequest
         return [
             'user_uuid' => ['numeric', 'min:1', Rule::exists('users', 'uuid')->whereNull('deleted_at')],
             'campaign_uuid' => ['numeric', 'min:1', Rule::exists('campaigns', 'uuid')->whereNull('deleted_at')],
-            'credit' => ['numeric', 'min:1'],
+            'credit' => ['numeric'],
         ];
     }
 }

@@ -8,22 +8,35 @@ use App\Http\Requests\UpdateUserCreditHistoryRequest;
 use App\Http\Requests\UserCreditHistoryRequest;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
-use App\Http\Controllers\Traits\RestDestroyTrait;
-use App\Http\Controllers\Traits\RestEditTrait;
 use App\Http\Resources\UserCreditHistoryResource;
 use App\Http\Resources\UserCreditHistoryResourceCollection;
 use App\Services\UserCreditHistoryService;
 use App\Services\MyUserCreditHistoryService;
+use App\Services\UserService;
+
 class UserCreditHistoryController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestEditTrait;
+    use RestIndexTrait, RestShowTrait;
+
+    /**
+     * @var MyUserCreditHistoryService
+     */
+    protected $myService;
+
+    /**
+     * @var
+     */
+    protected $userService;
 
     /**
      * @param UserCreditHistoryService $service
+     * @param MyUserCreditHistoryService $myService
+     * @param UserService $userService
      */
     public function __construct(
         UserCreditHistoryService $service,
-        MyUserCreditHistoryService $myService
+        MyUserCreditHistoryService $myService,
+        UserService $userService
     )
     {
         $this->service = $service;
@@ -33,6 +46,7 @@ class UserCreditHistoryController extends AbstractRestAPIController
         $this->editRequest = UpdateUserCreditHistoryRequest::class;
         $this->indexRequest = IndexRequest::class;
         $this->myService = $myService;
+        $this->userService = $userService;
     }
 
     /**
@@ -45,12 +59,23 @@ class UserCreditHistoryController extends AbstractRestAPIController
         if (empty($request->user_uuid)) {
             $data = array_merge($request->all(), [
                 'user_uuid' => auth()->user()->getkey(),
+                'add_by_uuid' => auth()->user()->getkey()
             ]);
         } else {
-            $data = $request->all();
+            $data = array_merge($request->all(), [
+                'add_by_uuid' => auth()->user()->getkey()
+            ]);
         }
 
-        $model = $this->service->create($data);
+        $user = $this->userService->findOrFailById($data['user_uuid']);
+
+        if($data['credit'] + $user->credit < 0)
+        {
+            return $this->sendValidationFailedJsonResponse();
+        } else {
+            $model = $this->service->create($data);
+            $this->service->updateUserCredit($model->user, $model->credit, $model->user->credit);
+        }
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)

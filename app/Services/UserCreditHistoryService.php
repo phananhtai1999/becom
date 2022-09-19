@@ -11,4 +11,17 @@ class UserCreditHistoryService extends AbstractService
     protected $modelClass = UserCreditHistory::class;
 
     protected $modelQueryBuilderClass = UserCreditHistoryQueryBuilder::class;
+
+    /**
+     * @param $model
+     * @param $credit
+     * @param $userCredit
+     * @return mixed
+     */
+    public function updateUserCredit($model, $credit, $userCredit)
+    {
+         return $model->update([
+            'credit' => $credit + $userCredit
+        ]);
+    }
 }
