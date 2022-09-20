@@ -424,7 +424,7 @@ class CampaignController extends AbstractRestAPIController
         if($this->sendEmailScheduleLogService->checkActiveCampaignbyCampaignUuid($request->get('campaign_uuid'))){
 
             $contactsNumberSendEmail = count($this->contactService->getContactsSendEmail($campaign->uuid));
-            $creditNumberSendEmail = $contactsNumberSendEmail * config('credit.default_credit');
+            $creditNumberSendEmail = $contactsNumberSendEmail * config('credit.default_credit') * $campaign->number_email_per_date;
             if($this->userService->checkCreditToSendCEmail($creditNumberSendEmail, $campaign->user_uuid)){
                 SendEmailByCampaignEvent::dispatch($campaign, $creditNumberSendEmail);
 
