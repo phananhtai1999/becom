@@ -20,7 +20,13 @@ class CreditHistoryController extends AbstractRestAPIController
     use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestEditTrait;
 
     /**
+     * @var MyCreditHistoryService
+     */
+    protected $myService;
+
+    /**
      * @param CreditHistoryService $service
+     * @param MyCreditHistoryService $myService
      */
     public function __construct(CreditHistoryService $service, MyCreditHistoryService $myService)
     {
@@ -55,8 +61,6 @@ class CreditHistoryController extends AbstractRestAPIController
         );
     }
 
-
-
     /**
      * @return \Illuminate\Http\JsonResponse
      * @throws \Psr\Container\ContainerExceptionInterface
@@ -89,6 +93,4 @@ class CreditHistoryController extends AbstractRestAPIController
             $this->service->resourceToData($this->resourceClass, $model)
         );
     }
-
-    
 }

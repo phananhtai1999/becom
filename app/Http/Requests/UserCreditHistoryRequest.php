@@ -26,8 +26,7 @@ class UserCreditHistoryRequest extends AbstractRequest
     {
         return [
             'user_uuid' => ['nullable', 'numeric', 'min:1', Rule::exists('users', 'uuid')->whereNull('deleted_at')],
-            'add_by_uuid' => ['required', 'numeric', 'min:1'],
-            'credit' => ['required', 'numeric', 'min:1'],
+            'credit' => ['required', 'numeric'],
         ];
     }
 }
