@@ -12,6 +12,7 @@ use App\Http\Resources\UserCreditHistoryResourceCollection;
 use App\Services\UserCreditHistoryService;
 use App\Services\MyUserCreditHistoryService;
 use App\Services\UserService;
+use Illuminate\Support\Facades\DB;
 
 class UserCreditHistoryController extends AbstractRestAPIController
 {
@@ -71,8 +72,18 @@ class UserCreditHistoryController extends AbstractRestAPIController
         {
             return $this->sendValidationFailedJsonResponse();
         } else {
-            $model = $this->service->create($data);
-            $this->service->updateUserCredit($model->user, $model->credit, $model->user->credit);
+            DB::beginTransaction();
+
+            try {
+                $model = $this->service->create($data);
+                $this->service->updateUserCredit($model->user, $model->credit, $model->user->credit);
+
+                DB::commit();
+            } catch (\Exception $exception) {
+                DB::rollBack();
+
+                return $this->sendValidationFailedJsonResponse();
+            }
         }
 
         return $this->sendCreatedJsonResponse(
