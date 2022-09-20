@@ -18,5 +18,8 @@ return [
     'email_does_not_exists' => 'Le-mail nexiste pas',
     'account_banned' => 'Votre compte est banni du système',
     'account_deleted' => "Votre compte n'est plus disponible dans le système",
-    'date_format' => 'La date de naissance ne correspond pas au format A-m-j.'
+    'date_format' => 'La date de naissance ne correspond pas au format A-m-j.',
+    'campaign_invalid' => "L'uuid de campagne sélectionné n'est pas valide.",
+    'credit_invalid' => "Le crédit de l'utilisateur n'est pas valide.",
+    'send_campaign_success' => 'Envoyer un e-mail en fonction du succès de la campagne.'
 ];

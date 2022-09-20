@@ -18,5 +18,8 @@ return [
     'email_does_not_exists' => '电子邮件不存在',
     'account_banned' => '您的帐户在系统中被禁止',
     'account_deleted' => '您的帐户在系统中不再可用',
-    'date_format' => '出生日期与格式 Y-m-d 不对应。'
+    'date_format' => '出生日期与格式 Y-m-d 不对应。',
+    'campaign_invalid' => '所选广告系列 uuid 无效',
+    'credit_invalid' => "用户信用无效",
+    'send_campaign_success' => '按活动成功发送电子邮件'
 ];
