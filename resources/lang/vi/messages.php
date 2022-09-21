@@ -18,5 +18,6 @@ return [
     'email_does_not_exists' => 'Email không tồn tại',
     'account_banned' => 'Tài khoản của bạn đã bị cấm trong hệ thống',
     'account_deleted' => 'Tài khoản của bạn không còn trong hệ thống',
-    'date_format' => 'Ngày sinh không khớp với định dạng Y-m-d.'
+    'date_format' => 'Ngày sinh không khớp với định dạng Y-m-d.',
+    'error_data' => 'Lỗi trên dòng'
 ];

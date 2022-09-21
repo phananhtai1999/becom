@@ -18,5 +18,6 @@ return [
     'email_does_not_exists' => 'Le-mail nexiste pas',
     'account_banned' => 'Votre compte est banni du système',
     'account_deleted' => "Votre compte n'est plus disponible dans le système",
-    'date_format' => 'La date de naissance ne correspond pas au format A-m-j.'
+    'date_format' => 'La date de naissance ne correspond pas au format A-m-j.',
+    'error_data' => 'erreur en ligne'
 ];
