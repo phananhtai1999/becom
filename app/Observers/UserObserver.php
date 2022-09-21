@@ -63,8 +63,7 @@ class UserObserver
      */
     public function updating(User $user)
     {
-        $userCredit = $this->service->findOrFailById($user->getKey());
-        $user->credit = $userCredit->credit;
+        //
     }
 
     /**

@@ -92,7 +92,9 @@ class UserController extends AbstractRestAPIController
             ]);
         }
 
-        $this->service->update($model, $data);
+        $this->service->update($model, array_merge($data, [
+            'credit' => $model->credit
+        ]));
 
         $model->roles()->sync($request->roles ? $request->roles : $model->roles);
 
@@ -119,7 +121,9 @@ class UserController extends AbstractRestAPIController
             ]);
         }
 
-        $this->service->update($model, $data);
+        $this->service->update($model, array_merge($data, [
+            'credit' => $model->credit
+        ]));
 
         $model->roles()->sync($request->roles ? $request->roles : $model->roles);
 
