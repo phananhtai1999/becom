@@ -4,9 +4,23 @@ namespace App\Observers;
 
 use App\Models\User;
 use App\Services\UserConfigService;
+use App\Services\UserService;
 
 class UserObserver
 {
+    /**
+     * @var UserService
+     */
+    protected $service;
+
+    /**
+     * @param UserService $service
+     */
+    public function __construct(UserService $service)
+    {
+        $this->service = $service;
+    }
+
     /**
      * Handle the User "created" event.
      *
@@ -24,12 +38,30 @@ class UserObserver
     }
 
     /**
+     * @param User $user
+     * @return void
+     */
+    public function creating(User $user)
+    {
+        $user->credit = '0';
+    }
+
+    /**
      * Handle the User "updated" event.
      *
      * @param  \App\Models\User  $user
      * @return void
      */
     public function updated(User $user)
+    {
+        //
+    }
+
+    /**
+     * @param User $user
+     * @return void
+     */
+    public function updating(User $user)
     {
         //
     }

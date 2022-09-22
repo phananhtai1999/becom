@@ -30,12 +30,14 @@ use App\Services\CampaignLinkDailyTrackingService;
 use App\Services\CampaignLinkTrackingService;
 use App\Services\CampaignService;
 use App\Services\CampaignTrackingService;
+use App\Services\ContactService;
 use App\Services\EmailService;
 use App\Services\MailSendingHistoryService;
 use App\Services\MailTemplateVariableService;
 use App\Services\SendEmailByCampaignService;
 use App\Services\SendEmailScheduleLogService;
 use App\Services\SmtpAccountService;
+use App\Services\UserService;
 use Carbon\Carbon;
 use App\Services\MyCampaignService;
 use Illuminate\Http\JsonResponse;
@@ -101,6 +103,16 @@ class CampaignController extends AbstractRestAPIController
     protected $mailSendingHistoryService;
 
     /**
+     * @var ContactService
+     */
+    protected $contactService;
+
+    /**
+     * @var UserService
+     */
+    protected $userService;
+
+    /**
      * @param CampaignService $service
      * @param MyCampaignService $myService
      * @param CampaignTrackingService $campaignTrackingService
@@ -113,6 +125,8 @@ class CampaignController extends AbstractRestAPIController
      * @param EmailService $emailService
      * @param SendEmailScheduleLogService $sendEmailScheduleLogService
      * @param MailSendingHistoryService $mailSendingHistoryService
+     * @param ContactService $contactService
+     * @param UserService $userService
      */
     public function __construct
     (
@@ -127,7 +141,9 @@ class CampaignController extends AbstractRestAPIController
         MailTemplateVariableService $mailTemplateVariableService,
         EmailService $emailService,
         SendEmailScheduleLogService $sendEmailScheduleLogService,
-        MailSendingHistoryService $mailSendingHistoryService
+        MailSendingHistoryService $mailSendingHistoryService,
+        ContactService $contactService,
+        UserService $userService
     )
     {
         $this->service = $service;
@@ -147,6 +163,8 @@ class CampaignController extends AbstractRestAPIController
         $this->emailService = $emailService;
         $this->sendEmailScheduleLogService = $sendEmailScheduleLogService;
         $this->mailSendingHistoryService = $mailSendingHistoryService;
+        $this->contactService = $contactService;
+        $this->userService = $userService;
     }
 
     /**
@@ -375,34 +393,47 @@ class CampaignController extends AbstractRestAPIController
 
     /**
      * @param SendEmailByCampaignRequest $request
-     * @return JsonResponse
+     * @return void|JsonResponse
      */
     public function sendEmailsByCampaign(SendEmailByCampaignRequest $request)
     {
         $campaign = $this->service->findOneById($request->get('campaign_uuid'));
         if($this->sendEmailScheduleLogService->checkActiveCampaignbyCampaignUuid($request->get('campaign_uuid'))){
-                SendEmailByCampaignEvent::dispatch($campaign);
-                return $this->sendOkJsonResponse(["message" => "Send Email By Campaign Success"]);
+
+            $contactsNumberSendEmail = count($this->contactService->getContactsSendEmail($campaign->uuid));
+            $creditNumberSendEmail = $contactsNumberSendEmail * config('credit.default_credit') * $campaign->number_email_per_date;
+            if($this->userService->checkCreditToSendCEmail($creditNumberSendEmail, $campaign->user_uuid)){
+                SendEmailByCampaignEvent::dispatch($campaign, $creditNumberSendEmail);
+
+                return $this->sendOkJsonResponse(["message" => __('messages.send_campaign_success')]);
+            }
+
+            return $this->sendValidationFailedJsonResponse(["errors" => ['credit' =>  __('messages.credit_invalid')]]);
         }
 
-        return $this->sendValidationFailedJsonResponse(["errors" => ['campaign_uuid' => 'The selected campaign uuid is invalid']]);
+        return $this->sendValidationFailedJsonResponse(["errors" => ['campaign_uuid' => __('messages.campaign_invalid')]]);
     }
 
     /**
      * @param SendEmailByMyCampaignRequest $request
-     * @return JsonResponse
+     * @return void|JsonResponse
      */
     public function sendEmailByMyCampaign(SendEmailByMyCampaignRequest $request)
     {
-        if($this->myService->CheckMyCampaign($request->get('campaign_uuid'))){
-            $campaign = $this->service->findOneById($request->get('campaign_uuid'));
-            if($this->sendEmailScheduleLogService->checkActiveCampaignbyCampaignUuid($request->get('campaign_uuid'))){
-                SendEmailByCampaignEvent::dispatch($campaign);
-                return $this->sendOkJsonResponse(["message" => "Send Email By Campaign Success"]);
+        $campaign = $this->service->findOneById($request->get('campaign_uuid'));
+        if($this->sendEmailScheduleLogService->checkActiveCampaignbyCampaignUuid($request->get('campaign_uuid'))){
+
+            $contactsNumberSendEmail = count($this->contactService->getContactsSendEmail($campaign->uuid));
+            $creditNumberSendEmail = $contactsNumberSendEmail * config('credit.default_credit') * $campaign->number_email_per_date;
+            if($this->userService->checkCreditToSendCEmail($creditNumberSendEmail, $campaign->user_uuid)){
+                SendEmailByCampaignEvent::dispatch($campaign, $creditNumberSendEmail);
+
+                return $this->sendOkJsonResponse(["message" => __('messages.send_campaign_success')]);
             }
 
-            return $this->sendValidationFailedJsonResponse(["errors" => ['campaign_uuid' => 'The selected campaign uuid is invalid']]);
+            return $this->sendValidationFailedJsonResponse(["errors" => ['credit' =>  __('messages.credit_invalid')]]);
         }
-        return $this->sendValidationFailedJsonResponse(["errors" => ['campaign_uuid' => 'The selected campaign uuid is invalid']]);
+
+        return $this->sendValidationFailedJsonResponse(["errors" => ['campaign_uuid' => __('messages.campaign_invalid')]]);
     }
 }

@@ -6,13 +6,16 @@ use App\Events\SendEmailByCampaignEvent;
 use App\Mail\SendCampaign;
 use App\Services\CampaignService;
 use App\Services\ContactService;
+use App\Services\CreditHistoryService;
 use App\Services\EmailService;
 use App\Services\MailSendingHistoryService;
 use App\Services\MailTemplateVariableService;
 use App\Services\SendEmailScheduleLogService;
 use App\Services\SmtpAccountService;
+use App\Services\UserService;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
 class SendEmailByCampaignListener implements ShouldQueue
@@ -53,6 +56,16 @@ class SendEmailByCampaignListener implements ShouldQueue
     private $contactService;
 
     /**
+     * @var UserService
+     */
+    private $userService;
+
+    /**
+     * @var CreditHistoryService
+     */
+    private $creditHistoryService;
+
+    /**
      * @param MailTemplateVariableService $mailTemplateVariableService
      * @param MailSendingHistoryService $mailSendingHistoryService
      * @param SmtpAccountService $smtpAccountService
@@ -60,6 +73,7 @@ class SendEmailByCampaignListener implements ShouldQueue
      * @param EmailService $emailService
      * @param SendEmailScheduleLogService $sendEmailScheduleLogService
      * @param ContactService $contactService
+     * @param UserService $userService
      */
     public function __construct(
         MailTemplateVariableService $mailTemplateVariableService,
@@ -68,7 +82,9 @@ class SendEmailByCampaignListener implements ShouldQueue
         CampaignService $campaignService,
         EmailService $emailService,
         SendEmailScheduleLogService $sendEmailScheduleLogService,
-        ContactService $contactService
+        ContactService $contactService,
+        UserService $userService,
+        CreditHistoryService $creditHistoryService
     )
     {
         $this->mailTemplateVariableService = $mailTemplateVariableService;
@@ -78,6 +94,8 @@ class SendEmailByCampaignListener implements ShouldQueue
         $this->emailService = $emailService;
         $this->sendEmailScheduleLogService = $sendEmailScheduleLogService;
         $this->contactService = $contactService;
+        $this->userService = $userService;
+        $this->creditHistoryService = $creditHistoryService;
 
     }
 
@@ -91,13 +109,33 @@ class SendEmailByCampaignListener implements ShouldQueue
     public function handle(SendEmailByCampaignEvent $event)
     {
         $campaign = $event->campaign;
+        $creditNumberSendEmail = $event->creditNumberSendEmail;
 
         $this->smtpAccountService->setSmtpAccountForSendEmail($campaign->smtpAccount);
+        $user = $this->userService->findOneById($campaign->user_uuid);
 
         $sendEmailScheduleLog = $this->sendEmailScheduleLogService->create([
             'campaign_uuid' => $campaign->getKey(),
             'start_time' => Carbon::now()
         ]);
+
+        DB::beginTransaction();
+
+        try {
+            $this->userService->update($user, [
+                'credit' => $user->credit-$creditNumberSendEmail
+            ]);
+
+            $this->creditHistoryService->create([
+                'user_uuid' => $campaign->user_uuid,
+                'campaign_uuid' => $campaign->uuid,
+                'credit' => $creditNumberSendEmail
+            ]);
+            DB::commit();
+        }catch (\Exception $e) {
+            DB::rollback();
+        }
+
         try {
             $this->sendEmailByCampaign($campaign);
             $this->sendEmailScheduleLogService->update($sendEmailScheduleLog, [
