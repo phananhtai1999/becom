@@ -65,10 +65,9 @@ class Contact extends AbstractModel
     }
 
     /**
-     * Scope a query to only uuid not in uuids.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param Builder $query
+     * @param ...$uuids
+     * @return Builder
      */
 
     public function scopeUuidsNotIn(Builder $query, ...$uuids): Builder
@@ -77,10 +76,9 @@ class Contact extends AbstractModel
     }
 
     /**
-     * Scope a query to only uuid in uuids.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param Builder $query
+     * @param ...$uuids
+     * @return Builder
      */
 
     public function scopeUuidsIn(Builder $query, ...$uuids): Builder
