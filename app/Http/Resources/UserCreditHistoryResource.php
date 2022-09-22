@@ -7,10 +7,10 @@ use App\Abstracts\AbstractJsonResource;
 class UserCreditHistoryResource extends AbstractJsonResource
 {
     /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
+     * @param $request
+     * @return array
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function toArray($request)
     {

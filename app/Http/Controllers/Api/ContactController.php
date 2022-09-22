@@ -17,6 +17,7 @@ use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Imports\ContactImport;
 use App\Services\ContactService;
 use App\Services\MyContactService;
+use Illuminate\Support\Facades\Validator;
 
 class ContactController extends AbstractRestAPIController
 {
@@ -229,9 +230,78 @@ class ContactController extends AbstractRestAPIController
      */
     public function importJsonFile(ImportJsonFileRequest $request)
     {
-        $this->service->importJsonFile($request->file);
+        try {
+            $file = $request->file;
+            $getFileContents = json_decode(file_get_contents($file));
 
-        return $this->sendOkJsonResponse();
+            $rules = [
+                'email' => ['required', 'string'],
+                'first_name' => ['required', 'string'],
+                'last_name' => ['required', 'string'],
+                'middle_name' => ['nullable', 'string'],
+                'phone' => ['nullable', 'numeric'],
+                'dob' => ['nullable', 'date_format:Y-m-d'],
+                'sex' => ['nullable', 'string'],
+                'city' => ['nullable', 'string'],
+                'country' => ['nullable', 'string'],
+            ];
+
+            foreach ($getFileContents as $key => $content) {
+
+                $data = [
+                    'email' => $content->email,
+                    'last_name' => $content->last_name,
+                    'first_name' => $content->first_name,
+                    'middle_name' => $content->middle_name,
+                    'phone' => $content->phone,
+                    'sex' => $content->sex,
+                    'dob' => $content->dob,
+                    'city' => $content->city,
+                    'country' => $content->country,
+                    'user_uuid' => auth()->user()->getkey()
+                ];
+
+                $validator = Validator::make($data, $rules);
+
+//                $errors = [];
+                if ($validator->fails()) {
+                    $error[] = $validator->errors()->merge(['Row fail' => __('messages.error_data') . ' ' .  ($key + 1)]);
+                    $jsonDataFail[] = $data;
+                    continue;
+                }
+
+                $this->service->create([
+                    'email' => $content->email,
+                    'last_name' => $content->last_name,
+                    'first_name' => $content->first_name,
+                    'middle_name' => $content->middle_name,
+                    'phone' => $content->phone,
+                    'sex' => $content->sex,
+                    'dob' => $content->dob,
+                    'city' => $content->city,
+                    'country' => $content->country,
+                    'user_uuid' => auth()->user()->getkey()
+                ]);
+            }
+
+            if (!empty($error)) {
+
+                $errorData = json_encode($jsonDataFail);
+
+                return response()->attachment([
+                    'status' => true,
+                    'locale' => app()->getLocale(),
+                    'message' => __('messages.success'),
+                    'errors' => $error,
+                    'error_data' => json_decode($errorData)
+                ]);
+            }
+
+            return $this->sendOkJsonResponse();
+        } catch (\ErrorException $errorException) {
+
+            return $this->sendValidationFailedJsonResponse();
+        }
     }
 
     /**
