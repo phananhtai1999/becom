@@ -36,6 +36,7 @@ class MailSendingHistoryService extends AbstractService
     {
         return $this->model->where('campaign_uuid', $campaignUuid)
             ->where('email', $email)
+            ->whereNotIn('status', ["fail"])
             ->groupBy('email')
             ->count();
     }

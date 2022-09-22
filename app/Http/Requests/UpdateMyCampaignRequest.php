@@ -32,8 +32,8 @@ class UpdateMyCampaignRequest extends AbstractRequest
             })],
             'from_date' => ['date', 'before_or_equal:to_date'],
             'to_date' => ['date', 'after_or_equal:from_date'],
-            'number_email_per_date' => ['numeric', 'min:1'],
-            'number_email_per_user' => ['numeric', 'min:1'],
+            'number_email_per_date' => ['numeric', 'min:1', 'lte:number_email_per_user'],
+            'number_email_per_user' => ['numeric', 'min:1', 'gte:number_email_per_date'],
             'status' => ['string'],
             'smtp_account_uuid' => ['numeric', 'min:1', Rule::exists('smtp_accounts', 'uuid')->where(function ($query) {
 
