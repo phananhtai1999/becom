@@ -45,7 +45,7 @@ use Illuminate\Support\Facades\Mail;
 
 class CampaignController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestShowTrait, RestDestroyTrait;
+    use RestIndexTrait, RestDestroyTrait;
 
     /**
      * @var
@@ -221,6 +221,27 @@ class CampaignController extends AbstractRestAPIController
     }
 
     /**
+     * @param $id
+     * @return JsonResponse
+     */
+    public function show($id)
+    {
+        $model = $this->service->findOrFailById($id);
+        $sentCount = $this->mailSendingHistoryService->getNumberEmailSentByStatusAndCampaignUuid($id, "sent");
+        $failedCount = $this->mailSendingHistoryService->getNumberEmailSentByStatusAndCampaignUuid($id, "fail");
+        $openedCount = $this->mailSendingHistoryService->getNumberEmailSentByStatusAndCampaignUuid($id, "opened");
+        $emailCount = $model->number_email_per_user * count($this->contactService->getContactsSendEmail($id));
+        $campaign = $this->service->resourceToData($this->resourceClass, $model)['data'];
+
+        return $this->sendOkJsonResponse(['data' => array_merge($campaign, [
+            'email_count' => $emailCount,
+            'sent_count' => $sentCount,
+            'failed_count' => $failedCount,
+            'opened_count' => $openedCount
+        ])]);
+    }
+
+    /**
      * @return JsonResponse
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
@@ -265,9 +286,18 @@ class CampaignController extends AbstractRestAPIController
     {
         $model = $this->myService->findMyCampaignByKeyOrAbort($id);
 
-        return $this->sendOkJsonResponse(
-            $this->service->resourceToData($this->resourceClass, $model)
-        );
+        $sentCount = $this->mailSendingHistoryService->getNumberEmailSentByStatusAndCampaignUuid($id, "sent");
+        $failedCount = $this->mailSendingHistoryService->getNumberEmailSentByStatusAndCampaignUuid($id, "fail");
+        $openedCount = $this->mailSendingHistoryService->getNumberEmailSentByStatusAndCampaignUuid($id, "opened");
+        $emailCount = $model->number_email_per_user * count($this->contactService->getContactsSendEmail($id));
+        $campaign = $this->service->resourceToData($this->resourceClass, $model)['data'];
+
+        return $this->sendOkJsonResponse(['data' => array_merge($campaign, [
+            'email_count' => $emailCount,
+            'sent_count' => $sentCount,
+            'failed_count' => $failedCount,
+            'opened_count' => $openedCount
+        ])]);
     }
 
     /**

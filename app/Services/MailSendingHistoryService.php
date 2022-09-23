@@ -70,4 +70,17 @@ class MailSendingHistoryService extends AbstractService
     {
         return $this->model->where('campaign_uuid', $campaignUuid)->groupBy('campaign_uuid')->count();
     }
+
+    /**
+     * @param $campaignUuid
+     * @param $status
+     * @return mixed
+     */
+    public function getNumberEmailSentByStatusAndCampaignUuid($campaignUuid, $status)
+    {
+        return $this->model->where([
+            ['campaign_uuid', $campaignUuid],
+            ['status', $status]
+        ])->count();
+    }
 }
