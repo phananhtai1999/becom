@@ -14,6 +14,7 @@ use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestEditTrait;
 use App\Services\CreditHistoryService;
 use App\Services\MyCreditHistoryService;
+use App\Services\UserCreditHistoryService;
 
 class CreditHistoryController extends AbstractRestAPIController
 {
@@ -25,10 +26,20 @@ class CreditHistoryController extends AbstractRestAPIController
     protected $myService;
 
     /**
+     * @var
+     */
+    protected $userAddCreditHistoryService;
+
+    /**
      * @param CreditHistoryService $service
      * @param MyCreditHistoryService $myService
+     * @param UserCreditHistoryService $userAddCreditHistoryService
      */
-    public function __construct(CreditHistoryService $service, MyCreditHistoryService $myService)
+    public function __construct(
+        CreditHistoryService $service,
+        MyCreditHistoryService $myService,
+        UserCreditHistoryService $userAddCreditHistoryService
+    )
     {
         $this->service = $service;
         $this->resourceCollectionClass = CreditHistoryResourceCollection::class;
@@ -37,6 +48,7 @@ class CreditHistoryController extends AbstractRestAPIController
         $this->editRequest = UpdateCreditHistoryRequest::class;
         $this->indexRequest = IndexRequest::class;
         $this->myService = $myService;
+        $this->userAddCreditHistoryService = $userAddCreditHistoryService;
     }
 
     /**
@@ -92,5 +104,26 @@ class CreditHistoryController extends AbstractRestAPIController
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
         );
+    }
+
+    /**
+     * @param IndexRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function addAndUseCreditHistory(IndexRequest $request)
+    {
+        $userUseCreditHistories = $this->service->userUseCreditHistories();
+
+        $userAddCreditHistories = $this->userAddCreditHistoryService->userAddCreditHistories(
+            $userUseCreditHistories,
+            $request->get('per_page', '15'),
+            $request->get('columns', '*'),
+            $request->get('page_name', 'page'),
+            $request->get('page', '1')
+        );
+
+        return $this->sendOkJsonResponse([
+            'data' => $userAddCreditHistories
+        ]);
     }
 }
