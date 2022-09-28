@@ -336,7 +336,8 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'user-use-credit-history.'],
      Route::group(['as' => 'my.'], function () {
         Route::get('/my/credit-histories', [CreditHistoryController::class, 'indexMyCreditHistory'])->name('index');
         Route::get('/my/credit-history/{id}', [CreditHistoryController::class, 'showMyCreditHistory'])->name('show');
-    });
+        Route::get('/my/add-and-use-credit-histories', [CreditHistoryController::class, 'addAndUseMyCreditHistory'])->name('add-and-use-my-credit-history');
+     });
 });
 
 //User Credit History
