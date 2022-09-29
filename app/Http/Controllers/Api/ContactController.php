@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
 use App\Http\Requests\ContactRequest;
-use App\Http\Requests\ImportExcelFileRequest;
+use App\Http\Requests\ImportExcelOrCsvFileRequest;
 use App\Http\Requests\ImportJsonFileRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyContactRequest;
@@ -14,10 +14,14 @@ use App\Http\Resources\ContactResourceCollection;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
-use App\Imports\ContactImport;
 use App\Services\ContactService;
 use App\Services\MyContactService;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Csv;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class ContactController extends AbstractRestAPIController
 {
@@ -188,39 +192,126 @@ class ContactController extends AbstractRestAPIController
     }
 
     /**
-     * @param ImportExcelFileRequest $request
+     * @param ImportExcelOrCsvFileRequest $request
      * @return \Illuminate\Http\JsonResponse
+     * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      */
-    public function importExcelFile(ImportExcelFileRequest $request)
+    public function importExcelOrCsvFile(ImportExcelOrCsvFileRequest $request)
     {
         try {
-            $import = new ContactImport();
-            $import->import($request->file);
+            $file = $request->file;
+            $extension = $file->getClientOriginalExtension();
 
-            if ($import->failures()->isNotEmpty()) {
-                foreach ($import->failures() as $failure) {
-
-                    return $this->sendValidationFailedJsonResponse([
-                        'errors' => [
-                            $failure->attribute() => $failure->errors()
-                        ]
-                    ]);
-                }
+            if ($extension == 'xlsx') {
+                $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
+            } else {
+                $reader = new \PhpOffice\PhpSpreadsheet\Reader\Csv();
             }
 
-            return $this->sendOkJsonResponse();
+            $reader->setReadDataOnly(true);
+            $reader->setReadEmptyCells(false);
+            $spreadsheet = $reader->load($file);
+            $getActiveSheet = $spreadsheet->getActiveSheet()->toArray();
+
+            if (count($getActiveSheet) >= 2) {
+                $fields = array_shift($getActiveSheet);
+                $rules = [
+                    'email' => ['required', 'string'],
+                    'first_name' => ['required', 'string'],
+                    'last_name' => ['required', 'string'],
+                    'middle_name' => ['nullable', 'string'],
+                    'phone' => ['nullable', 'numeric'],
+                    'dob' => ['nullable', 'date_format:Y-m-d'],
+                    'sex' => ['nullable', 'string'],
+                    'city' => ['nullable', 'string'],
+                    'country' => ['nullable', 'string'],
+                ];
+
+                foreach ($getActiveSheet as $key => $value) {
+
+                    $row = array_combine($fields, $value);
+                    $data = [
+                        'email' => $row['email'],
+                        'first_name' => $row['first_name'],
+                        'last_name' => $row['last_name'],
+                        'middle_name' => $row['middle_name'],
+                        'phone' => $row['phone'],
+                        'sex' => $row['sex'],
+                        'dob' => $row['dob'],
+                        'city' => $row['city'],
+                        'country' => $row['country'],
+                        'user_uuid' => auth()->user()->getkey()
+                    ];
+
+                    $validator = Validator::make($data, $rules);
+
+                    if ($validator->fails()) {
+                        $error[] = $validator->errors()->merge(['Row fail' => __('messages.error_data') . ' ' . ($key + 2)]);
+                        $jsonDataFail[] = $data;
+                        continue;
+                    }
+
+                    $this->service->create($data);
+                }
+
+                if (!empty($error)) {
+                    if (!File::exists(public_path('data_file_error'))) {
+                        File::makeDirectory(public_path('data_file_error'));
+                    }
+
+                    if ($extension == 'xlsx') {
+                        $fileName = 'import_failed_record_' . uniqid() . '_' . Carbon::today()->toDateString() . '.xlsx';
+                    } else {
+                        $fileName = 'import_failed_record_' . uniqid() . '_' . Carbon::today()->toDateString() . '.csv';
+                    }
+                    $fileStorePath = public_path('/data_file_error/' . $fileName);
+
+                    //Write into Excel file
+                    $spreadsheet = new Spreadsheet();
+                    $sheet = $spreadsheet->getActiveSheet();
+                    $columnCoordinate = 1;
+                    $columnHeader = ['email', 'first_name', 'last_name', 'middle_name', 'sex', 'phone', 'dob', 'city', 'country'];
+                    foreach ($columnHeader as $value) {
+                        $sheet->setCellValueByColumnAndRow($columnCoordinate, 1, $value);
+                        $columnCoordinate = $columnCoordinate + 1;
+                    }
+
+                    for ($i = 0; $i < count($jsonDataFail); $i++) {
+                        unset($jsonDataFail[$i]['user_uuid']);
+                        $row = $jsonDataFail[$i];
+                        $columnCoordinateData = 1;
+                        foreach ($row as $value) {
+                            $sheet->setCellValueByColumnAndRow($columnCoordinateData, $i + 2, $value);
+                            $columnCoordinateData = $columnCoordinateData + 1;
+                        }
+                    }
+
+                    if ($extension == 'xlsx') {
+                        $writer = new Xlsx($spreadsheet);
+                    } else {
+                        $writer = new Csv($spreadsheet);
+                    }
+                    $writer->save($fileStorePath);
+
+                    return response()->json([
+                        'status' => true,
+                        'locale' => app()->getLocale(),
+                        'message' => __('messages.success'),
+                        'errors' => $error,
+                        'error_data' => $jsonDataFail,
+                        'slug' => 'data_file_error/' . $fileName
+                    ]);
+                }
+
+                return $this->sendOkJsonResponse();
+            } else {
+
+                return $this->sendValidationFailedJsonResponse();
+            }
         } catch (\ErrorException $errorException) {
 
             return $this->sendValidationFailedJsonResponse();
-        } catch (\TypeError $typeError) {
-
-            return $this->sendValidationFailedJsonResponse([
-                'errors' => [
-                    'dob' => [
-                        __('messages.date_format')
-                    ]
-                ]
-            ]);
         }
     }
 
@@ -263,37 +354,32 @@ class ContactController extends AbstractRestAPIController
 
                 $validator = Validator::make($data, $rules);
 
-//                $errors = [];
                 if ($validator->fails()) {
-                    $error[] = $validator->errors()->merge(['Row fail' => __('messages.error_data') . ' ' .  ($key + 1)]);
+                    $error[] = $validator->errors()->merge(['Row fail' => __('messages.error_data') . ' ' . ($key + 1)]);
                     $jsonDataFail[] = $data;
                     continue;
                 }
 
-                $this->service->create([
-                    'email' => $content->email,
-                    'last_name' => $content->last_name,
-                    'first_name' => $content->first_name,
-                    'middle_name' => $content->middle_name,
-                    'phone' => $content->phone,
-                    'sex' => $content->sex,
-                    'dob' => $content->dob,
-                    'city' => $content->city,
-                    'country' => $content->country,
-                    'user_uuid' => auth()->user()->getkey()
-                ]);
+                $this->service->create($data);
             }
 
             if (!empty($error)) {
+                if (!File::exists(public_path('data_file_error'))) {
+                    File::makeDirectory(public_path('data_file_error'));
+                }
 
                 $errorData = json_encode($jsonDataFail);
+                $fileName = 'import_failed_record_' . uniqid() . '_' . Carbon::today()->toDateString() . '.json';
+                $fileStorePath = public_path('/data_file_error/' . $fileName);
+                File::put($fileStorePath, $errorData);
 
-                return response()->attachment([
+                return response()->json([
                     'status' => true,
                     'locale' => app()->getLocale(),
                     'message' => __('messages.success'),
                     'errors' => $error,
-                    'error_data' => json_decode($errorData)
+                    'error_data' => $jsonDataFail,
+                    'slug' => 'data_file_error/' . $fileName
                 ]);
             }
 

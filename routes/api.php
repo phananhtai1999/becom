@@ -363,7 +363,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'mail-open-tracking.'], func
 
 // Import File
 Route::group(['middleware' => ['auth:api'], 'as' => 'import-file.'], function () {
-    Route::post('/import-excel-file', [ContactController::class, 'importExcelFile'])->name('import-excel-file');
+    Route::post('/import-excel-or-csv-file', [ContactController::class, 'importExcelOrCsvFile'])->name('import-excel-or-csv-file');
     Route::post('/import-json-file', [ContactController::class, 'importJsonFile'])->name('import-json-file');
     Route::post('/download-template-excel', [ContactController::class, 'templateExcel'])->name('template-excel');
 });
