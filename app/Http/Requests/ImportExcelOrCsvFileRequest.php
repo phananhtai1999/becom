@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
 
-class ImportExcelFileRequest extends AbstractRequest
+class ImportExcelOrCsvFileRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.
