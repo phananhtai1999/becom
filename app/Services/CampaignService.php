@@ -42,6 +42,15 @@ class CampaignService extends AbstractService
     }
 
     /**
+     * @param $campaignUuid
+     * @return mixed
+     */
+    public function findCampaignByCreditHistory($campaignUuid)
+    {
+        return $this->findOneById($campaignUuid);
+    }
+
+    /**
      * @param $model
      * @return array|void
      */

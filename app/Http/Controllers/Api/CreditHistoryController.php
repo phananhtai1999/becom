@@ -12,6 +12,7 @@ use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestEditTrait;
+use App\Services\CampaignService;
 use App\Services\CreditHistoryService;
 use App\Services\MyCreditHistoryService;
 use App\Services\MyUserCreditHistoryService;
@@ -29,6 +30,11 @@ class CreditHistoryController extends AbstractRestAPIController
     /**
      * @var
      */
+    protected $campaignService;
+
+    /**
+     * @var
+     */
     protected $userAddCreditHistoryService;
 
     /**
@@ -41,12 +47,14 @@ class CreditHistoryController extends AbstractRestAPIController
      * @param MyCreditHistoryService $myService
      * @param UserCreditHistoryService $userAddCreditHistoryService
      * @param MyUserCreditHistoryService $addMyCreditHistoryService
+     * @param CampaignService $campaignService
      */
     public function __construct(
         CreditHistoryService $service,
         MyCreditHistoryService $myService,
         UserCreditHistoryService $userAddCreditHistoryService,
-        MyUserCreditHistoryService $addMyCreditHistoryService
+        MyUserCreditHistoryService $addMyCreditHistoryService,
+        CampaignService $campaignService
     )
     {
         $this->service = $service;
@@ -58,6 +66,7 @@ class CreditHistoryController extends AbstractRestAPIController
         $this->myService = $myService;
         $this->userAddCreditHistoryService = $userAddCreditHistoryService;
         $this->addMyCreditHistoryService = $addMyCreditHistoryService;
+        $this->campaignService = $campaignService;
     }
 
     /**
@@ -118,22 +127,42 @@ class CreditHistoryController extends AbstractRestAPIController
     /**
      * @param IndexRequest $request
      * @return \Illuminate\Http\JsonResponse
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function addAndUseCreditHistory(IndexRequest $request)
     {
         $userUseCreditHistories = $this->service->userUseCreditHistories();
+        $userAddCreditHistories = $this->userAddCreditHistoryService->userAddCreditHistories($userUseCreditHistories);
+        $expand = request()->get('expand', []);
 
-        $userAddCreditHistories = $this->userAddCreditHistoryService->userAddCreditHistories(
-            $userUseCreditHistories,
-            $request->get('per_page', '15'),
-            $request->get('columns', '*'),
-            $request->get('page_name', 'page'),
-            $request->get('page', '1')
-        );
+        if (\in_array('user__add_and_use_credit_history', $expand)) {
 
-        return $this->sendOkJsonResponse([
-            'data' => $userAddCreditHistories
-        ]);
+            foreach ($userAddCreditHistories->get() as $userAddCreditHistory) {
+                $findCampaign = $this->campaignService->findOneById($userAddCreditHistory->campaign_uuid);
+                $data[] = array_merge($userAddCreditHistory->toArray(), ['infor_user' => $userAddCreditHistory->user], ['infor_add_by' => $userAddCreditHistory->add_by], ['infor_campaign' => $findCampaign]);
+            }
+            $collectData = collect($data)->forPage($request->get('page', '1'), $request->get('per_page', '15'));
+
+            return \response()->json([
+                'status' => true,
+                'locale' => app()->getLocale(),
+                'message' => __('messages.success'),
+                'data' => $collectData
+            ]);
+
+        } else {
+            $data = $userAddCreditHistories->paginate(
+                $request->get('per_page', '15'),
+                $request->get('columns', '*'),
+                $request->get('page_name', 'page'),
+                $request->get('page', '1')
+            );
+
+            return $this->sendOkJsonResponse([
+                'data' => $data
+            ]);
+        }
     }
 
     /**

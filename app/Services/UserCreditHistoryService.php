@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Abstracts\AbstractService;
 use App\Models\QueryBuilders\UserCreditHistoryQueryBuilder;
 use App\Models\UserCreditHistory;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -31,13 +30,9 @@ class UserCreditHistoryService extends AbstractService
 
     /**
      * @param $data
-     * @param $perPage
-     * @param $columns
-     * @param $pageName
-     * @param $page
-     * @return LengthAwarePaginator
+     * @return \Spatie\QueryBuilder\Concerns\SortsQuery|QueryBuilder
      */
-    public function userAddCreditHistories($data, $perPage, $columns, $pageName, $page)
+    public function userAddCreditHistories($data)
     {
         return QueryBuilder::for($this->model)
             ->select('uuid', 'user_uuid', 'credit', DB::raw('NULL as campaign_uuid'), 'add_by_uuid', 'created_at')
@@ -49,7 +44,6 @@ class UserCreditHistoryService extends AbstractService
                 AllowedFilter::exact('credit'),
                 AllowedFilter::exact('campaign_uuid'),
                 AllowedFilter::exact('add_by_uuid'),
-            ])
-            ->paginate($perPage, $columns, $pageName, $page);
+            ]);
     }
 }
