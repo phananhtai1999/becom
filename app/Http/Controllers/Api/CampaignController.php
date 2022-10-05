@@ -227,9 +227,10 @@ class CampaignController extends AbstractRestAPIController
     public function show($id)
     {
         $model = $this->service->findOrFailById($id);
-        $sentCount = $this->mailSendingHistoryService->getNumberEmailSentByStatusAndCampaignUuid($id, "sent");
+
         $failedCount = $this->mailSendingHistoryService->getNumberEmailSentByStatusAndCampaignUuid($id, "fail");
         $openedCount = $this->mailSendingHistoryService->getNumberEmailSentByStatusAndCampaignUuid($id, "opened");
+        $sentCount = $this->mailSendingHistoryService->getNumberEmailSentByStatusAndCampaignUuid($id, "sent") + $openedCount;
         $emailCount = $model->number_email_per_user * count($this->contactService->getContactsSendEmail($id));
         $campaign = $this->service->resourceToData($this->resourceClass, $model)['data'];
 
@@ -286,9 +287,9 @@ class CampaignController extends AbstractRestAPIController
     {
         $model = $this->myService->findMyCampaignByKeyOrAbort($id);
 
-        $sentCount = $this->mailSendingHistoryService->getNumberEmailSentByStatusAndCampaignUuid($id, "sent");
         $failedCount = $this->mailSendingHistoryService->getNumberEmailSentByStatusAndCampaignUuid($id, "fail");
         $openedCount = $this->mailSendingHistoryService->getNumberEmailSentByStatusAndCampaignUuid($id, "opened");
+        $sentCount = $this->mailSendingHistoryService->getNumberEmailSentByStatusAndCampaignUuid($id, "sent") + $openedCount;
         $emailCount = $model->number_email_per_user * count($this->contactService->getContactsSendEmail($id));
         $campaign = $this->service->resourceToData($this->resourceClass, $model)['data'];
 

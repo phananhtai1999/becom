@@ -88,8 +88,8 @@ class MailSendingHistoryController extends AbstractRestAPIController
 
     /**
      * @param Request $request
-     * @param $mailSendingHistoryUuid
-     * @return \Illuminate\Http\JsonResponse
+     * @param $id
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
      */
     public function mailOpenTracking(Request $request, $id)
     {
@@ -99,6 +99,8 @@ class MailSendingHistoryController extends AbstractRestAPIController
 
         $mailSendingHistory = $this->service->findOneById($id);
         $this->service->update($mailSendingHistory, ['status' => 'opened']);
-        return $this->sendOkJsonResponse();
+
+        return response(file_get_contents(public_path('tracking_pixel/pixel.gif')))
+            ->header('content-type', 'image/gif');
     }
 }
