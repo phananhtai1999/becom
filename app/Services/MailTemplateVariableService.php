@@ -84,7 +84,7 @@ class MailTemplateVariableService extends AbstractService
      */
     public function injectTrackingImage($mailTemplate, $mailSendingHistoryUuid)
     {
-        $tracking_image = '<img border=0 width=1 alt="" height=1 src="'.route('mail-open-tracking', $mailSendingHistoryUuid).'" />';
+        $tracking_image = '<img width=1 alt="" height=1 src="'.route('mail-open-tracking', $mailSendingHistoryUuid).'" />';
 
         $linebreak = app(Str::class)->random(32);
         $html = str_replace("\n", $linebreak, $mailTemplate->rendered_body);
