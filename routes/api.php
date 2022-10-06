@@ -23,6 +23,7 @@ use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\ContactListController;
 use App\Http\Controllers\Api\CreditHistoryController;
 use App\Http\Controllers\Api\UserCreditHistoryController;
+use App\Http\Controllers\Api\CreditTransactionHistoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -338,6 +339,17 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'user-use-credit-history.'],
         Route::get('/my/credit-history/{id}', [CreditHistoryController::class, 'showMyCreditHistory'])->name('show');
         Route::get('/my/add-and-use-credit-histories', [CreditHistoryController::class, 'addAndUseMyCreditHistory'])->name('add-and-use-my-credit-history');
      });
+});
+
+//Transaciton CreditHistory View
+Route::group(['middleware' => ['auth:api'], 'as' => 'credit-transaction-histories.'], function () {
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/credit-transaction-histories', [CreditTransactionHistoryController::class, 'index'])->name('credit-transaction-history-view');
+    });
+
+    Route::group(['as' => 'my.'], function () {
+        Route::get('/my/credit-transaction-histories', [CreditTransactionHistoryController::class, 'indexMyCreditTransactionHistoryView'])->name('credit-transaction-history-view');
+    });
 });
 
 //User Credit History

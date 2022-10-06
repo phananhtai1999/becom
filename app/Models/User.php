@@ -153,6 +153,14 @@ class User extends Authenticatable
     }
 
     /**
+     * @return HasMany
+     */
+    public function creditTransactionHistories()
+    {
+        return $this->hasMany(CreditTransactionHistory::class, 'user_uuid', 'uuid');
+    }
+
+    /**
      * @return string
      */
     public function getNameAttribute()

@@ -109,4 +109,12 @@ class Campaign extends AbstractModel
     {
         return $this->belongsToMany(ContactList::class, 'campaign_contact_list', 'campaign_uuid', 'contact_list_uuid')->withTimestamps();
     }
+
+    /**
+     * @return HasMany
+     */
+    public function creditTransactionHistories()
+    {
+        return $this->hasMany(CreditTransactionHistory::class, 'campaign_uuid', 'uuid');
+    }
 }
