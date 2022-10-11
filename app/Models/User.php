@@ -37,7 +37,8 @@ class User extends Authenticatable
         'banned_at',
         'avatar_img',
         'cover_img',
-        'credit'
+        'credit',
+        'can_add_smtp_account'
     ];
 
     /**

@@ -31,6 +31,7 @@ class UpdateUserRequest extends AbstractRequest
             'last_name' => ['nullable', 'string'],
             'avatar_img' => ['nullable', 'string'],
             'cover_img' => ['nullable', 'string'],
+            'can_add_smtp_account' => ['nullable', 'boolean'],
             'roles' => ['array', 'min:1'],
             'roles.*' => ['numeric', 'min:1', 'exists:roles,uuid'],
         ];
