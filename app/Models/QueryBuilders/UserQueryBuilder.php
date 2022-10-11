@@ -38,6 +38,7 @@ class UserQueryBuilder extends AbstractQueryBuilder
                 'avatar_img',
                 'cover_img',
                 'credit',
+                'can_add_smtp_account',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -52,6 +53,7 @@ class UserQueryBuilder extends AbstractQueryBuilder
                 'avatar_img',
                 'cover_img',
                 'credit',
+                'can_add_smtp_account',
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -78,6 +80,8 @@ class UserQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__roles.name', 'roles.name'),
                 'credit',
                 AllowedFilter::exact('exact__credit', 'credit'),
+                'can_add_smtp_account',
+                AllowedFilter::exact('exact__can_add_smtp_account', 'can_add_smtp_account'),
             ]);
     }
 }

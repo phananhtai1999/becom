@@ -60,9 +60,17 @@ class UserController extends AbstractRestAPIController
     {
         $request = app($this->storeRequest);
 
-        $model = $this->service->create(array_merge($request->all(), [
-            'password' => Hash::make($request->get('password')),
-        ]));
+        if (empty($request->can_add_smtp_account))
+        {
+            $model = $this->service->create(array_merge($request->all(), [
+                'password' => Hash::make($request->get('password')),
+                'can_add_smtp_account' => '0'
+            ]));
+        } else {
+            $model = $this->service->create(array_merge($request->all(), [
+                'password' => Hash::make($request->get('password')),
+            ]));
+        }
 
         $model->roles()->sync(
             array_merge($request->get('roles', []), [config('user.default_role_uuid')])
@@ -86,6 +94,18 @@ class UserController extends AbstractRestAPIController
         $model = $this->service->findOrFailById($id);
 
         $data = $request->all();
+
+        if ($request->can_add_smtp_account == '0')
+        {
+            $data = array_merge($data, [
+                'can_add_smtp_account' => '0'
+            ]);
+        } elseif (empty($request->can_add_smtp_account)) {
+            $data = array_merge($data, [
+                'can_add_smtp_account' => $model->can_add_smtp_account
+            ]);
+        }
+
         if ($request->has('password')) {
             $data = array_merge($data, [
                 'password' => Hash::make($request->get('password'))
@@ -115,6 +135,18 @@ class UserController extends AbstractRestAPIController
         $model = $this->service->findOrFailById(auth()->user()->getkey());
 
         $data = $request->all();
+
+        if ($request->can_add_smtp_account == '0')
+        {
+            $data = array_merge($data, [
+                'can_add_smtp_account' => '0'
+            ]);
+        } elseif (empty($request->can_add_smtp_account)) {
+            $data = array_merge($data, [
+                'can_add_smtp_account' => $model->can_add_smtp_account
+            ]);
+        }
+
         if ($request->has('password')) {
             $data = array_merge($data, [
                 'password' => Hash::make($request->get('password'))

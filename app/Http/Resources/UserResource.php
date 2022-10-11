@@ -25,6 +25,7 @@ class UserResource extends AbstractJsonResource
             'credit' => $this->credit,
             'email' => $this->email,
             'banned_at' => $this->banned_at,
+            'can_add_smtp_account' => $this->can_add_smtp_account,
             'avatar_img' => $this->avatar_img,
             'avatar_img_absolute' => $this->avatar_img_absolute,
             'cover_img' => $this->cover_img,

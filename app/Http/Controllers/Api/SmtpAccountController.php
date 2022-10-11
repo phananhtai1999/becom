@@ -7,7 +7,6 @@ use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestEditTrait;
-use App\Http\Controllers\Traits\RestStoreTrait;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MySmtpAccountRequest;
 use App\Http\Requests\SendMailBySmtpAccountUuidRequest;
@@ -19,8 +18,10 @@ use App\Http\Resources\SmtpAccountResourceCollection;
 use App\Http\Resources\SmtpAccountResource;
 use App\Mail\SendEmails;
 use App\Models\MailTemplate;
+use App\Services\ConfigService;
 use App\Services\MySmtpAccountService;
 use App\Services\SmtpAccountService;
+use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Mail;
 use Psr\Container\ContainerExceptionInterface;
@@ -36,16 +37,32 @@ class SmtpAccountController extends AbstractRestAPIController
     protected $myService;
 
     /**
+     * @var
+     */
+    protected $userService;
+
+    /**
+     * @var
+     */
+    protected $configService;
+
+    /**
      * @param SmtpAccountService $service
      * @param MySmtpAccountService $myService
+     * @param UserService $userService
+     * @param ConfigService $configService
      */
     public function __construct(
         SmtpAccountService $service,
-        MySmtpAccountService $myService
+        MySmtpAccountService $myService,
+        UserService $userService,
+        ConfigService $configService
     )
     {
         $this->service = $service;
         $this->myService = $myService;
+        $this->userService = $userService;
+        $this->configService = $configService;
         $this->resourceCollectionClass = SmtpAccountResourceCollection::class;
         $this->resourceClass = SmtpAccountResource::class;
         $this->storeRequest = SmtpAccountRequest::class;
@@ -54,7 +71,9 @@ class SmtpAccountController extends AbstractRestAPIController
     }
 
     /**
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function store()
     {
@@ -100,13 +119,21 @@ class SmtpAccountController extends AbstractRestAPIController
      */
     public function storeMySmtpAccount(MySmtpAccountRequest $request)
     {
-        $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => auth()->user()->getkey(),
-        ]));
+        $user = $this->userService->findOrFailById(auth()->user()->getkey());
+        $config = $this->configService->findConfigByKey('smtp_auto');
 
-        return $this->sendCreatedJsonResponse(
-            $this->service->resourceToData($this->resourceClass, $model)
-        );
+        if($user->can_add_smtp_account == 1 || $config->value == 0)
+        {
+            $model = $this->service->create(array_merge($request->all(), [
+                'user_uuid' => auth()->user()->getkey(),
+            ]));
+
+            return $this->sendCreatedJsonResponse(
+                $this->service->resourceToData($this->resourceClass, $model)
+            );
+        } else {
+            return $this->sendUnAuthorizedJsonResponse();
+        }
     }
 
     /**
@@ -130,14 +157,20 @@ class SmtpAccountController extends AbstractRestAPIController
     public function editMySmtpAccount(UpdateMySmtpAccountRequest $request, $id)
     {
         $model = $this->myService->findMySmtpAccountByKeyOrAbort($id);
+        $config = $this->configService->findConfigByKey('smtp_auto');
 
-        $this->service->update($model, array_merge($request->all(), [
-            'user_uuid' => auth()->user()->getkey(),
-        ]));
+        if($model->user->can_add_smtp_account == 1 || $config->value == 0)
+        {
+            $this->service->update($model, array_merge($request->all(), [
+                'user_uuid' => auth()->user()->getkey(),
+            ]));
 
-        return $this->sendOkJsonResponse(
-            $this->service->resourceToData($this->resourceClass, $model)
-        );
+            return $this->sendCreatedJsonResponse(
+                $this->service->resourceToData($this->resourceClass, $model)
+            );
+        } else {
+            return $this->sendUnAuthorizedJsonResponse();
+        }
     }
 
     /**
