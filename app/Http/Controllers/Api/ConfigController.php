@@ -11,7 +11,6 @@ use App\Http\Resources\ConfigResourceResourceCollection;
 use App\Http\Resources\ConfigResource;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
-use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestEditTrait;
 use App\Http\Controllers\Traits\RestStoreTrait;
 use App\Services\ConfigService;
@@ -19,7 +18,7 @@ use Illuminate\Http\JsonResponse;
 
 class ConfigController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestEditTrait, RestStoreTrait;
+    use RestIndexTrait, RestShowTrait, RestEditTrait, RestStoreTrait;
 
     /**
      * @param ConfigService $service

@@ -118,7 +118,6 @@ Route::group(['middleware' => ['auth:api', 'role:admin'], 'as' => 'config.admin'
     Route::put('/config/upsert', [ConfigController::class, 'upsertConfig'])->name('upsertConfig');
     Route::get('/config/{id}', [ConfigController::class, 'show'])->name('show');
     Route::put('/config/{id}', [ConfigController::class, 'edit'])->name('edit');
-    Route::delete('/config/{id}', [ConfigController::class, 'destroy'])->name('destroy');
 });
 
 Route::get('/configs/all', [ConfigController::class, 'loadAllConfig'])->name('config.loadAllConfig');
