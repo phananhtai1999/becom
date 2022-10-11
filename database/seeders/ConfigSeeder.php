@@ -16,7 +16,7 @@ class ConfigSeeder extends Seeder
     {
         $key = [
             [
-                'key' => 'stmp_auto',
+                'key' => 'smtp_auto',
                 'value' => true,
             ],
         ];
