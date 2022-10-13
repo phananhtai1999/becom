@@ -217,7 +217,7 @@ class ContactController extends AbstractRestAPIController
             if (count($getActiveSheet) >= 2) {
                 $fields = array_shift($getActiveSheet);
                 $rules = [
-                    'email' => ['required', 'string'],
+                    'email' => ['required', 'string', 'email:rfc,dns'],
                     'first_name' => ['required', 'string'],
                     'last_name' => ['required', 'string'],
                     'middle_name' => ['nullable', 'string'],
@@ -231,21 +231,35 @@ class ContactController extends AbstractRestAPIController
                 foreach ($getActiveSheet as $key => $value) {
 
                     $row = array_combine($fields, $value);
-                    $data = [
-                        'email' => $row['email'],
-                        'first_name' => $row['first_name'],
-                        'last_name' => $row['last_name'],
-                        'middle_name' => $row['middle_name'],
-                        'phone' => $row['phone'],
-                        'sex' => $row['sex'],
-                        'dob' => $row['dob'],
-                        'city' => $row['city'],
-                        'country' => $row['country'],
-                        'user_uuid' => auth()->user()->getkey()
-                    ];
+                    if (is_integer($row['dob'])) {
+                        $data = [
+                            'email' => $row['email'],
+                            'first_name' => $row['first_name'],
+                            'last_name' => $row['last_name'],
+                            'middle_name' => $row['middle_name'],
+                            'phone' => $row['phone'],
+                            'sex' => $row['sex'],
+                            'dob' => date_format(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['dob']), 'Y-m-d'),
+                            'city' => $row['city'],
+                            'country' => $row['country'],
+                            'user_uuid' => auth()->user()->getkey()
+                        ];
+                    } else {
+                        $data = [
+                            'email' => $row['email'],
+                            'first_name' => $row['first_name'],
+                            'last_name' => $row['last_name'],
+                            'middle_name' => $row['middle_name'],
+                            'phone' => $row['phone'],
+                            'sex' => $row['sex'],
+                            'dob' => $row['dob'],
+                            'city' => $row['city'],
+                            'country' => $row['country'],
+                            'user_uuid' => auth()->user()->getkey()
+                        ];
+                    }
 
                     $validator = Validator::make($data, $rules);
-
                     if ($validator->fails()) {
                         $error[] = $validator->errors()->merge(['Row fail' => __('messages.error_data') . ' ' . ($key + 2)]);
                         $jsonDataFail[] = $data;
