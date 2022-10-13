@@ -21,6 +21,7 @@ return [
     'date_format' => 'Ngày sinh không khớp với định dạng Y-m-d.',
     'campaign_invalid' => 'Campaign Uuid đã chọn không hợp lệ.',
     'credit_invalid' => "Tín dụng của người dùng không hợp lệ.",
+    'smtp_account_invalid' => 'Smtp Account Uuid đã chọn không hợp lệ.',
     'send_campaign_success' => 'Gửi email theo chiến dịch thành công.',
     'error_data' => 'Lỗi trên dòng'
 ];

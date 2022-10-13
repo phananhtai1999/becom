@@ -20,6 +20,7 @@ return [
     'account_deleted' => '您的帐户在系统中不再可用',
     'date_format' => '出生日期与格式 Y-m-d 不对应。',
     'campaign_invalid' => '所选广告系列 uuid 无效',
+    'smtp_account_invalid' => '所选广告系列 uuid 无效.',
     'credit_invalid' => "用户信用无效",
     'send_campaign_success' => '按活动成功发送电子邮件',
     'error_data' => '在线错误'

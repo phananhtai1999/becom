@@ -20,6 +20,7 @@ return [
     'account_deleted' => 'Your account is no longer available in the system',
     'date_format' => 'The dob does not match the format Y-m-d.',
     'campaign_invalid' => 'The selected campaign uuid is invalid.',
+    'smtp_account_invalid' => 'The selected smtp account uuid is invalid.',
     'credit_invalid' => "User's credit is invalid.",
     'send_campaign_success' => 'Send Email By Campaign Success.',
     'error_data' => 'Error on line'

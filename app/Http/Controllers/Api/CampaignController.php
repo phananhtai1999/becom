@@ -30,6 +30,7 @@ use App\Services\CampaignLinkDailyTrackingService;
 use App\Services\CampaignLinkTrackingService;
 use App\Services\CampaignService;
 use App\Services\CampaignTrackingService;
+use App\Services\ConfigService;
 use App\Services\ContactService;
 use App\Services\EmailService;
 use App\Services\MailSendingHistoryService;
@@ -113,6 +114,11 @@ class CampaignController extends AbstractRestAPIController
     protected $userService;
 
     /**
+     * @var ConfigService
+     */
+    protected $configService;
+
+    /**
      * @param CampaignService $service
      * @param MyCampaignService $myService
      * @param CampaignTrackingService $campaignTrackingService
@@ -127,6 +133,7 @@ class CampaignController extends AbstractRestAPIController
      * @param MailSendingHistoryService $mailSendingHistoryService
      * @param ContactService $contactService
      * @param UserService $userService
+     * @param ConfigService $configService
      */
     public function __construct
     (
@@ -143,7 +150,8 @@ class CampaignController extends AbstractRestAPIController
         SendEmailScheduleLogService $sendEmailScheduleLogService,
         MailSendingHistoryService $mailSendingHistoryService,
         ContactService $contactService,
-        UserService $userService
+        UserService $userService,
+        ConfigService $configService
     )
     {
         $this->service = $service;
@@ -165,6 +173,7 @@ class CampaignController extends AbstractRestAPIController
         $this->mailSendingHistoryService = $mailSendingHistoryService;
         $this->contactService = $contactService;
         $this->userService = $userService;
+        $this->configService = $configService;
     }
 
     /**
@@ -268,9 +277,29 @@ class CampaignController extends AbstractRestAPIController
      */
     public function storeMyCampaign(MyCampaignRequest $request)
     {
-        $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => auth()->user()->getkey(),
-        ]));
+        $user = $this->userService->findOrFailById(auth()->user()->getkey());
+        $config = $this->configService->findConfigByKey('smtp_auto');
+
+        if(($user->can_add_smtp_account == 1 || $config->value == 0))
+        {
+            if(!empty($request->get('smtp_account_uuid'))){
+                $data = array_merge($request->all(), [
+                    'user_uuid' => auth()->user()->getkey(),
+                ]);
+            }else{
+                return $this->sendValidationFailedJsonResponse(["errors" => ['smtp_account_uuid' => __('messages.smtp_account_invalid')]]);
+            }
+        }else{
+            if(empty($request->get('smtp_account_uuid'))){
+                $data = array_merge($request->all(), [
+                    'user_uuid' => auth()->user()->getkey(),
+                ]);
+            }else{
+                return $this->sendValidationFailedJsonResponse(["errors" => ['smtp_account_uuid' => __('messages.smtp_account_invalid')]]);
+            }
+        }
+
+        $model = $this->service->create($data);
 
         $model->contactLists()->attach($request->get('contact_list', []));
 
@@ -310,9 +339,29 @@ class CampaignController extends AbstractRestAPIController
     {
         $model = $this->myService->findMyCampaignByKeyOrAbort($id);
 
-        $this->service->update($model, array_merge($request->all(), [
-            'user_uuid' => auth()->user()->getkey(),
-        ]));
+        $user = $this->userService->findOrFailById(auth()->user()->getkey());
+        $config = $this->configService->findConfigByKey('smtp_auto');
+
+        if(($user->can_add_smtp_account == 1 || $config->value == 0))
+        {
+            if(!empty($request->get('smtp_account_uuid'))){
+                $data = array_merge($request->all(), [
+                    'user_uuid' => auth()->user()->getkey(),
+                ]);
+            }else{
+                return $this->sendValidationFailedJsonResponse(["errors" => ['smtp_account_uuid' => __('messages.smtp_account_invalid')]]);
+            }
+        }else{
+            if(empty($request->get('smtp_account_uuid'))){
+                $data = array_merge($request->all(), [
+                    'user_uuid' => auth()->user()->getkey(),
+                ]);
+            }else{
+                return $this->sendValidationFailedJsonResponse(["errors" => ['smtp_account_uuid' => __('messages.smtp_account_invalid')]]);
+            }
+        }
+
+        $this->service->update($model, $data);
 
         $contactListUuid = $this->myService->findContactListKeyByMyCampaign($model);
 
