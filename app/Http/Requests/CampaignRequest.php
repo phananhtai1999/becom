@@ -31,7 +31,7 @@ class CampaignRequest extends AbstractRequest
             'number_email_per_date' => ['required', 'numeric', 'min:1', 'lte:number_email_per_user'],
             'number_email_per_user' => ['required', 'numeric', 'min:1', 'gte:number_email_per_date'],
             'status' => ['required', 'string'],
-            'smtp_account_uuid' => ['required', 'numeric', 'min:1', 'exists:smtp_accounts,uuid'],
+            'smtp_account_uuid' => ['nullable', 'numeric', 'min:1', 'exists:smtp_accounts,uuid'],
             'website_uuid' => ['required', 'numeric', 'min:1', 'exists:websites,uuid'],
             'was_finished' => ['required', 'boolean'],
             'was_stopped_by_owner' => ['required', 'boolean'],
