@@ -285,7 +285,7 @@ class ContactController extends AbstractRestAPIController
                     $spreadsheet = new Spreadsheet();
                     $sheet = $spreadsheet->getActiveSheet();
                     $columnCoordinate = 1;
-                    $columnHeader = ['email', 'first_name', 'last_name', 'middle_name', 'sex', 'phone', 'dob', 'city', 'country'];
+                    $columnHeader = ['email', 'first_name', 'last_name', 'middle_name', 'phone', 'sex', 'dob', 'city', 'country'];
                     foreach ($columnHeader as $value) {
                         $sheet->setCellValueByColumnAndRow($columnCoordinate, 1, $value);
                         $columnCoordinate = $columnCoordinate + 1;
