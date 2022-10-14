@@ -5,6 +5,7 @@ namespace App\Listeners;
 use App\Events\SendEmailByCampaignEvent;
 use App\Mail\SendCampaign;
 use App\Services\CampaignService;
+use App\Services\ConfigService;
 use App\Services\ContactService;
 use App\Services\CreditHistoryService;
 use App\Services\EmailService;
@@ -66,6 +67,11 @@ class SendEmailByCampaignListener implements ShouldQueue
     private $creditHistoryService;
 
     /**
+     * @var ConfigService
+     */
+    private $configService;
+
+    /**
      * @var int
      */
     private $creditReturn = 0;
@@ -89,6 +95,8 @@ class SendEmailByCampaignListener implements ShouldQueue
      * @param SendEmailScheduleLogService $sendEmailScheduleLogService
      * @param ContactService $contactService
      * @param UserService $userService
+     * @param CreditHistoryService $creditHistoryService
+     * @param ConfigService $configService
      */
     public function __construct(
         MailTemplateVariableService $mailTemplateVariableService,
@@ -99,7 +107,8 @@ class SendEmailByCampaignListener implements ShouldQueue
         SendEmailScheduleLogService $sendEmailScheduleLogService,
         ContactService $contactService,
         UserService $userService,
-        CreditHistoryService $creditHistoryService
+        CreditHistoryService $creditHistoryService,
+        ConfigService $configService
     )
     {
         $this->mailTemplateVariableService = $mailTemplateVariableService;
@@ -111,6 +120,7 @@ class SendEmailByCampaignListener implements ShouldQueue
         $this->contactService = $contactService;
         $this->userService = $userService;
         $this->creditHistoryService = $creditHistoryService;
+        $this->configService = $configService;
 
     }
 
@@ -126,9 +136,19 @@ class SendEmailByCampaignListener implements ShouldQueue
         $campaign = $event->campaign;
         $creditNumberSendEmail = $event->creditNumberSendEmail;
 
-        $this->smtpAccountService->setSmtpAccountForSendEmail($campaign->smtpAccount);
         $user = $campaign->user;
+        $config = $this->configService->findConfigByKey('smtp_auto');
 
+        if($user->can_add_smtp_account == 1 || $config->value == 0){
+            if(!empty($campaign->smtpAccount)){
+                $smtpAccount = $campaign->smtpAccount;
+            }else{
+                $smtpAccount = $this->smtpAccountService->getRandomSmtpAccountAdmin();
+            }
+        }else{
+            $smtpAccount = $this->smtpAccountService->getRandomSmtpAccountAdmin();
+        }
+        $this->smtpAccountService->setSmtpAccountForSendEmail($smtpAccount);
         $sendEmailScheduleLog = $this->sendEmailScheduleLogService->create([
             'campaign_uuid' => $campaign->getKey(),
             'start_time' => Carbon::now()

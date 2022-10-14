@@ -28,4 +28,15 @@ class SmtpAccountService extends AbstractService
         Config::set('mail.from.address', $smtpAccount->mail_from_address);
         Config::set('mail.from.name', $smtpAccount->mail_from_name);
     }
+
+    /**
+     * @return mixed
+     */
+    public function getRandomSmtpAccountAdmin()
+    {
+        return $this->model->select('smtp_accounts.*')
+            ->join('users', 'users.uuid', '=', 'smtp_accounts.user_uuid')
+            ->join('role_user', 'role_user.user_uuid', '=', 'users.uuid')
+            ->where('role_user.role_uuid', config('user.default_admin_role_uuid'))->inRandomOrder()->first();
+    }
 }
