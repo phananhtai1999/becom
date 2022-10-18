@@ -382,3 +382,6 @@ Route::get('/support-multiple-languages', [SupportMultipleLanguagesController::c
 // Mail Open Tracking
 Route::get('/mail-open-tracking/{id}', [MailSendingHistoryController::class, 'mailOpenTracking'])->name('mail-open-tracking');
 
+Route::group(['as' => 'chart.'], function (){
+    Route::get('/chart/email', [MailSendingHistoryController::class, 'emailTrackingChart'])->name('emailTrackingChart');
+});
