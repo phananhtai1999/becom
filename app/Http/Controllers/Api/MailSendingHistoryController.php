@@ -17,6 +17,7 @@ use App\Http\Resources\MailSendingHistoryResource;
 use App\Services\MailOpenTrackingService;
 use App\Services\MailSendingHistoryService;
 use App\Services\MyMailSendingHistoryService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class MailSendingHistoryController extends AbstractRestAPIController
@@ -111,9 +112,9 @@ class MailSendingHistoryController extends AbstractRestAPIController
      */
     public function emailTrackingChart(ChartRequest $request)
     {
-        $startDate = $request->get('start_date');
-        $endDate = $request->get('end_date');
-        $groupBy = $request->get('group_by');
+        $startDate = $request->get('start_date', Carbon::now()->toDateString());
+        $endDate = $request->get('end_date', Carbon::now()->toDateString());
+        $groupBy = $request->get('group_by', 'hour');
         $total = $this->service->getTotalEmailTrackingChart($startDate, $endDate);
         $emailsChart = $this->service->getEmailTrackingChart($startDate, $endDate, $groupBy);
         return $this->sendOkJsonResponse([

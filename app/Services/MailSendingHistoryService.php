@@ -97,7 +97,7 @@ class MailSendingHistoryService extends AbstractService
         $result = [];
         $check = true;
 
-        if($groupBy === "hour" || empty($groupBy)){
+        if($groupBy === "hour"){
             $emailsChart = $this->createQueryGetEmailChart("%Y-%m-%d %H:00:00", $startDate, $endDate);
             $endDate = Carbon::parse($endDate)->endOfDay();
 
@@ -119,12 +119,11 @@ class MailSendingHistoryService extends AbstractService
             $emailsChart = $this->createQueryGetEmailChart("%Y-%m", $startDate, $endDate);
             $endDate = Carbon::parse($endDate);
 
-            while($startDate < $endDate){
+            while($startDate <= $endDate){
                 $times[] = $startDate->format('Y-m');
                 $startDate = $startDate->addMonth();
             }
         }
-
         foreach ($times as $time){
             if(!empty($emailsChart)){
                 foreach ($emailsChart as $emailChart){
