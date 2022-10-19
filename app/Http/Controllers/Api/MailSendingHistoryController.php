@@ -8,6 +8,7 @@ use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestEditTrait;
 use App\Http\Controllers\Traits\RestStoreTrait;
+use App\Http\Requests\ChartRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MailSendingHistoryRequest;
 use App\Http\Requests\UpdateMailSendingHistoryRequest;
@@ -16,6 +17,7 @@ use App\Http\Resources\MailSendingHistoryResource;
 use App\Services\MailOpenTrackingService;
 use App\Services\MailSendingHistoryService;
 use App\Services\MyMailSendingHistoryService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class MailSendingHistoryController extends AbstractRestAPIController
@@ -102,5 +104,22 @@ class MailSendingHistoryController extends AbstractRestAPIController
 
         return response(file_get_contents(public_path('tracking_pixel/pixel.gif')))
             ->header('content-type', 'image/gif');
+    }
+
+    /**
+     * @param ChartRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function emailTrackingChart(ChartRequest $request)
+    {
+        $startDate = $request->get('start_date', Carbon::today());
+        $endDate = $request->get('end_date', Carbon::today());
+        $groupBy = $request->get('group_by', 'hour');
+        $total = $this->service->getTotalEmailTrackingChart($startDate, $endDate);
+        $emailsChart = $this->service->getEmailTrackingChart($startDate, $endDate, $groupBy);
+        return $this->sendOkJsonResponse([
+            'data' => $emailsChart,
+            'total' => $total[0]
+        ]);
     }
 }
