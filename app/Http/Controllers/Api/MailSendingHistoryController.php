@@ -112,8 +112,8 @@ class MailSendingHistoryController extends AbstractRestAPIController
      */
     public function emailTrackingChart(ChartRequest $request)
     {
-        $startDate = $request->get('start_date', Carbon::now()->toDateString());
-        $endDate = $request->get('end_date', Carbon::now()->toDateString());
+        $startDate = $request->get('start_date', Carbon::today());
+        $endDate = $request->get('end_date', Carbon::today());
         $groupBy = $request->get('group_by', 'hour');
         $total = $this->service->getTotalEmailTrackingChart($startDate, $endDate);
         $emailsChart = $this->service->getEmailTrackingChart($startDate, $endDate, $groupBy);

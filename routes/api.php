@@ -382,6 +382,8 @@ Route::get('/support-multiple-languages', [SupportMultipleLanguagesController::c
 // Mail Open Tracking
 Route::get('/mail-open-tracking/{id}', [MailSendingHistoryController::class, 'mailOpenTracking'])->name('mail-open-tracking');
 
-Route::group(['as' => 'chart.'], function (){
-    Route::get('/chart/email', [MailSendingHistoryController::class, 'emailTrackingChart'])->name('emailTrackingChart');
+Route::group(['middleware' => ['auth:api'], 'as' => 'chart.'], function (){
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/chart/email', [MailSendingHistoryController::class, 'emailTrackingChart'])->name('emailTrackingChart');
+    });
 });
