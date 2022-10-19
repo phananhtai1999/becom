@@ -9,6 +9,7 @@ use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\UpdateUserRequest;
+use App\Http\Requests\UserChartRequest;
 use App\Http\Requests\UserRequest;
 use App\Http\Resources\UserResourceCollection;
 use App\Http\Resources\UserResource;
@@ -60,8 +61,7 @@ class UserController extends AbstractRestAPIController
     {
         $request = app($this->storeRequest);
 
-        if (empty($request->can_add_smtp_account))
-        {
+        if (empty($request->can_add_smtp_account)) {
             $model = $this->service->create(array_merge($request->all(), [
                 'password' => Hash::make($request->get('password')),
                 'can_add_smtp_account' => '0'
@@ -95,8 +95,7 @@ class UserController extends AbstractRestAPIController
 
         $data = $request->all();
 
-        if ($request->can_add_smtp_account == '0')
-        {
+        if ($request->can_add_smtp_account == '0') {
             $data = array_merge($data, [
                 'can_add_smtp_account' => '0'
             ]);
@@ -136,8 +135,7 @@ class UserController extends AbstractRestAPIController
 
         $data = $request->all();
 
-        if ($request->can_add_smtp_account == '0')
-        {
+        if ($request->can_add_smtp_account == '0') {
             $data = array_merge($data, [
                 'can_add_smtp_account' => '0'
             ]);
@@ -209,10 +207,32 @@ class UserController extends AbstractRestAPIController
     public function ban($id)
     {
         $model = $this->service->findOrFailById($id);
-        $this->service->update($model,['banned_at' => Carbon::now()]);
+        $this->service->update($model, ['banned_at' => Carbon::now()]);
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
         );
+    }
+
+    /**
+     * @param UserChartRequest $request
+     * @return JsonResponse
+     */
+    public function userTrackingChart(UserChartRequest $request)
+    {
+        $startDate = $request->get('start_date', Carbon::today());
+        $endDate = $request->get('end_date', Carbon::today());
+        $groupBy = $request->get('group_by', 'hour');
+        $totalUserActives = $this->service->totalUserActives($startDate, $endDate);
+        $totalUserBanned = $this->service->totalUserBanned($startDate, $endDate);
+        $userTrackingChart = $this->service->userTrackingChart($groupBy, $startDate, $endDate);
+
+        return $this->sendOkJsonResponse([
+            'data' => $userTrackingChart,
+            'total' => [
+                'active' => $totalUserActives,
+                'banned' => $totalUserBanned
+            ]
+        ]);
     }
 }

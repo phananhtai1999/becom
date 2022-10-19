@@ -381,6 +381,12 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'import-file.'], function ()
 Route::get('/support-multiple-languages', [SupportMultipleLanguagesController::class, 'setCookie'])->name('set-cookie');
 // Mail Open Tracking
 Route::get('/mail-open-tracking/{id}', [MailSendingHistoryController::class, 'mailOpenTracking'])->name('mail-open-tracking');
+//Chart
+Route::group(['middleware' => ['auth:api'], 'as' => 'chart.'], function () {
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/user-chart', [UserController::class, 'userTrackingChart'])->name('user-tracking-chart');
+    });
+});
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'chart.'], function (){
     Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
