@@ -214,6 +214,10 @@ class UserController extends AbstractRestAPIController
         );
     }
 
+    /**
+     * @param UserChartRequest $request
+     * @return JsonResponse
+     */
     public function userTrackingChart(UserChartRequest $request)
     {
         $startDate = $request->get('start_date', Carbon::today());
