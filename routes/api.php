@@ -381,4 +381,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'import-file.'], function ()
 Route::get('/support-multiple-languages', [SupportMultipleLanguagesController::class, 'setCookie'])->name('set-cookie');
 // Mail Open Tracking
 Route::get('/mail-open-tracking/{id}', [MailSendingHistoryController::class, 'mailOpenTracking'])->name('mail-open-tracking');
+//User Chart
+Route::get('/user-tracking-chart', [UserController::class, 'userTrackingChart'])->name('user-tracking-chart');
+
 
