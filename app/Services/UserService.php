@@ -103,6 +103,17 @@ class UserService extends AbstractService
             ->get()->count();
     }
 
+    public function queryUser($startDate, $endDate, $dateTime)
+    {
+        return DB::table('users')->selectRaw("DATE_FORMAT(created_at, '{$dateTime}') as label, count(uuid) - count(banned_at) as active, count(banned_at) as banned")
+            ->whereDate('created_at', '>=', $startDate)
+            ->whereDate('created_at', '<=', $endDate)
+            ->whereNull('deleted_at')
+            ->orderBy('label', 'ASC')
+            ->groupby('label')
+            ->get()->toArray();
+    }
+
     public function userTrackingChart($groupBy, $startDate, $endDate)
     {
         $parseStartDate = Carbon::parse($startDate);
@@ -110,14 +121,7 @@ class UserService extends AbstractService
         $result = [];
 
         if ($groupBy === 'hour') {
-            $users = DB::table('users')->select(DB::raw("DATE_FORMAT(created_at, '%Y-%m-%d %H:00:00') as label"), DB::raw("count(uuid) - count(banned_at) as active"), DB::raw('count(banned_at) as banned'))
-                ->whereDate('created_at', '>=', $startDate)
-                ->whereDate('created_at', '<=', $endDate)
-                ->where('deleted_at', null)
-                ->orderBy('label', 'ASC')
-                ->groupby('label')
-                ->get()->toArray();
-
+            $users = $this->queryUser($startDate, $endDate, "%Y-%m-%d %H:00:00");
             $parseEndDate = Carbon::parse($endDate)->endOfDay();
             while ($parseStartDate <= $parseEndDate) {
                 $dateTime[] = [
@@ -126,14 +130,7 @@ class UserService extends AbstractService
                 $parseStartDate->addHour();
             }
         } elseif ($groupBy === 'date') {
-            $users = DB::table('users')->select(DB::raw("DATE_FORMAT(created_at, '%Y-%m-%d') as label"), DB::raw("count(uuid)-count(banned_at) as active"), DB::raw('count(banned_at) as banned'))
-                ->whereDate('created_at', '>=', $startDate)
-                ->whereDate('created_at', '<=', $endDate)
-                ->where('deleted_at', null)
-                ->groupby('label')
-                ->orderBy('label', 'ASC')
-                ->get()->toArray();
-
+            $users = $this->queryUser($startDate, $endDate, "%Y-%m-%d");
             $parseEndDate = Carbon::parse($endDate);
             while ($parseStartDate <= $parseEndDate) {
                 $dateTime[] = [
@@ -142,14 +139,7 @@ class UserService extends AbstractService
                 $parseStartDate->addDay();
             }
         } elseif ($groupBy === 'month') {
-            $users = DB::table('users')->selectRaw("DATE_FORMAT(created_at, '%Y-%m') as label, count(uuid) - count(banned_at) as active, count(banned_at) as banned")
-                ->whereDate('created_at', '>=', $startDate)
-                ->whereDate('created_at', '<=', $endDate)
-                ->whereNull('deleted_at')
-                ->groupby('label')
-                ->orderBy('label', 'ASC')
-                ->get()->toArray();
-
+            $users = $this->queryUser($startDate, $endDate, "%Y-%m");
             $parseEndDate = Carbon::parse($endDate);
             while ($parseStartDate <= $parseEndDate) {
                 $dateTime[] = [
