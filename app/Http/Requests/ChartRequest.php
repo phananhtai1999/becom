@@ -24,9 +24,9 @@ class ChartRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'start_date' => 'nullable|before_or_equal:end_date',
-            'end_date' => 'nullable|after_or_equal:start_date',
-            'group_by' => 'nullable|in:hour,date,month'
+            'start_date' => ['nullable', 'before_or_equal:end_date'],
+            'end_date' => ['nullable', 'after_or_equal:start_date'],
+            'group_by' => ['nullable', 'in:hour,date,month']
         ];
     }
 }

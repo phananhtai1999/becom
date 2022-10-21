@@ -103,6 +103,12 @@ class UserService extends AbstractService
             ->get()->count();
     }
 
+    /**
+     * @param $startDate
+     * @param $endDate
+     * @param $dateTime
+     * @return array
+     */
     public function queryUser($startDate, $endDate, $dateTime)
     {
         return DB::table('users')->selectRaw("DATE_FORMAT(created_at, '{$dateTime}') as label, count(uuid) - count(banned_at) as active, count(banned_at) as banned")
@@ -114,7 +120,13 @@ class UserService extends AbstractService
             ->get()->toArray();
     }
 
-    public function userTrackingChart($groupBy, $startDate, $endDate)
+    /**
+     * @param $groupBy
+     * @param $startDate
+     * @param $endDate
+     * @return array
+     */
+    public function userChart($groupBy, $startDate, $endDate)
     {
         $parseStartDate = Carbon::parse($startDate);
         $dateTime = [];
