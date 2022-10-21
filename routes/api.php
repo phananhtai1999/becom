@@ -384,12 +384,8 @@ Route::get('/mail-open-tracking/{id}', [MailSendingHistoryController::class, 'ma
 //Chart
 Route::group(['middleware' => ['auth:api'], 'as' => 'chart.'], function () {
     Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
-        Route::get('/user-chart', [UserController::class, 'userTrackingChart'])->name('user-tracking-chart');
-    });
-});
-
-Route::group(['middleware' => ['auth:api'], 'as' => 'chart.'], function (){
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
-        Route::get('/chart/email', [MailSendingHistoryController::class, 'emailTrackingChart'])->name('emailTrackingChart');
+        Route::get('/user-chart', [UserController::class, 'userChart'])->name('user-chart');
+        Route::get('/email-chart', [MailSendingHistoryController::class, 'emailChart'])->name('email-chart');
+        Route::get('/credit-chart', [CreditHistoryController::class, 'creditChart'])->name('credit-chart');
     });
 });

@@ -110,7 +110,7 @@ class MailSendingHistoryController extends AbstractRestAPIController
      * @param ChartRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function emailTrackingChart(ChartRequest $request)
+    public function emailChart(ChartRequest $request)
     {
         $startDate = $request->get('start_date', Carbon::today());
         $endDate = $request->get('end_date', Carbon::today());

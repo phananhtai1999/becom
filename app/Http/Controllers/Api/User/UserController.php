@@ -7,9 +7,9 @@ use App\Events\SendEmailVerifyEmailEvent;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
+use App\Http\Requests\ChartRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\UpdateUserRequest;
-use App\Http\Requests\UserChartRequest;
 use App\Http\Requests\UserRequest;
 use App\Http\Resources\UserResourceCollection;
 use App\Http\Resources\UserResource;
@@ -215,20 +215,20 @@ class UserController extends AbstractRestAPIController
     }
 
     /**
-     * @param UserChartRequest $request
+     * @param ChartRequest $request
      * @return JsonResponse
      */
-    public function userTrackingChart(UserChartRequest $request)
+    public function userChart(ChartRequest $request)
     {
         $startDate = $request->get('start_date', Carbon::today());
         $endDate = $request->get('end_date', Carbon::today());
         $groupBy = $request->get('group_by', 'hour');
         $totalUserActives = $this->service->totalUserActives($startDate, $endDate);
         $totalUserBanned = $this->service->totalUserBanned($startDate, $endDate);
-        $userTrackingChart = $this->service->userTrackingChart($groupBy, $startDate, $endDate);
+        $userChart = $this->service->userChart($groupBy, $startDate, $endDate);
 
         return $this->sendOkJsonResponse([
-            'data' => $userTrackingChart,
+            'data' => $userChart,
             'total' => [
                 'active' => $totalUserActives,
                 'banned' => $totalUserBanned
