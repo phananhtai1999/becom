@@ -9,6 +9,7 @@ use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Requests\CampaignLinkTrackingRequest;
 use App\Http\Requests\CampaignRequest;
+use App\Http\Requests\ChartRequest;
 use App\Http\Requests\IncrementCampaignTrackingRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\LoadAnalyticDataRequest;
@@ -515,5 +516,30 @@ class CampaignController extends AbstractRestAPIController
         }
 
         return $this->sendValidationFailedJsonResponse(["errors" => ['campaign_uuid' => __('messages.campaign_invalid')]]);
+    }
+
+    /**
+     * @param ChartRequest $request
+     * @return JsonResponse
+     */
+    public function campaignChart(ChartRequest $request)
+    {
+        $startDate = $request->get('start_date', Carbon::today());
+        $endDate = $request->get('end_date', Carbon::today());
+        $groupBy = $request->get('group_by', 'hour');
+
+        $totalActive = $this->service->getTotalActiveCampaignChart($startDate, $endDate);
+        $totalRunning = $this->sendEmailScheduleLogService->getTotalRunningCampaignChart($startDate, $endDate);
+
+        $campaignsChart = $this->service->getCampaignChart($startDate, $endDate, $groupBy);
+
+        return $this->sendOkJsonResponse([
+            'data' => $campaignsChart,
+            'total' => [
+                'running' => $totalRunning,
+                'active' => $totalActive
+            ]
+        ]);
+
     }
 }
