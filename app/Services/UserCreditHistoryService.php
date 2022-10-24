@@ -29,14 +29,16 @@ class UserCreditHistoryService extends AbstractService
     /**
      * @param $startDate
      * @param $endDate
-     * @return \Illuminate\Support\Collection
+     * @return bool|int
      */
     public function totalCreditAdded($startDate, $endDate)
     {
-        return DB::table('user_credit_histories')->selectRaw('SUM(credit) as sum')
+        $totalCreditAdded = DB::table('user_credit_histories')->selectRaw('SUM(credit) as sum')
             ->whereDate('created_at', '>=', $startDate)
             ->whereDate('created_at', '<=', $endDate)
             ->whereNull('deleted_at')
             ->get();
+
+        return !empty($totalCreditAdded['0']->sum) ? $totalCreditAdded['0']->sum : 0;
     }
 }
