@@ -27,4 +27,16 @@ class SendEmailScheduleLogService extends AbstractService
         return true;
     }
 
+    /**
+     * @param $startDate
+     * @param $endDate
+     * @return mixed
+     */
+    public function getTotalRunningCampaignChart($startDate, $endDate)
+    {
+        return $this->model->whereDate('updated_at', '>=', $startDate)
+            ->whereDate('updated_at', '<=', $endDate)
+            ->where('is_running', true)->count();
+    }
+
 }
