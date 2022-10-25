@@ -138,8 +138,8 @@ class CreditHistoryController extends AbstractRestAPIController
         return $this->sendOkJsonResponse([
             'data' => $data,
             'total' => [
-                'add' => $totalCreditAdded['0']->sum,
-                'used' => $totalCreditUsed['0']->sum,
+                'add' => $totalCreditAdded,
+                'used' => $totalCreditUsed,
             ]
         ]);
     }
