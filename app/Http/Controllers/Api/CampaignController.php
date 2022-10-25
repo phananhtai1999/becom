@@ -197,9 +197,14 @@ class CampaignController extends AbstractRestAPIController
 
         $model->contactLists()->attach($request->get('contact_list', []));
 
-        return $this->sendCreatedJsonResponse(
-            $this->service->resourceToData($this->resourceClass, $model)
-        );
+        $contactsNumberSendEmail = count($this->contactService->getContactsSendEmail($model->uuid));
+        $creditNumberSendEmail = $contactsNumberSendEmail * config('credit.default_credit') * $model->number_email_per_user;
+
+        return $this->sendCreatedJsonResponse([
+            'data' => array_merge($this->service->resourceToData($this->resourceClass, $model)['data'], [
+                'total_credits' => $creditNumberSendEmail
+            ])
+        ]);
     }
 
     /**
@@ -304,9 +309,14 @@ class CampaignController extends AbstractRestAPIController
 
         $model->contactLists()->attach($request->get('contact_list', []));
 
-        return $this->sendCreatedJsonResponse(
-            $this->service->resourceToData($this->resourceClass, $model)
-        );
+        $contactsNumberSendEmail = count($this->contactService->getContactsSendEmail($model->uuid));
+        $creditNumberSendEmail = $contactsNumberSendEmail * config('credit.default_credit') * $model->number_email_per_user;
+
+        return $this->sendCreatedJsonResponse([
+            'data' => array_merge($this->service->resourceToData($this->resourceClass, $model)['data'], [
+                'total_credits' => $creditNumberSendEmail
+            ])
+        ]);
     }
 
     /**
