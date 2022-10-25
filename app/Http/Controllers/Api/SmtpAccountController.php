@@ -7,6 +7,7 @@ use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestEditTrait;
+use App\Http\Requests\ChartRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MySmtpAccountRequest;
 use App\Http\Requests\SendMailBySmtpAccountUuidRequest;
@@ -23,6 +24,7 @@ use App\Services\MySmtpAccountService;
 use App\Services\SmtpAccountService;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -236,5 +238,23 @@ class SmtpAccountController extends AbstractRestAPIController
             return $this->sendValidationFailedJsonResponse(["smtp_account" => $e->getMessage()]);
         }
 
+    }
+
+    /**
+     * @param ChartRequest $request
+     * @return JsonResponse
+     */
+    public function smtpAccountChart(ChartRequest $request)
+    {
+        $startDate = $request->get('start_date', Carbon::today());
+        $endDate = $request->get('end_date', Carbon::today());
+        $groupBy = $request->get('group_by', 'hour');
+        $data = $this->service->smtpAccountChart($groupBy, $startDate, $endDate);
+        $total = $this->service->totalActiveAndInactiveSmtpAccountChart($startDate, $endDate);
+
+        return $this->sendOkJsonResponse([
+            'data' => $data,
+            'total' => $total['0']
+        ]);
     }
 }
