@@ -124,13 +124,13 @@ class CreditHistoryController extends AbstractRestAPIController
         $groupBy = $request->get('group_by', 'hour');
         $totalCreditAdded = $this->userCreditHistoryService->totalCreditAdded($startDate, $endDate);
         $totalCreditUsed = $this->service->totalCreditUsed($startDate, $endDate);
-
         $data = $this->service->creditChart($groupBy, $startDate, $endDate);
+
         return $this->sendOkJsonResponse([
             'data' => $data,
             'total' => [
-                'add' => $totalCreditAdded['0']->sum,
-                'used' => $totalCreditUsed['0']->sum,
+                'add' => $totalCreditAdded,
+                'used' => $totalCreditUsed,
             ]
         ]);
     }
