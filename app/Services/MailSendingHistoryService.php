@@ -163,8 +163,7 @@ class MailSendingHistoryService extends AbstractService
     {
         return $this->model->selectRaw("COUNT(IF( status = 'sent', 1, NULL ) ) as sent, COUNT(IF( status = 'opened', 1, NULL ) ) as opened")
             ->whereDate('updated_at', '>=', $startDate)
-            ->whereDate('updated_at', '<=', $endDate)
-            ->whereNull('deleted_at')->get();
+            ->whereDate('updated_at', '<=', $endDate)->get();
 
     }
 
@@ -178,7 +177,6 @@ class MailSendingHistoryService extends AbstractService
         return $this->model->selectRaw("date_format(updated_at, '{$dateFormat}') as label,  COUNT(IF( status = 'sent', 1, NULL ) ) as sent, COUNT(IF( status = 'opened', 1, NULL ) ) as opened")
             ->whereDate('updated_at', '>=', $startDate)
             ->whereDate('updated_at', '<=', $endDate)
-            ->whereNull('deleted_at')
             ->groupBy('label')
             ->orderBy('label', 'ASC')
             ->get()->toArray();
