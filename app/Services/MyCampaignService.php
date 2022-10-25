@@ -205,7 +205,6 @@ class MyCampaignService extends AbstractService
             ->whereDate('updated_at', '>=', $startDate)
             ->whereDate('updated_at', '<=', $endDate)
             ->where('user_uuid', auth()->user()->getKey())
-            ->whereNull('deleted_at')
             ->groupBy('label')
             ->orderBy('label', 'ASC')
             ->get()->toArray();
