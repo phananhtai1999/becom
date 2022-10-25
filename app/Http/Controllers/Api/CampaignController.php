@@ -540,6 +540,28 @@ class CampaignController extends AbstractRestAPIController
                 'active' => $totalActive
             ]
         ]);
+    }
 
+    /**
+     * @param ChartRequest $request
+     * @return JsonResponse
+     */
+    public function myCampaignChart(ChartRequest $request)
+    {
+        $startDate = $request->get('start_date', Carbon::today());
+        $endDate = $request->get('end_date', Carbon::today());
+        $groupBy = $request->get('group_by', 'hour');
+
+        $totalActiveMyCampaign = $this->myService->getTotalActiveMyCampaignChart($startDate, $endDate);
+        $totalRunningMyCampaign = $this->sendEmailScheduleLogService->getTotalRunningMyCampaignChart($startDate, $endDate);
+        $myCampaignsChart = $this->myService->getMyCampaignChart($startDate, $endDate, $groupBy);
+
+        return $this->sendOkJsonResponse([
+            'data' => $myCampaignsChart,
+            'total' => [
+                'running' => $totalRunningMyCampaign,
+                'active' => $totalActiveMyCampaign
+            ]
+        ]);
     }
 }
