@@ -25,12 +25,12 @@ class MailSendingHistoryController extends AbstractRestAPIController
     use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestStoreTrait, RestEditTrait;
 
     /**
-     * @var
+     * @var MyMailSendingHistoryService
      */
     protected $myService;
 
     /**
-     * @var
+     * @var MailOpenTrackingService
      */
     protected $mailOpenTrackingService;
 
@@ -115,11 +115,28 @@ class MailSendingHistoryController extends AbstractRestAPIController
         $startDate = $request->get('start_date', Carbon::today());
         $endDate = $request->get('end_date', Carbon::today());
         $groupBy = $request->get('group_by', 'hour');
+
         $total = $this->service->getTotalEmailTrackingChart($startDate, $endDate);
         $emailsChart = $this->service->getEmailTrackingChart($startDate, $endDate, $groupBy);
+
         return $this->sendOkJsonResponse([
             'data' => $emailsChart,
             'total' => $total[0]
+        ]);
+    }
+
+    public function myEmailChart(ChartRequest $request)
+    {
+        $startDate = $request->get('start_date', Carbon::today());
+        $endDate = $request->get('end_date', Carbon::today());
+        $groupBy = $request->get('group_by', 'hour');
+
+        $myTotal = $this->myService->getTotalMyEmailTrackingChart($startDate, $endDate);
+        $myEmailsChart = $this->myService->getMyEmailTrackingChart($startDate, $endDate, $groupBy);
+
+        return $this->sendOkJsonResponse([
+            'data' => $myEmailsChart,
+            'total' => $myTotal[0]
         ]);
     }
 }
