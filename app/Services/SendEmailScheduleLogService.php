@@ -39,4 +39,20 @@ class SendEmailScheduleLogService extends AbstractService
             ->where('is_running', true)->count();
     }
 
+    /**
+     * @param $startDate
+     * @param $endDate
+     * @return mixed
+     */
+    public function getTotalRunningMyCampaignChart($startDate, $endDate)
+    {
+         return $this->model->join('campaigns', 'campaigns.uuid', '=', 'send_email_schedule_logs.campaign_uuid')
+            ->whereDate('send_email_schedule_logs.updated_at', '>=', $startDate)
+            ->whereDate('send_email_schedule_logs.updated_at', '<=', $endDate)
+             ->where([
+                 'campaigns.user_uuid' => auth()->user()->getKey(),
+                 'send_email_schedule_logs.is_running' => true
+             ])->count();
+    }
+
 }

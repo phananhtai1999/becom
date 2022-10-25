@@ -389,4 +389,8 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'chart.'], function () {
         Route::get('/campaign-chart', [CampaignController::class, 'campaignChart'])->name('campaign-chart');
         Route::get('/credit-chart', [CreditHistoryController::class, 'creditChart'])->name('credit-chart');
     });
+
+    Route::group(['as' => 'my.'], function () {
+        Route::get('/my/campaign-chart', [CampaignController::class, 'myCampaignChart'])->name('my-campaign-chart');
+    });
 });
