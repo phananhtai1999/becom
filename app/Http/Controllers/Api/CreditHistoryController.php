@@ -15,6 +15,7 @@ use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestEditTrait;
 use App\Services\CreditHistoryService;
 use App\Services\MyCreditHistoryService;
+use App\Services\MyUserCreditHistoryService;
 use App\Services\UserCreditHistoryService;
 use Illuminate\Support\Carbon;
 
@@ -38,14 +39,21 @@ class CreditHistoryController extends AbstractRestAPIController
     protected $userCreditHistoryService;
 
     /**
+     * @var
+     */
+    protected $myAddCreditHistoryService;
+
+    /**
      * @param CreditHistoryService $service
      * @param MyCreditHistoryService $myService
      * @param UserCreditHistoryService $userCreditHistoryService
+     * @param MyUserCreditHistoryService $myAddCreditHistoryService
      */
     public function __construct(
         CreditHistoryService $service,
         MyCreditHistoryService $myService,
-        UserCreditHistoryService $userCreditHistoryService
+        UserCreditHistoryService $userCreditHistoryService,
+        MyUserCreditHistoryService $myAddCreditHistoryService
     )
     {
         $this->service = $service;
@@ -56,6 +64,7 @@ class CreditHistoryController extends AbstractRestAPIController
         $this->editRequest = UpdateCreditHistoryRequest::class;
         $this->indexRequest = IndexRequest::class;
         $this->myService = $myService;
+        $this->myAddCreditHistoryService = $myAddCreditHistoryService;
     }
 
     /**
@@ -131,6 +140,24 @@ class CreditHistoryController extends AbstractRestAPIController
             'total' => [
                 'add' => $totalCreditAdded,
                 'used' => $totalCreditUsed,
+            ]
+        ]);
+    }
+
+    public function myCreditChart(ChartRequest $request)
+    {
+        $startDate = $request->get('start_date', Carbon::today());
+        $endDate = $request->get('end_date', Carbon::today());
+        $groupBy = $request->get('group_by', 'hour');
+        $totalMyCreditAdded = $this->myAddCreditHistoryService->myTotalCreditAdded($startDate, $endDate);
+        $totalMyCreditUsed = $this->myService->myTotalCreditUsed($startDate, $endDate);
+        $data = $this->myService->myCreditChart($groupBy, $startDate, $endDate);
+
+        return $this->sendOkJsonResponse([
+            'data' => $data,
+            'total' => [
+                'add' => $totalMyCreditAdded,
+                'used' => $totalMyCreditUsed,
             ]
         ]);
     }
