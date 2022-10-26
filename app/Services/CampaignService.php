@@ -235,11 +235,11 @@ class CampaignService extends AbstractService
      * @param $endDate
      * @return mixed
      */
-    public function getTotalActiveCampaignChart($startDate, $endDate)
+    public function getTotalActiveAndOtherCampaignChart($startDate, $endDate)
     {
-        return $this->model->whereDate('updated_at', '>=', $startDate)
-            ->whereDate('updated_at', '<=', $endDate)
-            ->where('status', 'active')->count();
+        return $this->model->selectRaw("COUNT(IF( status = 'active', 1, NULL ) ) as active, COUNT(IF( status <> 'active', 1, NULL ) ) as other")
+            ->whereDate('updated_at', '>=', $startDate)
+            ->whereDate('updated_at', '<=', $endDate)->get()->toArray();
     }
 
 }

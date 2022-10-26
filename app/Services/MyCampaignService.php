@@ -244,13 +244,11 @@ class MyCampaignService extends AbstractService
      * @param $endDate
      * @return mixed
      */
-    public function getTotalActiveMyCampaignChart($startDate, $endDate)
+    public function getTotalActiveAndOtherMyCampaignChart($startDate, $endDate)
     {
-        return $this->model->whereDate('updated_at', '>=', $startDate)
+        return $this->model->selectRaw("COUNT(IF( status = 'active', 1, NULL ) ) as active, COUNT(IF( status <> 'active', 1, NULL ) ) as other")
+            ->whereDate('updated_at', '>=', $startDate)
             ->whereDate('updated_at', '<=', $endDate)
-            ->where([
-                'user_uuid'=> auth()->user()->getKey(),
-                'status' => 'active'
-            ])->count();
+            ->where('user_uuid', auth()->user()->getKey())->get()->toArray();
     }
 }
