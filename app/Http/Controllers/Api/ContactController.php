@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
+use App\Http\Requests\ChartRequest;
 use App\Http\Requests\ContactRequest;
 use App\Http\Requests\ImportExcelOrCsvFileRequest;
 use App\Http\Requests\ImportJsonFileRequest;
@@ -15,6 +16,7 @@ use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Services\ContactService;
+use App\Services\MyContactListService;
 use App\Services\MyContactService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\File;
@@ -33,16 +35,24 @@ class ContactController extends AbstractRestAPIController
     protected $myService;
 
     /**
+     * @var
+     */
+    protected $myContactListService;
+
+    /**
      * @param ContactService $service
      * @param MyContactService $myService
+     * @param MyContactListService $myContactListService
      */
     public function __construct(
         ContactService $service,
-        MyContactService $myService
+        MyContactService $myService,
+        MyContactListService $myContactListService
     )
     {
         $this->service = $service;
         $this->myService = $myService;
+        $this->myContactListService = $myContactListService;
         $this->resourceCollectionClass = ContactResourceCollection::class;
         $this->resourceClass = ContactResource::class;
         $this->storeRequest = ContactRequest::class;
@@ -414,6 +424,28 @@ class ContactController extends AbstractRestAPIController
         return $this->sendOkJsonResponse([
             'data' => [
                 "slug" => $url,
+            ]
+        ]);
+    }
+
+    /**
+     * @param ChartRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function myContactChart(ChartRequest $request)
+    {
+        $startDate = $request->get('start_date', Carbon::today());
+        $endDate = $request->get('end_date', Carbon::today());
+        $groupBy = $request->get('group_by', 'hour');
+        $totalMyContact = $this->myService->myTotalContact($startDate, $endDate);
+        $totalMyContactList = $this->myContactListService->myTotalContactList($startDate, $endDate);
+        $data = $this->myService->myContactChart($groupBy, $startDate, $endDate);
+
+        return $this->sendOkJsonResponse([
+            'data' => $data,
+            'total' => [
+                'contact' => $totalMyContact,
+                'list' => $totalMyContactList,
             ]
         ]);
     }
