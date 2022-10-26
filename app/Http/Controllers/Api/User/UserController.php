@@ -223,16 +223,12 @@ class UserController extends AbstractRestAPIController
         $startDate = $request->get('start_date', Carbon::today());
         $endDate = $request->get('end_date', Carbon::today());
         $groupBy = $request->get('group_by', 'hour');
-        $totalUserActives = $this->service->totalUserActives($startDate, $endDate);
-        $totalUserBanned = $this->service->totalUserBanned($startDate, $endDate);
+        $totalBannedAndActive = $this->service->totalBannedAndActive($startDate, $endDate);
         $userChart = $this->service->userChart($groupBy, $startDate, $endDate);
 
         return $this->sendOkJsonResponse([
             'data' => $userChart,
-            'total' => [
-                'active' => $totalUserActives,
-                'banned' => $totalUserBanned
-            ]
+            'total' => $totalBannedAndActive['0']
         ]);
     }
 }
