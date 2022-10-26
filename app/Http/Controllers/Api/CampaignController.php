@@ -538,16 +538,16 @@ class CampaignController extends AbstractRestAPIController
         $endDate = $request->get('end_date', Carbon::today());
         $groupBy = $request->get('group_by', 'hour');
 
-        $totalActive = $this->service->getTotalActiveCampaignChart($startDate, $endDate);
+        $totalActiveAndOther = $this->service->getTotalActiveAndOtherCampaignChart($startDate, $endDate);
         $totalRunning = $this->sendEmailScheduleLogService->getTotalRunningCampaignChart($startDate, $endDate);
-
         $campaignsChart = $this->service->getCampaignChart($startDate, $endDate, $groupBy);
 
         return $this->sendOkJsonResponse([
             'data' => $campaignsChart,
             'total' => [
                 'running' => $totalRunning,
-                'active' => $totalActive
+                'active' => $totalActiveAndOther[0]['active'],
+                'other' => $totalActiveAndOther[0]['other']
             ]
         ]);
     }
@@ -562,7 +562,7 @@ class CampaignController extends AbstractRestAPIController
         $endDate = $request->get('end_date', Carbon::today());
         $groupBy = $request->get('group_by', 'hour');
 
-        $totalActiveMyCampaign = $this->myService->getTotalActiveMyCampaignChart($startDate, $endDate);
+        $totalActiveAndOtherMyCampaign = $this->myService->getTotalActiveAndOtherMyCampaignChart($startDate, $endDate);
         $totalRunningMyCampaign = $this->sendEmailScheduleLogService->getTotalRunningMyCampaignChart($startDate, $endDate);
         $myCampaignsChart = $this->myService->getMyCampaignChart($startDate, $endDate, $groupBy);
 
@@ -570,7 +570,8 @@ class CampaignController extends AbstractRestAPIController
             'data' => $myCampaignsChart,
             'total' => [
                 'running' => $totalRunningMyCampaign,
-                'active' => $totalActiveMyCampaign
+                'active' => $totalActiveAndOtherMyCampaign[0]['active'],
+                'other' => $totalActiveAndOtherMyCampaign[0]['other']
             ]
         ]);
     }
