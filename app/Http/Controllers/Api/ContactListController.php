@@ -121,25 +121,54 @@ class ContactListController extends AbstractRestAPIController
 
     /**
      * @param $id
+     * @param UpdateContactListRequest $request
      * @return \Illuminate\Http\JsonResponse
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
+     * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      */
-    public function edit($id)
+    public function edit($id, UpdateContactListRequest $request)
     {
-        $request = app($this->editRequest);
-
         $model = $this->service->findOrFailById($id);
+        $file = $request->file;
+        if (!empty($file)) {
+            try {
+                $extension = $file->getClientOriginalExtension();
+                if ($extension == 'xlsx' || $extension == 'xcsv') {
+                    $import = $this->contactService->importExcelOrCsvFile($file);
+                } else {
+                    $import = $this->contactService->importJsonFile($file);
+                }
+                if (is_array($import)) {
+                    $this->service->update($model, $request->all());
+                    $contactUuid = $this->service->findContactKeyByContactList($model);
+                    $model->contacts()->sync(array_merge($request->get('contact', $contactUuid), $contactUuid, $import['data']));
 
-        $this->service->update($model, $request->all());
+                    if ($import['have_error_data'] === true) {
 
-        $contactUuid = $this->service->findContactKeyByContactList($model);
+                        return $this->sendOkJsonResponse([
+                                'data' => $this->service->resourceToData($this->resourceClass, $model)['data'],
+                                'errors' => $import['errors'],
+                                'error_data' => $import['error_data'],
+                                'slug' => $import['slug']
+                            ]
+                        );
+                    }
 
-        if ($contactUuid == null) {
-            $model->contacts()->sync($request->get('contact', []));
-        } else {
-            $model->contacts()->sync($request->get('contact', $contactUuid));
+                    return $this->sendOkJsonResponse(
+                        $this->service->resourceToData($this->resourceClass, $model)
+                    );
+                } elseif ($import === false) {
+
+                    return $this->sendValidationFailedJsonResponse();
+                }
+            } catch (\ErrorException $errorException) {
+
+                return $this->sendValidationFailedJsonResponse();
+            }
         }
+        $this->service->update($model, $request->all());
+        $contactUuid = $this->service->findContactKeyByContactList($model);
+        $model->contacts()->sync($request->get('contact', $contactUuid));
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -239,22 +268,57 @@ class ContactListController extends AbstractRestAPIController
      * @param UpdateMyContactListRequest $request
      * @param $id
      * @return \Illuminate\Http\JsonResponse
+     * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      */
     public function editMyContactList(UpdateMyContactListRequest $request, $id)
     {
         $model = $this->myService->findMyContactListByKeyOrAbort($id);
+        $file = $request->file;
+        if (!empty($file)) {
+            try {
+                $extension = $file->getClientOriginalExtension();
+                if ($extension == 'xlsx' || $extension == 'xcsv') {
+                    $import = $this->contactService->importExcelOrCsvFile($file);
+                } else {
+                    $import = $this->contactService->importJsonFile($file);
+                }
+                if (is_array($import)) {
+                    $this->service->update($model, array_merge($request->all(), [
+                        'user_uuid' => auth()->user()->getkey(),
+                    ]));
+                    $contactUuid = $this->service->findContactKeyByContactList($model);
+                    $model->contacts()->sync(array_merge($request->get('contact', $contactUuid), $contactUuid, $import['data']));
+
+                    if ($import['have_error_data'] === true) {
+
+                        return $this->sendOkJsonResponse([
+                                'data' => $this->service->resourceToData($this->resourceClass, $model)['data'],
+                                'errors' => $import['errors'],
+                                'error_data' => $import['error_data'],
+                                'slug' => $import['slug']
+                            ]
+                        );
+                    }
+
+                    return $this->sendOkJsonResponse(
+                        $this->service->resourceToData($this->resourceClass, $model)
+                    );
+                } elseif ($import === false) {
+
+                    return $this->sendValidationFailedJsonResponse();
+                }
+            } catch (\ErrorException $errorException) {
+
+                return $this->sendValidationFailedJsonResponse();
+            }
+        }
 
         $this->service->update($model, array_merge($request->all(), [
             'user_uuid' => auth()->user()->getkey(),
         ]));
-
         $contactUuid = $this->service->findContactKeyByContactList($model);
-
-        if ($contactUuid == null) {
-            $model->contacts()->sync($request->get('contact', []));
-        } else {
-            $model->contacts()->sync($request->get('contact', $contactUuid));
-        }
+        $model->contacts()->sync($request->get('contact', $contactUuid));
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)

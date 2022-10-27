@@ -24,6 +24,7 @@ class UpdateContactListRequest extends AbstractRequest
     public function rules()
     {
         return [
+            'file' => ['nullable', 'mimes:xlsx,csv,json,js'],
             'name' => ['string'],
             'contact' => ['nullable', 'array', 'min:1'],
             'contact.*' => ['numeric', 'min:1', 'exists:contacts,uuid'],

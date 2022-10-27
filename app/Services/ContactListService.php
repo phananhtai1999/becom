@@ -14,21 +14,16 @@ class ContactListService extends AbstractService
 
     /**
      * @param $model
-     * @return array|void
+     * @return array
      */
     public function findContactKeyByContactList($model)
     {
         $contacts = $model->contacts()->get();
-
-        if (empty($contacts)) {
-
-            return [];
-        } else {
-            foreach ($contacts as $contact) {
-                $contactUuid[] = $contact->uuid;
-
-                return $contactUuid;
-            }
+        $contactUuid = [];
+        foreach ($contacts as $contact) {
+            $contactUuid[] = $contact->uuid;
         }
+
+        return $contactUuid;
     }
 }
