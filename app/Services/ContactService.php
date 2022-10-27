@@ -183,4 +183,71 @@ class ContactService extends AbstractService
             return false;
         }
     }
+
+    /**
+     * @param $file
+     * @return array
+     */
+    public function importJsonFile($file)
+    {
+        $getKey = [];
+        $getFileContents = json_decode(file_get_contents($file));
+        $rules = [
+            'email' => ['required', 'string', 'email:rfc,dns'],
+            'first_name' => ['required', 'string'],
+            'last_name' => ['required', 'string'],
+            'middle_name' => ['nullable', 'string'],
+            'phone' => ['nullable', 'numeric'],
+            'dob' => ['nullable', 'date_format:Y-m-d'],
+            'sex' => ['nullable', 'string'],
+            'city' => ['nullable', 'string'],
+            'country' => ['nullable', 'string'],
+        ];
+
+        foreach ($getFileContents as $key => $content) {
+            $data = [
+                'email' => $content->email,
+                'last_name' => $content->last_name,
+                'first_name' => $content->first_name,
+                'middle_name' => $content->middle_name,
+                'phone' => $content->phone,
+                'sex' => $content->sex,
+                'dob' => $content->dob,
+                'city' => $content->city,
+                'country' => $content->country,
+                'user_uuid' => auth()->user()->getkey()
+            ];
+            $validator = Validator::make($data, $rules);
+            if ($validator->fails()) {
+                $error[] = $validator->errors()->merge(['Row fail' => __('messages.error_data') . ' ' . ($key + 1)]);
+                $jsonDataFail[] = $data;
+                continue;
+            }
+            $createData = $this->model->create($data);
+            $getKey[] = $createData->uuid;
+        }
+
+        if (!empty($error)) {
+            if (!File::exists(public_path('data_file_error'))) {
+                File::makeDirectory(public_path('data_file_error'));
+            }
+            $errorData = json_encode($jsonDataFail);
+            $fileName = 'import_failed_record_' . uniqid() . '_' . Carbon::today()->toDateString() . '.json';
+            $fileStorePath = public_path('/data_file_error/' . $fileName);
+            File::put($fileStorePath, $errorData);
+
+            return [
+                'have_error_data' => true,
+                'data' => $getKey,
+                'errors' => $error,
+                'error_data' => $jsonDataFail,
+                'slug' => 'data_file_error/' . $fileName
+            ];
+        }
+
+        return [
+            'have_error_data' => false,
+            'data' => $getKey
+        ];
+    }
 }

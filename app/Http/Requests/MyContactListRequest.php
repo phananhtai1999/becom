@@ -25,6 +25,7 @@ class MyContactListRequest extends AbstractRequest
     public function rules()
     {
         return [
+            'file' => ['nullable', 'mimes:xlsx,csv,json,js'],
             'name' => ['required', 'string'],
             'contact' => ['nullable', 'array', 'min:1'],
             'contact.*' => ['numeric', 'min:1', Rule::exists('contacts', 'uuid')->where(function ($query) {

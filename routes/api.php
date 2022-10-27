@@ -315,7 +315,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'contact-list.'], function (
 
     Route::group(['as' => 'my.'], function () {
         Route::get('/my/contact-lists', [ContactListController::class, 'indexMyContactList'])->name('index');
-        Route::post('/my/contact-list', [ContactListController::class, 'storeMyContactList'])->name('store');
+        Route::post('/my/contact-list', [ContactListController::class, 'storeMyContactListAndImportFile'])->name('store-my-contact-list-and-import-file');
         Route::get('/my/contact-list/{id}', [ContactListController::class, 'showMyContactList'])->name('show');
         Route::put('/my/contact-list/{id}', [ContactListController::class, 'editMyContactList'])->name('edit');
         Route::delete('/my/contact-list/{id}', [ContactListController::class, 'destroyMyContactList'])->name('destroy');

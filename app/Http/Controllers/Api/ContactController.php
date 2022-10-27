@@ -225,64 +225,12 @@ class ContactController extends AbstractRestAPIController
     public function importJsonFile(ImportJsonFileRequest $request)
     {
         try {
-            $file = $request->file;
-            $getFileContents = json_decode(file_get_contents($file));
-
-            $rules = [
-                'email' => ['required', 'string'],
-                'first_name' => ['required', 'string'],
-                'last_name' => ['required', 'string'],
-                'middle_name' => ['nullable', 'string'],
-                'phone' => ['nullable', 'numeric'],
-                'dob' => ['nullable', 'date_format:Y-m-d'],
-                'sex' => ['nullable', 'string'],
-                'city' => ['nullable', 'string'],
-                'country' => ['nullable', 'string'],
-            ];
-
-            foreach ($getFileContents as $key => $content) {
-
-                $data = [
-                    'email' => $content->email,
-                    'last_name' => $content->last_name,
-                    'first_name' => $content->first_name,
-                    'middle_name' => $content->middle_name,
-                    'phone' => $content->phone,
-                    'sex' => $content->sex,
-                    'dob' => $content->dob,
-                    'city' => $content->city,
-                    'country' => $content->country,
-                    'user_uuid' => auth()->user()->getkey()
-                ];
-
-                $validator = Validator::make($data, $rules);
-
-                if ($validator->fails()) {
-                    $error[] = $validator->errors()->merge(['Row fail' => __('messages.error_data') . ' ' . ($key + 1)]);
-                    $jsonDataFail[] = $data;
-                    continue;
-                }
-
-                $this->service->create($data);
-            }
-
-            if (!empty($error)) {
-                if (!File::exists(public_path('data_file_error'))) {
-                    File::makeDirectory(public_path('data_file_error'));
-                }
-
-                $errorData = json_encode($jsonDataFail);
-                $fileName = 'import_failed_record_' . uniqid() . '_' . Carbon::today()->toDateString() . '.json';
-                $fileStorePath = public_path('/data_file_error/' . $fileName);
-                File::put($fileStorePath, $errorData);
-
-                return response()->json([
-                    'status' => true,
-                    'locale' => app()->getLocale(),
-                    'message' => __('messages.success'),
-                    'errors' => $error,
-                    'error_data' => $jsonDataFail,
-                    'slug' => 'data_file_error/' . $fileName
+            $import = $this->service->importJsonFile($request->file);
+            if ($import['have_error_data'] === true) {
+                return $this->sendOkJsonResponse([
+                    'errors' => $import['errors'],
+                    'error_data' => $import['error_data'],
+                    'slug' => $import['slug']
                 ]);
             }
 
