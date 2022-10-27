@@ -38,7 +38,7 @@ class CreditHistoryService extends AbstractService
      */
     public function queryUserUseCreditHistory($startDate, $endDate, $dateTime)
     {
-        return DB::table('user_use_credit_histories')->selectRaw("DATE_FORMAT(created_at, '{$dateTime}') as label, '0' as added, SUM(credit) as used ")
+        return DB::table('user_use_credit_histories')->selectRaw("DATE_FORMAT(created_at, '{$dateTime}') as label, '0' as 'add', SUM(credit) as used ")
             ->whereDate('created_at', '>=', $startDate)
             ->whereDate('created_at', '<=', $endDate)
             ->whereNull('deleted_at')
@@ -55,7 +55,7 @@ class CreditHistoryService extends AbstractService
      */
     public function queryUserCreditHistory($startDate, $endDate, $dateTime)
     {
-        return DB::table('user_credit_histories')->selectRaw("DATE_FORMAT(created_at, '{$dateTime}') as label, SUM(credit) as added, '0' as used")
+        return DB::table('user_credit_histories')->selectRaw("DATE_FORMAT(created_at, '{$dateTime}') as label, SUM(credit) as 'add', '0' as used")
             ->whereDate('created_at', '>=', $startDate)
             ->whereDate('created_at', '<=', $endDate)
             ->whereNull('deleted_at')
@@ -116,7 +116,7 @@ class CreditHistoryService extends AbstractService
                         $check = true;
                         $data [] = [
                             'label' => $userCreditHistory->label,
-                            'added' => $userCreditHistory->added,
+                            'add' => $userCreditHistory->add,
                             'used' => $userCreditHistory->used,
                         ];
                         break;
@@ -127,14 +127,14 @@ class CreditHistoryService extends AbstractService
                 if (!($check)) {
                     $data [] = [
                         'label' => $value['date_time'],
-                        'added' => 0,
+                        'add' => 0,
                         'used' => 0,
                     ];
                 }
             } else {
                 $data [] = [
                     'label' => $value['date_time'],
-                    'added' => 0,
+                    'add' => 0,
                     'used' => 0,
                 ];
             }
@@ -147,8 +147,8 @@ class CreditHistoryService extends AbstractService
                         $check = true;
                         $result [] = [
                             'label' => $item['label'],
-                            'added' => $item['added'],
-                            'used' => $userUseCreditHistory->used,
+                            'add' => (int)$item['add'],
+                            'used' => (int)$userUseCreditHistory->used,
                         ];
                         break;
                     } else {
@@ -158,15 +158,15 @@ class CreditHistoryService extends AbstractService
                 if (!($check)) {
                     $result [] = [
                         'label' => $item['label'],
-                        'added' => $item['added'],
-                        'used' => $item['used'],
+                        'add' => (int)$item['add'],
+                        'used' => (int)$item['used'],
                     ];
                 }
             } else {
                 $result [] = [
                     'label' => $item['label'],
-                    'added' => $item['added'],
-                    'used' => $item['used'],
+                    'add' => (int)$item['add'],
+                    'used' => (int)$item['used'],
                 ];
             }
         }

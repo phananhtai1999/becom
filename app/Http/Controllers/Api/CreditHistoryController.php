@@ -138,12 +138,16 @@ class CreditHistoryController extends AbstractRestAPIController
         return $this->sendOkJsonResponse([
             'data' => $data,
             'total' => [
-                'add' => $totalCreditAdded,
-                'used' => $totalCreditUsed,
+                'add' => (int)$totalCreditAdded,
+                'used' => (int)$totalCreditUsed,
             ]
         ]);
     }
 
+    /**
+     * @param ChartRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function myCreditChart(ChartRequest $request)
     {
         $startDate = $request->get('start_date', Carbon::today());
@@ -156,8 +160,8 @@ class CreditHistoryController extends AbstractRestAPIController
         return $this->sendOkJsonResponse([
             'data' => $data,
             'total' => [
-                'add' => $totalMyCreditAdded,
-                'used' => $totalMyCreditUsed,
+                'add' => (int)$totalMyCreditAdded,
+                'used' => (int)$totalMyCreditUsed,
             ]
         ]);
     }
