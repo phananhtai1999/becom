@@ -306,7 +306,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'contact-list.'], function (
 
     Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
         Route::get('/contact-lists', [ContactListController::class, 'index'])->name('index');
-        Route::post('/contact-list', [ContactListController::class, 'store'])->name('store');
+        Route::post('/contact-list', [ContactListController::class, 'storeAndImportFile'])->name('store-and-importFile');
         Route::get('/contact-list/{id}', [ContactListController::class, 'show'])->name('show');
         Route::put('/contact-list/{id}', [ContactListController::class, 'edit'])->name('edit');
         Route::delete('/contact-list/{id}', [ContactListController::class, 'destroy'])->name('destroy');
