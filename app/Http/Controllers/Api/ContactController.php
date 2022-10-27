@@ -21,9 +21,6 @@ use App\Services\MyContactService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Csv;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class ContactController extends AbstractRestAPIController
 {
@@ -203,133 +200,25 @@ class ContactController extends AbstractRestAPIController
 
     /**
      * @param ImportExcelOrCsvFileRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\JsonResponse|void
      * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      */
     public function importExcelOrCsvFile(ImportExcelOrCsvFileRequest $request)
     {
         try {
-            $file = $request->file;
-            $extension = $file->getClientOriginalExtension();
-
-            if ($extension == 'xlsx') {
-                $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
-            } else {
-                $reader = new \PhpOffice\PhpSpreadsheet\Reader\Csv();
-            }
-
-            $reader->setReadDataOnly(true);
-            $reader->setReadEmptyCells(false);
-            $spreadsheet = $reader->load($file);
-            $getActiveSheet = $spreadsheet->getActiveSheet()->toArray();
-
-            if (count($getActiveSheet) >= 2) {
-                $fields = array_shift($getActiveSheet);
-                $rules = [
-                    'email' => ['required', 'string', 'email:rfc,dns'],
-                    'first_name' => ['required', 'string'],
-                    'last_name' => ['required', 'string'],
-                    'middle_name' => ['nullable', 'string'],
-                    'phone' => ['nullable', 'numeric'],
-                    'dob' => ['nullable', 'date_format:Y-m-d'],
-                    'sex' => ['nullable', 'string'],
-                    'city' => ['nullable', 'string'],
-                    'country' => ['nullable', 'string'],
-                ];
-
-                foreach ($getActiveSheet as $key => $value) {
-
-                    $row = array_combine($fields, $value);
-                    if (is_integer($row['dob'])) {
-                        $data = [
-                            'email' => $row['email'],
-                            'first_name' => $row['first_name'],
-                            'last_name' => $row['last_name'],
-                            'middle_name' => $row['middle_name'],
-                            'phone' => $row['phone'],
-                            'sex' => $row['sex'],
-                            'dob' => date_format(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['dob']), 'Y-m-d'),
-                            'city' => $row['city'],
-                            'country' => $row['country'],
-                            'user_uuid' => auth()->user()->getkey()
-                        ];
-                    } else {
-                        $data = [
-                            'email' => $row['email'],
-                            'first_name' => $row['first_name'],
-                            'last_name' => $row['last_name'],
-                            'middle_name' => $row['middle_name'],
-                            'phone' => $row['phone'],
-                            'sex' => $row['sex'],
-                            'dob' => $row['dob'],
-                            'city' => $row['city'],
-                            'country' => $row['country'],
-                            'user_uuid' => auth()->user()->getkey()
-                        ];
-                    }
-
-                    $validator = Validator::make($data, $rules);
-                    if ($validator->fails()) {
-                        $error[] = $validator->errors()->merge(['Row fail' => __('messages.error_data') . ' ' . ($key + 2)]);
-                        $jsonDataFail[] = $data;
-                        continue;
-                    }
-
-                    $this->service->create($data);
-                }
-
-                if (!empty($error)) {
-                    if (!File::exists(public_path('data_file_error'))) {
-                        File::makeDirectory(public_path('data_file_error'));
-                    }
-
-                    if ($extension == 'xlsx') {
-                        $fileName = 'import_failed_record_' . uniqid() . '_' . Carbon::today()->toDateString() . '.xlsx';
-                    } else {
-                        $fileName = 'import_failed_record_' . uniqid() . '_' . Carbon::today()->toDateString() . '.csv';
-                    }
-                    $fileStorePath = public_path('/data_file_error/' . $fileName);
-
-                    //Write into Excel file
-                    $spreadsheet = new Spreadsheet();
-                    $sheet = $spreadsheet->getActiveSheet();
-                    $columnCoordinate = 1;
-                    $columnHeader = ['email', 'first_name', 'last_name', 'middle_name', 'phone', 'sex', 'dob', 'city', 'country'];
-                    foreach ($columnHeader as $value) {
-                        $sheet->setCellValueByColumnAndRow($columnCoordinate, 1, $value);
-                        $columnCoordinate = $columnCoordinate + 1;
-                    }
-
-                    for ($i = 0; $i < count($jsonDataFail); $i++) {
-                        unset($jsonDataFail[$i]['user_uuid']);
-                        $row = $jsonDataFail[$i];
-                        $columnCoordinateData = 1;
-                        foreach ($row as $value) {
-                            $sheet->setCellValueByColumnAndRow($columnCoordinateData, $i + 2, $value);
-                            $columnCoordinateData = $columnCoordinateData + 1;
-                        }
-                    }
-
-                    if ($extension == 'xlsx') {
-                        $writer = new Xlsx($spreadsheet);
-                    } else {
-                        $writer = new Csv($spreadsheet);
-                    }
-                    $writer->save($fileStorePath);
-
-                    return response()->json([
-                        'status' => true,
-                        'locale' => app()->getLocale(),
-                        'message' => __('messages.success'),
-                        'errors' => $error,
-                        'error_data' => $jsonDataFail,
-                        'slug' => 'data_file_error/' . $fileName
+            $import = $this->service->importExcelOrCsvFile($request->file);
+            if (is_array($import)) {
+                if ($import['have_error_data'] === true) {
+                    return $this->sendOkJsonResponse([
+                        'errors' => $import['errors'],
+                        'error_data' => $import['error_data'],
+                        'slug' => $import['slug']
                     ]);
                 }
 
                 return $this->sendOkJsonResponse();
-            } else {
+            } elseif ($import === false) {
 
                 return $this->sendValidationFailedJsonResponse();
             }
@@ -346,64 +235,12 @@ class ContactController extends AbstractRestAPIController
     public function importJsonFile(ImportJsonFileRequest $request)
     {
         try {
-            $file = $request->file;
-            $getFileContents = json_decode(file_get_contents($file));
-
-            $rules = [
-                'email' => ['required', 'string'],
-                'first_name' => ['required', 'string'],
-                'last_name' => ['required', 'string'],
-                'middle_name' => ['nullable', 'string'],
-                'phone' => ['nullable', 'numeric'],
-                'dob' => ['nullable', 'date_format:Y-m-d'],
-                'sex' => ['nullable', 'string'],
-                'city' => ['nullable', 'string'],
-                'country' => ['nullable', 'string'],
-            ];
-
-            foreach ($getFileContents as $key => $content) {
-
-                $data = [
-                    'email' => $content->email,
-                    'last_name' => $content->last_name,
-                    'first_name' => $content->first_name,
-                    'middle_name' => $content->middle_name,
-                    'phone' => $content->phone,
-                    'sex' => $content->sex,
-                    'dob' => $content->dob,
-                    'city' => $content->city,
-                    'country' => $content->country,
-                    'user_uuid' => auth()->user()->getkey()
-                ];
-
-                $validator = Validator::make($data, $rules);
-
-                if ($validator->fails()) {
-                    $error[] = $validator->errors()->merge(['Row fail' => __('messages.error_data') . ' ' . ($key + 1)]);
-                    $jsonDataFail[] = $data;
-                    continue;
-                }
-
-                $this->service->create($data);
-            }
-
-            if (!empty($error)) {
-                if (!File::exists(public_path('data_file_error'))) {
-                    File::makeDirectory(public_path('data_file_error'));
-                }
-
-                $errorData = json_encode($jsonDataFail);
-                $fileName = 'import_failed_record_' . uniqid() . '_' . Carbon::today()->toDateString() . '.json';
-                $fileStorePath = public_path('/data_file_error/' . $fileName);
-                File::put($fileStorePath, $errorData);
-
-                return response()->json([
-                    'status' => true,
-                    'locale' => app()->getLocale(),
-                    'message' => __('messages.success'),
-                    'errors' => $error,
-                    'error_data' => $jsonDataFail,
-                    'slug' => 'data_file_error/' . $fileName
+            $import = $this->service->importJsonFile($request->file);
+            if ($import['have_error_data'] === true) {
+                return $this->sendOkJsonResponse([
+                    'errors' => $import['errors'],
+                    'error_data' => $import['error_data'],
+                    'slug' => $import['slug']
                 ]);
             }
 

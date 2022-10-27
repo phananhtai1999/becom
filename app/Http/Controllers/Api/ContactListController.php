@@ -14,6 +14,7 @@ use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Services\ContactListService;
+use App\Services\ContactService;
 use App\Services\MyContactListService;
 
 class ContactListController extends AbstractRestAPIController
@@ -26,16 +27,24 @@ class ContactListController extends AbstractRestAPIController
     protected $myService;
 
     /**
+     * @var
+     */
+    protected $contactService;
+
+    /**
      * @param ContactListService $service
      * @param MyContactListService $myService
+     * @param ContactService $contactService
      */
     public function __construct(
         ContactListService $service,
-        MyContactListService $myService
+        MyContactListService $myService,
+        ContactService $contactService
     )
     {
         $this->service = $service;
         $this->myService = $myService;
+        $this->contactService = $contactService;
         $this->resourceCollectionClass = ContactListResourceCollection::class;
         $this->resourceClass = ContactListResource::class;
         $this->storeRequest = ContactListRequest::class;
@@ -44,13 +53,56 @@ class ContactListController extends AbstractRestAPIController
     }
 
     /**
+     * @param ContactListRequest $request
      * @return \Illuminate\Http\JsonResponse
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
+     * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      */
-    public function store()
+    public function storeAndImportFile(ContactListRequest $request)
     {
-        $request = app($this->storeRequest);
+        $file = $request->file;
+        if (!empty($file)) {
+            try {
+                $extension = $file->getClientOriginalExtension();
+                if ($extension == 'xlsx' || $extension == 'xcsv') {
+                    $import = $this->contactService->importExcelOrCsvFile($file);
+                } else {
+                    $import = $this->contactService->importJsonFile($file);
+                }
+                if (is_array($import)) {
+                    if (empty($request->user_uuid)) {
+                        $data = array_merge($request->all(), [
+                            'user_uuid' => auth()->user()->getkey(),
+                        ]);
+                    } else {
+                        $data = $request->all();
+                    }
+
+                    $model = $this->service->create($data);
+                    $model->contacts()->attach(array_merge($request->get('contact', []), $import['data']));
+                    if ($import['have_error_data'] === true) {
+
+                        return $this->sendCreatedJsonResponse([
+                                'data' => $this->service->resourceToData($this->resourceClass, $model)['data'],
+                                'errors' => $import['errors'],
+                                'error_data' => $import['error_data'],
+                                'slug' => $import['slug']
+                            ]
+                        );
+                    }
+
+                    return $this->sendCreatedJsonResponse(
+                        $this->service->resourceToData($this->resourceClass, $model)
+                    );
+                } elseif ($import === false) {
+
+                    return $this->sendValidationFailedJsonResponse();
+                }
+            } catch (\ErrorException $errorException) {
+
+                return $this->sendValidationFailedJsonResponse();
+            }
+        }
 
         if (empty($request->user_uuid)) {
             $data = array_merge($request->all(), [
@@ -59,9 +111,7 @@ class ContactListController extends AbstractRestAPIController
         } else {
             $data = $request->all();
         }
-
         $model = $this->service->create($data);
-
         $model->contacts()->attach($request->get('contact', []));
 
         return $this->sendCreatedJsonResponse(
@@ -120,13 +170,51 @@ class ContactListController extends AbstractRestAPIController
     /**
      * @param MyContactListRequest $request
      * @return \Illuminate\Http\JsonResponse
+     * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      */
-    public function storeMyContactList(MyContactListRequest $request)
+    public function storeMyContactListAndImportFile(MyContactListRequest $request)
     {
+        $file = $request->file;
+        if (!empty($file)) {
+            try {
+                $extension = $file->getClientOriginalExtension();
+                if ($extension == 'xlsx' || $extension == 'xcsv') {
+                    $import = $this->contactService->importExcelOrCsvFile($file);
+                } else {
+                    $import = $this->contactService->importJsonFile($file);
+                }
+                if (is_array($import)) {
+                    $model = $this->service->create(array_merge($request->all(), [
+                        'user_uuid' => auth()->user()->getkey(),
+                    ]));
+                    $model->contacts()->attach(array_merge($request->get('contact', []), $import['data']));
+                    if ($import['have_error_data'] === true) {
+
+                        return $this->sendCreatedJsonResponse([
+                                'data' => $this->service->resourceToData($this->resourceClass, $model)['data'],
+                                'errors' => $import['errors'],
+                                'error_data' => $import['error_data'],
+                                'slug' => $import['slug']
+                            ]
+                        );
+                    }
+
+                    return $this->sendCreatedJsonResponse(
+                        $this->service->resourceToData($this->resourceClass, $model)
+                    );
+                } elseif ($import === false) {
+
+                    return $this->sendValidationFailedJsonResponse();
+                }
+            } catch (\ErrorException $errorException) {
+
+                return $this->sendValidationFailedJsonResponse();
+            }
+        }
         $model = $this->service->create(array_merge($request->all(), [
             'user_uuid' => auth()->user()->getkey(),
         ]));
-
         $model->contacts()->attach($request->get('contact', []));
 
         return $this->sendCreatedJsonResponse(
@@ -188,7 +276,7 @@ class ContactListController extends AbstractRestAPIController
      * @param $id
      * @param $contact_id
      * @return \Illuminate\Http\JsonResponse
-     * 
+     *
      */
     public function removeContactFromContactList($id, $contact_id)
     {
@@ -201,7 +289,7 @@ class ContactListController extends AbstractRestAPIController
      * @param $id
      * @param $contact_id
      * @return \Illuminate\Http\JsonResponse
-     * 
+     *
      */
     public function removeMyContactFromContactList($id, $contact_id)
     {
