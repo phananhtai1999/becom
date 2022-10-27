@@ -222,7 +222,7 @@ class CampaignService extends AbstractService
         $string = $type === "month" ? "-01" : "";
         $todayCampaignTableSubQuery = $yesterdayCampaignTableSubQuery = "(SELECT date_format(updated_at, '{$dateFormat}') as date_field, COUNT(uuid) as createCampaign
                   from campaigns
-                  where date(updated_at) >= '{$startDate}' and date(updated_at) <= '{$endDate}'
+                  where date(updated_at) >= '{$startDate}' and date(updated_at) <= '{$endDate}' and deleted_at is NULL
                   GROUP By date_field)";
         return DB::table(DB::raw("$todayCampaignTableSubQuery as today"))->selectRaw("today.date_field, today.createCampaign, (today.createCampaign - yest.createCampaign) as increase")
             ->leftJoin(DB::raw("$yesterdayCampaignTableSubQuery as yest"), 'yest.date_field', '=', DB::raw("date_format(concat(today.date_field, '$string') - INTERVAL 1 {$type}, '{$dateFormat}')"))
