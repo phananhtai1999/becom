@@ -211,13 +211,14 @@ class ContactController extends AbstractRestAPIController
             if (is_array($import)) {
                 if ($import['have_error_data'] === true) {
                     return $this->sendOkJsonResponse([
+                        'data' => $import['success_data'],
                         'errors' => $import['errors'],
                         'error_data' => $import['error_data'],
                         'slug' => $import['slug']
                     ]);
                 }
 
-                return $this->sendOkJsonResponse();
+                return $this->sendOkJsonResponse(['data' => $import['success_data']]);
             } elseif ($import === false) {
 
                 return $this->sendValidationFailedJsonResponse();

@@ -73,7 +73,7 @@ class ContactService extends AbstractService
         $reader->setReadEmptyCells(false);
         $spreadsheet = $reader->load($file);
         $getActiveSheet = $spreadsheet->getActiveSheet()->toArray();
-        $getKey = [];
+        $getKey = $getData = [];
         if (count($getActiveSheet) >= 2) {
             $fields = array_shift($getActiveSheet);
             $rules = [
@@ -125,6 +125,7 @@ class ContactService extends AbstractService
                 }
                 $createData = $this->model->create($data);
                 $getKey[] = $createData->uuid;
+                $getData[] = $createData;
             }
 
             if (!empty($error)) {
@@ -168,6 +169,7 @@ class ContactService extends AbstractService
 
                 return [
                     'have_error_data' => true,
+                    'success_data' => $getData,
                     'data' => $getKey,
                     'errors' => $error,
                     'error_data' => $jsonDataFail,
@@ -177,6 +179,7 @@ class ContactService extends AbstractService
 
             return [
                 'have_error_data' => false,
+                'success_data' => $getData,
                 'data' => $getKey
             ];
         } else {
