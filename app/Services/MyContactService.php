@@ -62,10 +62,11 @@ class MyContactService extends AbstractService
      */
     public function queryMyContact($startDate, $endDate, $dateTime)
     {
-        return DB::table('contacts')->selectRaw("DATE_FORMAT(created_at, '{$dateTime}') as label, count(uuid) as contact, '0' as list")
+        return DB::table('contacts')->selectRaw("DATE_FORMAT(created_at, '{$dateTime}') as label, count(uuid) as contact, 0 as list")
             ->whereDate('created_at', '>=', $startDate)
             ->whereDate('created_at', '<=', $endDate)
             ->whereNull('deleted_at')
+            ->where('user_uuid',auth()->user()->getkey())
             ->orderBy('label', 'ASC')
             ->groupby('label')
             ->get()->toArray();
@@ -79,10 +80,11 @@ class MyContactService extends AbstractService
      */
     public function queryMyContactList($startDate, $endDate, $dateTime)
     {
-        return DB::table('contact_lists')->selectRaw("DATE_FORMAT(created_at, '{$dateTime}') as label, '0' as contact, count(uuid) as list")
+        return DB::table('contact_lists')->selectRaw("DATE_FORMAT(created_at, '{$dateTime}') as label, 0 as contact, count(uuid) as list")
             ->whereDate('created_at', '>=', $startDate)
             ->whereDate('created_at', '<=', $endDate)
             ->whereNull('deleted_at')
+            ->where('user_uuid',auth()->user()->getkey())
             ->orderBy('label', 'ASC')
             ->groupby('label')
             ->get()->toArray();
@@ -97,10 +99,11 @@ class MyContactService extends AbstractService
      */
     public function createQueryGetIncrease($startDate, $endDate, $dateFormat, $type)
     {
+        $currentUser = auth()->user()->getkey();
         $string = $type === "month" ? "-01" : "";
         $todaySmtpAccountTableSubQuery = $yesterdaySmtpAccountTableSubQuery = "(SELECT date_format(created_at, '{$dateFormat}') as date_field, COUNT(uuid) as createContact
                   from contacts
-                  where date(created_at) >= '{$startDate}' and date(created_at) <= '{$endDate}'
+                  where date(created_at) >= '{$startDate}' and date(created_at) <= '{$endDate}' and deleted_at is NULL and user_uuid = '{$currentUser}'
                   GROUP By date_field)";
 
         return DB::table(DB::raw("$todaySmtpAccountTableSubQuery as today"))->selectRaw("today.date_field, today.createContact, (today.createContact - yest.createContact) as increase")
