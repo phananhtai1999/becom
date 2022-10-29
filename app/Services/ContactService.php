@@ -40,7 +40,7 @@ class ContactService extends AbstractService
 
     /**
      * @param $campaignUuid
-     * @return mixed
+     * @return array
      */
     public function getContactsSendEmail($campaignUuid)
     {
