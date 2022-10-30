@@ -83,7 +83,7 @@ class SmtpAccountService extends AbstractService
         $string = $type === "month" ? "-01" : "";
         $todaySmtpAccountTableSubQuery = $yesterdaySmtpAccountTableSubQuery = "(SELECT date_format(created_at, '{$dateFormat}') as date_field, COUNT(uuid) as createSmtpAccount
                   from smtp_accounts
-                  where date(created_at) >= '{$startDate}' and date(created_at) <= '{$endDate}'
+                  where date(created_at) >= '{$startDate}' and date(created_at) <= '{$endDate}' and deleted_at is NULL
                   GROUP By date_field)";
 
         return DB::table(DB::raw("$todaySmtpAccountTableSubQuery as today"))->selectRaw("today.date_field, today.createSmtpAccount, (today.createSmtpAccount - yest.createSmtpAccount) as increase")

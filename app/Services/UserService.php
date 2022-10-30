@@ -114,7 +114,7 @@ class UserService extends AbstractService
         $string = $type === "month" ? "-01" : "";
         $todayUserTableSubQuery = $yesterdayUserTableSubQuery = "(SELECT date_format(created_at, '{$dateFormat}') as date_field, COUNT(uuid) as createUser
                   from users
-                  where date(created_at) >= '{$startDate}' and date(created_at) <= '{$endDate}'
+                  where date(created_at) >= '{$startDate}' and date(created_at) <= '{$endDate}' and deleted_at is NULL
                   GROUP By date_field)";
 
         return DB::table(DB::raw("$todayUserTableSubQuery as today"))->selectRaw("today.date_field, today.createUser, (today.createUser - yest.createUser) as increase")
