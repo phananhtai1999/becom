@@ -40,19 +40,39 @@ class ContactService extends AbstractService
 
     /**
      * @param $campaignUuid
-     * @return mixed
+     * @return array
      */
     public function getContactsSendEmail($campaignUuid)
     {
-        return $this->model->select('contacts.*')
+        $contactsCampaign = $this->model->select('contacts.*')
             ->join('contact_contact_list', 'contact_contact_list.contact_uuid', '=', 'contacts.uuid')
             ->join('contact_lists', 'contact_lists.uuid', '=', 'contact_contact_list.contact_list_uuid')
             ->join('campaign_contact_list', 'campaign_contact_list.contact_list_uuid', '=', 'contact_lists.uuid')
             ->join('campaigns', 'campaigns.uuid', '=', 'campaign_contact_list.campaign_uuid')
-            ->where('campaigns.uuid', $campaignUuid)
-            ->whereIn('contacts.uuid', function ($query) {
-                $query->selectRaw('MIN(uuid)')->from('contacts')->groupBy('email');
-            })->get();
+            ->where('campaigns.uuid', $campaignUuid)->get();
+
+        $resultContacts = [];
+        $checkEmailExist = true;
+        foreach ($contactsCampaign as $contactCampaign){
+            if(empty($resultContacts)){
+                $resultContacts[] = $contactCampaign;
+            }else{
+                foreach ($resultContacts as $value){
+                    if($contactCampaign->email == $value->email){
+                        $checkEmailExist = true;
+                        break;
+                    }else{
+                        $checkEmailExist = false;
+                    }
+                }
+
+                if(!$checkEmailExist){
+                    $resultContacts[] = $contactCampaign;
+                }
+            }
+        }
+
+        return $resultContacts;
     }
 
     /**
