@@ -24,7 +24,7 @@ class UpdateConfigRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'key' => ['string', 'unique:configs,key'],
+            'key' => ['string', 'unique:configs,key,'.$this->id .',uuid,deleted_at,NULL'],
             'value' => ['nullable', 'string'],
             'default_value' => ['nullable', 'string'],
         ];

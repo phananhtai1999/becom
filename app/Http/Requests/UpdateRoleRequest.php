@@ -24,7 +24,7 @@ class UpdateRoleRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'name' => ['string', 'unique:roles,name'],
+            'name' => ['string', 'unique:roles,name,'.$this->id .',uuid,deleted_at,NULL'],
         ];
     }
 }

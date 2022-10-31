@@ -24,8 +24,8 @@ class UpdateUserRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'username' => ['string', 'unique:users,username'],
-            'email' => ['string', 'email:rfc,dns', 'unique:users,email'],
+            'username' => ['string', 'unique:users,username,'.$this->id .',uuid,deleted_at,NULL'],
+            'email' => ['string', 'email:rfc,dns', 'unique:users,email,'.$this->id .',uuid,deleted_at,NULL'],
             'password' => ['string', 'confirmed'],
             'first_name' => ['nullable', 'string'],
             'last_name' => ['nullable', 'string'],

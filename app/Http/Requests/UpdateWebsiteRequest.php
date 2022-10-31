@@ -24,7 +24,7 @@ class UpdateWebsiteRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'domain' => ['string', 'unique:websites,domain'],
+            'domain' => ['string', 'unique:websites,domain,'.$this->id .',uuid,deleted_at,NULL'],
             'user_uuid' => ['numeric', 'min:1', 'exists:users,uuid'],
             'name' => ['string'],
             'description' => ['string'],
