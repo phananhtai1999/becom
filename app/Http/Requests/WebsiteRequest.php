@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
+use Illuminate\Validation\Rule;
 
 class WebsiteRequest extends AbstractRequest
 {
@@ -24,7 +25,7 @@ class WebsiteRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'domain' => ['required', 'string', 'unique:websites,domain'],
+            'domain' => ['required', 'string', Rule::unique('websites')->whereNull('deleted_at')],
             'user_uuid' => ['nullable', 'numeric', 'min:1', 'exists:users,uuid'],
             'name' => ['required', 'string'],
             'description' => ['required', 'string'],

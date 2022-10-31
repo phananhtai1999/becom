@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
+use Illuminate\Validation\Rule;
 
 class RoleRequest extends AbstractRequest
 {
@@ -24,8 +25,8 @@ class RoleRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'name' => ['required', 'string', 'unique:roles,name'],
-            'slug' => ['nullable', 'string', 'unique:roles,slug'],
+            'name' => ['required', 'string', Rule::unique('roles')->whereNull('deleted_at')],
+            'slug' => ['nullable', 'string', Rule::unique('roles')->whereNull('deleted_at')],
         ];
     }
 }

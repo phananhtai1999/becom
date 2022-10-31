@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
+use Illuminate\Validation\Rule;
 
 class ConfigRequest extends AbstractRequest
 {
@@ -24,7 +25,7 @@ class ConfigRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'key' => ['required', 'string', 'unique:configs,key'],
+            'key' => ['required', 'string', Rule::unique('configs')->whereNull('deleted_at')],
             'value' => ['nullable', 'string'],
             'default_value' => ['nullable', 'string'],
         ];

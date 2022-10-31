@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
+use Illuminate\Validation\Rule;
 
 class UserRequest extends AbstractRequest
 {
@@ -24,10 +25,10 @@ class UserRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'username' => ['required', 'string', 'unique:users,username'],
+            'username' => ['required', 'string', Rule::unique('users')->whereNull('deleted_at')],
             'first_name' => ['nullable', 'string'],
             'last_name' => ['nullable', 'string'],
-            'email' => ['required', 'string', 'email:rfc,dns', 'unique:users,email'],
+            'email' => ['required', 'string', 'email:rfc,dns', Rule::unique('users')->whereNull('deleted_at')],
             'password' => ['required', 'string', 'confirmed'],
             'avatar_img' => ['nullable', 'string'],
             'cover_img' => ['nullable', 'string'],
