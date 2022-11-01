@@ -195,7 +195,7 @@ class CampaignController extends AbstractRestAPIController
         }
         $model = $this->service->create($data);
 
-        $model->contactLists()->attach($request->get('contact_list', []));
+        $model->contactLists()->attach($request->get('contact_list'));
 
         $contactsNumberSendEmail = count($this->contactService->getContactsSendEmail($model->uuid));
         $creditNumberSendEmail = $contactsNumberSendEmail * config('credit.default_credit') * $model->number_email_per_user;
@@ -221,14 +221,7 @@ class CampaignController extends AbstractRestAPIController
 
         $this->service->update($model, $request->all());
 
-        $contactListUuid = $this->service->findContactListKeyByCampaign($model);
-
-        if ($contactListUuid == null)
-        {
-            $model->contactLists()->sync($request->get('contact_list', []));
-        } else {
-            $model->contactLists()->sync($request->get('contact_list', $contactListUuid));
-        }
+        $model->contactLists()->sync($request->contact_list ?? $model->contactLists);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)

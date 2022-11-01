@@ -36,8 +36,8 @@ class UpdateCampaignRequest extends AbstractRequest
             'was_finished' => ['boolean'],
             'was_stopped_by_owner' => ['boolean'],
             'user_uuid' => ['numeric', 'min:1', 'exists:users,uuid'],
-            'contact_list' => ['nullable', 'array', 'min:1'],
-            'contacts_list.*' => ['numeric', 'min:1', 'exists:contact_lists,uuid'],
+            'contact_list' => ['array', 'min:1'],
+            'contact_list.*' => ['numeric', 'min:1', 'exists:contact_lists,uuid'],
         ];
     }
 }
