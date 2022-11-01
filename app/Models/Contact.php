@@ -53,7 +53,7 @@ class Contact extends AbstractModel
      */
     public function contactLists()
     {
-        return $this->belongsToMany(ContactList::class, 'contact_contact_list', 'contact_uuid', 'contact_list_uuid');
+        return $this->belongsToMany(ContactList::class, 'contact_contact_list', 'contact_uuid', 'contact_list_uuid')->withTimestamps();
     }
 
     /**

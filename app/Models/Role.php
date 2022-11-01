@@ -55,6 +55,6 @@ class Role extends AbstractModel
      */
     public function users()
     {
-        return $this->belongsToMany(User::class, 'role_user', 'role_uuid', 'user_uuid');
+        return $this->belongsToMany(User::class, 'role_user', 'role_uuid', 'user_uuid')->withTimestamps();
     }
 }
