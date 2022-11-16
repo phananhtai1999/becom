@@ -299,6 +299,10 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'contact.'], function () {
         Route::put('/my/contact/{id}', [ContactController::class, 'editMyContact'])->name('edit');
         Route::delete('/my/contact/{id}', [ContactController::class, 'destroyMyContact'])->name('destroy');
     });
+
+    Route::group(['middleware' => ['role:editor'], 'as' => 'editor.'], function () {
+        Route::get('/dynamic-content-contact', [ContactController::class, 'dynamicContentContact'])->name('dynamic-content-contact');
+    });
 });
 
 //Contact List
