@@ -19,8 +19,6 @@ use App\Services\ContactService;
 use App\Services\MyContactListService;
 use App\Services\MyContactService;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Validator;
 
 class ContactController extends AbstractRestAPIController
 {
@@ -284,6 +282,18 @@ class ContactController extends AbstractRestAPIController
             'total' => [
                 'contact' => $totalMyContact,
                 'list' => $totalMyContactList,
+            ]
+        ]);
+    }
+
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function dynamicContentContact()
+    {
+        return $this->sendOkJsonResponse([
+            'data' => [
+                'allow_fields' => config('dynamiccontentcontact')
             ]
         ]);
     }
