@@ -34,6 +34,7 @@ class Campaign extends AbstractModel
         'number_email_per_date',
         'number_email_per_user',
         'status',
+        'type',
         'smtp_account_uuid',
         'website_uuid',
         'user_uuid',
