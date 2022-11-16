@@ -19,10 +19,9 @@ class CheckCurrentRole
     public function handle(Request $request, Closure $next, $role)
     {
         $currentRoles = auth()->user()->roles;
-
+        $allowedRoles = array_slice(func_get_args(), 2);
         foreach ($currentRoles as $currentRole) {
-            if ($role == $currentRole->slug) {
-
+            if( in_array($currentRole->slug, $allowedRoles) ) {
                 return $next($request);
             }
         }

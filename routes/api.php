@@ -179,10 +179,13 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'mail-template.'], function 
 
     Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
         Route::get('/mail-templates', [MailTemplateController::class, 'index'])->name('index');
-        Route::post('/mail-template', [MailTemplateController::class, 'store'])->name('store');
         Route::get('/mail-template/{id}', [MailTemplateController::class, 'show'])->name('show');
-        Route::put('/mail-template/{id}', [MailTemplateController::class, 'edit'])->name('edit');
         Route::delete('/mail-template/{id}', [MailTemplateController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::group(['middleware' => ['role:admin,editor']], function () {
+        Route::post('/mail-template', [MailTemplateController::class, 'store'])->name('store');
+        Route::put('/mail-template/{id}', [MailTemplateController::class, 'edit'])->name('edit');
     });
 
     Route::group(['as' => 'my.'], function () {
@@ -332,10 +335,10 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'user-use-credit-history.'],
         Route::get('/credit-history/{id}', [CreditHistoryController::class, 'show'])->name('show');
     });
 
-     Route::group(['as' => 'my.'], function () {
+    Route::group(['as' => 'my.'], function () {
         Route::get('/my/credit-histories', [CreditHistoryController::class, 'indexMyCreditHistory'])->name('index');
         Route::get('/my/credit-history/{id}', [CreditHistoryController::class, 'showMyCreditHistory'])->name('show');
-     });
+    });
 });
 
 //Transaciton CreditHistory View
