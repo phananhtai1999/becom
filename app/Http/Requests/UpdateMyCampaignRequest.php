@@ -35,6 +35,7 @@ class UpdateMyCampaignRequest extends AbstractRequest
             'number_email_per_date' => ['numeric', 'min:1', 'lte:number_email_per_user'],
             'number_email_per_user' => ['numeric', 'min:1', 'gte:number_email_per_date'],
             'status' => ['string', 'in:active,banned'],
+            'type' => ['string', 'in:simple,birthday,scenario'],
             'smtp_account_uuid' => ['nullable', 'numeric', 'min:1', Rule::exists('smtp_accounts', 'uuid')->where(function ($query) {
 
                 return $query->where('user_uuid', auth()->user()->getkey())->whereNull('deleted_at');
