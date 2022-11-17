@@ -43,6 +43,7 @@ class Contact extends AbstractModel
      * @var string[]
      */
     protected $casts = [
+        'dob' => 'date',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
