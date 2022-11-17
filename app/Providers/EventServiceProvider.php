@@ -2,9 +2,11 @@
 
 namespace App\Providers;
 
+use App\Events\SendEmailByBirthdayCampaignEvent;
 use App\Events\SendEmailByCampaignEvent;
 use App\Events\SendEmailRecoveryPasswordEvent;
 use App\Events\SendEmailVerifyEmailEvent;
+use App\Listeners\SendEmailByBirthdayCampaignListener;
 use App\Listeners\SendEmailByCampaignListener;
 use App\Listeners\SendEmailRecoveryPasswordListener;
 use App\Listeners\SendEmailVerifyEmailListener;
@@ -43,6 +45,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         SendEmailByCampaignEvent::class => [
             SendEmailByCampaignListener::class
+        ],
+        SendEmailByBirthdayCampaignEvent::class => [
+            SendEmailByBirthdayCampaignListener::class
         ]
     ];
 

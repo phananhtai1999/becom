@@ -15,6 +15,7 @@ class Kernel extends ConsoleKernel
         'App\Console\Commands\SeedConfig',
         'App\Console\Commands\CreateUser',
         'App\Console\Commands\SendEmailByCampaign',
+        'App\Console\Commands\SendEmailByBirthdayCampaign',
     ];
 
     /**
@@ -27,6 +28,7 @@ class Kernel extends ConsoleKernel
     {
 //        $schedule->command('Send:Email')->everyMinute();
         $schedule->command('send:campaign')->dailyAt('8:00');
+        $schedule->command('send:birthday-campaign')->dailyAt('8:00');
 
     }
 

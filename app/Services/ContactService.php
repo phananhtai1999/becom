@@ -76,6 +76,44 @@ class ContactService extends AbstractService
     }
 
     /**
+     * @param $campaignUuid
+     * @return array
+     */
+    public function getBirthdayContactsSendEmail($campaignUuid)
+    {
+        $birthdayContacts = $this->model->select('contacts.*')
+            ->join('contact_contact_list', 'contact_contact_list.contact_uuid', '=', 'contacts.uuid')
+            ->join('contact_lists', 'contact_lists.uuid', '=', 'contact_contact_list.contact_list_uuid')
+            ->join('campaign_contact_list', 'campaign_contact_list.contact_list_uuid', '=', 'contact_lists.uuid')
+            ->join('campaigns', 'campaigns.uuid', '=', 'campaign_contact_list.campaign_uuid')
+            ->where('campaigns.uuid', $campaignUuid)
+            ->whereDate('contacts.dob', Carbon::now())->get();
+
+        $resultBirthdayContacts = [];
+        $checkEmailExist = true;
+        foreach ($birthdayContacts as $birthdayContact){
+            if(empty($resultBirthdayContacts)){
+                $resultBirthdayContacts[] = $birthdayContact;
+            }else{
+                foreach ($resultBirthdayContacts as $value){
+                    if($birthdayContact->email == $value->email){
+                        $checkEmailExist = true;
+                        break;
+                    }else{
+                        $checkEmailExist = false;
+                    }
+                }
+
+                if(!$checkEmailExist){
+                    $resultBirthdayContacts[] = $birthdayContact;
+                }
+            }
+        }
+
+        return $resultBirthdayContacts;
+    }
+
+    /**
      * @param $file
      * @return array|bool
      * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception

@@ -26,11 +26,32 @@ class CampaignService extends AbstractService
                     ->join('send_email_schedule_logs', 'send_email_schedule_logs.campaign_uuid', '=', 'campaigns.uuid')
                     ->where('send_email_schedule_logs.is_running', true);
             })->where([
+                ['campaigns.type', 'simple'],
                 ['campaigns.from_date', '<=', Carbon::now()],
                 ['campaigns.to_date', '>=', Carbon::now()],
                 ['campaigns.was_finished', false],
                 ['campaigns.was_stopped_by_owner', false],
             ])->firstOrFail();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getListActiveBirthdayCampaignUuid()
+    {
+        return $this->model->selectRaw('DISTINCT campaigns.uuid')
+            ->join('campaign_contact_list', 'campaigns.uuid', '=', 'campaign_contact_list.campaign_uuid')
+            ->join('contact_lists', 'campaign_contact_list.contact_list_uuid', '=', 'contact_lists.uuid')
+            ->join('contact_contact_list', 'contact_contact_list.contact_list_uuid', '=', 'contact_lists.uuid')
+            ->join('contacts', 'contact_contact_list.contact_uuid', '=', 'contacts.uuid')
+            ->where([
+                ['campaigns.type', 'birthday'],
+                ['campaigns.from_date', '<=', Carbon::now()],
+                ['campaigns.to_date', '>=', Carbon::now()],
+                ['campaigns.was_finished', false],
+                ['campaigns.was_stopped_by_owner', false],
+            ])
+            ->whereDate('contacts.dob', Carbon::now())->get()->toArray();
     }
 
     /**
