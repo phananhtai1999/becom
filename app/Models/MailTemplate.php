@@ -12,6 +12,9 @@ class MailTemplate extends AbstractModel
 {
     use HasFactory, SoftDeletes;
 
+    const PUBLISHED_PUBLISH_STATUS = 1;
+    const PENDING_PUBLISH_STATUS = 2;
+
     /**
      * @var string[]
      */
@@ -30,7 +33,8 @@ class MailTemplate extends AbstractModel
         'body',
         'website_uuid',
         'user_uuid',
-        'design'
+        'design',
+        'publish_status'
     ];
 
     /**
