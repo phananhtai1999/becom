@@ -29,6 +29,7 @@ class MailTemplateRequest extends AbstractRequest
             'website_uuid' => ['nullable', 'numeric', 'min:1', 'exists:websites,uuid'],
             'user_uuid' => ['nullable', 'numeric', 'min:1', 'exists:users,uuid'],
             'design' => ['required', 'string'],
+            'publish_status' => ['required', 'numeric', 'min:1', 'max:2'],
         ];
     }
 }
