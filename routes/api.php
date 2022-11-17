@@ -180,12 +180,17 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'mail-template.'], function 
     Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
         Route::get('/mail-templates', [MailTemplateController::class, 'index'])->name('index');
         Route::get('/mail-template/{id}', [MailTemplateController::class, 'show'])->name('show');
+        Route::post('/mail-template', [MailTemplateController::class, 'store'])->name('store');
+        Route::put('/mail-template/{id}', [MailTemplateController::class, 'edit'])->name('edit');
         Route::delete('/mail-template/{id}', [MailTemplateController::class, 'destroy'])->name('destroy');
+        Route::post('/accept-publish', [MailTemplateController::class, 'acceptPublishMailtemplate'])->name('accept-publish');
     });
 
     Route::group(['middleware' => ['role:admin,editor']], function () {
-        Route::post('/mail-template', [MailTemplateController::class, 'store'])->name('store');
-        Route::put('/mail-template/{id}', [MailTemplateController::class, 'edit'])->name('edit');
+        Route::get('/unpublished-mail-templates', [MailTemplateController::class, 'indexUnpublishedMailTemplate'])->name('index-unpublished');
+        Route::get('/unpublished-mail-template/{id}', [MailTemplateController::class, 'showUnpublishedMailTemplate'])->name('show-unpublished');
+        Route::post('/unpublished-mail-template', [MailTemplateController::class, 'storeUnpublishedMailTemplate'])->name('store-unpublished');
+        Route::put('/unpublished-mail-template/{id}', [MailTemplateController::class, 'editUnpublishedMailTemplate'])->name('edit-unpublished');
     });
 
     Route::group(['as' => 'my.'], function () {
