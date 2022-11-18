@@ -23,5 +23,6 @@ return [
     'smtp_account_invalid' => '所选广告系列 uuid 无效.',
     'credit_invalid' => "用户信用无效",
     'send_campaign_success' => '按活动成功发送电子邮件',
-    'error_data' => '在线错误'
+    'error_data' => '在线错误',
+    'birthday_campaign_have_not_scenario' => '生日活动未选择场景活动'
 ];

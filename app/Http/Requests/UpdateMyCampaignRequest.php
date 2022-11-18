@@ -24,7 +24,7 @@ class UpdateMyCampaignRequest extends AbstractRequest
      */
     public function rules()
     {
-        return [
+        $validate = [
             'tracking_key' => ['string'],
             'mail_template_uuid' => ['numeric', 'min:1', Rule::exists('mail_templates', 'uuid')->where(function ($query) {
 
@@ -52,6 +52,26 @@ class UpdateMyCampaignRequest extends AbstractRequest
 
                 return $query->where('user_uuid', auth()->user()->getkey())->whereNull('deleted_at');
             })],
+            'not_open_mail_campaign' => ['nullable', 'numeric', 'min:1', Rule::exists('campaigns', 'uuid')->where(function ($query) {
+                $query->where([
+                    ['type', 'scenario'],
+                    ['user_uuid', auth()->user()->getkey()]
+                ])->whereNull('deleted_at');
+            })],
+            'open_mail_campaign' =>  ['nullable', 'numeric', 'min:1', Rule::exists('campaigns', 'uuid')->where(function ($query) {
+                $query->where([
+                    ['type', 'scenario'],
+                    ['user_uuid', auth()->user()->getkey()]
+                ])->whereNull('deleted_at');
+            })],
+            'open_within' => ['nullable', 'numeric', 'min:1']
         ];
+
+        if (!empty($this->request->get('not_open_mail_campaign'))){
+            unset($validate['open_within'][0]);
+            array_unshift($validate['open_within'], "required");
+        }
+
+        return $validate;
     }
 }

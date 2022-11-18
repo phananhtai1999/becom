@@ -36,6 +36,9 @@ class CampaignResource extends AbstractJsonResource
             'user_uuid' => $this->user_uuid,
             'was_finished' => $this->was_finished,
             'was_stopped_by_owner' => $this->was_stopped_by_owner,
+            'open_within' => $this->open_within,
+            'open_mail_campaign' => $this->open_mail_campaign,
+            'not_open_mail_campaign' => $this->not_open_mail_campaign,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
@@ -59,6 +62,14 @@ class CampaignResource extends AbstractJsonResource
 
         if (\in_array('campaign__contact_lists', $expand)) {
             $data['contact_lists'] = ContactListResource::collection($this->contactLists);
+        }
+
+        if (\in_array('campaign__open_mail_campaign', $expand)) {
+            $data['open_mail_campaign'] = new CampaignResource($this->openMailCampaign);
+        }
+
+        if (\in_array('campaign__not_open_mail_campaign', $expand)) {
+            $data['not_open_mail_campaign'] = new CampaignResource($this->notOpenMailCampaign);
         }
 
         return $data;

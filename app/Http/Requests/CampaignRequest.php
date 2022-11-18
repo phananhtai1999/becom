@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
+use Illuminate\Validation\Rule;
 
 class CampaignRequest extends AbstractRequest
 {
@@ -23,7 +24,7 @@ class CampaignRequest extends AbstractRequest
      */
     public function rules()
     {
-        return [
+        $validate = [
             'tracking_key' => ['required', 'string'],
             'mail_template_uuid' => ['required', 'numeric', 'min:1', 'exists:mail_templates,uuid'],
             'from_date' => ['required', 'date', 'before_or_equal:to_date'],
@@ -40,6 +41,21 @@ class CampaignRequest extends AbstractRequest
             'user_uuid' => ['nullable', 'numeric', 'min:1', 'exists:users,uuid'],
             'contact_list' => ['required', 'array', 'min:1'],
             'contact_list.*' => ['required', 'numeric', 'min:1', 'exists:contact_lists,uuid'],
+            'not_open_mail_campaign' => ['nullable', 'numeric', 'min:1', Rule::exists('campaigns', 'uuid')->where(function ($query) {
+                $query->where('type', 'scenario')->whereNull('deleted_at');
+            })],
+            'open_mail_campaign' =>  ['nullable', 'numeric', 'min:1', Rule::exists('campaigns', 'uuid')->where(function ($query) {
+                $query->where('type', 'scenario')->whereNull('deleted_at');
+            })],
+            'open_within' => ['nullable', 'numeric', 'min:1']
         ];
+
+        if (!empty($this->request->get('not_open_mail_campaign'))){
+            unset($validate['open_within'][0]);
+            array_unshift($validate['open_within'], "required");
+        }
+
+        return $validate;
+
     }
 }

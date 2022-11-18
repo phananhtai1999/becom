@@ -40,7 +40,10 @@ class Campaign extends AbstractModel
         'user_uuid',
         'was_finished',
         'was_stopped_by_owner',
-        'send_type'
+        'send_type',
+        'open_within',
+        'open_mail_campaign',
+        'not_open_mail_campaign',
     ];
 
     /**
@@ -118,5 +121,21 @@ class Campaign extends AbstractModel
     public function creditTransactionHistories()
     {
         return $this->hasMany(CreditTransactionHistory::class, 'campaign_uuid', 'uuid');
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function openMailCampaign()
+    {
+        return $this->belongsTo(__CLASS__, 'open_mail_campaign');
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function notOpenMailCampaign()
+    {
+        return $this->belongsTo(__CLASS__, 'not_open_mail_campaign');
     }
 }

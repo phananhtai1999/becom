@@ -23,5 +23,6 @@ return [
     'smtp_account_invalid' => 'The selected smtp account uuid is invalid.',
     'credit_invalid' => "User's credit is invalid.",
     'send_campaign_success' => 'Send Email By Campaign Success.',
-    'error_data' => 'Error on line'
+    'error_data' => 'Error on line',
+    'birthday_campaign_have_not_scenario' => 'Birthday campaign is not selected scenario campaign'
 ];

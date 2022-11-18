@@ -41,7 +41,10 @@ class CampaignQueryBuilder extends AbstractQueryBuilder
                 'user_uuid',
                 'was_finished',
                 'was_stopped_by_owner',
-                'send_type'
+                'send_type',
+                'open_within',
+                'open_mail_campaign',
+                'not_open_mail_campaign',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -59,7 +62,10 @@ class CampaignQueryBuilder extends AbstractQueryBuilder
                 'user_uuid',
                 'was_finished',
                 'was_stopped_by_owner',
-                'send_type'
+                'send_type',
+                'open_within',
+                'open_mail_campaign',
+                'not_open_mail_campaign',
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -92,6 +98,12 @@ class CampaignQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__was_finished', 'was_finished'),
                 'was_stopped_by_owner',
                 AllowedFilter::exact('exact__was_stopped_by_owner', 'was_stopped_by_owner'),
+                'open_within',
+                AllowedFilter::exact('exact__open_within', 'open_within'),
+                'open_mail_campaign',
+                AllowedFilter::exact('exact__open_mail_campaign', 'open_mail_campaign'),
+                'not_open_mail_campaign',
+                AllowedFilter::exact('exact__not_open_mail_campaign', 'not_open_mail_campaign'),
                 'mailTemplate.subject',
                 AllowedFilter::exact('exact__mailTemplate.subject', 'mailTemplate.subject'),
                 'smtpAccount.mail_username',

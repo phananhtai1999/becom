@@ -23,5 +23,6 @@ return [
     'smtp_account_invalid' => "L'uuid de campagne sélectionné n'est pas valide",
     'credit_invalid' => "Le crédit de l'utilisateur n'est pas valide.",
     'send_campaign_success' => 'Envoyer un e-mail en fonction du succès de la campagne.',
-    'error_data' => 'erreur en ligne'
+    'error_data' => 'erreur en ligne',
+    'birthday_campaign_have_not_scenario' => "La campagne d'anniversaire n'est pas la campagne de scénario sélectionnée"
 ];
