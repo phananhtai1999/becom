@@ -23,5 +23,6 @@ return [
     'credit_invalid' => "Tín dụng của người dùng không hợp lệ.",
     'smtp_account_invalid' => 'Smtp Account Uuid đã chọn không hợp lệ.',
     'send_campaign_success' => 'Gửi email theo chiến dịch thành công.',
-    'error_data' => 'Lỗi trên dòng'
+    'error_data' => 'Lỗi trên dòng',
+    'birthday_campaign_have_not_scenario' => 'Chiến dịch sinh nhật không có chiến dịch kịch bản'
 ];
