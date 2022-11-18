@@ -39,7 +39,8 @@ class Campaign extends AbstractModel
         'website_uuid',
         'user_uuid',
         'was_finished',
-        'was_stopped_by_owner'
+        'was_stopped_by_owner',
+        'send_type'
     ];
 
     /**
