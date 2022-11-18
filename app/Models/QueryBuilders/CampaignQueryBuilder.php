@@ -40,7 +40,8 @@ class CampaignQueryBuilder extends AbstractQueryBuilder
                 'website_uuid',
                 'user_uuid',
                 'was_finished',
-                'was_stopped_by_owner'
+                'was_stopped_by_owner',
+                'send_type'
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -57,7 +58,8 @@ class CampaignQueryBuilder extends AbstractQueryBuilder
                 'website_uuid',
                 'user_uuid',
                 'was_finished',
-                'was_stopped_by_owner'
+                'was_stopped_by_owner',
+                'send_type'
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -78,6 +80,8 @@ class CampaignQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__status', 'status'),
                 'type',
                 AllowedFilter::exact('exact__type', 'type'),
+                'send_type',
+                AllowedFilter::exact('exact__send_type', 'send_type'),
                 'smtp_account_uuid',
                 AllowedFilter::exact('exact__smtp_account_uuid', 'smtp_account_uuid'),
                 'website_uuid',

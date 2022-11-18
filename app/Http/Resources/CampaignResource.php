@@ -30,6 +30,7 @@ class CampaignResource extends AbstractJsonResource
             'number_email_per_user' => $this->number_email_per_user,
             'status' => $this->status,
             'type' => $this->type,
+            'send_type' => $this->send_type,
             'smtp_account_uuid' => $this->smtp_account_uuid,
             'website_uuid' => $this->website_uuid,
             'user_uuid' => $this->user_uuid,
