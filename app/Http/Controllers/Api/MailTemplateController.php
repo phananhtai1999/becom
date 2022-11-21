@@ -11,8 +11,10 @@ use App\Http\Requests\AcceptPublishMailTemplateRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MailTemplateRequest;
 use App\Http\Requests\MyMailTemplateRequest;
+use App\Http\Requests\UnpublishedMailTemplateRequest;
 use App\Http\Requests\UpdateMailTemplateRequest;
 use App\Http\Requests\UpdateMyMailTemplateRequest;
+use App\Http\Requests\UpdateUnpublishedMailTemplateRequest;
 use App\Http\Resources\MailTemplateResourceCollection;
 use App\Http\Resources\MailTemplateResource;
 use App\Models\MailTemplate;
@@ -167,10 +169,10 @@ class MailTemplateController extends AbstractRestAPIController
     }
 
     /**
-     * @param MailTemplateRequest $request
+     * @param UnpublishedMailTemplateRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function storeUnpublishedMailTemplate(MailTemplateRequest $request)
+    public function storeUnpublishedMailTemplate(UnpublishedMailTemplateRequest $request)
     {
         if(empty($request->get('user_uuid'))){
             $data = array_merge($request->all(), [
@@ -202,11 +204,11 @@ class MailTemplateController extends AbstractRestAPIController
     }
 
     /**
-     * @param UpdateMailTemplateRequest $request
+     * @param UpdateUnpublishedMailTemplateRequest $request
      * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function editUnpublishedMailTemplate(UpdateMailTemplateRequest $request, $id)
+    public function editUnpublishedMailTemplate(UpdateUnpublishedMailTemplateRequest $request, $id)
     {
         $model = $this->service->findMailTemplateByKeyAndPublishStatus(MailTemplate::PENDING_PUBLISH_STATUS, $id);
 
