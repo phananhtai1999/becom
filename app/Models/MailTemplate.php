@@ -34,7 +34,8 @@ class MailTemplate extends AbstractModel
         'website_uuid',
         'user_uuid',
         'design',
-        'publish_status'
+        'publish_status',
+        'type'
     ];
 
     /**
