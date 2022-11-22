@@ -30,6 +30,7 @@ class UpdateMailTemplateRequest extends AbstractRequest
             'user_uuid' => ['numeric', 'min:1', 'exists:users,uuid'],
             'design' => ['string'],
             'publish_status' => ['numeric', 'min:1', 'max:2'],
+            'type' => ['string', 'in:sms,email'],
         ];
     }
 }

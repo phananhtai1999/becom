@@ -33,6 +33,7 @@ class UpdateMyMailTemplateRequest extends AbstractRequest
             })],
             'design' => 'string',
             'publish_status' => ['numeric', 'min:1', 'max:2'],
+            'type' => ['string', 'in:sms,email'],
         ];
     }
 }

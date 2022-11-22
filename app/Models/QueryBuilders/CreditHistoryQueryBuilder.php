@@ -52,6 +52,8 @@ class CreditHistoryQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__credit', 'credit'),
                 'type',
                 AllowedFilter::exact('exact__type', 'type'),
+                'campaign.send_type',
+                AllowedFilter::exact('exact__campaign.send_type', 'campaign.send_type'),
             ]);
     }
 }
