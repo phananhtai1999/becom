@@ -263,4 +263,53 @@ class CampaignService extends AbstractService
             ->whereDate('updated_at', '<=', $endDate)->get()->toArray();
     }
 
+    /**
+     * @param $campaign
+     * @param $mailSendingHistory
+     * @return bool
+     */
+    public function checkScenarioCampaign($campaign, $mailSendingHistory)
+    {
+        if (!empty($campaign->open_mail_campaign)) {
+            if (empty($campaign->not_open_mail_campaign)) {
+                return true;
+            }else {
+                $result = $this->model->select('campaigns.*')
+                    ->join('mail_sending_history', 'campaigns.uuid', '=', 'mail_sending_history.campaign_uuid')
+                    ->where('mail_sending_history.uuid', $mailSendingHistory->uuid)
+                    ->whereRaw('date(mail_sending_history.updated_at) - date(mail_sending_history.created_at) <= campaigns.open_within')
+                    ->first();
+                if (empty($result)) {
+                    return false;
+                }
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param $campaignUuid
+     * @return bool
+     */
+    public function checkActiveScenarioCampaign($campaignUuid)
+    {
+        $campaign = $this->model->where([
+            ['type', 'scenario'],
+            ['uuid', $campaignUuid],
+            ['from_date', '<=', Carbon::now()],
+            ['to_date', '>=', Carbon::now()],
+            ['was_finished', false],
+            ['was_stopped_by_owner', false],
+        ])->first();
+
+        if (empty($campaign)) {
+            return false;
+        }
+
+        return true;
+    }
+
 }

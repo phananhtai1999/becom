@@ -114,6 +114,44 @@ class ContactService extends AbstractService
     }
 
     /**
+     * @param $campaignUuid
+     * @param $email
+     * @return mixed
+     */
+    public function getContactByCampaign($campaignUuid, $email)
+    {
+        return $this->model->select('contacts.*')
+            ->join('contact_contact_list', 'contact_contact_list.contact_uuid', '=', 'contacts.uuid')
+            ->join('contact_lists', 'contact_lists.uuid', '=', 'contact_contact_list.contact_list_uuid')
+            ->join('campaign_contact_list', 'campaign_contact_list.contact_list_uuid', '=', 'contact_lists.uuid')
+            ->join('campaigns', 'campaigns.uuid', '=', 'campaign_contact_list.campaign_uuid')
+            ->where([
+                ['campaigns.uuid', $campaignUuid],
+                ['contacts.email', $email]
+            ])->first();
+    }
+
+    /**
+     * @param $contact
+     * @param $contactListUuid
+     * @return mixed
+     */
+    public function checkAndInsertContactIntoContactList($contact, $contactListUuid)
+    {
+        $model = $this->model->select('contacts.*')
+            ->join('contact_contact_list', 'contact_contact_list.contact_uuid', '=', 'contacts.uuid')
+            ->where('contact_contact_list.contact_list_uuid', $contactListUuid)
+            ->where('contacts.email', $contact->email)
+            ->first();
+
+        if (empty($model)) {
+            $contact->contactLists()->attach($contactListUuid);
+            return $contact;
+        }
+        return $model;
+    }
+
+    /**
      * @param $file
      * @return array|bool
      * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception

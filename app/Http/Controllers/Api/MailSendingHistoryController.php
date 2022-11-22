@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
+use App\Events\SendEmailNotOpenByScenarioCampaignEvent;
+use App\Events\SendNextEmailByScenarioCampaignEvent;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
@@ -14,6 +16,8 @@ use App\Http\Requests\MailSendingHistoryRequest;
 use App\Http\Requests\UpdateMailSendingHistoryRequest;
 use App\Http\Resources\MailSendingHistoryResourceCollection;
 use App\Http\Resources\MailSendingHistoryResource;
+use App\Services\CampaignService;
+use App\Services\ContactService;
 use App\Services\MailOpenTrackingService;
 use App\Services\MailSendingHistoryService;
 use App\Services\MyMailSendingHistoryService;
@@ -35,14 +39,28 @@ class MailSendingHistoryController extends AbstractRestAPIController
     protected $mailOpenTrackingService;
 
     /**
+     * @var CampaignService
+     */
+    protected $campaignService;
+
+    /**
+     * @var ContactService
+     */
+    protected $contactService;
+
+    /**
      * @param MailSendingHistoryService $service
      * @param MyMailSendingHistoryService $myService
      * @param MailOpenTrackingService $mailOpenTrackingService
+     * @param CampaignService $campaignService
+     * @param ContactService $contactService
      */
     public function __construct(
         MailSendingHistoryService $service,
         MyMailSendingHistoryService $myService,
-        MailOpenTrackingService $mailOpenTrackingService
+        MailOpenTrackingService $mailOpenTrackingService,
+        CampaignService $campaignService,
+        ContactService $contactService
     )
     {
         $this->service = $service;
@@ -53,6 +71,8 @@ class MailSendingHistoryController extends AbstractRestAPIController
         $this->storeRequest = MailSendingHistoryRequest::class;
         $this->editRequest = UpdateMailSendingHistoryRequest::class;
         $this->indexRequest = IndexRequest::class;
+        $this->campaignService = $campaignService;
+        $this->contactService = $contactService;
     }
 
     /**
@@ -101,6 +121,21 @@ class MailSendingHistoryController extends AbstractRestAPIController
 
         $mailSendingHistory = $this->service->findOneById($id);
         $this->service->update($mailSendingHistory, ['status' => 'opened']);
+
+        $campaign = $this->campaignService->findOneById($mailSendingHistory->campaign_uuid);
+        if ($this->campaignService->checkScenarioCampaign($campaign, $mailSendingHistory)) {
+            $contactOpenMail = $this->contactService->getContactByCampaign($campaign->uuid, $mailSendingHistory->email);
+            $campaignScenario = $this->campaignService->findOneById($campaign->open_mail_campaign);
+            $contactListCampaignScenario = $campaignScenario->contactlists;
+            $contact = $this->contactService->checkAndInsertContactIntoContactList($contactOpenMail, $contactListCampaignScenario[0]->uuid);
+
+            if ($this->campaignService->checkActiveScenarioCampaign($campaignScenario->uuid)) {
+                if (($this->service->getNumberEmailSentByStatusAndCampaignUuid($campaignScenario->uuid, "sent") > 0 ||
+                    $this->service->getNumberEmailSentByStatusAndCampaignUuid($campaignScenario->uuid, "opened") > 0) && ($this->service->getNumberEmailSentPerUser($campaignScenario->uuid, $contact->email) == 0)) {
+                    SendNextEmailByScenarioCampaignEvent::dispatch($campaignScenario, $contact);
+                }
+            }
+        }
 
         return response(file_get_contents(public_path('tracking_pixel/pixel.gif')))
             ->header('content-type', 'image/gif');

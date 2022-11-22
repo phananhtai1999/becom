@@ -24,5 +24,6 @@ return [
     'credit_invalid' => "User's credit is invalid.",
     'send_campaign_success' => 'Send Email By Campaign Success.',
     'error_data' => 'Error on line',
-    'birthday_campaign_have_not_scenario' => 'Birthday campaign is not selected scenario campaign'
+    'birthday_campaign_have_not_scenario' => 'Birthday campaign is not selected scenario campaign',
+    'scenario_campaign_only_one_contact_list'  => 'Scenario campaign choose only one contact list'
 ];

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
 use App\Events\SendEmailByCampaignEvent;
+use App\Events\SendNextEmailByScenarioCampaignEvent;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Requests\CampaignLinkTrackingRequest;
@@ -188,25 +189,29 @@ class CampaignController extends AbstractRestAPIController
         ) {
             return $this->sendValidationFailedJsonResponse(["errors" => ['campaign' => __('messages.birthday_campaign_have_not_scenario')]]);
         } else {
-            if(empty($request->get('user_uuid'))){
-                $data = array_merge($request->all(), [
-                    'user_uuid' => auth()->user()->getkey(),
+            if ($request->get('type') === "scenario" && count($request->get('contact_list')) > 1) {
+                return $this->sendValidationFailedJsonResponse(["errors" => ['campaign' => __('messages.scenario_campaign_only_one_contact_list')]]);
+            }else {
+                if(empty($request->get('user_uuid'))){
+                    $data = array_merge($request->all(), [
+                        'user_uuid' => auth()->user()->getkey(),
+                    ]);
+                }else{
+                    $data = $request->all();
+                }
+                $model = $this->service->create($data);
+
+                $model->contactLists()->attach($request->get('contact_list'));
+
+                $contactsNumberSendEmail = count($this->contactService->getContactsSendEmail($model->uuid));
+                $creditNumberSendEmail = $contactsNumberSendEmail * config('credit.default_credit') * $model->number_email_per_user;
+
+                return $this->sendCreatedJsonResponse([
+                    'data' => array_merge($this->service->resourceToData($this->resourceClass, $model)['data'], [
+                        'total_credits' => $creditNumberSendEmail
+                    ])
                 ]);
-            }else{
-                $data = $request->all();
             }
-            $model = $this->service->create($data);
-
-            $model->contactLists()->attach($request->get('contact_list'));
-
-            $contactsNumberSendEmail = count($this->contactService->getContactsSendEmail($model->uuid));
-            $creditNumberSendEmail = $contactsNumberSendEmail * config('credit.default_credit') * $model->number_email_per_user;
-
-            return $this->sendCreatedJsonResponse([
-                'data' => array_merge($this->service->resourceToData($this->resourceClass, $model)['data'], [
-                    'total_credits' => $creditNumberSendEmail
-                ])
-            ]);
         }
     }
 
@@ -225,15 +230,19 @@ class CampaignController extends AbstractRestAPIController
         ) {
             return $this->sendValidationFailedJsonResponse(["errors" => ['campaign' => __('messages.birthday_campaign_have_not_scenario')]]);
         } else {
-            $model = $this->service->findOrFailById($id);
+            if ($request->get('type') === "scenario" && count($request->get('contact_list')) > 1) {
+                return $this->sendValidationFailedJsonResponse(["errors" => ['campaign' => __('messages.scenario_campaign_only_one_contact_list')]]);
+            }else {
+                $model = $this->service->findOrFailById($id);
 
-            $this->service->update($model, $request->all());
+                $this->service->update($model, $request->all());
 
-            $model->contactLists()->sync($request->contact_list ?? $model->contactLists);
+                $model->contactLists()->sync($request->contact_list ?? $model->contactLists);
 
-            return $this->sendOkJsonResponse(
-                $this->service->resourceToData($this->resourceClass, $model)
-            );
+                return $this->sendOkJsonResponse(
+                    $this->service->resourceToData($this->resourceClass, $model)
+                );
+            }
         }
     }
 
@@ -293,37 +302,41 @@ class CampaignController extends AbstractRestAPIController
         ) {
             return $this->sendValidationFailedJsonResponse(["errors" => ['campaign' => __('messages.birthday_campaign_have_not_scenario')]]);
         } else {
-            if(($user->can_add_smtp_account == 1 || $config->value == 0))
-            {
-                if(!empty($request->get('smtp_account_uuid'))){
-                    $data = array_merge($request->all(), [
-                        'user_uuid' => auth()->user()->getkey(),
-                    ]);
+            if ($request->get('type') === "scenario" && count($request->get('contact_list')) > 1) {
+                return $this->sendValidationFailedJsonResponse(["errors" => ['campaign' => __('messages.scenario_campaign_only_one_contact_list')]]);
+            }else {
+                if(($user->can_add_smtp_account == 1 || $config->value == 0))
+                {
+                    if(!empty($request->get('smtp_account_uuid'))){
+                        $data = array_merge($request->all(), [
+                            'user_uuid' => auth()->user()->getkey(),
+                        ]);
+                    }else{
+                        return $this->sendValidationFailedJsonResponse(["errors" => ['smtp_account_uuid' => __('messages.smtp_account_invalid')]]);
+                    }
                 }else{
-                    return $this->sendValidationFailedJsonResponse(["errors" => ['smtp_account_uuid' => __('messages.smtp_account_invalid')]]);
+                    if(empty($request->get('smtp_account_uuid'))){
+                        $data = array_merge($request->all(), [
+                            'user_uuid' => auth()->user()->getkey(),
+                        ]);
+                    }else{
+                        return $this->sendValidationFailedJsonResponse(["errors" => ['smtp_account_uuid' => __('messages.smtp_account_invalid')]]);
+                    }
                 }
-            }else{
-                if(empty($request->get('smtp_account_uuid'))){
-                    $data = array_merge($request->all(), [
-                        'user_uuid' => auth()->user()->getkey(),
-                    ]);
-                }else{
-                    return $this->sendValidationFailedJsonResponse(["errors" => ['smtp_account_uuid' => __('messages.smtp_account_invalid')]]);
-                }
+
+                $model = $this->service->create($data);
+
+                $model->contactLists()->attach($request->get('contact_list', []));
+
+                $contactsNumberSendEmail = count($this->contactService->getContactsSendEmail($model->uuid));
+                $creditNumberSendEmail = $contactsNumberSendEmail * config('credit.default_credit') * $model->number_email_per_user;
+
+                return $this->sendCreatedJsonResponse([
+                    'data' => array_merge($this->service->resourceToData($this->resourceClass, $model)['data'], [
+                        'total_credits' => $creditNumberSendEmail
+                    ])
+                ]);
             }
-
-            $model = $this->service->create($data);
-
-            $model->contactLists()->attach($request->get('contact_list', []));
-
-            $contactsNumberSendEmail = count($this->contactService->getContactsSendEmail($model->uuid));
-            $creditNumberSendEmail = $contactsNumberSendEmail * config('credit.default_credit') * $model->number_email_per_user;
-
-            return $this->sendCreatedJsonResponse([
-                'data' => array_merge($this->service->resourceToData($this->resourceClass, $model)['data'], [
-                    'total_credits' => $creditNumberSendEmail
-                ])
-            ]);
         }
     }
 
@@ -366,39 +379,43 @@ class CampaignController extends AbstractRestAPIController
         ) {
             return $this->sendValidationFailedJsonResponse(["errors" => ['campaign' => __('messages.birthday_campaign_have_not_scenario')]]);
         } else {
-            if(($user->can_add_smtp_account == 1 || $config->value == 0))
-            {
-                if(!empty($request->get('smtp_account_uuid'))){
-                    $data = array_merge($request->all(), [
-                        'user_uuid' => auth()->user()->getkey(),
-                    ]);
+            if ($request->get('type') === "scenario" && count($request->get('contact_list')) > 1) {
+                return $this->sendValidationFailedJsonResponse(["errors" => ['campaign' => __('messages.scenario_campaign_only_one_contact_list')]]);
+            }else {
+                if(($user->can_add_smtp_account == 1 || $config->value == 0))
+                {
+                    if(!empty($request->get('smtp_account_uuid'))){
+                        $data = array_merge($request->all(), [
+                            'user_uuid' => auth()->user()->getkey(),
+                        ]);
+                    }else{
+                        return $this->sendValidationFailedJsonResponse(["errors" => ['smtp_account_uuid' => __('messages.smtp_account_invalid')]]);
+                    }
                 }else{
-                    return $this->sendValidationFailedJsonResponse(["errors" => ['smtp_account_uuid' => __('messages.smtp_account_invalid')]]);
+                    if(empty($request->get('smtp_account_uuid'))){
+                        $data = array_merge($request->all(), [
+                            'user_uuid' => auth()->user()->getkey(),
+                        ]);
+                    }else{
+                        return $this->sendValidationFailedJsonResponse(["errors" => ['smtp_account_uuid' => __('messages.smtp_account_invalid')]]);
+                    }
                 }
-            }else{
-                if(empty($request->get('smtp_account_uuid'))){
-                    $data = array_merge($request->all(), [
-                        'user_uuid' => auth()->user()->getkey(),
-                    ]);
-                }else{
-                    return $this->sendValidationFailedJsonResponse(["errors" => ['smtp_account_uuid' => __('messages.smtp_account_invalid')]]);
+
+                $this->service->update($model, $data);
+
+                $contactListUuid = $this->myService->findContactListKeyByMyCampaign($model);
+
+                if ($contactListUuid == null)
+                {
+                    $model->contactLists()->sync($request->get('contact_list', []));
                 }
+
+                $model->contactLists()->sync($request->get('contact_list', $contactListUuid));
+
+                return $this->sendOkJsonResponse(
+                    $this->service->resourceToData($this->resourceClass, $model)
+                );
             }
-
-            $this->service->update($model, $data);
-
-            $contactListUuid = $this->myService->findContactListKeyByMyCampaign($model);
-
-            if ($contactListUuid == null)
-            {
-                $model->contactLists()->sync($request->get('contact_list', []));
-            }
-
-            $model->contactLists()->sync($request->get('contact_list', $contactListUuid));
-
-            return $this->sendOkJsonResponse(
-                $this->service->resourceToData($this->resourceClass, $model)
-            );
         }
     }
 
