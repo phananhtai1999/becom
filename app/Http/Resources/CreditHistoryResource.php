@@ -7,10 +7,10 @@ use App\Abstracts\AbstractJsonResource;
 class CreditHistoryResource extends AbstractJsonResource
 {
     /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
+     * @param $request
+     * @return array
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function toArray($request)
     {
@@ -20,6 +20,7 @@ class CreditHistoryResource extends AbstractJsonResource
             'user_uuid' => $this->user_uuid,
             'campaign_uuid' => $this->campaign_uuid,
             'credit' => $this->credit,
+            'type' => $this->type,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
