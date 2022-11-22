@@ -24,6 +24,7 @@ use App\Http\Controllers\Api\ContactListController;
 use App\Http\Controllers\Api\CreditHistoryController;
 use App\Http\Controllers\Api\UserCreditHistoryController;
 use App\Http\Controllers\Api\CreditTransactionHistoryController;
+use App\Http\Controllers\Api\OrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -408,5 +409,22 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'chart.'], function () {
         Route::get('/my/campaign-chart', [CampaignController::class, 'myCampaignChart'])->name('my-campaign-chart');
         Route::get('/my/email-chart', [MailSendingHistoryController::class, 'myEmailChart'])->name('email-chart');
         Route::get('/my/contact-chart', [ContactController::class, 'myContactChart'])->name('myContactChart');
+    });
+});
+
+Route::group(['middleware' => ['auth:api'], 'as' => 'order.'], function () {
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/orders', [OrderController::class, 'index'])->name('index');
+        Route::get('/order/{id}', [OrderController::class, 'show'])->name('show');
+        Route::post('/order', [OrderController::class, 'store'])->name('store');
+        Route::put('/order/{id}', [OrderController::class, 'edit'])->name('edit');
+        Route::delete('/order/{id}', [OrderController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::group(['as' => 'my.'], function () {
+        Route::get('/my/orders', [OrderController::class, 'indexMyOrder'])->name('index');
+        Route::get('/my/order/{id}', [OrderController::class, 'showMyOrder'])->name('show');
+        Route::put('/my/order/{id}', [OrderController::class, 'editMyOrder'])->name('edit');
+        Route::delete('/my/order/{id}', [OrderController::class, 'destroyMyOrder'])->name('destroy');
     });
 });
