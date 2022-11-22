@@ -27,6 +27,7 @@ class CreditHistory extends AbstractModel
         'user_uuid',
         'campaign_uuid',
         'credit',
+        'type',
     ];
 
     /**
