@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Abstracts\AbstractRestAPIController;
 use App\Events\SendEmailByCampaignEvent;
 use App\Http\Controllers\Traits\RestIndexTrait;
-use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Requests\CampaignLinkTrackingRequest;
 use App\Http\Requests\CampaignRequest;
@@ -25,7 +24,6 @@ use App\Http\Resources\CampaignLinkDailyTrackingResource;
 use App\Http\Resources\CampaignLinkTrackingResource;
 use App\Http\Resources\CampaignResource;
 use App\Http\Resources\CampaignTrackingResource;
-use App\Mail\SendCampaign;
 use App\Services\CampaignDailyTrackingService;
 use App\Services\CampaignLinkDailyTrackingService;
 use App\Services\CampaignLinkTrackingService;
@@ -43,7 +41,6 @@ use App\Services\UserService;
 use Carbon\Carbon;
 use App\Services\MyCampaignService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Mail;
 
 class CampaignController extends AbstractRestAPIController
 {
