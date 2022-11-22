@@ -30,14 +30,16 @@ class CreditHistoryQueryBuilder extends AbstractQueryBuilder
                 $modelKeyName,
                 'user_uuid',
                 'campaign_uuid',
-                'credit'
+                'credit',
+                'type'
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
                 $modelKeyName,
                 'user_uuid',
                 'campaign_uuid',
-                'credit'
+                'credit',
+                'type'
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -48,6 +50,8 @@ class CreditHistoryQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__campaign_uuid', 'campaign_uuid'),
                 'credit',
                 AllowedFilter::exact('exact__credit', 'credit'),
+                'type',
+                AllowedFilter::exact('exact__type', 'type'),
             ]);
     }
 }
