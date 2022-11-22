@@ -4,12 +4,16 @@ namespace App\Providers;
 
 use App\Events\SendEmailByBirthdayCampaignEvent;
 use App\Events\SendEmailByCampaignEvent;
+use App\Events\SendEmailNotOpenByScenarioCampaignEvent;
 use App\Events\SendEmailRecoveryPasswordEvent;
 use App\Events\SendEmailVerifyEmailEvent;
+use App\Events\SendNextEmailByScenarioCampaignEvent;
 use App\Listeners\SendEmailByBirthdayCampaignListener;
 use App\Listeners\SendEmailByCampaignListener;
+use App\Listeners\SendEmailNotOpenByScenarioCampaignListener;
 use App\Listeners\SendEmailRecoveryPasswordListener;
 use App\Listeners\SendEmailVerifyEmailListener;
+use App\Listeners\SendNextEmailByScenarioCampaignListener;
 use App\Models\Config;
 use App\Models\Role;
 use App\Models\User;
@@ -48,6 +52,12 @@ class EventServiceProvider extends ServiceProvider
         ],
         SendEmailByBirthdayCampaignEvent::class => [
             SendEmailByBirthdayCampaignListener::class
+        ],
+        SendNextEmailByScenarioCampaignEvent::class => [
+            SendNextEmailByScenarioCampaignListener::class
+        ],
+        SendEmailNotOpenByScenarioCampaignEvent::class => [
+            SendEmailNotOpenByScenarioCampaignListener::class
         ]
     ];
 
