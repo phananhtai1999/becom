@@ -3,9 +3,8 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
-use Illuminate\Validation\Rule;
 
-class UpdateCreditHistoryRequest extends AbstractRequest
+class UpdateUnpublishedMailTemplateRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,10 +24,11 @@ class UpdateCreditHistoryRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'user_uuid' => ['numeric', 'min:1', Rule::exists('users', 'uuid')->whereNull('deleted_at')],
-            'campaign_uuid' => ['numeric', 'min:1', Rule::exists('campaigns', 'uuid')->whereNull('deleted_at')],
-            'credit' => ['numeric'],
-            'type' => ['string', 'in:sms,email'],
+            'subject' => ['string'],
+            'body' => ['string'],
+            'website_uuid' => ['nullable', 'numeric', 'min:1', 'exists:websites,uuid'],
+            'user_uuid' => ['numeric', 'min:1', 'exists:users,uuid'],
+            'design' => ['string'],
         ];
     }
 }
