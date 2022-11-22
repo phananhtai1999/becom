@@ -56,6 +56,8 @@ class CreditTransactionHistoryQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__campaign_uuid', 'campaign_uuid'),
                 'add_by_uuid',
                 AllowedFilter::exact('exact__add_by_uuid', 'add_by_uuid'),
+                'campaign.send_type',
+                AllowedFilter::exact('exact__campaign.send_type', 'campaign.send_type'),
             ]);
     }
 }

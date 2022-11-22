@@ -48,6 +48,8 @@ class CreditHistoryQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__campaign_uuid', 'campaign_uuid'),
                 'credit',
                 AllowedFilter::exact('exact__credit', 'credit'),
+                'campaign.send_type',
+                AllowedFilter::exact('exact__campaign.send_type', 'campaign.send_type'),
             ]);
     }
 }
