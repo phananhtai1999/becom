@@ -24,6 +24,7 @@ use App\Http\Controllers\Api\ContactListController;
 use App\Http\Controllers\Api\CreditHistoryController;
 use App\Http\Controllers\Api\UserCreditHistoryController;
 use App\Http\Controllers\Api\CreditTransactionHistoryController;
+use App\Http\Controllers\Api\PaymentMethodController;
 use App\Http\Controllers\Api\OrderController;
 
 /*
@@ -411,6 +412,15 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'chart.'], function () {
         Route::get('/my/contact-chart', [ContactController::class, 'myContactChart'])->name('myContactChart');
     });
 });
+
+Route::group(['middleware' => ['auth:api', 'role:admin'], 'as' => 'payment-method.'], function () {
+    Route::post('/payment-method', [PaymentMethodController::class, 'store'])->name('store');
+    Route::put('/payment-method/{id}', [PaymentMethodController::class, 'edit'])->name('edit');
+    Route::delete('/payment-method/{id}', [PaymentMethodController::class, 'destroy'])->name('destroy');
+});
+
+Route::get('/payment-methods', [PaymentMethodController::class, 'index'])->name('payment-method.index');
+Route::get('/payment-method/{id}', [PaymentMethodController::class, 'show'])->name('payment-method.show');
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'order.'], function () {
     Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
