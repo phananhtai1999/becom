@@ -2,12 +2,14 @@
 
 namespace App\Providers;
 
+use App\Events\PaymentSuccessfullyEvent;
 use App\Events\SendEmailByBirthdayCampaignEvent;
 use App\Events\SendEmailByCampaignEvent;
 use App\Events\SendEmailNotOpenByScenarioCampaignEvent;
 use App\Events\SendEmailRecoveryPasswordEvent;
 use App\Events\SendEmailVerifyEmailEvent;
 use App\Events\SendNextEmailByScenarioCampaignEvent;
+use App\Listeners\PaymentSuccessfullyListener;
 use App\Listeners\SendEmailByBirthdayCampaignListener;
 use App\Listeners\SendEmailByCampaignListener;
 use App\Listeners\SendEmailNotOpenByScenarioCampaignListener;
@@ -58,7 +60,10 @@ class EventServiceProvider extends ServiceProvider
         ],
         SendEmailNotOpenByScenarioCampaignEvent::class => [
             SendEmailNotOpenByScenarioCampaignListener::class
-        ]
+        ],
+        PaymentSuccessfullyEvent::class => [
+            PaymentSuccessfullyListener::class
+        ],
     ];
 
     /**

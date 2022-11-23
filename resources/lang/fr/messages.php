@@ -1,5 +1,8 @@
 <?php
 
+$maximumCredit = config('limitcredit.maximum_credit');
+$minimumCredit = config('limitcredit.minimum_credit');
+
 return [
 
     'success' => 'Succès',
@@ -24,5 +27,8 @@ return [
     'credit_invalid' => "Le crédit de l'utilisateur n'est pas valide.",
     'send_campaign_success' => 'Envoyer un e-mail en fonction du succès de la campagne.',
     'error_data' => 'erreur en ligne',
-    'birthday_campaign_have_not_scenario' => "La campagne d'anniversaire n'est pas la campagne de scénario sélectionnée"
+    'birthday_campaign_have_not_scenario' => "La campagne d'anniversaire n'est pas la campagne de scénario sélectionnée",
+    'minimum_money' => 'Le montant minimum est de 2000 VND',
+    'maximum_money' => 'Le montant maximum est de 50000000 VND',
+    'limit_maximum_and_minimum_credit' => "Le nombre maximum de crédits est de $maximumCredit, Le nombre minimum de crédits est de $minimumCredit"
 ];

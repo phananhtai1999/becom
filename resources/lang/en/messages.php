@@ -1,5 +1,8 @@
 <?php
 
+$maximumCredit = config('limitcredit.maximum_credit');
+$minimumCredit = config('limitcredit.minimum_credit');
+
 return [
 
     'success' => 'Success',
@@ -25,5 +28,8 @@ return [
     'send_campaign_success' => 'Send Email By Campaign Success.',
     'error_data' => 'Error on line',
     'birthday_campaign_have_not_scenario' => 'Birthday campaign is not selected scenario campaign',
-    'scenario_campaign_only_one_contact_list'  => 'Scenario campaign choose only one contact list'
+    'scenario_campaign_only_one_contact_list'  => 'Scenario campaign choose only one contact list',
+    'minimum_money' => 'Minimum money number is 2000 VND',
+    'maximum_money' => 'Maximum money number is 50000000 VND',
+    'limit_maximum_and_minimum_credit' => "Maximum credit number is $maximumCredit, Minimum credit number is $minimumCredit"
 ];

@@ -26,6 +26,8 @@ use App\Http\Controllers\Api\UserCreditHistoryController;
 use App\Http\Controllers\Api\CreditTransactionHistoryController;
 use App\Http\Controllers\Api\PaymentMethodController;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\CheckoutController;
+use App\Http\Controllers\Api\MomoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -437,4 +439,13 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'order.'], function () {
         Route::put('/my/order/{id}', [OrderController::class, 'editMyOrder'])->name('edit');
         Route::delete('/my/order/{id}', [OrderController::class, 'destroyMyOrder'])->name('destroy');
     });
+});
+
+//Momo
+Route::get('/momo/success-transaction', [MomoController::class, 'successTransaction'])->name('momo.successTransaction');
+
+// checkout
+Route::group(['middleware' => ['auth:api'], 'as' => 'checkout.'], function () {
+    Route::post('/checkout', [CheckoutController::class, 'checkout'])->name('checkout');
+    Route::post('/payment-again', [CheckoutController::class, 'paymentAgain'])->name('paymentAgain');
 });
