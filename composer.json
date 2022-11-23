@@ -24,7 +24,8 @@
         "spatie/laravel-query-builder": "*",
         "spatie/laravel-sluggable": "^2.6",
         "srmklive/paypal": "~3.0",
-        "stripe/stripe-php": "^7.117"
+        "stripe/stripe-php": "^7.117",
+      "ext-curl": "*"
     },
     "require-dev": {
         "facade/ignition": "^2.5",

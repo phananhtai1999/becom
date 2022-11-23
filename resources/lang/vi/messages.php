@@ -1,5 +1,8 @@
 <?php
 
+$maximumCredit = config('limitcredit.maximum_credit');
+$minimumCredit = config('limitcredit.minimum_credit');
+
 return [
 
     'success' => 'Thành công',
@@ -24,5 +27,8 @@ return [
     'smtp_account_invalid' => 'Smtp Account Uuid đã chọn không hợp lệ.',
     'send_campaign_success' => 'Gửi email theo chiến dịch thành công.',
     'error_data' => 'Lỗi trên dòng',
-    'birthday_campaign_have_not_scenario' => 'Chiến dịch sinh nhật không có chiến dịch kịch bản'
+    'birthday_campaign_have_not_scenario' => 'Chiến dịch sinh nhật không có chiến dịch kịch bản',
+    'minimum_money' => 'Số tiền tối thiểu là 2000 VND',
+    'maximum_money' => 'Số tiền tối đa là 50000000 VND',
+    'limit_maximum_and_minimum_credit' => "Số credit nạp tối da là $maximumCredit, Số credit nạp tối thiểu là $minimumCredit"
 ];
