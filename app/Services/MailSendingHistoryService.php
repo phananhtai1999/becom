@@ -181,4 +181,15 @@ class MailSendingHistoryService extends AbstractService
             ->orderBy('label', 'ASC')
             ->get()->toArray();
     }
+
+    /**
+     * @return mixed
+     */
+    public function getMailNotOpenHistories()
+    {
+        return $this->model->select('mail_sending_history.*')
+            ->join('campaigns', 'campaigns.uuid', '=', 'mail_sending_history.campaign_uuid')
+            ->whereRaw('CURDATE() - date(mail_sending_history.created_at) > campaigns.open_within')
+            ->whereNotNull('campaigns.not_open_mail_campaign')->get();
+    }
 }

@@ -33,7 +33,8 @@ class MyMailTemplateQueryBuilder extends AbstractQueryBuilder
                 'website_uuid',
                 'user_uuid',
                 'design',
-                'publish_status'
+                'publish_status',
+                'type'
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -43,7 +44,8 @@ class MyMailTemplateQueryBuilder extends AbstractQueryBuilder
                 'website_uuid',
                 'user_uuid',
                 'design',
-                'publish_status'
+                'publish_status',
+                'type'
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -58,6 +60,8 @@ class MyMailTemplateQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
                 'design',
                 AllowedFilter::exact('exact__design', 'design'),
+                'type',
+                AllowedFilter::exact('exact__type', 'type'),
                 'publish_status',
                 AllowedFilter::exact('exact__publish_status', 'publish_status'),
                 'website.domain',

@@ -28,7 +28,6 @@ class SendEmailByMyCampaignRequest extends AbstractRequest
         return [
             'campaign_uuid' => ['required', 'numeric', 'min:1', Rule::exists('campaigns', 'uuid')->where(function ($query){
                 return $query->where([
-                    ['uuid', $this->request->get('campaign_uuid')],
                     ['user_uuid', auth()->user()->getKey()],
                     ['from_date', '<=', Carbon::now()],
                     ['to_date', '>=', Carbon::now()],

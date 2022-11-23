@@ -25,6 +25,7 @@ use App\Http\Controllers\Api\CreditHistoryController;
 use App\Http\Controllers\Api\UserCreditHistoryController;
 use App\Http\Controllers\Api\CreditTransactionHistoryController;
 use App\Http\Controllers\Api\PaymentMethodController;
+use App\Http\Controllers\Api\OrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -420,3 +421,20 @@ Route::group(['middleware' => ['auth:api', 'role:admin'], 'as' => 'payment-metho
 
 Route::get('/payment-methods', [PaymentMethodController::class, 'index'])->name('payment-method.index');
 Route::get('/payment-method/{id}', [PaymentMethodController::class, 'show'])->name('payment-method.show');
+
+Route::group(['middleware' => ['auth:api'], 'as' => 'order.'], function () {
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/orders', [OrderController::class, 'index'])->name('index');
+        Route::get('/order/{id}', [OrderController::class, 'show'])->name('show');
+        Route::post('/order', [OrderController::class, 'store'])->name('store');
+        Route::put('/order/{id}', [OrderController::class, 'edit'])->name('edit');
+        Route::delete('/order/{id}', [OrderController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::group(['as' => 'my.'], function () {
+        Route::get('/my/orders', [OrderController::class, 'indexMyOrder'])->name('index');
+        Route::get('/my/order/{id}', [OrderController::class, 'showMyOrder'])->name('show');
+        Route::put('/my/order/{id}', [OrderController::class, 'editMyOrder'])->name('edit');
+        Route::delete('/my/order/{id}', [OrderController::class, 'destroyMyOrder'])->name('destroy');
+    });
+});
