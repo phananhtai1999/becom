@@ -29,6 +29,7 @@ class UnpublishedMailTemplateRequest extends AbstractRequest
             'website_uuid' => ['nullable', 'numeric', 'min:1', 'exists:websites,uuid'],
             'user_uuid' => ['nullable', 'numeric', 'min:1', 'exists:users,uuid'],
             'design' => ['required', 'string'],
+            'type' => ['required', 'string', 'in:sms,email'],
         ];
     }
 }
