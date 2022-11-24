@@ -28,6 +28,7 @@ use App\Http\Controllers\Api\PaymentMethodController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\CheckoutController;
 use App\Http\Controllers\Api\MomoController;
+use App\Http\Controllers\Api\PaypalController;
 
 /*
 |--------------------------------------------------------------------------
@@ -443,6 +444,10 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'order.'], function () {
 
 //Momo
 Route::get('/momo/success-transaction', [MomoController::class, 'successTransaction'])->name('momo.successTransaction');
+
+//Paypal
+Route::get('/paypal/success-transaction', [PayPalController::class, 'successTransaction'])->name('paypal.successTransaction');
+Route::get('/paypal/cancel-transaction', [PayPalController::class, 'cancelTransaction'])->name('paypal.cancelTransaction');
 
 // checkout
 Route::group(['middleware' => ['auth:api'], 'as' => 'checkout.'], function () {

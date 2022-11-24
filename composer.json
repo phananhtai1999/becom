@@ -9,6 +9,7 @@
     "license": "MIT",
     "require": {
         "php": "^7.3|^8.0",
+        "ext-curl": "*",
         "ext-json": "*",
         "aws/aws-sdk-php": "^3.216",
         "doctrine/dbal": "^3.3",
@@ -20,12 +21,12 @@
         "laravel/tinker": "^2.5",
         "league/flysystem-aws-s3-v3": "^1.0",
         "maatwebsite/excel": "^3.1",
+        "paypal/rest-api-sdk-php": "*",
         "phpoffice/phpspreadsheet": "^1.24",
         "spatie/laravel-query-builder": "*",
         "spatie/laravel-sluggable": "^2.6",
         "srmklive/paypal": "~3.0",
-        "stripe/stripe-php": "^7.117",
-      "ext-curl": "*"
+        "stripe/stripe-php": "^7.117"
     },
     "require-dev": {
         "facade/ignition": "^2.5",
