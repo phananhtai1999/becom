@@ -8,7 +8,9 @@ use App\Http\Requests\PaymentRequest;
 use App\Models\Order;
 use App\Services\MomoService;
 use App\Services\OrderService;
+use App\Services\PaypalService;
 use Illuminate\Http\JsonResponse;
+use Throwable;
 
 class CheckoutController extends AbstractRestAPIController
 {
@@ -23,21 +25,30 @@ class CheckoutController extends AbstractRestAPIController
     protected $momoService;
 
     /**
+     * @var
+     */
+    protected $paypalService;
+
+    /**
      * @param OrderService $orderService
      * @param MomoService $momoService
+     * @param PaypalService $paypalService
      */
     public function __construct(
         OrderService $orderService,
-        MomoService $momoService
+        MomoService $momoService,
+        PaypalService $paypalService
     )
     {
         $this->orderService = $orderService;
         $this->momoService = $momoService;
+        $this->paypalService = $paypalService;
     }
 
     /**
      * @param PaymentRequest $request
      * @return JsonResponse
+     * @throws Throwable
      */
     public function checkout(PaymentRequest $request)
     {
@@ -54,6 +65,8 @@ class CheckoutController extends AbstractRestAPIController
         $totalPriceOrder = 0;
         if ($paymentMethod == Order::ORDER_MOMO_PAYMENT_METHOD) {
             $totalPriceOrder = round(($credit / config('limitcredit.convert_one_usd_to_credit')) * config('limitcredit.currency_vnd'));
+        } elseif ($paymentMethod == Order::ORDER_PAYPAL_PAYMENT_METHOD) {
+            $totalPriceOrder = round($credit / config('limitcredit.convert_one_usd_to_credit'), 2);
         }
 
         $order = $this->orderService->create([
@@ -68,6 +81,8 @@ class CheckoutController extends AbstractRestAPIController
         $processResult = ['status' => false];
         if ($paymentMethod == Order::ORDER_MOMO_PAYMENT_METHOD) {
             $processResult = $this->momoService->processTransaction($totalPriceOrder, $order);
+        } elseif ($paymentMethod == Order::ORDER_PAYPAL_PAYMENT_METHOD) {
+            $processResult = $this->paypalService->processTransaction($totalPriceOrder, $order);
         }
 
         if ($processResult['status'] == false) {
@@ -85,6 +100,7 @@ class CheckoutController extends AbstractRestAPIController
     /**
      * @param PaymentAgainRequest $request
      * @return JsonResponse
+     * @throws Throwable
      */
     public function paymentAgain(PaymentAgainRequest $request)
     {
@@ -93,6 +109,8 @@ class CheckoutController extends AbstractRestAPIController
         $processResult = ['status' => false];
         if ($order->payment_method_uuid == Order::ORDER_MOMO_PAYMENT_METHOD) {
             $processResult = $this->momoService->processTransaction($order->total_price, $order);
+        } elseif ($order->payment_method_uuid == Order::ORDER_PAYPAL_PAYMENT_METHOD) {
+            $processResult = $this->paypalService->processTransaction($order->total_price, $order);
         }
 
         if ($processResult['status'] == false) {
