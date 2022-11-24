@@ -32,4 +32,8 @@ return [
         'locale' => env('PAYPAL_LOCALE', 'en_US'), // force gateway language  i.e. it_IT, es_ES, en_US ... (for express paypal only)
         'validate_ssl' => env('PAYPAL_VALIDATE_SSL', true), // Validate SSL when creating api client.
     ],
+    'stripe' => [
+        'client_secret' => env('STRIPE_SECRET_KEY', ''),
+        'endpoint_secret' => env('STRIPE_ENDPOINT_SECRET_KEY', ''),
+    ],
 ];

@@ -9,6 +9,7 @@ use App\Models\Order;
 use App\Services\MomoService;
 use App\Services\OrderService;
 use App\Services\PaypalService;
+use App\Services\StripeService;
 use Illuminate\Http\JsonResponse;
 use Throwable;
 
@@ -30,19 +31,27 @@ class CheckoutController extends AbstractRestAPIController
     protected $paypalService;
 
     /**
+     * @var
+     */
+    protected $stripeService;
+
+    /**
      * @param OrderService $orderService
      * @param MomoService $momoService
      * @param PaypalService $paypalService
+     * @param StripeService $stripeService
      */
     public function __construct(
         OrderService $orderService,
         MomoService $momoService,
-        PaypalService $paypalService
+        PaypalService $paypalService,
+        StripeService $stripeService
     )
     {
         $this->orderService = $orderService;
         $this->momoService = $momoService;
         $this->paypalService = $paypalService;
+        $this->stripeService = $stripeService;
     }
 
     /**
@@ -65,7 +74,7 @@ class CheckoutController extends AbstractRestAPIController
         $totalPriceOrder = 0;
         if ($paymentMethod == Order::ORDER_MOMO_PAYMENT_METHOD) {
             $totalPriceOrder = round(($credit / config('limitcredit.convert_one_usd_to_credit')) * config('limitcredit.currency_vnd'));
-        } elseif ($paymentMethod == Order::ORDER_PAYPAL_PAYMENT_METHOD) {
+        } elseif ($paymentMethod == Order::ORDER_PAYPAL_PAYMENT_METHOD || $paymentMethod == Order::ORDER_STRIPE_PAYMENT_METHOD) {
             $totalPriceOrder = round($credit / config('limitcredit.convert_one_usd_to_credit'), 2);
         }
 
@@ -83,6 +92,8 @@ class CheckoutController extends AbstractRestAPIController
             $processResult = $this->momoService->processTransaction($totalPriceOrder, $order);
         } elseif ($paymentMethod == Order::ORDER_PAYPAL_PAYMENT_METHOD) {
             $processResult = $this->paypalService->processTransaction($totalPriceOrder, $order);
+        } elseif ($paymentMethod == Order::ORDER_STRIPE_PAYMENT_METHOD) {
+            $processResult = $this->stripeService->processTransaction($totalPriceOrder, $order, $request->all());
         }
 
         if ($processResult['status'] == false) {
@@ -111,6 +122,8 @@ class CheckoutController extends AbstractRestAPIController
             $processResult = $this->momoService->processTransaction($order->total_price, $order);
         } elseif ($order->payment_method_uuid == Order::ORDER_PAYPAL_PAYMENT_METHOD) {
             $processResult = $this->paypalService->processTransaction($order->total_price, $order);
+        } elseif ($order->payment_method_uuid == Order::ORDER_STRIPE_PAYMENT_METHOD) {
+            $processResult = $this->stripeService->processTransaction($order->total_price, $order, $request->all());
         }
 
         if ($processResult['status'] == false) {
