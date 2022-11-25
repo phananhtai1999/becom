@@ -22,6 +22,7 @@ class ContactResource extends AbstractJsonResource
             'first_name' => $this->first_name,
             'last_name' => $this->last_name,
             'middle_name' => $this->middle_name,
+            'points' => $this->points,
             'phone' => $this->phone,
             'dob' => $this->dob,
             'sex' => $this->sex,

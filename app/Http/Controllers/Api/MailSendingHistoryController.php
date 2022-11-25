@@ -120,8 +120,13 @@ class MailSendingHistoryController extends AbstractRestAPIController
         $this->mailOpenTrackingService->mailOpenTracking($id, $ip, $userAgent);
 
         $mailSendingHistory = $this->service->findOneById($id);
+        //Add 1 point when open mail
+        if ($mailSendingHistory->status !== "opened") {
+            $this->contactService->addPointContactOpenMailCampaign($mailSendingHistory->campaign_uuid, $mailSendingHistory->email);
+        }
         $this->service->update($mailSendingHistory, ['status' => 'opened']);
 
+        //Send Email Scenario Campaign
         $campaign = $this->campaignService->findOneById($mailSendingHistory->campaign_uuid);
         if ($this->campaignService->checkScenarioCampaign($campaign, $mailSendingHistory)) {
             $contactOpenMail = $this->contactService->getContactByCampaign($campaign->uuid, $mailSendingHistory->email);

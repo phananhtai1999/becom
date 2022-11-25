@@ -17,12 +17,14 @@ use App\Listeners\SendEmailRecoveryPasswordListener;
 use App\Listeners\SendEmailVerifyEmailListener;
 use App\Listeners\SendNextEmailByScenarioCampaignListener;
 use App\Models\Config;
+use App\Models\Contact;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\UserAccessToken;
 use App\Models\UserConfig;
 use App\Models\UserDetail;
 use App\Observers\ConfigObserver;
+use App\Observers\ContactObserver;
 use App\Observers\RoleObserver;
 use App\Observers\UserAccessTokenObserver;
 use App\Observers\UserConfigObserver;
@@ -79,5 +81,6 @@ class EventServiceProvider extends ServiceProvider
         UserAccessToken::observe(UserAccessTokenObserver::class);
         Role::observe(RoleObserver::class);
         Config::observe(ConfigObserver::class);
+        Contact::observe(ContactObserver::class);
     }
 }

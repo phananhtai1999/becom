@@ -31,6 +31,7 @@ class Contact extends AbstractModel
         'first_name',
         'last_name',
         'middle_name',
+        'points',
         'phone',
         'sex',
         'dob',
