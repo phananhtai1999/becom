@@ -93,7 +93,7 @@ class ContactController extends AbstractRestAPIController
 
         $model = $this->service->findOrFailById($id);
 
-        $this->service->update($model, $request->all());
+        $this->service->update($model, $request->except("points"));
 
         $contactListUuid = $this->service->findContactListKeyByContact($model);
 
@@ -168,7 +168,7 @@ class ContactController extends AbstractRestAPIController
     {
         $model = $this->myService->findMyContactByKeyOrAbort($id);
 
-        $this->service->update($model, array_merge($request->all(), [
+        $this->service->update($model, array_merge($request->except("points"), [
             'user_uuid' => auth()->user()->getkey(),
         ]));
 
