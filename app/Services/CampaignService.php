@@ -26,12 +26,13 @@ class CampaignService extends AbstractService
                     ->join('send_email_schedule_logs', 'send_email_schedule_logs.campaign_uuid', '=', 'campaigns.uuid')
                     ->where('send_email_schedule_logs.is_running', true);
             })->where([
-                ['campaigns.type', 'simple'],
                 ['campaigns.from_date', '<=', Carbon::now()],
                 ['campaigns.to_date', '>=', Carbon::now()],
                 ['campaigns.was_finished', false],
                 ['campaigns.was_stopped_by_owner', false],
-            ])->firstOrFail();
+                ['campaigns.send_type', "email"],
+                ['campaigns.status', "active"],
+            ])->whereIn('campaigns.type', ['simple', 'scenario'])->firstOrFail();
     }
 
     /**
@@ -50,8 +51,54 @@ class CampaignService extends AbstractService
                 ['campaigns.to_date', '>=', Carbon::now()],
                 ['campaigns.was_finished', false],
                 ['campaigns.was_stopped_by_owner', false],
+                ['campaigns.send_type', "email"],
+                ['campaigns.status', "active"],
             ])
             ->whereDate('contacts.dob', Carbon::now())->get()->toArray();
+    }
+
+    /**
+     * @param $column
+     * @param $id
+     * @return bool
+     */
+    public function checkActiveCampainByColumn($column, $id)
+    {
+        if ($column === "type"){
+            $activeCampaign = $this->model->where([
+                ['uuid', $id]
+            ])->whereIn('type', ['simple', 'scenario'])->first();
+        }else {
+            $query = [];
+            if ($column === "was_finished") {
+                $query = [$column, false];
+            }
+            if ($column === "was_stopped_by_owner") {
+                $query = [$column, false];
+            }
+            if ($column === "from_date") {
+                $query = [$column, '<=', Carbon::now()];
+            }
+            if ($column === "to_date") {
+                $query = [$column, '>=', Carbon::now()];
+            }
+            if ($column === "send_type") {
+                $query = [$column, "email"];
+            }
+            if ($column === "status") {
+                $query = [$column, "active"];
+            }
+            $activeCampaign = $this->model->where([
+                ['uuid', $id], $query
+            ])->first();
+
+        }
+
+        if (!empty($activeCampaign)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -303,6 +350,8 @@ class CampaignService extends AbstractService
             ['to_date', '>=', Carbon::now()],
             ['was_finished', false],
             ['was_stopped_by_owner', false],
+            ['send_type', "email"],
+            ['status', "active"]
         ])->first();
 
         if (empty($campaign)) {

@@ -172,7 +172,8 @@ class SendEmailByBirthdayCampaignListener implements ShouldQueue
                 $creditHistory = $this->creditHistoryService->create([
                     'user_uuid' => $campaign->user_uuid,
                     'campaign_uuid' => $campaign->uuid,
-                    'credit' => $creditNumberSendEmail
+                    'credit' => $creditNumberSendEmail,
+                    'type' => $campaign->send_type
                 ]);
                 DB::commit();
             }catch (\Exception $e) {

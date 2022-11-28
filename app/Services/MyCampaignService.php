@@ -38,6 +38,54 @@ class MyCampaignService extends AbstractService
     }
 
     /**
+     * @param $column
+     * @param $id
+     * @return bool
+     */
+    public function checkActiveMyCampainByColumn($column, $id)
+    {
+        if ($column === "type"){
+            $activeCampaign = $this->model->where([
+                ['uuid', $id],
+                ['user_uuid', auth()->user()->getKey()]
+            ])->whereIn('type', ['simple', 'scenario'])->first();
+        }else {
+            $query = [];
+            if ($column === "was_finished") {
+                $query = [$column, false];
+            }
+            if ($column === "was_stopped_by_owner") {
+                $query = [$column, false];
+            }
+            if ($column === "from_date") {
+                $query = [$column, '<=', Carbon::now()];
+            }
+            if ($column === "to_date") {
+                $query = [$column, '>=', Carbon::now()];
+            }
+            if ($column === "send_type") {
+                $query = [$column, "email"];
+            }
+            if ($column === "status") {
+                $query = [$column, "active"];
+            }
+
+            $activeCampaign = $this->model->where([
+                ['uuid', $id],
+                ['user_uuid', auth()->user()->getKey()],
+                $query
+            ])->first();
+
+        }
+
+        if (!empty($activeCampaign)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * @return mixed
      */
     public function CheckMyCampaign($campaignUuid)

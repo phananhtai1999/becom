@@ -80,6 +80,8 @@ class MyContactQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__country', 'country'),
                 'user_uuid',
                 AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
+                'user.username',
+                AllowedFilter::exact('exact__user.username', 'user.username'),
                 AllowedFilter::scope('uuids_not_in'),
                 AllowedFilter::scope('uuids_in'),
             ]);
