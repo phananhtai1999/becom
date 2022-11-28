@@ -30,5 +30,13 @@ return [
     'birthday_campaign_have_not_scenario' => "La campagne d'anniversaire n'est pas la campagne de scénario sélectionnée",
     'minimum_money' => 'Le montant minimum est de 2000 VND',
     'maximum_money' => 'Le montant maximum est de 50000000 VND',
-    'limit_maximum_and_minimum_credit' => "Le nombre maximum de crédits est de $maximumCredit, Le nombre minimum de crédits est de $minimumCredit"
+    'limit_maximum_and_minimum_credit' => "Le nombre maximum de crédits est de $maximumCredit, Le nombre minimum de crédits est de $minimumCredit",
+    'is_running_campaign_invalid' => "La campagne est en cours!",
+    'type_campaign_invalid' => "Le type de campagne n'est pas valide!",
+    'send_type_campaign_invalid' => "Le type d'envoi de la campagne n'est pas valide!",
+    'from_date_campaign_invalid' => "La campagne n'a pas encore commencé!",
+    'to_date_campaign_invalid' => "La campagne a expiré!",
+    'was_finished_campaign_invalid' => "La campagne est terminée!",
+    'was_stopped_by_owner_campaign_invalid' => "La campagne a été arrêtée par le propriétaire!",
+    "status_campaign_invalid" => "L'état de la campagne n'est pas valide!"
 ];

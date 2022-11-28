@@ -27,13 +27,7 @@ class SendEmailByCampaignRequest extends AbstractRequest
     {
         return [
             'campaign_uuid' => ['required', 'numeric', 'min:1', Rule::exists('campaigns', 'uuid')->where(function ($query){
-                return $query->where([
-                    ['from_date', '<=', Carbon::now()],
-                    ['to_date', '>=', Carbon::now()],
-                    ['was_finished', false],
-                    ['was_stopped_by_owner', false],
-                    ['type', 'simple']
-                ]);
+                return $query->whereNull('deleted_at');
             })]
         ];
     }

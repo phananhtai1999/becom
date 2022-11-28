@@ -31,5 +31,13 @@ return [
     'scenario_campaign_only_one_contact_list'  => 'Scenario campaign choose only one contact list',
     'minimum_money' => 'Minimum money number is 2000 VND',
     'maximum_money' => 'Maximum money number is 50000000 VND',
-    'limit_maximum_and_minimum_credit' => "Maximum credit number is $maximumCredit, Minimum credit number is $minimumCredit"
+    'limit_maximum_and_minimum_credit' => "Maximum credit number is $maximumCredit, Minimum credit number is $minimumCredit",
+    'is_running_campaign_invalid' => "Campaign is running!",
+    'type_campaign_invalid' => "Campaign type is invalid!",
+    'send_type_campaign_invalid' => "Campaign send type is invalid!",
+    'from_date_campaign_invalid' => "Campaign hasn't started yet!",
+    'to_date_campaign_invalid' => "Campaign has expired!",
+    'was_finished_campaign_invalid' => "Campaign was finished!",
+    'was_stopped_by_owner_campaign_invalid' => "Campaign was stopped by owner!",
+    "status_campaign_invalid" => "Campaign status is invalid!"
 ];

@@ -30,5 +30,13 @@ return [
     'birthday_campaign_have_not_scenario' => 'Chiến dịch sinh nhật không có chiến dịch kịch bản',
     'minimum_money' => 'Số tiền tối thiểu là 2000 VND',
     'maximum_money' => 'Số tiền tối đa là 50000000 VND',
-    'limit_maximum_and_minimum_credit' => "Số credit nạp tối da là $maximumCredit, Số credit nạp tối thiểu là $minimumCredit"
+    'limit_maximum_and_minimum_credit' => "Số credit nạp tối da là $maximumCredit, Số credit nạp tối thiểu là $minimumCredit",
+    'is_running_campaign_invalid' => "Chiến dịch đang chạy!",
+    'type_campaign_invalid' => "Loại chiến dịch không hợp lệ!",
+    'send_type_campaign_invalid' => "Loại gửi chiến dịch không hợp lệ!",
+    'from_date_campaign_invalid' => "Chiến dịch vẫn chưa bắt đầu!",
+    'to_date_campaign_invalid' => "Chiến dịch đã hết hạn",
+    'was_finished_campaign_invalid' => "Chiến dịch đã kết thúc!",
+    'was_stopped_by_owner_campaign_invalid' => "Chiến dịch đã dừng bởi chủ sở hữu!",
+    "status_campaign_invalid" => "Trạng thái chiến dịch không hợp lệ!"
 ];

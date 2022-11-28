@@ -519,9 +519,15 @@ class CampaignController extends AbstractRestAPIController
      */
     public function sendEmailsByCampaign(SendEmailByCampaignRequest $request)
     {
+        $columns = ['type', 'send_type','status', 'from_date', 'to_date', 'was_finished', 'was_stopped_by_owner'];
+        foreach ($columns as $column) {
+            if (!$this->service->checkActiveCampainByColumn($column, $request->get('campaign_uuid'))) {
+                return $this->sendValidationFailedJsonResponse(["errors" => ["campaign_".$column => __("messages.{$column}_campaign_invalid")]]);
+            }
+        }
+
         $campaign = $this->service->findOneById($request->get('campaign_uuid'));
         if($this->sendEmailScheduleLogService->checkActiveCampaignbyCampaignUuid($request->get('campaign_uuid'))){
-
             $contactsNumberSendEmail = count($this->contactService->getContactsSendEmail($campaign->uuid));
             $creditNumberSendEmail = $contactsNumberSendEmail * config('credit.default_credit') * $campaign->number_email_per_date;
             if($this->userService->checkCreditToSendCEmail($creditNumberSendEmail, $campaign->user_uuid)){
@@ -533,7 +539,7 @@ class CampaignController extends AbstractRestAPIController
             return $this->sendValidationFailedJsonResponse(["errors" => ['credit' =>  __('messages.credit_invalid')]]);
         }
 
-        return $this->sendValidationFailedJsonResponse(["errors" => ['campaign_uuid' => __('messages.campaign_invalid')]]);
+        return $this->sendValidationFailedJsonResponse(["errors" => ['campaign_is_running' => __('messages.is_running_campaign_invalid')]]);
     }
 
     /**
@@ -542,6 +548,13 @@ class CampaignController extends AbstractRestAPIController
      */
     public function sendEmailByMyCampaign(SendEmailByMyCampaignRequest $request)
     {
+        $columns = ['type', 'send_type', 'status', 'from_date', 'to_date', 'was_finished', 'was_stopped_by_owner'];
+        foreach ($columns as $column) {
+            if (!$this->myService->checkActiveMyCampainByColumn($column, $request->get('campaign_uuid'))) {
+                return $this->sendValidationFailedJsonResponse(["errors" => ["campaign_".$column => __("messages.{$column}_campaign_invalid")]]);
+            }
+        }
+
         $campaign = $this->service->findOneById($request->get('campaign_uuid'));
         if($this->sendEmailScheduleLogService->checkActiveCampaignbyCampaignUuid($request->get('campaign_uuid'))){
 
@@ -556,7 +569,7 @@ class CampaignController extends AbstractRestAPIController
             return $this->sendValidationFailedJsonResponse(["errors" => ['credit' =>  __('messages.credit_invalid')]]);
         }
 
-        return $this->sendValidationFailedJsonResponse(["errors" => ['campaign_uuid' => __('messages.campaign_invalid')]]);
+        return $this->sendValidationFailedJsonResponse(["errors" => ['campaign_is_running' => __('messages.is_running_campaign_invalid')]]);
     }
 
     /**

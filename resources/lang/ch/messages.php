@@ -30,5 +30,13 @@ return [
     'birthday_campaign_have_not_scenario' => '生日活动未选择场景活动',
     'minimum_money' => '最低金额为 2000 越南盾',
     'maximum_money' => '最高金额为 50,000,000 越南盾',
-    'limit_maximum_and_minimum_credit' => "最大信用数为 $maximumCredit, 学分的最低数量是 $minimumCredit"
+    'limit_maximum_and_minimum_credit' => "最大信用数为 $maximumCredit, 学分的最低数量是 $minimumCredit",
+    'is_running_campaign_invalid' => "活动正在运行!",
+    'type_campaign_invalid' => "活动类型无效!",
+    'send_type_campaign_invalid' => "活动发送类型无效!",
+    'from_date_campaign_invalid' => "活动还没有开始!",
+    'to_date_campaign_invalid' => "活动已过期!",
+    'was_finished_campaign_invalid' => "活动已结束!",
+    'was_stopped_by_owner_campaign_invalid' => "活动被所有者停止了!",
+    "status_campaign_invalid" => "活动状态无效!"
 ];
