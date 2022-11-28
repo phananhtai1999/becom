@@ -244,6 +244,7 @@ class MailTemplateController extends AbstractRestAPIController
     public function getMailTemplatesDefault(IndexRequest $request)
     {
         $models = $this->service->getMailTemplateDefaultWithPagination(
+            MailTemplate::PUBLISHED_PUBLISH_STATUS,
             $request->get('per_page', '15'),
             $request->get('page', '1'),
             $request->get('columns', '*'),
