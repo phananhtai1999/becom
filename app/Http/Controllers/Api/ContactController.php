@@ -25,12 +25,12 @@ class ContactController extends AbstractRestAPIController
     use RestIndexTrait, RestShowTrait, RestDestroyTrait;
 
     /**
-     * @var
+     * @var MyContactService
      */
     protected $myService;
 
     /**
-     * @var
+     * @var MyContactListService
      */
     protected $myContactListService;
 
@@ -284,6 +284,30 @@ class ContactController extends AbstractRestAPIController
                 'list' => $totalMyContactList,
             ]
         ]);
+    }
+
+    /**
+     * @param ChartRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function myPointsContactChart(ChartRequest $request)
+    {
+        $startDate = $request->get('start_date', Carbon::today());
+        $endDate = $request->get('end_date', Carbon::today());
+        $groupBy = $request->get('group_by', 'hour');
+
+        if (empty($request->get('contact_list_uuid')) || $this->myContactListService->checkMyContactList($request->get('contact_list_uuid'))) {
+            $totalMyPointsContact = $this->myService->getTotalPointsContactByMyContactList($startDate, $endDate, $request->get('contact_list_uuid'));
+            $pointsContactChart = $this->myService->getPointsContactChartByMyContactList($groupBy, $startDate, $endDate, $request->get('contact_list_uuid'));
+            return $this->sendOkJsonResponse([
+                'data' => $pointsContactChart,
+                'total' => [
+                    'points' => $totalMyPointsContact,
+                ]
+            ]);
+        }
+
+        return $this->sendValidationFailedJsonResponse(["errors" => ['contact_list_uuid' => "The selected contact list uuid is invalid."]]);
     }
 
     /**

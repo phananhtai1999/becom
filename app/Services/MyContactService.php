@@ -258,4 +258,168 @@ class MyContactService extends AbstractService
 
         return $result;
     }
+
+    /**
+     * @param $startDate
+     * @param $endDate
+     * @param $contactListUuid
+     * @return int
+     */
+    public function getTotalPointsContactByMyContactList($startDate, $endDate, $contactListUuid = null)
+    {
+        if (empty($contactListUuid)) {
+            $totalMyContact = $this->model->selectRaw('sum(contacts.points) as points')
+                ->join('contact_contact_list', 'contact_contact_list.contact_uuid', '=', 'contacts.uuid')
+                ->join('contact_lists', 'contact_contact_list.contact_list_uuid', '=', 'contact_lists.uuid')
+                ->where('contact_lists.user_uuid', auth()->user()->getkey())
+                ->whereNull('contact_lists.deleted_at')
+                ->whereDate('contacts.updated_at', '>=', $startDate)
+                ->whereDate('contacts.updated_at', '<=', $endDate)
+                ->first();
+        }else {
+            $totalMyContact = $this->model->selectRaw('sum(contacts.points) as points')
+                ->join('contact_contact_list', 'contact_contact_list.contact_uuid', '=', 'contacts.uuid')
+                ->join('contact_lists', 'contact_contact_list.contact_list_uuid', '=', 'contact_lists.uuid')
+                ->where('contact_lists.user_uuid', auth()->user()->getkey())
+                ->where('contact_lists.uuid', $contactListUuid)
+                ->whereNull('contact_lists.deleted_at')
+                ->whereDate('contacts.updated_at', '>=', $startDate)
+                ->whereDate('contacts.updated_at', '<=', $endDate)
+                ->first();
+        }
+
+        return (int) $totalMyContact->points;
+    }
+
+    /**
+     * @param $dateFormat
+     * @param $startDate
+     * @param $endDate
+     * @param $type
+     * @param $contactListUuid
+     * @return array
+     */
+    public function createQueryGetPointsContactByMyContactList($dateFormat, $startDate, $endDate, $type, $contactListUuid)
+    {
+//        SELECT today.label, today.pointsContact, (today.pointsContact - yest.pointsContact) as increase
+//FROM (SELECT date_format(updated_at, '%Y-%m-%d') as label, SUM(points) as pointsContact
+//from contacts
+//where date(updated_at) >= '2022-11-21' AND date(updated_at) <= '2022-11-24'
+//GROUP By label) today LEFT JOIN
+//    (SELECT date_format(updated_at, '%Y-%m-%d') as label, SUM(points) as pointsContact
+//from contacts
+//where date(updated_at) >= '2022-11-21' AND date(updated_at) <= '2022-11-24'
+//GROUP By label) yest On yest.label = today.label - INTERVAL 1 day;
+        $queryContactList = !empty($contactListUuid) ? "and cl.uuid = '{$contactListUuid}'" : "";
+        $currentUser = auth()->user()->getkey();
+        $string = $type === "month" ? "-01" : "";
+        $todayPointsContactTableSubQuery = $yesterdayPointsContactTableSubQuery = "(SELECT date_format(c.updated_at, '{$dateFormat}') as label, sum(c.points) as points
+                  from contacts c, contact_contact_list ccl, contact_lists cl
+                  where c.uuid = ccl.contact_uuid AND ccl.contact_list_uuid = cl.uuid and
+                  date(c.updated_at) >= '{$startDate}' and date(c.updated_at) <= '{$endDate}'
+                  {$queryContactList}
+                  and cl.user_uuid = '{$currentUser}'
+                  and c.deleted_at is NULL and cl.deleted_at is NULL
+                  GROUP By label)";
+
+        return DB::table(DB::raw("$todayPointsContactTableSubQuery as today"))->selectRaw("today.label, today.points, (today.points - yest.points) as increase")
+            ->leftJoin(DB::raw("$yesterdayPointsContactTableSubQuery as yest"), 'yest.label', '=', DB::raw("date_format(concat(today.label, '$string') - INTERVAL 1 {$type}, '{$dateFormat}')"))
+            ->get()->toArray();
+    }
+
+    /**
+     * @param $groupBy
+     * @param $startDate
+     * @param $endDate
+     * @param $contactListUuid
+     * @return array
+     */
+    public function getPointsContactChartByMyContactList($groupBy, $startDate, $endDate, $contactListUuid = null)
+    {
+        $times = $result = [];
+        $check = true;
+        $subDate = $startDate;
+        $startDate = Carbon::parse($startDate);
+
+        if($groupBy === "hour"){
+            $dateFormat = "%Y-%m-%d %H:00:00";
+            $subDate = Carbon::parse($subDate)->subDay();
+            $endDate = Carbon::parse($endDate)->endOfDay();
+
+            while($startDate <= $endDate){
+                $times[] = $startDate->format('Y-m-d H:00:00');
+                $startDate = $startDate->addHour();
+            }
+        }
+        if($groupBy === "date"){
+            $dateFormat = "%Y-%m-%d";
+            $subDate = Carbon::parse($subDate)->subDay();
+            $endDate = Carbon::parse($endDate);
+
+            while($startDate <= $endDate){
+                $times[] = $startDate->format('Y-m-d');
+                $startDate = $startDate->addDay();
+            }
+        }
+        if($groupBy === "month"){
+            $dateFormat = "%Y-%m";
+            $subDate = Carbon::parse($subDate)->subMonth();
+            $endDate = Carbon::parse($endDate);
+
+            while($startDate <= $endDate){
+                $times[] = $startDate->format('Y-m');
+                $startDate = $startDate->addMonth();
+            }
+        }
+
+        $pointsContactsChart = $this->createQueryGetPointsContactByMyContactList($dateFormat, $subDate, $endDate, $groupBy === 'date' ? 'day' : $groupBy, $contactListUuid);
+
+        $lastIncrease = 0;
+        foreach ($times as $time){
+            if(!empty($pointsContactsChart)) {
+                foreach ($pointsContactsChart as $pointsContactChart){
+                    if($time == $pointsContactChart->label) {
+                        $result[] = [
+                            'label' => $pointsContactChart->label,
+                            'points' => (int)$pointsContactChart->points,
+                            'increase' => (int) ($pointsContactChart->increase ?? $pointsContactChart->points)
+                        ];
+                        $check = true;
+                        break;
+                    }else{
+                        $prevTime = $time;
+                        if($groupBy === 'hour'){
+                            $prevTime = Carbon::parse($prevTime)->subHour()->toDateTimeString();
+                        }
+                        if($groupBy === 'date'){
+                            $prevTime = Carbon::parse($prevTime)->subDay()->toDateString();
+                        }
+                        if($groupBy === 'month'){
+                            $prevTime = Carbon::parse($prevTime)->subMonth()->format('Y-m');
+                        }
+                        if($prevTime == $pointsContactChart->label){
+                            $lastIncrease = $pointsContactChart->points;
+                        }
+                        $check = false;
+                    }
+                }
+                if(!$check){
+                    $result[] = [
+                        'label' => $time,
+                        'points' => 0,
+                        'increase' => -$lastIncrease
+                    ];
+                    $lastIncrease = 0;
+                }
+            }else{
+                $result[] = [
+                    'label' => $time,
+                    'points' => 0,
+                    'increase' => 0
+
+                ];
+            }
+        }
+        return $result;
+    }
 }

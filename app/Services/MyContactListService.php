@@ -27,6 +27,24 @@ class MyContactListService extends AbstractService
 
     /**
      * @param $id
+     * @return bool
+     */
+    public function checkMyContactList($id)
+    {
+        $contactList = $this->findOneWhere([
+            ['uuid', $id],
+            ['user_uuid', auth()->user()->getKey()],
+        ]);
+
+        if (!empty($contactList)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param $id
      * @return mixed
      */
     public function deleteMyContactListByKey($id)
