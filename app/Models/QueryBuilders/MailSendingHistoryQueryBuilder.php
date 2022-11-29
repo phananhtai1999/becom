@@ -56,6 +56,14 @@ class MailSendingHistoryQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__campaign.tracking_key', 'campaign.tracking_key'),
                 'campaign.send_type',
                 AllowedFilter::exact('exact__campaign.send_type', 'campaign.send_type'),
+                'campaign.mailTemplate.subject',
+                AllowedFilter::exact('exact__campaign.mailTemplate.subject', 'campaign.mailTemplate.subject'),
+                'campaign.smtpAccount.mail_from_name',
+                AllowedFilter::exact('exact__campaign.smtpAccount.mail_from_name', 'campaign.smtpAccount.mail_from_name'),
+                'campaign.number_email_per_date',
+                AllowedFilter::exact('exact__campaign.number_email_per_date', 'campaign.number_email_per_date'),
+                'campaign.number_email_per_user',
+                AllowedFilter::exact('exact__campaign.number_email_per_user', 'campaign.number_email_per_user'),
             ]);
     }
 }
