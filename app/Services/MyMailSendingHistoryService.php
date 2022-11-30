@@ -22,9 +22,8 @@ class MyMailSendingHistoryService extends AbstractService
     {
         $mailSendingHistory = $this->model->select('mail_sending_history.*')
             ->join('campaigns', 'campaigns.uuid', '=', 'mail_sending_history.campaign_uuid')
-            ->join('websites', 'websites.uuid', '=', 'campaigns.website_uuid')
             ->where([
-                ['websites.user_uuid', auth()->user()->getKey()],
+                ['campaigns.user_uuid', auth()->user()->getKey()],
                 ['mail_sending_history.uuid', $id]
             ])->first();
 
