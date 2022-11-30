@@ -48,19 +48,22 @@ class CreditTransactionHistoryController extends AbstractRestAPIController
             'sms,email',
             'email,sms',
         ];
-        $filterSendType = $this->service->customFilterSendTypeOnCampaign(
-            $filters['campaign.send_type'],
-            $arrayFilters,
-            $request->get('per_page', '15'),
-            $request->get('columns', '*'),
-            $request->get('page_name', 'page'),
-            $request->get('page', '1'),
-        );
-        if (!empty($filterSendType)) {
-
-            return $this->sendOkJsonResponse(
-                $this->service->resourceCollectionToData($this->resourceCollectionClass, $filterSendType)
+        if(!empty($filters['campaign.send_type']))
+        {
+            $filterSendType = $this->service->customFilterSendTypeOnCampaign(
+                $filters['campaign.send_type'],
+                $arrayFilters,
+                $request->get('per_page', '15'),
+                $request->get('columns', '*'),
+                $request->get('page_name', 'page'),
+                $request->get('page', '1'),
             );
+            if (!empty($filterSendType)) {
+
+                return $this->sendOkJsonResponse(
+                    $this->service->resourceCollectionToData($this->resourceCollectionClass, $filterSendType)
+                );
+            }
         }
         $models = $this->service->getCollectionWithPagination();
 
@@ -77,16 +80,34 @@ class CreditTransactionHistoryController extends AbstractRestAPIController
      */
     public function indexMyCreditTransactionHistoryView(IndexRequest $request)
     {
+        $filters = $request->filter;
+        $arrayFilters = [
+            'sms',
+            'email',
+            'sms,email',
+            'email,sms',
+        ];
+        if(!empty($filters['campaign.send_type']))
+        {
+            $filterSendType = $this->myService->customMyFilterSendTypeOnCampaign(
+                $filters['campaign.send_type'],
+                $arrayFilters,
+                $request->get('per_page', '15'),
+                $request->get('columns', '*'),
+                $request->get('page_name', 'page'),
+                $request->get('page', '1'),
+            );
+            if (!empty($filterSendType)) {
+
+                return $this->sendOkJsonResponse(
+                    $this->service->resourceCollectionToData($this->resourceCollectionClass, $filterSendType)
+                );
+            }
+        }
+        $models = $this->myService->getCollectionWithPagination();
+
         return $this->sendOkJsonResponse(
-            $this->service->resourceCollectionToData(
-                $this->resourceCollectionClass,
-                $this->myService->getCollectionWithPagination(
-                    $request->get('per_page', '15'),
-                    $request->get('page', '1'),
-                    $request->get('columns', '*'),
-                    $request->get('page_name', 'page'),
-                )
-            )
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
         );
     }
 }
