@@ -16,18 +16,19 @@ use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Services\ContactListService;
 use App\Services\ContactService;
 use App\Services\MyContactListService;
+use Illuminate\Http\JsonResponse;
 
 class ContactListController extends AbstractRestAPIController
 {
     use RestIndexTrait, RestShowTrait, RestDestroyTrait;
 
     /**
-     * @var
+     * @var MyContactListService
      */
     protected $myService;
 
     /**
-     * @var
+     * @var ContactService
      */
     protected $contactService;
 
@@ -54,7 +55,7 @@ class ContactListController extends AbstractRestAPIController
 
     /**
      * @param ContactListRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      */
@@ -122,7 +123,7 @@ class ContactListController extends AbstractRestAPIController
     /**
      * @param $id
      * @param UpdateContactListRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      */
@@ -176,8 +177,24 @@ class ContactListController extends AbstractRestAPIController
     }
 
     /**
+     * @param $id
+     * @return JsonResponse
+     */
+    public function destroy($id)
+    {
+        if (!$this->service->checkExistsContactListInTables($id)) {
+            $this->service->destroy($id);
+
+            return $this->sendOkJsonResponse();
+        }
+
+        return $this->sendValidationFailedJsonResponse(["errors" => ["deleted_uuid" => __('messages.data_not_deleted')]]);
+
+    }
+
+    /**
      * @param IndexRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */
@@ -198,7 +215,7 @@ class ContactListController extends AbstractRestAPIController
 
     /**
      * @param MyContactListRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      */
@@ -253,7 +270,7 @@ class ContactListController extends AbstractRestAPIController
 
     /**
      * @param $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function showMyContactList($id)
     {
@@ -267,7 +284,7 @@ class ContactListController extends AbstractRestAPIController
     /**
      * @param UpdateMyContactListRequest $request
      * @param $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      */
@@ -327,19 +344,23 @@ class ContactListController extends AbstractRestAPIController
 
     /**
      * @param $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function destroyMyContactList($id)
     {
-        $this->myService->deleteMyContactListByKey($id);
+        if (!$this->service->checkExistsContactListInTables($id)) {
+            $this->myService->deleteMyContactListByKey($id);
 
-        return $this->sendOkJsonResponse();
+            return $this->sendOkJsonResponse();
+        }
+
+        return $this->sendValidationFailedJsonResponse(["errors" => ["deleted_uuid" => __('messages.data_not_deleted')]]);
     }
 
     /**
      * @param $id
      * @param $contact_id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      *
      */
     public function removeContactFromContactList($id, $contact_id)
@@ -352,7 +373,7 @@ class ContactListController extends AbstractRestAPIController
     /**
      * @param $id
      * @param $contact_id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      *
      */
     public function removeMyContactFromContactList($id, $contact_id)

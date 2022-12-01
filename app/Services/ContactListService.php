@@ -26,4 +26,21 @@ class ContactListService extends AbstractService
 
         return $contactUuid;
     }
+
+    /**
+     * @param $id
+     * @return bool
+     */
+    public function checkExistsContactListInTables($id)
+    {
+        $contactList = $this->findOrFailById($id);
+
+        $campaigns = $contactList->campaigns->toArray();
+
+        if (!empty($campaigns)) {
+            return true;
+        }
+
+        return false;
+    }
 }

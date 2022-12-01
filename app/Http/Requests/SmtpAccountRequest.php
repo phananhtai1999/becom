@@ -34,8 +34,7 @@ class SmtpAccountRequest extends AbstractRequest
             'mail_from_address' => ['required', 'string'],
             'mail_from_name' => ['required', 'string'],
             'secret_key' => ['required', 'string'],
-            'website_uuid' => ['required', 'numeric', 'min:1', 'exists:websites,uuid'],
-            'user_uuid' => ['nullable', 'numeric', 'min:1', 'exists:users,uuid'],
+            'website_uuid' => ['required', 'numeric', 'min:1', 'exists:websites,uuid']
         ];
     }
 }

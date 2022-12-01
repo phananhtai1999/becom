@@ -26,7 +26,12 @@ class UpdateCampaignRequest extends AbstractRequest
     {
         $validate = [
             'tracking_key' => ['string'],
-            'mail_template_uuid' => ['numeric', 'min:1', 'exists:mail_templates,uuid'],
+            'mail_template_uuid' => ['numeric', 'min:1', Rule::exists('mail_templates', 'uuid')->where(function ($query) {
+                return $query->where([
+                    ['website_uuid', $this->request->get('website_uuid')],
+                    ['user_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey()]
+                ])->whereNull('deleted_at');
+            })],
             'from_date' => ['date', 'before_or_equal:to_date'],
             'to_date' => ['date', 'after_or_equal:from_date'],
             'number_email_per_date' => ['numeric', 'min:1', 'lte:number_email_per_user'],
@@ -34,18 +39,33 @@ class UpdateCampaignRequest extends AbstractRequest
             'status' => ['string', 'in:active,banned'],
             'type' => ['string', 'in:simple,birthday,scenario'],
             'send_type' => ['string', 'in:sms,email'],
-            'smtp_account_uuid' => ['nullable', 'numeric', 'min:1', 'exists:smtp_accounts,uuid'],
-            'website_uuid' => ['numeric', 'min:1', 'exists:websites,uuid'],
+            'smtp_account_uuid' => ['nullable', 'numeric', 'min:1', Rule::exists('smtp_accounts', 'uuid')->where(function ($query) {
+                return $query->where([
+                    ['website_uuid', $this->request->get('website_uuid')],
+                    ['user_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey()]
+                ])->whereNull('deleted_at');
+            })],
+            'website_uuid' => ['numeric', 'min:1', Rule::exists('websites', 'uuid')->where(function ($query) {
+                return $query->where('user_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey())->whereNull('deleted_at');
+            })],
             'was_finished' => ['boolean'],
             'was_stopped_by_owner' => ['boolean'],
-            'user_uuid' => ['numeric', 'min:1', 'exists:users,uuid'],
+            'user_uuid' => ['nullable', 'numeric', 'min:1', 'exists:users,uuid'],
             'contact_list' => ['array', 'min:1'],
-            'contact_list.*' => ['numeric', 'min:1', 'exists:contact_lists,uuid'],
+            'contact_list.*' => ['numeric', 'min:1',  Rule::exists('contact_lists', 'uuid')->where(function ($query) {
+                return $query->where('user_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey())->whereNull('deleted_at');
+            })],
             'not_open_mail_campaign' => ['nullable', 'numeric', 'min:1', Rule::exists('campaigns', 'uuid')->where(function ($query) {
-                $query->where('type', 'scenario')->whereNull('deleted_at');
+                return $query->where([
+                    ['type', 'scenario'],
+                    ['user_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey()]
+                ])->whereNull('deleted_at');
             })],
             'open_mail_campaign' =>  ['nullable', 'numeric', 'min:1', Rule::exists('campaigns', 'uuid')->where(function ($query) {
-                $query->where('type', 'scenario')->whereNull('deleted_at');
+                return $query->where([
+                    ['type', 'scenario'],
+                    ['user_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey()]
+                ])->whereNull('deleted_at');
             })],
             'open_within' => ['nullable', 'numeric', 'min:1']
         ];
