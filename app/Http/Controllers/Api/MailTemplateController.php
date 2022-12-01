@@ -20,23 +20,32 @@ use App\Http\Resources\MailTemplateResource;
 use App\Models\MailTemplate;
 use App\Services\MailTemplateService;
 use App\Services\MyMailTemplateService;
+use App\Services\WebsiteService;
+use Illuminate\Http\JsonResponse;
 
 class MailTemplateController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestEditTrait;
+    use RestIndexTrait, RestShowTrait;
 
     /**
-     * @var
+     * @var MyMailTemplateService
      */
     protected $myService;
 
     /**
+     * @var WebsiteService
+     */
+    protected $websiteService;
+
+    /**
      * @param MailTemplateService $service
      * @param MyMailTemplateService $myService
+     * @param WebsiteService $websiteService
      */
     public function __construct(
         MailTemplateService $service,
-        MyMailTemplateService $myService
+        MyMailTemplateService $myService,
+        WebsiteService $websiteService
     )
     {
         $this->service = $service;
@@ -46,6 +55,7 @@ class MailTemplateController extends AbstractRestAPIController
         $this->storeRequest = MailTemplateRequest::class;
         $this->editRequest = UpdateMailTemplateRequest::class;
         $this->indexRequest = IndexRequest::class;
+        $this->websiteService = $websiteService;
     }
 
     /**
@@ -57,18 +67,63 @@ class MailTemplateController extends AbstractRestAPIController
     {
         $request = app($this->storeRequest);
 
-        if(empty($request->get('user_uuid'))){
-            $data = array_merge($request->all(), [
-                'user_uuid' => auth()->user()->getkey(),
-            ]);
-        }else{
-            $data = $request->all();
+        if (empty($request->get('website_uuid'))) {
+            $userUuid = auth()->user()->getKey();
+        }else {
+            $website = $this->websiteService->findOneById($request->get('website_uuid'));
+            $userUuid = $website->user_uuid;
         }
-        $model = $this->service->create($data);
+        $model = $this->service->create(array_merge($request->all(), [
+            'user_uuid' => $userUuid,
+        ]));
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
         );
+    }
+
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
+    public function edit($id)
+    {
+        $request = app($this->editRequest);
+
+        $model = $this->service->findOrFailById($id);
+
+        if (empty($request->get('website_uuid')) || $model->website_uuid == $request->get('website_uuid')) {
+            $data = $request->except('user_uuid');
+        }else {
+            if (!$this->service->checkExistsMailTemplateInTables($id)) {
+                $website = $this->websiteService->findOneById($request->get('website_uuid'));
+                $data = array_merge($request->all(), [
+                    'user_uuid' => $website->user_uuid,
+                ]);
+            } else {
+                return $this->sendValidationFailedJsonResponse(["errors" => ["website_uuid" => __('messages.website_uuid_not_changed')]]);
+            }
+        }
+        $this->service->update($model, $data);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
+    public function destroy($id)
+    {
+        if (!$this->service->checkExistsMailTemplateInTables($id)) {
+            $this->service->destroy($id);
+
+            return $this->sendOkJsonResponse();
+        }
+
+        return $this->sendValidationFailedJsonResponse(["errors" => ["deleted_uuid" => __('messages.data_not_deleted')]]);
     }
 
     /**
@@ -128,13 +183,17 @@ class MailTemplateController extends AbstractRestAPIController
     {
         $model = $this->myService->findMyMailTemplateByKeyOrAbort($id);
 
-        $this->service->update($model, array_merge($request->all(), [
-            'user_uuid' => auth()->user()->getkey(),
-        ]));
+        if (empty($request->get('website_uuid')) || $model->website_uuid == $request->get('website_uuid') ||
+            !$this->service->checkExistsMailTemplateInTables($id)) {
 
-        return $this->sendOkJsonResponse(
-            $this->service->resourceToData($this->resourceClass, $model)
-        );
+            $this->service->update($model, $request->except('user_uuid'));
+
+            return $this->sendOkJsonResponse(
+                $this->service->resourceToData($this->resourceClass, $model)
+            );
+        }
+
+        return $this->sendValidationFailedJsonResponse(["errors" => ["website_uuid" => __('messages.website_uuid_not_changed')]]);
     }
 
     /**
@@ -143,9 +202,13 @@ class MailTemplateController extends AbstractRestAPIController
      */
     public function destroyMyMailTemplate($id)
     {
-        $this->myService->deleteMyMailTemplateByKey($id);
+        if (!$this->service->checkExistsMailTemplateInTables($id)) {
+            $this->myService->deleteMyMailTemplateByKey($id);
 
-        return $this->sendOkJsonResponse();
+            return $this->sendOkJsonResponse();
+        }
+
+        return $this->sendValidationFailedJsonResponse(["errors" => ["deleted_uuid" => __('messages.data_not_deleted')]]);
     }
 
     /**
@@ -174,15 +237,16 @@ class MailTemplateController extends AbstractRestAPIController
      */
     public function storeUnpublishedMailTemplate(UnpublishedMailTemplateRequest $request)
     {
-        if(empty($request->get('user_uuid'))){
-            $data = array_merge($request->all(), [
-                'user_uuid' => auth()->user()->getkey(),
-            ]);
-        }else{
-            $data = $request->all();
+        if (empty($request->get('website_uuid'))) {
+            $userUuid = auth()->user()->getKey();
+        }else {
+            $website = $this->websiteService->findOneById($request->get('website_uuid'));
+            $userUuid = $website->user_uuid;
         }
-        $model = $this->service->create(array_merge($data, [
+
+        $model = $this->service->create(array_merge($request->all(), [
             'publish_status' => MailTemplate::PENDING_PUBLISH_STATUS,
+            'user_uuid' => $userUuid
         ]));
 
         return $this->sendCreatedJsonResponse(
@@ -212,7 +276,20 @@ class MailTemplateController extends AbstractRestAPIController
     {
         $model = $this->service->findMailTemplateByKeyAndPublishStatus(MailTemplate::PENDING_PUBLISH_STATUS, $id);
 
-        $this->service->update($model, array_merge($request->all(), [
+        if (empty($request->get('website_uuid')) || $model->website_uuid == $request->get('website_uuid')) {
+            $data = $request->except('user_uuid');
+        }else {
+            if (!$this->service->checkExistsMailTemplateInTables($id)) {
+                $website = $this->websiteService->findOneById($request->get('website_uuid'));
+                $data = array_merge($request->all(), [
+                    'user_uuid' => $website->user_uuid,
+                ]);
+            } else {
+                return $this->sendValidationFailedJsonResponse(["errors" => ["website_uuid" => __('messages.website_uuid_not_changed')]]);
+            }
+        }
+
+        $this->service->update($model, array_merge($data, [
             'publish_status' => 2,
         ]));
 

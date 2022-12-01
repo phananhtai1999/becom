@@ -93,4 +93,12 @@ class Website extends AbstractModel
     {
         return $this->hasOne(WebsiteVerification::class, 'website_uuid', 'uuid');
     }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function mailTemplates()
+    {
+        return $this->hasMany(MailTemplate::class, 'website_uuid', 'uuid');
+    }
 }

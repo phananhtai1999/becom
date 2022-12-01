@@ -27,8 +27,10 @@ class UpdateMyCampaignRequest extends AbstractRequest
         $validate = [
             'tracking_key' => ['string'],
             'mail_template_uuid' => ['numeric', 'min:1', Rule::exists('mail_templates', 'uuid')->where(function ($query) {
-
-                return $query->where('user_uuid', auth()->user()->getkey())->whereNull('deleted_at');
+                return $query->where([
+                    ['website_uuid', $this->request->get('website_uuid')],
+                    ['user_uuid', auth()->user()->getKey()]
+                ])->whereNull('deleted_at');
             })],
             'from_date' => ['date', 'before_or_equal:to_date'],
             'to_date' => ['date', 'after_or_equal:from_date'],
@@ -38,8 +40,10 @@ class UpdateMyCampaignRequest extends AbstractRequest
             'type' => ['string', 'in:simple,birthday,scenario'],
             'send_type' => ['string', 'in:sms,email'],
             'smtp_account_uuid' => ['nullable', 'numeric', 'min:1', Rule::exists('smtp_accounts', 'uuid')->where(function ($query) {
-
-                return $query->where('user_uuid', auth()->user()->getkey())->whereNull('deleted_at');
+                return $query->where([
+                    ['website_uuid', $this->request->get('website_uuid')],
+                    ['user_uuid', auth()->user()->getKey()]
+                ])->whereNull('deleted_at');
             })],
             'website_uuid' => ['numeric', 'min:1', Rule::exists('websites', 'uuid')->where(function ($query) {
 
@@ -53,13 +57,13 @@ class UpdateMyCampaignRequest extends AbstractRequest
                 return $query->where('user_uuid', auth()->user()->getkey())->whereNull('deleted_at');
             })],
             'not_open_mail_campaign' => ['nullable', 'numeric', 'min:1', Rule::exists('campaigns', 'uuid')->where(function ($query) {
-                $query->where([
+                return $query->where([
                     ['type', 'scenario'],
                     ['user_uuid', auth()->user()->getkey()]
                 ])->whereNull('deleted_at');
             })],
             'open_mail_campaign' =>  ['nullable', 'numeric', 'min:1', Rule::exists('campaigns', 'uuid')->where(function ($query) {
-                $query->where([
+                return $query->where([
                     ['type', 'scenario'],
                     ['user_uuid', auth()->user()->getkey()]
                 ])->whereNull('deleted_at');

@@ -39,5 +39,7 @@ return [
     'to_date_campaign_invalid' => "Campaign has expired!",
     'was_finished_campaign_invalid' => "Campaign was finished!",
     'was_stopped_by_owner_campaign_invalid' => "Campaign was stopped by owner!",
-    "status_campaign_invalid" => "Campaign status is invalid!"
+    "status_campaign_invalid" => "Campaign status is invalid!",
+    "data_not_deleted" => "This data cannot be deleted",
+    "website_uuid_not_changed" => "Website uuid cannot be changed"
 ];

@@ -23,6 +23,7 @@ use App\Services\ConfigService;
 use App\Services\MySmtpAccountService;
 use App\Services\SmtpAccountService;
 use App\Services\UserService;
+use App\Services\WebsiteService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
@@ -31,7 +32,7 @@ use Psr\Container\NotFoundExceptionInterface;
 
 class SmtpAccountController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestEditTrait;
+    use RestIndexTrait, RestShowTrait;
 
     /**
      * @var MySmtpAccountService
@@ -39,14 +40,19 @@ class SmtpAccountController extends AbstractRestAPIController
     protected $myService;
 
     /**
-     * @var
+     * @var UserService
      */
     protected $userService;
 
     /**
-     * @var
+     * @var ConfigService
      */
     protected $configService;
+
+    /**
+     * @var WebsiteService
+     */
+    protected $websiteService;
 
     /**
      * @param SmtpAccountService $service
@@ -58,7 +64,8 @@ class SmtpAccountController extends AbstractRestAPIController
         SmtpAccountService $service,
         MySmtpAccountService $myService,
         UserService $userService,
-        ConfigService $configService
+        ConfigService $configService,
+        WebsiteService $websiteService
     )
     {
         $this->service = $service;
@@ -70,6 +77,7 @@ class SmtpAccountController extends AbstractRestAPIController
         $this->storeRequest = SmtpAccountRequest::class;
         $this->editRequest = UpdateSmtpAccountRequest::class;
         $this->indexRequest = IndexRequest::class;
+        $this->websiteService = $websiteService;
     }
 
     /**
@@ -81,18 +89,60 @@ class SmtpAccountController extends AbstractRestAPIController
     {
         $request = app($this->storeRequest);
 
-        if(empty($request->get('user_uuid'))){
-            $data = array_merge($request->all(), [
-                'user_uuid' => auth()->user()->getkey(),
-            ]);
-        }else{
-            $data = $request->all();
-        }
-        $model = $this->service->create($data);
+        $website = $this->websiteService->findOneById($request->get('website_uuid'));
+
+        $model = $this->service->create(array_merge($request->all(), [
+            'user_uuid' => $website->user_uuid,
+        ]));
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
         );
+    }
+
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
+    public function edit($id)
+    {
+        $request = app($this->editRequest);
+
+        $model = $this->service->findOrFailById($id);
+
+        if (empty($request->get('website_uuid')) || $model->website_uuid == $request->get('website_uuid')) {
+            $data = $request->except('user_uuid');
+        }else {
+            if (!$this->service->checkExistsSmtpAccountInTables($id)) {
+                $website = $this->websiteService->findOneById($request->get('website_uuid'));
+                $data = array_merge($request->all(), [
+                    'user_uuid' => $website->user_uuid,
+                ]);
+            } else {
+                return $this->sendValidationFailedJsonResponse(["errors" => ["website_uuid" => __('messages.website_uuid_not_changed')]]);
+            }
+        }
+        $this->service->update($model, $data);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
+    public function destroy($id)
+    {
+        if (!$this->service->checkExistsSmtpAccountInTables($id)) {
+            $this->service->destroy($id);
+
+            return $this->sendOkJsonResponse();
+        }
+
+        return $this->sendValidationFailedJsonResponse(["errors" => ["deleted_uuid" => __('messages.data_not_deleted')]]);
+
     }
 
     /**
@@ -163,11 +213,17 @@ class SmtpAccountController extends AbstractRestAPIController
 
         if($model->user->can_add_smtp_account == 1 || $config->value == 0)
         {
-            $this->service->update($model, array_merge($request->all(), [
-                'user_uuid' => auth()->user()->getkey(),
-            ]));
+            if (empty($request->get('website_uuid')) || $model->website_uuid == $request->get('website_uuid') ||
+                !$this->service->checkExistsSmtpAccountInTables($id)) {
 
-            return $this->sendCreatedJsonResponse(
+                $data = $request->except('user_uuid');
+            }else {
+                return $this->sendValidationFailedJsonResponse(["errors" => ["website_uuid" => __('messages.website_uuid_not_changed')]]);
+            }
+
+            $this->service->update($model, $data);
+
+            return $this->sendOkJsonResponse(
                 $this->service->resourceToData($this->resourceClass, $model)
             );
         } else {
@@ -181,9 +237,13 @@ class SmtpAccountController extends AbstractRestAPIController
      */
     public function destroyMySmtpAccount($id)
     {
-        $this->myService->deleteMySmtpAccountByKey($id);
+        if (!$this->service->checkExistsSmtpAccountInTables($id)) {
+            $this->myService->deleteMySmtpAccountByKey($id);
 
-        return $this->sendOkJsonResponse();
+            return $this->sendOkJsonResponse();
+        }
+
+        return $this->sendValidationFailedJsonResponse(["errors" => ["deleted_uuid" => __('messages.data_not_deleted')]]);
     }
 
     /**

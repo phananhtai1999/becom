@@ -16,6 +16,23 @@ class SmtpAccountService extends AbstractService
     protected $modelQueryBuilderClass = SmtpAccountQueryBuilder::class;
 
     /**
+     * @param $id
+     * @return bool
+     */
+    public function checkExistsSmtpAccountInTables($id)
+    {
+        $smtpAccount = $this->findOrFailById($id);
+
+        $campaigns = $smtpAccount->campaigns->toArray();
+
+        if (!empty($campaigns)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * @param $smtpAccount
      * @return void
      */

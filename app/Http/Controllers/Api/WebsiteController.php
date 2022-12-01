@@ -22,10 +22,11 @@ use App\Services\FileVerificationService;
 use App\Services\MyWebsiteService;
 use App\Services\WebsiteService;
 use App\Services\WebsiteVerificationService;
+use Illuminate\Http\JsonResponse;
 
 class WebsiteController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestEditTrait;
+    use RestIndexTrait, RestShowTrait;
 
     /**
      * @var MyWebsiteService
@@ -67,7 +68,7 @@ class WebsiteController extends AbstractRestAPIController
     }
 
     /**
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function store()
     {
@@ -88,7 +89,48 @@ class WebsiteController extends AbstractRestAPIController
     }
 
     /**
-     * @return \Illuminate\Http\JsonResponse
+     * @param $id
+     * @return JsonResponse
+     */
+    public function edit($id)
+    {
+        $request = app($this->editRequest);
+
+        $model = $this->service->findOrFailById($id);
+
+        if (empty($request->get('user_uuid')) || $model->user_uuid == $request->get('user_uuid')
+            || !$this->service->checkExistsWebisteInTables($id)) {
+
+            $data = $request->all();
+        } else {
+            return $this->sendValidationFailedJsonResponse(["errors" => ["user_uuid" => __('messages.user_uuid_not_changed')]]);
+        }
+
+        $this->service->update($model, $data);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
+    public function destroy($id)
+    {
+        if (!$this->service->checkExistsWebisteInTables($id)) {
+            $this->service->destroy($id);
+
+            return $this->sendOkJsonResponse();
+        }
+
+        return $this->sendValidationFailedJsonResponse(["errors" => ["deleted_uuid" => __('messages.data_not_deleted')]]);
+
+    }
+
+    /**
+     * @return JsonResponse
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */
@@ -109,7 +151,7 @@ class WebsiteController extends AbstractRestAPIController
 
     /**
      * @param MyWebsiteRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function storeMyWebsite(MyWebsiteRequest $request)
     {
@@ -124,7 +166,7 @@ class WebsiteController extends AbstractRestAPIController
 
     /**
      * @param $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function showMyWebsite($id)
     {
@@ -138,7 +180,7 @@ class WebsiteController extends AbstractRestAPIController
     /**
      * @param UpdateMyWebsiteRequest $request
      * @param $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function editMyWebsite(UpdateMyWebsiteRequest $request, $id)
     {
@@ -155,18 +197,23 @@ class WebsiteController extends AbstractRestAPIController
 
     /**
      * @param $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function destroyMyWebsite($id)
     {
-        $this->myService->deleteMyWebsite($id);
+        if (!$this->service->checkExistsWebisteInTables($id)) {
+            $this->myService->deleteMyWebsite($id);
 
-        return $this->sendOkJsonResponse();
+            return $this->sendOkJsonResponse();
+        }
+
+        return $this->sendValidationFailedJsonResponse(["errors" => ["deleted_uuid" => __('messages.data_not_deleted')]]);
+
     }
 
     /**
      * @param WebsiteVerificationRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function verifyByDnsRecord(WebsiteVerificationRequest $request)
     {
@@ -185,7 +232,7 @@ class WebsiteController extends AbstractRestAPIController
 
     /**
      * @param VerifyDomainWebsiteVerificationRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function verifyByHtmlTag(VerifyDomainWebsiteVerificationRequest $request)
     {
@@ -209,7 +256,7 @@ class WebsiteController extends AbstractRestAPIController
 
     /**
      * @param VerifyDomainWebsiteVerificationRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function verifyByHtmlFile(VerifyDomainWebsiteVerificationRequest $request)
     {

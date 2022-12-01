@@ -13,6 +13,23 @@ class MailTemplateService extends AbstractService
     protected $modelQueryBuilderClass = MailTemplateQueryBuilder::class;
 
     /**
+     * @param $id
+     * @return bool
+     */
+    public function checkExistsMailTemplateInTables($id)
+    {
+        $mailTemplate = $this->findOrFailById($id);
+
+        $campaigns = $mailTemplate->campaigns->toArray();
+
+        if (!empty($campaigns)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * @param $perPage
      * @param $page
      * @param $columns
