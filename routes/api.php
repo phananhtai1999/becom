@@ -406,6 +406,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'chart.'], function () {
         Route::get('/campaign-chart', [CampaignController::class, 'campaignChart'])->name('campaign-chart');
         Route::get('/credit-chart', [CreditHistoryController::class, 'creditChart'])->name('credit-chart');
         Route::get('/smtp-account-chart', [SmtpAccountController::class, 'smtpAccountChart'])->name('smtpAccountChart');
+        Route::get('/point-contact-chart', [ContactController::class, 'pointsContactChart'])->name('pointsContactChart');
     });
 
     Route::group(['as' => 'my.'], function () {
