@@ -15,6 +15,7 @@ use App\Http\Resources\ContactResourceCollection;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
+use App\Services\ContactListService;
 use App\Services\ContactService;
 use App\Services\MyContactListService;
 use App\Services\MyContactService;
@@ -35,14 +36,21 @@ class ContactController extends AbstractRestAPIController
     protected $myContactListService;
 
     /**
+     * @var ContactListService
+     */
+    protected $contactListService;
+
+    /**
      * @param ContactService $service
      * @param MyContactService $myService
      * @param MyContactListService $myContactListService
+     * @param ContactListService $contactListService
      */
     public function __construct(
         ContactService $service,
         MyContactService $myService,
-        MyContactListService $myContactListService
+        MyContactListService $myContactListService,
+        ContactListService $contactListService
     )
     {
         $this->service = $service;
@@ -53,6 +61,7 @@ class ContactController extends AbstractRestAPIController
         $this->storeRequest = ContactRequest::class;
         $this->editRequest = UpdateContactRequest::class;
         $this->indexRequest = IndexRequest::class;
+        $this->contactListService = $contactListService;
     }
 
     /**
@@ -284,6 +293,26 @@ class ContactController extends AbstractRestAPIController
                 'list' => $totalMyContactList,
             ]
         ]);
+    }
+
+    public function pointsContactChart(ChartRequest $request)
+    {
+        $startDate = $request->get('start_date', Carbon::today());
+        $endDate = $request->get('end_date', Carbon::today());
+        $groupBy = $request->get('group_by', 'hour');
+
+        if (empty($request->get('contact_list_uuid')) || $this->contactListService->checkContactListByUuid($request->get('contact_list_uuid'))) {
+            $totalPointsContact = $this->service->getTotalPointsContactByContactList($startDate, $endDate, $request->get('contact_list_uuid'));
+            $pointsContactChart = $this->service->getPointsContactChartByContactList($groupBy, $startDate, $endDate, $request->get('contact_list_uuid'));
+            return $this->sendOkJsonResponse([
+                'data' => $pointsContactChart,
+                'total' => [
+                    'points' => $totalPointsContact,
+                ]
+            ]);
+        }
+
+        return $this->sendValidationFailedJsonResponse(["errors" => ['contact_list_uuid' => "The selected contact list uuid is invalid."]]);
     }
 
     /**

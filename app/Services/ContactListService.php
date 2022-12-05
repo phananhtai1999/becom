@@ -43,4 +43,20 @@ class ContactListService extends AbstractService
 
         return false;
     }
+
+    /**
+     * @param $id
+     * @return bool
+     */
+    public function checkContactListByUuid($id)
+    {
+        $contactList = $this->findOneWhere(['uuid' => $id ]);
+
+        if (!empty($contactList)) {
+            return true;
+        }
+
+        return false;
+    }
+
 }
