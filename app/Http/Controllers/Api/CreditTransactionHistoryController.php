@@ -9,7 +9,6 @@ use App\Http\Resources\CreditTransactionHistoryResourceCollection;
 use App\Services\CreditTransactionHistoryService;
 use App\Services\MyCreditTransactionHistoryService;
 
-
 class CreditTransactionHistoryController extends AbstractRestAPIController
 {
     /**
@@ -48,8 +47,14 @@ class CreditTransactionHistoryController extends AbstractRestAPIController
             'sms,email',
             'email,sms',
         ];
-        if(!empty($filters['campaign.send_type']))
-        {
+        if (!empty($filters)) {
+            foreach ($filters as $key => $filter) {
+                if ($filter == null) {
+                    unset($filters[$key]);
+                }
+            }
+        }
+        if (!empty($filters['campaign.send_type']) && count($filters) == 1) {
             $filterSendType = $this->service->customFilterSendTypeOnCampaign(
                 $filters['campaign.send_type'],
                 $arrayFilters,
@@ -87,27 +92,45 @@ class CreditTransactionHistoryController extends AbstractRestAPIController
             'sms,email',
             'email,sms',
         ];
-        if(!empty($filters['campaign.send_type']))
-        {
-            $filterSendType = $this->myService->customMyFilterSendTypeOnCampaign(
-                $filters['campaign.send_type'],
-                $arrayFilters,
-                $request->get('per_page', '15'),
-                $request->get('columns', '*'),
-                $request->get('page_name', 'page'),
-                $request->get('page', '1'),
-            );
-            if (!empty($filterSendType)) {
-
-                return $this->sendOkJsonResponse(
-                    $this->service->resourceCollectionToData($this->resourceCollectionClass, $filterSendType)
-                );
+        if (!empty($filters)) {
+            foreach ($filters as $key => $filter) {
+                if ($filter == null) {
+                    unset($filters[$key]);
+                }
             }
         }
-        $models = $this->myService->getCollectionWithPagination();
+        if (!empty($filters['campaign.send_type'])) {
+            if (count($filters) == 1) {
+                $filterSendType = $this->myService->customMyFilterSendTypeOnCampaign(
+                    $filters['campaign.send_type'],
+                    $arrayFilters,
+                    $request->get('per_page', '15'),
+                    $request->get('columns', '*'),
+                    $request->get('page_name', 'page'),
+                    $request->get('page', '1'),
+                );
+                if (!empty($filterSendType)) {
+
+                    return $this->sendOkJsonResponse(
+                        $this->service->resourceCollectionToData($this->resourceCollectionClass, $filterSendType)
+                    );
+                }
+            }
+            $models = $this->myService->getCollectionWithPagination();
+
+            return $this->sendOkJsonResponse(
+                $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+            );
+        }
+        $myAddAndUseCreditTransactionHistory = $this->myService->myFilterAddAndUseCreditTransactionHistory(
+            $request->get('per_page', '15'),
+            $request->get('columns', '*'),
+            $request->get('page_name', 'page'),
+            $request->get('page', '1'),
+        );
 
         return $this->sendOkJsonResponse(
-            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $myAddAndUseCreditTransactionHistory)
         );
     }
 }

@@ -15,7 +15,12 @@ class MyCreditTransactionHistoryQueryBuilder extends AbstractQueryBuilder
      */
     public static function baseQuery()
     {
-        return CreditTransactionHistory::where('user_uuid', auth()->user()->getKey());
+        return CreditTransactionHistory::select('transactions.*')
+            ->join('campaigns', 'campaigns.uuid', '=', 'transactions.campaign_uuid')
+            ->where([
+                ['transactions.user_uuid', auth()->user()->getkey()],
+                ['campaigns.user_uuid', auth()->user()->getkey()]
+            ]);
     }
 
     /**
@@ -58,6 +63,8 @@ class MyCreditTransactionHistoryQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__add_by_uuid', 'add_by_uuid'),
                 'campaign.send_type',
                 AllowedFilter::exact('exact__campaign.send_type', 'campaign.send_type'),
+                'campaign.tracking_key',
+                AllowedFilter::exact('exact__campaign.tracking_key', 'campaign.tracking_key'),
             ]);
     }
 }
