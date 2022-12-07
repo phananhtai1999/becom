@@ -3,19 +3,22 @@
 namespace App\Models\QueryBuilders;
 
 use App\Abstracts\AbstractQueryBuilder;
-use App\Models\CreditHistory;
+use App\Models\CreditTransactionHistory;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\Concerns\SortsQuery;
 use Spatie\QueryBuilder\QueryBuilder;
 
-class MyCreditHistoryQueryBuilder extends AbstractQueryBuilder
+class MyAddCreditTransactionHistoryQueryBuilder extends AbstractQueryBuilder
 {
     /**
      * @return string
      */
     public static function baseQuery()
     {
-        return CreditHistory::where('user_uuid', auth()->user()->getkey());
+        return CreditTransactionHistory::where([
+            ['user_uuid', auth()->user()->getkey()],
+            ['campaign_uuid', null]
+        ]);
     }
 
     /**
@@ -23,35 +26,39 @@ class MyCreditHistoryQueryBuilder extends AbstractQueryBuilder
      */
     public static function initialQuery()
     {
-        $modelKeyName = (new CreditHistory())->getKeyName();
+        $modelKeyName = (new CreditTransactionHistory())->getKeyName();
 
         return static::for(static::baseQuery())
             ->allowedFields([
                 $modelKeyName,
+                'uuid',
                 'user_uuid',
                 'credit',
                 'campaign_uuid',
-                'type'
+                'add_by_uuid',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
                 $modelKeyName,
+                'uuid',
                 'user_uuid',
                 'credit',
                 'campaign_uuid',
-                'type'
+                'add_by_uuid',
             ])
             ->allowedFilters([
                 $modelKeyName,
                 AllowedFilter::exact('exact__' . $modelKeyName, $modelKeyName),
+                'uuid',
+                AllowedFilter::exact('exact__uuid', 'uuid'),
                 'user_uuid',
                 AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
                 'credit',
                 AllowedFilter::exact('exact__credit', 'credit'),
                 'campaign_uuid',
                 AllowedFilter::exact('exact__campaign_uuid', 'campaign_uuid'),
-                'type',
-                AllowedFilter::exact('exact__type', 'type'),
+                'add_by_uuid',
+                AllowedFilter::exact('exact__add_by_uuid', 'add_by_uuid'),
                 'campaign.send_type',
                 AllowedFilter::exact('exact__campaign.send_type', 'campaign.send_type'),
                 'campaign.tracking_key',
