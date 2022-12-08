@@ -41,12 +41,6 @@ class CreditTransactionHistoryController extends AbstractRestAPIController
     public function index(IndexRequest $request)
     {
         $filters = $request->filter;
-        $arrayFilters = [
-            'sms',
-            'email',
-            'sms,email',
-            'email,sms',
-        ];
         if (!empty($filters)) {
             foreach ($filters as $key => $filter) {
                 if ($filter == null) {
@@ -56,19 +50,15 @@ class CreditTransactionHistoryController extends AbstractRestAPIController
         }
         if (!empty($filters['campaign.send_type']) && count($filters) == 1) {
             $filterSendType = $this->service->customFilterSendTypeOnCampaign(
-                $filters['campaign.send_type'],
-                $arrayFilters,
                 $request->get('per_page', '15'),
                 $request->get('columns', '*'),
                 $request->get('page_name', 'page'),
                 $request->get('page', '1'),
             );
-            if (!empty($filterSendType)) {
 
-                return $this->sendOkJsonResponse(
-                    $this->service->resourceCollectionToData($this->resourceCollectionClass, $filterSendType)
-                );
-            }
+            return $this->sendOkJsonResponse(
+                $this->service->resourceCollectionToData($this->resourceCollectionClass, $filterSendType)
+            );
         }
         $models = $this->service->getCollectionWithPagination();
 
@@ -86,12 +76,6 @@ class CreditTransactionHistoryController extends AbstractRestAPIController
     public function indexMyCreditTransactionHistoryView(IndexRequest $request)
     {
         $filters = $request->filter;
-        $arrayFilters = [
-            'sms',
-            'email',
-            'sms,email',
-            'email,sms',
-        ];
         if (!empty($filters)) {
             foreach ($filters as $key => $filter) {
                 if ($filter == null) {
@@ -99,27 +83,16 @@ class CreditTransactionHistoryController extends AbstractRestAPIController
                 }
             }
         }
-        if (!empty($filters['campaign.send_type'])) {
-            if (count($filters) == 1) {
-                $filterSendType = $this->myService->customMyFilterSendTypeOnCampaign(
-                    $filters['campaign.send_type'],
-                    $arrayFilters,
-                    $request->get('per_page', '15'),
-                    $request->get('columns', '*'),
-                    $request->get('page_name', 'page'),
-                    $request->get('page', '1'),
-                );
-                if (!empty($filterSendType)) {
-
-                    return $this->sendOkJsonResponse(
-                        $this->service->resourceCollectionToData($this->resourceCollectionClass, $filterSendType)
-                    );
-                }
-            }
-            $models = $this->myService->getCollectionWithPagination();
+        if (!empty($filters['campaign.send_type']) && count($filters) == 1) {
+            $filterSendType = $this->myService->customMyFilterSendTypeOnCampaign(
+                $request->get('per_page', '15'),
+                $request->get('columns', '*'),
+                $request->get('page_name', 'page'),
+                $request->get('page', '1'),
+            );
 
             return $this->sendOkJsonResponse(
-                $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+                $this->service->resourceCollectionToData($this->resourceCollectionClass, $filterSendType)
             );
         }
         $myAddAndUseCreditTransactionHistory = $this->myService->myFilterAddAndUseCreditTransactionHistory(

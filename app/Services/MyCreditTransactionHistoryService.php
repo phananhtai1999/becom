@@ -14,33 +14,24 @@ class MyCreditTransactionHistoryService extends AbstractService
     protected $modelQueryBuilderClass = MyCreditTransactionHistoryQueryBuilder::class;
 
     /**
-     * @param $filters
-     * @param $arrayFilters
      * @param $perPage
      * @param $columns
      * @param $pageName
      * @param $page
-     * @return false|\Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function customMyFilterSendTypeOnCampaign($filters, $arrayFilters, $perPage, $columns, $pageName, $page)
+    public function customMyFilterSendTypeOnCampaign($perPage, $columns, $pageName, $page)
     {
-        if (in_array($filters, $arrayFilters)) {
-            $myCreditTransactions = MyCreditTransactionHistoryQueryBuilder::initialQuery()->get()->count();
-            if ($myCreditTransactions >= 1) {
-                $models = $this->model
-                    ->where('user_uuid', auth()->user()->getkey())
-                    ->whereNull('campaign_uuid');
+        $models = $this->model
+            ->where('user_uuid', auth()->user()->getkey())
+            ->whereNull('campaign_uuid');
 
-                return MyCreditTransactionHistoryQueryBuilder::initialQuery()->unionAll($models)->paginate(
-                    $perPage,
-                    $columns,
-                    $pageName,
-                    $page
-                );
-            }
-        }
-
-        return false;
+        return MyCreditTransactionHistoryQueryBuilder::initialQuery()->unionAll($models)->paginate(
+            $perPage,
+            $columns,
+            $pageName,
+            $page
+        );
     }
 
     /**
