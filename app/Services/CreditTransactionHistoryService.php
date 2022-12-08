@@ -13,30 +13,21 @@ class CreditTransactionHistoryService extends AbstractService
     protected $modelQueryBuilderClass = CreditTransactionHistoryQueryBuilder::class;
 
     /**
-     * @param $filters
-     * @param $arrayFilters
      * @param $perPage
      * @param $columns
      * @param $pageName
      * @param $page
-     * @return false|\Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function customFilterSendTypeOnCampaign($filters, $arrayFilters, $perPage, $columns, $pageName, $page)
+    public function customFilterSendTypeOnCampaign($perPage, $columns, $pageName, $page)
     {
-        if (in_array($filters, $arrayFilters)) {
-            $creditTransactions = CreditTransactionHistoryQueryBuilder::initialQuery()->get()->count();
-            if ($creditTransactions >= 1) {
-                $models = $this->model->whereNull('campaign_uuid');
+        $models = $this->model->whereNull('campaign_uuid');
 
-                return CreditTransactionHistoryQueryBuilder::initialQuery()->unionAll($models)->paginate(
-                    $perPage,
-                    $columns,
-                    $pageName,
-                    $page
-                );
-            }
-        }
-
-        return false;
+        return CreditTransactionHistoryQueryBuilder::initialQuery()->unionAll($models)->paginate(
+            $perPage,
+            $columns,
+            $pageName,
+            $page
+        );
     }
 }
