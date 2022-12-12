@@ -8,17 +8,14 @@ use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\Concerns\SortsQuery;
 use Spatie\QueryBuilder\QueryBuilder;
 
-class MyAddCreditTransactionHistoryQueryBuilder extends AbstractQueryBuilder
+class AddCreditTransactionHistoryQueryBuilder extends AbstractQueryBuilder
 {
     /**
      * @return string
      */
     public static function baseQuery()
     {
-        return CreditTransactionHistory::where([
-            ['user_uuid', auth()->user()->getkey()],
-            ['campaign_uuid', null]
-        ]);
+        return CreditTransactionHistory::whereNull('campaign_uuid');
     }
 
     /**

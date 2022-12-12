@@ -44,6 +44,8 @@ class ContactListQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__name', 'name'),
                 'user_uuid',
                 AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
+                'user.username',
+                AllowedFilter::exact('exact__user.username', 'user.username'),
             ]);
     }
 }

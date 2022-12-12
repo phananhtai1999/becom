@@ -8,17 +8,14 @@ use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\Concerns\SortsQuery;
 use Spatie\QueryBuilder\QueryBuilder;
 
-class MyAddCreditTransactionHistoryQueryBuilder extends AbstractQueryBuilder
+class UseCreditTransactionHistoryQueryBuilder extends AbstractQueryBuilder
 {
     /**
      * @return string
      */
     public static function baseQuery()
     {
-        return CreditTransactionHistory::where([
-            ['user_uuid', auth()->user()->getkey()],
-            ['campaign_uuid', null]
-        ]);
+        return CreditTransactionHistory::whereNotNull('campaign_uuid');
     }
 
     /**
@@ -59,6 +56,8 @@ class MyAddCreditTransactionHistoryQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__campaign_uuid', 'campaign_uuid'),
                 'add_by_uuid',
                 AllowedFilter::exact('exact__add_by_uuid', 'add_by_uuid'),
+                'campaign.send_type',
+                AllowedFilter::exact('exact__campaign.send_type', 'campaign.send_type'),
                 'campaign.tracking_key',
                 AllowedFilter::exact('exact__campaign.tracking_key', 'campaign.tracking_key'),
             ]);
