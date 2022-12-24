@@ -19,6 +19,14 @@ class ConfigSeeder extends Seeder
                 'key' => 'smtp_auto',
                 'value' => true,
             ],
+            [
+                'key' => 'email_price',
+                'value' => 1,
+            ],
+            [
+                'key' => 'sms_price',
+                'value' => 5,
+            ],
         ];
 
         foreach ($key as $value) {
