@@ -184,7 +184,7 @@ class SendEmailByCampaignListener implements ShouldQueue
                     $quantityEmailWasSentPerUser = $this->mailSendingHistoryService->getNumberEmailSentPerUser($campaign->uuid, $contact->email);
 
                     if($quantityEmailWasSentPerUser < $campaign->number_email_per_user){
-                        $mailTemplate = $this->mailTemplateVariableService->renderBody($campaign->mailTemplate, $contact, $campaign->smtpAccount, $campaign);
+                        $mailTemplate = $this->mailTemplateVariableService->renderBody($campaign->mailTemplate, $contact, $smtpAccount, $campaign);
 
                         $mailSendingHistory = $this->mailSendingHistoryService->create([
                             'email' => $contact->email,

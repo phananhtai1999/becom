@@ -182,7 +182,7 @@ class SendEmailNotOpenByScenarioCampaignListener implements ShouldQueue
 
             foreach ($contacts as $contact) {
                 $contact = $this->contactService->findOneById($contact['uuid']);
-                $mailTemplate = $this->mailTemplateVariableService->renderBody($campaign->mailTemplate, $contact, $campaign->smtpAccount, $campaign);
+                $mailTemplate = $this->mailTemplateVariableService->renderBody($campaign->mailTemplate, $contact, $smtpAccount, $campaign);
 
                 $mailSendingHistory = $this->mailSendingHistoryService->create([
                     'email' => $contact->email,

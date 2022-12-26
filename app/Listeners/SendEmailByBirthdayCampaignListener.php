@@ -182,7 +182,7 @@ class SendEmailByBirthdayCampaignListener implements ShouldQueue
 
             for ($i = 1; $i <= $campaign->number_email_per_date; $i++) {
                 foreach ($contacts as $contact){
-                    $mailTemplate = $this->mailTemplateVariableService->renderBody($campaign->mailTemplate, $contact, $campaign->smtpAccount, $campaign);
+                    $mailTemplate = $this->mailTemplateVariableService->renderBody($campaign->mailTemplate, $contact, $smtpAccount, $campaign);
 
                     $mailSendingHistory = $this->mailSendingHistoryService->create([
                         'email' => $contact->email,
