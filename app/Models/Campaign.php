@@ -31,8 +31,6 @@ class Campaign extends AbstractModel
         'mail_template_uuid',
         'from_date',
         'to_date',
-        'number_email_per_date',
-        'number_email_per_user',
         'status',
         'type',
         'smtp_account_uuid',
@@ -41,9 +39,6 @@ class Campaign extends AbstractModel
         'was_finished',
         'was_stopped_by_owner',
         'send_type',
-        'open_within',
-        'open_mail_campaign',
-        'not_open_mail_campaign',
     ];
 
     /**
@@ -124,18 +119,10 @@ class Campaign extends AbstractModel
     }
 
     /**
-     * @return BelongsTo
+     * @return HasMany
      */
-    public function openMailCampaign()
+    public function campaignsScenario()
     {
-        return $this->belongsTo(__CLASS__, 'open_mail_campaign');
-    }
-
-    /**
-     * @return BelongsTo
-     */
-    public function notOpenMailCampaign()
-    {
-        return $this->belongsTo(__CLASS__, 'not_open_mail_campaign');
+        return $this->hasMany(CampaignScenario::class, 'campaign_uuid', 'uuid');
     }
 }
