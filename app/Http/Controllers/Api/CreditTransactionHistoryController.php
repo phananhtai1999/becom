@@ -50,6 +50,7 @@ class CreditTransactionHistoryController extends AbstractRestAPIController
         }
         if (!empty($filters['campaign.send_type'])) {
             $filterSendType = $this->service->customFilterSendTypeOnCampaign(
+                $filters,
                 count($filters),
                 $request->get('per_page', '15'),
                 $request->get('columns', '*'),

@@ -15,6 +15,7 @@ class CreditTransactionHistoryService extends AbstractService
     protected $modelQueryBuilderClass = CreditTransactionHistoryQueryBuilder::class;
 
     /**
+     * @param $filters
      * @param $countFilters
      * @param $perPage
      * @param $columns
@@ -22,9 +23,9 @@ class CreditTransactionHistoryService extends AbstractService
      * @param $page
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function customFilterSendTypeOnCampaign($countFilters, $perPage, $columns, $pageName, $page)
+    public function customFilterSendTypeOnCampaign($filters, $countFilters, $perPage, $columns, $pageName, $page)
     {
-        if ($countFilters == 1) {
+        if ($countFilters == 1 || (!empty($filters['credit_transaction_history']) && $filters['credit_transaction_history'] != 'added' && $filters['credit_transaction_history'] != 'used')) {
             $models = $this->model->whereNull('campaign_uuid');
 
             return CreditTransactionHistoryQueryBuilder::initialQuery()->unionAll($models)->orderByDesc('created_at')->paginate(
@@ -33,10 +34,26 @@ class CreditTransactionHistoryService extends AbstractService
                 $pageName,
                 $page
             );
+        } elseif (!empty($filters['credit_transaction_history']) && $filters['credit_transaction_history'] == 'added') {
+
+            return AddCreditTransactionHistoryQueryBuilder::initialQuery()->paginate(
+                $perPage,
+                $columns,
+                $pageName,
+                $page
+            );
+        } elseif (!empty($filters['credit_transaction_history']) && $filters['credit_transaction_history'] == 'used') {
+
+            return UseCreditTransactionHistoryQueryBuilder::initialQuery()->paginate(
+                $perPage,
+                $columns,
+                $pageName,
+                $page
+            );
         }
         $addCreditTransactionHistory = AddCreditTransactionHistoryQueryBuilder::initialQuery();
 
-        return UseCreditTransactionHistoryQueryBuilder::initialQuery()->unionAll($addCreditTransactionHistory)->paginate(
+        return UseCreditTransactionHistoryQueryBuilder::initialQuery()->unionAll($addCreditTransactionHistory)->orderByDesc('created_at')->paginate(
             $perPage,
             $columns,
             $pageName,
