@@ -64,6 +64,8 @@ class MailSendingHistoryQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__campaign.number_email_per_date', 'campaign.number_email_per_date'),
                 'campaign.number_email_per_user',
                 AllowedFilter::exact('exact__campaign.number_email_per_user', 'campaign.number_email_per_user'),
+                'campaign.website.domain',
+                AllowedFilter::exact('exact__campaign.website.domain', 'campaign.website.domain'),
             ]);
     }
 }

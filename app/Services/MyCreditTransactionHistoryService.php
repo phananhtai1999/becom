@@ -26,7 +26,7 @@ class MyCreditTransactionHistoryService extends AbstractService
             ->where('user_uuid', auth()->user()->getkey())
             ->whereNull('campaign_uuid');
 
-        return MyCreditTransactionHistoryQueryBuilder::initialQuery()->unionAll($models)->paginate(
+        return MyCreditTransactionHistoryQueryBuilder::initialQuery()->unionAll($models)->orderByDesc('created_at')->paginate(
             $perPage,
             $columns,
             $pageName,
