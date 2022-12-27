@@ -27,7 +27,7 @@ class CreditTransactionHistoryService extends AbstractService
         if ($countFilters == 1) {
             $models = $this->model->whereNull('campaign_uuid');
 
-            return CreditTransactionHistoryQueryBuilder::initialQuery()->unionAll($models)->paginate(
+            return CreditTransactionHistoryQueryBuilder::initialQuery()->unionAll($models)->orderByDesc('created_at')->paginate(
                 $perPage,
                 $columns,
                 $pageName,
