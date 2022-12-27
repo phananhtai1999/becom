@@ -12,6 +12,7 @@
         "ext-curl": "*",
         "ext-json": "*",
         "aws/aws-sdk-php": "^3.216",
+        "baum/baum": "*",
         "doctrine/dbal": "^3.3",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",
