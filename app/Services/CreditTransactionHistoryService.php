@@ -25,7 +25,7 @@ class CreditTransactionHistoryService extends AbstractService
      */
     public function customFilterSendTypeOnCampaign($filters, $countFilters, $perPage, $columns, $pageName, $page)
     {
-        if ($countFilters == 1 || (!empty($filters['credit_transaction_history']) && $filters['credit_transaction_history'] != 'added' && $filters['credit_transaction_history'] != 'used')) {
+        if ($countFilters == 1) {
             $models = $this->model->whereNull('campaign_uuid');
 
             return CreditTransactionHistoryQueryBuilder::initialQuery()->unionAll($models)->orderByDesc('created_at')->paginate(
@@ -36,7 +36,7 @@ class CreditTransactionHistoryService extends AbstractService
             );
         } elseif (!empty($filters['credit_transaction_history']) && $filters['credit_transaction_history'] == 'added') {
 
-            return AddCreditTransactionHistoryQueryBuilder::initialQuery()->paginate(
+            return AddCreditTransactionHistoryQueryBuilder::initialQuery()->orderByDesc('created_at')->paginate(
                 $perPage,
                 $columns,
                 $pageName,
@@ -44,7 +44,7 @@ class CreditTransactionHistoryService extends AbstractService
             );
         } elseif (!empty($filters['credit_transaction_history']) && $filters['credit_transaction_history'] == 'used') {
 
-            return UseCreditTransactionHistoryQueryBuilder::initialQuery()->paginate(
+            return UseCreditTransactionHistoryQueryBuilder::initialQuery()->orderByDesc('created_at')->paginate(
                 $perPage,
                 $columns,
                 $pageName,
