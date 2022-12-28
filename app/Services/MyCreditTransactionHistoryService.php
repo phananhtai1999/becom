@@ -14,24 +14,46 @@ class MyCreditTransactionHistoryService extends AbstractService
     protected $modelQueryBuilderClass = MyCreditTransactionHistoryQueryBuilder::class;
 
     /**
+     * @param $filters
+     * @param $countFilters
      * @param $perPage
      * @param $columns
      * @param $pageName
      * @param $page
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function customMyFilterSendTypeOnCampaign($perPage, $columns, $pageName, $page)
+    public function customMyFilterSendTypeOnCampaign($filters, $countFilters, $perPage, $columns, $pageName, $page)
     {
-        $models = $this->model
-            ->where('user_uuid', auth()->user()->getkey())
-            ->whereNull('campaign_uuid');
+        if ($countFilters == 1) {
+            $models = $this->model
+                ->where('user_uuid', auth()->user()->getkey())
+                ->whereNull('campaign_uuid');
 
-        return MyCreditTransactionHistoryQueryBuilder::initialQuery()->unionAll($models)->orderByDesc('created_at')->paginate(
-            $perPage,
-            $columns,
-            $pageName,
-            $page
-        );
+            return MyCreditTransactionHistoryQueryBuilder::initialQuery()->unionAll($models)->orderByDesc('created_at')->paginate(
+                $perPage,
+                $columns,
+                $pageName,
+                $page
+            );
+        } elseif (!empty($filters['credit_transaction_history']) && $filters['credit_transaction_history'] == 'added') {
+
+            return MyAddCreditTransactionHistoryQueryBuilder::initialQuery()->orderByDesc('created_at')->paginate(
+                $perPage,
+                $columns,
+                $pageName,
+                $page
+            );
+        } elseif (!empty($filters['credit_transaction_history']) && $filters['credit_transaction_history'] == 'used') {
+
+            return MyCreditTransactionHistoryQueryBuilder::initialQuery()->orderByDesc('created_at')->paginate(
+                $perPage,
+                $columns,
+                $pageName,
+                $page
+            );
+        }
+
+        return$this->myFilterAddAndUseCreditTransactionHistory($perPage, $columns, $pageName, $page);
     }
 
     /**
@@ -45,7 +67,7 @@ class MyCreditTransactionHistoryService extends AbstractService
     {
         $myAddCreditTransactionHistory = MyAddCreditTransactionHistoryQueryBuilder::initialQuery();
 
-        return MyCreditTransactionHistoryQueryBuilder::initialQuery()->unionAll($myAddCreditTransactionHistory)->paginate(
+        return MyCreditTransactionHistoryQueryBuilder::initialQuery()->unionAll($myAddCreditTransactionHistory)->orderByDesc('created_at')->paginate(
             $perPage,
             $columns,
             $pageName,
