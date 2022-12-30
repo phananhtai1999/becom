@@ -22,6 +22,7 @@ class MailSendingHistoryResource extends AbstractJsonResource
         $data = [
             'uuid' => $this->uuid,
             'campaign_uuid' => $this->campaign_uuid,
+            'campaign_scenario_uuid' => $this->campaign_scenario_uuid,
             'email' => $this->email,
             'time' => $this->time,
             'status' => $this->status,
@@ -32,6 +33,10 @@ class MailSendingHistoryResource extends AbstractJsonResource
 
         if (\in_array('mail_sending_history__campaign', $expand)) {
             $data['campaign'] = new CampaignResource($this->campaign);
+        }
+
+        if (\in_array('mail_sending_history__campaign_scenario', $expand)) {
+            $data['campaign_scenario'] = new CampaignScenarioResource($this->campaignScenario);
         }
 
         if (\in_array('mail_sending_history__website', $expand)) {

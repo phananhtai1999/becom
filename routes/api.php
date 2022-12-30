@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\EmailController;
 use App\Http\Controllers\Api\MailOpenTrackingController;
 use App\Http\Controllers\Api\MailSendingHistoryController;
 use App\Http\Controllers\Api\MailTemplateController;
+use App\Http\Controllers\Api\ScenarioController;
 use App\Http\Controllers\Api\SmtpAccountController;
 use App\Http\Controllers\Api\User\UserController;
 use App\Http\Controllers\Api\WebsiteController;
@@ -456,3 +457,16 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'checkout.'], function () {
     Route::post('/checkout', [CheckoutController::class, 'checkout'])->name('checkout');
     Route::post('/payment-again', [CheckoutController::class, 'paymentAgain'])->name('paymentAgain');
 });
+
+//Scenario
+Route::group(['middleware' => ['auth:api'], 'as' => 'scenario.'], function () {
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::post('scenario', [ScenarioController::class, 'storeScenario'])->name('storeScenario');
+    });
+    Route::group(['as' => 'my.'], function () {
+        Route::post('my/scenario', [ScenarioController::class, 'storeMyScenario'])->name('storeMyScenario');
+    });
+});
+
+
+

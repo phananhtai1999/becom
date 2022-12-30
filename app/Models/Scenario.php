@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Abstracts\AbstractModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -26,6 +27,7 @@ class Scenario extends AbstractModel
      */
     protected $fillable = [
         'name',
+        'user_uuid'
     ];
 
     /**
@@ -43,5 +45,13 @@ class Scenario extends AbstractModel
     public function campaignScenarios()
     {
         return $this->hasMany(CampaignScenario::class, 'scenario_uuid', 'uuid');
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_uuid', 'uuid');
     }
 }
