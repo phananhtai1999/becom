@@ -31,7 +31,8 @@ class MailSendingHistoryQueryBuilder extends AbstractQueryBuilder
                 'campaign_uuid',
                 'email',
                 'time',
-                'status'
+                'status',
+                'campaign_scenario_uuid',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -39,13 +40,16 @@ class MailSendingHistoryQueryBuilder extends AbstractQueryBuilder
                 'campaign_uuid',
                 'email',
                 'time',
-                'status'
+                'status',
+                'campaign_scenario_uuid',
             ])
             ->allowedFilters([
                 $modelKeyName,
                 AllowedFilter::exact('exact__' . $modelKeyName, $modelKeyName),
                 'campaign_uuid',
                 AllowedFilter::exact('exact__campaign_uuid', 'campaign_uuid'),
+                'campaign_scenario_uuid',
+                AllowedFilter::exact('exact__campaign_scenario_uuid', 'campaign_scenario_uuid'),
                 'email',
                 AllowedFilter::exact('exact__email', 'email'),
                 'time',
@@ -60,10 +64,6 @@ class MailSendingHistoryQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__campaign.mailTemplate.subject', 'campaign.mailTemplate.subject'),
                 'campaign.smtpAccount.mail_from_name',
                 AllowedFilter::exact('exact__campaign.smtpAccount.mail_from_name', 'campaign.smtpAccount.mail_from_name'),
-                'campaign.number_email_per_date',
-                AllowedFilter::exact('exact__campaign.number_email_per_date', 'campaign.number_email_per_date'),
-                'campaign.number_email_per_user',
-                AllowedFilter::exact('exact__campaign.number_email_per_user', 'campaign.number_email_per_user'),
                 'campaign.website.domain',
                 AllowedFilter::exact('exact__campaign.website.domain', 'campaign.website.domain'),
             ]);

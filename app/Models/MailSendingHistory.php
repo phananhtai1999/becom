@@ -34,7 +34,8 @@ class MailSendingHistory extends AbstractModel
         'campaign_uuid',
         'email',
         'time',
-        'status'
+        'status',
+        'campaign_scenario_uuid'
     ];
 
     /**
@@ -61,5 +62,13 @@ class MailSendingHistory extends AbstractModel
     public function mailOpenTrackings()
     {
         return $this->hasMany(MailOpenTracking::class, 'mail_sending_history_uuid', 'uuid');
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function campaignScenario()
+    {
+        return $this->belongsTo(CampaignScenario::class, 'campaign_scenario_uuid', 'uuid')->withTrashed();
     }
 }

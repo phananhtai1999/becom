@@ -34,8 +34,6 @@ class UpdateCampaignRequest extends AbstractRequest
             })],
             'from_date' => ['date', 'before_or_equal:to_date'],
             'to_date' => ['date', 'after_or_equal:from_date'],
-            'number_email_per_date' => ['numeric', 'min:1', 'lte:number_email_per_user'],
-            'number_email_per_user' => ['numeric', 'min:1', 'gte:number_email_per_date'],
             'status' => ['string', 'in:active,banned'],
             'type' => ['string', 'in:simple,birthday,scenario'],
             'send_type' => ['string', 'in:sms,email'],
@@ -54,29 +52,9 @@ class UpdateCampaignRequest extends AbstractRequest
             'contact_list' => ['array', 'min:1'],
             'contact_list.*' => ['numeric', 'min:1',  Rule::exists('contact_lists', 'uuid')->where(function ($query) {
                 return $query->where('user_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey())->whereNull('deleted_at');
-            })],
-            'not_open_mail_campaign' => ['nullable', 'numeric', 'min:1', Rule::exists('campaigns', 'uuid')->where(function ($query) {
-                return $query->where([
-                    ['type', 'scenario'],
-                    ['user_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey()]
-                ])->whereNull('deleted_at');
-            })],
-            'open_mail_campaign' =>  ['nullable', 'numeric', 'min:1', Rule::exists('campaigns', 'uuid')->where(function ($query) {
-                return $query->where([
-                    ['type', 'scenario'],
-                    ['user_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey()]
-                ])->whereNull('deleted_at');
-            })],
-            'open_within' => ['nullable', 'numeric', 'min:1']
+            })]
         ];
 
-        if (!empty($this->request->get('not_open_mail_campaign'))){
-            unset($validate['open_within'][0]);
-            array_unshift($validate['open_within'], "required");
-        }
-
         return $validate;
-
-
     }
 }
