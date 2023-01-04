@@ -461,10 +461,12 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'checkout.'], function () {
 //Scenario
 Route::group(['middleware' => ['auth:api'], 'as' => 'scenario.'], function () {
     Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('scenarios', [ScenarioController::class, 'indexMyScenario'])->name('index');
         Route::post('scenario', [ScenarioController::class, 'storeScenario'])->name('storeScenario');
         Route::get('scenario/{id}', [ScenarioController::class, 'showMyScenario'])->name('showMyScenario');
     });
     Route::group(['as' => 'my.'], function () {
+        Route::get('my/scenarios', [ScenarioController::class, 'indexMyScenario'])->name('indexMy');
         Route::post('my/scenario', [ScenarioController::class, 'storeMyScenario'])->name('storeMyScenario');
         Route::get('my/scenario/{id}', [ScenarioController::class, 'showMyScenario'])->name('showMyScenario');
     });

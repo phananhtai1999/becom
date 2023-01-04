@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
+use App\Http\Requests\IndexRequest;
 use App\Http\Requests\ScenarioRequest;
+use App\Http\Resources\ScenarioResourceCollection;
 use App\Services\CampaignScenarioService;
 use App\Services\CampaignService;
 use App\Services\MyScenarioService;
@@ -36,6 +38,28 @@ class ScenarioController extends AbstractRestAPIController
         $this->service = $service;
         $this->myService = $myService;
         $this->campaignScenarioService = $campaignScenarioService;
+        $this->resourceCollectionClass = ScenarioResourceCollection::class;
+    }
+
+    /**
+     * @param IndexRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     */
+    public function indexMyScenario(IndexRequest $request)
+    {
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData(
+                $this->resourceCollectionClass,
+                $this->myService->getCollectionWithPagination(
+                    $request->get('per_page', '15'),
+                    $request->get('page', '1'),
+                    $request->get('columns', '*'),
+                    $request->get('page_name', 'page'),
+                )
+            )
+        );
     }
 
     /**
