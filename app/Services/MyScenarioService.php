@@ -9,4 +9,15 @@ class MyScenarioService extends AbstractService
 {
     protected $modelClass = Scenario::class;
 
+    /**
+     * @param $id
+     * @return mixed
+     */
+    public function findMyScenarioByUuid($id)
+    {
+        return $this->findOneWhereOrFail([
+            ['user_uuid', auth()->user()->getkey()],
+            ['uuid', $id]
+        ]);
+    }
 }

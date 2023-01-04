@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Abstracts\AbstractRestAPIController;
 use App\Http\Requests\ScenarioRequest;
 use App\Services\CampaignScenarioService;
+use App\Services\CampaignService;
 use App\Services\MyScenarioService;
 use App\Services\ScenarioService;
 use Illuminate\Http\Request;
@@ -35,7 +36,6 @@ class ScenarioController extends AbstractRestAPIController
         $this->service = $service;
         $this->myService = $myService;
         $this->campaignScenarioService = $campaignScenarioService;
-
     }
 
     /**
@@ -215,6 +215,64 @@ class ScenarioController extends AbstractRestAPIController
         }
 
         return $this->sendOkJsonResponse((['message' => "Create campaign scenario success"]));
+    }
+
+    /**
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function showMyScenario($id)
+    {
+        $scenario = $this->myService->findMyScenarioByUuid($id);
+        $campaignsScenario = $this->campaignScenarioService->showCampaignScenarioByScenarioUuid($id);
+        $depth = $this->campaignScenarioService->getMaxDepthOfCampaignScenarioByScenarioUuid($id);
+
+        /*
+         * depth sâu nhất = 3 (Mặc định depth = 0 -> x0 = 0)
+         * depth = 1 -> (2^1 + 2^2 + 2^3)/2 = 7 => tại vị trí có depth = 1 thì x1 = x0(tại depth:0) +(-) 7
+         * depth = 2 -> (2^1 + 2^2)/2 = 3 => tại vị trí có depth = 1 thì x2 = x1(tại depth:0) +(-) 3
+         * depth = 3 -> (2^1)/2 = 1 => tại vị trí có depth = 3 thì x3 = x2(tại depth:2) +(-) 1
+         * /2 vì mỗi 1 node sẽ có 2 node con
+         * */
+        $distanceByDepth = $nodes = $coordinatesByUuid = [];
+        $exponent = 1;
+        for ($i = $depth; $i > 0; $i--) {
+            $distanceByDepth[$i] = empty($distanceByDepth[$i + 1]) ? (2 ** $exponent)/2 : (($distanceByDepth[$i + 1])*2 + (2 ** $exponent))/2;
+            $exponent ++;
+        }
+
+        foreach ($campaignsScenario as $item) {
+            if (!empty($item['parent_uuid'])) {
+                $coordinatesByUuid[$item['uuid']] = ($item['type'] === 'open') ? $coordinatesByUuid[$item['parent_uuid']] - $distanceByDepth[$item['depth']] : $coordinatesByUuid[$item['parent_uuid']] + $distanceByDepth[$item['depth']];
+                $nodes[] = [
+                    "uuid" => $item['uuid'],
+                    "campaign" => $item['campaign'],
+                    "scenario_uuid" => $item['scenario_uuid'],
+                    "parent_uuid" => $item['parent_uuid'],
+                    "type" => $item['type'],
+                    "open_within" => $item['open_within'],
+                    "x" => $coordinatesByUuid[$item['uuid']],
+                    "y" => $item['depth']
+                ];
+            }else{
+                $coordinatesByUuid[$item['uuid']] = 0;
+                $nodes[] = [
+                    "uuid" => $item['uuid'],
+                    "campaign" =>  $item['campaign'],
+                    "scenario_uuid" => $item['scenario_uuid'],
+                    "parent_uuid" => $item['parent_uuid'],
+                    "type" => $item['type'],
+                    "open_within" => $item['open_within'],
+                    "x" => 0,
+                    "y" => $item['depth']
+                ];
+            }
+        }
+
+        return $this->sendOkJsonResponse(['data' => [
+            'name' => $scenario->name,
+            'nodes' => $nodes
+        ]]);
     }
 
 }
