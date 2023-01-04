@@ -219,7 +219,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'campaign.'], function () {
         Route::get('/campaign/{id}', [CampaignController::class, 'show'])->name('show');
         Route::put('/campaign/{id}', [CampaignController::class, 'edit'])->name('edit');
         Route::delete('/campaign/{id}', [CampaignController::class, 'destroy'])->name('destroy');
-        Route::post('/emails/send-campaign', [CampaignController::class, 'sendEmailsByCampaign'])->name('sendEmailsByCampaign');
+//        Route::post('/emails/send-campaign', [CampaignController::class, 'sendEmailsByCampaign'])->name('sendEmailsByCampaign');
     });
 
     Route::group(['as' => 'my.'], function () {
@@ -228,7 +228,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'campaign.'], function () {
         Route::get('/my/campaign/{id}', [CampaignController::class, 'showMyCampaign'])->name('show');
         Route::put('/my/campaign/{id}', [CampaignController::class, 'editMyCampaign'])->name('edit');
         Route::delete('/my/campaign/{id}', [CampaignController::class, 'destroyMyCampaign'])->name('destroy');
-        Route::post('/my/emails/send-campaign', [CampaignController::class, 'sendEmailByMyCampaign'])->name('sendEmailByMyCampaign');
+//        Route::post('/my/emails/send-campaign', [CampaignController::class, 'sendEmailByMyCampaign'])->name('sendEmailByMyCampaign');
     });
 
     //Upsert-campaign-link-tracking
@@ -461,10 +461,14 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'checkout.'], function () {
 //Scenario
 Route::group(['middleware' => ['auth:api'], 'as' => 'scenario.'], function () {
     Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('scenarios', [ScenarioController::class, 'indexMyScenario'])->name('index');
         Route::post('scenario', [ScenarioController::class, 'storeScenario'])->name('storeScenario');
+        Route::get('scenario/{id}', [ScenarioController::class, 'showMyScenario'])->name('showMyScenario');
     });
     Route::group(['as' => 'my.'], function () {
+        Route::get('my/scenarios', [ScenarioController::class, 'indexMyScenario'])->name('indexMy');
         Route::post('my/scenario', [ScenarioController::class, 'storeMyScenario'])->name('storeMyScenario');
+        Route::get('my/scenario/{id}', [ScenarioController::class, 'showMyScenario'])->name('showMyScenario');
     });
 });
 
