@@ -6,13 +6,11 @@ use App\Abstracts\AbstractModel;
 use Baum\NestedSet\Node as WorksAsNestedSet;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CampaignScenario extends AbstractModel
 {
-    use HasFactory, SoftDeletes, WorksAsNestedSet;
+    use HasFactory, WorksAsNestedSet;
 
     /**
      * @var string
@@ -70,7 +68,6 @@ class CampaignScenario extends AbstractModel
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
-        'deleted_at' => 'datetime',
     ];
 
     /**
