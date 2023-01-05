@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
+use App\Http\Requests\EditScenarioRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\ScenarioRequest;
 use App\Http\Resources\ScenarioResourceCollection;
@@ -69,39 +70,16 @@ class ScenarioController extends AbstractRestAPIController
     public function storeScenario(ScenarioRequest $request)
     {
         $nodes = $request->get('nodes');
-        //Validate
-        $nodesIds = array_column($nodes, 'id');
-        $nodeSources =  array_column($nodes, 'source');
         $NodeIdBySource = array_column($nodes, 'source', 'id');
-        $countSourceRoot = count(array_filter($nodeSources, function ($value) {
-            return $value === null;}, ARRAY_FILTER_USE_BOTH));
 
-        if ($countSourceRoot < 1 || $countSourceRoot >= 2) {
-            return $this->sendValidationFailedJsonResponse(['error' => ['source_null' => "There is only one null value in the source."]]);
+        //Validate
+        $validateNodes = $this->service->validateScenario($nodes);
+
+        if (empty($validateNodes['status'])) {
+            return $this->sendOkJsonResponse(["errors" => $validateNodes['messages']]);
         }
-        $sourceTypes = $arrayIds = [];
-        foreach ($nodes as $node) {
-            if (empty($node['source'])) {
-                $arrayIds[] = $node['id'];
-            }else{
-                if (!in_array($node['source'], $arrayIds)) {
-                    return $this->sendValidationFailedJsonResponse(['error' => ['source_parent' => "The parent source above could not be found."]]);
-                }
-                $arrayIds[] = $node['id'];
-            }
-            if (array_count_values($nodesIds)[$node['id']] >= 2) {
-                return $this->sendValidationFailedJsonResponse(['error' => ['id_duplicated' => "The selected Ids cannot be duplicated."]]);
-            }
-            if (in_array($node['source'], $nodesIds)) {
-                $sourceTypes[$node['source']][] = $node['type'];
-            }
-            if (!empty($sourceTypes)) {
-                $countSourceType = array_count_values($sourceTypes[$node['source']]);
-                if ($countSourceType[$node['type']] >= 2) {
-                    return $this->sendValidationFailedJsonResponse(['error' => ['source_type_duplicate' => "Must be provide 'type' with the different value for 'source'."]]);
-                }
-            }
-        }
+        $sourceTypes = $validateNodes['sourceType'];
+
         //Insert data
         $scenario = $this->service->create([
             'name' => $request->get('name'),
@@ -159,39 +137,16 @@ class ScenarioController extends AbstractRestAPIController
     {
 
         $nodes = $request->get('nodes');
-        //Validate
-        $nodesIds = array_column($nodes, 'id');
-        $nodeSources =  array_column($nodes, 'source');
         $NodeIdBySource = array_column($nodes, 'source', 'id');
-        $countSourceRoot = count(array_filter($nodeSources, function ($value) {
-            return $value === null;}, ARRAY_FILTER_USE_BOTH));
 
-        if ($countSourceRoot < 1 || $countSourceRoot >= 2) {
-            return $this->sendValidationFailedJsonResponse(['error' => ['source_null' => "There is only one null value in the source."]]);
+        //Validate
+        $validateNodes = $this->service->validateScenario($nodes);
+
+        if (empty($validateNodes['status'])) {
+            return $this->sendOkJsonResponse(["errors" => $validateNodes['messages']]);
         }
-        $sourceTypes = $arrayIds = [];
-        foreach ($nodes as $node) {
-            if (empty($node['source'])) {
-                $arrayIds[] = $node['id'];
-            }else{
-                if (!in_array($node['source'], $arrayIds)) {
-                    return $this->sendValidationFailedJsonResponse(['error' => ['source_parent' => "The parent source above could not be found."]]);
-                }
-                $arrayIds[] = $node['id'];
-            }
-            if (array_count_values($nodesIds)[$node['id']] >= 2) {
-                return $this->sendValidationFailedJsonResponse(['error' => ['id_duplicated' => "The selected Ids cannot be duplicated."]]);
-            }
-            if (in_array($node['source'], $nodesIds)) {
-                $sourceTypes[$node['source']][] = $node['type'];
-            }
-            if (!empty($sourceTypes)) {
-               $countSourceType = array_count_values($sourceTypes[$node['source']]);
-                if ($countSourceType[$node['type']] >= 2) {
-                    return $this->sendValidationFailedJsonResponse(['error' => ['source_type_duplicate' => "Must be provide 'type' with the different value for 'source'."]]);
-                }
-            }
-        }
+        $sourceTypes = $validateNodes['sourceType'];
+
         //Insert data
         $scenario = $this->service->create([
             'name' => $request->get('name'),
@@ -297,6 +252,85 @@ class ScenarioController extends AbstractRestAPIController
             'name' => $scenario->name,
             'nodes' => $nodes
         ]]);
+    }
+
+    /**
+     * @param EditScenarioRequest $request
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function editMyScenario(EditScenarioRequest $request, $id)
+    {
+        $scenario = $this->myService->findMyScenarioByUuid($id);
+        $this->service->update($scenario, [
+            'name' => $request->get('name')
+        ]);
+
+        $nodes = $request->get('nodes');
+        $NodeIdBySource = array_column($nodes, 'source', 'id');
+
+        //Validate
+        $validateNodes = $this->service->validateScenario($nodes);
+
+        if (empty($validateNodes['status'])) {
+            return $this->sendOkJsonResponse(["errors" => $validateNodes['messages']]);
+        }
+        $sourceTypes = $validateNodes['sourceType'];
+
+        $nodesIdUUid = array_column($nodes, 'uuid', 'id');
+        foreach ( $nodesIdUUid as $item) {
+            if (!empty($item)) {
+                $nodesUuid [] = $item;
+            }
+        }
+
+        //Update Nodes
+        $campaignScenarioDelete = $this->campaignScenarioService->getCampaignsScenarioExistsInUUidByScenarioUuid($nodesUuid, $id);
+        if (!empty($campaignScenarioDelete)) {
+            foreach ($campaignScenarioDelete as $item) {
+                $item->delete();
+            }
+        }
+
+        foreach ($nodes as $node) {
+            if (!empty($node['uuid'])) {
+                $campaignScenario = $this->campaignScenarioService->findOneById($node['uuid']);
+                $this->campaignScenarioService->update($campaignScenario, [
+                    'campaign_uuid' => $node['campaign_uuid'],
+//                    'scenario_uuid' => $id,
+//                    'parent_uuid' => $node['source'],
+//                    'type' => $node['type'],
+                    'open_within' => $node['open_within']
+                ]);
+                $typeByNodeId[$node['id']] = [
+                    'campaignScenarioUuid' => $node['uuid'],
+                    'type' => $node['type']
+                ];
+            }else{
+                $campaignScenario = $this->campaignScenarioService->create([
+                    'campaign_uuid' => $node['campaign_uuid'],
+                    'scenario_uuid' => $scenario->uuid,
+                    'parent_uuid' => $typeByNodeId[$node['source']]['campaignScenarioUuid'],
+                    'type' => $node['type'],
+                    'open_within' => $node['open_within']
+                ]);
+                $typeByNodeId[$node['id']] = [
+                    'campaignScenarioUuid' => $campaignScenario->uuid,
+                    'type' => $node['type']
+                ];
+            }
+        }
+
+        //Move node type not_open -> last node
+        foreach ($typeByNodeId as $nodeId => $value) {
+            if (empty($nodesIdUUid[$nodeId]) && $value['type'] === 'not_open' && count($sourceTypes[$NodeIdBySource[$nodeId]]) === 2) {
+                $child = $this->campaignScenarioService->findOneById($value['campaignScenarioUuid']);
+                $parent = $this->campaignScenarioService->findOneById($child->parent_uuid);
+                $child->makeLastChildOf($parent);
+            }
+        }
+
+        return $this->sendOkJsonResponse((['message' => "Edit campaign scenario success"]));
     }
 
 }

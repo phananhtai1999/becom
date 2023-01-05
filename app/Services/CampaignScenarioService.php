@@ -28,4 +28,14 @@ class CampaignScenarioService extends AbstractService
     {
         return $this->model->where('scenario_uuid', $scenarioUuid)->orderBy('depth', "DESC")->pluck('depth')->first();
     }
+
+    /**
+     * @param $Uuid
+     * @param $scenarioUuid
+     * @return mixed
+     */
+    public function getCampaignsScenarioExistsInUUidByScenarioUuid($Uuid, $scenarioUuid)
+    {
+       return $this->model->where('scenario_uuid', $scenarioUuid)->whereNotIn('uuid', $Uuid)->orderBy('uuid', 'DESC')->get();
+    }
 }
