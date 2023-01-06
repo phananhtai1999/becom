@@ -34,6 +34,7 @@ class CampaignResource extends AbstractJsonResource
             'user_uuid' => $this->user_uuid,
             'was_finished' => $this->was_finished,
             'was_stopped_by_owner' => $this->was_stopped_by_owner,
+            'number_credit_needed_to_start_campaign' => $this->number_credit_needed_to_start_campaign,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at

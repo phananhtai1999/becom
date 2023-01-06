@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Abstracts\AbstractModel;
+use App\Services\CampaignService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -52,6 +53,13 @@ class Campaign extends AbstractModel
         'to_date' => 'datetime',
         'was_finished' => 'boolean',
         'was_stopped_by_owner' => 'boolean'
+    ];
+
+    /**
+     * @var string[]
+     */
+    protected $appends = [
+        'number_credit_needed_to_start_campaign',
     ];
 
     /**
@@ -124,5 +132,13 @@ class Campaign extends AbstractModel
     public function campaignsScenario()
     {
         return $this->hasMany(CampaignScenario::class, 'campaign_uuid', 'uuid');
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getNumberCreditNeededToStartCampaignAttribute()
+    {
+        return app(CampaignService::class)->numberOfCreditsToStartTheCampaign($this->uuid, $this->from_date, $this->to_date, $this->send_type, $this->type);
     }
 }

@@ -64,11 +64,11 @@ class CampaignService extends AbstractService
      */
     public function checkActiveCampainByColumn($column, $id)
     {
-        if ($column === "type"){
+        if ($column === "type") {
             $activeCampaign = $this->model->where([
                 ['uuid', $id]
             ])->whereIn('type', ['simple', 'scenario'])->first();
-        }else {
+        } else {
             $query = [];
             if ($column === "was_finished") {
                 $query = [$column, false];
@@ -152,34 +152,34 @@ class CampaignService extends AbstractService
         $subDate = $startDate;
         $startDate = Carbon::parse($startDate);
 
-        if($groupBy === "hour"){
+        if ($groupBy === "hour") {
             $dateFormat = "%Y-%m-%d %H:00:00";
             $subDate = Carbon::parse($subDate)->subDay();
             $endDate = Carbon::parse($endDate)->endOfDay();
 
-            while($startDate <= $endDate){
+            while ($startDate <= $endDate) {
                 $times[] = $startDate->format('Y-m-d H:00:00');
                 $startDate = $startDate->addHour();
             }
         }
 
-        if($groupBy === "date"){
+        if ($groupBy === "date") {
             $dateFormat = "%Y-%m-%d";
             $subDate = Carbon::parse($subDate)->subDay();
             $endDate = Carbon::parse($endDate);
 
-            while($startDate <= $endDate){
+            while ($startDate <= $endDate) {
                 $times[] = $startDate->format('Y-m-d');
                 $startDate = $startDate->addDay();
             }
         }
 
-        if($groupBy === "month"){
+        if ($groupBy === "month") {
             $dateFormat = "%Y-%m";
             $subDate = Carbon::parse($subDate)->subMonth();
             $endDate = Carbon::parse($endDate);
 
-            while($startDate <= $endDate){
+            while ($startDate <= $endDate) {
                 $times[] = $startDate->format('Y-m');
                 $startDate = $startDate->addMonth();
             }
@@ -188,10 +188,10 @@ class CampaignService extends AbstractService
         $campaignsChart = $this->createQueryGetCampaignChart($dateFormat, $subDate, $endDate);
         $campaignsIncrease = $this->createQueryGetIncrease($dateFormat, $subDate, $endDate, $groupBy === 'date' ? 'day' : $groupBy);
 
-        if(!empty($campaignsChart)){
-            foreach($campaignsChart as $campaignChart){
-                foreach($campaignsIncrease as $campaignIncrease){
-                    if(in_array($campaignIncrease->date_field, $campaignChart)){
+        if (!empty($campaignsChart)) {
+            foreach ($campaignsChart as $campaignChart) {
+                foreach ($campaignsIncrease as $campaignIncrease) {
+                    if (in_array($campaignIncrease->date_field, $campaignChart)) {
                         $chartResult[] = array_merge($campaignChart, [
                             'increase' => $campaignIncrease->increase
                         ]);
@@ -201,10 +201,10 @@ class CampaignService extends AbstractService
         }
 
         $lastIncrease = 0;
-        foreach ($times as $time){
-            if(!empty($chartResult)){
-                foreach ($chartResult as $chartItem){
-                    if(in_array($time, $chartItem)){
+        foreach ($times as $time) {
+            if (!empty($chartResult)) {
+                foreach ($chartResult as $chartItem) {
+                    if (in_array($time, $chartItem)) {
                         $result[] = [
                             'label' => $time,
                             'active' => $chartItem['active'],
@@ -214,25 +214,25 @@ class CampaignService extends AbstractService
                         $lastIncrease = $chartItem['active'] + $chartItem['other'];
                         $check = true;
                         break;
-                    }else{
+                    } else {
                         $prevTime = $time;
-                        if($groupBy === 'hour'){
+                        if ($groupBy === 'hour') {
                             $prevTime = Carbon::parse($prevTime)->subHour()->toDateTimeString();
                         }
-                        if($groupBy === 'date'){
+                        if ($groupBy === 'date') {
                             $prevTime = Carbon::parse($prevTime)->subDay()->toDateString();
                         }
-                        if($groupBy === 'month'){
+                        if ($groupBy === 'month') {
                             $prevTime = Carbon::parse($prevTime)->subMonth()->format('Y-m');
                         }
-                        if(in_array($prevTime, $chartItem)){
+                        if (in_array($prevTime, $chartItem)) {
                             $lastIncrease = $chartItem['active'] + $chartItem['other'];
                         }
                         $check = false;
                     }
                 }
 
-                if(!$check){
+                if (!$check) {
                     $result[] = [
                         'label' => $time,
                         'active' => 0,
@@ -241,7 +241,7 @@ class CampaignService extends AbstractService
                     ];
                     $lastIncrease = 0;
                 }
-            }else{
+            } else {
                 $result[] = [
                     'label' => $time,
                     'active' => 0,
@@ -251,7 +251,7 @@ class CampaignService extends AbstractService
             }
         }
 
-       return $result;
+        return $result;
     }
 
     /**
@@ -260,7 +260,8 @@ class CampaignService extends AbstractService
      * @param $endDate
      * @return mixed
      */
-    public function createQueryGetCampaignChart($dateFormat, $startDate, $endDate){
+    public function createQueryGetCampaignChart($dateFormat, $startDate, $endDate)
+    {
         return $this->model->selectRaw("date_format(updated_at, '{$dateFormat}') as label,  COUNT(IF( status = 'active', 1, NULL ) ) as active, COUNT(IF( status <> 'active', 1, NULL ) ) as other")
             ->whereDate('updated_at', '>=', $startDate)
             ->whereDate('updated_at', '<=', $endDate)
@@ -320,7 +321,7 @@ class CampaignService extends AbstractService
         if (!empty($campaign->open_mail_campaign)) {
             if (empty($campaign->not_open_mail_campaign)) {
                 return true;
-            }else {
+            } else {
                 $result = $this->model->select('campaigns.*')
                     ->join('mail_sending_history', 'campaigns.uuid', '=', 'mail_sending_history.campaign_uuid')
                     ->where('mail_sending_history.uuid', $mailSendingHistory->uuid)
@@ -361,4 +362,28 @@ class CampaignService extends AbstractService
         return true;
     }
 
+    /**
+     * @param $uuid
+     * @param $fromDate
+     * @param $toDate
+     * @param $sendType
+     * @param $type
+     * @return float|int
+     */
+    public function numberOfCreditsToStartTheCampaign($uuid, $fromDate, $toDate, $sendType, $type)
+    {
+        if ($sendType == 'email') {
+            $config = app(ConfigService::class)->findConfigByKey('email_price')->value;
+        } elseif ($sendType == 'sms') {
+            $config = app(ConfigService::class)->findConfigByKey('sms_price')->value;
+        }
+
+        if ($type == 'birthday') {
+            $numberCreditNeededToSendCampaign = (app(ContactService::class)->getBirthdayContactsSendEmailsByCampaigns($uuid, $fromDate, $toDate)) * $config;
+        } else {
+            $numberCreditNeededToSendCampaign = (app(ContactService::class)->getListsContactsSendEmailsByCampaigns($uuid)) * $config;
+        }
+
+        return $numberCreditNeededToSendCampaign;
+    }
 }
