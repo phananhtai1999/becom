@@ -38,9 +38,9 @@ class CampaignService extends AbstractService
     /**
      * @return mixed
      */
-    public function getListActiveBirthdayCampaignUuid()
+    public function getListActiveBirthdayCampaign()
     {
-        return $this->model->selectRaw('DISTINCT campaigns.uuid')
+        return $this->model->selectRaw('DISTINCT campaigns.*')->with(['user', 'mailTemplate', 'website', 'smtpAccount'])
             ->join('campaign_contact_list', 'campaigns.uuid', '=', 'campaign_contact_list.campaign_uuid')
             ->join('contact_lists', 'campaign_contact_list.contact_list_uuid', '=', 'contact_lists.uuid')
             ->join('contact_contact_list', 'contact_contact_list.contact_list_uuid', '=', 'contact_lists.uuid')
@@ -54,7 +54,8 @@ class CampaignService extends AbstractService
                 ['campaigns.send_type', "email"],
                 ['campaigns.status', "active"],
             ])
-            ->whereDate('contacts.dob', Carbon::now())->get()->toArray();
+            ->whereDate('contacts.dob', Carbon::now())
+            ->whereNull('contacts.deleted_at')->get();
     }
 
     /**

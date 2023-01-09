@@ -62,7 +62,7 @@ class UserService extends AbstractService
      * @param $userUuid
      * @return bool
      */
-    public function checkCreditToSendCEmail($creditNumberSendEmail, $userUuid)
+    public function checkCreditToSendEmail($creditNumberSendEmail, $userUuid)
     {
         $user = $this->findOneById($userUuid);
         if ($user->credit < $creditNumberSendEmail) {

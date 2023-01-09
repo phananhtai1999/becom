@@ -3,6 +3,7 @@
 namespace App\Events;
 
 use App\Models\Campaign;
+use App\Models\CampaignScenario;
 use App\Models\Email;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -28,15 +29,21 @@ class SendEmailByCampaignEvent
     public $creditNumberSendEmail;
 
     /**
+     * @var CampaignScenario
+     */
+    public $campaignRootScenario;
+
+    /**
      * Create a new event instance.
      *
      * @param $campaign
      * @param $creditNumberSendEmail
      */
-    public function __construct($campaign, $creditNumberSendEmail)
+    public function __construct($campaign, $creditNumberSendEmail, $campaignRootScenario)
     {
         $this->campaign = $campaign;
         $this->creditNumberSendEmail = $creditNumberSendEmail;
+        $this->campaignRootScenario = $campaignRootScenario;
     }
 
     /**

@@ -78,24 +78,18 @@ class MailTemplateVariableService extends AbstractService
             $campaignFromDate = $campaign->from_date;
             $campaignToDate = $campaign->to_date;
             $campaignTrackingKey = $campaign->tracking_key;
-            $campaignNumberEmailPerUser = $campaign->number_email_per_user;
-            $campaignNumberEmailPerDate = $campaign->number_email_per_date;
 //            $search = array_merge($search, [
 //                '{{ $campaign_from_date }}',
 //                '{{ $campaign_to_date }}',
 //                '{{ $campaign_tracking_key }}',
-//                '{{ $campaign_number_email_per_user }}',
-//                '{{ $campaign_number_email_per_date }}'
 //            ]);
             $search = array_merge($search, [
                 '{ campaign_from_date }',
                 '{ campaign_to_date }',
                 '{ campaign_tracking_key }',
-                '{ campaign_number_email_per_user }',
-                '{ campaign_number_email_per_date }'
             ]);
             $replace = array_merge($replace, [
-                $campaignFromDate, $campaignToDate, $campaignTrackingKey, $campaignNumberEmailPerUser, $campaignNumberEmailPerDate
+                $campaignFromDate, $campaignToDate, $campaignTrackingKey
             ]);
         }
         $mailTemplate->setRenderedBodyAttribute(Str::replace($search, $replace, $mailTemplate->body));

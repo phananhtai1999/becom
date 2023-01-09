@@ -129,15 +129,16 @@ class SendNextEmailByScenarioCampaignListener implements ShouldQueue
         $contact = $event->contact;
 
         $user = $campaign->user;
-        $config = $this->configService->findConfigByKey('smtp_auto');
-        $creditNumberSendEmail = config('credit.default_credit');
+        $configSmtpAuto = $this->configService->findConfigByKey('smtp_auto');
+        $configEmailPrice = $this->configService->findConfigByKey('email_price');
+        $creditNumberSendEmail = $configEmailPrice->value;
 
-        if (!$this->userService->checkCreditToSendCEmail($creditNumberSendEmail, $campaign->user_uuid)){
+        if (!$this->userService->checkCreditToSendEmail($creditNumberSendEmail, $campaign->user_uuid)){
             $this->campaignService->update($campaign, [
                 'was_stopped_by_owner' => true
             ]);
         }else {
-            if($user->can_add_smtp_account == 1 || $config->value == 0){
+            if($user->can_add_smtp_account == 1 || $configSmtpAuto->value == 0){
                 if(!empty($campaign->smtpAccount)){
                     $smtpAccount = $campaign->smtpAccount;
                 }else{
@@ -184,7 +185,7 @@ class SendNextEmailByScenarioCampaignListener implements ShouldQueue
                 Mail::to($contact->email)->send(new SendCampaign($emailTracking));
             } catch (\Exception $e) {
                 $this->mailSuccess = false;
-                $this->creditReturn = config('credit.default_credit');
+                $this->creditReturn = $configEmailPrice->value;
                 $this->mailSendingHistoryService->update($mailSendingHistory, [
                     'status' => 'fail'
                 ]);

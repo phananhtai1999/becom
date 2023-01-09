@@ -47,7 +47,9 @@ class SendEmailByBirthdayCampaign extends Command
      */
     public function handle()
     {
-        $listBirthdayCampaignUuid = $this->service->getListActiveBirthdayCampaignUuid();
-        SendEmailByBirthdayCampaignEvent::dispatch($listBirthdayCampaignUuid);
+        $listBirthdayCampaign = $this->service->getListActiveBirthdayCampaign();
+        if($listBirthdayCampaign->count()){
+            SendEmailByBirthdayCampaignEvent::dispatch($listBirthdayCampaign);
+        }
     }
 }

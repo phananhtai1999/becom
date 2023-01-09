@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Events\SendEmailByCampaignEvent;
 use App\Services\CampaignService;
+use App\Services\ConfigService;
 use App\Services\ContactService;
 use App\Services\EmailService;
 use App\Services\MailSendingHistoryService;
@@ -42,6 +43,11 @@ class SendEmailByCampaign extends Command
     protected $sendEmailByCampaignService;
 
     /**
+     * @var ContactService
+     */
+    protected $configService;
+
+    /**
      * Create a new command instance.
      *
      *
@@ -52,12 +58,14 @@ class SendEmailByCampaign extends Command
     public function __construct(
         CampaignService $service,
         ContactService $contactService,
-        SendEmailByCampaignService $sendEmailByCampaignService
+        SendEmailByCampaignService $sendEmailByCampaignService,
+        ConfigService $configService
     )
     {
         $this->service = $service;
         $this->sendEmailByCampaignService = $sendEmailByCampaignService;
         $this->contactService = $contactService;
+        $this->configService = $configService;
         parent::__construct();
     }
 
@@ -67,8 +75,9 @@ class SendEmailByCampaign extends Command
     public function handle()
     {
         $activeCampaign = $this->service->loadActiveCampaign();
+        $configEmailPrice = $this->configService->findConfigByKey('email_price');
         $contactsNumberSendEmail = count($this->contactService->getContactsSendEmail($activeCampaign->uuid));
-        $creditNumberSendEmail = $contactsNumberSendEmail * config('credit.default_credit') * $activeCampaign->number_email_per_date;
+        $creditNumberSendEmail = $contactsNumberSendEmail * $configEmailPrice->value;
         SendEmailByCampaignEvent::dispatch($activeCampaign, $creditNumberSendEmail);
     }
 }

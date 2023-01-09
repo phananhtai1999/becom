@@ -50,30 +50,9 @@ class ContactService extends AbstractService
             ->join('contact_lists', 'contact_lists.uuid', '=', 'contact_contact_list.contact_list_uuid')
             ->join('campaign_contact_list', 'campaign_contact_list.contact_list_uuid', '=', 'contact_lists.uuid')
             ->join('campaigns', 'campaigns.uuid', '=', 'campaign_contact_list.campaign_uuid')
-            ->where('campaigns.uuid', $campaignUuid)->get();
+            ->where('campaigns.uuid', $campaignUuid)->get()->unique('email');
 
-        $resultContacts = [];
-        $checkEmailExist = true;
-        foreach ($contactsCampaign as $contactCampaign) {
-            if (empty($resultContacts)) {
-                $resultContacts[] = $contactCampaign;
-            } else {
-                foreach ($resultContacts as $value) {
-                    if ($contactCampaign->email == $value->email) {
-                        $checkEmailExist = true;
-                        break;
-                    } else {
-                        $checkEmailExist = false;
-                    }
-                }
-
-                if (!$checkEmailExist) {
-                    $resultContacts[] = $contactCampaign;
-                }
-            }
-        }
-
-        return $resultContacts;
+        return $contactsCampaign;
     }
 
     /**
@@ -88,30 +67,9 @@ class ContactService extends AbstractService
             ->join('campaign_contact_list', 'campaign_contact_list.contact_list_uuid', '=', 'contact_lists.uuid')
             ->join('campaigns', 'campaigns.uuid', '=', 'campaign_contact_list.campaign_uuid')
             ->where('campaigns.uuid', $campaignUuid)
-            ->whereDate('contacts.dob', Carbon::now())->get();
+            ->whereDate('contacts.dob', Carbon::now())->get()->unique('email');
 
-        $resultBirthdayContacts = [];
-        $checkEmailExist = true;
-        foreach ($birthdayContacts as $birthdayContact) {
-            if (empty($resultBirthdayContacts)) {
-                $resultBirthdayContacts[] = $birthdayContact;
-            } else {
-                foreach ($resultBirthdayContacts as $value) {
-                    if ($birthdayContact->email == $value->email) {
-                        $checkEmailExist = true;
-                        break;
-                    } else {
-                        $checkEmailExist = false;
-                    }
-                }
-
-                if (!$checkEmailExist) {
-                    $resultBirthdayContacts[] = $birthdayContact;
-                }
-            }
-        }
-
-        return $resultBirthdayContacts;
+        return $birthdayContacts;
     }
 
     /**
@@ -171,7 +129,7 @@ class ContactService extends AbstractService
 
         foreach ($contactsOpenMail as $contactOpenMail) {
             $this->update($contactOpenMail, [
-                'points' => $contactOpenMail->points + 1
+               'points' => $contactOpenMail->points + 1
             ]);
         }
     }
@@ -391,7 +349,7 @@ class ContactService extends AbstractService
                 ->whereDate('contacts.updated_at', '>=', $startDate)
                 ->whereDate('contacts.updated_at', '<=', $endDate)
                 ->first();
-        } else {
+        }else {
             $totalMyContact = $this->model->selectRaw('sum(contacts.points) as points')
                 ->join('contact_contact_list', 'contact_contact_list.contact_uuid', '=', 'contacts.uuid')
                 ->join('contact_lists', 'contact_contact_list.contact_list_uuid', '=', 'contact_lists.uuid')
@@ -402,7 +360,7 @@ class ContactService extends AbstractService
                 ->first();
         }
 
-        return (int)$totalMyContact->points;
+        return (int) $totalMyContact->points;
     }
 
     /**
@@ -453,32 +411,32 @@ class ContactService extends AbstractService
         $subDate = $startDate;
         $startDate = Carbon::parse($startDate);
 
-        if ($groupBy === "hour") {
+        if($groupBy === "hour"){
             $dateFormat = "%Y-%m-%d %H:00:00";
             $subDate = Carbon::parse($subDate)->subDay();
             $endDate = Carbon::parse($endDate)->endOfDay();
 
-            while ($startDate <= $endDate) {
+            while($startDate <= $endDate){
                 $times[] = $startDate->format('Y-m-d H:00:00');
                 $startDate = $startDate->addHour();
             }
         }
-        if ($groupBy === "date") {
+        if($groupBy === "date"){
             $dateFormat = "%Y-%m-%d";
             $subDate = Carbon::parse($subDate)->subDay();
             $endDate = Carbon::parse($endDate);
 
-            while ($startDate <= $endDate) {
+            while($startDate <= $endDate){
                 $times[] = $startDate->format('Y-m-d');
                 $startDate = $startDate->addDay();
             }
         }
-        if ($groupBy === "month") {
+        if($groupBy === "month"){
             $dateFormat = "%Y-%m";
             $subDate = Carbon::parse($subDate)->subMonth();
             $endDate = Carbon::parse($endDate);
 
-            while ($startDate <= $endDate) {
+            while($startDate <= $endDate){
                 $times[] = $startDate->format('Y-m');
                 $startDate = $startDate->addMonth();
             }
@@ -487,35 +445,35 @@ class ContactService extends AbstractService
         $pointsContactsChart = $this->createQueryGetPointsContactByContactList($dateFormat, $subDate, $endDate, $groupBy === 'date' ? 'day' : $groupBy, $contactListUuid);
 
         $lastIncrease = 0;
-        foreach ($times as $time) {
-            if (!empty($pointsContactsChart)) {
-                foreach ($pointsContactsChart as $pointsContactChart) {
-                    if ($time == $pointsContactChart->label) {
+        foreach ($times as $time){
+            if(!empty($pointsContactsChart)) {
+                foreach ($pointsContactsChart as $pointsContactChart){
+                    if($time == $pointsContactChart->label) {
                         $result[] = [
                             'label' => $pointsContactChart->label,
                             'points' => (int)$pointsContactChart->points,
-                            'increase' => (int)($pointsContactChart->increase ?? $pointsContactChart->points)
+                            'increase' => (int) ($pointsContactChart->increase ?? $pointsContactChart->points)
                         ];
                         $check = true;
                         break;
-                    } else {
+                    }else{
                         $prevTime = $time;
-                        if ($groupBy === 'hour') {
+                        if($groupBy === 'hour'){
                             $prevTime = Carbon::parse($prevTime)->subHour()->toDateTimeString();
                         }
-                        if ($groupBy === 'date') {
+                        if($groupBy === 'date'){
                             $prevTime = Carbon::parse($prevTime)->subDay()->toDateString();
                         }
-                        if ($groupBy === 'month') {
+                        if($groupBy === 'month'){
                             $prevTime = Carbon::parse($prevTime)->subMonth()->format('Y-m');
                         }
-                        if ($prevTime == $pointsContactChart->label) {
+                        if($prevTime == $pointsContactChart->label){
                             $lastIncrease = $pointsContactChart->points;
                         }
                         $check = false;
                     }
                 }
-                if (!$check) {
+                if(!$check){
                     $result[] = [
                         'label' => $time,
                         'points' => 0,
@@ -523,7 +481,7 @@ class ContactService extends AbstractService
                     ];
                     $lastIncrease = 0;
                 }
-            } else {
+            }else{
                 $result[] = [
                     'label' => $time,
                     'points' => 0,
