@@ -29,6 +29,10 @@ class ScenarioResource extends AbstractJsonResource
             $data['campaign_scenario'] = CampaignScenarioResource::collection($this->campaignScenarios);
         }
 
+        if (\in_array('scenario__user', $expand)) {
+            $data['user'] = new UserResource($this->user);
+        }
+
         return $data;
     }
 }

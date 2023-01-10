@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
+use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Requests\EditScenarioRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\ScenarioRequest;
@@ -15,6 +16,8 @@ use Illuminate\Http\Request;
 
 class ScenarioController extends AbstractRestAPIController
 {
+    use RestIndexTrait;
+
     /**
      * @var MyScenarioService
      */
@@ -200,11 +203,35 @@ class ScenarioController extends AbstractRestAPIController
      * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
+    public function show($id)
+    {
+        $scenario = $this->service->findOrFailById($id);
+        $nodes = $this->showCampaignScenarioByUuid($id);
+
+        return $this->sendOkJsonResponse(['data' => [
+            'name' => $scenario->name,
+            'nodes' => $nodes
+        ]]);
+    }
+    /**
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function showMyScenario($id)
     {
         $scenario = $this->myService->findMyScenarioByUuid($id);
-        $campaignsScenario = $this->campaignScenarioService->showCampaignScenarioByScenarioUuid($id);
-        $depth = $this->campaignScenarioService->getMaxDepthOfCampaignScenarioByScenarioUuid($id);
+        $nodes = $this->showCampaignScenarioByUuid($id);
+
+        return $this->sendOkJsonResponse(['data' => [
+            'name' => $scenario->name,
+            'nodes' => $nodes
+        ]]);
+    }
+
+    public function showCampaignScenarioByUuid($scenarioUuid)
+    {
+        $campaignsScenario = $this->campaignScenarioService->showCampaignScenarioByScenarioUuid($scenarioUuid);
+        $depth = $this->campaignScenarioService->getMaxDepthOfCampaignScenarioByScenarioUuid($scenarioUuid);
 
         /*
          * depth sâu nhất = 3 (Mặc định depth = 0 -> x0 = 0)
@@ -248,10 +275,7 @@ class ScenarioController extends AbstractRestAPIController
             }
         }
 
-        return $this->sendOkJsonResponse(['data' => [
-            'name' => $scenario->name,
-            'nodes' => $nodes
-        ]]);
+        return $nodes;
     }
 
     /**
