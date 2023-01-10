@@ -135,7 +135,7 @@ class SendEmailByBirthdayCampaignListener implements ShouldQueue
             $user = $campaign->user;
 
             $contacts = $this->contactService->getBirthdayContactsSendEmail($campaign->uuid);
-            dd($contacts);
+
             $creditNumberSendEmail = count($contacts) * $configEmailPrice->value;
 
             if (!$this->userService->checkCreditToSendEmail($creditNumberSendEmail, $campaign->user_uuid)){

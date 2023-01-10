@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Events\SendEmailNotOpenByScenarioCampaignEvent;
+use App\Services\CampaignScenarioService;
 use App\Services\CampaignService;
 use App\Services\ContactService;
 use App\Services\MailSendingHistoryService;
@@ -36,6 +37,8 @@ class SendEmailNotOpenByScenarioCampaign extends Command
 
     protected $contactService;
 
+    protected $campaignScenarioService;
+
     /**
      * Create a new command instance.
      *
@@ -44,13 +47,15 @@ class SendEmailNotOpenByScenarioCampaign extends Command
     public function __construct(
         CampaignService $campaignService,
         MailSendingHistoryService $service,
-        ContactService $contactService
+        ContactService $contactService,
+        CampaignScenarioService $campaignScenarioService
     )
     {
         parent::__construct();
         $this->service = $service;
         $this->campaignService = $campaignService;
         $this->contactService = $contactService;
+        $this->campaignScenarioService = $campaignScenarioService;
     }
 
     /**
@@ -61,38 +66,26 @@ class SendEmailNotOpenByScenarioCampaign extends Command
     public function handle()
     {
         $mailNotOpenHistories = $this->service->getMailNotOpenHistories();
-        $contactsNotOpenByScenarioCampaignUuid = [];
-        $checkContactExist = false;
-        foreach ($mailNotOpenHistories as $mailNotOpenHistory) {
-            $campaign = $this->campaignService->findOneById($mailNotOpenHistory->campaign_uuid);
-            $contactNotOpenMail = $this->contactService->getContactByCampaign($campaign->uuid, $mailNotOpenHistory->email);
-            $campaignScenario = $this->campaignService->findOneById($campaign->not_open_mail_campaign);
-
-            $contactListCampaignScenario = $campaignScenario->contactlists;
-            $contact = $this->contactService->checkAndInsertContactIntoContactList($contactNotOpenMail, $contactListCampaignScenario[0]->uuid)->toArray();
-
-            if ($this->campaignService->checkActiveScenarioCampaign($campaignScenario->uuid)) {
-                if (($this->service->getNumberEmailSentByStatusAndCampaignUuid($campaignScenario->uuid, "sent") > 0 ||
-                        $this->service->getNumberEmailSentByStatusAndCampaignUuid($campaignScenario->uuid, "opened") > 0) && ($this->service->getNumberEmailSentPerUser($campaignScenario->uuid, $contact['email']) == 0)) {
-                    if (array_key_exists($campaignScenario->uuid, $contactsNotOpenByScenarioCampaignUuid)) {
-                        foreach ($contactsNotOpenByScenarioCampaignUuid[$campaignScenario->uuid] as $item) {
-                            if (in_array($contact['email'], $item)) {
-                                $checkContactExist = true;
-                                break;
-                            }
-                        }
-                        if (!$checkContactExist) {
-                            $contactsNotOpenByScenarioCampaignUuid[$campaignScenario->uuid][] = $contact;
-                        }
-                    }else {
-                        $contactsNotOpenByScenarioCampaignUuid[$campaignScenario->uuid][] = $contact;
-                    }
+        $contactNotOpenByCampaignScenario = [];
+        foreach ($mailNotOpenHistories->groupBy('campaign_scenario_uuid') as $campaignScenarioUuid => $mailSendingHistories) {
+            $contacts = [];
+            $notOpenCampaignScenario = $this->campaignScenarioService->getCampaignWhenNotOpenEmailByUuid($campaignScenarioUuid);
+            if ($campaign = $this->campaignService->checkActiveCampaignScenario($notOpenCampaignScenario->campaign_uuid)) {
+                foreach ($mailSendingHistories->pluck('email') as $emailNotOpen) {
+                    $contactNotOpen = $this->contactService->getContactByCampaign(optional($mailSendingHistories[0]->campaignScenario)->getRoot()->campaign_uuid, $emailNotOpen);
+                    $contacts[] = $contactNotOpen;
                 }
+                $contactNotOpenByCampaignScenario[] = [
+                    "campaign" => $campaign,
+                    "contact" => $contacts,
+                    "campaignScenario" => $notOpenCampaignScenario
+                ];
             }
+
         }
 
-        if (!empty($contactsNotOpenByScenarioCampaignUuid)) {
-            SendEmailNotOpenByScenarioCampaignEvent::dispatch($contactsNotOpenByScenarioCampaignUuid);
+        if (!empty($contactNotOpenByCampaignScenario)) {
+            SendEmailNotOpenByScenarioCampaignEvent::dispatch($contactNotOpenByCampaignScenario);
         }
     }
 }

@@ -29,21 +29,15 @@ class SendEmailByCampaignEvent
     public $creditNumberSendEmail;
 
     /**
-     * @var CampaignScenario
-     */
-    public $campaignRootScenario;
-
-    /**
      * Create a new event instance.
      *
      * @param $campaign
      * @param $creditNumberSendEmail
      */
-    public function __construct($campaign, $creditNumberSendEmail, $campaignRootScenario)
+    public function __construct($campaign, $creditNumberSendEmail)
     {
         $this->campaign = $campaign;
         $this->creditNumberSendEmail = $creditNumberSendEmail;
-        $this->campaignRootScenario = $campaignRootScenario;
     }
 
     /**

@@ -125,8 +125,9 @@ class SendNextEmailByScenarioCampaignListener implements ShouldQueue
      */
     public function handle(SendNextEmailByScenarioCampaignEvent $event)
     {
-        $campaign = $event->campaignScenario;
+        $campaignScenario = $event->campaignScenario;
         $contact = $event->contact;
+        $campaign = $event->campaign;
 
         $user = $campaign->user;
         $configSmtpAuto = $this->configService->findConfigByKey('smtp_auto');
@@ -173,13 +174,12 @@ class SendNextEmailByScenarioCampaignListener implements ShouldQueue
             }
 
             $mailTemplate = $this->mailTemplateVariableService->renderBody($campaign->mailTemplate, $contact, $smtpAccount, $campaign);
-
             $mailSendingHistory = $this->mailSendingHistoryService->create([
                 'email' => $contact->email,
                 'campaign_uuid' => $campaign->uuid,
+                'campaign_scenario_uuid' => $campaignScenario->uuid,
                 'time' => Carbon::now()
             ]);
-
             $emailTracking = $this->mailTemplateVariableService->injectTrackingImage($mailTemplate, $mailSendingHistory->uuid);
             try {
                 Mail::to($contact->email)->send(new SendCampaign($emailTracking));

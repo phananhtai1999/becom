@@ -16,6 +16,7 @@ use App\Http\Requests\MailSendingHistoryRequest;
 use App\Http\Requests\UpdateMailSendingHistoryRequest;
 use App\Http\Resources\MailSendingHistoryResourceCollection;
 use App\Http\Resources\MailSendingHistoryResource;
+use App\Services\CampaignScenarioService;
 use App\Services\CampaignService;
 use App\Services\ContactService;
 use App\Services\MailOpenTrackingService;
@@ -49,18 +50,25 @@ class MailSendingHistoryController extends AbstractRestAPIController
     protected $contactService;
 
     /**
+     * @var CampaignScenarioService
+     */
+    protected $campaignScenarioService;
+
+    /**
      * @param MailSendingHistoryService $service
      * @param MyMailSendingHistoryService $myService
      * @param MailOpenTrackingService $mailOpenTrackingService
      * @param CampaignService $campaignService
      * @param ContactService $contactService
+     * @param CampaignScenarioService $campaignScenarioService
      */
     public function __construct(
         MailSendingHistoryService $service,
         MyMailSendingHistoryService $myService,
         MailOpenTrackingService $mailOpenTrackingService,
         CampaignService $campaignService,
-        ContactService $contactService
+        ContactService $contactService,
+        CampaignScenarioService $campaignScenarioService
     )
     {
         $this->service = $service;
@@ -73,6 +81,7 @@ class MailSendingHistoryController extends AbstractRestAPIController
         $this->indexRequest = IndexRequest::class;
         $this->campaignService = $campaignService;
         $this->contactService = $contactService;
+        $this->campaignScenarioService = $campaignScenarioService;
     }
 
     /**
@@ -117,28 +126,20 @@ class MailSendingHistoryController extends AbstractRestAPIController
     {
         $ip = $request->ip();
         $userAgent = $request->header('User-Agent');
-        $this->mailOpenTrackingService->mailOpenTracking($id, $ip, $userAgent);
+//        $this->mailOpenTrackingService->mailOpenTracking($id, $ip, $userAgent);
 
         $mailSendingHistory = $this->service->findOneById($id);
-        //Add 1 point when open mail
-        if ($mailSendingHistory->status !== "opened") {
-            $this->contactService->addPointContactOpenMailCampaign($mailSendingHistory->campaign_uuid, $mailSendingHistory->email);
-        }
-        $this->service->update($mailSendingHistory, ['status' => 'opened']);
 
         //Send Email Scenario Campaign
-        $campaign = $this->campaignService->findOneById($mailSendingHistory->campaign_uuid);
-        if ($this->campaignService->checkScenarioCampaign($campaign, $mailSendingHistory)) {
-            $contactOpenMail = $this->contactService->getContactByCampaign($campaign->uuid, $mailSendingHistory->email);
-            $campaignScenario = $this->campaignService->findOneById($campaign->open_mail_campaign);
-            $contactListCampaignScenario = $campaignScenario->contactlists;
-            $contact = $this->contactService->checkAndInsertContactIntoContactList($contactOpenMail, $contactListCampaignScenario[0]->uuid);
-
-            if ($this->campaignService->checkActiveScenarioCampaign($campaignScenario->uuid)) {
-                if (($this->service->getNumberEmailSentByStatusAndCampaignUuid($campaignScenario->uuid, "sent") > 0 ||
-                    $this->service->getNumberEmailSentByStatusAndCampaignUuid($campaignScenario->uuid, "opened") > 0) && ($this->service->getNumberEmailSentPerUser($campaignScenario->uuid, $contact->email) == 0)) {
-                    SendNextEmailByScenarioCampaignEvent::dispatch($campaignScenario, $contact);
-                }
+        if ($mailSendingHistory->status !== "opened") {
+            //Add 1 point when open mail
+//            $this->contactService->addPointContactOpenMailCampaign($mailSendingHistory->campaign_uuid, $mailSendingHistory->email);
+            $this->service->update($mailSendingHistory, ['status' => 'opened']);
+            if ($mailSendingHistory->campaign_scenario_uuid
+                && ($nextCampaignScenario = $this->campaignScenarioService->getCampaignWhenOpenEmailByUuid($mailSendingHistory->campaign_scenario_uuid))
+                    && ($nextCampaign = $this->campaignService->checkActiveCampaignScenario($nextCampaignScenario->campaign_uuid))) {
+                $contactOpenMail = $this->contactService->getContactByCampaign($nextCampaignScenario->getRoot()->campaign_uuid, $mailSendingHistory->email);
+                SendNextEmailByScenarioCampaignEvent::dispatch($nextCampaign, $contactOpenMail, $nextCampaignScenario);
             }
         }
 

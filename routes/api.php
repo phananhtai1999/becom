@@ -473,9 +473,3 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'scenario.'], function () {
         Route::put('my/scenario/{id}', [ScenarioController::class, 'editMyScenario'])->name('editMyScenario');
     });
 });
-
-Route::get('test/{id}', [CampaignController::class, 'test'])->name('showMyScenario');
-
-
-
-

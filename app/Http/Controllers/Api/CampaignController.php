@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
 use App\Events\SendEmailByBirthdayCampaignEvent;
+use App\Events\SendEmailByCampaginRootScenarioEvent;
 use App\Events\SendEmailByCampaignEvent;
+use App\Events\SendEmailNotOpenByScenarioCampaignEvent;
 use App\Events\SendNextEmailByScenarioCampaignEvent;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
@@ -31,6 +33,7 @@ use App\Models\Website;
 use App\Services\CampaignDailyTrackingService;
 use App\Services\CampaignLinkDailyTrackingService;
 use App\Services\CampaignLinkTrackingService;
+use App\Services\CampaignScenarioService;
 use App\Services\CampaignService;
 use App\Services\CampaignTrackingService;
 use App\Services\ConfigService;
@@ -526,26 +529,18 @@ class CampaignController extends AbstractRestAPIController
         }
 
         $campaign = $this->myService->findMyCampaignByKeyOrAbort($request->get('campaign_uuid'));
-
         $campaignsScenario = $campaign->campaignsScenario;
         $campaignRootScenario = $campaignsScenario->filter(function ($value) {
             return $value->parent_uuid === null;
         });
-
-        if ($campaignRootScenario->count()) {
-            dd("oke");
-        }
-        dd("NoOke");
-
-
-        $configEmailPrice = $this->configService->findConfigByKey('email_price');
         if ($this->sendEmailScheduleLogService->checkActiveCampaignbyCampaignUuid($request->get('campaign_uuid'))) {
-
-            $contactsNumberSendEmail = count($this->contactService->getContactsSendEmail($campaign->uuid));
-            $creditNumberSendEmail = $contactsNumberSendEmail * $configEmailPrice->value;
+            $creditNumberSendEmail = $campaign->number_credit_needed_to_start_campaign * ($campaignRootScenario->count() > 0 ? $campaignRootScenario->count() : 1 );
             if ($this->userService->checkCreditToSendEmail($creditNumberSendEmail, $campaign->user_uuid)) {
-                SendEmailByCampaignEvent::dispatch($campaign, $creditNumberSendEmail, $campaignRootScenario);
-
+                if ($campaignRootScenario->count()) {
+                    SendEmailByCampaginRootScenarioEvent::dispatch($campaign, $creditNumberSendEmail, $campaignRootScenario);
+                }else{
+                    SendEmailByCampaignEvent::dispatch($campaign, $creditNumberSendEmail);
+                }
                 return $this->sendOkJsonResponse(["message" => __('messages.send_campaign_success')]);
             }
 
@@ -601,11 +596,5 @@ class CampaignController extends AbstractRestAPIController
                 'other' => $totalActiveAndOtherMyCampaign[0]['other']
             ]
         ]);
-    }
-
-    public function test($id)
-    {
-        $a = $this->contactService->getBirthdayContactsSendEmail(1);
-        dd($a);
     }
 }
