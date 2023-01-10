@@ -126,11 +126,8 @@ class SendEmailByCampaginRootScenarioListener implements ShouldQueue
     }
 
     /**
-     * Handle the event.
-     *
-     * @param SendEmailByCampaignEvent $event
+     * @param SendEmailByCampaginRootScenarioEvent $event
      * @return void
-     * @throws \Throwable
      */
     public function handle(SendEmailByCampaginRootScenarioEvent $event)
     {

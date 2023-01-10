@@ -3,11 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
-use App\Events\SendEmailByBirthdayCampaignEvent;
 use App\Events\SendEmailByCampaginRootScenarioEvent;
 use App\Events\SendEmailByCampaignEvent;
-use App\Events\SendEmailNotOpenByScenarioCampaignEvent;
-use App\Events\SendNextEmailByScenarioCampaignEvent;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Requests\CampaignLinkTrackingRequest;
@@ -28,12 +25,9 @@ use App\Http\Resources\CampaignLinkDailyTrackingResource;
 use App\Http\Resources\CampaignLinkTrackingResource;
 use App\Http\Resources\CampaignResource;
 use App\Http\Resources\CampaignTrackingResource;
-use App\Models\Campaign;
-use App\Models\Website;
 use App\Services\CampaignDailyTrackingService;
 use App\Services\CampaignLinkDailyTrackingService;
 use App\Services\CampaignLinkTrackingService;
-use App\Services\CampaignScenarioService;
 use App\Services\CampaignService;
 use App\Services\CampaignTrackingService;
 use App\Services\ConfigService;
@@ -47,9 +41,7 @@ use App\Services\SmtpAccountService;
 use App\Services\UserService;
 use Carbon\Carbon;
 use App\Services\MyCampaignService;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\DB;
 
 class CampaignController extends AbstractRestAPIController
 {

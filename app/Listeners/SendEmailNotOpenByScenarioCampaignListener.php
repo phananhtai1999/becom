@@ -120,9 +120,7 @@ class SendEmailNotOpenByScenarioCampaignListener implements ShouldQueue
     }
 
     /**
-     * Handle the event.
-     *
-     * @param  object  $event
+     * @param SendEmailNotOpenByScenarioCampaignEvent $event
      * @return void
      */
     public function handle(SendEmailNotOpenByScenarioCampaignEvent $event)
