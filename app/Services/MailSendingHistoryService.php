@@ -32,7 +32,7 @@ class MailSendingHistoryService extends AbstractService
      * @param $email
      * @return mixed
      */
-    public function getNumberEmailSentPerUser($campaignUuid, $email)
+    public function getNumberEmailByCampaign($campaignUuid, $email)
     {
         return $this->model->where('campaign_uuid', $campaignUuid)
             ->where('email', $email)
@@ -42,24 +42,21 @@ class MailSendingHistoryService extends AbstractService
     }
 
     /**
-     * @param $campaign
-     * @param $emails
-     * @return bool
+     * @param $campaignUuid
+     * @param $email
+     * @return mixed
      */
-    public function checkTodayNumberEmailSentUser($campaign, $toEmails){
-        foreach($toEmails as $email){
-            $numberEmailSent =  $this->model->where('campaign_uuid', $campaign->uuid)
-                ->where('email', $email)
-                ->whereDate('time', Carbon::now())
-                ->groupBy('email')
-                ->count();
-
-            if($numberEmailSent >= $campaign->number_email_per_date){
-                return false;
-            }
-        }
-
-        return true;
+    public function getNumberEmailByCampaignScenario($campaignUuid, $email, $campaignScenarioUuid)
+    {
+        return $this->model
+            ->where([
+                ['campaign_uuid' => $campaignUuid],
+                ['campaign_scenario_uuid' => $campaignScenarioUuid],
+                ['email'=> $email]
+            ])
+            ->whereNotIn('status', ["fail"])
+            ->groupBy('email')
+            ->count();
     }
 
     /**
@@ -187,9 +184,29 @@ class MailSendingHistoryService extends AbstractService
      */
     public function getMailNotOpenHistories()
     {
-        return $this->model->select('mail_sending_history.*')
-            ->join('campaigns', 'campaigns.uuid', '=', 'mail_sending_history.campaign_uuid')
-            ->whereRaw('CURDATE() - date(mail_sending_history.created_at) > campaigns.open_within')
-            ->whereNotNull('campaigns.not_open_mail_campaign')->get();
+         return $this->model->with('campaignScenario')->select("mail_sending_history.*")
+             ->join('campaign_scenario as c', 'c.parent_uuid', '=', 'mail_sending_history.campaign_scenario_uuid')
+             ->where('c.type', 'not_open')
+             ->where('mail_sending_history.status', 'sent')
+             ->whereRaw('CURDATE() - date(mail_sending_history.updated_at) > c.open_within')
+             ->whereNotIn('c.uuid', function ($query) {
+                    $query->select('m.campaign_scenario_uuid')
+                        ->from('mail_sending_history as m')
+                        ->whereNotNull('m.campaign_scenario_uuid')
+                        ->where('m.status', "sent")
+                        ->whereRaw("m.email = mail_sending_history.email");
+             })->get();
+        /*
+         * select `mail_sending_history`.*
+        from `mail_sending_history` inner join `campaign_scenario` on `campaign_scenario`.`parent_uuid` = `mail_sending_history`.`campaign_scenario_uuid`
+        where `campaign_scenario`.`type` = "not_open" and `mail_sending_history`.`status` = "sent"
+        and CURDATE() - date(mail_sending_history.updated_at) > campaign_scenario.open_within and
+        `campaign_scenario`.`uuid` not in (select `m`.`campaign_scenario_uuid`
+                                   from `mail_sending_history` as `m`
+                                   where `m`.`campaign_scenario_uuid` is not null and `m`.`status` = "sent" and 			`m`.`email` = mail_sending_history.email) and `mail_sending_history`.`deleted_at` is null;
+         * */
+
+        //Kiểm tra trường hợp not open chưa tồn tại trong mailsendinghistory
+
     }
 }

@@ -137,14 +137,15 @@ class SendEmailByCampaignListener implements ShouldQueue
         $creditNumberSendEmail = $event->creditNumberSendEmail;
 
         $user = $campaign->user;
-        $config = $this->configService->findConfigByKey('smtp_auto');
+        $configSmtpAuto = $this->configService->findConfigByKey('smtp_auto');
+        $configEmailPrice = $this->configService->findConfigByKey('email_price');
 
-        if (!$this->userService->checkCreditToSendCEmail($creditNumberSendEmail, $campaign->user_uuid)){
+        if (!$this->userService->checkCreditToSendEmail($creditNumberSendEmail, $campaign->user_uuid)){
             $this->campaignService->update($campaign, [
                 'was_stopped_by_owner' => true
             ]);
         }else {
-            if($user->can_add_smtp_account == 1 || $config->value == 0){
+            if($user->can_add_smtp_account == 1 || $configSmtpAuto->value == 0){
                 if(!empty($campaign->smtpAccount)){
                     $smtpAccount = $campaign->smtpAccount;
                 }else{
@@ -178,48 +179,28 @@ class SendEmailByCampaignListener implements ShouldQueue
             }
 
             $contacts = $this->contactService->getContactsSendEmail($campaign->uuid);
+            foreach ($contacts as $contact){
+                $mailTemplate = $this->mailTemplateVariableService->renderBody($campaign->mailTemplate, $contact, $smtpAccount, $campaign);
+                $mailSendingHistory = $this->mailSendingHistoryService->create([
+                    'email' => $contact->email,
+                    'campaign_uuid' => $campaign->uuid,
+                    'time' => Carbon::now()
+                ]);
 
-            for ($i = 1; $i <= $campaign->number_email_per_date; $i++) {
-                foreach ($contacts as $contact){
-                    $quantityEmailWasSentPerUser = $this->mailSendingHistoryService->getNumberEmailSentPerUser($campaign->uuid, $contact->email);
-
-                    if($quantityEmailWasSentPerUser < $campaign->number_email_per_user){
-                        $mailTemplate = $this->mailTemplateVariableService->renderBody($campaign->mailTemplate, $contact, $smtpAccount, $campaign);
-
-                        $mailSendingHistory = $this->mailSendingHistoryService->create([
-                            'email' => $contact->email,
-                            'campaign_uuid' =>   $campaign->uuid,
-                            'time' => Carbon::now()
-                        ]);
-
-                        $emailTracking = $this->mailTemplateVariableService->injectTrackingImage($mailTemplate, $mailSendingHistory->uuid);
-                        try {
-                            Mail::to($contact->email)->send(new SendCampaign($emailTracking));
-                        } catch (\Exception $e) {
-                            $this->mailSuccess = false;
-                            $this->creditReturn += config('credit.default_credit');
-                            $this->mailSendingHistoryService->update($mailSendingHistory, [
-                                'status' => 'fail'
-                            ]);
-                            $this->sendEmailScheduleLogService->update($sendEmailScheduleLog, [
-                                'is_running' => false,
-                                'was_crashed' => true,
-                                'log' => $e->getMessage()
-                            ]);
-                        }
-                    }
-                }
-
-                if($this->checkWasFinishedCampaign($campaign)){
-                    if(($this->numberEmailSentPerDate = $i) < $campaign->number_email_per_date) {
-                        $returnUser = ($campaign->number_email_per_date - $this->numberEmailSentPerDate)
-                            * config('credit.default_credit') * count($contacts);
-                        $payCreditHistory = $this->numberEmailSentPerDate * count($contacts)
-                            * config('credit.default_credit');
-                        $this->returnCreditUserAndCreditHistory($user, $creditHistory, $returnUser, $payCreditHistory);
-                    }
-                    $this->campaignService->update($campaign, ['was_finished' => true]);
-                    break;
+                $emailTracking = $this->mailTemplateVariableService->injectTrackingImage($mailTemplate, $mailSendingHistory->uuid);
+                try {
+                    Mail::to($contact->email)->send(new SendCampaign($emailTracking));
+                } catch (\Exception $e) {
+                    $this->mailSuccess = false;
+                    $this->creditReturn += $configEmailPrice->value;
+                    $this->mailSendingHistoryService->update($mailSendingHistory, [
+                        'status' => 'fail'
+                    ]);
+                    $this->sendEmailScheduleLogService->update($sendEmailScheduleLog, [
+                        'is_running' => false,
+                        'was_crashed' => true,
+                        'log' => $e->getMessage()
+                    ]);
                 }
             }
 
@@ -236,74 +217,6 @@ class SendEmailByCampaignListener implements ShouldQueue
                 ]);
             }
         }
-    }
-
-
-//    public function sendEmailByCampaign($campaign, $sendEmailScheduleLog)
-//    {
-//
-//        $contacts = $this->contactService->getContactsSendEmail($campaign->uuid);
-//
-//        for ($i = 1; $i <= $campaign->number_email_per_date; $i++) {
-//            foreach ($contacts as $contact){
-//                $quantityEmailWasSentPerUser = $this->mailSendingHistoryService->getNumberEmailSentPerUser($campaign->uuid, $contact->email);
-//
-//                if($quantityEmailWasSentPerUser < $campaign->number_email_per_user){
-//                    $mailTemplate = $this->mailTemplateVariableService->renderBody($campaign->mailTemplate, $contact, $campaign->smtpAccount, $campaign);
-//
-//                    $mailSendingHistory = $this->mailSendingHistoryService->create([
-//                        'email' => $contact->email,
-//                        'campaign_uuid' =>   $campaign->uuid,
-//                        'time' => Carbon::now()
-//                    ]);
-//
-//                    $emailTracking = $this->mailTemplateVariableService->injectTrackingImage($mailTemplate, $mailSendingHistory->uuid);
-//                    try {
-//                        Mail::to($contact->email)->send(new SendCampaign($emailTracking));
-//                    } catch (\Exception $e) {
-//                        $this->mailSuccess = false;
-//                        $this->creditReturn += config('credit.default_credit');
-//                        $this->mailSendingHistoryService->update($mailSendingHistory, [
-//                            'status' => 'fail'
-//                        ]);
-//                        $this->sendEmailScheduleLogService->update($sendEmailScheduleLog, [
-//                            'is_running' => false,
-//                            'was_crashed' => true,
-//                            'log' => $e->getMessage()
-//                        ]);
-//                    }
-//                }
-//            }
-//        }
-//
-//
-//
-//        if($this->mailSuccess){
-//            $this->sendEmailScheduleLogService->update($sendEmailScheduleLog, [
-//                'end_time' => Carbon::now(),
-//                'is_running' => false
-//            ]);
-//        }
-//
-//        if($this->checkWasFinishedCampaign($campaign)){
-//            $this->campaignService->update($campaign, ['was_finished' => true]);
-//        }
-//
-//    }
-
-    /**
-     * @param $campaign
-     * @return bool
-     */
-    public function checkWasFinishedCampaign($campaign)
-    {
-        $contacts = $this->contactService->getContactsSendEmail($campaign->uuid);
-        foreach ($contacts as $contact){
-            if($this->mailSendingHistoryService->getNumberEmailSentPerUser($campaign->uuid, $contact->email) !== $campaign->number_email_per_user){
-                return false;
-            }
-        }
-        return true;
     }
 
     /**

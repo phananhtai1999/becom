@@ -38,9 +38,9 @@ class CampaignService extends AbstractService
     /**
      * @return mixed
      */
-    public function getListActiveBirthdayCampaignUuid()
+    public function getListActiveBirthdayCampaign()
     {
-        return $this->model->selectRaw('DISTINCT campaigns.uuid')
+        return $this->model->selectRaw('DISTINCT campaigns.*')->with(['user', 'mailTemplate', 'website', 'smtpAccount'])
             ->join('campaign_contact_list', 'campaigns.uuid', '=', 'campaign_contact_list.campaign_uuid')
             ->join('contact_lists', 'campaign_contact_list.contact_list_uuid', '=', 'contact_lists.uuid')
             ->join('contact_contact_list', 'contact_contact_list.contact_list_uuid', '=', 'contact_lists.uuid')
@@ -54,7 +54,8 @@ class CampaignService extends AbstractService
                 ['campaigns.send_type', "email"],
                 ['campaigns.status', "active"],
             ])
-            ->whereDate('contacts.dob', Carbon::now())->get()->toArray();
+            ->whereDate('contacts.dob', Carbon::now())
+            ->whereNull('contacts.deleted_at')->get();
     }
 
     /**
@@ -340,26 +341,19 @@ class CampaignService extends AbstractService
 
     /**
      * @param $campaignUuid
-     * @return bool
+     * @return mixed
      */
-    public function checkActiveScenarioCampaign($campaignUuid)
+    public function checkActiveCampaignScenario($campaignUuid)
     {
-        $campaign = $this->model->where([
-            ['type', 'scenario'],
+        return $this->model->where([
             ['uuid', $campaignUuid],
-            ['from_date', '<=', Carbon::now()],
             ['to_date', '>=', Carbon::now()],
             ['was_finished', false],
             ['was_stopped_by_owner', false],
             ['send_type', "email"],
             ['status', "active"]
-        ])->first();
+        ])->with(['user', 'mailTemplate', 'website', 'smtpAccount'])->first();
 
-        if (empty($campaign)) {
-            return false;
-        }
-
-        return true;
     }
 
     /**
@@ -386,4 +380,14 @@ class CampaignService extends AbstractService
 
         return $numberCreditNeededToSendCampaign;
     }
+
+    /**
+     * @param $campaignUuid
+     * @return mixed
+     */
+    public function getInfoRelationshipCampaignByUuid($campaignUuid)
+    {
+        return $this->model->with(['user', 'mailTemplate', 'website', 'smtpAccount'])->find($campaignUuid);
+    }
+
 }

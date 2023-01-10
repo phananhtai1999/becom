@@ -14,14 +14,14 @@ class SendEmailByBirthdayCampaignEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $listBirthdayCampaignUuid;
+    public $listBirthdayCampaign;
 
     /**
      * @param $contactsByBirthdayCampaigns
      */
-    public function __construct($listBirthdayCampaignUuid)
+    public function __construct($listBirthdayCampaign)
     {
-        $this->listBirthdayCampaignUuid = $listBirthdayCampaignUuid;
+        $this->listBirthdayCampaign = $listBirthdayCampaign;
     }
 
     /**

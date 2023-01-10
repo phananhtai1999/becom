@@ -228,7 +228,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'campaign.'], function () {
         Route::get('/my/campaign/{id}', [CampaignController::class, 'showMyCampaign'])->name('show');
         Route::put('/my/campaign/{id}', [CampaignController::class, 'editMyCampaign'])->name('edit');
         Route::delete('/my/campaign/{id}', [CampaignController::class, 'destroyMyCampaign'])->name('destroy');
-//        Route::post('/my/emails/send-campaign', [CampaignController::class, 'sendEmailByMyCampaign'])->name('sendEmailByMyCampaign');
+        Route::post('/my/emails/send-campaign', [CampaignController::class, 'sendEmailByMyCampaign'])->name('sendEmailByMyCampaign');
     });
 
     //Upsert-campaign-link-tracking
@@ -461,9 +461,9 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'checkout.'], function () {
 //Scenario
 Route::group(['middleware' => ['auth:api'], 'as' => 'scenario.'], function () {
     Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
-        Route::get('scenarios', [ScenarioController::class, 'indexMyScenario'])->name('index');
+        Route::get('scenarios', [ScenarioController::class, 'index'])->name('index');
         Route::post('scenario', [ScenarioController::class, 'storeScenario'])->name('storeScenario');
-        Route::get('scenario/{id}', [ScenarioController::class, 'showMyScenario'])->name('showMyScenario');
+        Route::get('scenario/{id}', [ScenarioController::class, 'show'])->name('showMyScenario');
         Route::put('scenario/{id}', [ScenarioController::class, 'editMyScenario'])->name('editMyScenario');
     });
     Route::group(['as' => 'my.'], function () {
@@ -473,6 +473,3 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'scenario.'], function () {
         Route::put('my/scenario/{id}', [ScenarioController::class, 'editMyScenario'])->name('editMyScenario');
     });
 });
-
-
-

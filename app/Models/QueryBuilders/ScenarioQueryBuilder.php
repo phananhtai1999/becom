@@ -8,14 +8,14 @@ use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\Concerns\SortsQuery;
 use Spatie\QueryBuilder\QueryBuilder;
 
-class MyScenarioQueryBuilder extends AbstractQueryBuilder
+class ScenarioQueryBuilder extends AbstractQueryBuilder
 {
     /**
      * @return string
      */
     public static function baseQuery()
     {
-        return Scenario::where('user_uuid', auth()->user()->getKey());
+        return Scenario::class;
     }
 
     /**

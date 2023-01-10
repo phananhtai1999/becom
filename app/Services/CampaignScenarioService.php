@@ -38,4 +38,28 @@ class CampaignScenarioService extends AbstractService
     {
        return $this->model->where('scenario_uuid', $scenarioUuid)->whereNotIn('uuid', $Uuid)->orderBy('uuid', 'DESC')->get();
     }
+
+    /**
+     * @param $campaignScenarioUuid
+     * @return mixed
+     */
+    public function getCampaignWhenOpenEmailByUuid($campaignScenarioUuid)
+    {
+        return $this->model->where([
+            ['parent_uuid', $campaignScenarioUuid],
+            ['type', "open"]
+        ])->first();
+    }
+
+    /**
+     * @param $campaignScenarioUuid
+     * @return mixed
+     */
+    public function getCampaignWhenNotOpenEmailByUuid($campaignScenarioUuid)
+    {
+        return $this->model->where([
+            ['parent_uuid', $campaignScenarioUuid],
+            ['type', "not_open"]
+        ])->first();
+    }
 }

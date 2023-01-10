@@ -120,33 +120,32 @@ class SendEmailNotOpenByScenarioCampaignListener implements ShouldQueue
     }
 
     /**
-     * Handle the event.
-     *
-     * @param  object  $event
+     * @param SendEmailNotOpenByScenarioCampaignEvent $event
      * @return void
      */
     public function handle(SendEmailNotOpenByScenarioCampaignEvent $event)
     {
-        $contactsNotOpenByScenarioCampaignUuid = $event->contactsNotOpenByScenarioCampaignUuid;
+        $contactNotOpenByCampaignScenario = $event->contactNotOpenByCampaignScenario;
+        $configSmtpAuto = $this->configService->findConfigByKey('smtp_auto');
+        $configEmailPrice = $this->configService->findConfigByKey('email_price');
 
-        foreach ($contactsNotOpenByScenarioCampaignUuid as $scenarioCampaignUuid => $contacts) {
-            $this->creditReturn = 0;
+        foreach ($contactNotOpenByCampaignScenario as $value) {
+            $this->creditReturn =   0;
 
-            $campaign = $this->campaignService->findOneById($scenarioCampaignUuid);
+            $campaign = $value['campaign'];
+            $contacts = $value['contact'];
             $user = $campaign->user;
 
-            $creditNumberSendEmail = count($contacts) * config('credit.default_credit');
+            $creditNumberSendEmail = count($contacts) * $configEmailPrice->value;
 
-            if (!$this->userService->checkCreditToSendCEmail($creditNumberSendEmail, $campaign->user_uuid)){
+            if (!$this->userService->checkCreditToSendEmail($creditNumberSendEmail, $campaign->user_uuid)){
                 $this->campaignService->update($campaign, [
                     'was_stopped_by_owner' => true
                 ]);
                 continue;
             }
 
-            $config = $this->configService->findConfigByKey('smtp_auto');
-
-            if($user->can_add_smtp_account == 1 || $config->value == 0){
+            if($user->can_add_smtp_account == 1 || $configSmtpAuto->value == 0){
                 if(!empty($campaign->smtpAccount)){
                     $smtpAccount = $campaign->smtpAccount;
                 }else{
@@ -181,12 +180,11 @@ class SendEmailNotOpenByScenarioCampaignListener implements ShouldQueue
             }
 
             foreach ($contacts as $contact) {
-                $contact = $this->contactService->findOneById($contact['uuid']);
                 $mailTemplate = $this->mailTemplateVariableService->renderBody($campaign->mailTemplate, $contact, $smtpAccount, $campaign);
-
                 $mailSendingHistory = $this->mailSendingHistoryService->create([
                     'email' => $contact->email,
                     'campaign_uuid' =>   $campaign->uuid,
+                    'campaign_scenario_uuid' => $value['campaignScenario']->uuid,
                     'time' => Carbon::now()
                 ]);
 
@@ -195,7 +193,7 @@ class SendEmailNotOpenByScenarioCampaignListener implements ShouldQueue
                     Mail::to($contact->email)->send(new SendCampaign($emailTracking));
                 } catch (\Exception $e) {
                     $this->mailSuccess = false;
-                    $this->creditReturn += config('credit.default_credit');
+                    $this->creditReturn += $configEmailPrice->value;
                     $this->mailSendingHistoryService->update($mailSendingHistory, [
                         'status' => 'fail'
                     ]);

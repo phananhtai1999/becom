@@ -126,27 +126,26 @@ class SendEmailByBirthdayCampaignListener implements ShouldQueue
      */
     public function handle(SendEmailByBirthdayCampaignEvent $event)
     {
-        $listBirthdayCampaignUuid = $event->listBirthdayCampaignUuid;
+        $listBirthdayCampaign = $event->listBirthdayCampaign;
+        $configEmailPrice = $this->configService->findConfigByKey('email_price');
+        $configSmtpAuto = $this->configService->findConfigByKey('smtp_auto');
 
-        foreach ($listBirthdayCampaignUuid as $birthdayCampaignUuid) {
+        foreach ($listBirthdayCampaign as $campaign) {
             $this->creditReturn = 0;
-
-            $campaign = $this->campaignService->findOneById($birthdayCampaignUuid['uuid']);
             $user = $campaign->user;
 
             $contacts = $this->contactService->getBirthdayContactsSendEmail($campaign->uuid);
-            $creditNumberSendEmail = count($contacts) * config('credit.default_credit') * $campaign->number_email_per_date;
 
-            if (!$this->userService->checkCreditToSendCEmail($creditNumberSendEmail, $campaign->user_uuid)){
+            $creditNumberSendEmail = count($contacts) * $configEmailPrice->value;
+
+            if (!$this->userService->checkCreditToSendEmail($creditNumberSendEmail, $campaign->user_uuid)){
                 $this->campaignService->update($campaign, [
                     'was_stopped_by_owner' => true
                 ]);
                 continue;
             }
 
-            $config = $this->configService->findConfigByKey('smtp_auto');
-
-            if($user->can_add_smtp_account == 1 || $config->value == 0){
+            if($user->can_add_smtp_account == 1 || $configSmtpAuto->value == 0){
                 if(!empty($campaign->smtpAccount)){
                     $smtpAccount = $campaign->smtpAccount;
                 }else{
@@ -157,6 +156,7 @@ class SendEmailByBirthdayCampaignListener implements ShouldQueue
             }
 
             $this->smtpAccountService->setSmtpAccountForSendEmail($smtpAccount);
+
             $sendEmailScheduleLog = $this->sendEmailScheduleLogService->create([
                 'campaign_uuid' => $campaign->getKey(),
                 'start_time' => Carbon::now()
@@ -180,33 +180,30 @@ class SendEmailByBirthdayCampaignListener implements ShouldQueue
                 DB::rollback();
             }
 
-            for ($i = 1; $i <= $campaign->number_email_per_date; $i++) {
-                foreach ($contacts as $contact){
-                    $mailTemplate = $this->mailTemplateVariableService->renderBody($campaign->mailTemplate, $contact, $smtpAccount, $campaign);
+            foreach ($contacts as $contact){
+                $mailTemplate = $this->mailTemplateVariableService->renderBody($campaign->mailTemplate, $contact, $smtpAccount, $campaign);
 
-                    $mailSendingHistory = $this->mailSendingHistoryService->create([
-                        'email' => $contact->email,
-                        'campaign_uuid' =>   $campaign->uuid,
-                        'time' => Carbon::now()
+                $mailSendingHistory = $this->mailSendingHistoryService->create([
+                    'email' => $contact->email,
+                    'campaign_uuid' => $campaign->uuid,
+                    'time' => Carbon::now()
+                ]);
+
+                $emailTracking = $this->mailTemplateVariableService->injectTrackingImage($mailTemplate, $mailSendingHistory->uuid);
+                try {
+                    Mail::to($contact->email)->send(new SendCampaign($emailTracking));
+                } catch (\Exception $e) {
+                    $this->mailSuccess = false;
+                    $this->creditReturn += $configEmailPrice->value;
+                    $this->mailSendingHistoryService->update($mailSendingHistory, [
+                        'status' => 'fail'
                     ]);
-
-                    $emailTracking = $this->mailTemplateVariableService->injectTrackingImage($mailTemplate, $mailSendingHistory->uuid);
-                    try {
-                        Mail::to($contact->email)->send(new SendCampaign($emailTracking));
-                    } catch (\Exception $e) {
-                        $this->mailSuccess = false;
-                        $this->creditReturn += config('credit.default_credit');
-                        $this->mailSendingHistoryService->update($mailSendingHistory, [
-                            'status' => 'fail'
-                        ]);
-                        $this->sendEmailScheduleLogService->update($sendEmailScheduleLog, [
-                            'is_running' => false,
-                            'was_crashed' => true,
-                            'log' => $e->getMessage()
-                        ]);
-                    }
+                    $this->sendEmailScheduleLogService->update($sendEmailScheduleLog, [
+                        'is_running' => false,
+                        'was_crashed' => true,
+                        'log' => $e->getMessage()
+                    ]);
                 }
-
             }
 
             if($this->creditReturn > 0) {
@@ -221,9 +218,7 @@ class SendEmailByBirthdayCampaignListener implements ShouldQueue
                     'is_running' => false
                 ]);
             }
-
         }
-
     }
 
     /**

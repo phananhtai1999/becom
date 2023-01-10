@@ -14,16 +14,16 @@ class SendEmailNotOpenByScenarioCampaignEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $contactsNotOpenByScenarioCampaignUuid;
+    public $contactNotOpenByCampaignScenario;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct($contactsNotOpenByScenarioCampaignUuid)
+    public function __construct($contactNotOpenByCampaignScenario)
     {
-        $this->contactsNotOpenByScenarioCampaignUuid = $contactsNotOpenByScenarioCampaignUuid;
+        $this->contactNotOpenByCampaignScenario = $contactNotOpenByCampaignScenario;
     }
 
     /**

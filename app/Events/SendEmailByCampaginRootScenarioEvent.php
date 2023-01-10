@@ -4,7 +4,6 @@ namespace App\Events;
 
 use App\Models\Campaign;
 use App\Models\CampaignScenario;
-use App\Models\Email;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -12,9 +11,8 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use phpDocumentor\Reflection\Types\Boolean;
 
-class SendEmailByCampaignEvent
+class SendEmailByCampaginRootScenarioEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -29,15 +27,21 @@ class SendEmailByCampaignEvent
     public $creditNumberSendEmail;
 
     /**
+     * @var CampaignScenario
+     */
+    public $campaignRootScenario;
+
+    /**
      * Create a new event instance.
      *
      * @param $campaign
      * @param $creditNumberSendEmail
      */
-    public function __construct($campaign, $creditNumberSendEmail)
+    public function __construct($campaign, $creditNumberSendEmail, $campaignRootScenario)
     {
         $this->campaign = $campaign;
         $this->creditNumberSendEmail = $creditNumberSendEmail;
+        $this->campaignRootScenario = $campaignRootScenario;
     }
 
     /**
@@ -47,6 +51,6 @@ class SendEmailByCampaignEvent
      */
     public function broadcastOn()
     {
-        return [];
+        return new PrivateChannel('channel-name');
     }
 }

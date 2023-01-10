@@ -2,6 +2,9 @@
 
 namespace App\Events;
 
+use App\Models\Campaign;
+use App\Models\CampaignScenario;
+use App\Models\Contact;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -14,18 +17,31 @@ class SendNextEmailByScenarioCampaignEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
+    /**
+     * @var CampaignScenario
+     */
     public $campaignScenario;
 
+    /**
+     * @var Contact
+     */
     public $contact;
 
     /**
-     * @param $campaignScenario
-     * @param $contact
+     * @var Campaign
      */
-    public function __construct($campaignScenario, $contact)
+    public $campaign;
+
+    /**
+     * @param $campaign
+     * @param $contact
+     * @param $campaignScenario
+     */
+    public function __construct($campaign, $contact, $campaignScenario)
     {
         $this->campaignScenario = $campaignScenario;
         $this->contact = $contact;
+        $this->campaign = $campaign;
     }
 
     /**
