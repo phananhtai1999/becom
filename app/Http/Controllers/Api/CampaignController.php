@@ -183,7 +183,6 @@ class CampaignController extends AbstractRestAPIController
     public function store()
     {
         $request = app($this->storeRequest);
-        $config = $this->configService->findConfigByKey('email_price');
 
         if ($request->get('type') === "scenario" && count($request->get('contact_list')) > 1) {
             return $this->sendValidationFailedJsonResponse(["errors" => ['campaign' => __('messages.scenario_campaign_only_one_contact_list')]]);
@@ -199,12 +198,8 @@ class CampaignController extends AbstractRestAPIController
 
             $model->contactLists()->attach($request->get('contact_list'));
 
-            $creditNumberSendEmail = count($this->contactService->getContactsSendEmail($model->uuid)) * $config->value;
-
             return $this->sendCreatedJsonResponse([
-                'data' => array_merge($this->service->resourceToData($this->resourceClass, $model)['data'], [
-                    'total_credits' => $creditNumberSendEmail
-                ])
+                $this->service->resourceToData($this->resourceClass, $model)
             ]);
         }
     }
@@ -284,7 +279,6 @@ class CampaignController extends AbstractRestAPIController
     {
         $user = $this->userService->findOrFailById(auth()->user()->getkey());
         $configSmtpAuto = $this->configService->findConfigByKey('smtp_auto');
-        $configEmailPrice = $this->configService->findConfigByKey('email_price');
 
         if ($request->get('type') === "scenario" && count($request->get('contact_list')) > 1) {
             return $this->sendValidationFailedJsonResponse(["errors" => ['campaign' => __('messages.scenario_campaign_only_one_contact_list')]]);
@@ -305,12 +299,8 @@ class CampaignController extends AbstractRestAPIController
 
             $model->contactLists()->attach($request->get('contact_list', []));
 
-            $creditNumberSendEmail = count($this->contactService->getContactsSendEmail($model->uuid)) * $configEmailPrice->value;
-
             return $this->sendCreatedJsonResponse([
-                'data' => array_merge($this->service->resourceToData($this->resourceClass, $model)['data'], [
-                    'total_credits' => $creditNumberSendEmail
-                ])
+                $this->service->resourceToData($this->resourceClass, $model)
             ]);
         }
     }
