@@ -92,7 +92,6 @@ class MailSendingHistoryService extends AbstractService
         $startDate = Carbon::parse($startDate);
         $times = [];
         $result = [];
-        $check = true;
 
         if($groupBy === "hour"){
             $emailsChart = $this->createQueryGetEmailChart("%Y-%m-%d %H:00:00", $startDate, $endDate);
@@ -121,18 +120,16 @@ class MailSendingHistoryService extends AbstractService
                 $startDate = $startDate->addMonth();
             }
         }
+
         foreach ($times as $time){
             if(!empty($emailsChart)){
-                foreach ($emailsChart as $emailChart){
-                    if(in_array($time, $emailChart)){
-                        $result[] = $emailChart;
-                        $check = true;
-                        break;
-                    }else{
-                        $check = false;
-                    }
-                }
-                if(!$check){
+                $emailsChartByLabel = $emailsChart->keyBy('label');
+                $emailChart = $emailsChartByLabel->first(function ($value, $key) use ($time) {
+                    return $key === $time;
+                });
+                if ($emailChart) {
+                    $result[] = $emailChart;
+                } else {
                     $result[] = [
                         'label' => $time,
                         'sent' => 0,
@@ -147,6 +144,32 @@ class MailSendingHistoryService extends AbstractService
                 ];
             }
         }
+//        foreach ($times as $time){
+//            if(!empty($emailsChart)){
+//                foreach ($emailsChart as $emailChart){
+//                    if(in_array($time, $emailChart)){
+//                        $result[] = $emailChart;
+//                        $check = true;
+//                        break;
+//                    }else{
+//                        $check = false;
+//                    }
+//                }
+//                if(!$check){
+//                    $result[] = [
+//                        'label' => $time,
+//                        'sent' => 0,
+//                        'opened' => 0
+//                    ];
+//                }
+//            }else{
+//                $result[] = [
+//                    'label' => $time,
+//                    'sent' => 0,
+//                    'opened' => 0
+//                ];
+//            }
+//        }
         return $result;
     }
 
@@ -160,7 +183,7 @@ class MailSendingHistoryService extends AbstractService
     {
         return $this->model->selectRaw("COUNT(IF( status = 'sent', 1, NULL ) ) as sent, COUNT(IF( status = 'opened', 1, NULL ) ) as opened")
             ->whereDate('updated_at', '>=', $startDate)
-            ->whereDate('updated_at', '<=', $endDate)->get();
+            ->whereDate('updated_at', '<=', $endDate)->first();
 
     }
 
@@ -176,7 +199,7 @@ class MailSendingHistoryService extends AbstractService
             ->whereDate('updated_at', '<=', $endDate)
             ->groupBy('label')
             ->orderBy('label', 'ASC')
-            ->get()->toArray();
+            ->get();
     }
 
     /**

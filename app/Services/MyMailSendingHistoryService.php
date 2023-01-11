@@ -45,10 +45,9 @@ class MyMailSendingHistoryService extends AbstractService
         $startDate = Carbon::parse($startDate);
         $times = [];
         $result = [];
-        $check = true;
 
         if($groupBy === "hour"){
-            $emailsChart = $this->createQueryGetEmailChart("%Y-%m-%d %H:00:00", $startDate, $endDate);
+            $emailsChart = $this->createQueryGetMyEmailChart("%Y-%m-%d %H:00:00", $startDate, $endDate);
             $endDate = Carbon::parse($endDate)->endOfDay();
 
             while($startDate <= $endDate){
@@ -57,7 +56,7 @@ class MyMailSendingHistoryService extends AbstractService
             }
         }
         if($groupBy === "date"){
-            $emailsChart = $this->createQueryGetEmailChart("%Y-%m-%d", $startDate, $endDate);
+            $emailsChart = $this->createQueryGetMyEmailChart("%Y-%m-%d", $startDate, $endDate);
             $endDate = Carbon::parse($endDate);
 
             while($startDate <= $endDate){
@@ -66,7 +65,7 @@ class MyMailSendingHistoryService extends AbstractService
             }
         }
         if($groupBy === "month"){
-            $emailsChart = $this->createQueryGetEmailChart("%Y-%m", $startDate, $endDate);
+            $emailsChart = $this->createQueryGetMyEmailChart("%Y-%m", $startDate, $endDate);
             $endDate = Carbon::parse($endDate);
 
             while($startDate <= $endDate){
@@ -74,18 +73,16 @@ class MyMailSendingHistoryService extends AbstractService
                 $startDate = $startDate->addMonth();
             }
         }
+
         foreach ($times as $time){
             if(!empty($emailsChart)){
-                foreach ($emailsChart as $emailChart){
-                    if(in_array($time, $emailChart)){
-                        $result[] = $emailChart;
-                        $check = true;
-                        break;
-                    }else{
-                        $check = false;
-                    }
-                }
-                if(!$check){
+                $emailsChartByLabel = $emailsChart->keyBy('label');
+                $emailChart = $emailsChartByLabel->first(function ($value, $key) use ($time) {
+                    return $key === $time;
+                });
+                if ($emailChart) {
+                    $result[] = $emailChart;
+                } else {
                     $result[] = [
                         'label' => $time,
                         'sent' => 0,
@@ -100,6 +97,7 @@ class MyMailSendingHistoryService extends AbstractService
                 ];
             }
         }
+
         return $result;
     }
 
@@ -115,7 +113,7 @@ class MyMailSendingHistoryService extends AbstractService
             ->join('campaigns', 'campaigns.uuid', '=', 'mail_sending_history.campaign_uuid')
             ->whereDate('mail_sending_history.updated_at', '>=', $startDate)
             ->whereDate('mail_sending_history.updated_at', '<=', $endDate)
-            ->where('campaigns.user_uuid', auth()->user()->getKey())->get();
+            ->where('campaigns.user_uuid', auth()->user()->getKey())->first();
     }
 
     /**
@@ -124,7 +122,7 @@ class MyMailSendingHistoryService extends AbstractService
      * @param $endDate
      * @return mixed
      */
-    public function createQueryGetEmailChart($dateFormat, $startDate, $endDate){
+    public function createQueryGetMyEmailChart($dateFormat, $startDate, $endDate){
         return $this->model->selectRaw("date_format(mail_sending_history.updated_at, '{$dateFormat}') as label,  COUNT(IF( mail_sending_history.status = 'sent', 1, NULL ) ) as sent, COUNT(IF( mail_sending_history.status = 'opened', 1, NULL ) ) as opened")
             ->join('campaigns', 'campaigns.uuid', '=', 'mail_sending_history.campaign_uuid')
             ->whereDate('mail_sending_history.updated_at', '>=', $startDate)
@@ -132,6 +130,6 @@ class MyMailSendingHistoryService extends AbstractService
             ->where('campaigns.user_uuid', auth()->user()->getKey())
             ->groupBy('label')
             ->orderBy('label', 'ASC')
-            ->get()->toArray();
+            ->get();
     }
 }

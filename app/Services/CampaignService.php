@@ -148,8 +148,8 @@ class CampaignService extends AbstractService
      */
     public function getCampaignChart($startDate, $endDate, $groupBy)
     {
-        $times = $result = $chartResult = [];
-        $check = true;
+
+        $times = $result = [];
         $subDate = $startDate;
         $startDate = Carbon::parse($startDate);
 
@@ -186,61 +186,41 @@ class CampaignService extends AbstractService
             }
         }
 
-        $campaignsChart = $this->createQueryGetCampaignChart($dateFormat, $subDate, $endDate);
         $campaignsIncrease = $this->createQueryGetIncrease($dateFormat, $subDate, $endDate, $groupBy === 'date' ? 'day' : $groupBy);
 
-        if (!empty($campaignsChart)) {
-            foreach ($campaignsChart as $campaignChart) {
-                foreach ($campaignsIncrease as $campaignIncrease) {
-                    if (in_array($campaignIncrease->date_field, $campaignChart)) {
-                        $chartResult[] = array_merge($campaignChart, [
-                            'increase' => $campaignIncrease->increase
-                        ]);
-                    }
-                }
-            }
-        }
-
-        $lastIncrease = 0;
         foreach ($times as $time) {
-            if (!empty($chartResult)) {
-                foreach ($chartResult as $chartItem) {
-                    if (in_array($time, $chartItem)) {
-                        $result[] = [
+            if (!empty($campaignsIncrease)) {
+                $campaignsIncreaseByLabel = $campaignsIncrease->keyBy('label');
+                $campaignIncrease = $campaignsIncreaseByLabel->first(function ($value, $key) use ($time) {
+                    return $key === $time;
+                });
+                if ($campaignIncrease) {
+                    $result[] = [
                             'label' => $time,
-                            'active' => $chartItem['active'],
-                            'other' => $chartItem['other'],
-                            'increase' => $chartItem['increase'] ?? $chartItem['active'] + $chartItem['other']
+                            'active' => $campaignIncrease->active,
+                            'other' => $campaignIncrease->other,
+                            'increase' => $campaignIncrease->increase ?? $campaignIncrease->active + $campaignIncrease->other
                         ];
-                        $lastIncrease = $chartItem['active'] + $chartItem['other'];
-                        $check = true;
-                        break;
-                    } else {
-                        $prevTime = $time;
-                        if ($groupBy === 'hour') {
-                            $prevTime = Carbon::parse($prevTime)->subHour()->toDateTimeString();
-                        }
-                        if ($groupBy === 'date') {
-                            $prevTime = Carbon::parse($prevTime)->subDay()->toDateString();
-                        }
-                        if ($groupBy === 'month') {
-                            $prevTime = Carbon::parse($prevTime)->subMonth()->format('Y-m');
-                        }
-                        if (in_array($prevTime, $chartItem)) {
-                            $lastIncrease = $chartItem['active'] + $chartItem['other'];
-                        }
-                        $check = false;
+                }else{
+                    $prevTime = $time;
+                    if ($groupBy === 'hour') {
+                        $prevTime = Carbon::parse($prevTime)->subHour()->toDateTimeString();
                     }
-                }
-
-                if (!$check) {
+                    if ($groupBy === 'date') {
+                        $prevTime = Carbon::parse($prevTime)->subDay()->toDateString();
+                    }
+                    if ($groupBy === 'month') {
+                        $prevTime = Carbon::parse($prevTime)->subMonth()->format('Y-m');
+                    }
+                    $campaignPrevTime = $campaignsIncreaseByLabel->first(function ($value, $key) use ($prevTime) {
+                        return $key === $prevTime;
+                    });
                     $result[] = [
                         'label' => $time,
                         'active' => 0,
                         'other' => 0,
-                        'increase' => -$lastIncrease
+                        'increase' => -(!$campaignPrevTime ? 0 : $campaignPrevTime->active + $campaignPrevTime->other)
                     ];
-                    $lastIncrease = 0;
                 }
             } else {
                 $result[] = [
@@ -259,44 +239,42 @@ class CampaignService extends AbstractService
      * @param $dateFormat
      * @param $startDate
      * @param $endDate
-     * @return mixed
-     */
-    public function createQueryGetCampaignChart($dateFormat, $startDate, $endDate)
-    {
-        return $this->model->selectRaw("date_format(updated_at, '{$dateFormat}') as label,  COUNT(IF( status = 'active', 1, NULL ) ) as active, COUNT(IF( status <> 'active', 1, NULL ) ) as other")
-            ->whereDate('updated_at', '>=', $startDate)
-            ->whereDate('updated_at', '<=', $endDate)
-            ->groupBy('label')
-            ->orderBy('label', 'ASC')
-            ->get()->toArray();
-    }
-
-    /**
-     * @param $dateFormat
-     * @param $startDate
-     * @param $endDate
      * @param $type
-     * @return array
+     * @return \Illuminate\Support\Collection
      */
     public function createQueryGetIncrease($dateFormat, $startDate, $endDate, $type)
     {
-//                SELECT today.date_field, today.createCampaign, (today.createCampaign - yest.createCampaign) as increase
-//         FROM (SELECT date_format(updated_at, '%Y-%m-%d') as date_field, COUNT(uuid) as createCampaign
-//                  from campaigns
-//                  where date(updated_at) >= '2022-10-03' AND date(updated_at) <= '2022-10-05'
-//                  GROUP By date_field) today LEFT JOIN
-//              (SELECT date_format(updated_at, '%Y-%m-%d') as date_field, COUNT(uuid) as createCampaign
-//                  from campaigns
-//                  where date(updated_at) >= '2022-10-03' AND date(updated_at) <= '2022-10-05'
-//                  GROUP By date_field) yest On yest.date_field = today.date_field - INTERVAL 1 day;
+
+        /*
+         SELECT A.date_field, A.active, A.other, B.increase
+        FROM
+            (select date_format(updated_at, '%Y-%m-%d') as date_field,  COUNT(IF( status = 'active', 1, NULL ) ) as active, COUNT(IF( status <> 'active', 1, NULL ) ) as other
+            from `campaigns`
+            group by `date_field` order by `date_field` asc) as A
+        JOIN (SELECT today.date_field, today.createCampaign, (today.createCampaign - yest.createCampaign) as increase
+            FROM (SELECT date_format(updated_at, '%Y-%m-%d') as date_field, COUNT(uuid) as createCampaign
+            from campaigns
+            GROUP By date_field) today LEFT JOIN
+            (SELECT date_format(updated_at, '%Y-%m-%d') as date_field, COUNT(uuid) as createCampaign
+            from campaigns
+            GROUP By date_field) yest On yest.date_field = today.date_field - INTERVAL 1 day) as B on A.date_field = B.date_field;
+        */
         $string = $type === "month" ? "-01" : "";
-        $todayCampaignTableSubQuery = $yesterdayCampaignTableSubQuery = "(SELECT date_format(updated_at, '{$dateFormat}') as date_field, COUNT(uuid) as createCampaign
-                  from campaigns
-                  where date(updated_at) >= '{$startDate}' and date(updated_at) <= '{$endDate}' and deleted_at is NULL
-                  GROUP By date_field)";
-        return DB::table(DB::raw("$todayCampaignTableSubQuery as today"))->selectRaw("today.date_field, today.createCampaign, (today.createCampaign - yest.createCampaign) as increase")
-            ->leftJoin(DB::raw("$yesterdayCampaignTableSubQuery as yest"), 'yest.date_field', '=', DB::raw("date_format(concat(today.date_field, '$string') - INTERVAL 1 {$type}, '{$dateFormat}')"))
-            ->get()->toArray();
+        $todayCampaignTableSubQuery = $yesterdayCampaignTableSubQuery = $this->model->selectRaw("date_format(updated_at, '{$dateFormat}') as label, COUNT(uuid) as createCampaign")
+            ->whereRaw('date(updated_at) >= "'.$startDate.'"')
+            ->whereRaw('date(updated_at) <= "'.$endDate.'"')->groupBy('label')->toSql();
+        $campaignStatusTable = $this->model->selectRaw("date_format(updated_at, '{$dateFormat}') as label,  COUNT(IF( status = 'active', 1, NULL ) ) as active, COUNT(IF( status <> 'active', 1, NULL ) ) as other")
+            ->whereRaw('date(updated_at) >= "'.$startDate.'"')
+            ->whereRaw('date(updated_at) <= "'.$endDate.'"')
+            ->groupBy('label')
+            ->orderBy('label', 'ASC')->toSql();
+
+        $campaignIncreaseTable = DB::table(DB::raw("($todayCampaignTableSubQuery) as today"))->selectRaw("today.label, today.createCampaign, (today.createCampaign - yest.createCampaign) as increase")
+            ->leftJoin(DB::raw("($yesterdayCampaignTableSubQuery) as yest"), 'yest.label', '=', DB::raw("date_format(concat(today.label, '$string') - INTERVAL 1 {$type}, '{$dateFormat}')"))
+            ->toSql();
+        return DB::table(DB::raw("($campaignStatusTable) as campaignStatusTable"))->selectRaw("campaignStatusTable.label, campaignStatusTable.active, campaignStatusTable.other, campaignIncreaseTable.increase")
+            ->join(DB::raw("($campaignIncreaseTable) as campaignIncreaseTable"), 'campaignStatusTable.label', '=', 'campaignIncreaseTable.label')
+            ->get();
 
     }
 
@@ -309,7 +287,7 @@ class CampaignService extends AbstractService
     {
         return $this->model->selectRaw("COUNT(IF( status = 'active', 1, NULL ) ) as active, COUNT(IF( status <> 'active', 1, NULL ) ) as other")
             ->whereDate('updated_at', '>=', $startDate)
-            ->whereDate('updated_at', '<=', $endDate)->get()->toArray();
+            ->whereDate('updated_at', '<=', $endDate)->first()->setAppends([]);
     }
 
     /**

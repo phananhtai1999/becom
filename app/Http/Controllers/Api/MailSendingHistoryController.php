@@ -133,13 +133,17 @@ class MailSendingHistoryController extends AbstractRestAPIController
         //Send Email Scenario Campaign
         if ($mailSendingHistory->status !== "opened") {
             //Add 1 point when open mail
-//            $this->contactService->addPointContactOpenMailCampaign($mailSendingHistory->campaign_uuid, $mailSendingHistory->email);
             $this->service->update($mailSendingHistory, ['status' => 'opened']);
-            if ($mailSendingHistory->campaign_scenario_uuid
-                && ($nextCampaignScenario = $this->campaignScenarioService->getCampaignWhenOpenEmailByUuid($mailSendingHistory->campaign_scenario_uuid))
-                    && ($nextCampaign = $this->campaignService->checkActiveCampaignScenario($nextCampaignScenario->campaign_uuid))) {
-                $contactOpenMail = $this->contactService->getContactByCampaign($nextCampaignScenario->getRoot()->campaign_uuid, $mailSendingHistory->email);
-                SendNextEmailByScenarioCampaignEvent::dispatch($nextCampaign, $contactOpenMail, $nextCampaignScenario);
+            if ($mailSendingHistory->campaign_scenario_uuid){
+                $campaignScenario = $this->campaignScenarioService->findOneById($mailSendingHistory->campaign_scenario_uuid);
+                $this->contactService->addPointContactOpenMailCampaign($campaignScenario->getRoot()->campaign_uuid, $mailSendingHistory->email);
+                if(($nextCampaignScenario = $this->campaignScenarioService->getCampaignWhenOpenEmailByUuid($mailSendingHistory->campaign_scenario_uuid, $mailSendingHistory->created_at))
+                && ($nextCampaign = $this->campaignService->checkActiveCampaignScenario($nextCampaignScenario->campaign_uuid))) {
+                    $contactOpenMail = $this->contactService->getContactByCampaign($nextCampaignScenario->getRoot()->campaign_uuid, $mailSendingHistory->email);
+                    SendNextEmailByScenarioCampaignEvent::dispatch($nextCampaign, $contactOpenMail, $nextCampaignScenario);
+                }
+            }else{
+                $this->contactService->addPointContactOpenMailCampaign($mailSendingHistory->campaign_uuid, $mailSendingHistory->email);
             }
         }
 
@@ -162,10 +166,14 @@ class MailSendingHistoryController extends AbstractRestAPIController
 
         return $this->sendOkJsonResponse([
             'data' => $emailsChart,
-            'total' => $total[0]
+            'total' => $total
         ]);
     }
 
+    /**
+     * @param ChartRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function myEmailChart(ChartRequest $request)
     {
         $startDate = $request->get('start_date', Carbon::today());
@@ -177,7 +185,7 @@ class MailSendingHistoryController extends AbstractRestAPIController
 
         return $this->sendOkJsonResponse([
             'data' => $myEmailsChart,
-            'total' => $myTotal[0]
+            'total' => $myTotal
         ]);
     }
 }

@@ -550,8 +550,8 @@ class CampaignController extends AbstractRestAPIController
             'data' => $campaignsChart,
             'total' => [
                 'running' => $totalRunning,
-                'active' => $totalActiveAndOther[0]['active'],
-                'other' => $totalActiveAndOther[0]['other']
+                'active' => $totalActiveAndOther->active,
+                'other' => $totalActiveAndOther->other
             ]
         ]);
     }
@@ -574,8 +574,8 @@ class CampaignController extends AbstractRestAPIController
             'data' => $myCampaignsChart,
             'total' => [
                 'running' => $totalRunningMyCampaign,
-                'active' => $totalActiveAndOtherMyCampaign[0]['active'],
-                'other' => $totalActiveAndOtherMyCampaign[0]['other']
+                'active' => $totalActiveAndOtherMyCampaign->active,
+                'other' => $totalActiveAndOtherMyCampaign->other
             ]
         ]);
     }
