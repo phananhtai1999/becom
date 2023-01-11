@@ -35,6 +35,7 @@ class MailSendingHistoryService extends AbstractService
     public function getNumberEmailByCampaign($campaignUuid, $email)
     {
         return $this->model->where('campaign_uuid', $campaignUuid)
+            ->whereNull('campaign_scenario_uuid')
             ->where('email', $email)
             ->whereNotIn('status', ["fail"])
             ->groupBy('email')
@@ -50,9 +51,9 @@ class MailSendingHistoryService extends AbstractService
     {
         return $this->model
             ->where([
-                ['campaign_uuid' => $campaignUuid],
-                ['campaign_scenario_uuid' => $campaignScenarioUuid],
-                ['email'=> $email]
+                ['campaign_uuid', $campaignUuid],
+                ['campaign_scenario_uuid', $campaignScenarioUuid],
+                ['email', $email]
             ])
             ->whereNotIn('status', ["fail"])
             ->groupBy('email')
@@ -232,4 +233,6 @@ class MailSendingHistoryService extends AbstractService
         //Kiểm tra trường hợp not open chưa tồn tại trong mailsendinghistory
 
     }
+
+
 }
