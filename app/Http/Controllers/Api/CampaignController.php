@@ -342,16 +342,17 @@ class CampaignController extends AbstractRestAPIController
         if ($request->get('type') === "scenario" && count($request->get('contact_list')) > 1) {
             return $this->sendValidationFailedJsonResponse(["errors" => ['campaign' => __('messages.scenario_campaign_only_one_contact_list')]]);
         } else {
-            if (($user->can_add_smtp_account == 1 || $config->value == 0)) {
-                if (empty($request->get('smtp_account_uuid'))) {
-                    return $this->sendValidationFailedJsonResponse(["errors" => ['smtp_account_uuid' => __('messages.smtp_account_invalid')]]);
-                }
-            } else {
-                if (!empty($request->get('smtp_account_uuid'))) {
-                    return $this->sendValidationFailedJsonResponse(["errors" => ['smtp_account_uuid' => __('messages.smtp_account_invalid')]]);
+            if (array_key_exists('smtp_account_uuid', $request->all())) {
+                if (($user->can_add_smtp_account == 1 || $config->value == 0)) {
+                    if (empty($request->get('smtp_account_uuid'))) {
+                        return $this->sendValidationFailedJsonResponse(["errors" => ['smtp_account_uuid' => __('messages.smtp_account_invalid')]]);
+                    }
+                } else {
+                    if (!empty($request->get('smtp_account_uuid'))) {
+                        return $this->sendValidationFailedJsonResponse(["errors" => ['smtp_account_uuid' => __('messages.smtp_account_invalid')]]);
+                    }
                 }
             }
-
             $this->service->update($model, array_merge($request->all(), [
                 'user_uuid' => auth()->user()->getkey(),
             ]));
