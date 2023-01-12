@@ -52,7 +52,11 @@ class Campaign extends AbstractModel
         'from_date' => 'datetime',
         'to_date' => 'datetime',
         'was_finished' => 'boolean',
-        'was_stopped_by_owner' => 'boolean'
+        'was_stopped_by_owner' => 'boolean',
+        'mail_template_uuid' =>  'integer',
+        'smtp_account_uuid' =>  'integer',
+        'website_uuid' =>  'integer',
+        'user_uuid' =>  'integer',
     ];
 
     /**
