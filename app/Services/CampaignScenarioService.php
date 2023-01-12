@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Abstracts\AbstractService;
 use App\Models\CampaignScenario;
+use Carbon\Carbon;
 
 class CampaignScenarioService extends AbstractService
 {
@@ -41,14 +42,28 @@ class CampaignScenarioService extends AbstractService
 
     /**
      * @param $campaignScenarioUuid
-     * @return mixed
+     * @param $timeSendEmail
+     * @return null|mixed
      */
-    public function getCampaignWhenOpenEmailByUuid($campaignScenarioUuid)
+    public function getCampaignWhenOpenEmailByUuid($campaignScenarioUuid, $timeSendEmail)
     {
-        return $this->model->where([
+        $campaignScenarioNotOpen = $this->model->where([
+            ['parent_uuid', $campaignScenarioUuid],
+            ['type', "not_open"]
+        ])->first();
+        $campaignScenarioOpen = $this->model->where([
             ['parent_uuid', $campaignScenarioUuid],
             ['type', "open"]
         ])->first();
+        if ($campaignScenarioNotOpen) {
+            if ($timeSendEmail->addDays($campaignScenarioNotOpen->open_within) >= Carbon::now()) {
+                return $campaignScenarioOpen;
+            }
+
+            return null;
+        }
+
+        return $campaignScenarioOpen;
     }
 
     /**

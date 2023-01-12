@@ -154,6 +154,7 @@ class MailTemplateController extends AbstractRestAPIController
     {
         $model = $this->service->create(array_merge($request->all(), [
             'user_uuid' => auth()->user()->getkey(),
+            'publish_status' => MailTemplate::PUBLISHED_PUBLISH_STATUS
         ]));
 
         return $this->sendCreatedJsonResponse(
@@ -186,7 +187,7 @@ class MailTemplateController extends AbstractRestAPIController
         if (empty($request->get('website_uuid')) || $model->website_uuid == $request->get('website_uuid') ||
             !$this->service->checkExistsMailTemplateInTables($id)) {
 
-            $this->service->update($model, $request->except('user_uuid'));
+            $this->service->update($model, $request->except(['user_uuid', 'publish_status']));
 
             return $this->sendOkJsonResponse(
                 $this->service->resourceToData($this->resourceClass, $model)

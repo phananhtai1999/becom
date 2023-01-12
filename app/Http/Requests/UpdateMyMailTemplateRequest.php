@@ -28,11 +28,9 @@ class UpdateMyMailTemplateRequest extends AbstractRequest
             'subject' => ['string'],
             'body' => ['string'],
             'website_uuid' => ['nullable', 'numeric', 'min:1', Rule::exists('websites', 'uuid')->where(function ($query) {
-
                 return $query->where('user_uuid', auth()->user()->getkey())->whereNull('deleted_at');
             })],
             'design' => 'string',
-            'publish_status' => ['numeric', 'min:1', 'max:2'],
             'type' => ['string', 'in:sms,email'],
         ];
     }

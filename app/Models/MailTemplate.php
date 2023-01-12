@@ -46,6 +46,8 @@ class MailTemplate extends AbstractModel
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
+        'website_uuid' =>  'integer',
+        'user_uuid' =>  'integer',
     ];
 
     /**

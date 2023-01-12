@@ -267,26 +267,17 @@ class MyContactService extends AbstractService
      */
     public function getTotalPointsContactByMyContactList($startDate, $endDate, $contactListUuid = null)
     {
-        if (empty($contactListUuid)) {
-            $totalMyContact = $this->model->selectRaw('sum(contacts.points) as points')
-                ->join('contact_contact_list', 'contact_contact_list.contact_uuid', '=', 'contacts.uuid')
-                ->join('contact_lists', 'contact_contact_list.contact_list_uuid', '=', 'contact_lists.uuid')
-                ->where('contact_lists.user_uuid', auth()->user()->getkey())
-                ->whereNull('contact_lists.deleted_at')
-                ->whereDate('contacts.updated_at', '>=', $startDate)
-                ->whereDate('contacts.updated_at', '<=', $endDate)
-                ->first();
-        }else {
-            $totalMyContact = $this->model->selectRaw('sum(contacts.points) as points')
-                ->join('contact_contact_list', 'contact_contact_list.contact_uuid', '=', 'contacts.uuid')
-                ->join('contact_lists', 'contact_contact_list.contact_list_uuid', '=', 'contact_lists.uuid')
-                ->where('contact_lists.user_uuid', auth()->user()->getkey())
-                ->where('contact_lists.uuid', $contactListUuid)
-                ->whereNull('contact_lists.deleted_at')
-                ->whereDate('contacts.updated_at', '>=', $startDate)
-                ->whereDate('contacts.updated_at', '<=', $endDate)
-                ->first();
-        }
+        $totalMyContact = $this->model->selectRaw('sum(contacts.points) as points')
+            ->join('contact_contact_list', 'contact_contact_list.contact_uuid', '=', 'contacts.uuid')
+            ->join('contact_lists', 'contact_contact_list.contact_list_uuid', '=', 'contact_lists.uuid')
+            ->where('contact_lists.user_uuid', auth()->user()->getkey())
+            ->when($contactListUuid, function ($query, $contactListUuid) {
+                $query->where('contact_lists.uuid', $contactListUuid);
+            })
+            ->whereNull('contact_lists.deleted_at')
+            ->whereDate('contacts.updated_at', '>=', $startDate)
+            ->whereDate('contacts.updated_at', '<=', $endDate)
+            ->first();
 
         return (int) $totalMyContact->points;
     }

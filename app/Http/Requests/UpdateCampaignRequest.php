@@ -27,10 +27,10 @@ class UpdateCampaignRequest extends AbstractRequest
         $validate = [
             'tracking_key' => ['string'],
             'mail_template_uuid' => ['numeric', 'min:1', Rule::exists('mail_templates', 'uuid')->where(function ($query) {
-                return $query->where([
-                    ['website_uuid', $this->request->get('website_uuid')],
-                    ['user_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey()]
-                ])->whereNull('deleted_at');
+                return $query->where('user_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey())->where(function ($q) {
+                    $q->where('website_uuid', $this->request->get('website_uuid'))
+                        ->orWhere('website_uuid', null);
+                })->where('publish_status', true)->whereNull('deleted_at');
             })],
             'from_date' => ['date', 'before_or_equal:to_date'],
             'to_date' => ['date', 'after_or_equal:from_date'],

@@ -219,7 +219,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'campaign.'], function () {
         Route::get('/campaign/{id}', [CampaignController::class, 'show'])->name('show');
         Route::put('/campaign/{id}', [CampaignController::class, 'edit'])->name('edit');
         Route::delete('/campaign/{id}', [CampaignController::class, 'destroy'])->name('destroy');
-//        Route::post('/emails/send-campaign', [CampaignController::class, 'sendEmailsByCampaign'])->name('sendEmailsByCampaign');
+        Route::post('/emails/send-campaign', [CampaignController::class, 'sendEmailsByCampaign'])->name('sendEmailsByCampaign');
     });
 
     Route::group(['as' => 'my.'], function () {
