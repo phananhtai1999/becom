@@ -63,9 +63,6 @@ class MyCampaignService extends AbstractService
             if ($column === "to_date") {
                 $query = [$column, '>=', Carbon::now()];
             }
-            if ($column === "send_type") {
-                $query = [$column, "email"];
-            }
             if ($column === "status") {
                 $query = [$column, "active"];
             }

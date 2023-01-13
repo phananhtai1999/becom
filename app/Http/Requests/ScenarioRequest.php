@@ -34,7 +34,6 @@ class ScenarioRequest extends AbstractRequest
             'nodes.*.campaign_uuid' => ['required', 'numeric', 'min:1', Rule::exists('campaigns', 'uuid')->where(function ($q) {
                 return $q->where('user_uuid', auth()->user()->getkey())
                     ->where('type','<>','birthday')
-                    ->where('send_type', 'email')
                     ->where('to_date', '>=', Carbon::now())->whereNull('deleted_at');
             })],
             'nodes.*.source' => ['nullable','required_unless:nodes.*.type,null', 'string', 'different:nodes.*.id'],
