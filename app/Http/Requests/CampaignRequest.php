@@ -27,10 +27,13 @@ class CampaignRequest extends AbstractRequest
         $validate = [
             'tracking_key' => ['required', 'string'],
             'mail_template_uuid' => ['required', 'numeric', 'min:1', Rule::exists('mail_templates', 'uuid')->where(function ($query) {
-                return $query->where('user_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey())->where(function ($q) {
+                return $query->where([
+                    ['user_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey()],
+                    ['type', $this->request->get('send_type')],
+                    ['publish_status', true]])->where(function ($q) {
                     $q->where('website_uuid', $this->request->get('website_uuid'))
                         ->orWhere('website_uuid', null);
-                })->where('publish_status', true)->whereNull('deleted_at');
+                })->whereNull('deleted_at');
             })],
             'from_date' => ['required', 'date', 'before_or_equal:to_date'],
             'to_date' => ['required', 'date', 'after_or_equal:from_date'],
