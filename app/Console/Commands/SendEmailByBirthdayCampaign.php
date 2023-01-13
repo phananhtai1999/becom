@@ -48,8 +48,12 @@ class SendEmailByBirthdayCampaign extends Command
     public function handle()
     {
         $listBirthdayCampaign = $this->service->getListActiveBirthdayCampaign();
-        if($listBirthdayCampaign->count()){
-            SendEmailByBirthdayCampaignEvent::dispatch($listBirthdayCampaign);
+        $listBirthdayCampaignBySendType = $listBirthdayCampaign->groupBy('send_type');
+        if ($listBirthdayCampaignBySendType->has('email')) {
+            SendEmailByBirthdayCampaignEvent::dispatch($listBirthdayCampaignBySendType['email']);
+        }
+        if ($listBirthdayCampaignBySendType->has('sms')) {
+            //TO DO SMS
         }
     }
 }

@@ -483,7 +483,7 @@ class CampaignController extends AbstractRestAPIController
     public function sendEmailsByCampaign(SendEmailByCampaignRequest $request)
     {
         //validate campaign
-        $columns = ['type', 'send_type', 'status', 'from_date', 'to_date', 'was_finished', 'was_stopped_by_owner'];
+        $columns = ['type', 'status', 'from_date', 'to_date', 'was_finished', 'was_stopped_by_owner'];
         foreach ($columns as $column) {
             if (!$this->service->checkActiveCampainByColumn($column, $request->get('campaign_uuid'))) {
                 return $this->sendValidationFailedJsonResponse(["errors" => ["campaign_" . $column => __("messages.{$column}_campaign_invalid")]]);
@@ -498,11 +498,16 @@ class CampaignController extends AbstractRestAPIController
         if ($this->sendEmailScheduleLogService->checkActiveCampaignbyCampaignUuid($request->get('campaign_uuid'))) {
             $creditNumberSendEmail = $campaign->number_credit_needed_to_start_campaign * ($campaignRootScenario->count() > 0 ? $campaignRootScenario->count() : 1 );
             if ($this->userService->checkCreditToSendEmail($creditNumberSendEmail, $campaign->user_uuid)) {
-                if ($campaignRootScenario->count()) {
-                    SendEmailByCampaginRootScenarioEvent::dispatch($campaign, $creditNumberSendEmail, $campaignRootScenario);
+                if ($campaign->send_type === "email") {
+                    if ($campaignRootScenario->count()) {
+                        SendEmailByCampaginRootScenarioEvent::dispatch($campaign, $creditNumberSendEmail, $campaignRootScenario);
+                    }else{
+                        SendEmailByCampaignEvent::dispatch($campaign, $creditNumberSendEmail);
+                    }
                 }else{
-                    SendEmailByCampaignEvent::dispatch($campaign, $creditNumberSendEmail);
+                    // TO DO SMS
                 }
+
                 return $this->sendOkJsonResponse(["message" => __('messages.send_campaign_success')]);
             }
         }
@@ -517,7 +522,7 @@ class CampaignController extends AbstractRestAPIController
     public function sendEmailByMyCampaign(SendEmailByMyCampaignRequest $request)
     {
         //validate campaign
-        $columns = ['type', 'send_type', 'status', 'from_date', 'to_date', 'was_finished', 'was_stopped_by_owner'];
+        $columns = ['type', 'status', 'from_date', 'to_date', 'was_finished', 'was_stopped_by_owner'];
         foreach ($columns as $column) {
             if (!$this->myService->checkActiveMyCampainByColumn($column, $request->get('campaign_uuid'))) {
                 return $this->sendValidationFailedJsonResponse(["errors" => ["campaign_" . $column => __("messages.{$column}_campaign_invalid")]]);
@@ -532,11 +537,16 @@ class CampaignController extends AbstractRestAPIController
         if ($this->sendEmailScheduleLogService->checkActiveCampaignbyCampaignUuid($request->get('campaign_uuid'))) {
             $creditNumberSendEmail = $campaign->number_credit_needed_to_start_campaign * ($campaignRootScenario->count() > 0 ? $campaignRootScenario->count() : 1 );
             if ($this->userService->checkCreditToSendEmail($creditNumberSendEmail, $campaign->user_uuid)) {
-                if ($campaignRootScenario->count()) {
-                    SendEmailByCampaginRootScenarioEvent::dispatch($campaign, $creditNumberSendEmail, $campaignRootScenario);
-                }else{
-                    SendEmailByCampaignEvent::dispatch($campaign, $creditNumberSendEmail);
+                if ($campaign->send_type === "email") {
+                    if ($campaignRootScenario->count()) {
+                        SendEmailByCampaginRootScenarioEvent::dispatch($campaign, $creditNumberSendEmail, $campaignRootScenario);
+                    }else{
+                        SendEmailByCampaignEvent::dispatch($campaign, $creditNumberSendEmail);
+                    }
+                }else {
+                    //TO DO SMS
                 }
+
                 return $this->sendOkJsonResponse(["message" => __('messages.send_campaign_success')]);
             }
 

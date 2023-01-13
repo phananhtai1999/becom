@@ -66,7 +66,8 @@ class SendEmailNotOpenByScenarioCampaign extends Command
     public function handle()
     {
         $mailNotOpenHistories = $this->service->getMailNotOpenHistories();
-        $contactNotOpenByCampaignScenario = [];
+        $contactNotOpenByCampaignScenarioEmail = [];
+        $contactNotOpenByCampaignScenarioSMS = [];
         foreach ($mailNotOpenHistories->groupBy('campaign_scenario_uuid') as $campaignScenarioUuid => $mailSendingHistories) {
             $contacts = [];
             $notOpenCampaignScenario = $this->campaignScenarioService->getCampaignWhenNotOpenEmailByUuid($campaignScenarioUuid);
@@ -75,17 +76,22 @@ class SendEmailNotOpenByScenarioCampaign extends Command
                     $contactNotOpen = $this->contactService->getContactByCampaign(optional($mailSendingHistories[0]->campaignScenario)->getRoot()->campaign_uuid, $emailNotOpen);
                     $contacts[] = $contactNotOpen;
                 }
-                $contactNotOpenByCampaignScenario[] = [
-                    "campaign" => $campaign,
-                    "contact" => $contacts,
-                    "campaignScenario" => $notOpenCampaignScenario
-                ];
+                if ($campaign->send_type === "email") {
+                    $contactNotOpenByCampaignScenarioEmail[] = [
+                        "campaign" => $campaign,
+                        "contact" => $contacts,
+                        "campaignScenario" => $notOpenCampaignScenario
+                    ];
+                }else {
+                    // TO DO SMS
+                }
+
             }
 
         }
 
-        if (!empty($contactNotOpenByCampaignScenario)) {
-            SendEmailNotOpenByScenarioCampaignEvent::dispatch($contactNotOpenByCampaignScenario);
+        if (!empty($contactNotOpenByCampaignScenarioEmail)) {
+            SendEmailNotOpenByScenarioCampaignEvent::dispatch($contactNotOpenByCampaignScenarioEmail);
         }
     }
 }

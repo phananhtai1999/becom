@@ -51,7 +51,6 @@ class CampaignService extends AbstractService
                 ['campaigns.to_date', '>=', Carbon::now()],
                 ['campaigns.was_finished', false],
                 ['campaigns.was_stopped_by_owner', false],
-                ['campaigns.send_type', "email"],
                 ['campaigns.status', "active"],
             ])
             ->whereDate('contacts.dob', Carbon::now())
@@ -82,9 +81,6 @@ class CampaignService extends AbstractService
             }
             if ($column === "to_date") {
                 $query = [$column, '>=', Carbon::now()];
-            }
-            if ($column === "send_type") {
-                $query = [$column, "email"];
             }
             if ($column === "status") {
                 $query = [$column, "active"];
@@ -328,7 +324,6 @@ class CampaignService extends AbstractService
             ['to_date', '>=', Carbon::now()],
             ['was_finished', false],
             ['was_stopped_by_owner', false],
-            ['send_type', "email"],
             ['status', "active"]
         ])->with(['user', 'mailTemplate', 'website', 'smtpAccount'])->first();
 
