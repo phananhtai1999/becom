@@ -186,22 +186,23 @@ class CampaignController extends AbstractRestAPIController
 
         if ($request->get('type') === "scenario" && count($request->get('contact_list')) > 1) {
             return $this->sendValidationFailedJsonResponse(["errors" => ['campaign' => __('messages.scenario_campaign_only_one_contact_list')]]);
-        } else {
-            if (empty($request->get('user_uuid'))) {
-                $data = array_merge($request->all(), [
-                    'user_uuid' => auth()->user()->getkey(),
-                ]);
-            } else {
-                $data = $request->all();
-            }
-            $model = $this->service->create($data);
-
-            $model->contactLists()->attach($request->get('contact_list'));
-
-            return $this->sendCreatedJsonResponse([
-                $this->service->resourceToData($this->resourceClass, $model)
-            ]);
         }
+
+        if (empty($request->get('user_uuid'))) {
+            $data = array_merge($request->all(), [
+                'user_uuid' => auth()->user()->getkey(),
+            ]);
+        } else {
+            $data = $request->all();
+        }
+
+        $model = $this->service->create($data);
+
+        $model->contactLists()->attach($request->get('contact_list'));
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
     }
 
     /**
@@ -216,17 +217,19 @@ class CampaignController extends AbstractRestAPIController
 
         if ($request->get('type') === "scenario" && count($request->get('contact_list')) > 1) {
             return $this->sendValidationFailedJsonResponse(["errors" => ['campaign' => __('messages.scenario_campaign_only_one_contact_list')]]);
-        } else {
-            $model = $this->service->findOrFailById($id);
-
-            $this->service->update($model, $request->all());
-
-            $model->contactLists()->sync($request->contact_list ?? $model->contactLists);
-
-            return $this->sendOkJsonResponse(
-                $this->service->resourceToData($this->resourceClass, $model)
-            );
         }
+
+        $model = $this->service->findOrFailById($id);
+        if (!empty($request->get('send_type')) && $model->mailTemplate->type != $request->get('send_type')) {
+            return $this->sendValidationFailedJsonResponse(["errors" => ['send_type' => "Please enter the same 'type' as the mail template."]]);
+        }
+        $this->service->update($model, $request->all());
+
+        $model->contactLists()->sync($request->contact_list ?? $model->contactLists);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
     }
 
     /**
@@ -282,7 +285,9 @@ class CampaignController extends AbstractRestAPIController
 
         if ($request->get('type') === "scenario" && count($request->get('contact_list')) > 1) {
             return $this->sendValidationFailedJsonResponse(["errors" => ['campaign' => __('messages.scenario_campaign_only_one_contact_list')]]);
-        } else {
+        }
+
+        if ($request->get('send_type') === "email") {
             if (($user->can_add_smtp_account == 1 || $configSmtpAuto->value == 0)) {
                 if (empty($request->get('smtp_account_uuid'))) {
                     return $this->sendValidationFailedJsonResponse(["errors" => ['smtp_account_uuid' => __('messages.smtp_account_invalid')]]);
@@ -292,17 +297,17 @@ class CampaignController extends AbstractRestAPIController
                     return $this->sendValidationFailedJsonResponse(["errors" => ['smtp_account_uuid' => __('messages.smtp_account_invalid')]]);
                 }
             }
-
-            $model = $this->service->create(array_merge($request->all(), [
-                'user_uuid' => auth()->user()->getkey(),
-            ]));
-
-            $model->contactLists()->attach($request->get('contact_list', []));
-
-            return $this->sendCreatedJsonResponse([
-                $this->service->resourceToData($this->resourceClass, $model)
-            ]);
         }
+
+        $model = $this->service->create(array_merge($request->all(), [
+            'user_uuid' => auth()->user()->getkey(),
+        ]));
+
+        $model->contactLists()->attach($request->get('contact_list', []));
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
     }
 
     /**
@@ -341,34 +346,39 @@ class CampaignController extends AbstractRestAPIController
 
         if ($request->get('type') === "scenario" && count($request->get('contact_list')) > 1) {
             return $this->sendValidationFailedJsonResponse(["errors" => ['campaign' => __('messages.scenario_campaign_only_one_contact_list')]]);
-        } else {
-            if (array_key_exists('smtp_account_uuid', $request->all())) {
-                if (($user->can_add_smtp_account == 1 || $config->value == 0)) {
-                    if (empty($request->get('smtp_account_uuid'))) {
-                        return $this->sendValidationFailedJsonResponse(["errors" => ['smtp_account_uuid' => __('messages.smtp_account_invalid')]]);
-                    }
-                } else {
-                    if (!empty($request->get('smtp_account_uuid'))) {
-                        return $this->sendValidationFailedJsonResponse(["errors" => ['smtp_account_uuid' => __('messages.smtp_account_invalid')]]);
-                    }
+        }
+
+        if (!empty($request->get('send_type')) && $model->mailTemplate->type != $request->get('send_type')) {
+            return $this->sendValidationFailedJsonResponse(["errors" => ['send_type' => "Please enter the same 'type' as the mail template."]]);
+        }
+
+        if (array_key_exists('smtp_account_uuid', $request->all()) && (($request->get('send_type') ?? $model->send_type ) === "email")) {
+            if (($user->can_add_smtp_account == 1 || $config->value == 0)){
+                if (empty($request->get('smtp_account_uuid'))) {
+                    return $this->sendValidationFailedJsonResponse(["errors" => ['smtp_account_uuid' => __('messages.smtp_account_invalid')]]);
+                }
+            } else {
+                if (!empty($request->get('smtp_account_uuid'))) {
+                    return $this->sendValidationFailedJsonResponse(["errors" => ['smtp_account_uuid' => __('messages.smtp_account_invalid')]]);
                 }
             }
-            $this->service->update($model, array_merge($request->all(), [
-                'user_uuid' => auth()->user()->getkey(),
-            ]));
-
-            $contactListUuid = $this->myService->findContactListKeyByMyCampaign($model);
-
-            if ($contactListUuid == null) {
-                $model->contactLists()->sync($request->get('contact_list', []));
-            }
-
-            $model->contactLists()->sync($request->get('contact_list', $contactListUuid));
-
-            return $this->sendOkJsonResponse(
-                $this->service->resourceToData($this->resourceClass, $model)
-            );
         }
+
+        $this->service->update($model, array_merge($request->all(), [
+            'user_uuid' => auth()->user()->getkey(),
+        ]));
+
+        $contactListUuid = $this->myService->findContactListKeyByMyCampaign($model);
+
+        if ($contactListUuid == null) {
+            $model->contactLists()->sync($request->get('contact_list', []));
+        }
+
+        $model->contactLists()->sync($request->get('contact_list', $contactListUuid));
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
 
     }
 
