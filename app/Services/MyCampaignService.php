@@ -58,10 +58,10 @@ class MyCampaignService extends AbstractService
                 $query = [$column, false];
             }
             if ($column === "from_date") {
-                $query = [$column, '<=', Carbon::now()];
+                $query = [$column, '<=', Carbon::now('Asia/Ho_Chi_Minh')];
             }
             if ($column === "to_date") {
-                $query = [$column, '>=', Carbon::now()];
+                $query = [$column, '>=', Carbon::now('Asia/Ho_Chi_Minh')];
             }
             if ($column === "status") {
                 $query = [$column, "active"];
@@ -92,8 +92,8 @@ class MyCampaignService extends AbstractService
             ->where([
                 ['campaigns.uuid', $campaignUuid],
                 ['websites.user_uuid', auth()->user()->getKey()],
-                ['campaigns.from_date', '<=', Carbon::now()],
-                ['campaigns.to_date', '>=', Carbon::now()],
+                ['campaigns.from_date', '<=', Carbon::now('Asia/Ho_Chi_Minh')],
+                ['campaigns.to_date', '>=', Carbon::now('Asia/Ho_Chi_Minh')],
                 ['campaigns.was_finished', false],
                 ['campaigns.was_stopped_by_owner', false],
             ])->first();
