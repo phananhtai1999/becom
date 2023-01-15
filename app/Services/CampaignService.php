@@ -47,8 +47,8 @@ class CampaignService extends AbstractService
             ->join('contacts', 'contact_contact_list.contact_uuid', '=', 'contacts.uuid')
             ->where([
                 ['campaigns.type', 'birthday'],
-                ['campaigns.from_date', '<=', Carbon::now()],
-                ['campaigns.to_date', '>=', Carbon::now()],
+                ['campaigns.from_date', '<=', Carbon::now('Asia/Ho_Chi_Minh')],
+                ['campaigns.to_date', '>=', Carbon::now('Asia/Ho_Chi_Minh')],
                 ['campaigns.was_finished', false],
                 ['campaigns.was_stopped_by_owner', false],
                 ['campaigns.status', "active"],
@@ -77,10 +77,10 @@ class CampaignService extends AbstractService
                 $query = [$column, false];
             }
             if ($column === "from_date") {
-                $query = [$column, '<=', Carbon::now()];
+                $query = [$column, '<=', Carbon::now('Asia/Ho_Chi_Minh')];
             }
             if ($column === "to_date") {
-                $query = [$column, '>=', Carbon::now()];
+                $query = [$column, '>=', Carbon::now('Asia/Ho_Chi_Minh')];
             }
             if ($column === "status") {
                 $query = [$column, "active"];
@@ -321,7 +321,7 @@ class CampaignService extends AbstractService
     {
         return $this->model->where([
             ['uuid', $campaignUuid],
-            ['to_date', '>=', Carbon::now()],
+            ['to_date', '>=', Carbon::now('Asia/Ho_Chi_Minh')],
             ['was_finished', false],
             ['was_stopped_by_owner', false],
             ['status', "active"]

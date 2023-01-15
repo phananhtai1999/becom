@@ -63,12 +63,12 @@ class MailSendingHistoryController extends AbstractRestAPIController
      * @param CampaignScenarioService $campaignScenarioService
      */
     public function __construct(
-        MailSendingHistoryService $service,
+        MailSendingHistoryService   $service,
         MyMailSendingHistoryService $myService,
-        MailOpenTrackingService $mailOpenTrackingService,
-        CampaignService $campaignService,
-        ContactService $contactService,
-        CampaignScenarioService $campaignScenarioService
+        MailOpenTrackingService     $mailOpenTrackingService,
+        CampaignService             $campaignService,
+        ContactService              $contactService,
+        CampaignScenarioService     $campaignScenarioService
     )
     {
         $this->service = $service;
@@ -129,16 +129,17 @@ class MailSendingHistoryController extends AbstractRestAPIController
         $this->mailOpenTrackingService->mailOpenTracking($id, $ip, $userAgent);
 
         $mailSendingHistory = $this->service->findOneById($id);
-
-        //Send Email Scenario Campaign
-        if ($mailSendingHistory->status !== "opened") {
-            //Add 1 point when open mail
+        $statusMailSendingHistory = $mailSendingHistory->status;
+        if ($statusMailSendingHistory !== "opened") {
             $this->service->update($mailSendingHistory, ['status' => 'opened']);
-            if ($mailSendingHistory->campaign_scenario_uuid){
-                $campaignScenario = $this->campaignScenarioService->findOneById($mailSendingHistory->campaign_scenario_uuid);
-                $this->contactService->addPointContactOpenMailCampaign($campaignScenario->getRoot()->campaign_uuid, $mailSendingHistory->email);
-                if(($nextCampaignScenario = $this->campaignScenarioService->getCampaignWhenOpenEmailByUuid($mailSendingHistory->campaign_scenario_uuid, $mailSendingHistory->created_at))
-                && ($nextCampaign = $this->campaignService->checkActiveCampaignScenario($nextCampaignScenario->campaign_uuid))) {
+        }
+        //Add 1 point when open mail
+        if ($mailSendingHistory->campaign_scenario_uuid) {
+            $campaignScenario = $this->campaignScenarioService->findOneById($mailSendingHistory->campaign_scenario_uuid);
+            $this->contactService->addPointContactOpenMailCampaign($campaignScenario->getRoot()->campaign_uuid, $mailSendingHistory->email);
+            if ($statusMailSendingHistory !== "opened") {
+                if (($nextCampaignScenario = $this->campaignScenarioService->getCampaignWhenOpenEmailByUuid($mailSendingHistory->campaign_scenario_uuid, $mailSendingHistory->created_at))
+                    && ($nextCampaign = $this->campaignService->checkActiveCampaignScenario($nextCampaignScenario->campaign_uuid))) {
                     $contactOpenMail = $this->contactService->getContactByCampaign($nextCampaignScenario->getRoot()->campaign_uuid, $mailSendingHistory->email);
                     if ($nextCampaign->send_type === "email") {
                         SendNextEmailByScenarioCampaignEvent::dispatch($nextCampaign, $contactOpenMail, $nextCampaignScenario);
@@ -146,9 +147,9 @@ class MailSendingHistoryController extends AbstractRestAPIController
                         // To DO SMS
                     }
                 }
-            }else{
-                $this->contactService->addPointContactOpenMailCampaign($mailSendingHistory->campaign_uuid, $mailSendingHistory->email);
             }
+        } else {
+            $this->contactService->addPointContactOpenMailCampaign($mailSendingHistory->campaign_uuid, $mailSendingHistory->email);
         }
 
         return response(file_get_contents(public_path('tracking_pixel/pixel.gif')))
