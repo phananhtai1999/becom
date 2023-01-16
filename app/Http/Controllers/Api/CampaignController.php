@@ -368,13 +368,7 @@ class CampaignController extends AbstractRestAPIController
             'user_uuid' => auth()->user()->getkey(),
         ]));
 
-        $contactListUuid = $this->myService->findContactListKeyByMyCampaign($model);
-
-        if ($contactListUuid == null) {
-            $model->contactLists()->sync($request->get('contact_list', []));
-        }
-
-        $model->contactLists()->sync($request->get('contact_list', $contactListUuid));
+        $model->contactLists()->sync($request->contact_list ?? $model->contactLists);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
