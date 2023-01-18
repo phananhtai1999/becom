@@ -392,7 +392,7 @@ class ContactController extends AbstractRestAPIController
     public function selectAllContact()
     {
         try {
-            $models = $this->service->filteringByCustomContactField()->pluck('uuid')->all();
+            $models = $this->service->filteringByCustomContactField()->get()->pluck('uuid');
 
             return $this->sendOkJsonResponse([
                 'data' => [
@@ -410,7 +410,7 @@ class ContactController extends AbstractRestAPIController
     public function selectAllMyContact()
     {
         try {
-            $models = $this->myService->filteringByMyCustomContactField()->pluck('uuid')->all();
+            $models = $this->myService->filteringByMyCustomContactField()->get()->pluck('uuid');
 
             return $this->sendOkJsonResponse([
                 'data' => [
