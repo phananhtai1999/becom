@@ -6,7 +6,10 @@ use App\Abstracts\AbstractService;
 use App\Models\Contact;
 use App\Models\QueryBuilders\MyContactQueryBuilder;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class MyContactService extends AbstractService
 {
@@ -412,5 +415,174 @@ class MyContactService extends AbstractService
             }
         }
         return $result;
+    }
+
+    /**
+     * @return QueryBuilder
+     */
+    public function filteringByMyCustomContactField()
+    {
+        $modelKeyName = $this->model->getKeyName();
+
+        return QueryBuilder::for($this->model->where('user_uuid', auth()->user()->getkey()))
+            ->allowedFields([
+                $modelKeyName,
+                'email',
+                'first_name',
+                'last_name',
+                'middle_name',
+                'points',
+                'phone',
+                'sex',
+                'dob',
+                'city',
+                'country',
+                'user_uuid'
+            ])
+            ->defaultSort('-created_at')
+            ->allowedSorts([
+                $modelKeyName,
+                'email',
+                'first_name',
+                'last_name',
+                'middle_name',
+                'points',
+                'phone',
+                'sex',
+                'dob',
+                'city',
+                'country',
+                'user_uuid'
+            ])
+            ->allowedFilters([
+                $this->getMyDuplicateFiltersByNumeric($modelKeyName),
+                $this->getMyDuplicateFilters('email'),
+                $this->getMyDuplicateFilters('first_name'),
+                $this->getMyDuplicateFilters('last_name'),
+                $this->getMyDuplicateFilters('middle_name'),
+                $this->getMyDuplicateFilters('country'),
+                $this->getMyDuplicateFilters('city'),
+                $this->getMyDuplicateFilters('phone'),
+                $this->getMyDuplicateFilters('sex'),
+                $this->getMyDuplicateFiltersByNumeric('points'),
+                $this->getMyDuplicateFiltersByNumeric('dob'),
+                $this->getMyDuplicateFiltersByNumeric('user_uuid'),
+                $this->getMyFilterRelationshipWithUser('user.username'),
+            ]);
+    }
+
+    /**
+     * @param $field
+     * @return AllowedFilter
+     */
+    public function getMyDuplicateFilters($field)
+    {
+        return AllowedFilter::callback($field, function (Builder $query, $value, $field) {
+            if ($value[0] == $field) {
+                if ($value[1] == '=') {
+                    $query->whereIn($field, array_slice($value, 3));
+                } elseif ($value[1] == '!=') {
+                    $query->whereNotIn($field, array_slice($value, 3));
+                } elseif ($value[1] == 'like') {
+                    if (count($value) > 4) {
+                        $query->where(function ($query) use ($value, $field) {
+                            for ($i = 4; $i <= count($value); $i++) {
+                                $query->orwhere($field, 'like', '%' . $value[$i - 1] . '%');
+                            }
+                        });
+                    } else {
+                        $query->where($field, 'like', '%' . $value[3] . '%');
+                    }
+                } elseif ($value[1] == 'empty') {
+                    $query->whereNull($field);
+                } elseif ($value[1] == '!empty') {
+                    $query->whereNotNull($field);
+                }
+            }
+        });
+    }
+
+    /**
+     * @param $field
+     * @return AllowedFilter
+     */
+    public function getMyDuplicateFiltersByNumeric($field)
+    {
+        return AllowedFilter::callback($field, function (Builder $query, $value, $field) {
+            if ($value[0] == $field) {
+                if ($value[1] == '=') {
+                    $query->whereIn($field, array_slice($value, 3));
+                } elseif ($value[1] == '!=') {
+                    $query->whereNotIn($field, array_slice($value, 3));
+                } elseif ($value[1] == 'like') {
+                    if (count($value) > 4) {
+                        $query->where(function ($query) use ($value, $field) {
+                            for ($i = 4; $i <= count($value); $i++) {
+                                $query->orwhere($field, 'like', '%' . $value[$i - 1] . '%');
+                            }
+                        });
+                    } else {
+                        $query->where($field, 'like', '%' . $value[3] . '%');
+                    }
+                } elseif ($value[1] == '>') {
+                    $query->where($field, '>', max(array_slice($value, 3)));
+                } elseif ($value[1] == '>=') {
+                    $query->where($field, '>=', min(array_slice($value, 3)));
+                } elseif ($value[1] == '<') {
+                    $query->where($field, '<', min(array_slice($value, 3)));
+                } elseif ($value[1] == '<=') {
+                    $query->where($field, '<=', max(array_slice($value, 3)));
+                } elseif ($value[1] == 'empty') {
+                    $query->whereNull($field);
+                } elseif ($value[1] == '!empty') {
+                    $query->whereNotNull($field);
+                }
+            }
+        });
+    }
+
+    /**
+     * @param $field
+     * @return AllowedFilter
+     */
+    public function getMyFilterRelationshipWithUser($field)
+    {
+        return AllowedFilter::callback($field, function (Builder $query, $value, $field) {
+            if ($value[0] == $field) {
+                if ($value[1] == '=') {
+                    $query->whereExists(function ($user) use ($value) {
+                        $user->from('users')
+                            ->whereRaw('contacts.user_uuid = users.uuid')
+                            ->whereIn('users.username', array_slice($value, 3));
+                    });
+                } elseif ($value[1] == '!=') {
+                    $query->whereExists(function ($user) use ($value) {
+                        $user->from('users')
+                            ->whereRaw('contacts.user_uuid = users.uuid')
+                            ->whereNotIn('users.username', array_slice($value, 3));
+                    });
+                } elseif ($value[1] == 'like') {
+                    if (count($value) > 4) {
+                        $query->where(function ($query) use ($value) {
+                            for ($i = 4; $i <= count($value); $i++) {
+                                $query->orWhereExists(function ($query) use ($value, $i) {
+                                    $query->select("users.uuid")
+                                        ->from('users')
+                                        ->whereRaw('contacts.user_uuid = users.uuid')
+                                        ->where('users.username', 'like', '%' . $value[$i - 1] . '%');
+                                });
+                            }
+                        });
+                    } else {
+                        $query->whereExists(function ($user) use ($value) {
+                            $user->select("users.uuid")
+                                ->from('users')
+                                ->whereRaw('contacts.user_uuid = users.uuid')
+                                ->where('users.username', 'like', '%' . $value[3] . '%');
+                        });
+                    }
+                }
+            }
+        });
     }
 }
