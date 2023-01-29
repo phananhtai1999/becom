@@ -12,7 +12,6 @@ use App\Http\Requests\MyContactRequest;
 use App\Http\Requests\UpdateContactRequest;
 use App\Http\Resources\ContactResource;
 use App\Http\Resources\ContactResourceCollection;
-use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Services\ContactListService;
@@ -23,7 +22,7 @@ use Carbon\Carbon;
 
 class ContactController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestShowTrait, RestDestroyTrait;
+    use RestShowTrait, RestDestroyTrait;
 
     /**
      * @var MyContactService
@@ -62,6 +61,28 @@ class ContactController extends AbstractRestAPIController
         $this->editRequest = UpdateContactRequest::class;
         $this->indexRequest = IndexRequest::class;
         $this->contactListService = $contactListService;
+    }
+
+    /**
+     * @param IndexRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function index(IndexRequest $request)
+    {
+        try {
+            $models = $this->service->filteringByCustomContactField()->paginate(
+                $request->get('per_page', '15'),
+                $request->get('columns', '*'),
+                $request->get('page_name', 'page'),
+                $request->get('page', '1')
+            );
+
+            return $this->sendOkJsonResponse(
+                $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+            );
+        } catch (\ValueError|\ErrorException $error) {
+            return $this->sendValidationFailedJsonResponse();
+        }
     }
 
     /**
@@ -120,22 +141,26 @@ class ContactController extends AbstractRestAPIController
     /**
      * @param IndexRequest $request
      * @return \Illuminate\Http\JsonResponse
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function indexMyContact(IndexRequest $request)
     {
-        return $this->sendOkJsonResponse(
-            $this->service->resourceCollectionToData(
-                $this->resourceCollectionClass,
-                $this->myService->getCollectionWithPagination(
-                    $request->get('per_page', '15'),
-                    $request->get('page', '1'),
-                    $request->get('columns', '*'),
-                    $request->get('page_name', 'page'),
+        try {
+            $models = $this->myService->filteringByMyCustomContactField()->paginate(
+                $request->get('per_page', '15'),
+                $request->get('columns', '*'),
+                $request->get('page_name', 'page'),
+                $request->get('page', '1')
+            );
+
+            return $this->sendOkJsonResponse(
+                $this->service->resourceCollectionToData(
+                    $this->resourceCollectionClass,
+                    $models
                 )
-            )
-        );
+            );
+        } catch (\ValueError|\ErrorException $error) {
+            return $this->sendValidationFailedJsonResponse();
+        }
     }
 
     /**
@@ -349,5 +374,51 @@ class ContactController extends AbstractRestAPIController
                 'allow_fields' => config('dynamiccontentcontact')
             ]
         ]);
+    }
+
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function customFilterDefault()
+    {
+        return $this->sendOkJsonResponse([
+            'data' => config('customfilterdefault')
+        ]);
+    }
+
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function selectAllContact()
+    {
+        try {
+            $models = $this->service->filteringByCustomContactField()->get()->pluck('uuid');
+
+            return $this->sendOkJsonResponse([
+                'data' => [
+                    'uuid' => $models
+                ]
+            ]);
+        } catch (\ValueError|\ErrorException $error) {
+            return $this->sendValidationFailedJsonResponse();
+        }
+    }
+
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function selectAllMyContact()
+    {
+        try {
+            $models = $this->myService->filteringByMyCustomContactField()->get()->pluck('uuid');
+
+            return $this->sendOkJsonResponse([
+                'data' => [
+                    'uuid' => $models
+                ]
+            ]);
+        } catch (\ValueError|\ErrorException $error) {
+            return $this->sendValidationFailedJsonResponse();
+        }
     }
 }

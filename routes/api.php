@@ -304,6 +304,8 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'contact.'], function () {
         Route::get('/contact/{id}', [ContactController::class, 'show'])->name('show');
         Route::put('/contact/{id}', [ContactController::class, 'edit'])->name('edit');
         Route::delete('/contact/{id}', [ContactController::class, 'destroy'])->name('destroy');
+        Route::get('/custom-filter-default', [ContactController::class, 'customFilterDefault'])->name('custom-filter-default');
+        Route::get('/select-all-contact', [ContactController::class, 'selectAllContact'])->name('select-all-contact');
     });
 
     Route::group(['as' => 'my.'], function () {
@@ -312,6 +314,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'contact.'], function () {
         Route::get('/my/contact/{id}', [ContactController::class, 'showMyContact'])->name('show');
         Route::put('/my/contact/{id}', [ContactController::class, 'editMyContact'])->name('edit');
         Route::delete('/my/contact/{id}', [ContactController::class, 'destroyMyContact'])->name('destroy');
+        Route::get('/my/select-all-contact', [ContactController::class, 'selectAllMyContact'])->name('select-all-contact');
     });
 
     Route::group(['middleware' => ['role:editor'], 'as' => 'editor.'], function () {
