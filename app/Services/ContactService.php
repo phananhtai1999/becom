@@ -558,6 +558,34 @@ class ContactService extends AbstractService
                 'user_uuid'
             ])
             ->allowedFilters([
+                $modelKeyName,
+                AllowedFilter::exact('exact__' . $modelKeyName, $modelKeyName),
+                'email',
+                AllowedFilter::exact('exact__email', 'email'),
+                'first_name',
+                AllowedFilter::exact('exact__first_name', 'first_name'),
+                'last_name',
+                AllowedFilter::exact('exact__last_name', 'last_name'),
+                'middle_name',
+                AllowedFilter::exact('exact__middle_name', 'middle_name'),
+                'points',
+                AllowedFilter::exact('exact__points', 'points'),
+                'phone',
+                AllowedFilter::exact('exact__phone', 'phone'),
+                'sex',
+                AllowedFilter::exact('exact__sex', 'sex'),
+                'dob',
+                AllowedFilter::exact('exact__dob', 'dob'),
+                'city',
+                AllowedFilter::exact('exact__city', 'city'),
+                'country',
+                AllowedFilter::exact('exact__country', 'country'),
+                'user_uuid',
+                AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
+                'user.username',
+                AllowedFilter::exact('exact__user.username', 'user.username'),
+                AllowedFilter::scope('uuids_not_in'),
+                AllowedFilter::scope('uuids_in'),
                 $this->getDuplicateFiltersByNumeric($modelKeyName),
                 $this->getDuplicateFilters('email'),
                 $this->getDuplicateFilters('first_name'),
@@ -580,7 +608,7 @@ class ContactService extends AbstractService
      */
     public function getDuplicateFilters($field)
     {
-        return AllowedFilter::callback($field, function (Builder $query, $value, $field) {
+        return AllowedFilter::callback("custom__$field", function (Builder $query, $value, $field) {
             if ($value[0] == $field) {
                 if ($value[1] == '=') {
                     $query->whereIn($field, array_slice($value, 3));
@@ -590,7 +618,7 @@ class ContactService extends AbstractService
                     if (count($value) > 4) {
                         $query->where(function ($query) use ($value, $field) {
                             for ($i = 4; $i <= count($value); $i++) {
-                                $query->orwhere($field, 'like', '%' . $value[$i - 1] . '%');
+                                $query->orWhere($field, 'like', '%' . $value[$i - 1] . '%');
                             }
                         });
                     } else {
@@ -602,7 +630,7 @@ class ContactService extends AbstractService
                     $query->whereNotNull($field);
                 }
             }
-        });
+        }, $field);
     }
 
     /**
@@ -611,7 +639,7 @@ class ContactService extends AbstractService
      */
     public function getDuplicateFiltersByNumeric($field)
     {
-        return AllowedFilter::callback($field, function (Builder $query, $value, $field) {
+        return AllowedFilter::callback("custom__$field", function (Builder $query, $value, $field) {
             if ($value[0] == $field) {
                 if ($value[1] == '=') {
                     $query->whereIn($field, array_slice($value, 3));
@@ -621,7 +649,7 @@ class ContactService extends AbstractService
                     if (count($value) > 4) {
                         $query->where(function ($query) use ($value, $field) {
                             for ($i = 4; $i <= count($value); $i++) {
-                                $query->orwhere($field, 'like', '%' . $value[$i - 1] . '%');
+                                $query->orWhere($field, 'like', '%' . $value[$i - 1] . '%');
                             }
                         });
                     } else {
@@ -641,7 +669,7 @@ class ContactService extends AbstractService
                     $query->whereNotNull($field);
                 }
             }
-        });
+        }, $field);
     }
 
     /**
@@ -650,7 +678,7 @@ class ContactService extends AbstractService
      */
     public function getFilterRelationshipWithUser($field)
     {
-        return AllowedFilter::callback($field, function (Builder $query, $value, $field) {
+        return AllowedFilter::callback("custom__$field", function (Builder $query, $value, $field) {
             if ($value[0] == $field) {
                 if ($value[1] == '=') {
                     $query->whereExists(function ($user) use ($value) {
@@ -686,6 +714,6 @@ class ContactService extends AbstractService
                     }
                 }
             }
-        });
+        }, $field);
     }
 }
