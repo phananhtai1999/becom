@@ -52,6 +52,8 @@ class UserDetailQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__date_of_birth', 'date_of_birth'),
                 'user_uuid',
                 AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
+                AllowedFilter::scope('from__date_of_birth'),
+                AllowedFilter::scope('to__date_of_birth'),
             ]);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Abstracts\AbstractModel;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -47,5 +48,25 @@ class UserDetail extends AbstractModel
     public function user()
     {
         return $this->belongsTo(User::class, 'user_uuid', 'uuid');
+    }
+
+    /**
+     * @param Builder $query
+     * @param $dateOfBirth
+     * @return Builder
+     */
+    public function scopeFromDateOfBirth(Builder $query, $dateOfBirth): Builder
+    {
+        return $query->whereDate('date_of_birth', '>=', $dateOfBirth);
+    }
+
+    /**
+     * @param Builder $query
+     * @param $dateOfBirth
+     * @return Builder
+     */
+    public function scopeDateOfBirth(Builder $query, $dateOfBirth): Builder
+    {
+        return $query->whereDate('date_of_birth', '<=', $dateOfBirth);
     }
 }

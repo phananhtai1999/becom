@@ -87,4 +87,24 @@ class Contact extends AbstractModel
     {
         return $query->whereIn('uuid', $uuids);
     }
+
+    /**
+     * @param Builder $query
+     * @param $dob
+     * @return Builder
+     */
+    public function scopeFromDob(Builder $query, $dob): Builder
+    {
+        return $query->whereDate('dob', '>=', $dob);
+    }
+
+    /**
+     * @param Builder $query
+     * @param $dob
+     * @return Builder
+     */
+    public function scopeToDob(Builder $query, $dob): Builder
+    {
+        return $query->whereDate('dob', '<=', $dob);
+    }
 }

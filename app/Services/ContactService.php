@@ -586,6 +586,8 @@ class ContactService extends AbstractService
                 AllowedFilter::exact('exact__user.username', 'user.username'),
                 AllowedFilter::scope('uuids_not_in'),
                 AllowedFilter::scope('uuids_in'),
+                AllowedFilter::scope('from__dob'),
+                AllowedFilter::scope('to__dob'),
                 $this->getDuplicateFiltersByNumeric($modelKeyName),
                 $this->getDuplicateFilters('email'),
                 $this->getDuplicateFilters('first_name'),

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Abstracts\AbstractModel;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -59,5 +60,25 @@ class WebsiteVerification extends AbstractModel
     public function website()
     {
         return $this->belongsTo(Website::class, 'website_uuid', 'uuid');
+    }
+
+    /**
+     * @param Builder $query
+     * @param $verifiedAt
+     * @return Builder
+     */
+    public function scopeFromVerifiedAt(Builder $query, $verifiedAt): Builder
+    {
+        return $query->whereDate('verified_at', '>=', $verifiedAt);
+    }
+
+    /**
+     * @param Builder $query
+     * @param $verifiedAt
+     * @return Builder
+     */
+    public function scopeToVerifiedAt(Builder $query, $verifiedAt): Builder
+    {
+        return $query->whereDate('verified_at', '<=', $verifiedAt);
     }
 }

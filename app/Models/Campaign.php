@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Abstracts\AbstractModel;
 use App\Services\CampaignService;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -144,5 +145,45 @@ class Campaign extends AbstractModel
     public function getNumberCreditNeededToStartCampaignAttribute()
     {
         return app(CampaignService::class)->numberOfCreditsToStartTheCampaign($this->uuid, $this->from_date, $this->to_date, $this->send_type, $this->type);
+    }
+
+    /**
+     * @param Builder $query
+     * @param $fromDate
+     * @return Builder
+     */
+    public function scopeFromFromDate(Builder $query, $fromDate): Builder
+    {
+        return $query->whereDate('from_date', '>=', $fromDate);
+    }
+
+    /**
+     * @param Builder $query
+     * @param $fromDate
+     * @return Builder
+     */
+    public function scopeToFromDate(Builder $query, $fromDate): Builder
+    {
+        return $query->whereDate('from_date', '<=', $fromDate);
+    }
+
+    /**
+     * @param Builder $query
+     * @param $toDate
+     * @return Builder
+     */
+    public function scopeFromToDate(Builder $query, $toDate): Builder
+    {
+        return $query->whereDate('to_date', '>=', $toDate);
+    }
+
+    /**
+     * @param Builder $query
+     * @param $toDate
+     * @return Builder
+     */
+    public function scopeToToDate(Builder $query, $toDate): Builder
+    {
+        return $query->whereDate('to_date', '<=', $toDate);
     }
 }
