@@ -66,6 +66,8 @@ class MailSendingHistoryQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__campaign.smtpAccount.mail_from_name', 'campaign.smtpAccount.mail_from_name'),
                 'campaign.website.domain',
                 AllowedFilter::exact('exact__campaign.website.domain', 'campaign.website.domain'),
+                AllowedFilter::scope('from__time'),
+                AllowedFilter::scope('to__time'),
             ]);
     }
 }

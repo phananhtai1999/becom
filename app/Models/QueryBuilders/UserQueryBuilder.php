@@ -82,6 +82,8 @@ class UserQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__credit', 'credit'),
                 'can_add_smtp_account',
                 AllowedFilter::exact('exact__can_add_smtp_account', 'can_add_smtp_account'),
+                AllowedFilter::scope('from__banned_at'),
+                AllowedFilter::scope('to__banned_at'),
             ]);
     }
 }

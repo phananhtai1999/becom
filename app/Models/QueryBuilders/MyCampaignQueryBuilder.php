@@ -92,6 +92,10 @@ class MyCampaignQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__website.domain', 'website.domain'),
                 'user.username',
                 AllowedFilter::exact('exact__user.username', 'user.username'),
+                AllowedFilter::scope('from__from_date'),
+                AllowedFilter::scope('to__from_date'),
+                AllowedFilter::scope('from__to_date'),
+                AllowedFilter::scope('to__to_date'),
             ]);
     }
 }

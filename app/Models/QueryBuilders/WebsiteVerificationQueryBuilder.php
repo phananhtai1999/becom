@@ -50,6 +50,8 @@ class WebsiteVerificationQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__token', 'token'),
                 'verified_at',
                 AllowedFilter::exact('exact__verified_at', 'verified_at'),
+                AllowedFilter::scope('from__verified_at'),
+                AllowedFilter::scope('to__verified_at'),
             ]);
     }
 }

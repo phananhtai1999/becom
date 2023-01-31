@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Abstracts\AbstractModel;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -70,5 +71,25 @@ class MailSendingHistory extends AbstractModel
     public function campaignScenario()
     {
         return $this->belongsTo(CampaignScenario::class, 'campaign_scenario_uuid', 'uuid');
+    }
+
+    /**
+     * @param Builder $query
+     * @param $time
+     * @return Builder
+     */
+    public function scopeFromTime(Builder $query, $time): Builder
+    {
+        return $query->whereDate('time', '>=', $time);
+    }
+
+    /**
+     * @param Builder $query
+     * @param $time
+     * @return Builder
+     */
+    public function scopeToTime(Builder $query, $time): Builder
+    {
+        return $query->whereDate('time', '<=', $time);
     }
 }
