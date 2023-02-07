@@ -5,7 +5,10 @@ namespace App\Services;
 use App\Abstracts\AbstractService;
 use App\Models\Campaign;
 use App\Models\QueryBuilders\CampaignQueryBuilder;
+use App\Models\QueryBuilders\SortTotalCreditOfCampaignQueryBuilder;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
 class CampaignService extends AbstractService
@@ -192,12 +195,12 @@ class CampaignService extends AbstractService
                 });
                 if ($campaignIncrease) {
                     $result[] = [
-                            'label' => $time,
-                            'active' => $campaignIncrease->active,
-                            'other' => $campaignIncrease->other,
-                            'increase' => $campaignIncrease->increase ?? $campaignIncrease->active + $campaignIncrease->other
-                        ];
-                }else{
+                        'label' => $time,
+                        'active' => $campaignIncrease->active,
+                        'other' => $campaignIncrease->other,
+                        'increase' => $campaignIncrease->increase ?? $campaignIncrease->active + $campaignIncrease->other
+                    ];
+                } else {
                     $prevTime = $time;
                     if ($groupBy === 'hour') {
                         $prevTime = Carbon::parse($prevTime)->subHour()->toDateTimeString();
@@ -257,11 +260,11 @@ class CampaignService extends AbstractService
         */
         $string = $type === "month" ? "-01" : "";
         $todayCampaignTableSubQuery = $yesterdayCampaignTableSubQuery = $this->model->selectRaw("date_format(updated_at, '{$dateFormat}') as label, COUNT(uuid) as createCampaign")
-            ->whereRaw('date(updated_at) >= "'.$startDate.'"')
-            ->whereRaw('date(updated_at) <= "'.$endDate.'"')->groupBy('label')->toSql();
+            ->whereRaw('date(updated_at) >= "' . $startDate . '"')
+            ->whereRaw('date(updated_at) <= "' . $endDate . '"')->groupBy('label')->toSql();
         $campaignStatusTable = $this->model->selectRaw("date_format(updated_at, '{$dateFormat}') as label,  COUNT(IF( status = 'active', 1, NULL ) ) as active, COUNT(IF( status <> 'active', 1, NULL ) ) as other")
-            ->whereRaw('date(updated_at) >= "'.$startDate.'"')
-            ->whereRaw('date(updated_at) <= "'.$endDate.'"')
+            ->whereRaw('date(updated_at) >= "' . $startDate . '"')
+            ->whereRaw('date(updated_at) <= "' . $endDate . '"')
             ->groupBy('label')
             ->orderBy('label', 'ASC')->toSql();
 
@@ -363,4 +366,37 @@ class CampaignService extends AbstractService
         return $this->model->with(['user', 'mailTemplate', 'website', 'smtpAccount'])->find($campaignUuid);
     }
 
+    /**
+     * @param $results
+     * @param $perPage
+     * @param $page
+     * @return LengthAwarePaginator
+     */
+    public function collectionPagination($results, $perPage, $page = null)
+    {
+        $page = $page ?: (LengthAwarePaginator::resolveCurrentPage() ?: 1);
+
+        $results = $results instanceof Collection ? $results : Collection::make($results);
+
+        return new LengthAwarePaginator($results->forPage($page, $perPage)->values(), $results->count(), $perPage, $page, [
+            'path' => LengthAwarePaginator::resolveCurrentPath(),
+            'pageName' => 'page',
+        ]);
+    }
+
+    /**
+     * @param $perPage
+     * @param $sort
+     * @return LengthAwarePaginator
+     */
+    public function sortTotalCredit($perPage, $sort)
+    {
+        if ($sort == 'number_credit_needed_to_start_campaign') {
+            $sortTotalCredit = SortTotalCreditOfCampaignQueryBuilder::initialQuery()->get()->sortBy('number_credit_needed_to_start_campaign');
+        } elseif ($sort == '-number_credit_needed_to_start_campaign') {
+            $sortTotalCredit = SortTotalCreditOfCampaignQueryBuilder::initialQuery()->get()->sortByDesc('number_credit_needed_to_start_campaign');
+        }
+
+        return $this->collectionPagination($sortTotalCredit, $perPage);
+    }
 }
