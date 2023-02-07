@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Abstracts\AbstractRestAPIController;
 use App\Events\SendEmailByCampaginRootScenarioEvent;
 use App\Events\SendEmailByCampaignEvent;
-use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Requests\CampaignLinkTrackingRequest;
 use App\Http\Requests\CampaignRequest;
@@ -45,7 +44,7 @@ use Illuminate\Http\JsonResponse;
 
 class CampaignController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestDestroyTrait;
+    use RestDestroyTrait;
 
     /**
      * @var MyCampaignService
@@ -173,6 +172,28 @@ class CampaignController extends AbstractRestAPIController
         $this->contactService = $contactService;
         $this->userService = $userService;
         $this->configService = $configService;
+    }
+
+    /**
+     * @param IndexRequest $request
+     * @return JsonResponse
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     */
+    public function index(IndexRequest $request)
+    {
+        $sortTotalCredit = explode(',', $request->sort);
+
+        if($sortTotalCredit[0] == 'number_credit_needed_to_start_campaign' || $sortTotalCredit[0] == '-number_credit_needed_to_start_campaign')
+        {
+            $models= $this->service->sortTotalCredit($request->get('per_page', '15'), $sortTotalCredit[0]);
+        } else {
+            $models =$this->service->getCollectionWithPagination();
+        }
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+        );
     }
 
     /**
