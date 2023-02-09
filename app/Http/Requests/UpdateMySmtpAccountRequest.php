@@ -28,7 +28,9 @@ class UpdateMySmtpAccountRequest extends AbstractRequest
             'mail_mailer' => ['string'],
             'mail_host' => ['string'],
             'mail_port' => ['string'],
-            'mail_username' => ['string', 'unique:smtp_accounts,mail_username,'.$this->id .',uuid,deleted_at,NULL'],
+            'mail_username' => ['string', Rule::unique('smtp_accounts')->ignore($this->id,'uuid')->where(function ($query) {
+                return $query->where('user_uuid', auth()->user()->getkey())->whereNull('deleted_at');
+            })],
             'mail_password' => ['string'],
             'smtp_mail_encryption_uuid' => ['numeric', 'exists:smtp_account_encryptions,uuid'],
             'mail_from_address' => ['string'],

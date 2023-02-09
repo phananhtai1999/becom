@@ -91,13 +91,16 @@ class SmtpAccountController extends AbstractRestAPIController
 
         $website = $this->websiteService->findOneById($request->get('website_uuid'));
 
-        $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => $website->user_uuid,
-        ]));
+        if ($this->service->checkMailUserNameUnique($request->get('mail_username'), $website->user_uuid)) {
+            $model = $this->service->create(array_merge($request->all(), [
+                'user_uuid' => $website->user_uuid,
+            ]));
 
-        return $this->sendCreatedJsonResponse(
-            $this->service->resourceToData($this->resourceClass, $model)
-        );
+            return $this->sendCreatedJsonResponse(
+                $this->service->resourceToData($this->resourceClass, $model)
+            );
+        }
+        return $this->sendValidationFailedJsonResponse(["errors" => ["mail_username" => "The mail username has already been taken."]]);
     }
 
     /**
@@ -111,10 +114,17 @@ class SmtpAccountController extends AbstractRestAPIController
         $model = $this->service->findOrFailById($id);
 
         if (empty($request->get('website_uuid')) || $model->website_uuid == $request->get('website_uuid')) {
+            if ($request->get('mail_username') && $model->mail_username != $request->get('mail_username')
+                && !$this->service->checkMailUserNameUnique($request->get('mail_username'), $model->user_uuid)) {
+                return $this->sendValidationFailedJsonResponse(["errors" => ["mail_username" => "The mail username has already been taken."]]);
+            }
             $data = $request->except('user_uuid');
         }else {
             if (!$this->service->checkExistsSmtpAccountInTables($id)) {
                 $website = $this->websiteService->findOneById($request->get('website_uuid'));
+                if (!$this->service->checkMailUserNameUnique($request->get('mail_username'), $website->user_uuid)) {
+                    return $this->sendValidationFailedJsonResponse(["errors" => ["mail_username" => "The mail username has already been taken."]]);
+                }
                 $data = array_merge($request->all(), [
                     'user_uuid' => $website->user_uuid,
                 ]);
