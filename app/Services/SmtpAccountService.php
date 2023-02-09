@@ -36,6 +36,24 @@ class SmtpAccountService extends AbstractService
     }
 
     /**
+     * @param $mailUserName
+     * @param $userUuid
+     * @return bool
+     */
+    public function checkMailUserNameUnique($mailUserName, $userUuid)
+    {
+        $smtpAccount = $this->findOneWhere([
+            ['user_uuid', $userUuid],
+            ['mail_username', $mailUserName]
+        ]);
+        if ($smtpAccount) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * @param $smtpAccount
      * @return void
      */

@@ -28,7 +28,9 @@ class MySmtpAccountRequest extends AbstractRequest
             'mail_mailer' => ['required', 'string'],
             'mail_host' => ['required', 'string'],
             'mail_port' => ['required', 'string'],
-            'mail_username' => ['required', 'string', Rule::unique('smtp_accounts')->whereNull('deleted_at')],
+            'mail_username' => ['required', 'string', Rule::unique('smtp_accounts')->where(function ($query) {
+                return $query->where('user_uuid', auth()->user()->getkey())->whereNull('deleted_at');
+            })],
             'mail_password' => ['required', 'string'],
             'smtp_mail_encryption_uuid' => ['required', 'numeric', 'exists:smtp_account_encryptions,uuid'],
             'mail_from_address' => ['required', 'string'],
