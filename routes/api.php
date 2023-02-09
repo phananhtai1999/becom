@@ -220,6 +220,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'campaign.'], function () {
         Route::put('/campaign/{id}', [CampaignController::class, 'edit'])->name('edit');
         Route::delete('/campaign/{id}', [CampaignController::class, 'destroy'])->name('destroy');
         Route::post('/emails/send-campaign', [CampaignController::class, 'sendEmailsByCampaign'])->name('sendEmailsByCampaign');
+        Route::post('/test-send-campaign', [CampaignController::class, 'testSendEmailByCampaign'])->name('testSendEmailByCampaign');
     });
 
     Route::group(['as' => 'my.'], function () {
@@ -229,6 +230,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'campaign.'], function () {
         Route::put('/my/campaign/{id}', [CampaignController::class, 'editMyCampaign'])->name('edit');
         Route::delete('/my/campaign/{id}', [CampaignController::class, 'destroyMyCampaign'])->name('destroy');
         Route::post('/my/emails/send-campaign', [CampaignController::class, 'sendEmailByMyCampaign'])->name('sendEmailByMyCampaign');
+        Route::post('my/test-send-campaign/', [CampaignController::class, 'testSendEmailByMyCampaign'])->name('testSendEmailByCampaign');
     });
 
     //Upsert-campaign-link-tracking
