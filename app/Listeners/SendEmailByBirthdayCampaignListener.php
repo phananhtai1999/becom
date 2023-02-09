@@ -155,8 +155,7 @@ class SendEmailByBirthdayCampaignListener implements ShouldQueue
                 $smtpAccount = $this->smtpAccountService->getRandomSmtpAccountAdmin();
             }
 
-            $this->smtpAccountService->setSmtpAccountForSendEmail($smtpAccount);
-
+            $this->smtpAccountService->setSwiftSmtpAccountForSendEmail($smtpAccount);
             $sendEmailScheduleLog = $this->sendEmailScheduleLogService->create([
                 'campaign_uuid' => $campaign->getKey(),
                 'start_time' => Carbon::now()
@@ -191,7 +190,7 @@ class SendEmailByBirthdayCampaignListener implements ShouldQueue
 
                 $emailTracking = $this->mailTemplateVariableService->injectTrackingImage($mailTemplate, $mailSendingHistory->uuid);
                 try {
-                    Mail::to($contact->email)->send(new SendCampaign($emailTracking));
+                    Mail::to($contact->email)->send(new SendCampaign($emailTracking, $smtpAccount->mail_from_name, $smtpAccount->mail_from_address));
                 } catch (\Exception $e) {
                     $this->mailSuccess = false;
                     $this->creditReturn += $configEmailPrice->value;

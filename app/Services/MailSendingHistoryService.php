@@ -32,7 +32,7 @@ class MailSendingHistoryService extends AbstractService
      * @param $email
      * @return mixed
      */
-    public function getNumberEmailByCampaign($campaignUuid, $email)
+    public function getNumberEmailByCampaign($campaignUuid, $email) // Lấy số lượng email đã gửi theo campaign
     {
         return $this->model->where('campaign_uuid', $campaignUuid)
             ->whereNull('campaign_scenario_uuid')

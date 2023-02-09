@@ -12,14 +12,20 @@ class SendCampaign extends Mailable
 
     public $mailTemplate;
 
+    public $mailFromName;
+
+    public $mailFromAddress;
+
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($mailTemplate)
+    public function __construct($mailTemplate, $mailFromName, $mailFromAddress)
     {
         $this->mailTemplate = $mailTemplate;
+        $this->mailFromName = $mailFromName;
+        $this->mailFromAddress = $mailFromAddress;
     }
 
     /**
@@ -29,7 +35,7 @@ class SendCampaign extends Mailable
      */
     public function build()
     {
-        return $this->subject($this->mailTemplate->subject)
+        return $this->from($this->mailFromAddress, $this->mailFromName)->subject($this->mailTemplate->subject)
             ->view('mail.SendCampaign');
     }
 }
