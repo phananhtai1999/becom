@@ -24,6 +24,7 @@ use App\Http\Resources\CampaignLinkDailyTrackingResource;
 use App\Http\Resources\CampaignLinkTrackingResource;
 use App\Http\Resources\CampaignResource;
 use App\Http\Resources\CampaignTrackingResource;
+use App\Mail\SendCampaign;
 use App\Services\CampaignDailyTrackingService;
 use App\Services\CampaignLinkDailyTrackingService;
 use App\Services\CampaignLinkTrackingService;
@@ -41,6 +42,7 @@ use App\Services\UserService;
 use Carbon\Carbon;
 use App\Services\MyCampaignService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Mail;
 
 class CampaignController extends AbstractRestAPIController
 {
@@ -617,5 +619,61 @@ class CampaignController extends AbstractRestAPIController
                 'other' => $totalActiveAndOtherMyCampaign->other
             ]
         ]);
+    }
+
+    /**
+     * @param SendEmailByCampaignRequest $request
+     * @return JsonResponse
+     */
+    public function testSendEmailByCampaign(SendEmailByCampaignRequest $request)
+    {
+        $campaign = $this->service->getInfoRelationshipCampaignByUuid($request->campaign_uuid);
+        $user = $campaign->user;
+        $config = $this->configService->findConfigByKey('smtp_auto');
+        try {
+            if($user->can_add_smtp_account == 1 || $config->value == 0){
+                if(!empty($campaign->smtpAccount)){
+                    $smtpAccount = $campaign->smtpAccount;
+                }else{
+                    $smtpAccount = $this->smtpAccountService->getRandomSmtpAccountAdmin();
+                }
+            }else{
+                $smtpAccount = $this->smtpAccountService->getRandomSmtpAccountAdmin();
+            }
+            $this->smtpAccountService->setSmtpAccountForSendEmail($smtpAccount);
+            $mailTemplate = $this->mailTemplateVariableService->renderBody($campaign->mailTemplate, $user->email, $smtpAccount, $campaign);
+            Mail::to($user->email)->send(new SendCampaign($mailTemplate, $smtpAccount->mail_from_name, $smtpAccount->mail_from_address));
+            return $this->sendOkJsonResponse(['message' => 'Test send email by campaign successfully']);
+        }catch (\Exception $e){
+            return $this->sendValidationFailedJsonResponse(["smtp_account" => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * @param SendEmailByMyCampaignRequest $request
+     * @return JsonResponse
+     */
+    public function testSendEmailByMyCampaign(SendEmailByMyCampaignRequest $request)
+    {
+        $campaign = $this->service->getInfoRelationshipCampaignByUuid($request->campaign_uuid);
+        $user = $campaign->user;
+        $config = $this->configService->findConfigByKey('smtp_auto');
+        try {
+            if($user->can_add_smtp_account == 1 || $config->value == 0){
+                if(!empty($campaign->smtpAccount)){
+                    $smtpAccount = $campaign->smtpAccount;
+                }else{
+                    $smtpAccount = $this->smtpAccountService->getRandomSmtpAccountAdmin();
+                }
+            }else{
+                $smtpAccount = $this->smtpAccountService->getRandomSmtpAccountAdmin();
+            }
+            $this->smtpAccountService->setSmtpAccountForSendEmail($smtpAccount);
+            $mailTemplate = $this->mailTemplateVariableService->renderBody($campaign->mailTemplate, $user->email, $smtpAccount, $campaign);
+            Mail::to($user->email)->send(new SendCampaign($mailTemplate, $smtpAccount->mail_from_name, $smtpAccount->mail_from_address));
+            return $this->sendOkJsonResponse(['message' => 'Test send email by my campaign successfully']);
+        }catch (\Exception $e){
+            return $this->sendValidationFailedJsonResponse(["smtp_account" => $e->getMessage()]);
+        }
     }
 }
