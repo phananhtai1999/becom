@@ -8,6 +8,9 @@ use App\Models\SmtpAccount;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Swift_SmtpTransport;
+use Swift_Mailer;
+use Illuminate\Support\Facades\Mail;
 
 class SmtpAccountService extends AbstractService
 {
@@ -46,6 +49,19 @@ class SmtpAccountService extends AbstractService
         Config::set('mail.mailers.smtp.encryption', $smtpAccount->smtpAccountEncryption->name);
         Config::set('mail.from.address', $smtpAccount->mail_from_address);
         Config::set('mail.from.name', $smtpAccount->mail_from_name);
+    }
+
+    /**
+     * @param $smtpAccount
+     * @return void
+     */
+    public function setSwiftSmtpAccountForSendEmail($smtpAccount) //Thiết lập đổi smtp account khi gửi email bằng queue
+    {
+        $transport = new Swift_SmtpTransport($smtpAccount->mail_host, $smtpAccount->mail_port, $smtpAccount->smtpAccountEncryption->name);
+        $transport->setUsername($smtpAccount->mail_username);
+        $transport->setPassword($smtpAccount->mail_password);
+        $mailtrap = new Swift_Mailer($transport);
+        Mail::setSwiftMailer($mailtrap);
     }
 
     /**
