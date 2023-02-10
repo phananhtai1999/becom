@@ -54,7 +54,7 @@ class UserService extends AbstractService
     {
         return $this->model->withTrashed()->where([
             'email' => $email
-        ])->first();
+        ])->orderBy('uuid', 'DESC')->first();
     }
 
     /**
