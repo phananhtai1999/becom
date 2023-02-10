@@ -38,5 +38,7 @@ return [
     'to_date_campaign_invalid' => "Chiến dịch đã hết hạn",
     'was_finished_campaign_invalid' => "Chiến dịch đã kết thúc!",
     'was_stopped_by_owner_campaign_invalid' => "Chiến dịch đã dừng bởi chủ sở hữu!",
-    "status_campaign_invalid" => "Trạng thái chiến dịch không hợp lệ!"
+    "status_campaign_invalid" => "Trạng thái chiến dịch không hợp lệ!",
+    "sent_mail_success" => "Thư đã được gửi thành công",
+    "mail_username_already_taken" => "Tên người dùng thư đã được sử dụng."
 ];

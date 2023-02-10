@@ -100,7 +100,7 @@ class SmtpAccountController extends AbstractRestAPIController
                 $this->service->resourceToData($this->resourceClass, $model)
             );
         }
-        return $this->sendValidationFailedJsonResponse(["errors" => ["mail_username" => "The mail username has already been taken."]]);
+        return $this->sendValidationFailedJsonResponse(["errors" => ["mail_username" => __('messages.mail_username_already_taken')]]);
     }
 
     /**
@@ -116,14 +116,14 @@ class SmtpAccountController extends AbstractRestAPIController
         if (empty($request->get('website_uuid')) || $model->website_uuid == $request->get('website_uuid')) {
             if ($request->get('mail_username') && $model->mail_username != $request->get('mail_username')
                 && !$this->service->checkMailUserNameUnique($request->get('mail_username'), $model->user_uuid)) {
-                return $this->sendValidationFailedJsonResponse(["errors" => ["mail_username" => "The mail username has already been taken."]]);
+                return $this->sendValidationFailedJsonResponse(["errors" => ["mail_username" => __('messages.mail_username_already_taken')]]);
             }
             $data = $request->except('user_uuid');
         }else {
             if (!$this->service->checkExistsSmtpAccountInTables($id)) {
                 $website = $this->websiteService->findOneById($request->get('website_uuid'));
                 if (!$this->service->checkMailUserNameUnique($request->get('mail_username'), $website->user_uuid)) {
-                    return $this->sendValidationFailedJsonResponse(["errors" => ["mail_username" => "The mail username has already been taken."]]);
+                    return $this->sendValidationFailedJsonResponse(["errors" => ["mail_username" => __('messages.mail_username_already_taken')]]);
                 }
                 $data = array_merge($request->all(), [
                     'user_uuid' => $website->user_uuid,
@@ -266,16 +266,13 @@ class SmtpAccountController extends AbstractRestAPIController
         try {
             $subject = $request->get('subject');
             $body = $request->get('body');
-            $toEmails = $request->get('to_emails');
 
             $smtpAccount = $this->service->findOneById($request->get('smtp_account_uuid'));
             $this->service->setSmtpAccountForSendEmail($smtpAccount);
 
-            foreach ($toEmails as $emails) {
-                Mail::to($emails)->send(new SendEmails($subject, $body));
-            }
+            Mail::to(auth()->user()->email)->send(new SendEmails($subject, $body));
 
-            return response()->json(['message' => 'Mail Sent Successfully'], 200);
+            return $this->sendOkJsonResponse(['message' => __('messages.sent_mail_success')]);
         }catch (\Exception $e){
             return $this->sendValidationFailedJsonResponse(["smtp_account" => $e->getMessage()]);
         }
@@ -294,16 +291,13 @@ class SmtpAccountController extends AbstractRestAPIController
 
             $subject = $mailTemplate->subject;
             $body = $mailTemplate->body;
-            $toEmails = $request->get('to_emails');
 
             $smtpAccount = $this->service->findOneById($request->get('smtp_account_uuid'));
             $this->service->setSmtpAccountForSendEmail($smtpAccount);
 
-            foreach ($toEmails as $emails) {
-                Mail::to($emails)->send(new SendEmails($subject, $body));
-            }
+            Mail::to(auth()->user()->email)->send(new SendEmails($subject, $body));
 
-            return response()->json(['message' => 'Mail Sent Successfully'], 200);
+            return $this->sendOkJsonResponse(['message' => __('messages.sent_mail_success')]);
         }catch (\Exception $e){
             return $this->sendValidationFailedJsonResponse(["smtp_account" => $e->getMessage()]);
         }

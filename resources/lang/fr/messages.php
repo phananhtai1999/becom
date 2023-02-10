@@ -38,5 +38,7 @@ return [
     'to_date_campaign_invalid' => "La campagne a expiré!",
     'was_finished_campaign_invalid' => "La campagne est terminée!",
     'was_stopped_by_owner_campaign_invalid' => "La campagne a été arrêtée par le propriétaire!",
-    "status_campaign_invalid" => "L'état de la campagne n'est pas valide!"
+    "status_campaign_invalid" => "L'état de la campagne n'est pas valide!",
+    "sent_mail_success" => "Courrier envoyé avec succès",
+    "mail_username_already_taken" => "Le nom d'utilisateur de messagerie a déjà été pris"
 ];

@@ -41,5 +41,7 @@ return [
     'was_stopped_by_owner_campaign_invalid' => "Campaign was stopped by owner!",
     "status_campaign_invalid" => "Campaign status is invalid!",
     "data_not_deleted" => "This data cannot be deleted",
-    "website_uuid_not_changed" => "Website uuid cannot be changed"
+    "website_uuid_not_changed" => "Website uuid cannot be changed",
+    "sent_mail_success" => "Mail Sent Successfully",
+    "mail_username_already_taken" => "The mail username has already been taken."
 ];
