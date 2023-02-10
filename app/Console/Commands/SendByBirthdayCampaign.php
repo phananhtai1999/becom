@@ -2,11 +2,11 @@
 
 namespace App\Console\Commands;
 
-use App\Events\SendEmailByBirthdayCampaignEvent;
+use App\Events\SendByBirthdayCampaignEvent;
 use App\Services\CampaignService;
 use Illuminate\Console\Command;
 
-class SendEmailByBirthdayCampaign extends Command
+class SendByBirthdayCampaign extends Command
 {
     /**
      * The name and signature of the console command.
@@ -50,10 +50,10 @@ class SendEmailByBirthdayCampaign extends Command
         $listBirthdayCampaign = $this->service->getListActiveBirthdayCampaign();
         $listBirthdayCampaignBySendType = $listBirthdayCampaign->groupBy('send_type');
         if ($listBirthdayCampaignBySendType->has('email')) {
-            SendEmailByBirthdayCampaignEvent::dispatch($listBirthdayCampaignBySendType['email']);
+            SendByBirthdayCampaignEvent::dispatch($listBirthdayCampaignBySendType['email']);
         }
         if ($listBirthdayCampaignBySendType->has('sms')) {
-            //TO DO SMS
+            SendByBirthdayCampaignEvent::dispatch($listBirthdayCampaignBySendType['sms']);
         }
     }
 }

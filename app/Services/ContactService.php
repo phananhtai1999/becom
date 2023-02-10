@@ -60,19 +60,48 @@ class ContactService extends AbstractService
 
     /**
      * @param $campaignUuid
+     * @return mixed
+     */
+    public function getContactsSendSms($campaignUuid)
+    {
+        $contactsCampaign = $this->model->select('contacts.*')
+            ->join('contact_contact_list', 'contact_contact_list.contact_uuid', '=', 'contacts.uuid')
+            ->join('contact_lists', 'contact_lists.uuid', '=', 'contact_contact_list.contact_list_uuid')
+            ->join('campaign_contact_list', 'campaign_contact_list.contact_list_uuid', '=', 'contact_lists.uuid')
+            ->join('campaigns', 'campaigns.uuid', '=', 'campaign_contact_list.campaign_uuid')
+            ->where('campaigns.uuid', $campaignUuid)->get()->unique('phone');
+
+        return $contactsCampaign;
+    }
+
+    /**
+     * @param $campaignUuid
      * @return array
      */
     public function getBirthdayContactsSendEmail($campaignUuid)
     {
-        $birthdayContacts = $this->model->select('contacts.*')
+        return $this->model->select('contacts.*')
             ->join('contact_contact_list', 'contact_contact_list.contact_uuid', '=', 'contacts.uuid')
             ->join('contact_lists', 'contact_lists.uuid', '=', 'contact_contact_list.contact_list_uuid')
             ->join('campaign_contact_list', 'campaign_contact_list.contact_list_uuid', '=', 'contact_lists.uuid')
             ->join('campaigns', 'campaigns.uuid', '=', 'campaign_contact_list.campaign_uuid')
             ->where('campaigns.uuid', $campaignUuid)
             ->whereDate('contacts.dob', Carbon::now())->get()->unique('email');
+    }
 
-        return $birthdayContacts;
+    /**
+     * @param $campaignUuid
+     * @return mixed
+     */
+    public function getBirthdayContactsSendSms($campaignUuid)
+    {
+        return $this->model->select('contacts.*')
+            ->join('contact_contact_list', 'contact_contact_list.contact_uuid', '=', 'contacts.uuid')
+            ->join('contact_lists', 'contact_lists.uuid', '=', 'contact_contact_list.contact_list_uuid')
+            ->join('campaign_contact_list', 'campaign_contact_list.contact_list_uuid', '=', 'contact_lists.uuid')
+            ->join('campaigns', 'campaigns.uuid', '=', 'campaign_contact_list.campaign_uuid')
+            ->where('campaigns.uuid', $campaignUuid)
+            ->whereDate('contacts.dob', Carbon::now())->get()->unique('phone');
     }
 
     /**
@@ -91,6 +120,42 @@ class ContactService extends AbstractService
                 ['campaigns.uuid', $campaignUuid],
                 ['contacts.email', $email]
             ])->first();
+    }
+
+    /**
+     * @param $campaignUuid
+     * @param $email
+     * @return mixed
+     */
+    public function getContactByCampaignTypeEmail($campaignUuid, $email)
+    {
+        return $this->model->select('contacts.*')
+            ->join('contact_contact_list', 'contact_contact_list.contact_uuid', '=', 'contacts.uuid')
+            ->join('contact_lists', 'contact_lists.uuid', '=', 'contact_contact_list.contact_list_uuid')
+            ->join('campaign_contact_list', 'campaign_contact_list.contact_list_uuid', '=', 'contact_lists.uuid')
+            ->join('campaigns', 'campaigns.uuid', '=', 'campaign_contact_list.campaign_uuid')
+            ->where([
+                ['campaigns.uuid', $campaignUuid],
+                ['contacts.email', $email]
+            ])->get()->unique('email');
+    }
+
+    /**
+     * @param $campaignUuid
+     * @param $email
+     * @return mixed
+     */
+    public function getContactByCampaignTypeSms($campaignUuid, $email)
+    {
+        return $this->model->select('contacts.*')
+            ->join('contact_contact_list', 'contact_contact_list.contact_uuid', '=', 'contacts.uuid')
+            ->join('contact_lists', 'contact_lists.uuid', '=', 'contact_contact_list.contact_list_uuid')
+            ->join('campaign_contact_list', 'campaign_contact_list.contact_list_uuid', '=', 'contact_lists.uuid')
+            ->join('campaigns', 'campaigns.uuid', '=', 'campaign_contact_list.campaign_uuid')
+            ->where([
+                ['campaigns.uuid', $campaignUuid],
+                ['contacts.phone', $email]
+            ])->get()->unique('phone');
     }
 
     /**
@@ -128,6 +193,9 @@ class ContactService extends AbstractService
             ->where([
                 ['campaigns.uuid', $campaignUuid],
                 ['contacts.email', $email]
+            ])->orWhere([
+                ['campaigns.uuid', $campaignUuid],
+                ['contacts.phone', $email]
             ])->get();
 
         foreach ($contactsOpenMail as $contactOpenMail) {
@@ -504,6 +572,20 @@ class ContactService extends AbstractService
 
     /**
      * @param $campaignUuid
+     * @return mixed
+     */
+    public function getListsContactsSendSmsByCampaigns($campaignUuid)
+    {
+        return $this->model->select('contacts.*')
+            ->join('contact_contact_list', 'contact_contact_list.contact_uuid', '=', 'contacts.uuid')
+            ->join('contact_lists', 'contact_lists.uuid', '=', 'contact_contact_list.contact_list_uuid')
+            ->join('campaign_contact_list', 'campaign_contact_list.contact_list_uuid', '=', 'contact_lists.uuid')
+            ->join('campaigns', 'campaigns.uuid', '=', 'campaign_contact_list.campaign_uuid')
+            ->where('campaigns.uuid', $campaignUuid)->get()->unique('phone')->count();
+    }
+
+    /**
+     * @param $campaignUuid
      * @param $fromDate
      * @param $toDate
      * @return mixed
@@ -518,6 +600,24 @@ class ContactService extends AbstractService
             ->whereDate('contacts.dob', '>=', $fromDate)
             ->whereDate('contacts.dob', '<=', $toDate)
             ->where('campaigns.uuid', $campaignUuid)->get()->unique('email')->count();
+    }
+
+    /**
+     * @param $campaignUuid
+     * @param $fromDate
+     * @param $toDate
+     * @return mixed
+     */
+    public function getBirthdayContactsSendSmsByCampaigns($campaignUuid, $fromDate, $toDate)
+    {
+        return $this->model->select('contacts.*')
+            ->join('contact_contact_list', 'contact_contact_list.contact_uuid', '=', 'contacts.uuid')
+            ->join('contact_lists', 'contact_lists.uuid', '=', 'contact_contact_list.contact_list_uuid')
+            ->join('campaign_contact_list', 'campaign_contact_list.contact_list_uuid', '=', 'contact_lists.uuid')
+            ->join('campaigns', 'campaigns.uuid', '=', 'campaign_contact_list.campaign_uuid')
+            ->whereDate('contacts.dob', '>=', $fromDate)
+            ->whereDate('contacts.dob', '<=', $toDate)
+            ->where('campaigns.uuid', $campaignUuid)->get()->unique('phone')->count();
     }
 
     /**

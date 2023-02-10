@@ -45,6 +45,7 @@ class MailSendingHistoryService extends AbstractService
     /**
      * @param $campaignUuid
      * @param $email
+     * @param $campaignScenarioUuid
      * @return mixed
      */
     public function getNumberEmailByCampaignScenario($campaignUuid, $email, $campaignScenarioUuid)
@@ -219,7 +220,8 @@ class MailSendingHistoryService extends AbstractService
                         ->whereNotNull('m.campaign_scenario_uuid')
                         ->where('m.status', "sent")
                         ->whereRaw("m.email = mail_sending_history.email");
-             })->get();
+             })
+             ->get();
         /*
          * select `mail_sending_history`.*
         from `mail_sending_history` inner join `campaign_scenario` on `campaign_scenario`.`parent_uuid` = `mail_sending_history`.`campaign_scenario_uuid`

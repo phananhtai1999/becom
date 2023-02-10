@@ -342,16 +342,18 @@ class CampaignService extends AbstractService
      */
     public function numberOfCreditsToStartTheCampaign($uuid, $fromDate, $toDate, $sendType, $type)
     {
-        if ($sendType == 'email') {
+        if ($sendType == 'email' && $type == 'birthday') {
             $config = app(ConfigService::class)->findConfigByKey('email_price')->value;
-        } elseif ($sendType == 'sms') {
-            $config = app(ConfigService::class)->findConfigByKey('sms_price')->value;
-        }
-
-        if ($type == 'birthday') {
             $numberCreditNeededToSendCampaign = (app(ContactService::class)->getBirthdayContactsSendEmailsByCampaigns($uuid, $fromDate, $toDate)) * $config;
-        } else {
+        } elseif ($sendType == 'sms' && $type == 'birthday') {
+            $config = app(ConfigService::class)->findConfigByKey('sms_price')->value;
+            $numberCreditNeededToSendCampaign = (app(ContactService::class)->getBirthdayContactsSendSmsByCampaigns($uuid, $fromDate, $toDate)) * $config;
+        } elseif ($sendType == 'email' && $type != 'birthday') {
+            $config = app(ConfigService::class)->findConfigByKey('email_price')->value;
             $numberCreditNeededToSendCampaign = (app(ContactService::class)->getListsContactsSendEmailsByCampaigns($uuid)) * $config;
+        } elseif ($sendType == 'sms' && $type != 'birthday') {
+            $config = app(ConfigService::class)->findConfigByKey('sms_price')->value;
+            $numberCreditNeededToSendCampaign = (app(ContactService::class)->getListsContactsSendSmsByCampaigns($uuid)) * $config;
         }
 
         return $numberCreditNeededToSendCampaign;

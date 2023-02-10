@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
-use App\Events\SendEmailByCampaginRootScenarioEvent;
-use App\Events\SendEmailByCampaignEvent;
+use App\Events\SendByCampaginRootScenarioEvent;
+use App\Events\SendByCampaignEvent;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Requests\CampaignLinkTrackingRequest;
 use App\Http\Requests\CampaignRequest;
@@ -184,11 +184,10 @@ class CampaignController extends AbstractRestAPIController
     {
         $sortTotalCredit = explode(',', $request->sort);
 
-        if($sortTotalCredit[0] == 'number_credit_needed_to_start_campaign' || $sortTotalCredit[0] == '-number_credit_needed_to_start_campaign')
-        {
-            $models= $this->service->sortTotalCredit($request->get('per_page', '15'), $sortTotalCredit[0]);
+        if ($sortTotalCredit[0] == 'number_credit_needed_to_start_campaign' || $sortTotalCredit[0] == '-number_credit_needed_to_start_campaign') {
+            $models = $this->service->sortTotalCredit($request->get('per_page', '15'), $sortTotalCredit[0]);
         } else {
-            $models =$this->service->getCollectionWithPagination();
+            $models = $this->service->getCollectionWithPagination();
         }
 
         return $this->sendOkJsonResponse(
@@ -373,8 +372,8 @@ class CampaignController extends AbstractRestAPIController
             return $this->sendValidationFailedJsonResponse(["errors" => ['send_type' => "Please enter the same 'type' as the mail template."]]);
         }
 
-        if (array_key_exists('smtp_account_uuid', $request->all()) && (($request->get('send_type') ?? $model->send_type ) === "email")) {
-            if (($user->can_add_smtp_account == 1 || $config->value == 0)){
+        if (array_key_exists('smtp_account_uuid', $request->all()) && (($request->get('send_type') ?? $model->send_type) === "email")) {
+            if (($user->can_add_smtp_account == 1 || $config->value == 0)) {
                 if (empty($request->get('smtp_account_uuid'))) {
                     return $this->sendValidationFailedJsonResponse(["errors" => ['smtp_account_uuid' => __('messages.smtp_account_invalid')]]);
                 }
@@ -493,7 +492,7 @@ class CampaignController extends AbstractRestAPIController
 
     /**
      * @param SendEmailByCampaignRequest $request
-     * @return void|JsonResponse
+     * @return JsonResponse
      */
     public function sendEmailsByCampaign(SendEmailByCampaignRequest $request)
     {
@@ -511,20 +510,15 @@ class CampaignController extends AbstractRestAPIController
             return $value->parent_uuid === null;
         });
         if ($this->sendEmailScheduleLogService->checkActiveCampaignbyCampaignUuid($request->get('campaign_uuid'))) {
-            $creditNumberSendEmail = $campaign->number_credit_needed_to_start_campaign * ($campaignRootScenario->count() > 0 ? $campaignRootScenario->count() : 1 );
-            if ($this->userService->checkCreditToSendEmail($creditNumberSendEmail, $campaign->user_uuid)) {
-                if ($campaign->send_type === "email") {
-                    if ($campaignRootScenario->count()) {
-                        SendEmailByCampaginRootScenarioEvent::dispatch($campaign, $creditNumberSendEmail, $campaignRootScenario);
-                    }else{
-                        SendEmailByCampaignEvent::dispatch($campaign, $creditNumberSendEmail);
-                    }
-                }else{
-                    // TO DO SMS
+            $creditNumberSendEmail = $campaign->number_credit_needed_to_start_campaign * ($campaignRootScenario->count() > 0 ? $campaignRootScenario->count() : 1);
+            if ($this->userService->checkCredit($creditNumberSendEmail, $campaign->user_uuid)) {
+                if ($campaignRootScenario->count()) {
+                    SendByCampaginRootScenarioEvent::dispatch($campaign, $creditNumberSendEmail, $campaignRootScenario);
+                } else {
+                    SendByCampaignEvent::dispatch($campaign, $creditNumberSendEmail);
                 }
-
-                return $this->sendOkJsonResponse(["message" => __('messages.send_campaign_success')]);
             }
+            return $this->sendOkJsonResponse(["message" => __('messages.send_campaign_success')]);
         }
 
         return $this->sendValidationFailedJsonResponse(["errors" => ['campaign_is_running' => __('messages.is_running_campaign_invalid')]]);
@@ -550,15 +544,15 @@ class CampaignController extends AbstractRestAPIController
             return $value->parent_uuid === null;
         });
         if ($this->sendEmailScheduleLogService->checkActiveCampaignbyCampaignUuid($request->get('campaign_uuid'))) {
-            $creditNumberSendEmail = $campaign->number_credit_needed_to_start_campaign * ($campaignRootScenario->count() > 0 ? $campaignRootScenario->count() : 1 );
-            if ($this->userService->checkCreditToSendEmail($creditNumberSendEmail, $campaign->user_uuid)) {
+            $creditNumberSendEmail = $campaign->number_credit_needed_to_start_campaign * ($campaignRootScenario->count() > 0 ? $campaignRootScenario->count() : 1);
+            if ($this->userService->checkCredit($creditNumberSendEmail, $campaign->user_uuid)) {
                 if ($campaign->send_type === "email") {
                     if ($campaignRootScenario->count()) {
-                        SendEmailByCampaginRootScenarioEvent::dispatch($campaign, $creditNumberSendEmail, $campaignRootScenario);
-                    }else{
-                        SendEmailByCampaignEvent::dispatch($campaign, $creditNumberSendEmail);
+                        SendByCampaginRootScenarioEvent::dispatch($campaign, $creditNumberSendEmail, $campaignRootScenario);
+                    } else {
+                        SendByCampaignEvent::dispatch($campaign, $creditNumberSendEmail);
                     }
-                }else {
+                } else {
                     //TO DO SMS
                 }
 

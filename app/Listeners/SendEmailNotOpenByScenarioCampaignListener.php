@@ -138,7 +138,7 @@ class SendEmailNotOpenByScenarioCampaignListener implements ShouldQueue
 
             $creditNumberSendEmail = count($contacts) * $configEmailPrice->value;
 
-            if (!$this->userService->checkCreditToSendEmail($creditNumberSendEmail, $campaign->user_uuid)){
+            if (!$this->userService->checkCredit($creditNumberSendEmail, $campaign->user_uuid)){
                 $this->campaignService->update($campaign, [
                     'was_stopped_by_owner' => true
                 ]);

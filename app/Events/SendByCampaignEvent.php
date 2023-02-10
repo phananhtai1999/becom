@@ -3,18 +3,12 @@
 namespace App\Events;
 
 use App\Models\Campaign;
-use App\Models\CampaignScenario;
-use App\Models\Email;
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use phpDocumentor\Reflection\Types\Boolean;
 
-class SendEmailByCampaignEvent
+class SendByCampaignEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -26,18 +20,16 @@ class SendEmailByCampaignEvent
     /**
      * @var int
      */
-    public $creditNumberSendEmail;
+    public $creditNumberSendByCampaign;
 
     /**
-     * Create a new event instance.
-     *
      * @param $campaign
-     * @param $creditNumberSendEmail
+     * @param $creditNumberSendByCampaign
      */
-    public function __construct($campaign, $creditNumberSendEmail)
+    public function __construct($campaign, $creditNumberSendByCampaign)
     {
         $this->campaign = $campaign;
-        $this->creditNumberSendEmail = $creditNumberSendEmail;
+        $this->creditNumberSendByCampaign = $creditNumberSendByCampaign;
     }
 
     /**

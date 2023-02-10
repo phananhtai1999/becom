@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Abstracts\AbstractService;
-use App\Events\SendEmailByCampaignEvent;
+use App\Events\SendByCampaignEvent;
 use Carbon\Carbon;
 
 class SendEmailByCampaignService extends AbstractService
@@ -27,7 +27,7 @@ class SendEmailByCampaignService extends AbstractService
 
                 $quantityEmailWasSentPerUser = 0;
 
-                SendEmailByCampaignEvent::dispatch($activeCampaign, $emailsCampaign, $quantityEmailWasSentPerUser, $sendEmailScheduleLog);
+                SendByCampaignEvent::dispatch($activeCampaign, $emailsCampaign, $quantityEmailWasSentPerUser, $sendEmailScheduleLog);
 
 
             } else {
@@ -36,7 +36,7 @@ class SendEmailByCampaignService extends AbstractService
                 $quantityEmailWasSentPerUser = app(MailSendingHistoryService::class)->getNumberEmailSentPerUserByCampaignUuid($activeCampaign->uuid)
                     ->quantity_email_per_user;
 
-                SendEmailByCampaignEvent::dispatch($activeCampaign, $emails, $quantityEmailWasSentPerUser, $sendEmailScheduleLog);
+                SendByCampaignEvent::dispatch($activeCampaign, $emails, $quantityEmailWasSentPerUser, $sendEmailScheduleLog);
 
             }
         }catch (\Exception $e){
