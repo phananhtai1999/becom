@@ -629,7 +629,7 @@ class CampaignController extends AbstractRestAPIController
     public function testSendEmailByCampaign(SendEmailByCampaignRequest $request)
     {
         $campaign = $this->service->getInfoRelationshipCampaignByUuid($request->campaign_uuid);
-        $user = $campaign->user;
+        $user = auth()->user();
         $config = $this->configService->findConfigByKey('smtp_auto');
         try {
             if($user->can_add_smtp_account == 1 || $config->value == 0){
@@ -657,7 +657,7 @@ class CampaignController extends AbstractRestAPIController
     public function testSendEmailByMyCampaign(SendEmailByMyCampaignRequest $request)
     {
         $campaign = $this->service->getInfoRelationshipCampaignByUuid($request->campaign_uuid);
-        $user = $campaign->user;
+        $user = auth()->user();
         $config = $this->configService->findConfigByKey('smtp_auto');
         try {
             if($user->can_add_smtp_account == 1 || $config->value == 0){
