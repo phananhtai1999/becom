@@ -13,7 +13,7 @@
                     <tbody>
                     <tr>
                         <td>
-                            <a href="{{ Request::server('HTTP_ORIGIN') . '/auth/password-recovery?token=' . $passwordReset->token }}"
+                            <a href="{{ route('auth.recovery-password'). '?token='.$passwordReset->token }}"
                                target="_blank">
                                 {{ __('Recovery Password') }}
                             </a>
