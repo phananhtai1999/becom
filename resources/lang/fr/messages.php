@@ -40,5 +40,14 @@ return [
     'was_stopped_by_owner_campaign_invalid' => "La campagne a été arrêtée par le propriétaire!",
     "status_campaign_invalid" => "L'état de la campagne n'est pas valide!",
     "sent_mail_success" => "Courrier envoyé avec succès",
-    "mail_username_already_taken" => "Le nom d'utilisateur de messagerie a déjà été pris"
+    "mail_username_already_taken" => "Le nom d'utilisateur de messagerie a déjà été pris",
+    "send_type_campaign_error" => "Veuillez saisir le même « type » que le modèle de courrier.",
+    "test_send_campaign_success" => "Testez l'envoi d'e-mails par campagne avec succès",
+    "contact_list_uuid_invalid" => "L'uuid de la liste de contacts sélectionnée n'est pas valide.",
+    "create_scenario_success" => "Créer le succès du scénario de campagne",
+    "source_only_one_null" => "Il n'y a qu'une seule valeur nulle dans la source",
+    "parent_source_not_found" => "La source parente ci-dessus est introuvable.",
+    "id_duplicated" => "Les identifiants sélectionnés ne peuvent pas être dupliqués.",
+    "type_source_error" => 'Chaque source doit avoir au maximum deux types : "ouvert" et "non ouvert".',
+    "edit_scenario_success" => "Modifier le succès du scénario de campagne",
 ];

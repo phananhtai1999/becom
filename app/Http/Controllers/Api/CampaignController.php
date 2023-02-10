@@ -244,7 +244,7 @@ class CampaignController extends AbstractRestAPIController
 
         $model = $this->service->findOrFailById($id);
         if (!empty($request->get('send_type')) && $model->mailTemplate->type != $request->get('send_type')) {
-            return $this->sendValidationFailedJsonResponse(["errors" => ['send_type' => "Please enter the same 'type' as the mail template."]]);
+            return $this->sendValidationFailedJsonResponse(["errors" => ['send_type' => __('messages.send_type_campaign_error')]]);
         }
         $this->service->update($model, $request->all());
 
@@ -284,16 +284,17 @@ class CampaignController extends AbstractRestAPIController
      */
     public function indexMyCampaign(IndexRequest $request)
     {
+        $sortTotalCredit = explode(',', $request->sort);
+
+        if($sortTotalCredit[0] == 'number_credit_needed_to_start_campaign' || $sortTotalCredit[0] == '-number_credit_needed_to_start_campaign')
+        {
+            $models= $this->myService->sortMyTotalCredit($request->get('per_page', '15'), $sortTotalCredit[0]);
+        } else {
+            $models =$this->myService->getCollectionWithPagination();
+        }
+
         return $this->sendOkJsonResponse(
-            $this->service->resourceCollectionToData(
-                $this->resourceCollectionClass,
-                $this->myService->getCollectionWithPagination(
-                    $request->get('per_page', '15'),
-                    $request->get('page', '1'),
-                    $request->get('columns', '*'),
-                    $request->get('page_name', 'page'),
-                )
-            )
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
         );
     }
 
@@ -372,7 +373,7 @@ class CampaignController extends AbstractRestAPIController
         }
 
         if (!empty($request->get('send_type')) && $model->mailTemplate->type != $request->get('send_type')) {
-            return $this->sendValidationFailedJsonResponse(["errors" => ['send_type' => "Please enter the same 'type' as the mail template."]]);
+            return $this->sendValidationFailedJsonResponse(["errors" => ['send_type' => __('messages.send_type_campaign_error')]]);
         }
 
         if (array_key_exists('smtp_account_uuid', $request->all()) && (($request->get('send_type') ?? $model->send_type ) === "email")) {
@@ -643,7 +644,7 @@ class CampaignController extends AbstractRestAPIController
             $this->smtpAccountService->setSmtpAccountForSendEmail($smtpAccount);
             $mailTemplate = $this->mailTemplateVariableService->renderBody($campaign->mailTemplate, $user->email, $smtpAccount, $campaign);
             Mail::to($user->email)->send(new SendCampaign($mailTemplate, $smtpAccount->mail_from_name, $smtpAccount->mail_from_address));
-            return $this->sendOkJsonResponse(['message' => 'Test send email by campaign successfully']);
+            return $this->sendOkJsonResponse(['message' => __('messages.test_send_campaign_success')]);
         }catch (\Exception $e){
             return $this->sendValidationFailedJsonResponse(["smtp_account" => $e->getMessage()]);
         }
@@ -671,7 +672,7 @@ class CampaignController extends AbstractRestAPIController
             $this->smtpAccountService->setSmtpAccountForSendEmail($smtpAccount);
             $mailTemplate = $this->mailTemplateVariableService->renderBody($campaign->mailTemplate, $user->email, $smtpAccount, $campaign);
             Mail::to($user->email)->send(new SendCampaign($mailTemplate, $smtpAccount->mail_from_name, $smtpAccount->mail_from_address));
-            return $this->sendOkJsonResponse(['message' => 'Test send email by my campaign successfully']);
+            return $this->sendOkJsonResponse(['message' => __('messages.test_send_campaign_success')]);
         }catch (\Exception $e){
             return $this->sendValidationFailedJsonResponse(["smtp_account" => $e->getMessage()]);
         }

@@ -40,5 +40,14 @@ return [
     'was_stopped_by_owner_campaign_invalid' => "Chiến dịch đã dừng bởi chủ sở hữu!",
     "status_campaign_invalid" => "Trạng thái chiến dịch không hợp lệ!",
     "sent_mail_success" => "Thư đã được gửi thành công",
-    "mail_username_already_taken" => "Tên người dùng thư đã được sử dụng."
+    "mail_username_already_taken" => "Tên người dùng thư đã được sử dụng.",
+    "send_type_campaign_error" => "Vui lòng nhập giống với loại của mẫu thư.",
+    "test_send_campaign_success" => "Kiểm tra gửi email theo chiến dịch thành công",
+    "contact_list_uuid_invalid" => "Contact list uuid đã chọn không hợp lệ.",
+    "create_scenario_success" => "Tạo kịch bản chiến dịch thành công",
+    "source_only_one_null" => "Chỉ có một giá trị null trong source.",
+    "parent_source_not_found" => "Không thể tìm thấy source cha ở trên",
+    "id_duplicated" => "Các Id đã chọn không thể trùng lặp.",
+    "type_source_error" => "Mỗi nguồn nên có tối đa hai loại: 'open' và 'not_open'.",
+    "edit_scenario_success" => "Chỉnh sửa thành công kịch bản chiến dịch",
 ];
