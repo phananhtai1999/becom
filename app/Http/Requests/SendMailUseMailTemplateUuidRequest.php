@@ -25,9 +25,7 @@ class SendMailUseMailTemplateUuidRequest extends AbstractRequest
     {
         return [
             'smtp_account_uuid' => ['required', 'numeric', 'min:1', 'exists:smtp_accounts,uuid'],
-            'mail_template_uuid' => ['required', 'numeric', 'min:1', 'exists:mail_templates,uuid'],
-            'to_emails' => ['required', 'array'],
-            'to_emails.*' => ['email:rfc,dns'],
+            'mail_template_uuid' => ['required', 'numeric', 'min:1', 'exists:mail_templates,uuid']
         ];
     }
 }

@@ -38,5 +38,7 @@ return [
     'to_date_campaign_invalid' => "活动已过期!",
     'was_finished_campaign_invalid' => "活动已结束!",
     'was_stopped_by_owner_campaign_invalid' => "活动被所有者停止了!",
-    "status_campaign_invalid" => "活动状态无效!"
+    "status_campaign_invalid" => "活动状态无效!",
+    "sent_mail_success" => "邮件发送成功y",
+    "mail_username_already_taken" => "邮件用户名已被占用"
 ];

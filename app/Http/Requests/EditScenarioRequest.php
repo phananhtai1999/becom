@@ -30,7 +30,9 @@ class EditScenarioRequest extends AbstractRequest
             'name' => ['required', "string"],
             'nodes' => ['required', 'array', 'min:1'],
             'nodes.*' => ['required'],
-            'nodes.*.uuid' => ['nullable','required_if:nodes.*.source,null', 'numeric', 'min:1', 'exists:campaign_scenario,uuid'],
+            'nodes.*.uuid' => ['nullable','required_if:nodes.*.source,null', 'numeric', 'min:1', Rule::exists('campaign_scenario', 'uuid')->where(function ($q) {
+                return $q->where('scenario_uuid', $this->id);
+            })],
             'nodes.*.id' => ['required', 'string'],
             'nodes.*.campaign_uuid' => ['required', 'numeric', 'min:1', Rule::exists('campaigns', 'uuid')->where(function ($q) {
                 return $q->where('user_uuid', auth()->user()->getkey())
