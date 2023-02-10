@@ -129,7 +129,7 @@ class ScenarioController extends AbstractRestAPIController
             }
         }
 
-        return $this->sendOkJsonResponse((['message' => "Create campaign scenario success"]));
+        return $this->sendOkJsonResponse((['message' => __('messages.create_scenario_success')]));
     }
 
     /**
@@ -354,7 +354,7 @@ class ScenarioController extends AbstractRestAPIController
             }
         }
 
-        return $this->sendOkJsonResponse((['message' => "Edit campaign scenario success"]));
+        return $this->sendOkJsonResponse((['message' => __('messages.edit_scenario_success')]));
     }
 
 }

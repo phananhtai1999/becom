@@ -25,7 +25,7 @@ class ScenarioService extends AbstractService
 
         if ($countSourceRoot < 1 || $countSourceRoot >= 2) {
             return ['status' => false,
-                     'messages' => ['source_null' => "There is only one null value in the source."]];
+                     'messages' => ['source_null' => __('messages.source_only_one_null')]];
         }
         $sourceTypes = $arrayIds = [];
         foreach ($nodes as $node) {
@@ -34,13 +34,13 @@ class ScenarioService extends AbstractService
             }else{
                 if (!in_array($node['source'], $arrayIds)) {
                     return ['status' => false,
-                        'messages' => ['source_parent' => "The parent source above could not be found."]];
+                        'messages' => ['source_parent' => __('messages.parent_source_not_found')]];
                 }
                 $arrayIds[] = $node['id'];
             }
             if (array_count_values($nodesIds)[$node['id']] >= 2) {
                 return ['status' => false,
-                    'messages' => ['id_duplicated' => "The selected Ids cannot be duplicated."]];
+                    'messages' => ['id_duplicated' => __('messages.id_duplicated')]];
             }
             if (in_array($node['source'], $nodesIds)) {
                 $sourceTypes[$node['source']][] = $node['type'];
@@ -49,7 +49,7 @@ class ScenarioService extends AbstractService
                 $countSourceType = array_count_values($sourceTypes[$node['source']]);
                 if ($countSourceType[$node['type']] >= 2) {
                     return ['status' => false,
-                        'messages' => ['id_duplicated' => "Must be provide 'type' with the different value for 'source'."]];
+                        'messages' => ['type_source' => __('messages.type_source_error')]];
                 }
             }
         }

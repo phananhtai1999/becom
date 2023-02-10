@@ -337,7 +337,7 @@ class ContactController extends AbstractRestAPIController
             ]);
         }
 
-        return $this->sendValidationFailedJsonResponse(["errors" => ['contact_list_uuid' => "The selected contact list uuid is invalid."]]);
+        return $this->sendValidationFailedJsonResponse(["errors" => ['contact_list_uuid' => __('messages.contact_list_uuid_invalid')]]);
     }
 
     /**
@@ -361,7 +361,7 @@ class ContactController extends AbstractRestAPIController
             ]);
         }
 
-        return $this->sendValidationFailedJsonResponse(["errors" => ['contact_list_uuid' => "The selected contact list uuid is invalid."]]);
+        return $this->sendValidationFailedJsonResponse(["errors" => ['contact_list_uuid' => __('messages.contact_list_uuid_invalid')]]);
     }
 
     /**

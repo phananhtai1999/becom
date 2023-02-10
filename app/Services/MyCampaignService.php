@@ -5,7 +5,10 @@ namespace App\Services;
 use App\Abstracts\AbstractService;
 use App\Models\Campaign;
 use App\Models\QueryBuilders\MyCampaignQueryBuilder;
+use App\Models\QueryBuilders\SortTotalCreditOfMyCampaignQueryBuilder;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
 class MyCampaignService extends AbstractService
@@ -255,5 +258,39 @@ class MyCampaignService extends AbstractService
             ->whereDate('updated_at', '>=', $startDate)
             ->whereDate('updated_at', '<=', $endDate)
             ->where('user_uuid', auth()->user()->getKey())->first()->setAppends([]);
+    }
+
+    /**
+     * @param $perPage
+     * @param $sort
+     * @return LengthAwarePaginator
+     */
+    public function sortMyTotalCredit($perPage, $sort)
+    {
+        if ($sort == 'number_credit_needed_to_start_campaign') {
+            $sortTotalCredit = SortTotalCreditOfMyCampaignQueryBuilder::initialQuery()->get()->sortBy('number_credit_needed_to_start_campaign');
+        } elseif ($sort == '-number_credit_needed_to_start_campaign') {
+            $sortTotalCredit = SortTotalCreditOfMyCampaignQueryBuilder::initialQuery()->get()->sortByDesc('number_credit_needed_to_start_campaign');
+        }
+
+        return $this->collectionPagination($sortTotalCredit, $perPage);
+    }
+
+    /**
+     * @param $results
+     * @param $perPage
+     * @param $page
+     * @return LengthAwarePaginator
+     */
+    public function collectionPagination($results, $perPage, $page = null)
+    {
+        $page = $page ?: (LengthAwarePaginator::resolveCurrentPage() ?: 1);
+
+        $results = $results instanceof Collection ? $results : Collection::make($results);
+
+        return new LengthAwarePaginator($results->forPage($page, $perPage)->values(), $results->count(), $perPage, $page, [
+            'path' => LengthAwarePaginator::resolveCurrentPath(),
+            'pageName' => 'page',
+        ]);
     }
 }

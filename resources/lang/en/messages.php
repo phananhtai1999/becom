@@ -43,5 +43,14 @@ return [
     "data_not_deleted" => "This data cannot be deleted",
     "website_uuid_not_changed" => "Website uuid cannot be changed",
     "sent_mail_success" => "Mail Sent Successfully",
-    "mail_username_already_taken" => "The mail username has already been taken."
+    "mail_username_already_taken" => "The mail username has already been taken.",
+    "send_type_campaign_error" => "Please enter the same type of mail template.",
+    "test_send_campaign_success" => "Test send email by campaign successfully",
+    "contact_list_uuid_invalid" => "The selected contact list uuid is invalid.",
+    "create_scenario_success" => "Create campaign scenario success",
+    "source_only_one_null" => "There is only one null value in the source.",
+    "parent_source_not_found" => "The parent source above could not be found.",
+    "id_duplicated" => "The selected Ids cannot be duplicated.",
+    "type_source_error" => "Each source should have a maximum of two types: 'open' and 'not open'.",
+    "edit_scenario_success" => "Edit campaign scenario success",
 ];

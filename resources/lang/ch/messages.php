@@ -40,5 +40,14 @@ return [
     'was_stopped_by_owner_campaign_invalid' => "活动被所有者停止了!",
     "status_campaign_invalid" => "活动状态无效!",
     "sent_mail_success" => "邮件发送成功y",
-    "mail_username_already_taken" => "邮件用户名已被占用"
+    "mail_username_already_taken" => "邮件用户名已被占用",
+    "send_type_campaign_error" => "请输入与邮件模板相同的“类型”",
+    "test_send_campaign_success" => "成功测试按活动发送电子邮件",
+    "contact_list_uuid_invalid" => "所选联系人列表 uuid 无效。",
+    "create_scenario_success" => "创建活动场景成功",
+    "source_only_one_null" => "源中只有一个空值.",
+    "parent_source_not_found" => "找不到上面的父源",
+    "id_duplicated" => "所选 ID 不能重复.",
+    "type_source_error" => '每个来源最多应有两种类型：“开放”和“未开放”。',
+    "edit_scenario_success" => "编辑活动场景成功",
 ];
