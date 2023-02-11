@@ -50,4 +50,5 @@ return [
     "id_duplicated" => "所选 ID 不能重复.",
     "type_source_error" => '每个来源最多应有两种类型：“开放”和“未开放”。',
     "edit_scenario_success" => "编辑活动场景成功",
+    "old_password_invalid" => "选择的旧密码无效.",
 ];

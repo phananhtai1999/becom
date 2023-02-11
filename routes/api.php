@@ -76,6 +76,8 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'user.'], function () {
         Route::put('/user/verify-my-email/{pin}', [UserController::class, 'checkVerificationCode'])->name('checkVerificationCode');
         Route::put('/my/profile', [UserController::class, 'editMyProfile'])->name('editMyProfile');
     });
+
+    Route::post('/user/change-password', [UserController::class, 'changePassword'])->name('changePassword');
 });
 
 Route::get('/user/show-by-username/{username}', [UserController::class, 'showByUserName'])->name('user.showByUserName');

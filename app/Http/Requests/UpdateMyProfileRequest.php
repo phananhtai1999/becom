@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
 
-class UpdateUserRequest extends AbstractRequest
+class UpdateMyProfileRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,16 +24,10 @@ class UpdateUserRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'username' => ['string', 'unique:users,username,'.$this->id.',uuid,deleted_at,NULL'],
-            'email' => ['string', 'email:rfc,dns', 'unique:users,email,'.$this->id.',uuid,deleted_at,NULL'],
-            'password' => ['string', 'confirmed'],
             'first_name' => ['nullable', 'string'],
             'last_name' => ['nullable', 'string'],
             'avatar_img' => ['nullable', 'string'],
             'cover_img' => ['nullable', 'string'],
-            'can_add_smtp_account' => ['nullable', 'boolean'],
-            'roles' => ['array', 'min:1'],
-            'roles.*' => ['numeric', 'min:1', 'exists:roles,uuid'],
         ];
     }
 }

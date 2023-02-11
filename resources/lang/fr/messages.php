@@ -50,4 +50,5 @@ return [
     "id_duplicated" => "Les identifiants sélectionnés ne peuvent pas être dupliqués.",
     "type_source_error" => 'Chaque source doit avoir au maximum deux types : "ouvert" et "non ouvert".',
     "edit_scenario_success" => "Modifier le succès du scénario de campagne",
+    "old_password_invalid" => "L'ancien mot de passe sélectionné n'est pas valide.",
 ];

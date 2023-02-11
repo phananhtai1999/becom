@@ -50,4 +50,5 @@ return [
     "id_duplicated" => "Các Id đã chọn không thể trùng lặp.",
     "type_source_error" => "Mỗi nguồn nên có tối đa hai loại: 'open' và 'not_open'.",
     "edit_scenario_success" => "Chỉnh sửa thành công kịch bản chiến dịch",
+    "old_password_invalid" => "Mật khẩu cũ đã chọn không hợp lệ.",
 ];
