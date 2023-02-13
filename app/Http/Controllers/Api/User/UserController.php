@@ -7,8 +7,10 @@ use App\Events\SendEmailVerifyEmailEvent;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
+use App\Http\Requests\ChangePasswordRequest;
 use App\Http\Requests\ChartRequest;
 use App\Http\Requests\IndexRequest;
+use App\Http\Requests\UpdateMyProfileRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Requests\UserRequest;
 use App\Http\Resources\UserResourceCollection;
@@ -127,35 +129,12 @@ class UserController extends AbstractRestAPIController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function editMyProfile()
+    public function editMyProfile(UpdateMyProfileRequest $request)
     {
-        $request = app($this->editRequest);
-
         $model = $this->service->findOrFailById(auth()->user()->getkey());
 
-        $data = $request->all();
-
-        if ($request->can_add_smtp_account == '0') {
-            $data = array_merge($data, [
-                'can_add_smtp_account' => '0'
-            ]);
-        } elseif (empty($request->can_add_smtp_account)) {
-            $data = array_merge($data, [
-                'can_add_smtp_account' => $model->can_add_smtp_account
-            ]);
-        }
-
-        if ($request->has('password')) {
-            $data = array_merge($data, [
-                'password' => Hash::make($request->get('password'))
-            ]);
-        }
-
-        $this->service->update($model, array_merge($data, [
-            'credit' => $model->credit
-        ]));
-
-        $model->roles()->sync($request->roles ? $request->roles : $model->roles);
+        $data = $request->only(['first_name', 'last_name', 'avatar_img', 'cover_img']);
+        $this->service->update($model, $data);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -230,5 +209,22 @@ class UserController extends AbstractRestAPIController
             'data' => $userChart,
             'total' => $totalBannedAndActive['0']
         ]);
+    }
+
+    /**
+     * @param ChangePasswordRequest $request
+     * @return JsonResponse
+     */
+    public function changePassword(ChangePasswordRequest $request)
+    {
+        $user = auth()->user();
+        if (Hash::check($request->get('old_password'), $user->password)) {
+            $this->service->update($user, [
+                'password' => Hash::make($request->get('new_password'))
+            ]);
+
+            return $this->sendOkJsonResponse(["messages" => __('messages.change_password_success')]);
+        }
+        return $this->sendValidationFailedJsonResponse(["errors" => ["old_password" => __('messages.old_password_invalid')]]);
     }
 }

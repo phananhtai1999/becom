@@ -53,4 +53,5 @@ return [
     "id_duplicated" => "The selected Ids cannot be duplicated.",
     "type_source_error" => "Each source should have a maximum of two types: 'open' and 'not open'.",
     "edit_scenario_success" => "Edit campaign scenario success",
+    "old_password_invalid" => "The selected old password is invalid.",
 ];
