@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateWebsiteRequest extends AbstractRequest
 {
@@ -24,7 +25,10 @@ class UpdateWebsiteRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'domain' => ['string', 'unique:websites,domain,'.$this->id .',uuid,deleted_at,NULL'],
+            'domain' => ['string', Rule::unique('websites')->ignore($this->id, 'uuid')->where(function ($query) {
+                return $query->where('user_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey())
+                    ->whereNull('deleted_at');
+            })],
             'user_uuid' => ['numeric', 'min:1', 'exists:users,uuid'],
             'name' => ['string'],
             'description' => ['string'],
