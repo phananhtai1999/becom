@@ -20,6 +20,7 @@ class UserFactory extends Factory {
 			'email' => $this->faker->unique()->safeEmail(),
 			'email_verified_at' => now(),
 			'password' => Hash::make('111@222'),
+            'can_add_smtp_account' => true,
 
 		];
 	}
