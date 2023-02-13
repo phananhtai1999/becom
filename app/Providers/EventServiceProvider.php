@@ -3,21 +3,21 @@
 namespace App\Providers;
 
 use App\Events\PaymentSuccessfullyEvent;
-use App\Events\SendEmailByBirthdayCampaignEvent;
-use App\Events\SendEmailByCampaginRootScenarioEvent;
-use App\Events\SendEmailByCampaignEvent;
-use App\Events\SendEmailNotOpenByScenarioCampaignEvent;
+use App\Events\SendByBirthdayCampaignEvent;
+use App\Events\SendByCampaginRootScenarioEvent;
+use App\Events\SendByCampaignEvent;
+use App\Events\SendNotOpenByScenarioCampaignEvent;
 use App\Events\SendEmailRecoveryPasswordEvent;
 use App\Events\SendEmailVerifyEmailEvent;
-use App\Events\SendNextEmailByScenarioCampaignEvent;
+use App\Events\SendNextByScenarioCampaignEvent;
 use App\Listeners\PaymentSuccessfullyListener;
-use App\Listeners\SendEmailByBirthdayCampaignListener;
-use App\Listeners\SendEmailByCampaginRootScenarioListener;
-use App\Listeners\SendEmailByCampaignListener;
-use App\Listeners\SendEmailNotOpenByScenarioCampaignListener;
+use App\Listeners\SendByBirthdayCampaignListener;
+use App\Listeners\SendByCampaginRootScenarioListener;
+use App\Listeners\SendByCampaignListener;
+use App\Listeners\SendNotOpenByScenarioCampaignListener;
 use App\Listeners\SendEmailRecoveryPasswordListener;
 use App\Listeners\SendEmailVerifyEmailListener;
-use App\Listeners\SendNextEmailByScenarioCampaignListener;
+use App\Listeners\SendNextByScenarioCampaignListener;
 use App\Models\Config;
 use App\Models\Contact;
 use App\Models\Role;
@@ -53,23 +53,23 @@ class EventServiceProvider extends ServiceProvider
         SendEmailVerifyEmailEvent::class => [
             SendEmailVerifyEmailListener::class
         ],
-        SendEmailByCampaignEvent::class => [
-            SendEmailByCampaignListener::class
+        SendByCampaignEvent::class => [
+            SendByCampaignListener::class
         ],
-        SendEmailByBirthdayCampaignEvent::class => [
-            SendEmailByBirthdayCampaignListener::class
+        SendByBirthdayCampaignEvent::class => [
+            SendByBirthdayCampaignListener::class
         ],
-        SendNextEmailByScenarioCampaignEvent::class => [
-            SendNextEmailByScenarioCampaignListener::class
+        SendNextByScenarioCampaignEvent::class => [
+            SendNextByScenarioCampaignListener::class
         ],
-        SendEmailNotOpenByScenarioCampaignEvent::class => [
-            SendEmailNotOpenByScenarioCampaignListener::class
+        SendNotOpenByScenarioCampaignEvent::class => [
+            SendNotOpenByScenarioCampaignListener::class
         ],
         PaymentSuccessfullyEvent::class => [
             PaymentSuccessfullyListener::class
         ],
-        SendEmailByCampaginRootScenarioEvent::class => [
-            SendEmailByCampaginRootScenarioListener::class
+        SendByCampaginRootScenarioEvent::class => [
+            SendByCampaginRootScenarioListener::class
         ],
     ];
 

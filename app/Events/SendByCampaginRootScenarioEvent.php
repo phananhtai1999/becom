@@ -4,7 +4,6 @@ namespace App\Events;
 
 use App\Models\Campaign;
 use App\Models\CampaignScenario;
-use App\Models\Contact;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -13,19 +12,9 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class SendNextEmailByScenarioCampaignEvent
+class SendByCampaginRootScenarioEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
-
-    /**
-     * @var CampaignScenario
-     */
-    public $campaignScenario;
-
-    /**
-     * @var Contact
-     */
-    public $contact;
 
     /**
      * @var Campaign
@@ -33,15 +22,25 @@ class SendNextEmailByScenarioCampaignEvent
     public $campaign;
 
     /**
-     * @param $campaign
-     * @param $contact
-     * @param $campaignScenario
+     * @var int
      */
-    public function __construct($campaign, $contact, $campaignScenario)
+    public $creditNumberSendEmail;
+
+    /**
+     * @var CampaignScenario
+     */
+    public $campaignRootScenario;
+
+    /**
+     * @param $campaign
+     * @param $creditNumberSendEmail
+     * @param $campaignRootScenario
+     */
+    public function __construct($campaign, $creditNumberSendEmail, $campaignRootScenario)
     {
-        $this->campaignScenario = $campaignScenario;
-        $this->contact = $contact;
         $this->campaign = $campaign;
+        $this->creditNumberSendEmail = $creditNumberSendEmail;
+        $this->campaignRootScenario = $campaignRootScenario;
     }
 
     /**
@@ -51,6 +50,6 @@ class SendNextEmailByScenarioCampaignEvent
      */
     public function broadcastOn()
     {
-        return [];
+        return new PrivateChannel('channel-name');
     }
 }

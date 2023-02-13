@@ -3,8 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
-use App\Events\SendEmailNotOpenByScenarioCampaignEvent;
-use App\Events\SendNextEmailByScenarioCampaignEvent;
+use App\Events\SendNextByScenarioCampaignEvent;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
@@ -133,23 +132,24 @@ class MailSendingHistoryController extends AbstractRestAPIController
         if ($statusMailSendingHistory !== "opened") {
             $this->service->update($mailSendingHistory, ['status' => 'opened']);
         }
-        //Add 1 point when open mail
+
         if ($mailSendingHistory->campaign_scenario_uuid) {
-            $campaignScenario = $this->campaignScenarioService->findOneById($mailSendingHistory->campaign_scenario_uuid);
-            $this->contactService->addPointContactOpenMailCampaign($campaignScenario->getRoot()->campaign_uuid, $mailSendingHistory->email);
+            $campaignScenario = $this->campaignScenarioService->findOneById($mailSendingHistory->campaign_scenario_uuid);        //Add 1 point when open mail
+            //Add 1 point when open mail or phone
+            $this->contactService->addPointContactOpenByCampaign($campaignScenario->getRoot()->campaign_uuid, $mailSendingHistory->email);
             if ($statusMailSendingHistory !== "opened") {
                 if (($nextCampaignScenario = $this->campaignScenarioService->getCampaignWhenOpenEmailByUuid($mailSendingHistory->campaign_scenario_uuid, $mailSendingHistory->created_at))
                     && ($nextCampaign = $this->campaignService->checkActiveCampaignScenario($nextCampaignScenario->campaign_uuid))) {
-                    $contactOpenMail = $this->contactService->getContactByCampaign($nextCampaignScenario->getRoot()->campaign_uuid, $mailSendingHistory->email);
                     if ($nextCampaign->send_type === "email") {
-                        SendNextEmailByScenarioCampaignEvent::dispatch($nextCampaign, $contactOpenMail, $nextCampaignScenario);
-                    } else {
-                        // To DO SMS
+                        $contactOpenMail = $this->contactService->getContactByCampaignTypeEmail($nextCampaignScenario->getRoot()->campaign_uuid, $mailSendingHistory->email);
+                    } elseif ($nextCampaign->send_type === "sms") {
+                        $contactOpenMail = $this->contactService->getContactByCampaignTypeSms($nextCampaignScenario->getRoot()->campaign_uuid, $mailSendingHistory->email);
                     }
+                    SendNextByScenarioCampaignEvent::dispatch($nextCampaign, $contactOpenMail, $nextCampaignScenario);
                 }
             }
         } else {
-            $this->contactService->addPointContactOpenMailCampaign($mailSendingHistory->campaign_uuid, $mailSendingHistory->email);
+            $this->contactService->addPointContactOpenByCampaign($mailSendingHistory->campaign_uuid, $mailSendingHistory->email);
         }
 
         return response(file_get_contents(public_path('tracking_pixel/pixel.gif')))

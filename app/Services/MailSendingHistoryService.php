@@ -45,6 +45,7 @@ class MailSendingHistoryService extends AbstractService
     /**
      * @param $campaignUuid
      * @param $email
+     * @param $campaignScenarioUuid
      * @return mixed
      */
     public function getNumberEmailByCampaignScenario($campaignUuid, $email, $campaignScenarioUuid)
@@ -94,36 +95,36 @@ class MailSendingHistoryService extends AbstractService
         $times = [];
         $result = [];
 
-        if($groupBy === "hour"){
+        if ($groupBy === "hour") {
             $emailsChart = $this->createQueryGetEmailChart("%Y-%m-%d %H:00:00", $startDate, $endDate);
             $endDate = Carbon::parse($endDate)->endOfDay();
 
-            while($startDate <= $endDate){
+            while ($startDate <= $endDate) {
                 $times[] = $startDate->format('Y-m-d H:00:00');
                 $startDate = $startDate->addHour();
             }
         }
-        if($groupBy === "date"){
+        if ($groupBy === "date") {
             $emailsChart = $this->createQueryGetEmailChart("%Y-%m-%d", $startDate, $endDate);
             $endDate = Carbon::parse($endDate);
 
-            while($startDate <= $endDate){
+            while ($startDate <= $endDate) {
                 $times[] = $startDate->format('Y-m-d');
                 $startDate = $startDate->addDay();
             }
         }
-        if($groupBy === "month"){
+        if ($groupBy === "month") {
             $emailsChart = $this->createQueryGetEmailChart("%Y-%m", $startDate, $endDate);
             $endDate = Carbon::parse($endDate);
 
-            while($startDate <= $endDate){
+            while ($startDate <= $endDate) {
                 $times[] = $startDate->format('Y-m');
                 $startDate = $startDate->addMonth();
             }
         }
 
-        foreach ($times as $time){
-            if(!empty($emailsChart)){
+        foreach ($times as $time) {
+            if (!empty($emailsChart)) {
                 $emailsChartByLabel = $emailsChart->keyBy('label');
                 $emailChart = $emailsChartByLabel->first(function ($value, $key) use ($time) {
                     return $key === $time;
@@ -137,7 +138,7 @@ class MailSendingHistoryService extends AbstractService
                         'opened' => 0
                     ];
                 }
-            }else{
+            } else {
                 $result[] = [
                     'label' => $time,
                     'sent' => 0,
@@ -194,7 +195,8 @@ class MailSendingHistoryService extends AbstractService
      * @param $endDate
      * @return mixed
      */
-    public function createQueryGetEmailChart($dateFormat, $startDate, $endDate){
+    public function createQueryGetEmailChart($dateFormat, $startDate, $endDate)
+    {
         return $this->model->selectRaw("date_format(updated_at, '{$dateFormat}') as label,  COUNT(IF( status = 'sent', 1, NULL ) ) as sent, COUNT(IF( status = 'opened', 1, NULL ) ) as opened")
             ->whereDate('updated_at', '>=', $startDate)
             ->whereDate('updated_at', '<=', $endDate)
@@ -208,18 +210,19 @@ class MailSendingHistoryService extends AbstractService
      */
     public function getMailNotOpenHistories()
     {
-         return $this->model->with('campaignScenario')->select("mail_sending_history.*")
-             ->join('campaign_scenario as c', 'c.parent_uuid', '=', 'mail_sending_history.campaign_scenario_uuid')
-             ->where('c.type', 'not_open')
-             ->where('mail_sending_history.status', 'sent')
-             ->whereRaw('CURDATE() - date(mail_sending_history.updated_at) > c.open_within')
-             ->whereNotIn('c.uuid', function ($query) {
-                    $query->select('m.campaign_scenario_uuid')
-                        ->from('mail_sending_history as m')
-                        ->whereNotNull('m.campaign_scenario_uuid')
-                        ->where('m.status', "sent")
-                        ->whereRaw("m.email = mail_sending_history.email");
-             })->get();
+        return $this->model->with('campaignScenario')->select("mail_sending_history.*")
+            ->join('campaign_scenario as c', 'c.parent_uuid', '=', 'mail_sending_history.campaign_scenario_uuid')
+            ->where('c.type', 'not_open')
+            ->where('mail_sending_history.status', 'sent')
+            ->whereRaw('CURDATE() - date(mail_sending_history.updated_at) > c.open_within')
+            ->whereNotIn('c.uuid', function ($query) {
+                $query->select('m.campaign_scenario_uuid')
+                    ->from('mail_sending_history as m')
+                    ->whereNotNull('m.campaign_scenario_uuid')
+                    ->where('m.status', "sent")
+                    ->whereRaw("m.email = mail_sending_history.email");
+            })
+            ->get();
         /*
          * select `mail_sending_history`.*
         from `mail_sending_history` inner join `campaign_scenario` on `campaign_scenario`.`parent_uuid` = `mail_sending_history`.`campaign_scenario_uuid`
@@ -233,6 +236,4 @@ class MailSendingHistoryService extends AbstractService
         //Kiểm tra trường hợp not open chưa tồn tại trong mailsendinghistory
 
     }
-
-
 }

@@ -2,28 +2,28 @@
 
 namespace App\Console\Commands;
 
-use App\Events\SendEmailNotOpenByScenarioCampaignEvent;
+use App\Events\SendNotOpenByScenarioCampaignEvent;
 use App\Services\CampaignScenarioService;
 use App\Services\CampaignService;
 use App\Services\ContactService;
 use App\Services\MailSendingHistoryService;
 use Illuminate\Console\Command;
 
-class SendEmailNotOpenByScenarioCampaign extends Command
+class SendNotOpenByScenarioCampaign extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'send:email-not-open';
+    protected $signature = 'send:not-open-campaign';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Send email not open campaign by scenario campaign';
+    protected $description = 'Send not open campaign by scenario campaign';
 
     /**
      * @var MailSendingHistoryService
@@ -35,8 +35,14 @@ class SendEmailNotOpenByScenarioCampaign extends Command
      */
     protected $campaignService;
 
+    /**
+     * @var ContactService
+     */
     protected $contactService;
 
+    /**
+     * @var CampaignScenarioService
+     */
     protected $campaignScenarioService;
 
     /**
@@ -45,10 +51,10 @@ class SendEmailNotOpenByScenarioCampaign extends Command
      * @return void
      */
     public function __construct(
-        CampaignService $campaignService,
+        CampaignService           $campaignService,
         MailSendingHistoryService $service,
-        ContactService $contactService,
-        CampaignScenarioService $campaignScenarioService
+        ContactService            $contactService,
+        CampaignScenarioService   $campaignScenarioService
     )
     {
         parent::__construct();
@@ -59,39 +65,33 @@ class SendEmailNotOpenByScenarioCampaign extends Command
     }
 
     /**
-     * Execute the console command.
-     *
-     * @return int
+     * @return void
      */
     public function handle()
     {
-        $mailNotOpenHistories = $this->service->getMailNotOpenHistories();
-        $contactNotOpenByCampaignScenarioEmail = [];
-        $contactNotOpenByCampaignScenarioSMS = [];
-        foreach ($mailNotOpenHistories->groupBy('campaign_scenario_uuid') as $campaignScenarioUuid => $mailSendingHistories) {
+        $notOpenHistories = $this->service->getMailNotOpenHistories();
+        $contactNotOpenByCampaignScenario = [];
+        foreach ($notOpenHistories->groupBy('campaign_scenario_uuid') as $campaignScenarioUuid => $mailSendingHistories) {
             $contacts = [];
             $notOpenCampaignScenario = $this->campaignScenarioService->getCampaignWhenNotOpenEmailByUuid($campaignScenarioUuid);
+
             if ($campaign = $this->campaignService->checkActiveCampaignScenario($notOpenCampaignScenario->campaign_uuid)) {
                 foreach ($mailSendingHistories->pluck('email') as $emailNotOpen) {
+
                     $contactNotOpen = $this->contactService->getContactByCampaign(optional($mailSendingHistories[0]->campaignScenario)->getRoot()->campaign_uuid, $emailNotOpen);
                     $contacts[] = $contactNotOpen;
                 }
-                if ($campaign->send_type === "email") {
-                    $contactNotOpenByCampaignScenarioEmail[] = [
-                        "campaign" => $campaign,
-                        "contact" => $contacts,
-                        "campaignScenario" => $notOpenCampaignScenario
-                    ];
-                }else {
-                    // TO DO SMS
-                }
 
+                $contactNotOpenByCampaignScenario[] = [
+                    "campaign" => $campaign,
+                    "contact" => $contacts,
+                    "campaignScenario" => $notOpenCampaignScenario
+                ];
             }
-
         }
 
-        if (!empty($contactNotOpenByCampaignScenarioEmail)) {
-            SendEmailNotOpenByScenarioCampaignEvent::dispatch($contactNotOpenByCampaignScenarioEmail);
+        if (!empty($contactNotOpenByCampaignScenario)) {
+            SendNotOpenByScenarioCampaignEvent::dispatch($contactNotOpenByCampaignScenario);
         }
     }
 }

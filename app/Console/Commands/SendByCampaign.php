@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Events\SendEmailByCampaignEvent;
+use App\Events\SendByCampaignEvent;
 use App\Services\CampaignService;
 use App\Services\ConfigService;
 use App\Services\ContactService;
@@ -11,7 +11,7 @@ use App\Services\MailSendingHistoryService;
 use App\Services\SendEmailByCampaignService;
 use Illuminate\Console\Command;
 
-class SendEmailByCampaign extends Command
+class SendByCampaign extends Command
 {
     /**
      * The name and signature of the console command.
@@ -78,6 +78,6 @@ class SendEmailByCampaign extends Command
         $configEmailPrice = $this->configService->findConfigByKey('email_price');
         $contactsNumberSendEmail = count($this->contactService->getContactsSendEmail($activeCampaign->uuid));
         $creditNumberSendEmail = $contactsNumberSendEmail * $configEmailPrice->value;
-        SendEmailByCampaignEvent::dispatch($activeCampaign, $creditNumberSendEmail);
+        SendByCampaignEvent::dispatch($activeCampaign, $creditNumberSendEmail);
     }
 }
