@@ -3,7 +3,6 @@
 namespace App\Listeners;
 
 use App\Events\SendNextByScenarioCampaignEvent;
-use App\Mail\SendCampaign;
 use App\Notifications\BaseNotification;
 use App\Services\CampaignService;
 use App\Services\ConfigService;
@@ -17,7 +16,7 @@ use App\Services\SmtpAccountService;
 use App\Services\UserService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class SendNextByScenarioCampaignListener
+class SendNextByScenarioCampaignListener implements  ShouldQueue
 {
     /**
      * @var MailTemplateVariableService

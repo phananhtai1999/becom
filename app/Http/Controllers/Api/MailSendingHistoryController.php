@@ -136,7 +136,7 @@ class MailSendingHistoryController extends AbstractRestAPIController
         if ($mailSendingHistory->campaign_scenario_uuid) {
             $campaignScenario = $this->campaignScenarioService->findOneById($mailSendingHistory->campaign_scenario_uuid);        //Add 1 point when open mail
             //Add 1 point when open mail or phone
-            $this->contactService->addPointContactOpenMailCampaign($campaignScenario->getRoot()->campaign_uuid, $mailSendingHistory->email);
+            $this->contactService->addPointContactOpenByCampaign($campaignScenario->getRoot()->campaign_uuid, $mailSendingHistory->email);
             if ($statusMailSendingHistory !== "opened") {
                 if (($nextCampaignScenario = $this->campaignScenarioService->getCampaignWhenOpenEmailByUuid($mailSendingHistory->campaign_scenario_uuid, $mailSendingHistory->created_at))
                     && ($nextCampaign = $this->campaignService->checkActiveCampaignScenario($nextCampaignScenario->campaign_uuid))) {
@@ -149,7 +149,7 @@ class MailSendingHistoryController extends AbstractRestAPIController
                 }
             }
         } else {
-            $this->contactService->addPointContactOpenMailCampaign($mailSendingHistory->campaign_uuid, $mailSendingHistory->email);
+            $this->contactService->addPointContactOpenByCampaign($mailSendingHistory->campaign_uuid, $mailSendingHistory->email);
         }
 
         return response(file_get_contents(public_path('tracking_pixel/pixel.gif')))

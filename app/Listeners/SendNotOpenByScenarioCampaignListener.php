@@ -2,7 +2,7 @@
 
 namespace App\Listeners;
 
-use App\Events\SendByCampaignEvent;
+use App\Events\SendNotOpenByScenarioCampaignEvent;
 use App\Notifications\BaseNotification;
 use App\Services\CampaignService;
 use App\Services\ConfigService;
@@ -16,7 +16,7 @@ use App\Services\SmtpAccountService;
 use App\Services\UserService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class SendByCampaignListener implements ShouldQueue
+class SendNotOpenByScenarioCampaignListener implements ShouldQueue
 {
     /**
      * @var MailTemplateVariableService
@@ -69,21 +69,6 @@ class SendByCampaignListener implements ShouldQueue
     private $configService;
 
     /**
-     * @var int
-     */
-    private $creditReturn = 0;
-
-    /**
-     * @var bool
-     */
-    private $mailSuccess = true;
-
-    /**
-     * @var int
-     */
-    private $numberEmailSentPerDate = 0;
-
-    /**
      * @param MailTemplateVariableService $mailTemplateVariableService
      * @param MailSendingHistoryService $mailSendingHistoryService
      * @param SmtpAccountService $smtpAccountService
@@ -121,22 +106,21 @@ class SendByCampaignListener implements ShouldQueue
     }
 
     /**
-     * @param SendByCampaignEvent $event
+     * @param SendNotOpenByScenarioCampaignEvent $event
      * @return void
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
-    public function handle(SendByCampaignEvent $event)
+    public function handle(SendNotOpenByScenarioCampaignEvent $event)
     {
-        $campaign = $event->campaign;
-        $emailNotification = app()->makeWith(BaseNotification::class, ['campaign' => $campaign])->getAdapter();
-        $creditNumberSendByCampaign = $emailNotification->calculatorCredit();
+        $contactNotOpenByCampaignScenario = $event->contactNotOpenByCampaignScenario;
+        foreach ($contactNotOpenByCampaignScenario as $value) {
+            $campaign = $value['campaign'];
+            $contacts = $value['contact'];
 
-        if (!$this->userService->checkCredit($creditNumberSendByCampaign, $campaign->user_uuid)){
-            $this->campaignService->update($campaign, [
-                'was_stopped_by_owner' => true
-            ]);
-        }else {
-            $emailNotification->send($emailNotification->getContacts(), null, null);
+            $emailNotification =  app()->makeWith(BaseNotification::class, ['campaign' => $campaign])->getAdapter();
+            $creditNumberSendByCampaign = count($contacts) * $emailNotification->getNotificationPrice();
+
+            $emailNotification->send($contacts, $value['campaignScenario']->uuid, $creditNumberSendByCampaign);
         }
     }
 }

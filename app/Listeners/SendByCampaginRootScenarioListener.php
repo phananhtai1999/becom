@@ -3,8 +3,6 @@
 namespace App\Listeners;
 
 use App\Events\SendByCampaginRootScenarioEvent;
-use App\Events\SendByCampaignEvent;
-use App\Mail\SendCampaign;
 use App\Notifications\BaseNotification;
 use App\Services\CampaignService;
 use App\Services\ConfigService;
@@ -16,10 +14,7 @@ use App\Services\MailTemplateVariableService;
 use App\Services\SendEmailScheduleLogService;
 use App\Services\SmtpAccountService;
 use App\Services\UserService;
-use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 
 class SendByCampaginRootScenarioListener implements ShouldQueue
 {

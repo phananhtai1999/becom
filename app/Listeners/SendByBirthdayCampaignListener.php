@@ -16,7 +16,7 @@ use App\Services\SmtpAccountService;
 use App\Services\UserService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class SendByBirthdayCampaignListener
+class SendByBirthdayCampaignListener implements ShouldQueue
 {
 
     /**

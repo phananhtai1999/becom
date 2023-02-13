@@ -116,10 +116,19 @@ class ContactService extends AbstractService
             ->join('contact_lists', 'contact_lists.uuid', '=', 'contact_contact_list.contact_list_uuid')
             ->join('campaign_contact_list', 'campaign_contact_list.contact_list_uuid', '=', 'contact_lists.uuid')
             ->join('campaigns', 'campaigns.uuid', '=', 'campaign_contact_list.campaign_uuid')
+            //get contacts by campaign with send_type 'email'
             ->where([
+                ['campaigns.send_type', 'email'],
                 ['campaigns.uuid', $campaignUuid],
                 ['contacts.email', $email]
-            ])->first();
+            ])
+            //get contacts by campaign with send_type 'phone'
+            ->orWhere([
+                ['campaigns.send_type', 'sms'],
+                ['campaigns.uuid', $campaignUuid],
+                ['contacts.phone', $email]
+            ])
+            ->first();
     }
 
     /**
@@ -183,7 +192,7 @@ class ContactService extends AbstractService
      * @param $email
      * @return void
      */
-    public function addPointContactOpenMailCampaign($campaignUuid, $email)
+    public function addPointContactOpenByCampaign($campaignUuid, $email)
     {
         $contactsOpenMail = $this->model->select('contacts.*')
             ->join('contact_contact_list', 'contact_contact_list.contact_uuid', '=', 'contacts.uuid')
@@ -191,10 +200,12 @@ class ContactService extends AbstractService
             ->join('campaign_contact_list', 'campaign_contact_list.contact_list_uuid', '=', 'contact_lists.uuid')
             ->join('campaigns', 'campaigns.uuid', '=', 'campaign_contact_list.campaign_uuid')
             ->where([
-                ['campaigns.uuid', $campaignUuid],
+                ['campaigns.send_type', 'email'],
+                ['campaigns.uuid', $campaignUuid],  //add point campaign send_type is email
                 ['contacts.email', $email]
             ])->orWhere([
-                ['campaigns.uuid', $campaignUuid],
+                ['campaigns.send_type', 'sms'],
+                ['campaigns.uuid', $campaignUuid],  //add point campaign send_type is sms
                 ['contacts.phone', $email]
             ])->get();
 

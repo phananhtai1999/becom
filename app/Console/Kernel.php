@@ -16,7 +16,7 @@ class Kernel extends ConsoleKernel
         'App\Console\Commands\CreateUser',
         'App\Console\Commands\SendByCampaign',
         'App\Console\Commands\SendByBirthdayCampaign',
-        'App\Console\Commands\SendEmailNotOpenByScenarioCampaign',
+        'App\Console\Commands\SendNotOpenByScenarioCampaign',
     ];
 
     /**
