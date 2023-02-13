@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Abstracts\AbstractModel;
 use App\Services\CampaignService;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -65,6 +66,7 @@ class Campaign extends AbstractModel
      */
     protected $appends = [
         'number_credit_needed_to_start_campaign',
+        'is_expired'
     ];
 
     /**
@@ -145,6 +147,11 @@ class Campaign extends AbstractModel
     public function getNumberCreditNeededToStartCampaignAttribute()
     {
         return app(CampaignService::class)->numberOfCreditsToStartTheCampaign($this->uuid, $this->from_date, $this->to_date, $this->send_type, $this->type);
+    }
+
+    public function getIsExpiredAttribute()
+    {
+        return $this->to_date < Carbon::now('Asia/Ho_Chi_Minh');
     }
 
     /**
