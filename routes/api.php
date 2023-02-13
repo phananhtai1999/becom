@@ -49,6 +49,7 @@ Route::group(['as' => 'auth.'], function () {
     Route::post('/login', [AuthController::class, 'login'])->name('login');
     Route::post('/forget-password', [AuthController::class, 'forgetPassword'])->name('forget-password');
     Route::post('/recovery-password', [AuthController::class, 'recoveryPassword'])->name('recovery-password');
+    Route::get('/check-token', [AuthController::class, 'checkToken'])->name('check-token');
 });
 
 //Social API

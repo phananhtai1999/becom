@@ -17,6 +17,7 @@ use App\Services\PasswordResetService;
 use App\Services\UserAccessTokenService;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
 
@@ -230,5 +231,22 @@ class AuthController extends AbstractRestAPIController
         }
 
         return $this->sendValidationFailedJsonResponse(['email' => __('messages.email_does_not_exists')]);
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function checkToken(Request $request)
+    {
+        /** @var PasswordReset $passwordReset */
+        $passwordReset = $this->passwordResetService
+            ->findOneWhere(['token' => $request->get('token')]);
+
+        if ($passwordReset) {
+            return $this->sendOkJsonResponse(['message' => __('messages.success')]);
+        }
+
+        return $this->sendValidationFailedJsonResponse(['token' => __('messages.token_does_not_exists')]);
     }
 }

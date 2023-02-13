@@ -13,7 +13,7 @@
                     <tbody>
                     <tr>
                         <td>
-                            <a href="{{ route('auth.recovery-password'). '?token='.$passwordReset->token }}"
+                            <a href="{{ config('auth.recovery_password_url'). '?token='.$passwordReset->token.'&email='.$user->email }}"
                                target="_blank">
                                 {{ __('Recovery Password') }}
                             </a>

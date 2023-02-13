@@ -117,4 +117,7 @@ return [
     'login_succeed_redirect_url' => env('FRONTEND_URL') . '/auth/login/success',
 
     'login_failed_redirect_url' => env('FRONTEND_URL') . '/login/failed',
+
+    'recovery_password_url' => env('FRONTEND_URL') . '/auth/recovery-password',
+
 ];
