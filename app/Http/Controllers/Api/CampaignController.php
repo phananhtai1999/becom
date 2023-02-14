@@ -15,6 +15,8 @@ use App\Http\Requests\LoadAnalyticDataRequest;
 use App\Http\Requests\MyCampaignRequest;
 use App\Http\Requests\SendEmailByCampaignRequest;
 use App\Http\Requests\SendEmailByMyCampaignRequest;
+use App\Http\Requests\StartCampaignRequest;
+use App\Http\Requests\StartMyCampaignRequest;
 use App\Http\Requests\UpdateCampaignRequest;
 use App\Http\Requests\UpdateMyCampaignRequest;
 use App\Http\Resources\CampaignDailyTrackingResourceCollection;
@@ -499,32 +501,12 @@ class CampaignController extends AbstractRestAPIController
      */
     public function sendEmailsByCampaign(SendEmailByCampaignRequest $request)
     {
-        //validate campaign
-        $columns = ['type', 'status', 'from_date', 'to_date', 'was_finished', 'was_stopped_by_owner'];
-        foreach ($columns as $column) {
-            if (!$this->service->checkActiveCampainByColumn($column, $request->get('campaign_uuid'))) {
-                return $this->sendValidationFailedJsonResponse(["errors" => ["campaign_" . $column => __("messages.{$column}_campaign_invalid")]]);
-            }
+        $result = $this->checkAndSendCampaign($request->get('campaign_uuid'));
+        if ($result['status']) {
+            return $this->sendOkJsonResponse(["message" => $result['messages']]);
         }
 
-        $campaign = $this->service->findOneById($request->get('campaign_uuid'));
-        $campaignsScenario = $campaign->campaignsScenario;
-        $campaignRootScenario = $campaignsScenario->filter(function ($value) {
-            return $value->parent_uuid === null;
-        });
-        if ($this->sendEmailScheduleLogService->checkActiveCampaignbyCampaignUuid($request->get('campaign_uuid'))) {
-            $creditNumberSendEmail = $campaign->number_credit_needed_to_start_campaign * ($campaignRootScenario->count() > 0 ? $campaignRootScenario->count() : 1);
-            if ($this->userService->checkCredit($creditNumberSendEmail, $campaign->user_uuid)) {
-                if ($campaignRootScenario->count()) {
-                    SendByCampaginRootScenarioEvent::dispatch($campaign, $creditNumberSendEmail, $campaignRootScenario);
-                } else {
-                    SendByCampaignEvent::dispatch($campaign, $creditNumberSendEmail);
-                }
-            }
-            return $this->sendOkJsonResponse(["message" => __('messages.send_campaign_success')]);
-        }
-
-        return $this->sendValidationFailedJsonResponse(["errors" => ['campaign_is_running' => __('messages.is_running_campaign_invalid')]]);
+        return $this->sendValidationFailedJsonResponse(['errors' => $result['messages']]);
     }
 
     /**
@@ -533,39 +515,114 @@ class CampaignController extends AbstractRestAPIController
      */
     public function sendEmailByMyCampaign(SendEmailByMyCampaignRequest $request)
     {
+        $result = $this->checkAndSendCampaign($request->get('campaign_uuid'));
+        if ($result['status']) {
+            return $this->sendOkJsonResponse(["message" => $result['messages']]);
+        }
+
+        return $this->sendValidationFailedJsonResponse(['errors' => $result['messages']]);
+    }
+
+    /**
+     * @param StartCampaignRequest $request
+     * @return JsonResponse
+     */
+    public function statusCampaign(StartCampaignRequest $request)
+    {
+        $campaign = $this->service->findOneById($request->get('campaign_uuid'));
+        if ($request->get('was_stopped_by_owner')) {
+            $this->service->update($campaign, [
+               'was_stopped_by_owner' => $request->get('was_stopped_by_owner')
+            ]);
+
+            return $this->sendOkJsonResponse();
+        }
+
+        $this->service->update($campaign, [
+            'was_stopped_by_owner' => $request->get('was_stopped_by_owner')
+        ]);
+
+        $result = $this->checkAndSendCampaign($request->get('campaign_uuid'));
+        if (!$result['status']) {
+            $this->service->update($campaign, [
+                'was_stopped_by_owner' => !$request->get('was_stopped_by_owner')
+            ]);
+            return $this->sendValidationFailedJsonResponse(['errors' => $result['messages']]);
+        }
+
+        return $this->sendOkJsonResponse(["message" => $result['messages']]);
+
+    }
+
+    /**
+     * @param StartMyCampaignRequest $request
+     * @return JsonResponse
+     */
+    public function statusMyCampaign(StartMyCampaignRequest $request)
+    {
+        $campaign = $this->service->findOneById($request->get('campaign_uuid'));
+        if ($request->get('was_stopped_by_owner')) {
+            $this->service->update($campaign, [
+                'was_stopped_by_owner' => $request->get('was_stopped_by_owner')
+            ]);
+
+            return $this->sendOkJsonResponse();
+        }
+
+        $this->service->update($campaign, [
+            'was_stopped_by_owner' => $request->get('was_stopped_by_owner')
+        ]);
+
+        $result = $this->checkAndSendCampaign($request->get('campaign_uuid'));
+        if (!$result['status']) {
+            $this->service->update($campaign, [
+                'was_stopped_by_owner' => !$request->get('was_stopped_by_owner')
+            ]);
+            return $this->sendValidationFailedJsonResponse(['errors' => $result['messages']]);
+        }
+
+        return $this->sendOkJsonResponse(["message" => $result['messages']]);
+    }
+
+    /**
+     * @param $campaignUuid
+     * @return array
+     */
+    public function checkAndSendCampaign($campaignUuid)
+    {
         //validate campaign
         $columns = ['type', 'status', 'from_date', 'to_date', 'was_finished', 'was_stopped_by_owner'];
         foreach ($columns as $column) {
-            if (!$this->myService->checkActiveMyCampainByColumn($column, $request->get('campaign_uuid'))) {
-                return $this->sendValidationFailedJsonResponse(["errors" => ["campaign_" . $column => __("messages.{$column}_campaign_invalid")]]);
+            if (!$this->service->checkActiveCampainByColumn($column, $campaignUuid)) {
+                return ['status' => false,
+                    'messages' => ["campaign_" . $column => __("messages.{$column}_campaign_invalid")]];
             }
         }
 
-        $campaign = $this->myService->findMyCampaignByKeyOrAbort($request->get('campaign_uuid'));
+        $campaign = $this->service->findOneById($campaignUuid);
         $campaignsScenario = $campaign->campaignsScenario;
         $campaignRootScenario = $campaignsScenario->filter(function ($value) {
             return $value->parent_uuid === null;
         });
-        if ($this->sendEmailScheduleLogService->checkActiveCampaignbyCampaignUuid($request->get('campaign_uuid'))) {
+        if ($this->sendEmailScheduleLogService->checkActiveCampaignbyCampaignUuid($campaignUuid)) {
             $creditNumberSendEmail = $campaign->number_credit_needed_to_start_campaign * ($campaignRootScenario->count() > 0 ? $campaignRootScenario->count() : 1);
             if ($this->userService->checkCredit($creditNumberSendEmail, $campaign->user_uuid)) {
-                if ($campaign->send_type === "email") {
-                    if ($campaignRootScenario->count()) {
-                        SendByCampaginRootScenarioEvent::dispatch($campaign, $creditNumberSendEmail, $campaignRootScenario);
-                    } else {
-                        SendByCampaignEvent::dispatch($campaign, $creditNumberSendEmail);
-                    }
+                if ($campaignRootScenario->count()) {
+                    SendByCampaginRootScenarioEvent::dispatch($campaign, $creditNumberSendEmail, $campaignRootScenario);
                 } else {
-                    //TO DO SMS
+                    SendByCampaignEvent::dispatch($campaign, $creditNumberSendEmail);
                 }
 
-                return $this->sendOkJsonResponse(["message" => __('messages.send_campaign_success')]);
+                return ['status' => true,
+                    'messages' => __('messages.send_campaign_success')];
             }
 
-            return $this->sendValidationFailedJsonResponse(["errors" => ['credit' => __('messages.credit_invalid')]]);
+            return ['status' => false,
+                'messages' => ['credit' => __('messages.credit_invalid')]];
         }
 
-        return $this->sendValidationFailedJsonResponse(["errors" => ['campaign_is_running' => __('messages.is_running_campaign_invalid')]]);
+        return ['status' => false,
+            'messages' => ['campaign_is_running' => __('messages.is_running_campaign_invalid')]];
     }
 
     /**
