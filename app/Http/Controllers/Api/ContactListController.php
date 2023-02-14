@@ -10,7 +10,6 @@ use App\Http\Requests\UpdateContactListRequest;
 use App\Http\Requests\UpdateMyContactListRequest;
 use App\Http\Resources\ContactListResource;
 use App\Http\Resources\ContactListResourceCollection;
-use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Services\ContactListService;
@@ -20,7 +19,7 @@ use Illuminate\Http\JsonResponse;
 
 class ContactListController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestShowTrait, RestDestroyTrait;
+    use RestShowTrait, RestDestroyTrait;
 
     /**
      * @var MyContactListService
@@ -38,9 +37,9 @@ class ContactListController extends AbstractRestAPIController
      * @param ContactService $contactService
      */
     public function __construct(
-        ContactListService $service,
+        ContactListService   $service,
         MyContactListService $myService,
-        ContactService $contactService
+        ContactService       $contactService
     )
     {
         $this->service = $service;
@@ -51,6 +50,33 @@ class ContactListController extends AbstractRestAPIController
         $this->storeRequest = ContactListRequest::class;
         $this->editRequest = UpdateContactListRequest::class;
         $this->indexRequest = IndexRequest::class;
+    }
+
+    /**
+     * @param IndexRequest $request
+     * @return JsonResponse
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     */
+    public function index(IndexRequest $request)
+    {
+        $sortContacts = explode(',', $request->sort);
+
+        if ($sortContacts[0] == 'contacts' || $sortContacts[0] == '-contacts') {
+            $models = $this->service->sortContacts(
+                $request->get('per_page', '15'),
+                $request->get('columns', '*'),
+                $request->get('page_name', 'page'),
+                $request->get('page', '1'),
+                $sortContacts[0]
+            );
+        } else {
+            $models = $this->service->getCollectionWithPagination();
+        }
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+        );
     }
 
     /**
@@ -200,16 +226,22 @@ class ContactListController extends AbstractRestAPIController
      */
     public function indexMyContactList(IndexRequest $request)
     {
+        $sortMyContacts = explode(',', $request->sort);
+
+        if ($sortMyContacts[0] == 'contacts' || $sortMyContacts[0] == '-contacts') {
+            $models = $this->myService->sortMyContacts(
+                $request->get('per_page', '15'),
+                $request->get('columns', '*'),
+                $request->get('page_name', 'page'),
+                $request->get('page', '1'),
+                $sortMyContacts[0]
+            );
+        } else {
+            $models = $this->myService->getCollectionWithPagination();
+        }
+
         return $this->sendOkJsonResponse(
-            $this->service->resourceCollectionToData(
-                $this->resourceCollectionClass,
-                $this->myService->getCollectionWithPagination(
-                    $request->get('per_page', '15'),
-                    $request->get('page', '1'),
-                    $request->get('columns', '*'),
-                    $request->get('page_name', 'page'),
-                )
-            )
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
         );
     }
 
