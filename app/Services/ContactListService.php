@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Abstracts\AbstractService;
 use App\Models\ContactList;
 use App\Models\QueryBuilders\ContactListQueryBuilder;
+use App\Models\QueryBuilders\SortContactsInContactListQueryBuilder;
 
 class ContactListService extends AbstractService
 {
@@ -53,4 +54,20 @@ class ContactListService extends AbstractService
         return false;
     }
 
+    /**
+     * @param $perPage
+     * @param $columns
+     * @param $pageName
+     * @param $page
+     * @param $sort
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|void
+     */
+    public function sortContacts($perPage, $columns, $pageName,  $page, $sort)
+    {
+        if ($sort == 'contacts') {
+            return SortContactsInContactListQueryBuilder::initialQuery()->withCount('contacts')->orderBy('contacts_count')->paginate($perPage, $columns, $pageName, $page);
+        } elseif ($sort == '-contacts') {
+            return SortContactsInContactListQueryBuilder::initialQuery()->withCount('contacts')->orderByDesc('contacts_count')->paginate($perPage, $columns, $pageName, $page);
+        }
+    }
 }
