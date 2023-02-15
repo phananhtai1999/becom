@@ -7,6 +7,8 @@ use App\Models\Contact;
 use App\Models\QueryBuilders\ContactQueryBuilder;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
@@ -211,7 +213,7 @@ class ContactService extends AbstractService
 
         foreach ($contactsOpenMail as $contactOpenMail) {
             $this->update($contactOpenMail, [
-               'points' => $contactOpenMail->points + 1
+                'points' => $contactOpenMail->points + 1
             ]);
         }
     }
@@ -434,7 +436,7 @@ class ContactService extends AbstractService
             ->whereDate('contacts.updated_at', '<=', $endDate)
             ->first();
 
-        return (int) $totalContact->points;
+        return (int)$totalContact->points;
     }
 
     /**
@@ -485,32 +487,32 @@ class ContactService extends AbstractService
         $subDate = $startDate;
         $startDate = Carbon::parse($startDate);
 
-        if($groupBy === "hour"){
+        if ($groupBy === "hour") {
             $dateFormat = "%Y-%m-%d %H:00:00";
             $subDate = Carbon::parse($subDate)->subDay();
             $endDate = Carbon::parse($endDate)->endOfDay();
 
-            while($startDate <= $endDate){
+            while ($startDate <= $endDate) {
                 $times[] = $startDate->format('Y-m-d H:00:00');
                 $startDate = $startDate->addHour();
             }
         }
-        if($groupBy === "date"){
+        if ($groupBy === "date") {
             $dateFormat = "%Y-%m-%d";
             $subDate = Carbon::parse($subDate)->subDay();
             $endDate = Carbon::parse($endDate);
 
-            while($startDate <= $endDate){
+            while ($startDate <= $endDate) {
                 $times[] = $startDate->format('Y-m-d');
                 $startDate = $startDate->addDay();
             }
         }
-        if($groupBy === "month"){
+        if ($groupBy === "month") {
             $dateFormat = "%Y-%m";
             $subDate = Carbon::parse($subDate)->subMonth();
             $endDate = Carbon::parse($endDate);
 
-            while($startDate <= $endDate){
+            while ($startDate <= $endDate) {
                 $times[] = $startDate->format('Y-m');
                 $startDate = $startDate->addMonth();
             }
@@ -519,35 +521,35 @@ class ContactService extends AbstractService
         $pointsContactsChart = $this->createQueryGetPointsContactByContactList($dateFormat, $subDate, $endDate, $groupBy === 'date' ? 'day' : $groupBy, $contactListUuid);
 
         $lastIncrease = 0;
-        foreach ($times as $time){
-            if(!empty($pointsContactsChart)) {
-                foreach ($pointsContactsChart as $pointsContactChart){
-                    if($time == $pointsContactChart->label) {
+        foreach ($times as $time) {
+            if (!empty($pointsContactsChart)) {
+                foreach ($pointsContactsChart as $pointsContactChart) {
+                    if ($time == $pointsContactChart->label) {
                         $result[] = [
                             'label' => $pointsContactChart->label,
                             'points' => (int)$pointsContactChart->points,
-                            'increase' => (int) ($pointsContactChart->increase ?? $pointsContactChart->points)
+                            'increase' => (int)($pointsContactChart->increase ?? $pointsContactChart->points)
                         ];
                         $check = true;
                         break;
-                    }else{
+                    } else {
                         $prevTime = $time;
-                        if($groupBy === 'hour'){
+                        if ($groupBy === 'hour') {
                             $prevTime = Carbon::parse($prevTime)->subHour()->toDateTimeString();
                         }
-                        if($groupBy === 'date'){
+                        if ($groupBy === 'date') {
                             $prevTime = Carbon::parse($prevTime)->subDay()->toDateString();
                         }
-                        if($groupBy === 'month'){
+                        if ($groupBy === 'month') {
                             $prevTime = Carbon::parse($prevTime)->subMonth()->format('Y-m');
                         }
-                        if($prevTime == $pointsContactChart->label){
+                        if ($prevTime == $pointsContactChart->label) {
                             $lastIncrease = $pointsContactChart->points;
                         }
                         $check = false;
                     }
                 }
-                if(!$check){
+                if (!$check) {
                     $result[] = [
                         'label' => $time,
                         'points' => 0,
@@ -555,7 +557,7 @@ class ContactService extends AbstractService
                     ];
                     $lastIncrease = 0;
                 }
-            }else{
+            } else {
                 $result[] = [
                     'label' => $time,
                     'points' => 0,
@@ -695,8 +697,6 @@ class ContactService extends AbstractService
                 AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
                 'user.username',
                 AllowedFilter::exact('exact__user.username', 'user.username'),
-                AllowedFilter::scope('uuids_not_in'),
-                AllowedFilter::scope('uuids_in'),
                 AllowedFilter::scope('from__dob'),
                 AllowedFilter::scope('to__dob'),
                 $this->getDuplicateFiltersByNumeric($modelKeyName),
@@ -828,5 +828,77 @@ class ContactService extends AbstractService
                 }
             }
         }, $field);
+    }
+
+    /**
+     * @param $uuidsIn
+     * @param $uuidsNotIn
+     * @param $perPage
+     * @return LengthAwarePaginator|QueryBuilder
+     */
+    public function sortContactsToTopOrBottomOfListByUuid($uuidsIn, $uuidsNotIn, $perPage)
+    {
+        $arrayIntersectUuidsIn = array_intersect(explode(',', $uuidsIn), $this->model->all()->pluck('uuid')->toArray());
+        $arrayIntersectUuidsNotIn = array_intersect(explode(',', $uuidsNotIn), $this->model->all()->pluck('uuid')->toArray());
+        if (!empty($uuidsIn) && !empty($uuidsNotIn) && !empty($arrayIntersectUuidsIn) && !empty($arrayIntersectUuidsNotIn)) {
+
+            $collection = $this->filteringByCustomContactField()->get()
+                ->sortByDesc('created_at')
+                ->sortBy(function ($item) use ($arrayIntersectUuidsIn, $arrayIntersectUuidsNotIn) {
+                    if (!in_array($item->uuid, $arrayIntersectUuidsIn) || in_array($item->uuid, $arrayIntersectUuidsNotIn)) {
+
+                        return $item;
+                    }
+                });
+
+            return $this->collectionPagination($collection, $perPage);
+        } elseif (!empty($uuidsIn) && !empty($arrayIntersectUuidsIn) && empty($uuidsNotIn) && empty($arrayIntersectUuidsNotIn)) {
+            //Uuids_in
+            $collection = $this->filteringByCustomContactField()->get()
+                ->sortByDesc('created_at')
+                ->sortBy(function ($item) use ($arrayIntersectUuidsIn) {
+                    if (!in_array($item->uuid, $arrayIntersectUuidsIn)) {
+
+                        return $item;
+                    }
+                });
+
+            return $this->collectionPagination($collection, $perPage);
+        } elseif (!empty($uuidsNotIn) && !empty($arrayIntersectUuidsNotIn) && empty($uuidsIn) && empty($arrayIntersectUuidsIn)) {
+            //Uuids_Not_in
+            $collection = $this->filteringByCustomContactField()->get()
+                ->sortByDesc('created_at')
+                ->sortBy(function ($item) use ($arrayIntersectUuidsNotIn) {
+                    if (in_array($item->uuid, $arrayIntersectUuidsNotIn)) {
+
+                        return $item;
+                    }
+                });
+
+            return $this->collectionPagination($collection, $perPage);
+        } elseif (!empty($uuidsIn) && !empty($uuidsNotIn) && empty($arrayIntersectUuidsIn) && empty($arrayIntersectUuidsNotIn)) {
+
+            return $this->collectionPagination([], $perPage);
+        }
+
+        return $this->filteringByCustomContactField();
+    }
+
+    /**
+     * @param $results
+     * @param $perPage
+     * @param $page
+     * @return LengthAwarePaginator
+     */
+    public function collectionPagination($results, $perPage, $page = null)
+    {
+        $page = $page ?: (LengthAwarePaginator::resolveCurrentPage() ?: 1);
+
+        $results = $results instanceof Collection ? $results : Collection::make($results);
+
+        return new LengthAwarePaginator($results->forPage($page, $perPage)->values(), $results->count(), $perPage, $page, [
+            'path' => LengthAwarePaginator::resolveCurrentPath(),
+            'pageName' => 'page',
+        ]);
     }
 }

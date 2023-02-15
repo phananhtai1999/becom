@@ -46,10 +46,10 @@ class ContactController extends AbstractRestAPIController
      * @param ContactListService $contactListService
      */
     public function __construct(
-        ContactService $service,
-        MyContactService $myService,
+        ContactService       $service,
+        MyContactService     $myService,
         MyContactListService $myContactListService,
-        ContactListService $contactListService
+        ContactListService   $contactListService
     )
     {
         $this->service = $service;
@@ -70,12 +70,24 @@ class ContactController extends AbstractRestAPIController
     public function index(IndexRequest $request)
     {
         try {
-            $models = $this->service->filteringByCustomContactField()->paginate(
-                $request->get('per_page', '15'),
-                $request->get('columns', '*'),
-                $request->get('page_name', 'page'),
-                $request->get('page', '1')
-            );
+            $filters = $request->filter;
+            if (!empty($filters['uuids_in']) && !empty($filters['uuids_not_in'])) {
+
+                $models = $this->service->sortContactsToTopOrBottomOfListByUuid($filters['uuids_in'], $filters['uuids_not_in'], $request->get('per_page', '15'));
+            } elseif (!empty($filters['uuids_in']) && empty($filters['uuids_not_in'])) {
+
+                $models = $this->service->sortContactsToTopOrBottomOfListByUuid($filters['uuids_in'], '', $request->get('per_page', '15'));
+            } elseif (!empty($filters['uuids_not_in']) && empty($filters['uuids_in'])) {
+
+                $models = $this->service->sortContactsToTopOrBottomOfListByUuid('', $filters['uuids_not_in'], $request->get('per_page', '15'));
+            } else {
+                $models = $this->service->sortContactsToTopOrBottomOfListByUuid('', '', $request->get('per_page', '15'))->paginate(
+                    $request->get('per_page', '15'),
+                    $request->get('columns', '*'),
+                    $request->get('page_name', 'page'),
+                    $request->get('page', '1')
+                );
+            }
 
             return $this->sendOkJsonResponse(
                 $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
