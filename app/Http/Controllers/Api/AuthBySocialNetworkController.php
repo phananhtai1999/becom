@@ -94,10 +94,10 @@ class AuthBySocialNetworkController extends AbstractRestAPIController
 
         $findUser = $this->userService->findByEmail($googleUser->email);
 
-        if (!empty($findUserSocial && $findUser)) {
+        if ($findUserSocial && $findUser) {
 
             return $this->loginSocial($findUser);
-        } elseif (!empty($findUser) && empty($findUserSocial)) {
+        } elseif ($findUser && !$findUserSocial) {
             $this->service->create([
                 'social_profile_key' => 'google_' . $googleUser->getId(),
                 'social_network_uuid' => 'google',
@@ -114,6 +114,7 @@ class AuthBySocialNetworkController extends AbstractRestAPIController
                 'email' => $googleUser->email,
                 'username' => $googleUser->email,
                 'password' => Hash::make(Str::random(20)),
+                'can_add_smtp_account' => true
             ]);
 
             $newUser->roles()->attach([config('user.default_role_uuid')]);
@@ -143,10 +144,10 @@ class AuthBySocialNetworkController extends AbstractRestAPIController
 
         $findUser = $this->userService->findByEmail($facebookUser->getEmail());
 
-        if (!empty($findUserSocial && $findUser)) {
+        if ($findUserSocial && $findUser) {
 
             return $this->loginSocial($findUser);
-        } elseif (!empty($findUser) && empty($findUserSocial)) {
+        } elseif ($findUser && !$findUserSocial) {
             $this->service->create([
                 'social_profile_key' => 'facebook_' . $facebookUser->getId(),
                 'social_network_uuid' => 'facebook',
@@ -163,6 +164,7 @@ class AuthBySocialNetworkController extends AbstractRestAPIController
                 'email' => $facebookUser->getEmail(),
                 'username' => $facebookUser->getEmail(),
                 'password' => Hash::make(Str::random(20)),
+                'can_add_smtp_account' => true
             ]);
 
             $newUser->roles()->attach([config('user.default_role_uuid')]);
@@ -193,10 +195,10 @@ class AuthBySocialNetworkController extends AbstractRestAPIController
 
             $findUser = $this->userService->findByEmail($linkedinUser->getEmail());
 
-            if (!empty($findUserSocial && $findUser)) {
+            if ($findUserSocial && $findUser) {
 
                 return $this->loginSocial($findUser);
-            } elseif (!empty($findUser) && empty($findUserSocial)) {
+            } elseif ($findUser && !$findUserSocial) {
                 $this->service->create([
                     'social_profile_key' => 'linkedin_' . $linkedinUser->getId(),
                     'social_network_uuid' => 'linkedin',
@@ -247,10 +249,10 @@ class AuthBySocialNetworkController extends AbstractRestAPIController
 
             $findUser = $this->userService->findByEmail($githubUser->email);
 
-            if (!empty($findUserSocial && $findUser)) {
+            if ($findUserSocial && $findUser) {
 
                 return $this->loginSocial($findUser);
-            } elseif (!empty($findUser) && empty($findUserSocial)) {
+            } elseif ($findUser && !$findUserSocial) {
                 $this->service->create([
                     'social_profile_key' => 'github_' . $githubUser->getId(),
                     'social_network_uuid' => 'github',
