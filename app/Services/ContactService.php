@@ -843,40 +843,41 @@ class ContactService extends AbstractService
         if (!empty($uuidsIn) && !empty($uuidsNotIn) && !empty($arrayIntersectUuidsIn) && !empty($arrayIntersectUuidsNotIn)) {
 
             $collection = $this->filteringByCustomContactField()->get()
-                ->sortByDesc('created_at')
                 ->sortBy(function ($item) use ($arrayIntersectUuidsIn, $arrayIntersectUuidsNotIn) {
-                    if (!in_array($item->uuid, $arrayIntersectUuidsIn) || in_array($item->uuid, $arrayIntersectUuidsNotIn)) {
+                    if (in_array($item->uuid, $arrayIntersectUuidsIn) || !in_array($item->uuid, $arrayIntersectUuidsNotIn)) {
 
-                        return $item;
+                        return $item->created_at;
                     }
-                });
+                }, SORT_STRING, true);
 
             return $this->collectionPagination($collection, $perPage);
         } elseif (!empty($uuidsIn) && !empty($arrayIntersectUuidsIn) && empty($uuidsNotIn) && empty($arrayIntersectUuidsNotIn)) {
             //Uuids_in
             $collection = $this->filteringByCustomContactField()->get()
-                ->sortByDesc('created_at')
                 ->sortBy(function ($item) use ($arrayIntersectUuidsIn) {
-                    if (!in_array($item->uuid, $arrayIntersectUuidsIn)) {
+                    if (in_array($item->uuid, $arrayIntersectUuidsIn)) {
 
-                        return $item;
+                        return $item->created_at;
                     }
-                });
+                }, SORT_STRING, true);
 
             return $this->collectionPagination($collection, $perPage);
         } elseif (!empty($uuidsNotIn) && !empty($arrayIntersectUuidsNotIn) && empty($uuidsIn) && empty($arrayIntersectUuidsIn)) {
             //Uuids_Not_in
             $collection = $this->filteringByCustomContactField()->get()
-                ->sortByDesc('created_at')
                 ->sortBy(function ($item) use ($arrayIntersectUuidsNotIn) {
-                    if (in_array($item->uuid, $arrayIntersectUuidsNotIn)) {
+                    if (!in_array($item->uuid, $arrayIntersectUuidsNotIn)) {
 
-                        return $item;
+                        return $item->created_at;
                     }
-                });
+                }, SORT_STRING, true);
 
             return $this->collectionPagination($collection, $perPage);
-        } elseif (!empty($uuidsIn) && !empty($uuidsNotIn) && empty($arrayIntersectUuidsIn) && empty($arrayIntersectUuidsNotIn)) {
+        } elseif (
+            (!empty($uuidsIn) && !empty($uuidsNotIn) && empty($arrayIntersectUuidsIn) && empty($arrayIntersectUuidsNotIn)) ||
+            (!empty($uuidsIn) && !empty($uuidsNotIn) && !empty($arrayIntersectUuidsIn) && empty($arrayIntersectUuidsNotIn)) ||
+            (!empty($uuidsIn) && !empty($uuidsNotIn) && empty($arrayIntersectUuidsIn) && !empty($arrayIntersectUuidsNotIn))
+        ) {
 
             return $this->collectionPagination([], $perPage);
         }

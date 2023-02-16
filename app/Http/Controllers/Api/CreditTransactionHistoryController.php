@@ -41,6 +41,16 @@ class CreditTransactionHistoryController extends AbstractRestAPIController
     public function index(IndexRequest $request)
     {
         $filters = $request->filter;
+        $sort = explode(',', $request->sort);
+        $arraySort = [
+            'uuid',
+            'user_uuid',
+            'credit',
+            'campaign_uuid',
+            'add_by_uuid',
+        ];
+        $fieldSort = !empty($sort[0]) && in_array($sort[0], $arraySort) ? $sort[0] : 'created_at';
+
         if (!empty($filters)) {
             foreach ($filters as $key => $filter) {
                 if ($filter == null) {
@@ -51,6 +61,7 @@ class CreditTransactionHistoryController extends AbstractRestAPIController
         if (!empty($filters['campaign.send_type'])) {
             $filterSendType = $this->service->customFilterSendTypeOnCampaign(
                 $filters,
+                $fieldSort,
                 count($filters),
                 $request->get('per_page', '15'),
                 $request->get('columns', '*'),
@@ -78,6 +89,16 @@ class CreditTransactionHistoryController extends AbstractRestAPIController
     public function indexMyCreditTransactionHistoryView(IndexRequest $request)
     {
         $filters = $request->filter;
+        $sort = explode(',', $request->sort);
+        $arraySort = [
+            'uuid',
+            'user_uuid',
+            'credit',
+            'campaign_uuid',
+            'add_by_uuid',
+        ];
+        $fieldSort = !empty($sort[0]) && in_array($sort[0], $arraySort) ? $sort[0] : 'created_at';
+
         if (!empty($filters)) {
             foreach ($filters as $key => $filter) {
                 if ($filter == null) {
@@ -88,6 +109,7 @@ class CreditTransactionHistoryController extends AbstractRestAPIController
         if (!empty($filters['campaign.send_type'])) {
             $filterSendType = $this->myService->customMyFilterSendTypeOnCampaign(
                 $filters,
+                $fieldSort,
                 count($filters),
                 $request->get('per_page', '15'),
                 $request->get('columns', '*'),
@@ -100,6 +122,7 @@ class CreditTransactionHistoryController extends AbstractRestAPIController
             );
         }
         $myAddAndUseCreditTransactionHistory = $this->myService->myFilterAddAndUseCreditTransactionHistory(
+            $fieldSort,
             $request->get('per_page', '15'),
             $request->get('columns', '*'),
             $request->get('page_name', 'page'),
