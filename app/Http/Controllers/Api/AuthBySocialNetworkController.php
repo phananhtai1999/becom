@@ -134,52 +134,57 @@ class AuthBySocialNetworkController extends AbstractRestAPIController
     }
 
     /**
-     * @return JsonResponse
+     * @return Application|JsonResponse|RedirectResponse|Redirector
      */
     public function loginByFacebookCallback()
     {
-        $facebookUser = Socialite::driver('facebook')->stateless()->user();
+        try {
+            $facebookUser = Socialite::driver('facebook')->stateless()->user();
 
-        $findUserSocial = $this->service->findBySocialProfileEmail('facebook_' . $facebookUser->getId());
+            $findUserSocial = $this->service->findBySocialProfileEmail('facebook_' . $facebookUser->getId());
 
-        $findUser = $this->userService->findByEmail($facebookUser->getEmail());
+            $findUser = $this->userService->findByEmail($facebookUser->getEmail());
 
-        if ($findUserSocial && $findUser) {
+            if ($findUserSocial && $findUser) {
 
-            return $this->loginSocial($findUser);
-        } elseif ($findUser && !$findUserSocial) {
-            $this->service->create([
-                'social_profile_key' => 'facebook_' . $facebookUser->getId(),
-                'social_network_uuid' => 'facebook',
-                'user_uuid' => $findUser->uuid,
-                'social_profile_name' => $facebookUser->getName(),
-                'social_profile_avatar' => $facebookUser->getAvatar(),
-                'social_profile_email' => $facebookUser->getEmail(),
-                'updated_info_at' => Carbon::now(),
-            ]);
+                return $this->loginSocial($findUser);
+            } elseif ($findUser && !$findUserSocial) {
+                $this->service->create([
+                    'social_profile_key' => 'facebook_' . $facebookUser->getId(),
+                    'social_network_uuid' => 'facebook',
+                    'user_uuid' => $findUser->uuid,
+                    'social_profile_name' => $facebookUser->getName(),
+                    'social_profile_avatar' => $facebookUser->getAvatar(),
+                    'social_profile_email' => $facebookUser->getEmail(),
+                    'updated_info_at' => Carbon::now(),
+                ]);
 
-            return $this->loginSocial($findUser);
-        } else {
-            $newUser = $this->userService->create([
-                'email' => $facebookUser->getEmail(),
-                'username' => $facebookUser->getEmail(),
-                'password' => Hash::make(Str::random(20)),
-                'can_add_smtp_account' => true
-            ]);
+                return $this->loginSocial($findUser);
+            } else {
+                $newUser = $this->userService->create([
+                    'email' => $facebookUser->getEmail(),
+                    'username' => $facebookUser->getEmail(),
+                    'password' => Hash::make(Str::random(20)),
+                    'can_add_smtp_account' => true
+                ]);
 
-            $newUser->roles()->attach([config('user.default_role_uuid')]);
+                $newUser->roles()->attach([config('user.default_role_uuid')]);
 
-            $this->service->create([
-                'social_profile_key' => 'facebook_' . $facebookUser->getId(),
-                'social_network_uuid' => 'facebook',
-                'user_uuid' => $newUser->uuid,
-                'social_profile_name' => $facebookUser->getName(),
-                'social_profile_avatar' => $facebookUser->getAvatar(),
-                'social_profile_email' => $facebookUser->getEmail(),
-                'updated_info_at' => Carbon::now(),
-            ]);
+                $this->service->create([
+                    'social_profile_key' => 'facebook_' . $facebookUser->getId(),
+                    'social_network_uuid' => 'facebook',
+                    'user_uuid' => $newUser->uuid,
+                    'social_profile_name' => $facebookUser->getName(),
+                    'social_profile_avatar' => $facebookUser->getAvatar(),
+                    'social_profile_email' => $facebookUser->getEmail(),
+                    'updated_info_at' => Carbon::now(),
+                ]);
 
-            return $this->loginSocial($newUser);
+                return $this->loginSocial($newUser);
+
+            }
+        }catch (\Exception $exception ){
+            return redirect(URL::to(config('auth.login_failed_redirect_url')));
         }
     }
 

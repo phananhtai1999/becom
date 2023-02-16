@@ -95,7 +95,7 @@ class SmsNotification extends BaseNotification {
      */
     public function getBirthdayContacts()
     {
-        return $this->contactService->getBirthdayContactsSendEmail($this->campaign->uuid);
+        return $this->contactService->getBirthdayContactsSendSms($this->campaign->uuid);
     }
 
     /**

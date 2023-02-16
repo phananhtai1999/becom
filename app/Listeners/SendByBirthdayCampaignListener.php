@@ -133,7 +133,7 @@ class SendByBirthdayCampaignListener implements ShouldQueue
                 continue;
             }
 
-            $emailNotification->send($contacts, null, null);
+            $emailNotification->send($contacts, null, $creditNumberSendByCampaign);
         }
     }
 }
