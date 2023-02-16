@@ -7,6 +7,8 @@ use App\Models\Contact;
 use App\Models\QueryBuilders\MyContactQueryBuilder;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -481,8 +483,6 @@ class MyContactService extends AbstractService
                 AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
                 'user.username',
                 AllowedFilter::exact('exact__user.username', 'user.username'),
-                AllowedFilter::scope('uuids_not_in'),
-                AllowedFilter::scope('uuids_in'),
                 AllowedFilter::scope('from__dob'),
                 AllowedFilter::scope('to__dob'),
                 $this->getMyDuplicateFiltersByNumeric($modelKeyName),
@@ -614,5 +614,78 @@ class MyContactService extends AbstractService
                 }
             }
         }, $field);
+    }
+
+    /**
+     * @param $uuidsIn
+     * @param $uuidsNotIn
+     * @param $perPage
+     * @return LengthAwarePaginator|QueryBuilder
+     */
+    public function sortMyContactsToTopOrBottomOfListByUuid($uuidsIn, $uuidsNotIn, $perPage)
+    {
+        $arrayIntersectUuidsIn = array_intersect(explode(',', $uuidsIn), $this->model->all()->pluck('uuid')->toArray());
+        $arrayIntersectUuidsNotIn = array_intersect(explode(',', $uuidsNotIn), $this->model->all()->pluck('uuid')->toArray());
+        if (!empty($uuidsIn) && !empty($uuidsNotIn) && !empty($arrayIntersectUuidsIn) && !empty($arrayIntersectUuidsNotIn)) {
+
+            $collection = $this->filteringByMyCustomContactField()->get()
+                ->sortBy(function ($item) use ($arrayIntersectUuidsIn, $arrayIntersectUuidsNotIn) {
+                    if (in_array($item->uuid, $arrayIntersectUuidsIn) || !in_array($item->uuid, $arrayIntersectUuidsNotIn)) {
+
+                        return $item->created_at;
+                    }
+                }, SORT_STRING, true);
+
+            return $this->collectionPagination($collection, $perPage);
+        } elseif (!empty($uuidsIn) && !empty($arrayIntersectUuidsIn) && empty($uuidsNotIn) && empty($arrayIntersectUuidsNotIn)) {
+            //Uuids_in
+            $collection = $this->filteringByMyCustomContactField()->get()
+                ->sortBy(function ($item) use ($arrayIntersectUuidsIn) {
+                    if (in_array($item->uuid, $arrayIntersectUuidsIn)) {
+
+                        return $item->created_at;
+                    }
+                }, SORT_STRING, true);
+
+            return $this->collectionPagination($collection, $perPage);
+        } elseif (!empty($uuidsNotIn) && !empty($arrayIntersectUuidsNotIn) && empty($uuidsIn) && empty($arrayIntersectUuidsIn)) {
+            //Uuids_Not_in
+            $collection = $this->filteringByMyCustomContactField()->get()
+                ->sortBy(function ($item) use ($arrayIntersectUuidsNotIn) {
+                    if (!in_array($item->uuid, $arrayIntersectUuidsNotIn)) {
+
+                        return $item->created_at;
+                    }
+                }, SORT_STRING, true);
+
+            return $this->collectionPagination($collection, $perPage);
+        } elseif (
+            (!empty($uuidsIn) && !empty($uuidsNotIn) && empty($arrayIntersectUuidsIn) && empty($arrayIntersectUuidsNotIn)) ||
+            (!empty($uuidsIn) && !empty($uuidsNotIn) && !empty($arrayIntersectUuidsIn) && empty($arrayIntersectUuidsNotIn)) ||
+            (!empty($uuidsIn) && !empty($uuidsNotIn) && empty($arrayIntersectUuidsIn) && !empty($arrayIntersectUuidsNotIn))
+        ) {
+
+            return $this->collectionPagination([], $perPage);
+        }
+
+        return $this->filteringByMyCustomContactField();
+    }
+
+    /**
+     * @param $results
+     * @param $perPage
+     * @param $page
+     * @return LengthAwarePaginator
+     */
+    public function collectionPagination($results, $perPage, $page = null)
+    {
+        $page = $page ?: (LengthAwarePaginator::resolveCurrentPage() ?: 1);
+
+        $results = $results instanceof Collection ? $results : Collection::make($results);
+
+        return new LengthAwarePaginator($results->forPage($page, $perPage)->values(), $results->count(), $perPage, $page, [
+            'path' => LengthAwarePaginator::resolveCurrentPath(),
+            'pageName' => 'page',
+        ]);
     }
 }

@@ -157,12 +157,24 @@ class ContactController extends AbstractRestAPIController
     public function indexMyContact(IndexRequest $request)
     {
         try {
-            $models = $this->myService->filteringByMyCustomContactField()->paginate(
-                $request->get('per_page', '15'),
-                $request->get('columns', '*'),
-                $request->get('page_name', 'page'),
-                $request->get('page', '1')
-            );
+            $filters = $request->filter;
+            if (!empty($filters['uuids_in']) && !empty($filters['uuids_not_in'])) {
+
+                $models = $this->myService->sortMyContactsToTopOrBottomOfListByUuid($filters['uuids_in'], $filters['uuids_not_in'], $request->get('per_page', '15'));
+            } elseif (!empty($filters['uuids_in']) && empty($filters['uuids_not_in'])) {
+
+                $models = $this->myService->sortMyContactsToTopOrBottomOfListByUuid($filters['uuids_in'], '', $request->get('per_page', '15'));
+            } elseif (!empty($filters['uuids_not_in']) && empty($filters['uuids_in'])) {
+
+                $models = $this->myService->sortMyContactsToTopOrBottomOfListByUuid('', $filters['uuids_not_in'], $request->get('per_page', '15'));
+            } else {
+                $models = $this->myService->sortMyContactsToTopOrBottomOfListByUuid('', '', $request->get('per_page', '15'))->paginate(
+                    $request->get('per_page', '15'),
+                    $request->get('columns', '*'),
+                    $request->get('page_name', 'page'),
+                    $request->get('page', '1')
+                );
+            }
 
             return $this->sendOkJsonResponse(
                 $this->service->resourceCollectionToData(
