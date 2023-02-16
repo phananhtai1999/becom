@@ -120,6 +120,14 @@ class SendNotOpenByScenarioCampaignListener implements ShouldQueue
             $emailNotification =  app()->makeWith(BaseNotification::class, ['campaign' => $campaign])->getAdapter();
             $creditNumberSendByCampaign = count($contacts) * $emailNotification->getNotificationPrice();
 
+            if (!$this->userService->checkCredit($creditNumberSendByCampaign, $campaign->user_uuid)){
+                $this->campaignService->update($campaign, [
+                    'was_stopped_by_owner' => true
+                ]);
+
+                continue;
+            }
+
             $emailNotification->send($contacts, $value['campaignScenario']->uuid, $creditNumberSendByCampaign);
         }
     }
