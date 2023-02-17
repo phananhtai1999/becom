@@ -326,7 +326,6 @@ class CampaignService extends AbstractService
             ['uuid', $campaignUuid],
             ['to_date', '>=', Carbon::now('Asia/Ho_Chi_Minh')],
             ['was_finished', false],
-            ['was_stopped_by_owner', false],
             ['status', "active"]
         ])->with(['mailTemplate', 'website', 'smtpAccount'])->first();
 
