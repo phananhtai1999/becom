@@ -15,7 +15,7 @@ class AddCreditTransactionHistoryQueryBuilder extends AbstractQueryBuilder
      */
     public static function baseQuery()
     {
-        return CreditTransactionHistory::whereNull('campaign_uuid');
+        return CreditTransactionHistory::whereNull('campaign_uuid')->where('credit', '!=', '0');
     }
 
     /**
