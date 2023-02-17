@@ -232,7 +232,7 @@ class ContactService extends AbstractService
         } else {
             $reader = new \PhpOffice\PhpSpreadsheet\Reader\Csv();
         }
-        $reader->setReadDataOnly(true);
+        $reader->setReadDataOnly(false);
         $reader->setReadEmptyCells(false);
         $spreadsheet = $reader->load($file);
         $getActiveSheet = $spreadsheet->getActiveSheet()->toArray();
@@ -244,7 +244,7 @@ class ContactService extends AbstractService
                 'first_name' => ['required', 'string'],
                 'last_name' => ['required', 'string'],
                 'middle_name' => ['nullable', 'string'],
-                'phone' => ['nullable', 'numeric'],
+                'phone' => ['nullable', 'numeric', 'digits_between:1,11'],
                 'dob' => ['nullable', 'date_format:Y-m-d'],
                 'sex' => ['nullable', 'string'],
                 'city' => ['nullable', 'string'],
@@ -253,33 +253,18 @@ class ContactService extends AbstractService
 
             foreach ($getActiveSheet as $key => $value) {
                 $row = array_combine($fields, $value);
-                if (is_integer($row['dob'])) {
-                    $data = [
-                        'email' => $row['email'],
-                        'first_name' => $row['first_name'],
-                        'last_name' => $row['last_name'],
-                        'middle_name' => $row['middle_name'],
-                        'phone' => $row['phone'],
-                        'sex' => $row['sex'],
-                        'dob' => date_format(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['dob']), 'Y-m-d'),
-                        'city' => $row['city'],
-                        'country' => $row['country'],
-                        'user_uuid' => auth()->user()->getkey()
-                    ];
-                } else {
-                    $data = [
-                        'email' => $row['email'],
-                        'first_name' => $row['first_name'],
-                        'last_name' => $row['last_name'],
-                        'middle_name' => $row['middle_name'],
-                        'phone' => $row['phone'],
-                        'sex' => $row['sex'],
-                        'dob' => $row['dob'],
-                        'city' => $row['city'],
-                        'country' => $row['country'],
-                        'user_uuid' => auth()->user()->getkey()
-                    ];
-                }
+                $data = [
+                    'email' => $row['email'],
+                    'first_name' => $row['first_name'],
+                    'last_name' => $row['last_name'],
+                    'middle_name' => $row['middle_name'],
+                    'phone' => $row['phone'],
+                    'sex' => $row['sex'],
+                    'dob' => $row['dob'],
+                    'city' => $row['city'],
+                    'country' => $row['country'],
+                    'user_uuid' => auth()->user()->getkey()
+                ];
                 $validator = Validator::make($data, $rules);
                 if ($validator->fails()) {
                     $error[] = $validator->errors()->merge(['Row fail' => __('messages.error_data') . ' ' . ($key + 2)]);
