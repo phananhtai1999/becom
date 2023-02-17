@@ -48,9 +48,22 @@ class CreditTransactionHistoryController extends AbstractRestAPIController
             'credit',
             'campaign_uuid',
             'add_by_uuid',
+            '-uuid',
+            '-user_uuid',
+            '-credit',
+            '-campaign_uuid',
+            '-add_by_uuid',
         ];
-        $fieldSort = !empty($sort[0]) && in_array($sort[0], $arraySort) ? $sort[0] : 'created_at';
-
+        $directionDesc = [
+            '-uuid',
+            '-user_uuid',
+            '-credit',
+            '-campaign_uuid',
+            '-add_by_uuid',
+            '-created_at'
+        ];
+        $fieldSort = !empty($sort[0]) && in_array($sort[0], $arraySort) ? $sort[0] : '-created_at';
+        $orderBy = in_array($fieldSort, $directionDesc) ? 'desc' : 'asc';
         if (!empty($filters)) {
             foreach ($filters as $key => $filter) {
                 if ($filter == null) {
@@ -62,6 +75,7 @@ class CreditTransactionHistoryController extends AbstractRestAPIController
             $filterSendType = $this->service->customFilterSendTypeOnCampaign(
                 $filters,
                 $fieldSort,
+                $orderBy,
                 count($filters),
                 $request->get('per_page', '15'),
                 $request->get('columns', '*'),
@@ -96,8 +110,22 @@ class CreditTransactionHistoryController extends AbstractRestAPIController
             'credit',
             'campaign_uuid',
             'add_by_uuid',
+            '-uuid',
+            '-user_uuid',
+            '-credit',
+            '-campaign_uuid',
+            '-add_by_uuid',
         ];
-        $fieldSort = !empty($sort[0]) && in_array($sort[0], $arraySort) ? $sort[0] : 'created_at';
+        $directionDesc = [
+            '-uuid',
+            '-user_uuid',
+            '-credit',
+            '-campaign_uuid',
+            '-add_by_uuid',
+            '-created_at'
+        ];
+        $fieldSort = !empty($sort[0]) && in_array($sort[0], $arraySort) ? $sort[0] : '-created_at';
+        $orderBy = in_array($fieldSort, $directionDesc) ? 'desc' : 'asc';
 
         if (!empty($filters)) {
             foreach ($filters as $key => $filter) {
@@ -110,6 +138,7 @@ class CreditTransactionHistoryController extends AbstractRestAPIController
             $filterSendType = $this->myService->customMyFilterSendTypeOnCampaign(
                 $filters,
                 $fieldSort,
+                $orderBy,
                 count($filters),
                 $request->get('per_page', '15'),
                 $request->get('columns', '*'),
@@ -123,6 +152,7 @@ class CreditTransactionHistoryController extends AbstractRestAPIController
         }
         $myAddAndUseCreditTransactionHistory = $this->myService->myFilterAddAndUseCreditTransactionHistory(
             $fieldSort,
+            $orderBy,
             $request->get('per_page', '15'),
             $request->get('columns', '*'),
             $request->get('page_name', 'page'),
