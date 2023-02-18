@@ -28,7 +28,9 @@ class CreditTransactionHistoryService extends AbstractService
     public function customFilterSendTypeOnCampaign($filters, $fieldSort, $orderBy, $countFilters, $perPage, $columns, $pageName, $page)
     {
         if ($countFilters == 1) {
-            $models = $this->model->whereNull('campaign_uuid');
+            $models = $this->model
+                ->where('credit', '!=', '0')
+                ->whereNull('campaign_uuid');
 
             return CreditTransactionHistoryQueryBuilder::initialQuery()->unionAll($models)->orderBy(ltrim($fieldSort, '-'), $orderBy)->paginate(
                 $perPage,

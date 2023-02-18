@@ -15,7 +15,7 @@ class CreditTransactionHistoryQueryBuilder extends AbstractQueryBuilder
      */
     public static function baseQuery()
     {
-        return CreditTransactionHistory::class;
+        return CreditTransactionHistory::where('credit', '!=', '0');
     }
 
     /**

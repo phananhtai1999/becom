@@ -28,7 +28,10 @@ class MyCreditTransactionHistoryService extends AbstractService
     {
         if ($countFilters == 1) {
             $models = $this->model
-                ->where('user_uuid', auth()->user()->getkey())
+                ->where([
+                    ['user_uuid', auth()->user()->getkey()],
+                    ['credit', '!=', '0']
+                ])
                 ->whereNull('campaign_uuid');
 
             return MyCreditTransactionHistoryQueryBuilder::initialQuery()->unionAll($models)->orderBy(ltrim($fieldSort, '-'), $orderBy)->paginate(
@@ -55,7 +58,7 @@ class MyCreditTransactionHistoryService extends AbstractService
             );
         }
 
-        return$this->myFilterAddAndUseCreditTransactionHistory($fieldSort, $orderBy, $perPage, $columns, $pageName, $page);
+        return $this->myFilterAddAndUseCreditTransactionHistory($fieldSort, $orderBy, $perPage, $columns, $pageName, $page);
     }
 
     /**
