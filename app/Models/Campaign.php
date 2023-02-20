@@ -149,9 +149,12 @@ class Campaign extends AbstractModel
         return app(CampaignService::class)->numberOfCreditsToStartTheCampaign($this->uuid, $this->from_date, $this->to_date, $this->send_type, $this->type);
     }
 
+    /**
+     * @return bool
+     */
     public function getIsExpiredAttribute()
     {
-        return $this->to_date < Carbon::now('Asia/Ho_Chi_Minh');
+        return $this->to_date->toDateTimeString() < Carbon::now('Asia/Ho_Chi_Minh')->toDateTimeString();
     }
 
     /**

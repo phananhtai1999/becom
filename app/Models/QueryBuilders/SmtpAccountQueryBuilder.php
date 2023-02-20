@@ -82,6 +82,8 @@ class SmtpAccountQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
                 'user.username',
                 AllowedFilter::exact('exact__user.username', 'user.username'),
+                'user.email',
+                AllowedFilter::exact('exact__user.email', 'user.email'),
                 'website.domain',
                 AllowedFilter::exact('exact__website.domain', 'website.domain'),
                 'smtpAccountEncryption.name',

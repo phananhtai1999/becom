@@ -92,6 +92,8 @@ class CampaignQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__website.domain', 'website.domain'),
                 'user.username',
                 AllowedFilter::exact('exact__user.username', 'user.username'),
+                'user.email',
+                AllowedFilter::exact('exact__user.email', 'user.email'),
                 'contactLists.uuid',
                 AllowedFilter::exact('exact__contactLists.uuid', 'contactLists.uuid'),
                 AllowedFilter::scope('from__from_date'),
