@@ -68,6 +68,7 @@ class MyAddCreditTransactionHistoryQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__user.email', 'user.email'),
                 'add_by.email',
                 AllowedFilter::exact('exact__add_by.email', 'add_by.email'),
+                AllowedFilter::scope('add_by_email'),
             ]);
     }
 }
