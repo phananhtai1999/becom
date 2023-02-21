@@ -66,6 +66,13 @@ class MyCreditTransactionHistoryQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__campaign.send_type', 'campaign.send_type'),
                 'campaign.tracking_key',
                 AllowedFilter::exact('exact__campaign.tracking_key', 'campaign.tracking_key'),
+                'created_at',
+                AllowedFilter::exact('exact__created_at', 'created_at'),
+                'user.email',
+                AllowedFilter::exact('exact__user.email', 'user.email'),
+                'add_by.email',
+                AllowedFilter::exact('exact__add_by.email', 'add_by.email'),
+                AllowedFilter::scope('add_by_email'),
             ]);
     }
 }

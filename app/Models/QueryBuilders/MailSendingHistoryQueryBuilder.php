@@ -4,7 +4,9 @@ namespace App\Models\QueryBuilders;
 
 use App\Abstracts\AbstractQueryBuilder;
 use App\Models\MailSendingHistory;
+use App\Sorts\SortOpenTracking;
 use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\AllowedSort;
 use Spatie\QueryBuilder\Concerns\SortsQuery;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -42,6 +44,7 @@ class MailSendingHistoryQueryBuilder extends AbstractQueryBuilder
                 'time',
                 'status',
                 'campaign_scenario_uuid',
+                AllowedSort::custom('view', new SortOpenTracking())
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -66,6 +69,10 @@ class MailSendingHistoryQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__campaign.smtpAccount.mail_from_name', 'campaign.smtpAccount.mail_from_name'),
                 'campaign.website.domain',
                 AllowedFilter::exact('exact__campaign.website.domain', 'campaign.website.domain'),
+                'campaign.user.username',
+                AllowedFilter::exact('exact__campaign.user.username', 'campaign.user.username'),
+                'campaign.user.email',
+                AllowedFilter::exact('exact__campaign.user.email', 'campaign.user.email'),
                 AllowedFilter::scope('from__time'),
                 AllowedFilter::scope('to__time'),
             ]);
