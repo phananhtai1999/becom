@@ -49,6 +49,8 @@ class MyCampaignRequest extends AbstractRequest
             'website_uuid' => ['required', 'numeric', 'min:1', Rule::exists('websites', 'uuid')->where(function ($query) {
                 return $query->where('user_uuid', auth()->user()->getkey())->whereNull('deleted_at');
             })],
+            'reply_to_email' => ['nullable','required_if:send_type,email', 'string', 'email:rfc,dns'],
+            'reply_name' => ['nullable','required_if:send_type,email', 'string'],
             'was_finished' => ['required', 'boolean'],
             'was_stopped_by_owner' => ['required', 'boolean'],
             'contact_list' => ['nullable', 'array', 'min:1'],

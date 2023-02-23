@@ -50,6 +50,8 @@ class UpdateMyCampaignRequest extends AbstractRequest
 
                 return $query->where('user_uuid', auth()->user()->getkey())->whereNull('deleted_at');
             })],
+            'reply_to_email' => ['nullable','required_if:send_type,email', 'string', 'email:rfc,dns'],
+            'reply_name' => ['nullable','required_if:send_type,email', 'string'],
             'was_finished' => ['boolean'],
             'was_stopped_by_owner' => ['boolean'],
             'contact_list' => ['nullable', 'array', 'min:1'],

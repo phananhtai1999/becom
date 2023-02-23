@@ -39,6 +39,8 @@ class Campaign extends AbstractModel
         'smtp_account_uuid',
         'website_uuid',
         'user_uuid',
+        'reply_to_email',
+        'reply_name',
         'was_finished',
         'was_stopped_by_owner',
         'send_type',
