@@ -37,6 +37,8 @@ class CampaignFactory extends Factory {
             'send_type' => $optionSendType[array_rand($optionSendType)],
 			'website_uuid' => Website::where('uuid', '<=', 3)->inRandomOrder()->first()->uuid,
 			'user_uuid' => User::inRandomOrder()->first()->uuid,
+            'reply_to_email' => $this->faker->safeEmail(),
+            'reply_name' => $this->faker->name()
 		];
 	}
 }
