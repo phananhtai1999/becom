@@ -2,7 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\ContactList;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\App;
 
 class DatabaseSeeder extends Seeder {
 	/**
@@ -11,18 +13,27 @@ class DatabaseSeeder extends Seeder {
 	 * @return void
 	 */
 	public function run() {
-		$this->call([
-			UserSeeder::class,
-			SmtpAccountEncryptionSeeder::class,
+        $this->call([
+            UserSeeder::class
+        ]);
+        if (!App::environment('production')) {
+            $this->call([
+                SmtpAccountEncryptionSeeder::class,
+                WebsiteSeeder::class,
+                MailTemplateDefaultSeeder::class,
+                MailTemplateSeeder::class,
+                SmtpAccountSeeder::class,
+                ContactListSeeder::class,
+                CampaignSeeder::class
+            ]);
 
-		]);
 
-
-		\App\Models\Website::factory(200)->create();
-		\App\Models\Email::factory(100)->create();
-		\App\Models\SmtpAccount::factory(100)->create();
-		\App\Models\MailTemplate::factory(100)->create();
-		\App\Models\Campaign::factory(100)->create();
-		
+            \App\Models\Website::factory(200)->create();
+            \App\Models\SmtpAccount::factory(100)->create();
+            \App\Models\Contact::factory(100)->create();
+            \App\Models\ContactList::factory(100)->create();
+            \App\Models\MailTemplate::factory(100)->create();
+            \App\Models\Campaign::factory(100)->create();
+        }
 	}
 }

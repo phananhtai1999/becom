@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
 use App\Models\Website;
 use App\Models\MailTemplate;
 use App\Models\SmtpAccount;
@@ -14,18 +15,28 @@ class CampaignFactory extends Factory {
 	 * @return array
 	 */
 	public function definition() {
+        $optionType = [
+            'simple',
+            'birthday',
+            'scenario'
+        ];
+        $optionSendType = [
+            'email',
+            'sms'
+        ];
 		return [
 			'tracking_key' => $this->faker->lexify('tracking-??????'),
 			'mail_template_uuid' => MailTemplate::inRandomOrder()->first()->uuid,
 			'from_date' => $this->faker->dateTimeBetween('-1 week', 'now'),
 			'to_date' => $this->faker->dateTimeBetween('now', '+1 week'),
-			'number_email_per_date' => rand(1,10),
-			'number_email_per_user' => rand(1,10),
 			'smtp_account_uuid' => SmtpAccount::inRandomOrder()->first()->uuid,
 			'was_finished' => rand(0,1),
 			'status' => 'active',
 			'was_stopped_by_owner' => rand(0,1),
+            'type' => $optionType[array_rand($optionType)],
+            'send_type' => $optionSendType[array_rand($optionSendType)],
 			'website_uuid' => Website::where('uuid', '<=', 3)->inRandomOrder()->first()->uuid,
+			'user_uuid' => User::inRandomOrder()->first()->uuid,
 		];
 	}
 }

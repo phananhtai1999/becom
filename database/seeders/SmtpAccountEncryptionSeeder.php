@@ -16,7 +16,7 @@ class SmtpAccountEncryptionSeeder extends Seeder {
 				'name' => 'SSL',
 			],
 			[
-				'name' => 'LTS',
+				'name' => 'TLS',
 			],
 
 		];
