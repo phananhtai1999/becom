@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
+use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Requests\ContactListRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyContactListRequest;
@@ -19,7 +20,7 @@ use Illuminate\Http\JsonResponse;
 
 class ContactListController extends AbstractRestAPIController
 {
-    use RestShowTrait, RestDestroyTrait;
+    use RestIndexTrait, RestShowTrait, RestDestroyTrait;
 
     /**
      * @var MyContactListService
@@ -50,33 +51,6 @@ class ContactListController extends AbstractRestAPIController
         $this->storeRequest = ContactListRequest::class;
         $this->editRequest = UpdateContactListRequest::class;
         $this->indexRequest = IndexRequest::class;
-    }
-
-    /**
-     * @param IndexRequest $request
-     * @return JsonResponse
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
-     */
-    public function index(IndexRequest $request)
-    {
-        $sortContacts = explode(',', $request->sort);
-
-        if ($sortContacts[0] == 'contacts' || $sortContacts[0] == '-contacts') {
-            $models = $this->service->sortContacts(
-                $request->get('per_page', '15'),
-                $request->get('columns', '*'),
-                $request->get('page_name', 'page'),
-                $request->get('page', '1'),
-                $sortContacts[0]
-            );
-        } else {
-            $models = $this->service->getCollectionWithPagination();
-        }
-
-        return $this->sendOkJsonResponse(
-            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
-        );
     }
 
     /**
@@ -226,22 +200,12 @@ class ContactListController extends AbstractRestAPIController
      */
     public function indexMyContactList(IndexRequest $request)
     {
-        $sortMyContacts = explode(',', $request->sort);
-
-        if ($sortMyContacts[0] == 'contacts' || $sortMyContacts[0] == '-contacts') {
-            $models = $this->myService->sortMyContacts(
-                $request->get('per_page', '15'),
-                $request->get('columns', '*'),
-                $request->get('page_name', 'page'),
-                $request->get('page', '1'),
-                $sortMyContacts[0]
-            );
-        } else {
-            $models = $this->myService->getCollectionWithPagination();
-        }
-
         return $this->sendOkJsonResponse(
-            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+            $this->service->resourceCollectionToData(
+                $this->resourceCollectionClass,
+                $this->myService->getCollectionWithPagination(
+                )
+            )
         );
     }
 

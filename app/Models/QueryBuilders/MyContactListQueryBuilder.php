@@ -4,7 +4,10 @@ namespace App\Models\QueryBuilders;
 
 use App\Abstracts\AbstractQueryBuilder;
 use App\Models\ContactList;
+use App\Models\SearchQueryBuilders\SearchQueryBuilder;
+use App\Sorts\SortContacts;
 use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\AllowedSort;
 use Spatie\QueryBuilder\Concerns\SortsQuery;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -35,7 +38,8 @@ class MyContactListQueryBuilder extends AbstractQueryBuilder
             ->allowedSorts([
                 $modelKeyName,
                 'name',
-                'user_uuid'
+                'user_uuid',
+                AllowedSort::custom('contacts', new SortContacts())
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -47,5 +51,26 @@ class MyContactListQueryBuilder extends AbstractQueryBuilder
                 'user.username',
                 AllowedFilter::exact('exact__user.username', 'user.username'),
             ]);
+    }
+
+    /**
+     * @return string
+     */
+    public static function fillAble()
+    {
+        return ContactList::class;
+    }
+
+    /**
+     * @param $search
+     * @param $searchBy
+     * @return mixed
+     */
+    public static function searchQuery($search, $searchBy)
+    {
+        $initialQuery = static::initialQuery();
+        $baseQuery = static::fillAble();
+
+        return SearchQueryBuilder::search($baseQuery, $initialQuery, $search, $searchBy);
     }
 }

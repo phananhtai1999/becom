@@ -3,6 +3,7 @@
 namespace App\Models\QueryBuilders;
 
 use App\Abstracts\AbstractQueryBuilder;
+use App\Models\SearchQueryBuilders\SearchQueryBuilder;
 use App\Models\SmtpAccountEncryption;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\Concerns\SortsQuery;
@@ -43,5 +44,26 @@ class SmtpAccountEncrytionQueryBuilder extends AbstractQueryBuilder
                 'name',
                 AllowedFilter::exact('exact__name', 'name'),
             ]);
+    }
+
+    /**
+     * @return string
+     */
+    public static function fillAble()
+    {
+        return SmtpAccountEncryption::class;
+    }
+
+    /**
+     * @param $search
+     * @param $searchBy
+     * @return mixed
+     */
+    public static function searchQuery($search, $searchBy)
+    {
+        $initialQuery = static::initialQuery();
+        $baseQuery = static::fillAble();
+
+        return SearchQueryBuilder::search($baseQuery, $initialQuery, $search, $searchBy);
     }
 }

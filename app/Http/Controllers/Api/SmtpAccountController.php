@@ -59,6 +59,7 @@ class SmtpAccountController extends AbstractRestAPIController
      * @param MySmtpAccountService $myService
      * @param UserService $userService
      * @param ConfigService $configService
+     * @param WebsiteService $websiteService
      */
     public function __construct(
         SmtpAccountService $service,

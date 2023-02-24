@@ -5,7 +5,7 @@ namespace App\Sorts;
 use Illuminate\Database\Eloquent\Builder;
 use Spatie\QueryBuilder\Sorts\Sort;
 
-class SortOpenTracking implements Sort
+class SortContacts implements Sort
 {
     /**
      * @param Builder $query
@@ -17,6 +17,6 @@ class SortOpenTracking implements Sort
     {
         $direction = $descending ? 'DESC' : 'ASC';
 
-        $query->withCount('mailOpenTrackings')->orderByRaw("mail_open_trackings_count {$direction}");
+        $query->withCount('contacts')->orderByRaw("contacts_count {$direction}");
     }
 }

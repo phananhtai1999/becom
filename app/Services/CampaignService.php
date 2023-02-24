@@ -388,14 +388,16 @@ class CampaignService extends AbstractService
     /**
      * @param $perPage
      * @param $sort
+     * @param $search
+     * @param $searchBy
      * @return LengthAwarePaginator
      */
-    public function sortTotalCredit($perPage, $sort)
+    public function sortTotalCredit($perPage, $sort, $search, $searchBy)
     {
         if ($sort == 'number_credit_needed_to_start_campaign') {
-            $sortTotalCredit = SortTotalCreditOfCampaignQueryBuilder::initialQuery()->get()->sortBy('number_credit_needed_to_start_campaign');
+            $sortTotalCredit = SortTotalCreditOfCampaignQueryBuilder::searchQuery($search, $searchBy)->get()->sortBy('number_credit_needed_to_start_campaign');
         } elseif ($sort == '-number_credit_needed_to_start_campaign') {
-            $sortTotalCredit = SortTotalCreditOfCampaignQueryBuilder::initialQuery()->get()->sortByDesc('number_credit_needed_to_start_campaign');
+            $sortTotalCredit = SortTotalCreditOfCampaignQueryBuilder::searchQuery($search, $searchBy)->get()->sortByDesc('number_credit_needed_to_start_campaign');
         }
 
         return $this->collectionPagination($sortTotalCredit, $perPage);

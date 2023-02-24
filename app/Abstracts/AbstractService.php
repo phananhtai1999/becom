@@ -75,8 +75,10 @@ abstract class AbstractService
         $page = request()->get('page', $page);
         $columns = request()->get('columns', $columns);
         $pageName = request()->get('page_name', $pageName);
+        $search = request()->get('search', '');
+        $searchBy = request()->get('search_by', '');
 
-        return $this->modelQueryBuilderClass::initialQuery()
+        return $this->modelQueryBuilderClass::searchQuery($search, $searchBy)
             ->paginate($perPage, $columns, $pageName, $page);
     }
 

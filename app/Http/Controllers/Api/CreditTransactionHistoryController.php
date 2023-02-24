@@ -81,6 +81,8 @@ class CreditTransactionHistoryController extends AbstractRestAPIController
                 $request->get('columns', '*'),
                 $request->get('page_name', 'page'),
                 $request->get('page', '1'),
+                $request->search,
+                $request->search_by
             );
 
             return $this->sendOkJsonResponse(
@@ -144,6 +146,8 @@ class CreditTransactionHistoryController extends AbstractRestAPIController
                 $request->get('columns', '*'),
                 $request->get('page_name', 'page'),
                 $request->get('page', '1'),
+                $request->search,
+                $request->search_by
             );
 
             return $this->sendOkJsonResponse(
@@ -157,6 +161,8 @@ class CreditTransactionHistoryController extends AbstractRestAPIController
             $request->get('columns', '*'),
             $request->get('page_name', 'page'),
             $request->get('page', '1'),
+            $request->search,
+            $request->search_by
         );
 
         return $this->sendOkJsonResponse(
