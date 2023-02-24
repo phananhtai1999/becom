@@ -190,7 +190,7 @@ class CampaignController extends AbstractRestAPIController
         $sortTotalCredit = explode(',', $request->sort);
 
         if ($sortTotalCredit[0] == 'number_credit_needed_to_start_campaign' || $sortTotalCredit[0] == '-number_credit_needed_to_start_campaign') {
-            $models = $this->service->sortTotalCredit($request->get('per_page', '15'), $sortTotalCredit[0]);
+            $models = $this->service->sortTotalCredit($request->get('per_page', '15'), $sortTotalCredit[0], $request->search, $request->search_by);
         } else {
             $models = $this->service->getCollectionWithPagination();
         }
@@ -290,7 +290,7 @@ class CampaignController extends AbstractRestAPIController
 
         if($sortTotalCredit[0] == 'number_credit_needed_to_start_campaign' || $sortTotalCredit[0] == '-number_credit_needed_to_start_campaign')
         {
-            $models= $this->myService->sortMyTotalCredit($request->get('per_page', '15'), $sortTotalCredit[0]);
+            $models= $this->myService->sortMyTotalCredit($request->get('per_page', '15'), $sortTotalCredit[0], $request->search, $request->search_by);
         } else {
             $models =$this->myService->getCollectionWithPagination();
         }

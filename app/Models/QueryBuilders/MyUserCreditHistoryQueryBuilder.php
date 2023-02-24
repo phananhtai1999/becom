@@ -3,6 +3,7 @@
 namespace App\Models\QueryBuilders;
 
 use App\Abstracts\AbstractQueryBuilder;
+use App\Models\SearchQueryBuilders\SearchQueryBuilder;
 use App\Models\UserCreditHistory;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\Concerns\SortsQuery;
@@ -49,5 +50,26 @@ class MyUserCreditHistoryQueryBuilder extends AbstractQueryBuilder
                 'campaign_uuid',
                 AllowedFilter::exact('exact__campaign_uuid', 'campaign_uuid'),
             ]);
+    }
+
+    /**
+     * @return string
+     */
+    public static function fillAble()
+    {
+        return UserCreditHistory::class;
+    }
+
+    /**
+     * @param $search
+     * @param $searchBy
+     * @return mixed
+     */
+    public static function searchQuery($search, $searchBy)
+    {
+        $initialQuery = static::initialQuery();
+        $baseQuery = static::fillAble();
+
+        return SearchQueryBuilder::search($baseQuery, $initialQuery, $search, $searchBy);
     }
 }

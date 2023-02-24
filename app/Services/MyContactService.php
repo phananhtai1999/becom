@@ -502,6 +502,32 @@ class MyContactService extends AbstractService
     }
 
     /**
+     * @param $search
+     * @param $searchBy
+     * @return QueryBuilder
+     */
+    public function search($search, $searchBy): QueryBuilder
+    {
+        if ($search && !empty($searchBy)) {
+            //Get all fields
+            $getFillAble = app(Contact::class)->getFillable();
+            $query = $this->filteringByMyCustomContactField();
+            $query->where(function ($query) use ($search, $searchBy, $getFillAble) {
+                foreach ($searchBy as $value) {
+                    $query->when(in_array($value, $getFillAble), function ($q) use ($search, $value) {
+
+                        return $q->orWhere($value, 'like', '%' . $search . '%');
+                    });
+                }
+            });
+
+            return $query;
+        }
+
+        return $this->filteringByMyCustomContactField();
+    }
+
+    /**
      * @param $field
      * @return AllowedFilter
      */
@@ -622,13 +648,13 @@ class MyContactService extends AbstractService
      * @param $perPage
      * @return LengthAwarePaginator|QueryBuilder
      */
-    public function sortMyContactsToTopOrBottomOfListByUuid($uuidsIn, $uuidsNotIn, $perPage)
+    public function sortMyContactsToTopOrBottomOfListByUuid($uuidsIn, $uuidsNotIn, $perPage, $search, $searcBy)
     {
         $arrayIntersectUuidsIn = array_intersect(explode(',', $uuidsIn), $this->model->all()->pluck('uuid')->toArray());
         $arrayIntersectUuidsNotIn = array_intersect(explode(',', $uuidsNotIn), $this->model->all()->pluck('uuid')->toArray());
         if (!empty($uuidsIn) && !empty($uuidsNotIn) && !empty($arrayIntersectUuidsIn) && !empty($arrayIntersectUuidsNotIn)) {
 
-            $collection = $this->filteringByMyCustomContactField()->get()
+            $collection = $this->search($search, $searcBy)->get()
                 ->sortBy(function ($item) use ($arrayIntersectUuidsIn, $arrayIntersectUuidsNotIn) {
                     if (in_array($item->uuid, $arrayIntersectUuidsIn) || !in_array($item->uuid, $arrayIntersectUuidsNotIn)) {
 
@@ -639,7 +665,7 @@ class MyContactService extends AbstractService
             return $this->collectionPagination($collection, $perPage);
         } elseif (!empty($uuidsIn) && !empty($arrayIntersectUuidsIn) && empty($uuidsNotIn) && empty($arrayIntersectUuidsNotIn)) {
             //Uuids_in
-            $collection = $this->filteringByMyCustomContactField()->get()
+            $collection = $this->search($search, $searcBy)->get()
                 ->sortBy(function ($item) use ($arrayIntersectUuidsIn) {
                     if (in_array($item->uuid, $arrayIntersectUuidsIn)) {
 
@@ -650,7 +676,7 @@ class MyContactService extends AbstractService
             return $this->collectionPagination($collection, $perPage);
         } elseif (!empty($uuidsNotIn) && !empty($arrayIntersectUuidsNotIn) && empty($uuidsIn) && empty($arrayIntersectUuidsIn)) {
             //Uuids_Not_in
-            $collection = $this->filteringByMyCustomContactField()->get()
+            $collection = $this->search($search, $searcBy)->get()
                 ->sortBy(function ($item) use ($arrayIntersectUuidsNotIn) {
                     if (!in_array($item->uuid, $arrayIntersectUuidsNotIn)) {
 
@@ -668,7 +694,7 @@ class MyContactService extends AbstractService
             return $this->collectionPagination([], $perPage);
         }
 
-        return $this->filteringByMyCustomContactField();
+        return $this->search($search, $searcBy);
     }
 
     /**

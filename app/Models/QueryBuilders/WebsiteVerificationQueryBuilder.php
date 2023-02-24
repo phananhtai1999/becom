@@ -3,6 +3,7 @@
 namespace App\Models\QueryBuilders;
 
 use App\Abstracts\AbstractQueryBuilder;
+use App\Models\SearchQueryBuilders\SearchQueryBuilder;
 use App\Models\WebsiteVerification;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\Concerns\SortsQuery;
@@ -53,5 +54,26 @@ class WebsiteVerificationQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::scope('from__verified_at'),
                 AllowedFilter::scope('to__verified_at'),
             ]);
+    }
+
+    /**
+     * @return string
+     */
+    public static function fillAble()
+    {
+        return WebsiteVerification::class;
+    }
+
+    /**
+     * @param $search
+     * @param $searchBy
+     * @return mixed
+     */
+    public static function searchQuery($search, $searchBy)
+    {
+        $initialQuery = static::initialQuery();
+        $baseQuery = static::fillAble();
+
+        return SearchQueryBuilder::search($baseQuery, $initialQuery, $search, $searchBy);
     }
 }

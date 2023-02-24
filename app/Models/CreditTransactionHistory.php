@@ -22,6 +22,16 @@ class CreditTransactionHistory extends AbstractModel
     protected $primaryKey = 'uuid';
 
     /**
+     * @var string[]
+     */
+    protected $fillable = [
+        'campaign_uuid',
+        'credit',
+        'add_by_uuid',
+        'user_uuid',
+    ];
+
+    /**
      * @return BelongsTo
      */
     public function user() {

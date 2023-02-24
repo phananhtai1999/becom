@@ -3,6 +3,7 @@
 namespace App\Models\QueryBuilders;
 
 use App\Abstracts\AbstractQueryBuilder;
+use App\Models\SearchQueryBuilders\SearchQueryBuilder;
 use App\Models\Website;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\Concerns\SortsQuery;
@@ -61,5 +62,26 @@ class WebsiteQueryBuilder extends AbstractQueryBuilder
                 'user.email',
                 AllowedFilter::exact('exact__user.email', 'user.email'),
             ]);
+    }
+
+    /**
+     * @return string
+     */
+    public static function fillAble()
+    {
+        return Website::class;
+    }
+
+    /**
+     * @param $search
+     * @param $searchBy
+     * @return mixed
+     */
+    public static function searchQuery($search, $searchBy)
+    {
+        $initialQuery = static::initialQuery();
+        $baseQuery = static::fillAble();
+
+        return SearchQueryBuilder::search($baseQuery, $initialQuery, $search, $searchBy);
     }
 }

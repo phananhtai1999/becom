@@ -23,16 +23,18 @@ class CreditTransactionHistoryService extends AbstractService
      * @param $columns
      * @param $pageName
      * @param $page
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * @param $search
+     * @param $searchBy
+     * @return mixed
      */
-    public function customFilterSendTypeOnCampaign($filters, $fieldSort, $orderBy, $countFilters, $perPage, $columns, $pageName, $page)
+    public function customFilterSendTypeOnCampaign($filters, $fieldSort, $orderBy, $countFilters, $perPage, $columns, $pageName, $page, $search, $searchBy)
     {
         if ($countFilters == 1) {
             $models = $this->model
                 ->where('credit', '!=', '0')
                 ->whereNull('campaign_uuid');
 
-            return CreditTransactionHistoryQueryBuilder::initialQuery()->unionAll($models)->orderBy(ltrim($fieldSort, '-'), $orderBy)->paginate(
+            return CreditTransactionHistoryQueryBuilder::searchQuery($search, $searchBy)->unionAll($models)->orderBy(ltrim($fieldSort, '-'), $orderBy)->paginate(
                 $perPage,
                 $columns,
                 $pageName,
@@ -40,7 +42,7 @@ class CreditTransactionHistoryService extends AbstractService
             );
         } elseif (!empty($filters['credit_transaction_history']) && $filters['credit_transaction_history'] == 'added') {
 
-            return AddCreditTransactionHistoryQueryBuilder::initialQuery()->orderBy(ltrim($fieldSort, '-'), $orderBy)->paginate(
+            return AddCreditTransactionHistoryQueryBuilder::searchQuery($search, $searchBy)->orderBy(ltrim($fieldSort, '-'), $orderBy)->paginate(
                 $perPage,
                 $columns,
                 $pageName,
@@ -48,16 +50,16 @@ class CreditTransactionHistoryService extends AbstractService
             );
         } elseif (!empty($filters['credit_transaction_history']) && $filters['credit_transaction_history'] == 'used') {
 
-            return UseCreditTransactionHistoryQueryBuilder::initialQuery()->orderBy(ltrim($fieldSort, '-'), $orderBy)->paginate(
+            return UseCreditTransactionHistoryQueryBuilder::searchQuery($search, $searchBy)->orderBy(ltrim($fieldSort, '-'), $orderBy)->paginate(
                 $perPage,
                 $columns,
                 $pageName,
                 $page
             );
         }
-        $addCreditTransactionHistory = AddCreditTransactionHistoryQueryBuilder::initialQuery();
+        $addCreditTransactionHistory = AddCreditTransactionHistoryQueryBuilder::searchQuery($search, $searchBy);
 
-        return UseCreditTransactionHistoryQueryBuilder::initialQuery()->unionAll($addCreditTransactionHistory)->orderBy(ltrim($fieldSort, '-'), $orderBy)->paginate(
+        return UseCreditTransactionHistoryQueryBuilder::searchQuery($search, $searchBy)->unionAll($addCreditTransactionHistory)->orderBy(ltrim($fieldSort, '-'), $orderBy)->paginate(
             $perPage,
             $columns,
             $pageName,

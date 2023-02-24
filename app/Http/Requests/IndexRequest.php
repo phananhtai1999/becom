@@ -24,12 +24,15 @@ class IndexRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'per_page' => 'integer|min:1|max:100',
-            'page' => 'integer|min:1',
-            'sorted_by' =>  'string|in:ASC,asc,DESC,desc',
+            'per_page' => ['integer', 'min:1', 'max:100'],
+            'page' => ['integer', 'min:1'],
+            'sorted_by' =>  ['string', 'in:ASC,asc,DESC,desc'],
             'filter' => ['array'],
             'filter.*' => ['nullable', 'string'],
             'sort' => ['nullable', 'string'],
+            'search' =>  ['nullable', 'string'],
+            'search_by' => ['array'],
+            'search_by.*' => ['nullable', 'string'],
         ];
     }
 }

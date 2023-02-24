@@ -75,6 +75,7 @@ class MailOpenTrackingController extends AbstractRestAPIController
 
     /**
      * @param ReportAnalyticDataCampaignRequest $request
+     * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
     public function reportAnalyticDataCampaign(ReportAnalyticDataCampaignRequest $request, $id)

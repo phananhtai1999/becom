@@ -4,6 +4,7 @@ namespace App\Models\QueryBuilders;
 
 use App\Abstracts\AbstractQueryBuilder;
 use App\Models\Order;
+use App\Models\SearchQueryBuilders\SearchQueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\Concerns\SortsQuery;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -61,5 +62,26 @@ class MyOrderQueryBuilder extends AbstractQueryBuilder
                 'note',
                 AllowedFilter::exact('exact__note', 'note'),
             ]);
+    }
+
+    /**
+     * @return string
+     */
+    public static function fillAble()
+    {
+        return Order::class;
+    }
+
+    /**
+     * @param $search
+     * @param $searchBy
+     * @return mixed
+     */
+    public static function searchQuery($search, $searchBy)
+    {
+        $initialQuery = static::initialQuery();
+        $baseQuery = static::fillAble();
+
+        return SearchQueryBuilder::search($baseQuery, $initialQuery, $search, $searchBy);
     }
 }

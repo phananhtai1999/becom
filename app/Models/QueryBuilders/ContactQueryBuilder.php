@@ -4,6 +4,7 @@ namespace App\Models\QueryBuilders;
 
 use App\Abstracts\AbstractQueryBuilder;
 use App\Models\Contact;
+use App\Models\SearchQueryBuilders\SearchQueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\Concerns\SortsQuery;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -87,5 +88,26 @@ class ContactQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::scope('from__dob'),
                 AllowedFilter::scope('to__dob'),
             ]);
+    }
+
+    /**
+     * @return string
+     */
+    public static function fillAble()
+    {
+        return Contact::class;
+    }
+
+    /**
+     * @param $search
+     * @param $searchBy
+     * @return mixed
+     */
+    public static function searchQuery($search, $searchBy)
+    {
+        $initialQuery = static::initialQuery();
+        $baseQuery = static::fillAble();
+
+        return SearchQueryBuilder::search($baseQuery, $initialQuery, $search, $searchBy);
     }
 }
