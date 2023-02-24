@@ -14,13 +14,14 @@ class DatabaseSeeder extends Seeder {
 	 */
 	public function run() {
         $this->call([
-            UserSeeder::class
+            UserSeeder::class,
+            SmtpAccountEncryptionSeeder::class,
+            MailTemplateDefaultSeeder::class,
+            ConfigSeeder::class
         ]);
         if (!App::environment('production')) {
             $this->call([
-                SmtpAccountEncryptionSeeder::class,
                 WebsiteSeeder::class,
-                MailTemplateDefaultSeeder::class,
                 MailTemplateSeeder::class,
                 SmtpAccountSeeder::class,
                 ContactListSeeder::class,
