@@ -50,8 +50,11 @@ class ConfigSeeder extends Seeder
             [
                 "key"=> "logo",
                 "value"=> "https://file.storage.techupzone.com/linkstar-stg/public/upload/c690285d-4348-4ba4-b982-1e12d2334a5f_1677036055.png",
+            ],
+            [
+                "key"=> "favicon_icon",
+                "value"=> "https://file.storage.techupzone.com/linkstar-stg/public/upload/c690285d-4348-4ba4-b982-1e12d2334a5f_1677036055.png",
             ]
-
         ];
 
         foreach ($configs as $config) {
