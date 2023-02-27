@@ -3,10 +3,8 @@
 namespace App\Services;
 
 use App\Abstracts\AbstractService;
-use App\Events\PaymentSuccessfullyEvent;
-use App\Models\Order;
 use Exception;
-use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Auth;
 use Stripe\Exception\InvalidRequestException;
 use Stripe\StripeClient;
 
@@ -18,11 +16,9 @@ class StripeService extends AbstractService
      * @param $request
      * @return array
      */
-    public function processTransaction($totalPriceCart, $order, $request)
+    public function processTransaction($price, $userUuid, $request)
     {
         $stripe = new StripeClient(config('payment.stripe.client_secret'));
-        $pendingStatus = Order::ORDER_PENDING_REQUEST_STATUS;
-        $successStatus = Order::ORDER_PAYMENT_SUCCESS_STATUS;
 
         try {
             $token = $stripe->tokens->create([
@@ -36,23 +32,18 @@ class StripeService extends AbstractService
             ]);
 
             $stripe->charges->create([
-                'amount' => $totalPriceCart * 100,
+                'amount' => $price * 100,
                 'currency' => 'usd',
                 'source' => $token,
                 'description' => empty($request['description']) ? __('Payment incurred at') . ' ' . config('app.name') : $request['description']
             ]);
 
-            $paymentData = ["token" => $token->id];
-            Event::dispatch(new PaymentSuccessfullyEvent($order, $paymentData, $successStatus));
-
             return [
                 'status' => true,
-                'redirect_url' => env('FRONTEND_URL') . '/checkout/payment-completed/' . $order->getKey()
+                'redirect_url' => env('FRONTEND_URL') . '/payment/payment-completed/' . $userUuid
             ];
 
         } catch (InvalidRequestException|Exception $e) {
-            $paymentData = ["message" => $e->getMessage()];
-            Event::dispatch(new PaymentSuccessfullyEvent($order, $paymentData, $pendingStatus));
 
             return [
                 'status' => false,
@@ -60,4 +51,76 @@ class StripeService extends AbstractService
             ];
         }
     }
+
+    public function createProduct($request)
+    {
+        $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+
+        return $stripe->products->create([
+            'name' => $request->get('name'),
+        ]);
+    }
+
+    public function createPlan($productID, $request, $price)
+    {
+        $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+
+        $product = $stripe->products->retrieve($productID);
+        $plan = $stripe->plans->create([
+            'amount' => $price * 100,
+            'currency' => 'usd',
+            'interval' => $request->get('duration_type'),
+            'product' => $product,
+        ]);
+
+        return [
+            'plan_id' => $plan->id,
+        ];
+    }
+
+
+    public function processSubscription($membershipPackage, $fromDate, $toDate, $plan, $request)
+    {
+        $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+
+        try {
+            $token = $stripe->tokens->create([
+                'card' => [
+                    'name' => Auth::user()->name,
+                    'number' => $request['card_number'],
+                    'exp_month' => $request['exp_month'],
+                    'exp_year' => $request['exp_year'],
+                    'cvc' => $request['cvc'],
+                ]
+            ]);
+
+            $customer = $stripe->customers->create([
+                'email' => auth()->user()->email,
+                'source' => $token
+            ]);
+
+            $subscription = $stripe->subscriptions->create([
+                'customer' => $customer,
+                'items' => [
+                    ['price' => $plan],
+                ]
+            ]);
+
+            $stripe->subscriptionSchedules->create([
+                'from_subscription' => $subscription
+            ]);
+
+            return [
+                'status' => true,
+                'redirect_url' => env('FRONTEND_URL') . '/membership-packages/subscription-completed'
+            ];
+        } catch (\Exception $e) {
+
+            return [
+                'status' => false,
+                'message' => $e->getMessage(),
+            ];
+        }
+    }
+
 }
