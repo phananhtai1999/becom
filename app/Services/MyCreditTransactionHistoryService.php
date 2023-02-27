@@ -17,7 +17,6 @@ class MyCreditTransactionHistoryService extends AbstractService
      * @param $filters
      * @param $fieldSort
      * @param $orderBy
-     * @param $countFilters
      * @param $perPage
      * @param $columns
      * @param $pageName
@@ -26,23 +25,9 @@ class MyCreditTransactionHistoryService extends AbstractService
      * @param $searchBy
      * @return mixed
      */
-    public function customMyFilterSendTypeOnCampaign($filters, $fieldSort, $orderBy, $countFilters, $perPage, $columns, $pageName, $page, $search, $searchBy)
+    public function customMyFilterSendTypeOnCampaign($filters, $fieldSort, $orderBy, $perPage, $columns, $pageName, $page, $search, $searchBy)
     {
-        if ($countFilters == 1) {
-            $models = $this->model
-                ->where([
-                    ['user_uuid', auth()->user()->getkey()],
-                    ['credit', '!=', '0']
-                ])
-                ->whereNull('campaign_uuid');
-
-            return MyCreditTransactionHistoryQueryBuilder::searchQuery($search, $searchBy)->unionAll($models)->orderBy(ltrim($fieldSort, '-'), $orderBy)->paginate(
-                $perPage,
-                $columns,
-                $pageName,
-                $page
-            );
-        } elseif (!empty($filters['credit_transaction_history']) && $filters['credit_transaction_history'] == 'added') {
+        if (!empty($filters['credit_transaction_history']) && $filters['credit_transaction_history'] == 'added') {
 
             return MyAddCreditTransactionHistoryQueryBuilder::searchQuery($search, $searchBy)->orderBy(ltrim($fieldSort, '-'), $orderBy)->paginate(
                 $perPage,
