@@ -12,6 +12,9 @@ class PaymentMethod extends AbstractModel
 {
     use HasFactory, SoftDeletes, HasSlug;
 
+    const PAYPAL = 1;
+    const STRIPE = 2;
+
     /**
      * @var string
      */

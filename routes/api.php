@@ -5,8 +5,11 @@ use App\Http\Controllers\Api\EmailController;
 use App\Http\Controllers\Api\MailOpenTrackingController;
 use App\Http\Controllers\Api\MailSendingHistoryController;
 use App\Http\Controllers\Api\MailTemplateController;
+use App\Http\Controllers\Api\Payment\PaymentController;
+use App\Http\Controllers\Api\PlatformPackageController;
 use App\Http\Controllers\Api\ScenarioController;
 use App\Http\Controllers\Api\SmtpAccountController;
+use App\Http\Controllers\Api\SubscriptionPlanController;
 use App\Http\Controllers\Api\User\UserController;
 use App\Http\Controllers\Api\WebsiteController;
 use App\Http\Controllers\Api\WebsiteVerificationController;
@@ -483,3 +486,17 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'scenario.'], function () {
         Route::put('my/scenario/{id}', [ScenarioController::class, 'editMyScenario'])->name('editMyScenario');
     });
 });
+
+Route::group(['middleware' => ['auth:api'], 'as' => 'payment.'], function () {
+    Route::post('/platform-package', [PlatformPackageController::class, 'store']);
+    Route::post('/subscription-plan', [SubscriptionPlanController::class, 'store']);
+});
+Route::group(['middleware' => ['auth:api'], 'as' => 'payment.'], function () {
+    Route::post('/payment', [PaymentController::class, 'payment']);
+    Route::post('/upgrade-user', [PaymentController::class, 'upgradeUser']);
+});
+
+Route::get('/paypal/success-payment', [\App\Http\Controllers\Api\Payment\PaypalController::class, 'successPayment'])->name('paypal.successPayment');
+Route::get('/paypal/success-payment-subscription', [\App\Http\Controllers\Api\Payment\PaypalController::class, 'successPaymentSubscription'])->name('paypal.successPaymentSubscription');
+Route::get('/paypal/cancel-payment', [\App\Http\Controllers\Api\Payment\PaypalController::class, 'cancelPayment'])->name('paypal.cancelPayment');
+Route::get('/paypal/cancel-payment-subscription', [\App\Http\Controllers\Api\Payment\PaypalController::class, 'cancelPaymentSubscription'])->name('paypal.cancelPaymentSubscription');

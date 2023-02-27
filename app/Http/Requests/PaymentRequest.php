@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -18,15 +19,34 @@ class PaymentRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array
+     * @return string[][]
      */
-    public function rules()
+    public function rules(): array
+    {
+        $rule = [
+            'payment_method' => ['required', Rule::in('stripe', 'paypal')],
+            "card_number" => ['required_if:payment_method,==,stripe', 'integer', 'digits:16'],
+            "exp_month" => ['required_if:payment_method,==,stripe', 'integer'],
+            "exp_year" => ['required_if:payment_method,==,stripe', 'integer', 'min:' . Carbon::now()->year],
+            "cvc" => ['required_if:payment_method,==,stripe', 'integer', 'digits:3']
+        ];
+
+        if ($this->request->get('exp_year') == Carbon::now()->year) {
+            $rule['exp_month'] = array_merge($rule['exp_month'], ['min:' . Carbon::now()->month]);
+
+        }
+
+        return $rule;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function messages(): array
     {
         return [
-            'credit' => ['required', 'numeric'],
-            'payment_method_uuid' => ['required', 'numeric', Rule::exists('payment_methods', 'uuid')->whereNull('deleted_at')],
+            'exp_month.min' => 'The exp month must be as least current month',
+            'exp_year.min' => 'The exp year must be as least current year'
         ];
     }
 }

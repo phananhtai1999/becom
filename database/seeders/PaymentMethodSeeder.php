@@ -20,10 +20,7 @@ class PaymentMethodSeeder extends Seeder
             ],
             [
                 'name' => 'stripe'
-            ],
-            [
-                'name' => 'momo'
-            ],
+            ]
         ];
 
         foreach ($paymentMethods as $paymentMethod) {
