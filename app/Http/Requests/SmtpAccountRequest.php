@@ -25,15 +25,15 @@ class SmtpAccountRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'mail_mailer' => ['required', 'string'],
-            'mail_host' => ['required', 'string'],
-            'mail_port' => ['required', 'string'],
-            'mail_username' => ['required', 'string'],
-            'mail_password' => ['required', 'string'],
+            'mail_mailer' => ['required', 'string', 'in:smtp,telegram,viber'],
+            'mail_host' => ['required_if:mail_mailer,===,smtp', 'string'],
+            'mail_port' => ['required_if:mail_mailer,===,smtp', 'string'],
+            'mail_username' => ['required_if:mail_mailer,===,smtp', 'string'],
+            'mail_password' => ['required_if:mail_mailer,===,smtp', 'string'],
             'smtp_mail_encryption_uuid' => ['required', 'numeric', 'exists:smtp_account_encryptions,uuid'],
-            'mail_from_address' => ['required', 'string'],
-            'mail_from_name' => ['required', 'string'],
-            'secret_key' => ['required', 'string'],
+            'mail_from_address' => ['required_if:mail_mailer,===,smtp', 'string'],
+            'mail_from_name' => ['required_if:mail_mailer,===,smtp', 'string'],
+            'secret_key' => ['required_if:mail_mailer,===,telegram,viber', 'string'],
             'website_uuid' => ['required', 'numeric', 'min:1', 'exists:websites,uuid']
         ];
     }

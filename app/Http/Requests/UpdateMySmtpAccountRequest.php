@@ -25,17 +25,17 @@ class UpdateMySmtpAccountRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'mail_mailer' => ['string'],
-            'mail_host' => ['string'],
-            'mail_port' => ['string'],
-            'mail_username' => ['string', Rule::unique('smtp_accounts')->ignore($this->id,'uuid')->where(function ($query) {
+            'mail_mailer' => ['string', 'in:smtp,telegram,viber'],
+            'mail_host' => ['required_if:mail_mailer,===,smtp', 'string'],
+            'mail_port' => ['required_if:mail_mailer,===,smtp', 'string'],
+            'mail_username' => ['required_if:mail_mailer,===,smtp', 'string', Rule::unique('smtp_accounts')->where(function ($query) {
                 return $query->where('user_uuid', auth()->user()->getkey())->whereNull('deleted_at');
             })],
-            'mail_password' => ['string'],
+            'mail_password' => ['required_if:mail_mailer,===,smtp', 'string'],
             'smtp_mail_encryption_uuid' => ['numeric', 'exists:smtp_account_encryptions,uuid'],
-            'mail_from_address' => ['string'],
-            'mail_from_name' => ['string'],
-            'secret_key' => ['string'],
+            'mail_from_address' => ['required_if:mail_mailer,===,smtp', 'string'],
+            'mail_from_name' => ['required_if:mail_mailer,===,smtp', 'string'],
+            'secret_key' => ['required_if:mail_mailer,===,telegram,viber', 'string'],
             'website_uuid' => ['numeric', 'min:1', Rule::exists('websites', 'uuid')->where(function ($query) {
 
                 return $query->where('user_uuid', auth()->user()->getkey())->whereNull('deleted_at');

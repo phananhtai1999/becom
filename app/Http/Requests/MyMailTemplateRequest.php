@@ -33,6 +33,7 @@ class MyMailTemplateRequest extends AbstractRequest
             })],
             'design' => ['required', 'string'],
             'type' => ['required', 'string', 'in:sms,email'],
+            'image' => ['nullable', 'string'],
         ];
     }
 }

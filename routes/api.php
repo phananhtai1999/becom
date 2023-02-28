@@ -169,6 +169,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'smtp-account.'], function (
         Route::get('/smtp-account/{id}', [SmtpAccountController::class, 'show'])->name('show');
         Route::put('/smtp-account/{id}', [SmtpAccountController::class, 'edit'])->name('edit');
         Route::delete('/smtp-account/{id}', [SmtpAccountController::class, 'destroy'])->name('destroy');
+        Route::get('/get-mail-mailer-type/smtp-account', [SmtpAccountController::class, 'getMailMailerSmtpAccount'])->name('get-mail-mailer-smtp-account');
     });
 
     Route::group(['as' => 'my.'], function () {
