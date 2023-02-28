@@ -3,8 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
+use App\Http\Controllers\Traits\RestDestroyTrait;
+use App\Http\Controllers\Traits\RestIndexTrait;
+use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\SubscriptionPlanRequest;
 use App\Http\Resources\SubscriptionPlanResource;
+use App\Http\Resources\SubscriptionPlanResourceCollection;
 use App\Services\PaypalService;
 use App\Services\PlatformPackageService;
 use App\Services\StripeService;
@@ -12,6 +16,7 @@ use App\Services\SubscriptionPlanService;
 
 class SubscriptionPlanController extends AbstractRestAPIController
 {
+    use RestIndexTrait, RestShowTrait, RestDestroyTrait;
     public function __construct(
         SubscriptionPlanService $subscriptionPlanService,
         PaypalService           $paypalService,
@@ -24,6 +29,7 @@ class SubscriptionPlanController extends AbstractRestAPIController
         $this->stripeService = $stripeService;
         $this->platformPacakageService = $platformPackageService;
         $this->resourceClass = SubscriptionPlanResource::class;
+        $this->resourceCollectionClass = SubscriptionPlanResourceCollection::class;
     }
 
     public function store(SubscriptionPlanRequest $request)

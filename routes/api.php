@@ -1,11 +1,13 @@
 <?php
 
 use App\Http\Controllers\Api\CampaignController;
+use App\Http\Controllers\Api\CreditPackageController;
 use App\Http\Controllers\Api\EmailController;
 use App\Http\Controllers\Api\MailOpenTrackingController;
 use App\Http\Controllers\Api\MailSendingHistoryController;
 use App\Http\Controllers\Api\MailTemplateController;
 use App\Http\Controllers\Api\Payment\PaymentController;
+use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\PlatformPackageController;
 use App\Http\Controllers\Api\ScenarioController;
 use App\Http\Controllers\Api\SmtpAccountController;
@@ -487,10 +489,35 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'scenario.'], function () {
     });
 });
 
-Route::group(['middleware' => ['auth:api'], 'as' => 'payment.'], function () {
+Route::group(['middleware' => ['auth:api'], 'as' => 'platformPackage.'], function () {
     Route::post('/platform-package', [PlatformPackageController::class, 'store']);
-    Route::post('/subscription-plan', [SubscriptionPlanController::class, 'store']);
+    Route::get('/platform-package/{id}', [PlatformPackageController::class, 'show']);
+    Route::get('/platform-packages', [PlatformPackageController::class, 'index']);
+    Route::delete('/platform-package/{id}', [PlatformPackageController::class, 'destroy']);
 });
+
+Route::group(['middleware' => ['auth:api'], 'as' => 'creditPackage.'], function () {
+    Route::post('/credit-package', [CreditPackageController::class, 'store']);
+    Route::get('/credit-package/{id}', [CreditPackageController::class, 'show']);
+    Route::put('/credit-package/{id}', [CreditPackageController::class, 'edit']);
+    Route::get('/credit-packages', [CreditPackageController::class, 'index']);
+    Route::delete('/credit-package/{id}', [CreditPackageController::class, 'destroy']);
+});
+Route::group(['middleware' => ['auth:api'], 'as' => 'subscriptionPlan.'], function () {
+    Route::post('/subscription-plan', [SubscriptionPlanController::class, 'store']);
+    Route::get('/subscription-plan/{id}', [SubscriptionPlanController::class, 'show']);
+    Route::get('/subscription-plans', [SubscriptionPlanController::class, 'index']);
+    Route::delete('/subscription-plan/{id}', [SubscriptionPlanController::class, 'destroy']);
+});
+Route::group(['middleware' => ['auth:api'], 'as' => 'permission.'], function () {
+    Route::post('/permission', [PermissionController::class, 'store']);
+    Route::get('/permission/{id}', [PermissionController::class, 'show']);
+    Route::put('/permission/{id}', [PermissionController::class, 'edit']);
+    Route::get('/permissions', [PermissionController::class, 'index']);
+    Route::delete('/permission/{id}', [PermissionController::class, 'destroy']);
+});
+
+//Payment and subscription
 Route::group(['middleware' => ['auth:api'], 'as' => 'payment.'], function () {
     Route::post('/payment', [PaymentController::class, 'payment']);
     Route::post('/upgrade-user', [PaymentController::class, 'upgradeUser']);
