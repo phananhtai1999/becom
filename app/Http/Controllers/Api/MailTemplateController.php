@@ -227,6 +227,8 @@ class MailTemplateController extends AbstractRestAPIController
                     $request->get('columns', '*'),
                     $request->get('page_name', 'page'),
                     $request->get('page', '1'),
+                    $request->get('search'),
+                    $request->get('search_by'),
                 )
             )
         );
