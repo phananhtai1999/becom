@@ -80,6 +80,8 @@ class SortTotalCreditOfMyCampaignQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__mailTemplate.subject', 'mailTemplate.subject'),
                 'smtpAccount.mail_username',
                 AllowedFilter::exact('exact__smtpAccount.mail_username', 'smtpAccount.mail_username'),
+                'smtpAccount.mail_mailer',
+                AllowedFilter::exact('exact__smtpAccount.mail_mailer', 'smtpAccount.mail_mailer'),
                 'website.domain',
                 AllowedFilter::exact('exact__website.domain', 'website.domain'),
                 'user.username',

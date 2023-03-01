@@ -160,9 +160,10 @@ class EmailNotification extends BaseNotification
      * @param $contact
      * @param $emailTracking
      * @param $smtpAccount
+     * @param $mailTemplate
      * @return void
      */
-    public function sendContent($contact, $emailTracking, $smtpAccount)
+    public function sendContent($contact, $emailTracking, $smtpAccount, $mailTemplate)
     {
         Mail::to($contact->email)->send(new SendCampaign($emailTracking, $smtpAccount->mail_from_name, $smtpAccount->mail_from_address, $this->campaign->reply_to_email, $this->campaign->reply_name));
     }
