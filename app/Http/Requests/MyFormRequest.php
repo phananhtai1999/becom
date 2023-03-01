@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use App\Abstracts\AbstractRequest;
 use Illuminate\Validation\Rule;
 
-class WebsitePageRequest extends AbstractRequest
+class MyFormRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -28,9 +28,10 @@ class WebsitePageRequest extends AbstractRequest
             'title' => ['required', 'string'],
             'template' => ['required', 'string'],
             'template_json' => ['required', 'string'],
-            'website_page_category_uuid' => ['required', 'numeric', Rule::exists('website_page_categories','uuid')->whereNull('deleted_at')],
-            'publish_status' => ['required', 'numeric', 'min:1', 'max:2'],
-            'user_uuid' => ['nullable', 'numeric', Rule::exists('users','uuid')->whereNull('deleted_at')],
+            'contact_list_uuid' => ['required', 'numeric', 'min:1', Rule::exists('contact_lists', 'uuid')->where(function ($query) {
+
+                return $query->where('user_uuid', auth()->user()->getkey())->whereNull('deleted_at');
+            })],
         ];
     }
 }

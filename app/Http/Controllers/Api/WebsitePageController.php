@@ -56,7 +56,7 @@ class WebsitePageController extends AbstractRestAPIController
         $request = app($this->storeRequest);
 
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => auth()->user()->getKey()
+            'user_uuid' => $request->get('user_uuid') ?? auth()->user()->getKey()
         ]));
 
         return $this->sendCreatedJsonResponse(
@@ -73,7 +73,9 @@ class WebsitePageController extends AbstractRestAPIController
 
         $model = $this->service->findOrFailById($id);
 
-        $this->service->update($model, $request->except('user_uuid'));
+        $this->service->update($model, array_merge($request->all(), [
+            'user_uuid' => $request->get('user_uuid') ?? auth()->user()->getKey()
+        ]));
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
