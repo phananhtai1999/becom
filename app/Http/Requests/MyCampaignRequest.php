@@ -39,7 +39,7 @@ class MyCampaignRequest extends AbstractRequest
             'to_date' => ['required', 'date', 'after_or_equal:from_date'],
             'status' => ['required', 'string', 'in:active,banned'],
             'type' => ['required', 'string', 'in:simple,birthday,scenario'],
-            'send_type' => ['required', 'string', 'in:sms,email'],
+            'send_type' => ['required', 'string', 'in:sms,email,telegram,viber'],
             'smtp_account_uuid' => ['nullable', 'numeric', 'min:1', Rule::exists('smtp_accounts', 'uuid')->where(function ($query) {
                 return $query->where([
                     ['website_uuid', $this->request->get('website_uuid')],

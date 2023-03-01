@@ -35,7 +35,8 @@ class MailTemplate extends AbstractModel
         'user_uuid',
         'design',
         'publish_status',
-        'type'
+        'type',
+        'image'
     ];
 
     /**
@@ -43,6 +44,7 @@ class MailTemplate extends AbstractModel
      */
     protected $casts = [
         'design' => 'array',
+        'image' => 'array',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',

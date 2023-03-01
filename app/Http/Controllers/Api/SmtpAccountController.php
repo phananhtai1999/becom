@@ -322,4 +322,14 @@ class SmtpAccountController extends AbstractRestAPIController
             'total' => $total['0']
         ]);
     }
+
+    /**
+     * @return JsonResponse
+     */
+    public function getMailMailerSmtpAccount()
+    {
+        return $this->sendOkJsonResponse([
+            'data' => config('mailmailer')
+        ]);
+    }
 }
