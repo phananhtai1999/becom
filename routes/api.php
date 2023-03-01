@@ -12,6 +12,8 @@ use App\Http\Controllers\Api\SmtpAccountController;
 use App\Http\Controllers\Api\SubscriptionPlanController;
 use App\Http\Controllers\Api\User\UserController;
 use App\Http\Controllers\Api\WebsiteController;
+use App\Http\Controllers\Api\WebsitePageCategoryController;
+use App\Http\Controllers\Api\WebsitePageController;
 use App\Http\Controllers\Api\WebsiteVerificationController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
@@ -484,6 +486,43 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'scenario.'], function () {
         Route::post('my/scenario', [ScenarioController::class, 'storeMyScenario'])->name('storeMyScenario');
         Route::get('my/scenario/{id}', [ScenarioController::class, 'showMyScenario'])->name('showMyScenario');
         Route::put('my/scenario/{id}', [ScenarioController::class, 'editMyScenario'])->name('editMyScenario');
+    });
+});
+
+//Website_page_categories
+Route::group(['middleware' => ['auth:api'], 'as' => 'website_page_category.'], function () {
+
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::post('/website-page-category', [WebsitePageCategoryController::class, 'store'])->name('store');
+        Route::put('/website-page-category/{id}', [WebsitePageCategoryController::class, 'edit'])->name('edit');
+        Route::delete('/website-page-category/{id}', [WebsitePageCategoryController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::group(['as' => 'my.'], function () {
+        Route::get('/website-page-categories', [WebsitePageCategoryController::class, 'index'])->name('index');
+        Route::get('/website-page-category/{id}', [WebsitePageCategoryController::class, 'show'])->name('show');
+    });
+
+});
+
+//Website_pages
+Route::group(['middleware' => ['auth:api'], 'as' => 'website_page'], function () {
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('website-pages', [WebsitePageController::class, 'index'])->name('index');
+        Route::post('website-page', [WebsitePageController::class, 'store'])->name('store');
+        Route::get('website-page/{id}', [WebsitePageController::class, 'show'])->name('show');
+        Route::put('website-page/{id}', [WebsitePageController::class, 'edit'])->name('edit');
+        Route::delete('/website-page/{id}', [WebsitePageController::class, 'destroy'])->name('destroy');
+        Route::get('/unpublished-website-pages', [WebsitePageController::class, 'indexUnpublishedWebsitePage'])->name('index-unpublished');
+        Route::get('/unpublished-website-page/{id}', [WebsitePageController::class, 'showUnpublishedWebsitePage'])->name('show-unpublished');
+        Route::post('website-page/accept-publish', [WebsitePageController::class, 'acceptPublishWebsitePage'])->name('acceptPublishWebsitePage');
+    });
+    Route::group(['as' => 'my.'], function () {
+        Route::get('my/website-pages', [WebsitePageController::class, 'indexMyWebsitePage'])->name('indexMyWebsitePage');
+        Route::post('my/website-page', [WebsitePageController::class, 'storeMyWebsitePage'])->name('storeMyWebsitePage');
+        Route::get('my/website-page/{id}', [WebsitePageController::class, 'showMyWebsitePage'])->name('showMyWebsitePage');
+        Route::put('my/website-page/{id}', [WebsitePageController::class, 'editMyWebsitePage'])->name('editMyWebsitePage');
+        Route::delete('my/website-page/{id}', [WebsitePageController::class, 'destroyMyWebsitePage'])->name('destroyMyWebsitePage');
     });
 });
 

@@ -52,9 +52,9 @@ class MailTemplateService extends AbstractService
      * @param $page
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function indexMailtemplateByPublishStatus($publishStatus, $perPage, $columns, $pageName, $page)
+    public function indexMailtemplateByPublishStatus($publishStatus, $perPage, $columns, $pageName, $page, $search, $searchBy)
     {
-        return MailTemplateQueryBuilder::initialQuery()->where('publish_status', $publishStatus)
+        return MailTemplateQueryBuilder::searchQuery($search, $searchBy)->where('publish_status', $publishStatus)
             ->paginate($perPage, $columns, $pageName, $page);
     }
 
