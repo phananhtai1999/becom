@@ -24,12 +24,14 @@ class CampaignRequest extends AbstractRequest
      */
     public function rules()
     {
+        $sendType = $this->request->get('send_type');
         $validate = [
             'tracking_key' => ['required', 'string'],
-            'mail_template_uuid' => ['required', 'numeric', 'min:1', Rule::exists('mail_templates', 'uuid')->where(function ($query) {
+            'mail_template_uuid' => ['required', 'numeric', 'min:1', Rule::exists('mail_templates', 'uuid')->where(function ($query) use ($sendType) {
+
                 return $query->where([
                     ['user_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey()],
-                    ['type', $this->request->get('send_type')],
+                    ['type', $sendType],
                     ['publish_status', true]])->where(function ($q) {
                     $q->where('website_uuid', $this->request->get('website_uuid'))
                         ->orWhere('website_uuid', null);
@@ -40,11 +42,25 @@ class CampaignRequest extends AbstractRequest
             'status' => ['required', 'string', 'in:active,banned'],
             'type' => ['required', 'string', 'in:simple,birthday,scenario'],
             'send_type' => ['required', 'string', 'in:sms,email,telegram,viber'],
-            'smtp_account_uuid' => ['nullable', 'numeric', 'min:1', Rule::exists('smtp_accounts', 'uuid')->where(function ($query) {
-                return $query->where([
-                    ['website_uuid', $this->request->get('website_uuid')],
-                    ['user_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey()]
-                ])->whereNull('deleted_at');
+            'smtp_account_uuid' => ['nullable', 'numeric', 'min:1', Rule::exists('smtp_accounts', 'uuid')->where(function ($query) use ($sendType) {
+                if ($sendType == 'email') {
+                    return $query->where([
+                        ['website_uuid', $this->request->get('website_uuid')],
+                        ['user_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey()],
+                        ['mail_mailer', 'smtp'],
+                    ])->whereNull('deleted_at');
+                } elseif ($sendType == 'sms') {
+                    return $query->where([
+                        ['website_uuid', $this->request->get('website_uuid')],
+                        ['user_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey()],
+                    ])->whereNull('deleted_at');
+                } else {
+                    return $query->where([
+                        ['website_uuid', $this->request->get('website_uuid')],
+                        ['user_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey()],
+                        ['mail_mailer', $sendType],
+                    ])->whereNull('deleted_at');
+                }
             })],
             'website_uuid' => ['required', 'numeric', 'min:1', Rule::exists('websites', 'uuid')->where(function ($query) {
                 return $query->where('user_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey())->whereNull('deleted_at');
@@ -52,10 +68,10 @@ class CampaignRequest extends AbstractRequest
             'was_finished' => ['required', 'boolean'],
             'was_stopped_by_owner' => ['required', 'boolean'],
             'user_uuid' => ['nullable', 'numeric', 'min:1', 'exists:users,uuid'],
-            'reply_to_email' => ['nullable','required_if:send_type,email', 'string', 'email:rfc,dns'],
-            'reply_name' => ['nullable','required_if:send_type,email', 'string'],
+            'reply_to_email' => ['nullable', 'required_if:send_type,email', 'string', 'email:rfc,dns'],
+            'reply_name' => ['nullable', 'required_if:send_type,email', 'string'],
             'contact_list' => ['required', 'array', 'min:1'],
-            'contact_list.*' => ['required', 'numeric', 'min:1',  Rule::exists('contact_lists', 'uuid')->where(function ($query) {
+            'contact_list.*' => ['required', 'numeric', 'min:1', Rule::exists('contact_lists', 'uuid')->where(function ($query) {
                 return $query->where('user_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey())->whereNull('deleted_at');
             })]
         ];

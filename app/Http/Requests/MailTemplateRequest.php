@@ -29,8 +29,9 @@ class MailTemplateRequest extends AbstractRequest
             'website_uuid' => ['nullable', 'numeric', 'min:1', 'exists:websites,uuid'],
             'design' => ['required', 'string'],
             'publish_status' => ['required', 'numeric', 'min:1', 'max:2'],
-            'type' => ['required', 'string', 'in:sms,email'],
-            'image' => ['nullable', 'string'],
+            'type' => ['required', 'string', 'in:sms,email,telegram,viber'],
+            'image' => ['nullable', 'array'],
+            'image.*' => ['string'],
         ];
     }
 }

@@ -12,6 +12,7 @@ use App\Services\SmtpAccountService;
 use App\Services\UserService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class BaseNotification
 {
@@ -150,7 +151,7 @@ class BaseNotification
             $mailSendingHistory = $this->saveMailSendingHistory($contact, $scenario);
             $emailTracking = $this->getContent($contact, $smtpAccount, $mailSendingHistory);
             try {
-                $this->sendContent($contact, $emailTracking, $smtpAccount);
+                $this->sendContent($contact, $emailTracking, $smtpAccount, $this->campaign->mailTemplate);
             } catch (\Exception $e) {
                 $this->mailSuccess = false;
                 $this->creditReturn += $configPrice;
@@ -214,6 +215,10 @@ class BaseNotification
             return app()->makeWith(SmsNotification::class, ['campaign' => $this->campaign]);
         } elseif ($this->campaign->send_type == 'email') {
             return app()->makeWith(EmailNotification::class, ['campaign' => $this->campaign]);
+        } elseif ($this->campaign->send_type == 'telegram') {
+            return app()->makeWith(TelegramNotification::class, ['campaign' => $this->campaign]);
+        } elseif ($this->campaign->send_type == 'viber') {
+            return app()->makeWith(ViberNotification::class, ['campaign' => $this->campaign]);
         }
     }
 }

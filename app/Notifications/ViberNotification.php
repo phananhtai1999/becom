@@ -13,7 +13,7 @@ use App\Services\UserService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
-class SmsNotification extends BaseNotification {
+class ViberNotification extends BaseNotification {
 
     /**
      * @var
@@ -119,7 +119,7 @@ class SmsNotification extends BaseNotification {
      */
     public function getNotificationPrice()
     {
-        return $this->configService->findConfigByKey('sms_price')->value;
+        return $this->configService->findConfigByKey('viber_price')->value;
     }
 
     /**
@@ -158,16 +158,28 @@ class SmsNotification extends BaseNotification {
      */
     public function sendContent($contact, $content, $smtpAccount, $mailTemplate)
     {
-        Log::info('Phone:' . "$contact->phone" . '|' . 'Content:' . "$content");
+        Log::info('Phone:' . "$contact->phone" . '|' . 'Content:' . "$content". '|' . 'secret_ket:' . "$smtpAccount->secret_key" . '|' . 'image:' . json_encode($mailTemplate->image));
     }
 
     /**
      * @param $user
-     * @return null
+     * @return mixed
      */
     public function getSendOption($user)
     {
-        return null;
+        $configSmtpAuto = $this->configService->findConfigByKey('smtp_auto');
+        if ($user->can_add_smtp_account == 1 || $configSmtpAuto->value == 0) {
+            if (!empty($this->campaign->smtpAccount)) {
+                $smtpAccount = $this->campaign->smtpAccount;
+            } else {
+                $smtpAccount = $this->smtpAccountService->getRandomSmtpAccountAdmin();
+            }
+        } else {
+            $smtpAccount = $this->smtpAccountService->getRandomSmtpAccountAdmin();
+        }
+        $this->smtpAccountService->setSwiftSmtpAccountForSendEmail($smtpAccount);
+
+        return $smtpAccount;
     }
 }
 
