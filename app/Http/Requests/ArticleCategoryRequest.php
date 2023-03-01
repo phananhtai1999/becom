@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use App\Abstracts\AbstractRequest;
 use Illuminate\Validation\Rule;
 
-class WebsitePageCategoryRequest extends AbstractRequest
+class ArticleCategoryRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,9 +25,13 @@ class WebsitePageCategoryRequest extends AbstractRequest
     public function rules()
     {
         return [
+            'image' => ['nullable', 'string'],
+            'slug' => ['required', 'string'],
             'title' => ['required', 'array', 'min:1'],
             'title.en' => ['required', 'string'],
             'title.*' => ['required', 'string'],
+            'publish_status' => ['required', 'numeric', 'min:1', 'max:2'],
+            'parent_uuid' => ['nullable', 'numeric', Rule::exists('article_categories', 'uuid')->whereNull('deleted_at')]
         ];
     }
 }
