@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\CampaignController;
 use App\Http\Controllers\Api\CreditPackageController;
 use App\Http\Controllers\Api\EmailController;
 use App\Http\Controllers\Api\FormController;
+use App\Http\Controllers\Api\LanguageController;
 use App\Http\Controllers\Api\MailOpenTrackingController;
 use App\Http\Controllers\Api\MailSendingHistoryController;
 use App\Http\Controllers\Api\MailTemplateController;
@@ -609,4 +610,20 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'form.'], function () {
         Route::put('/my/form/{id}', [FormController::class, 'editMyForm'])->name('edit');
         Route::delete('/my/form/{id}', [FormController::class, 'destroyMyForm'])->name('destroy');
     });
+});
+
+//Language
+Route::group(['middleware' => ['auth:api'], 'as' => 'language.'], function () {
+
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::post('/language', [LanguageController::class, 'store'])->name('store');
+        Route::put('/language/{id}', [LanguageController::class, 'edit'])->name('edit');
+        Route::delete('/language/{id}', [LanguageController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::group(['as' => 'my.'], function () {
+        Route::get('/languages', [LanguageController::class, 'index'])->name('index');
+        Route::get('/language/{id}', [LanguageController::class, 'show'])->name('show');
+    });
+
 });
