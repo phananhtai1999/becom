@@ -26,7 +26,8 @@ class WebsitePageCategoryRequest extends AbstractRequest
     {
         return [
             'title' => ['required', 'array', 'min:1'],
-            'title.*' => ['required', 'string']
+            'title.en' => ['required', 'string'],
+            'title.*' => ['required', 'string'],
         ];
     }
 }

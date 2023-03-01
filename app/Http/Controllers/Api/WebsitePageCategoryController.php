@@ -13,6 +13,7 @@ use App\Http\Requests\UpdateWebsitePageCategoryRequest;
 use App\Http\Requests\WebsitePageCategoryRequest;
 use App\Http\Resources\WebsitePageCategoryResource;
 use App\Http\Resources\WebsitePageCategoryResourceCollection;
+use App\Models\Language;
 use App\Models\WebsitePageCategory;
 use App\Services\WebsitePageCategoryService;
 use Illuminate\Http\JsonResponse;
@@ -39,10 +40,8 @@ class WebsitePageCategoryController extends AbstractRestAPIController
     {
         $request = app($this->storeRequest);
 
-        $listLanguages = ['vi', 'en', 'fr', 'ch'];
-
         foreach ($request->title as $lang => $value) {
-            if (!in_array($lang, $listLanguages)) {
+            if (!in_array($lang, Language::LANGUAGES_SUPPORT)) {
                 return $this->sendValidationFailedJsonResponse();
             }
         }
@@ -62,10 +61,8 @@ class WebsitePageCategoryController extends AbstractRestAPIController
     {
         $request = app($this->editRequest);
 
-        $listLanguages = ['vi', 'en', 'fr', 'ch'];
-
         foreach ($request->title as $lang => $value) {
-            if (!in_array($lang, $listLanguages)) {
+            if (!in_array($lang, Language::LANGUAGES_SUPPORT)) {
                 return $this->sendValidationFailedJsonResponse();
             }
         }
