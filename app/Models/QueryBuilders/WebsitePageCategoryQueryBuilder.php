@@ -25,7 +25,7 @@ class WebsitePageCategoryQueryBuilder extends AbstractQueryBuilder
      */
     public static function initialQuery()
     {
-        $modelKeyName = (new WebsitePage())->getKeyName();
+        $modelKeyName = (new WebsitePageCategory())->getKeyName();
 
         return static::for(static::baseQuery())
             ->allowedFields([
