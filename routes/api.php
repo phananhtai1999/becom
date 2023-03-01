@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Api\ArticleCategoryController;
+use App\Http\Controllers\Api\ArticleController;
 use App\Http\Controllers\Api\CampaignController;
 use App\Http\Controllers\Api\CreditPackageController;
 use App\Http\Controllers\Api\EmailController;
@@ -627,3 +629,29 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'language.'], function () {
     });
 
 });
+
+//Article Category
+Route::group(['middleware' => ['auth:api'], 'as' => 'article-category.'], function () {
+
+    Route::group(['middleware' => ['role:admin,editor'], 'as' => 'author.'], function () {
+        Route::post('/article-category', [ArticleCategoryController::class, 'store'])->name('store');
+        Route::put('/article-category/{id}', [ArticleCategoryController::class, 'edit'])->name('edit');
+        Route::delete('/article-category/{id}', [ArticleCategoryController::class, 'destroy'])->name('destroy');
+        Route::get('/article-categories', [ArticleCategoryController::class, 'index'])->name('index');
+        Route::get('/article-category/{id}', [ArticleCategoryController::class, 'show'])->name('show');
+    });
+});
+
+//Article
+Route::group(['middleware' => ['auth:api'], 'as' => 'article.'], function () {
+
+    Route::group(['middleware' => ['role:admin,editor'], 'as' => 'author.'], function () {
+        Route::post('/article', [ArticleController::class, 'store'])->name('store');
+        Route::put('/article/{id}', [ArticleController::class, 'edit'])->name('edit');
+        Route::delete('/article/{id}', [ArticleController::class, 'destroy'])->name('destroy');
+        Route::get('/articles', [ArticleController::class, 'index'])->name('index');
+        Route::get('/article/{id}', [ArticleController::class, 'show'])->name('show');
+    });
+});
+
+
