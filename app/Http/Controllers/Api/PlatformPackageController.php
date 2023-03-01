@@ -3,14 +3,19 @@
 namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
+use App\Http\Controllers\Traits\RestDestroyTrait;
+use App\Http\Controllers\Traits\RestIndexTrait;
+use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\PlatformPackageRequest;
 use App\Http\Resources\PlatformPackageResource;
+use App\Http\Resources\PlatformPackageResourceCollection;
 use App\Services\PaypalService;
 use App\Services\PlatformPackageService;
 use App\Services\StripeService;
 
 class PlatformPackageController extends AbstractRestAPIController
 {
+    use RestIndexTrait, RestShowTrait, RestDestroyTrait;
     public function __construct(
         PlatformPackageService $service,
         PaypalService          $paypalService,
@@ -21,6 +26,7 @@ class PlatformPackageController extends AbstractRestAPIController
         $this->stripeService = $stripeService;
         $this->paypalService = $paypalService;
         $this->resourceClass = PlatformPackageResource::class;
+        $this->resourceCollectionClass = PlatformPackageResourceCollection::class;
     }
 
     public function store(PlatformPackageRequest $request)

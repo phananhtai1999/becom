@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PlatformPackage extends Model
 {
-    use HasFactory;
+    use HasFactory,SoftDeletes;
 
     /**
      * @var string
@@ -39,4 +40,9 @@ class PlatformPackage extends Model
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
     ];
+
+    public function subscriptionPlans()
+    {
+        return $this->hasMany(SubscriptionPlan::class, 'platform_package_uuid', 'uuid');
+    }
 }

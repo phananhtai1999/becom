@@ -4,10 +4,11 @@ namespace App\Models;
 
 use App\Abstracts\AbstractModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SubscriptionPlan extends AbstractModel
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     /**
      * @var string
@@ -38,4 +39,9 @@ class SubscriptionPlan extends AbstractModel
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
     ];
+
+    public function platformPackage()
+    {
+        return $this->belongsTo(PlatformPackage::class, 'platform_package_uuid', 'uuid')->withTrashed();
+    }
 }
