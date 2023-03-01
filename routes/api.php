@@ -530,7 +530,6 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website_page'], function ()
     });
 });
 
-Route::group(['middleware' => ['auth:api'], 'as' => 'payment.'], function () {
 Route::group(['middleware' => ['auth:api'], 'as' => 'platformPackage.'], function () {
     Route::post('/platform-package', [PlatformPackageController::class, 'store']);
     Route::get('/platform-package/{id}', [PlatformPackageController::class, 'show']);
