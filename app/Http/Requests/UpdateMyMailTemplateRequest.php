@@ -32,6 +32,7 @@ class UpdateMyMailTemplateRequest extends AbstractRequest
             })],
             'design' => 'string',
             'type' => ['string', 'in:sms,email'],
+            'image' => ['nullable', 'string'],
         ];
     }
 }

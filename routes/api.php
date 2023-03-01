@@ -10,10 +10,13 @@ use App\Http\Controllers\Api\Payment\PaymentController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\PlatformPackageController;
 use App\Http\Controllers\Api\ScenarioController;
+use App\Http\Controllers\Api\SectionTemplateController;
 use App\Http\Controllers\Api\SmtpAccountController;
 use App\Http\Controllers\Api\SubscriptionPlanController;
 use App\Http\Controllers\Api\User\UserController;
 use App\Http\Controllers\Api\WebsiteController;
+use App\Http\Controllers\Api\WebsitePageCategoryController;
+use App\Http\Controllers\Api\WebsitePageController;
 use App\Http\Controllers\Api\WebsiteVerificationController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
@@ -171,6 +174,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'smtp-account.'], function (
         Route::get('/smtp-account/{id}', [SmtpAccountController::class, 'show'])->name('show');
         Route::put('/smtp-account/{id}', [SmtpAccountController::class, 'edit'])->name('edit');
         Route::delete('/smtp-account/{id}', [SmtpAccountController::class, 'destroy'])->name('destroy');
+        Route::get('/get-mail-mailer-type/smtp-account', [SmtpAccountController::class, 'getMailMailerSmtpAccount'])->name('get-mail-mailer-smtp-account');
     });
 
     Route::group(['as' => 'my.'], function () {
@@ -489,6 +493,44 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'scenario.'], function () {
     });
 });
 
+//Website_page_categories
+Route::group(['middleware' => ['auth:api'], 'as' => 'website_page_category.'], function () {
+
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::post('/website-page-category', [WebsitePageCategoryController::class, 'store'])->name('store');
+        Route::put('/website-page-category/{id}', [WebsitePageCategoryController::class, 'edit'])->name('edit');
+        Route::delete('/website-page-category/{id}', [WebsitePageCategoryController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::group(['as' => 'my.'], function () {
+        Route::get('/website-page-categories', [WebsitePageCategoryController::class, 'index'])->name('index');
+        Route::get('/website-page-category/{id}', [WebsitePageCategoryController::class, 'show'])->name('show');
+    });
+
+});
+
+//Website_pages
+Route::group(['middleware' => ['auth:api'], 'as' => 'website_page'], function () {
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('website-pages', [WebsitePageController::class, 'index'])->name('index');
+        Route::post('website-page', [WebsitePageController::class, 'store'])->name('store');
+        Route::get('website-page/{id}', [WebsitePageController::class, 'show'])->name('show');
+        Route::put('website-page/{id}', [WebsitePageController::class, 'edit'])->name('edit');
+        Route::delete('/website-page/{id}', [WebsitePageController::class, 'destroy'])->name('destroy');
+        Route::get('/unpublished-website-pages', [WebsitePageController::class, 'indexUnpublishedWebsitePage'])->name('index-unpublished');
+        Route::get('/unpublished-website-page/{id}', [WebsitePageController::class, 'showUnpublishedWebsitePage'])->name('show-unpublished');
+        Route::post('website-page/accept-publish', [WebsitePageController::class, 'acceptPublishWebsitePage'])->name('acceptPublishWebsitePage');
+    });
+    Route::group(['as' => 'my.'], function () {
+        Route::get('my/website-pages', [WebsitePageController::class, 'indexMyWebsitePage'])->name('indexMyWebsitePage');
+        Route::post('my/website-page', [WebsitePageController::class, 'storeMyWebsitePage'])->name('storeMyWebsitePage');
+        Route::get('my/website-page/{id}', [WebsitePageController::class, 'showMyWebsitePage'])->name('showMyWebsitePage');
+        Route::put('my/website-page/{id}', [WebsitePageController::class, 'editMyWebsitePage'])->name('editMyWebsitePage');
+        Route::delete('my/website-page/{id}', [WebsitePageController::class, 'destroyMyWebsitePage'])->name('destroyMyWebsitePage');
+    });
+});
+
+Route::group(['middleware' => ['auth:api'], 'as' => 'payment.'], function () {
 Route::group(['middleware' => ['auth:api'], 'as' => 'platformPackage.'], function () {
     Route::post('/platform-package', [PlatformPackageController::class, 'store']);
     Route::get('/platform-package/{id}', [PlatformPackageController::class, 'show']);
@@ -527,3 +569,24 @@ Route::get('/paypal/success-payment', [\App\Http\Controllers\Api\Payment\PaypalC
 Route::get('/paypal/success-payment-subscription', [\App\Http\Controllers\Api\Payment\PaypalController::class, 'successPaymentSubscription'])->name('paypal.successPaymentSubscription');
 Route::get('/paypal/cancel-payment', [\App\Http\Controllers\Api\Payment\PaypalController::class, 'cancelPayment'])->name('paypal.cancelPayment');
 Route::get('/paypal/cancel-payment-subscription', [\App\Http\Controllers\Api\Payment\PaypalController::class, 'cancelPaymentSubscription'])->name('paypal.cancelPaymentSubscription');
+
+//Section Template
+Route::group(['middleware' => ['auth:api'], 'as' => 'section-template'], function () {
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('section-templates', [SectionTemplateController::class, 'index'])->name('index');
+        Route::post('section-template', [SectionTemplateController::class, 'store'])->name('store');
+        Route::get('section-template/{id}', [SectionTemplateController::class, 'show'])->name('show');
+        Route::put('section-template/{id}', [SectionTemplateController::class, 'edit'])->name('edit');
+        Route::delete('/section-template/{id}', [SectionTemplateController::class, 'destroy'])->name('destroy');
+        Route::get('/unpublished-section-templates', [SectionTemplateController::class, 'indexUnpublishedSectionTemplate'])->name('index-unpublished');
+        Route::get('/unpublished-section-template/{id}', [SectionTemplateController::class, 'showUnpublishedSectionTemplate'])->name('show-unpublished');
+        Route::post('section-template/accept-publish', [SectionTemplateController::class, 'acceptPublishSectionTemplate'])->name('acceptPublishSectionTemplate');
+    });
+    Route::group(['as' => 'my.'], function () {
+        Route::get('my/section-templates', [SectionTemplateController::class, 'indexMySectionTemplate'])->name('indexMySectionTemplate');
+        Route::post('my/section-template', [SectionTemplateController::class, 'storeMySectionTemplate'])->name('storeMySectionTemplate');
+        Route::get('my/section-template/{id}', [SectionTemplateController::class, 'showMySectionTemplate'])->name('showMySectionTemplate');
+        Route::put('my/section-template/{id}', [SectionTemplateController::class, 'editMySectionTemplate'])->name('editMySectionTemplate');
+        Route::delete('my/section-template/{id}', [SectionTemplateController::class, 'destroyMySectionTemplate'])->name('destroyMySectionTemplate');
+    });
+});

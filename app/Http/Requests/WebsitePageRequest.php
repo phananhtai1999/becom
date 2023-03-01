@@ -3,8 +3,9 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
+use Illuminate\Validation\Rule;
 
-class MailTemplateRequest extends AbstractRequest
+class WebsitePageRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,13 +25,11 @@ class MailTemplateRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'subject' => ['required', 'string'],
-            'body' => ['required', 'string'],
-            'website_uuid' => ['nullable', 'numeric', 'min:1', 'exists:websites,uuid'],
-            'design' => ['required', 'string'],
+            'title' => ['required', 'string'],
+            'template' => ['required', 'string'],
+            'template_json' => ['required', 'string'],
+            'website_page_category_uuid' => ['required', 'numeric', Rule::exists('website_page_categories','uuid')->whereNull('deleted_at')],
             'publish_status' => ['required', 'numeric', 'min:1', 'max:2'],
-            'type' => ['required', 'string', 'in:sms,email'],
-            'image' => ['nullable', 'string'],
         ];
     }
 }

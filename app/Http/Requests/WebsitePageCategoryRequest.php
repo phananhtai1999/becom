@@ -3,8 +3,9 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
+use Illuminate\Validation\Rule;
 
-class UpdateMailTemplateRequest extends AbstractRequest
+class WebsitePageCategoryRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,13 +25,8 @@ class UpdateMailTemplateRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'subject' => ['string'],
-            'body' => ['string'],
-            'website_uuid' => ['nullable', 'numeric', 'min:1', 'exists:websites,uuid'],
-            'design' => ['string'],
-            'publish_status' => ['numeric', 'min:1', 'max:2'],
-            'type' => ['string', 'in:sms,email'],
-            'image' => ['nullable', 'string'],
+            'title' => ['required', 'array', 'min:1'],
+            'title.*' => ['required', 'string']
         ];
     }
 }

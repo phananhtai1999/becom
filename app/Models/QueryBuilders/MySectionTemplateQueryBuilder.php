@@ -3,20 +3,20 @@
 namespace App\Models\QueryBuilders;
 
 use App\Abstracts\AbstractQueryBuilder;
-use App\Models\MailTemplate;
 use App\Models\SearchQueryBuilders\SearchQueryBuilder;
+use App\Models\SectionTemplate;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\Concerns\SortsQuery;
 use Spatie\QueryBuilder\QueryBuilder;
 
-class MyMailTemplateQueryBuilder extends AbstractQueryBuilder
+class MySectionTemplateQueryBuilder extends AbstractQueryBuilder
 {
     /**
      * @return string
      */
     public static function baseQuery()
     {
-        return MailTemplate::where('user_uuid', auth()->user()->getKey());
+        return SectionTemplate::where('user_uuid', auth()->user()->getKey());
     }
 
     /**
@@ -24,53 +24,45 @@ class MyMailTemplateQueryBuilder extends AbstractQueryBuilder
      */
     public static function initialQuery()
     {
-        $modelKeyName = (new MailTemplate())->getKeyName();
+        $modelKeyName = (new SectionTemplate())->getKeyName();
 
         return static::for(static::baseQuery())
             ->allowedFields([
                 $modelKeyName,
-                'subject',
-                'body',
-                'website_uuid',
+                'title',
+                'template',
+                'template_json',
                 'user_uuid',
-                'design',
+                'website_page_category_uuid',
                 'publish_status',
-                'type',
-                'image'
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
                 $modelKeyName,
-                'subject',
-                'body',
-                'website_uuid',
+                'title',
+                'template',
+                'template_json',
                 'user_uuid',
-                'design',
+                'website_page_category_uuid',
                 'publish_status',
-                'type',
-                'image'
             ])
             ->allowedFilters([
                 $modelKeyName,
                 AllowedFilter::exact('exact__' . $modelKeyName, $modelKeyName),
-                'subject',
-                AllowedFilter::exact('exact__subject', 'subject'),
-                'body',
-                AllowedFilter::exact('exact__body', 'body'),
-                'website_uuid',
-                AllowedFilter::exact('exact__website_uuid', 'website_uuid'),
+                'title',
+                AllowedFilter::exact('exact__title', 'title'),
+                'template',
+                AllowedFilter::exact('exact__template', 'template'),
+                'template_json',
+                AllowedFilter::exact('exact__template_json', 'template_json'),
                 'user_uuid',
                 AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
-                'design',
-                AllowedFilter::exact('exact__design', 'design'),
-                'image',
-                AllowedFilter::exact('exact__image', 'image'),
-                'type',
-                AllowedFilter::exact('exact__type', 'type'),
+                'website_page_category_uuid',
+                AllowedFilter::exact('exact__website_page_category_uuid', 'website_page_category_uuid'),
+                'websitePageCategory.title',
+                AllowedFilter::exact('exact__websitePageCategory.name', 'websitePageCategory.title'),
                 'publish_status',
                 AllowedFilter::exact('exact__publish_status', 'publish_status'),
-                'website.domain',
-                AllowedFilter::exact('exact__website.domain', 'website.domain'),
                 'user.username',
                 AllowedFilter::exact('exact__user.username', 'user.username'),
                 'user.email',
@@ -83,7 +75,7 @@ class MyMailTemplateQueryBuilder extends AbstractQueryBuilder
      */
     public static function fillAble()
     {
-        return MailTemplate::class;
+        return SectionTemplate::class;
     }
 
     /**
