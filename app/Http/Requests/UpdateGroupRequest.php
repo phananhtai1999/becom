@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use App\Abstracts\AbstractRequest;
 use Illuminate\Validation\Rule;
 
-class UpdateConfigRequest extends AbstractRequest
+class UpdateGroupRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,10 +25,7 @@ class UpdateConfigRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'key' => ['string', 'unique:configs,key,'.$this->id .',uuid,deleted_at,NULL'],
-            'value' => ['nullable', 'string'],
-            'default_value' => ['nullable', 'string'],
-            'group_id' => ['numeric', 'min:1', Rule::exists('groups', 'uuid')->whereNull('deleted_at')],
+            'name' => ['string', Rule::unique('groups', 'name')->ignore($this->id, 'uuid')->whereNull('deleted_at')],
         ];
     }
 }

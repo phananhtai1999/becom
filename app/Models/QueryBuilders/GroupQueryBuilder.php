@@ -3,20 +3,20 @@
 namespace App\Models\QueryBuilders;
 
 use App\Abstracts\AbstractQueryBuilder;
-use App\Models\Config;
+use App\Models\Group;
 use App\Models\SearchQueryBuilders\SearchQueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\Concerns\SortsQuery;
 use Spatie\QueryBuilder\QueryBuilder;
 
-class ConfigQueryBuilder extends AbstractQueryBuilder
+class GroupQueryBuilder extends AbstractQueryBuilder
 {
     /**
      * @return string
      */
     public static function baseQuery()
     {
-        return Config::class;
+        return Group::class;
     }
 
     /**
@@ -24,37 +24,23 @@ class ConfigQueryBuilder extends AbstractQueryBuilder
      */
     public static function initialQuery()
     {
-        $modelKeyName = (new Config())->getKeyName();
+        $modelKeyName = (new Group())->getKeyName();
 
         return static::for(static::baseQuery())
             ->allowedFields([
                 $modelKeyName,
-                'key',
-                'value',
-                'default_value',
-                'group_id',
+                'name',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
                 $modelKeyName,
-                'key',
-                'value',
-                'default_value',
-                'group_id',
+                'name',
             ])
             ->allowedFilters([
                 $modelKeyName,
                 AllowedFilter::exact('exact__' . $modelKeyName, $modelKeyName),
-                'key',
-                AllowedFilter::exact('exact__key', 'key'),
-                'value',
-                AllowedFilter::exact('exact__value', 'value'),
-                'default_value',
-                AllowedFilter::exact('exact__default_value', 'default_value'),
-                'group_id',
-                AllowedFilter::exact('exact__group_id', 'group_id'),
-                'group.name',
-                AllowedFilter::exact('exact__group.name', 'group.name'),
+                'name',
+                AllowedFilter::exact('exact__name', 'name'),
             ]);
     }
 
@@ -63,7 +49,7 @@ class ConfigQueryBuilder extends AbstractQueryBuilder
      */
     public static function fillAble()
     {
-        return Config::class;
+        return Group::class;
     }
 
     /**
