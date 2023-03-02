@@ -4,9 +4,11 @@ namespace App\Models;
 
 use App\Abstracts\AbstractModel;
 use Baum\NestedSet\Node as WorksAsNestedSet;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Translatable\HasTranslations;
 
@@ -95,11 +97,23 @@ class ArticleCategory extends AbstractModel
     }
 
     /**
-     * @return Collection
+     * @return HasMany
      */
     public function childrenArticleCategory()
     {
-        return $this->children()->orderBy('created_at', 'DESC')->get();
+        return $this->hasMany(__CLASS__, 'parent_uuid');
+    }
+
+    /**
+     * @param Builder $query
+     * @param $data
+     * @return Builder|void
+     */
+    public function scopeCategoryRoot(Builder $query, $check)
+    {
+        if ($check) {
+            return $query->whereNull('parent_uuid');
+        }
     }
 
 }

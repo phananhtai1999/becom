@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Language extends AbstractModel
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
     CONST LANGUAGES_SUPPORT = [
       'vi','en','fr','ch'
@@ -33,7 +33,6 @@ class Language extends AbstractModel
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
-        'deleted_at' => 'datetime',
         'status' => 'boolean',
     ];
 }

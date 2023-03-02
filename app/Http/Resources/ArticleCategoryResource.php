@@ -37,6 +37,10 @@ class ArticleCategoryResource extends AbstractJsonResource
             $data['parent_category'] = new ArticleCategoryResource($this->parentArticleCategory);
         }
 
+        if (\in_array('article_category__children_category', $expand)) {
+            $data['children_category'] = self::collection($this->childrenArticleCategory);
+        }
+
         return $data;
     }
 }

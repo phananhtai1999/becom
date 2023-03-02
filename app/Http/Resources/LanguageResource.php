@@ -20,7 +20,6 @@ class LanguageResource extends AbstractJsonResource
             'flag_image' => $this->flag_image,
             'status' => $this->status,
             'fe' => $this->fe,
-            'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
         ];
