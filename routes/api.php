@@ -1,11 +1,17 @@
 <?php
 
+use App\Http\Controllers\Api\ArticleCategoryController;
+use App\Http\Controllers\Api\ArticleController;
 use App\Http\Controllers\Api\CampaignController;
+use App\Http\Controllers\Api\CreditPackageController;
 use App\Http\Controllers\Api\EmailController;
+use App\Http\Controllers\Api\FormController;
+use App\Http\Controllers\Api\LanguageController;
 use App\Http\Controllers\Api\MailOpenTrackingController;
 use App\Http\Controllers\Api\MailSendingHistoryController;
 use App\Http\Controllers\Api\MailTemplateController;
 use App\Http\Controllers\Api\Payment\PaymentController;
+use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\PlatformPackageController;
 use App\Http\Controllers\Api\ScenarioController;
 use App\Http\Controllers\Api\SectionTemplateController;
@@ -594,3 +600,65 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'section-template'], functio
         Route::delete('my/section-template/{id}', [SectionTemplateController::class, 'destroyMySectionTemplate'])->name('destroyMySectionTemplate');
     });
 });
+
+//Form
+Route::group(['middleware' => ['auth:api'], 'as' => 'form.'], function () {
+
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/forms', [FormController::class, 'index'])->name('index');
+        Route::post('/form', [FormController::class, 'store'])->name('store');
+        Route::get('/form/{id}', [FormController::class, 'show'])->name('show');
+        Route::put('/form/{id}', [FormController::class, 'edit'])->name('edit');
+        Route::delete('/form/{id}', [FormController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::group(['as' => 'my.'], function () {
+        Route::get('/my/forms', [FormController::class, 'indexMyForm'])->name('index');
+        Route::post('/my/form', [FormController::class, 'storeMyForm'])->name('store');
+        Route::get('/my/form/{id}', [FormController::class, 'showMyForm'])->name('show');
+        Route::put('/my/form/{id}', [FormController::class, 'editMyForm'])->name('edit');
+        Route::delete('/my/form/{id}', [FormController::class, 'destroyMyForm'])->name('destroy');
+    });
+});
+
+//Language
+Route::group(['middleware' => ['auth:api'], 'as' => 'language.'], function () {
+
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::post('/language', [LanguageController::class, 'store'])->name('store');
+        Route::put('/language/{id}', [LanguageController::class, 'edit'])->name('edit');
+        Route::delete('/language/{id}', [LanguageController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::group(['as' => 'my.'], function () {
+        Route::get('/languages', [LanguageController::class, 'index'])->name('index');
+        Route::get('/language/{id}', [LanguageController::class, 'show'])->name('show');
+    });
+
+});
+
+//Article Category
+Route::group(['middleware' => ['auth:api'], 'as' => 'article-category.'], function () {
+
+    Route::group(['middleware' => ['role:admin,editor'], 'as' => 'author.'], function () {
+        Route::post('/article-category', [ArticleCategoryController::class, 'store'])->name('store');
+        Route::put('/article-category/{id}', [ArticleCategoryController::class, 'edit'])->name('edit');
+        Route::delete('/article-category/{id}', [ArticleCategoryController::class, 'destroy'])->name('destroy');
+        Route::get('/article-categories', [ArticleCategoryController::class, 'index'])->name('index');
+        Route::get('/article-category/{id}', [ArticleCategoryController::class, 'show'])->name('show');
+    });
+});
+
+//Article
+Route::group(['middleware' => ['auth:api'], 'as' => 'article.'], function () {
+
+    Route::group(['middleware' => ['role:admin,editor'], 'as' => 'author.'], function () {
+        Route::post('/article', [ArticleController::class, 'store'])->name('store');
+        Route::put('/article/{id}', [ArticleController::class, 'edit'])->name('edit');
+        Route::delete('/article/{id}', [ArticleController::class, 'destroy'])->name('destroy');
+        Route::get('/articles', [ArticleController::class, 'index'])->name('index');
+        Route::get('/article/{id}', [ArticleController::class, 'show'])->name('show');
+    });
+});
+
+

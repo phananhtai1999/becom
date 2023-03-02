@@ -3,21 +3,20 @@
 namespace App\Models\QueryBuilders;
 
 use App\Abstracts\AbstractQueryBuilder;
+use App\Models\ArticleCategory;
 use App\Models\SearchQueryBuilders\SearchQueryBuilder;
-use App\Models\WebsitePage;
-use App\Models\WebsitePageCategory;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\Concerns\SortsQuery;
 use Spatie\QueryBuilder\QueryBuilder;
 
-class WebsitePageCategoryQueryBuilder extends AbstractQueryBuilder
+class ArticleCategoryQueryBuilder extends AbstractQueryBuilder
 {
     /**
      * @return string
      */
     public static function baseQuery()
     {
-        return WebsitePageCategory::class;
+        return ArticleCategory::class;
     }
 
     /**
@@ -25,23 +24,47 @@ class WebsitePageCategoryQueryBuilder extends AbstractQueryBuilder
      */
     public static function initialQuery()
     {
-        $modelKeyName = (new WebsitePageCategory())->getKeyName();
+        $modelKeyName = (new ArticleCategory())->getKeyName();
 
         return static::for(static::baseQuery())
             ->allowedFields([
                 $modelKeyName,
-                'title',
+                'image',
+                'slug',
+                'parent_uuid',
+                'user_uuid',
+                'publish_status',
+                'title'
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
                 $modelKeyName,
-                'title',
+                'image',
+                'slug',
+                'parent_uuid',
+                'user_uuid',
+                'publish_status',
+                'title'
             ])
             ->allowedFilters([
                 $modelKeyName,
                 AllowedFilter::exact('exact__' . $modelKeyName, $modelKeyName),
                 'title',
                 AllowedFilter::exact('exact__title', 'title'),
+                'image',
+                AllowedFilter::exact('exact__image', 'image'),
+                'slug',
+                AllowedFilter::exact('exact__slug', 'slug'),
+                'user_uuid',
+                AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
+                'parent_uuid',
+                AllowedFilter::exact('exact__parent_uuid', 'parent_uuid'),
+                'publish_status',
+                AllowedFilter::exact('exact__publish_status', 'publish_status'),
+                'user.username',
+                AllowedFilter::exact('exact__user.username', 'user.username'),
+                'user.email',
+                AllowedFilter::exact('exact__user.email', 'user.email'),
             ]);
     }
 
@@ -50,7 +73,7 @@ class WebsitePageCategoryQueryBuilder extends AbstractQueryBuilder
      */
     public static function fillAble()
     {
-        return WebsitePageCategory::class;
+        return ArticleCategory::class;
     }
 
     /**

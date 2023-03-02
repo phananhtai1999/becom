@@ -3,21 +3,21 @@
 namespace App\Models\QueryBuilders;
 
 use App\Abstracts\AbstractQueryBuilder;
+use App\Models\Language;
 use App\Models\SearchQueryBuilders\SearchQueryBuilder;
 use App\Models\WebsitePage;
-use App\Models\WebsitePageCategory;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\Concerns\SortsQuery;
 use Spatie\QueryBuilder\QueryBuilder;
 
-class WebsitePageCategoryQueryBuilder extends AbstractQueryBuilder
+class LanguageQueryBuilder extends AbstractQueryBuilder
 {
     /**
      * @return string
      */
     public static function baseQuery()
     {
-        return WebsitePageCategory::class;
+        return Language::class;
     }
 
     /**
@@ -25,23 +25,35 @@ class WebsitePageCategoryQueryBuilder extends AbstractQueryBuilder
      */
     public static function initialQuery()
     {
-        $modelKeyName = (new WebsitePageCategory())->getKeyName();
+        $modelKeyName = (new Language())->getKeyName();
 
         return static::for(static::baseQuery())
             ->allowedFields([
                 $modelKeyName,
-                'title',
+                'name',
+                'fe',
+                'status',
+                'flag_image',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
                 $modelKeyName,
-                'title',
+                'name',
+                'fe',
+                'status',
+                'flag_image',
             ])
             ->allowedFilters([
                 $modelKeyName,
                 AllowedFilter::exact('exact__' . $modelKeyName, $modelKeyName),
-                'title',
-                AllowedFilter::exact('exact__title', 'title'),
+                'name',
+                AllowedFilter::exact('exact__name', 'name'),
+                'fe',
+                AllowedFilter::exact('exact__fe', 'fe'),
+                'flag_image',
+                AllowedFilter::exact('exact__flag_image', 'flag_image'),
+                'status',
+                AllowedFilter::exact('exact__status', 'status'),
             ]);
     }
 
@@ -50,7 +62,7 @@ class WebsitePageCategoryQueryBuilder extends AbstractQueryBuilder
      */
     public static function fillAble()
     {
-        return WebsitePageCategory::class;
+        return Language::class;
     }
 
     /**
