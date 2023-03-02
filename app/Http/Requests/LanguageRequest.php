@@ -26,8 +26,8 @@ class LanguageRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'code' => ['required', 'string', Rule::in(Language::LANGUAGES_SUPPORT), Rule::unique('languages','code')->whereNull('deleted_at')],
-            'name' => ['required', 'string', Rule::unique('languages','name')->whereNull('deleted_at')],
+            'code' => ['required', 'string', Rule::in(Language::LANGUAGES_SUPPORT), Rule::unique('languages','code')],
+            'name' => ['required', 'string', Rule::unique('languages','name')],
             'flag_image' => ['nullable', 'string'],
             'fe' => ['required', 'json'],
             'status' => ['required', 'boolean']
