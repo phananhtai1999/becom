@@ -83,14 +83,29 @@ class SmtpAccountService extends AbstractService
     }
 
     /**
+     * @param $sendTypeCampaign
      * @return mixed
      */
-    public function getRandomSmtpAccountAdmin()
+    public function getRandomSmtpAccountAdmin($sendTypeCampaign)
     {
         return $this->model->select('smtp_accounts.*')
             ->join('users', 'users.uuid', '=', 'smtp_accounts.user_uuid')
             ->join('role_user', 'role_user.user_uuid', '=', 'users.uuid')
-            ->where('role_user.role_uuid', config('user.default_admin_role_uuid'))->inRandomOrder()->first();
+            ->where(function ($query) use ($sendTypeCampaign) {
+                if ($sendTypeCampaign == 'email') {
+
+                    return $query->where([
+                        ['role_user.role_uuid', config('user.default_admin_role_uuid')],
+                        ['smtp_accounts.mail_mailer', 'smtp']
+                    ]);
+                } else {
+
+                    return $query->where([
+                        ['role_user.role_uuid', config('user.default_admin_role_uuid')],
+                        ['smtp_accounts.mail_mailer', $sendTypeCampaign]
+                    ]);
+                }
+            })->inRandomOrder()->first();
     }
 
     /**
