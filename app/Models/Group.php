@@ -6,14 +6,14 @@ use App\Abstracts\AbstractModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Config extends AbstractModel
+class Group extends AbstractModel
 {
     use HasFactory, SoftDeletes;
 
     /**
      * @var string
      */
-    protected $table = "configs";
+    protected $table = "groups";
 
     /**
      * @var string
@@ -24,10 +24,7 @@ class Config extends AbstractModel
      * @var string[]
      */
     protected $fillable = [
-        'key',
-        'value',
-        'default_value',
-        'group_id',
+        'name',
     ];
 
     /**
@@ -40,10 +37,10 @@ class Config extends AbstractModel
     ];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function group()
+    public function configs()
     {
-        return $this->belongsTo(Group::class, 'group_id', 'uuid');
+        return $this->hasMany(Config::class, 'group_id', 'uuid');
     }
 }

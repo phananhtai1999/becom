@@ -28,6 +28,7 @@ class ConfigRequest extends AbstractRequest
             'key' => ['required', 'string', Rule::unique('configs')->whereNull('deleted_at')],
             'value' => ['nullable', 'string'],
             'default_value' => ['nullable', 'string'],
+            'group_id' => ['required', 'numeric', 'min:1', Rule::exists('groups', 'uuid')->whereNull('deleted_at')],
         ];
     }
 }

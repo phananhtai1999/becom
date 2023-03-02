@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\CampaignController;
 use App\Http\Controllers\Api\CreditPackageController;
 use App\Http\Controllers\Api\EmailController;
 use App\Http\Controllers\Api\FormController;
+use App\Http\Controllers\Api\GroupController;
 use App\Http\Controllers\Api\LanguageController;
 use App\Http\Controllers\Api\MailOpenTrackingController;
 use App\Http\Controllers\Api\MailSendingHistoryController;
@@ -646,6 +647,16 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'article-category.'], functi
         Route::delete('/article-category/{id}', [ArticleCategoryController::class, 'destroy'])->name('destroy');
         Route::get('/article-categories', [ArticleCategoryController::class, 'index'])->name('index');
         Route::get('/article-category/{id}', [ArticleCategoryController::class, 'show'])->name('show');
+    });
+});
+
+Route::group(['middleware' => ['auth:api'], 'as' => 'group.'], function () {
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/groups', [GroupController::class, 'index'])->name('index');
+        Route::post('/group', [GroupController::class, 'store'])->name('store');
+        Route::get('/group/{id}', [GroupController::class, 'show'])->name('show');
+        Route::put('/group/{id}', [GroupController::class, 'edit'])->name('edit');
+        Route::delete('/group/{id}', [GroupController::class, 'destroy'])->name('destroy');
     });
 });
 
