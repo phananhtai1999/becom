@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Api\Payment;
 
 use App\Abstracts\AbstractRestAPIController;
+use App\Events\PaymentCreditPackageSuccessEvent;
+use App\Models\PaymentMethod;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Event;
 use Srmklive\PayPal\Services\PayPal as PayPalClient;
 use Throwable;
 
@@ -33,7 +36,12 @@ class PaypalController extends AbstractRestAPIController
         $provider->setApiCredentials(config('paypal'));
         $provider->getAccessToken();
         $response = $provider->capturePaymentOrder($request['token']);
+        $paymentData = [
+            "token" => $request['token'],
+            "payerId" => $request['PayerID'],
+        ];
         if (isset($response['status']) && $response['status'] == 'COMPLETED') {
+            Event::dispatch(new PaymentCreditPackageSuccessEvent($request->creditPackageUuid, $paymentData, $request->userUuid, PaymentMethod::PAYPAL));
 
             return redirect()->to(env('FRONTEND_URL') . '/payment/payment-completed/' . $request->get('userUuid'));
         } else {

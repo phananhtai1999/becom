@@ -28,7 +28,7 @@ class PaypalService extends AbstractService
      * @return array
      * @throws Throwable
      */
-    public function processTransaction($price, $userUuid)
+    public function processTransaction($creditPackage, $userUuid)
     {
         try {
             $provider = new PayPalClient();
@@ -38,14 +38,14 @@ class PaypalService extends AbstractService
             $response = $provider->createOrder([
                 "intent" => "CAPTURE",
                 "application_context" => [
-                    "return_url" => route('paypal.successPayment', 'userUuid=' . $userUuid),
-                    "cancel_url" => route('paypal.cancelPayment', 'userUuid=' . $userUuid),
+                    "return_url" => route('paypal.successPayment', ['userUuid=' . $userUuid, 'creditPackageUuid=' . $creditPackage->uuid]),
+                    "cancel_url" => route('paypal.cancelPayment', ['userUuid=' . $userUuid, 'creditPackageUuid=' . $creditPackage->uuid]),
                 ],
                 "purchase_units" => [
                     0 => [
                         "amount" => [
                             "currency_code" => "USD",
-                            "value" => round($price, 2),
+                            "value" => round($creditPackage->price, 2),
                         ]
                     ]
                 ]

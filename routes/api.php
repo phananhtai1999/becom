@@ -535,31 +535,38 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website_page'], function ()
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'platformPackage.'], function () {
-    Route::post('/platform-package', [PlatformPackageController::class, 'store']);
-    Route::get('/platform-package/{id}', [PlatformPackageController::class, 'show']);
-    Route::get('/platform-packages', [PlatformPackageController::class, 'index']);
-    Route::delete('/platform-package/{id}', [PlatformPackageController::class, 'destroy']);
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::post('/platform-package', [PlatformPackageController::class, 'store']);
+        Route::get('/platform-package/{id}', [PlatformPackageController::class, 'show']);
+        Route::get('/platform-packages', [PlatformPackageController::class, 'index']);
+        Route::delete('/platform-package/{id}', [PlatformPackageController::class, 'destroy']);
+    });
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'creditPackage.'], function () {
-    Route::post('/credit-package', [CreditPackageController::class, 'store']);
-    Route::get('/credit-package/{id}', [CreditPackageController::class, 'show']);
-    Route::put('/credit-package/{id}', [CreditPackageController::class, 'edit']);
-    Route::get('/credit-packages', [CreditPackageController::class, 'index']);
-    Route::delete('/credit-package/{id}', [CreditPackageController::class, 'destroy']);
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::post('/credit-package', [CreditPackageController::class, 'store']);
+        Route::get('/credit-package/{id}', [CreditPackageController::class, 'show']);
+        Route::put('/credit-package/{id}', [CreditPackageController::class, 'edit']);
+        Route::get('/credit-packages', [CreditPackageController::class, 'index']);
+        Route::delete('/credit-package/{id}', [CreditPackageController::class, 'destroy']);
+    });
 });
 Route::group(['middleware' => ['auth:api'], 'as' => 'subscriptionPlan.'], function () {
-    Route::post('/subscription-plan', [SubscriptionPlanController::class, 'store']);
-    Route::get('/subscription-plan/{id}', [SubscriptionPlanController::class, 'show']);
-    Route::get('/subscription-plans', [SubscriptionPlanController::class, 'index']);
-    Route::delete('/subscription-plan/{id}', [SubscriptionPlanController::class, 'destroy']);
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::post('/subscription-plan', [SubscriptionPlanController::class, 'store']);
+        Route::get('/subscription-plan/{id}', [SubscriptionPlanController::class, 'show']);
+        Route::get('/subscription-plans', [SubscriptionPlanController::class, 'index']);
+        Route::delete('/subscription-plan/{id}', [SubscriptionPlanController::class, 'destroy']);
+    });
 });
 Route::group(['middleware' => ['auth:api'], 'as' => 'permission.'], function () {
-    Route::post('/permission', [PermissionController::class, 'store']);
-    Route::get('/permission/{id}', [PermissionController::class, 'show']);
-    Route::put('/permission/{id}', [PermissionController::class, 'edit']);
-    Route::get('/permissions', [PermissionController::class, 'index']);
-    Route::delete('/permission/{id}', [PermissionController::class, 'destroy']);
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {    Route::post('/permission', [PermissionController::class, 'store']);
+        Route::get('/permission/{id}', [PermissionController::class, 'show']);
+        Route::put('/permission/{id}', [PermissionController::class, 'edit']);
+        Route::get('/permissions', [PermissionController::class, 'index']);
+        Route::delete('/permission/{id}', [PermissionController::class, 'destroy']);
+    });
 });
 
 //Payment and subscription

@@ -4,19 +4,17 @@ namespace App\Models;
 
 use App\Abstracts\AbstractModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Translatable\HasTranslations;
 
-class Permission extends AbstractModel
+class CreditPackageHistory extends AbstractModel
 {
-    use HasFactory, SoftDeletes, HasTranslations;
+    use HasFactory, SoftDeletes;
 
     /**
      * @var string
      */
-    protected $table = "permissions";
-
-    public $translatable = ['name'];
+    protected $table = "credit_package_histories";
 
     /**
      * @var string
@@ -27,11 +25,8 @@ class Permission extends AbstractModel
      * @var string[]
      */
     protected $fillable = [
-        'name',
-        'code'
-    ];
-
-    protected $casts = [
-        'name' => 'array'
-    ];
-}
+        'user_uuid',
+        'credit_package_uuid',
+        'payment_method_uuid',
+        'logs'
+    ];}
