@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Payment;
 
 use App\Abstracts\AbstractRestAPIController;
 use App\Events\PaymentCreditPackageSuccessEvent;
+use App\Models\PaymentMethod;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -40,7 +41,7 @@ class PaypalController extends AbstractRestAPIController
             "payerId" => $request['PayerID'],
         ];
         if (isset($response['status']) && $response['status'] == 'COMPLETED') {
-            Event::dispatch(new PaymentCreditPackageSuccessEvent($request->creditPackageUuid, $paymentData, $request->userUuid));
+            Event::dispatch(new PaymentCreditPackageSuccessEvent($request->creditPackageUuid, $paymentData, $request->userUuid, PaymentMethod::PAYPAL));
 
             return redirect()->to(env('FRONTEND_URL') . '/payment/payment-completed/' . $request->get('userUuid'));
         } else {

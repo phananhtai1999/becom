@@ -27,5 +27,6 @@ class CreditPackageHistory extends AbstractModel
     protected $fillable = [
         'user_uuid',
         'credit_package_uuid',
+        'payment_method_uuid',
         'logs'
     ];}

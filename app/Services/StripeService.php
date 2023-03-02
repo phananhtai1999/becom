@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Abstracts\AbstractService;
 use App\Events\PaymentCreditPackageSuccessEvent;
+use App\Models\PaymentMethod;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
@@ -40,7 +41,7 @@ class StripeService extends AbstractService
                 'description' => empty($request['description']) ? __('Payment incurred at') . ' ' . config('app.name') : $request['description']
             ]);
             $paymentData = ["token" => $token->id];
-            Event::dispatch(new PaymentCreditPackageSuccessEvent($creditPackage->uuid, $paymentData, $userUuid));
+            Event::dispatch(new PaymentCreditPackageSuccessEvent($creditPackage->uuid, $paymentData, $userUuid, PaymentMethod::STRIPE));
 
             return [
                 'status' => true,

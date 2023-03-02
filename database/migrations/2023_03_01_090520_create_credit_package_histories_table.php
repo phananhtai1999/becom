@@ -17,6 +17,7 @@ class CreateCreditPackageHistoriesTable extends Migration
             $table->id('uuid');
             $table->integer('user_uuid');
             $table->integer('credit_package_uuid');
+            $table->integer('payment_method_uuid');
             $table->json('logs');
             $table->softDeletes();
             $table->timestamps();

@@ -27,7 +27,8 @@ class PaymentCreditPackageSuccessListener
         CreditPackageHistory::create([
             'credit_package_uuid' => $event->creditPackageUuid,
             'user_uuid' => $event->userUuid,
-            'logs' => json_encode($event->paymentData)
+            'logs' => json_encode($event->paymentData),
+            'payment_method_uuid' => $event->paymentMethodUuid
         ]);
     }
 }

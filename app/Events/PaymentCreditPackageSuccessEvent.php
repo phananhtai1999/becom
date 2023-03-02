@@ -18,6 +18,7 @@ class PaymentCreditPackageSuccessEvent
     public $creditPackageUuid;
     public $paymentData;
     public $userUuid;
+    public $paymentMethodUuid;
 
     /**
      * Create a new event instance.
@@ -27,12 +28,14 @@ class PaymentCreditPackageSuccessEvent
     public function __construct(
         $creditPackageUuid,
         $paymentData,
-        $userUuid
+        $userUuid,
+        $paymentMethodUuid
     )
     {
         $this->creditPackageUuid = $creditPackageUuid;
         $this->paymentData = $paymentData;
         $this->userUuid = $userUuid;
+        $this->paymentMethodUuid = $paymentMethodUuid;
     }
 
     /**
