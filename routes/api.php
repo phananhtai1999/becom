@@ -1,14 +1,11 @@
 <?php
 
 use App\Http\Controllers\Api\CampaignController;
-use App\Http\Controllers\Api\CreditPackageController;
 use App\Http\Controllers\Api\EmailController;
-use App\Http\Controllers\Api\FormController;
 use App\Http\Controllers\Api\MailOpenTrackingController;
 use App\Http\Controllers\Api\MailSendingHistoryController;
 use App\Http\Controllers\Api\MailTemplateController;
 use App\Http\Controllers\Api\Payment\PaymentController;
-use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\PlatformPackageController;
 use App\Http\Controllers\Api\ScenarioController;
 use App\Http\Controllers\Api\SectionTemplateController;
@@ -532,31 +529,38 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website_page'], function ()
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'platformPackage.'], function () {
-    Route::post('/platform-package', [PlatformPackageController::class, 'store']);
-    Route::get('/platform-package/{id}', [PlatformPackageController::class, 'show']);
-    Route::get('/platform-packages', [PlatformPackageController::class, 'index']);
-    Route::delete('/platform-package/{id}', [PlatformPackageController::class, 'destroy']);
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::post('/platform-package', [PlatformPackageController::class, 'store']);
+        Route::get('/platform-package/{id}', [PlatformPackageController::class, 'show']);
+        Route::get('/platform-packages', [PlatformPackageController::class, 'index']);
+        Route::delete('/platform-package/{id}', [PlatformPackageController::class, 'destroy']);
+    });
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'creditPackage.'], function () {
-    Route::post('/credit-package', [CreditPackageController::class, 'store']);
-    Route::get('/credit-package/{id}', [CreditPackageController::class, 'show']);
-    Route::put('/credit-package/{id}', [CreditPackageController::class, 'edit']);
-    Route::get('/credit-packages', [CreditPackageController::class, 'index']);
-    Route::delete('/credit-package/{id}', [CreditPackageController::class, 'destroy']);
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::post('/credit-package', [CreditPackageController::class, 'store']);
+        Route::get('/credit-package/{id}', [CreditPackageController::class, 'show']);
+        Route::put('/credit-package/{id}', [CreditPackageController::class, 'edit']);
+        Route::get('/credit-packages', [CreditPackageController::class, 'index']);
+        Route::delete('/credit-package/{id}', [CreditPackageController::class, 'destroy']);
+    });
 });
 Route::group(['middleware' => ['auth:api'], 'as' => 'subscriptionPlan.'], function () {
-    Route::post('/subscription-plan', [SubscriptionPlanController::class, 'store']);
-    Route::get('/subscription-plan/{id}', [SubscriptionPlanController::class, 'show']);
-    Route::get('/subscription-plans', [SubscriptionPlanController::class, 'index']);
-    Route::delete('/subscription-plan/{id}', [SubscriptionPlanController::class, 'destroy']);
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::post('/subscription-plan', [SubscriptionPlanController::class, 'store']);
+        Route::get('/subscription-plan/{id}', [SubscriptionPlanController::class, 'show']);
+        Route::get('/subscription-plans', [SubscriptionPlanController::class, 'index']);
+        Route::delete('/subscription-plan/{id}', [SubscriptionPlanController::class, 'destroy']);
+    });
 });
 Route::group(['middleware' => ['auth:api'], 'as' => 'permission.'], function () {
-    Route::post('/permission', [PermissionController::class, 'store']);
-    Route::get('/permission/{id}', [PermissionController::class, 'show']);
-    Route::put('/permission/{id}', [PermissionController::class, 'edit']);
-    Route::get('/permissions', [PermissionController::class, 'index']);
-    Route::delete('/permission/{id}', [PermissionController::class, 'destroy']);
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {    Route::post('/permission', [PermissionController::class, 'store']);
+        Route::get('/permission/{id}', [PermissionController::class, 'show']);
+        Route::put('/permission/{id}', [PermissionController::class, 'edit']);
+        Route::get('/permissions', [PermissionController::class, 'index']);
+        Route::delete('/permission/{id}', [PermissionController::class, 'destroy']);
+    });
 });
 
 //Payment and subscription
@@ -588,25 +592,5 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'section-template'], functio
         Route::get('my/section-template/{id}', [SectionTemplateController::class, 'showMySectionTemplate'])->name('showMySectionTemplate');
         Route::put('my/section-template/{id}', [SectionTemplateController::class, 'editMySectionTemplate'])->name('editMySectionTemplate');
         Route::delete('my/section-template/{id}', [SectionTemplateController::class, 'destroyMySectionTemplate'])->name('destroyMySectionTemplate');
-    });
-});
-
-//Form
-Route::group(['middleware' => ['auth:api'], 'as' => 'form.'], function () {
-
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
-        Route::get('/forms', [FormController::class, 'index'])->name('index');
-        Route::post('/form', [FormController::class, 'store'])->name('store');
-        Route::get('/form/{id}', [FormController::class, 'show'])->name('show');
-        Route::put('/form/{id}', [FormController::class, 'edit'])->name('edit');
-        Route::delete('/form/{id}', [FormController::class, 'destroy'])->name('destroy');
-    });
-
-    Route::group(['as' => 'my.'], function () {
-        Route::get('/my/forms', [FormController::class, 'indexMyForm'])->name('index');
-        Route::post('/my/form', [FormController::class, 'storeMyForm'])->name('store');
-        Route::get('/my/form/{id}', [FormController::class, 'showMyForm'])->name('show');
-        Route::put('/my/form/{id}', [FormController::class, 'editMyForm'])->name('edit');
-        Route::delete('/my/form/{id}', [FormController::class, 'destroyMyForm'])->name('destroy');
     });
 });

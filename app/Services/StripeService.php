@@ -3,8 +3,10 @@
 namespace App\Services;
 
 use App\Abstracts\AbstractService;
+use App\Events\PaymentCreditPackageSuccessEvent;
 use Exception;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Event;
 use Stripe\Exception\InvalidRequestException;
 use Stripe\StripeClient;
 
@@ -16,7 +18,7 @@ class StripeService extends AbstractService
      * @param $request
      * @return array
      */
-    public function processTransaction($price, $userUuid, $request)
+    public function processTransaction($creditPackage, $userUuid, $request)
     {
         $stripe = new StripeClient(config('payment.stripe.client_secret'));
 
@@ -32,11 +34,13 @@ class StripeService extends AbstractService
             ]);
 
             $stripe->charges->create([
-                'amount' => $price * 100,
+                'amount' => $creditPackage->price * 100,
                 'currency' => 'usd',
                 'source' => $token,
                 'description' => empty($request['description']) ? __('Payment incurred at') . ' ' . config('app.name') : $request['description']
             ]);
+            $paymentData = ["token" => $token->id];
+            Event::dispatch(new PaymentCreditPackageSuccessEvent($creditPackage->uuid, $paymentData, $userUuid));
 
             return [
                 'status' => true,

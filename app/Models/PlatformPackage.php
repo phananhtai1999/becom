@@ -45,4 +45,8 @@ class PlatformPackage extends Model
     {
         return $this->hasMany(SubscriptionPlan::class, 'platform_package_uuid', 'uuid');
     }
+
+    public function permissions() {
+        return $this->belongsToMany(Permission::class, 'platform_package_permission', 'platform_package_uuid', 'permission_uuid');
+    }
 }

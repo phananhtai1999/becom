@@ -24,7 +24,7 @@ class PermissionRequest extends FormRequest
     public function rules()
     {
         return [
-            'platform_package_uuid' => ['required', 'exists:platform_packages,uuid'],
+            'name.*' => ['required'],
             'code' => ['required']
         ];
     }

@@ -6,6 +6,7 @@ use App\Abstracts\AbstractRestAPIController;
 use App\Http\Requests\PaymentRequest;
 use App\Http\Requests\UpgradeUserRequest;
 use App\Models\PaymentMethod;
+use App\Services\CreditPackageService;
 use App\Services\PaypalService;
 use App\Services\PlatformPackageService;
 use App\Services\StripeService;
@@ -21,7 +22,8 @@ class PaymentController extends AbstractRestAPIController
         StripeService           $stripeService,
         UserService             $userService,
         SubscriptionPlanService $subscriptionPlanService,
-        PlatformPackageService  $platformPackageService
+        PlatformPackageService  $platformPackageService,
+        CreditPackageService $creditPackageService
     )
     {
         $this->paypalService = $paypalService;
@@ -29,16 +31,17 @@ class PaymentController extends AbstractRestAPIController
         $this->userService = $userService;
         $this->subscriptionPlanService = $subscriptionPlanService;
         $this->platformPackageService = $platformPackageService;
+        $this->creditPackageService = $creditPackageService;
     }
 
     public function payment(PaymentRequest $request)
     {
-
         try {
-            if ($request->get('payment_method') == PaymentMethod::PAYPAL) {
-                $processResult = $this->paypalService->processTransaction($request->get('price'), Auth::user()->getKey());
-            } elseif ($request->get('payment_method') == PaymentMethod::STRIPE) {
-                $processResult = $this->stripeService->processTransaction($request->get('price'), Auth::user()->getKey(), $request->all());
+            $creditPackage = $this->creditPackageService->findOrFailById($request->get('credit_package_uuid'));
+            if ($request->get('payment_method') == 'paypal') {
+                $processResult = $this->paypalService->processTransaction($creditPackage, Auth::user()->getKey());
+            } else {
+                $processResult = $this->stripeService->processTransaction($creditPackage, Auth::user()->getKey(), $request->all());
             }
 
             if ($processResult['status']) {
