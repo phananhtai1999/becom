@@ -172,10 +172,10 @@ class TelegramNotification extends BaseNotification {
             if (!empty($this->campaign->smtpAccount)) {
                 $smtpAccount = $this->campaign->smtpAccount;
             } else {
-                $smtpAccount = $this->smtpAccountService->getRandomSmtpAccountAdmin();
+                $smtpAccount = $this->smtpAccountService->getRandomSmtpAccountAdmin($this->campaign->send_type);
             }
         } else {
-            $smtpAccount = $this->smtpAccountService->getRandomSmtpAccountAdmin();
+            $smtpAccount = $this->smtpAccountService->getRandomSmtpAccountAdmin($this->campaign->send_type);
         }
         $this->smtpAccountService->setSwiftSmtpAccountForSendEmail($smtpAccount);
 
