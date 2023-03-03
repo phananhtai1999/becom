@@ -40,6 +40,7 @@ class PlatformPackageController extends AbstractRestAPIController
         ];
         $model = $this->service->create([
             'uuid' => $request->get('name'),
+            'description' => $request->get('description'),
             'monthly' => $request->get('monthly'),
             'yearly' => $request->get('yearly'),
             'payment_product_id' => json_encode($product)
