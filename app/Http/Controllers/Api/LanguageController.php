@@ -16,6 +16,7 @@ use App\Http\Resources\LanguageResource;
 use App\Http\Resources\LanguageResourceCollection;
 use App\Models\Language;
 use App\Services\LanguageService;
+use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\File;
 
@@ -77,5 +78,18 @@ class LanguageController extends AbstractRestAPIController
         }
 
         return $this->sendOkJsonResponse();
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function languageSupport()
+    {
+        $languagesSupport = app(Language::class)->languagesSupport;
+        $listLanguages = [];
+        foreach ($languagesSupport as $languageSupport) {
+            $listLanguages[] = ["code" => $languageSupport, "name" => config('languages.codes')[$languageSupport]];
+        }
+        return $this->sendOkJsonResponse(["data" => json_encode($listLanguages)]);
     }
 }

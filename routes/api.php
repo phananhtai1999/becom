@@ -632,13 +632,11 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'language.'], function () {
         Route::get('/show-translates-json', [LanguageController::class, 'showTranslates']);
         Route::post('/save-translates-json', [LanguageController::class, 'saveTranslates']);
     });
-
-    Route::group(['as' => 'my.'], function () {
-        Route::get('/languages', [LanguageController::class, 'index'])->name('index');
-        Route::get('/language/{id}', [LanguageController::class, 'show'])->name('show');
-    });
-
 });
+
+Route::get('/languages-support', [LanguageController::class, 'languageSupport'])->name('language.languageSupport');
+Route::get('/languages', [LanguageController::class, 'index'])->name('language.index');
+Route::get('/language/{id}', [LanguageController::class, 'show'])->name('language.show');
 
 //Article Category
 Route::group(['middleware' => ['auth:api'], 'as' => 'article-category.'], function () {
