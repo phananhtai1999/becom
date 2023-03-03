@@ -30,7 +30,8 @@ class UpgradeUserRequest extends AbstractRequest
             "card_number" => ['required_if:payment_method,==,2', 'integer', 'digits:16'],
             "exp_month" => ['required_if:payment_method,==,2', 'integer'],
             "exp_year" => ['required_if:payment_method,==,2', 'integer', 'min:' . Carbon::now()->year],
-            "cvc" => ['required_if:payment_method,==,2', 'integer', 'digits:3']
+            "cvc" => ['required_if:payment_method,==,2', 'integer', 'digits:3'],
+            "subscription_plan_uuid" => ['required', 'integer', 'exists:subscription_plans,uuid']
         ];
 
         if ($this->request->get('exp_year') == Carbon::now()->year) {

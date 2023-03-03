@@ -14,11 +14,18 @@ class PlatformPackageResource extends JsonResource
      */
     public function toArray($request)
     {
-        return [
+        $expand = request()->get('expand', []);
+
+        $data = [
             'uuid' => $this->uuid,
             'monthly' => $this->monthly,
             'yearly' => $this->yearly,
             'payment_product_id' => $this->payment_product_id,
         ];
+        if (\in_array('platform_package__permissions', $expand)) {
+            $data['permissions'] = PermissionResource::collection($this->permissions);
+        }
+
+        return $data;
     }
 }

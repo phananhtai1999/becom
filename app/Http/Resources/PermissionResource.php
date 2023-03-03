@@ -17,7 +17,7 @@ class PermissionResource extends JsonResource
         return [
             'uuid' => $this->uuid,
             'code' => $this->code,
-            'name' => $this->name,
+            'name' => auth()->user()->roles->where('slug', 'admin')->isEmpty() ? $this->name : $this->getTranslations('name'),
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
