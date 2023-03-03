@@ -26,7 +26,7 @@ class UpdateLanguageRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'code' => ['string', Rule::in(Language::LANGUAGES_SUPPORT), Rule::unique('languages','code')->ignore($this->id, 'code')],
+            'code' => ['string', Rule::in(app(Language::class)->languagesSupport), Rule::unique('languages','code')->ignore($this->id, 'code')],
             'name' => ['string', Rule::unique('languages','name')->ignore($this->id, 'code')],
             'flag_image' => ['nullable', 'string'],
             'fe' => ['json'],
