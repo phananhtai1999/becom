@@ -629,6 +629,8 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'language.'], function () {
         Route::post('/language', [LanguageController::class, 'store'])->name('store');
         Route::put('/language/{id}', [LanguageController::class, 'edit'])->name('edit');
         Route::delete('/language/{id}', [LanguageController::class, 'destroy'])->name('destroy');
+        Route::get('/show-translates-json', [LanguageController::class, 'showTranslates']);
+        Route::post('/save-translates-json', [LanguageController::class, 'saveTranslates']);
     });
 
     Route::group(['as' => 'my.'], function () {

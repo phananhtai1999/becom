@@ -11,4 +11,12 @@ class LanguageService extends AbstractService
     protected $modelClass = Language::class;
 
     protected $modelQueryBuilderClass = LanguageQueryBuilder::class;
+
+    /**
+     * @return mixed
+     */
+    public function getAllLanguage()
+    {
+        return $this->model->all();
+    }
 }

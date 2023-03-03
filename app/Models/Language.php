@@ -4,7 +4,7 @@ namespace App\Models;
 
 use App\Abstracts\AbstractModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\File;
 
 class Language extends AbstractModel
 {
@@ -22,6 +22,8 @@ class Language extends AbstractModel
 
     protected $keyType = "string";
 
+    public $languagesSupport = "";
+
     protected $fillable = [
         'code',
         'name',
@@ -35,4 +37,13 @@ class Language extends AbstractModel
         'updated_at' => 'datetime',
         'status' => 'boolean',
     ];
+
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->languagesSupport = array_map('basename', File::directories(resource_path('lang')));
+    }
+
+
 }
