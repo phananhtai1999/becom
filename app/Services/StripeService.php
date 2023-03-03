@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Abstracts\AbstractService;
 use App\Events\PaymentCreditPackageSuccessEvent;
+use App\Events\SubscriptionSuccessEvent;
 use App\Models\PaymentMethod;
 use Exception;
 use Illuminate\Support\Facades\Auth;
@@ -84,7 +85,7 @@ class StripeService extends AbstractService
     }
 
 
-    public function processSubscription($membershipPackage, $fromDate, $toDate, $plan, $request)
+    public function processSubscription($subscriptionPlan, $subscriptionDate, $expirationDate, $plan, $request)
     {
         $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
 
@@ -114,6 +115,25 @@ class StripeService extends AbstractService
             $stripe->subscriptionSchedules->create([
                 'from_subscription' => $subscription
             ]);
+            $subscriptionData = ["id" => $subscription->id];
+
+            $subscriptionHistory = [
+                'user_uuid' => Auth::user()->getKey(),
+                'subscription_plan_uuid' => $subscriptionPlan->uuid,
+                'subscription_date' => $subscriptionDate,
+                'expiration_date' => $expirationDate,
+                'payment_method_uuid' => PaymentMethod::STRIPE,
+                'logs' => $subscriptionData,
+                'status' => 'success'
+            ];
+            $userPlatformPackage = [
+                'user_uuid' => Auth::user()->getKey(),
+                'platform_package_uuid' => $subscriptionPlan->platform_package_uuid,
+                'subscription_plan_uuid' => $subscriptionPlan->uuid,
+                'expiration_date' => $expirationDate,
+                'auto_renew' => true
+            ];
+            Event::dispatch(new SubscriptionSuccessEvent($subscriptionHistory, $userPlatformPackage));
 
             return [
                 'status' => true,

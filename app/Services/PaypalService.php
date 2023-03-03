@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Abstracts\AbstractService;
+use Illuminate\Support\Facades\Auth;
 use PayPal\Exception\PayPalConfigurationException;
 use PayPal\Exception\PayPalConnectionException;
 use PayPal\Exception\PayPalInvalidCredentialException;
@@ -135,7 +136,7 @@ class PaypalService extends AbstractService
     /**
      * @throws Throwable
      */
-    public function processSubscription($membershipPackage, $fromDate, $toDate, $plan)
+    public function processSubscription($subscriptionPlan, $subscriptionDate, $expirationDate, $plan)
     {
         try {
             $provider = $this->accessServer();
@@ -146,7 +147,13 @@ class PaypalService extends AbstractService
                     "value" => "0"
                 ],
                 "application_context" => [
-                    "return_url" => route('paypal.successPaymentSubscription', 'membershipPackageId=' . 1 . '&fromDate=' . $fromDate . '&toDate=' . $toDate),
+                    "return_url" => route('paypal.successPaymentSubscription', [
+                            'subscriptionPlanUuid=' . $subscriptionPlan->uuid,
+                            'subscriptionDate=' . $subscriptionDate,
+                            'userUuid=' . Auth::user()->getKey(),
+                            'expirationDate=' . $expirationDate,
+                            'platformPackageUuid=' . $subscriptionPlan->platform_package_uuid
+                    ]),
                     "cancel_url" => route('paypal.cancelPaymentSubscription'),
                 ],
             ]);

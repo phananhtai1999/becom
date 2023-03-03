@@ -11,6 +11,7 @@ use App\Events\SendNotOpenByScenarioCampaignEvent;
 use App\Events\SendEmailRecoveryPasswordEvent;
 use App\Events\SendEmailVerifyEmailEvent;
 use App\Events\SendNextByScenarioCampaignEvent;
+use App\Events\SubscriptionSuccessEvent;
 use App\Listeners\PaymentCreditPackageSuccessListener;
 use App\Listeners\PaymentSuccessfullyListener;
 use App\Listeners\SendByBirthdayCampaignListener;
@@ -20,6 +21,7 @@ use App\Listeners\SendNotOpenByScenarioCampaignListener;
 use App\Listeners\SendEmailRecoveryPasswordListener;
 use App\Listeners\SendEmailVerifyEmailListener;
 use App\Listeners\SendNextByScenarioCampaignListener;
+use App\Listeners\SubscriptionSuccessListener;
 use App\Models\Config;
 use App\Models\Contact;
 use App\Models\Role;
@@ -75,6 +77,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         SendByCampaginRootScenarioEvent::class => [
             SendByCampaginRootScenarioListener::class
+        ],
+        SubscriptionSuccessEvent::class => [
+            SubscriptionSuccessListener::class
         ],
     ];
 

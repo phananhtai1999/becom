@@ -50,6 +50,8 @@ class PlatformPackageQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__yearly', 'yearly'),
                 'payment_product_id',
                 AllowedFilter::exact('exact__payment_product_id', 'payment_product_id'),
+                'permissions.uuid',
+                AllowedFilter::exact('exact__permissions.uuid', 'permissions.uuid'),
             ]);
     }
 

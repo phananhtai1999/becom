@@ -72,9 +72,9 @@ class PaymentController extends AbstractRestAPIController
 
         $processResult = ['status' => false];
         if ($request->get('payment_method_uuid') == PaymentMethod::STRIPE) {
-            $processResult = $this->stripeService->processSubscription($platformPackage, $fromDate, $toDate, $plan->stripe, $request->all());
+            $processResult = $this->stripeService->processSubscription($subscriptionPlan, $fromDate, $toDate, $plan->stripe, $request->all());
         } elseif ($request->get('payment_method_uuid') == PaymentMethod::PAYPAL) {
-            $processResult = $this->paypalService->processSubscription($platformPackage, $fromDate, $toDate, $plan->paypal);
+            $processResult = $this->paypalService->processSubscription($subscriptionPlan, $fromDate, $toDate, $plan->paypal);
         }
         if (!$processResult['status']) {
 
