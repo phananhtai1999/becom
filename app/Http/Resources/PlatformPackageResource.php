@@ -20,6 +20,7 @@ class PlatformPackageResource extends JsonResource
             'uuid' => $this->uuid,
             'monthly' => $this->monthly,
             'yearly' => $this->yearly,
+            'description' => $this->description,
             'payment_product_id' => $this->payment_product_id,
         ];
         if (\in_array('platform_package__permissions', $expand)) {

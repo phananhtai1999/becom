@@ -29,7 +29,8 @@ class PlatformPackage extends Model
         'uuid',
         'monthly',
         'yearly',
-        'payment_product_id'
+        'payment_product_id',
+        'description'
     ];
 
     /**
