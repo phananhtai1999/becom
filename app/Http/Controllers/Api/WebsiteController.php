@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
+use App\Http\Controllers\Traits\RestIndexMyTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
@@ -26,7 +27,7 @@ use Illuminate\Http\JsonResponse;
 
 class WebsiteController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestShowTrait;
+    use RestIndexTrait, RestShowTrait, RestIndexMyTrait;
 
     /**
      * @var MyWebsiteService
@@ -127,26 +128,6 @@ class WebsiteController extends AbstractRestAPIController
 
         return $this->sendValidationFailedJsonResponse(["errors" => ["deleted_uuid" => __('messages.data_not_deleted')]]);
 
-    }
-
-    /**
-     * @return JsonResponse
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
-     */
-    public function indexMyWebsite(IndexRequest $request)
-    {
-        return $this->sendOkJsonResponse(
-            $this->service->resourceCollectionToData(
-                $this->resourceCollectionClass,
-                $this->myService->getCollectionWithPagination(
-                    $request->get('per_page', '15'),
-                    $request->get('page', '1'),
-                    $request->get('columns', '*'),
-                    $request->get('page_name', 'page'),
-                )
-            )
-        );
     }
 
     /**

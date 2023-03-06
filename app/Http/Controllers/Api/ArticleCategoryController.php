@@ -13,6 +13,7 @@ use App\Http\Resources\ArticleCategoryResource;
 use App\Http\Resources\ArticleCategoryResourceCollection;
 use App\Models\Language;
 use App\Services\ArticleCategoryService;
+use App\Services\LanguageService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -21,10 +22,17 @@ class ArticleCategoryController extends AbstractRestAPIController
     use RestIndexTrait, RestShowTrait, RestDestroyTrait;
 
     /**
+     * @var LanguageService
+     */
+    protected $languageService;
+
+    /**
      * @param ArticleCategoryService $service
+     * @param LanguageService $languageService
      */
     public function __construct(
-        ArticleCategoryService $service
+        ArticleCategoryService $service,
+        LanguageService $languageService
     )
     {
         $this->service = $service;
@@ -33,6 +41,7 @@ class ArticleCategoryController extends AbstractRestAPIController
         $this->storeRequest = ArticleCategoryRequest::class;
         $this->editRequest = UpdateArticleCategoryRequest::class;
         $this->indexRequest = IndexRequest::class;
+        $this->languageService = $languageService;
     }
 
     /**
@@ -42,10 +51,8 @@ class ArticleCategoryController extends AbstractRestAPIController
     {
         $request = app($this->storeRequest);
 
-        foreach ($request->title as $lang => $value) {
-            if (!in_array($lang, Language::LANGUAGES_SUPPORT)) {
-                return $this->sendValidationFailedJsonResponse();
-            }
+        if (!$this->languageService->checkLanguages($request->title)) {
+            return $this->sendValidationFailedJsonResponse();
         }
 
         $model = $this->service->create(array_merge($request->all(), [
@@ -65,6 +72,9 @@ class ArticleCategoryController extends AbstractRestAPIController
     {
         $request = app($this->editRequest);
 
+        if ($request->title && !$this->languageService->checkLanguages($request->title)) {
+            return $this->sendValidationFailedJsonResponse();
+        }
         $model = $this->service->findOrFailById($id);
 
         $this->service->update($model, $request->except('user_uuid'));

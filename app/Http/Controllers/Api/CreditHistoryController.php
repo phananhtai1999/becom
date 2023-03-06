@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
+use App\Http\Controllers\Traits\RestIndexMyTrait;
 use App\Http\Requests\ChartRequest;
 use App\Http\Requests\CreditHistoryRequest;
 use App\Http\Requests\IndexRequest;
@@ -21,7 +22,7 @@ use Illuminate\Support\Carbon;
 
 class CreditHistoryController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestEditTrait;
+    use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestEditTrait, RestIndexMyTrait;
 
     /**
      * @var MyCreditHistoryService
@@ -86,26 +87,6 @@ class CreditHistoryController extends AbstractRestAPIController
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
-        );
-    }
-
-    /**
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
-     */
-    public function indexMyCreditHistory(IndexRequest $request)
-    {
-        return $this->sendOkJsonResponse(
-            $this->service->resourceCollectionToData(
-                $this->resourceCollectionClass,
-                $this->myService->getCollectionWithPagination(
-                    $request->get('per_page', '15'),
-                    $request->get('page', '1'),
-                    $request->get('columns', '*'),
-                    $request->get('page_name', 'page'),
-                )
-            )
         );
     }
 

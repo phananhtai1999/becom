@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Abstracts\AbstractRestAPIController;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestEditTrait;
+use App\Http\Controllers\Traits\RestIndexMyTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\AcceptPublishWebsitePageRequest;
@@ -23,7 +24,7 @@ use Illuminate\Http\Request;
 
 class WebsitePageController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestShowTrait, RestDestroyTrait;
+    use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestIndexMyTrait;
 
     /**
      * @var MyWebsitePageService
@@ -79,27 +80,6 @@ class WebsitePageController extends AbstractRestAPIController
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
-        );
-    }
-
-    /**
-     * @param IndexRequest $request
-     * @return JsonResponse
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
-     */
-    public function indexMyWebsitePage(IndexRequest $request)
-    {
-        return $this->sendOkJsonResponse(
-            $this->service->resourceCollectionToData(
-                $this->resourceCollectionClass,
-                $this->myService->getCollectionWithPagination(
-                    $request->get('per_page', '15'),
-                    $request->get('page', '1'),
-                    $request->get('columns', '*'),
-                    $request->get('page_name', 'page'),
-                )
-            )
         );
     }
 

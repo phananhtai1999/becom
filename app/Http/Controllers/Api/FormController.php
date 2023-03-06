@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Abstracts\AbstractRestAPIController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\RestDestroyTrait;
+use App\Http\Controllers\Traits\RestIndexMyTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\FormRequest;
@@ -22,7 +23,7 @@ use Illuminate\Http\Request;
 
 class FormController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestShowTrait, RestDestroyTrait;
+    use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestIndexMyTrait;
     /**
      * @var MyFormService
      */
@@ -88,22 +89,6 @@ class FormController extends AbstractRestAPIController
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
-        );
-    }
-
-    /**
-     * @param IndexRequest $request
-     * @return JsonResponse
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
-     */
-    public function indexMyForm(IndexRequest $request)
-    {
-        return $this->sendOkJsonResponse(
-            $this->service->resourceCollectionToData(
-                $this->resourceCollectionClass,
-                $this->myService->getCollectionWithPagination()
-            )
         );
     }
 

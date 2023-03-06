@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
+use App\Http\Controllers\Traits\RestIndexMyTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\AcceptPublishMailTemplateRequest;
@@ -23,7 +24,7 @@ use Illuminate\Http\JsonResponse;
 
 class MailTemplateController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestShowTrait;
+    use RestIndexTrait, RestShowTrait, RestIndexMyTrait;
 
     /**
      * @var MyMailTemplateService
@@ -124,26 +125,6 @@ class MailTemplateController extends AbstractRestAPIController
         }
 
         return $this->sendValidationFailedJsonResponse(["errors" => ["deleted_uuid" => __('messages.data_not_deleted')]]);
-    }
-
-    /**
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
-     */
-    public function indexMyMailTemplate(IndexRequest $request)
-    {
-        return $this->sendOkJsonResponse(
-            $this->service->resourceCollectionToData(
-                $this->resourceCollectionClass,
-                $this->myService->getCollectionWithPagination(
-                    $request->get('per_page', '15'),
-                    $request->get('page', '1'),
-                    $request->get('columns', '*'),
-                    $request->get('page_name', 'page'),
-                )
-            )
-        );
     }
 
     /**

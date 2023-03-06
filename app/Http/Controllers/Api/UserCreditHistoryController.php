@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
+use App\Http\Controllers\Traits\RestIndexMyTrait;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\UserCreditHistoryRequest;
 use App\Http\Controllers\Traits\RestIndexTrait;
@@ -16,7 +17,7 @@ use Illuminate\Support\Facades\DB;
 
 class UserCreditHistoryController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestShowTrait;
+    use RestIndexTrait, RestShowTrait, RestIndexMyTrait;
 
     /**
      * @var MyUserCreditHistoryService
@@ -88,26 +89,6 @@ class UserCreditHistoryController extends AbstractRestAPIController
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
-        );
-    }
-
-    /**
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
-     */
-    public function indexMyUserCreditHistory(IndexRequest $request)
-    {
-        return $this->sendOkJsonResponse(
-            $this->service->resourceCollectionToData(
-                $this->resourceCollectionClass,
-                $this->myService->getCollectionWithPagination(
-                    $request->get('per_page', '15'),
-                    $request->get('page', '1'),
-                    $request->get('columns', '*'),
-                    $request->get('page_name', 'page'),
-                )
-            )
         );
     }
 

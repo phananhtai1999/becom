@@ -15,8 +15,23 @@ class LanguageService extends AbstractService
     /**
      * @return mixed
      */
-    public function getAllLanguage()
+    public function getAllCodeLanguage()
     {
-        return $this->model->all();
+        return $this->model->pluck('code');
+    }
+
+    /**
+     * @param $dataLanguages
+     * @return bool
+     */
+    public function checkLanguages($dataLanguages)
+    {
+        foreach ($dataLanguages as $lang => $value) {
+            if (!$this->getAllCodeLanguage()->contains($lang)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
