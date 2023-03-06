@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Abstracts\AbstractJsonResource;
+use App\Services\UserService;
 
 class ArticleCategoryResource extends AbstractJsonResource
 {
@@ -19,7 +20,7 @@ class ArticleCategoryResource extends AbstractJsonResource
         $data = [
             'uuid' => $this->uuid,
             'slug' => $this->slug,
-            'title' => auth()->user()->roles->where('slug', 'admin')->isEmpty() ? $this->title : $this->getTranslations('title'),
+            'title' => app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('title') : $this->title,
             'image' => $this->image,
             'parent_uuid' => $this->parent_uuid,
             'user_uuid' => $this->user_uuid,

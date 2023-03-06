@@ -562,7 +562,8 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'subscriptionPlan.'], functi
     });
 });
 Route::group(['middleware' => ['auth:api'], 'as' => 'permission.'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {    Route::post('/permission', [PermissionController::class, 'store']);
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::post('/permission', [PermissionController::class, 'store']);
         Route::get('/permission/{id}', [PermissionController::class, 'show']);
         Route::put('/permission/{id}', [PermissionController::class, 'edit']);
         Route::get('/permissions', [PermissionController::class, 'index']);
@@ -640,7 +641,6 @@ Route::get('/language/{id}', [LanguageController::class, 'show'])->name('languag
 
 //Article Category
 Route::group(['middleware' => ['auth:api'], 'as' => 'article-category.'], function () {
-
     Route::group(['middleware' => ['role:admin,editor'], 'as' => 'author.'], function () {
         Route::post('/article-category', [ArticleCategoryController::class, 'store'])->name('store');
         Route::put('/article-category/{id}', [ArticleCategoryController::class, 'edit'])->name('edit');
@@ -649,6 +649,9 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'article-category.'], functi
         Route::get('/article-category/{id}', [ArticleCategoryController::class, 'show'])->name('show');
     });
 });
+Route::get('public/article-categories', [ArticleCategoryController::class, 'index'])->name('article-categories-public.index');
+Route::get('public/article-category/{id}', [ArticleCategoryController::class, 'show'])->name('article-categories-public.show');
+
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'group.'], function () {
     Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
@@ -667,9 +670,12 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'article.'], function () {
         Route::post('/article', [ArticleController::class, 'store'])->name('store');
         Route::put('/article/{id}', [ArticleController::class, 'edit'])->name('edit');
         Route::delete('/article/{id}', [ArticleController::class, 'destroy'])->name('destroy');
-        Route::get('/articles', [ArticleController::class, 'index'])->name('index');
-        Route::get('/article/{id}', [ArticleController::class, 'show'])->name('show');
+        Route::get('/articles', [ArticleController::class, 'index'])->name('article.index');
+        Route::get('/article/{id}', [ArticleController::class, 'show'])->name('article.show');
     });
 });
+Route::get('public/articles', [ArticleController::class, 'index'])->name('article-public.index');
+Route::get('public/article/{id}', [ArticleController::class, 'show'])->name('article-public.index');
+
 
 
