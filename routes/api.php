@@ -615,7 +615,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'form.'], function () {
     });
 
     Route::group(['as' => 'my.'], function () {
-        Route::get('/my/forms', [FormController::class, 'index My'])->name('index');
+        Route::get('/my/forms', [FormController::class, 'indexMy'])->name('index');
         Route::post('/my/form', [FormController::class, 'storeMyForm'])->name('store');
         Route::get('/my/form/{id}', [FormController::class, 'showMyForm'])->name('show');
         Route::put('/my/form/{id}', [FormController::class, 'editMyForm'])->name('edit');
