@@ -234,4 +234,17 @@ class UserService extends AbstractService
 
         return $result;
     }
+
+    /**
+     * @return bool
+     */
+    public function checkLanguagesPermission()
+    {
+        if (auth()->guest()) {
+            return false;
+        }
+
+        return auth()->user()->roles->whereIn('slug', ["admin", "editor"])->count();
+
+    }
 }

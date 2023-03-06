@@ -2,9 +2,10 @@
 
 namespace App\Http\Resources;
 
-use Illuminate\Http\Resources\Json\JsonResource;
+use App\Abstracts\AbstractJsonResource;
+use App\Services\UserService;
 
-class PermissionResource extends JsonResource
+class PermissionResource extends AbstractJsonResource
 {
     /**
      * Transform the resource into an array.
@@ -17,7 +18,7 @@ class PermissionResource extends JsonResource
         return [
             'uuid' => $this->uuid,
             'code' => $this->code,
-            'name' => auth()->user()->roles->where('slug', 'admin')->isEmpty() ? $this->name : $this->getTranslations('name'),
+            'name' => app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('name') : $this->name,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
