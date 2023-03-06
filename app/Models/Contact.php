@@ -107,4 +107,12 @@ class Contact extends AbstractModel
     {
         return $query->whereDate('dob', '<=', $dob);
     }
+
+    /**
+     * @return BelongsTo
+     */
+    public function status()
+    {
+        return $this->belongsTo(Status::class, 'status_uuid', 'uuid');
+    }
 }
