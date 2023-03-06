@@ -156,7 +156,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website.'], function () {
     });
 
     Route::group(['as' => 'my.'], function () {
-        Route::get('/my/websites', [WebsiteController::class, 'indexMyWebsite'])->name('index');
+        Route::get('/my/websites', [WebsiteController::class, 'indexMy'])->name('index');
         Route::post('/my/website', [WebsiteController::class, 'storeMyWebsite'])->name('store');
         Route::get('/my/website/{id}', [WebsiteController::class, 'showMyWebsite'])->name('show');
         Route::put('/my/website/{id}', [WebsiteController::class, 'editMyWebsite'])->name('edit');
@@ -183,7 +183,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'smtp-account.'], function (
     });
 
     Route::group(['as' => 'my.'], function () {
-        Route::get('/my/smtp-accounts', [SmtpAccountController::class, 'indexMySmtpAccount'])->name('index');
+        Route::get('/my/smtp-accounts', [SmtpAccountController::class, 'indexMy'])->name('index');
         Route::post('/my/smtp-account', [SmtpAccountController::class, 'storeMySmtpAccount'])->name('store');
         Route::get('/my/smtp-account/{id}', [SmtpAccountController::class, 'showMySmtpAccount'])->name('show');
         Route::put('/my/smtp-account/{id}', [SmtpAccountController::class, 'editMySmtpAccount'])->name('edit');
@@ -217,7 +217,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'mail-template.'], function 
     });
 
     Route::group(['as' => 'my.'], function () {
-        Route::get('/my/mail-templates', [MailTemplateController::class, 'indexMyMailTemplate'])->name('index');
+        Route::get('/my/mail-templates', [MailTemplateController::class, 'indexMy'])->name('index');
         Route::post('/my/mail-template', [MailTemplateController::class, 'storeMyMailTemplate'])->name('store');
         Route::get('/my/mail-template/{id}', [MailTemplateController::class, 'showMyMailTemplate'])->name('show');
         Route::put('/my/mail-template/{id}', [MailTemplateController::class, 'editMyMailTemplate'])->name('edit');
@@ -293,7 +293,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'mail-sending-history.'], fu
     });
 
     Route::group(['as' => 'my.'], function () {
-        Route::get('/my/mail-sending-histories', [MailSendingHistoryController::class, 'indexMyMailSendingHistory'])->name('index');
+        Route::get('/my/mail-sending-histories', [MailSendingHistoryController::class, 'indexMy'])->name('index');
         Route::get('/my/mail-sending-history/{id}', [MailSendingHistoryController::class, 'showMyMailSendingHistory'])->name('show');
     });
 });
@@ -356,7 +356,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'contact-list.'], function (
     });
 
     Route::group(['as' => 'my.'], function () {
-        Route::get('/my/contact-lists', [ContactListController::class, 'indexMyContactList'])->name('index');
+        Route::get('/my/contact-lists', [ContactListController::class, 'indexMy'])->name('index');
         Route::post('/my/contact-list', [ContactListController::class, 'storeMyContactListAndImportFile'])->name('store-my-contact-list-and-import-file');
         Route::get('/my/contact-list/{id}', [ContactListController::class, 'showMyContactList'])->name('show');
         Route::put('/my/contact-list/{id}', [ContactListController::class, 'editMyContactList'])->name('edit');
@@ -375,7 +375,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'user-use-credit-history.'],
     });
 
     Route::group(['as' => 'my.'], function () {
-        Route::get('/my/credit-histories', [CreditHistoryController::class, 'indexMyCreditHistory'])->name('index');
+        Route::get('/my/credit-histories', [CreditHistoryController::class, 'indexMy'])->name('index');
         Route::get('/my/credit-history/{id}', [CreditHistoryController::class, 'showMyCreditHistory'])->name('show');
     });
 });
@@ -402,7 +402,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'user-credit-history.'], fun
     });
 
     Route::group(['as' => 'my.'], function () {
-        Route::get('/my/user-credit-histories', [UserCreditHistoryController::class, 'indexMyUserCreditHistory'])->name('index');
+        Route::get('/my/user-credit-histories', [UserCreditHistoryController::class, 'indexMy'])->name('index');
         Route::get('/my/user-credit-history/{id}', [UserCreditHistoryController::class, 'showMyUserCreditHistory'])->name('show');
     });
 });
@@ -462,7 +462,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'order.'], function () {
     });
 
     Route::group(['as' => 'my.'], function () {
-        Route::get('/my/orders', [OrderController::class, 'indexMyOrder'])->name('index');
+        Route::get('/my/orders', [OrderController::class, 'indexMy'])->name('index');
         Route::get('/my/order/{id}', [OrderController::class, 'showMyOrder'])->name('show');
         Route::put('/my/order/{id}', [OrderController::class, 'editMyOrder'])->name('edit');
         Route::delete('/my/order/{id}', [OrderController::class, 'destroyMyOrder'])->name('destroy');
@@ -491,7 +491,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'scenario.'], function () {
         Route::put('scenario/{id}', [ScenarioController::class, 'editMyScenario'])->name('editMyScenario');
     });
     Route::group(['as' => 'my.'], function () {
-        Route::get('my/scenarios', [ScenarioController::class, 'indexMyScenario'])->name('indexMy');
+        Route::get('my/scenarios', [ScenarioController::class, 'indexMy'])->name('indexMy');
         Route::post('my/scenario', [ScenarioController::class, 'storeMyScenario'])->name('storeMyScenario');
         Route::get('my/scenario/{id}', [ScenarioController::class, 'showMyScenario'])->name('showMyScenario');
         Route::put('my/scenario/{id}', [ScenarioController::class, 'editMyScenario'])->name('editMyScenario');
@@ -527,7 +527,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website_page'], function ()
         Route::post('website-page/accept-publish', [WebsitePageController::class, 'acceptPublishWebsitePage'])->name('acceptPublishWebsitePage');
     });
     Route::group(['as' => 'my.'], function () {
-        Route::get('my/website-pages', [WebsitePageController::class, 'indexMyWebsitePage'])->name('indexMyWebsitePage');
+        Route::get('my/website-pages', [WebsitePageController::class, 'indexMy'])->name('indexMyWebsitePage');
         Route::post('my/website-page', [WebsitePageController::class, 'storeMyWebsitePage'])->name('storeMyWebsitePage');
         Route::get('my/website-page/{id}', [WebsitePageController::class, 'showMyWebsitePage'])->name('showMyWebsitePage');
         Route::put('my/website-page/{id}', [WebsitePageController::class, 'editMyWebsitePage'])->name('editMyWebsitePage');
@@ -595,7 +595,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'section-template'], functio
         Route::post('section-template/accept-publish', [SectionTemplateController::class, 'acceptPublishSectionTemplate'])->name('acceptPublishSectionTemplate');
     });
     Route::group(['as' => 'my.'], function () {
-        Route::get('my/section-templates', [SectionTemplateController::class, 'indexMySectionTemplate'])->name('indexMySectionTemplate');
+        Route::get('my/section-templates', [SectionTemplateController::class, 'indexMy'])->name('indexMySectionTemplate');
         Route::post('my/section-template', [SectionTemplateController::class, 'storeMySectionTemplate'])->name('storeMySectionTemplate');
         Route::get('my/section-template/{id}', [SectionTemplateController::class, 'showMySectionTemplate'])->name('showMySectionTemplate');
         Route::put('my/section-template/{id}', [SectionTemplateController::class, 'editMySectionTemplate'])->name('editMySectionTemplate');
@@ -615,7 +615,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'form.'], function () {
     });
 
     Route::group(['as' => 'my.'], function () {
-        Route::get('/my/forms', [FormController::class, 'indexMyForm'])->name('index');
+        Route::get('/my/forms', [FormController::class, 'indexMy'])->name('index');
         Route::post('/my/form', [FormController::class, 'storeMyForm'])->name('store');
         Route::get('/my/form/{id}', [FormController::class, 'showMyForm'])->name('show');
         Route::put('/my/form/{id}', [FormController::class, 'editMyForm'])->name('edit');

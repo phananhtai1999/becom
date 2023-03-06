@@ -44,7 +44,7 @@ class LanguageController extends AbstractRestAPIController
     public function showTranslates()
     {
         $translates = [];
-        $languagesCode = $this->service->getAllLanguage()->pluck('code');
+        $languagesCode = $this->service->getAllCodeLanguage();
         foreach ($languagesCode as $code) {
             $files = File::allFiles(resource_path("lang/$code"));
             foreach ($files as $file) {

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
+use App\Http\Controllers\Traits\RestIndexMyTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Requests\ContactListRequest;
 use App\Http\Requests\IndexRequest;
@@ -20,7 +21,7 @@ use Illuminate\Http\JsonResponse;
 
 class ContactListController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestShowTrait, RestDestroyTrait;
+    use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestIndexMyTrait;
 
     /**
      * @var MyContactListService
@@ -190,23 +191,6 @@ class ContactListController extends AbstractRestAPIController
 
         return $this->sendValidationFailedJsonResponse(["errors" => ["deleted_uuid" => __('messages.data_not_deleted')]]);
 
-    }
-
-    /**
-     * @param IndexRequest $request
-     * @return JsonResponse
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
-     */
-    public function indexMyContactList(IndexRequest $request)
-    {
-        return $this->sendOkJsonResponse(
-            $this->service->resourceCollectionToData(
-                $this->resourceCollectionClass,
-                $this->myService->getCollectionWithPagination(
-                )
-            )
-        );
     }
 
     /**
