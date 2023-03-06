@@ -29,6 +29,6 @@ class Localization
             return $next($request);
         }
 
-        return $next($request)->withCookie(cookie('lang' , $lang, 3600, null, null, false, false));
+        return $next($request)->withCookie(cookie('lang' , $lang, 3600, null, null, true, false));
     }
 }
