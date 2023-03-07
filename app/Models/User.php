@@ -72,6 +72,7 @@ class User extends Authenticatable
         'name',
         'avatar_img_absolute',
         'cover_img_absolute ',
+        'platform_package'
     ];
 
     /**
@@ -188,5 +189,21 @@ class User extends Authenticatable
     public function scopeToBannedAt(Builder $query, $bannedAt): Builder
     {
         return $query->whereDate('banned_at', '<=', $bannedAt);
+    }
+
+    /**
+     * @return HasOne
+     */
+    public function userPlatformPackage()
+    {
+        return $this->hasOne(UserPlatformPackage::class, 'user_uuid', 'uuid');
+    }
+
+    /**
+     * @return null
+     */
+    public function getPlatformPackageAttribute()
+    {
+        return $this->userPlatformPackage->platform_package_uuid ?? null;
     }
 }

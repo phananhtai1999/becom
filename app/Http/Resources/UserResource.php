@@ -30,6 +30,7 @@ class UserResource extends AbstractJsonResource
             'avatar_img_absolute' => $this->avatar_img_absolute,
             'cover_img' => $this->cover_img,
             'cover_img_absolute' => $this->cover_img_absolute,
+            'platform_package' => $this->platform_package,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
