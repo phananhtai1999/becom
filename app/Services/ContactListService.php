@@ -52,4 +52,20 @@ class ContactListService extends AbstractService
 
         return false;
     }
+
+    /**
+     * @param $contactListUuid
+     * @param $email
+     * @return bool
+     */
+    public function checkContactExistsInContactList($contactListUuid, $email)
+    {
+        $contactList = $this->findOrFailById($contactListUuid);
+        $contacts = $contactList->contacts->pluck('email');
+        if ($contacts->contains($email)) {
+           return true;
+        }
+
+        return false;
+    }
 }

@@ -11,11 +11,13 @@ use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\FormRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyFormRequest;
+use App\Http\Requests\SubmitContactForFormRequest;
 use App\Http\Requests\UpdateFormRequest;
 use App\Http\Requests\UpdateMyFormRequest;
 use App\Http\Resources\FormResource;
 use App\Http\Resources\FormResourceCollection;
 use App\Services\ContactListService;
+use App\Services\ContactService;
 use App\Services\FormService;
 use App\Services\MyFormService;
 use Illuminate\Http\JsonResponse;
@@ -31,6 +33,8 @@ class FormController extends AbstractRestAPIController
 
     protected $contactListService;
 
+    protected $contactService;
+
 
     /**
      * @param FormService $service
@@ -39,7 +43,8 @@ class FormController extends AbstractRestAPIController
     public function __construct(
         FormService $service,
         MyFormService $myService,
-        ContactListService $contactListService
+        ContactListService $contactListService,
+        ContactService $contactService
     )
     {
         $this->myService = $myService;
@@ -50,6 +55,7 @@ class FormController extends AbstractRestAPIController
         $this->editRequest = UpdateFormRequest::class;
         $this->indexRequest = IndexRequest::class;
         $this->contactListService = $contactListService;
+        $this->contactService = $contactService;
     }
 
     /**
@@ -146,6 +152,27 @@ class FormController extends AbstractRestAPIController
         );
     }
 
+    /**
+     * @param SubmitContactForFormRequest $request
+     * @return JsonResponse
+     */
+    public function submitContact(SubmitContactForFormRequest $request)
+    {
+        $form = $this->service->findOneById($request->get('form_uuid'));
 
+        if (!$this->contactListService->checkContactExistsInContactList($form->contact_list_uuid, $request->email)) {
+            $contact = $this->contactService->create([
+                "first_name" => $request->get('first_name'),
+                "last_name" => $request->get('last_name'),
+                "email" => $request->get('email'),
+                "phone" => $request->get('phone'),
+                "user_uuid" => $form->user_uuid
+            ]);
+
+            $contact->contactLists()->attach($form->contact_list_uuid);
+        }
+
+        return $this->sendOkJsonResponse();
+    }
 
 }

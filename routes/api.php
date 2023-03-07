@@ -627,7 +627,6 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'section-template'], functio
 
 //Form
 Route::group(['middleware' => ['auth:api'], 'as' => 'form.'], function () {
-
     Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
         Route::get('/forms', [FormController::class, 'index'])->name('index');
         Route::post('/form', [FormController::class, 'store'])->name('store');
@@ -644,6 +643,9 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'form.'], function () {
         Route::delete('/my/form/{id}', [FormController::class, 'destroyMyForm'])->name('destroy');
     });
 });
+
+Route::post('/form/submit-contact', [FormController::class, 'submitContact'])->name('form.submitContact');
+
 
 //Language
 Route::group(['middleware' => ['auth:api'], 'as' => 'language.'], function () {
