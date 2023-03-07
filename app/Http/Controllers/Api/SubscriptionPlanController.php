@@ -38,7 +38,6 @@ class SubscriptionPlanController extends AbstractRestAPIController
         if ($isExist) {
             return $this->sendJsonResponse(false, 'This plan for this platform package already exists', [], 400);
         }
-
         $platformPackage = $this->platformPacakageService->findOrFailById($request->get('platform_package_uuid'));
         $product = json_decode($platformPackage->payment_product_id);
         if ($request->get('duration_type') == "month") {
@@ -55,8 +54,8 @@ class SubscriptionPlanController extends AbstractRestAPIController
 
         $model = $this->service->create(array_merge($request->all(), [
             'payment_plan_id' => json_encode($product),
+            'duration' => $request->get('duration', 1)
         ]));
-
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
         );
