@@ -23,7 +23,7 @@ class PaymentController extends AbstractRestAPIController
         UserService             $userService,
         SubscriptionPlanService $subscriptionPlanService,
         PlatformPackageService  $platformPackageService,
-        CreditPackageService $creditPackageService
+        CreditPackageService    $creditPackageService
     )
     {
         $this->paypalService = $paypalService;
@@ -78,10 +78,13 @@ class PaymentController extends AbstractRestAPIController
         }
         if (!$processResult['status']) {
 
-            return $this->sendOkJsonResponse(['data' => [
-                'message' => $processResult['message'],
-                'redirect_url' => env('FRONTEND_URL') . '/membership-packages/subscription-failed/' . 1
-            ]]);
+            return $this->sendJsonResponse(
+                false,
+                $processResult['message'] ?? 'failed',
+                ['data' => [
+                    'redirect_url' => env('FRONTEND_URL') . 'my/profile/upgrade/failed?subscriptionPlanId=' . $subscriptionPlan->uuid
+                ]]
+            );
         } else {
 
             return $this->sendOkJsonResponse([

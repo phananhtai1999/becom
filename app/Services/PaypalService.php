@@ -114,7 +114,7 @@ class PaypalService extends AbstractService
             "billing_cycles" => [[
                 "frequency" => [
                     "interval_unit" => $request->get('duration_type'),
-                    "interval_count" => $request->get('duration') ? $request->get('duration') : 1
+                    "interval_count" => $request->get('duration', 1)
                 ],
                 "tenure_type" => "REGULAR",
                 "sequence" => 1,
@@ -154,7 +154,7 @@ class PaypalService extends AbstractService
                             'expirationDate=' . $expirationDate,
                             'platformPackageUuid=' . $subscriptionPlan->platform_package_uuid
                     ]),
-                    "cancel_url" => route('paypal.cancelPaymentSubscription'),
+                    "cancel_url" => route('paypal.cancelPaymentSubscription', ['subscriptionPlanUuid=' . $subscriptionPlan->uuid,]),
                 ],
             ]);
 

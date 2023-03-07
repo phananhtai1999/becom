@@ -80,18 +80,17 @@ class PaypalController extends AbstractRestAPIController
             'auto_renew' => true
         ];
         if (isset($response['status']) && $response['status'] == 'ACTIVE') {
-
             Event::dispatch(new SubscriptionSuccessEvent($subscriptionHistory, $userPlatformPackage));
 
-            return redirect()->to(env('FRONTEND_URL') . '/membership-packages/payment-completed');
+            return redirect()->to(env('FRONTEND_URL') . 'my/profile/upgrade/success?subscriptionPlanId=' . $request->subscriptionPlanUuid);
         } else {
 
-            return redirect()->to(env('FRONTEND_URL') . '/membership-packages/payment-error');
+            return redirect()->to(env('FRONTEND_URL') . 'my/profile/upgrade/failed?subscriptionPlanId=' . $request->subscriptionPlanUuid);
         }
     }
 
     public function cancelPaymentSubscription(Request $request)
     {
-        return redirect()->to(env('FRONTEND_URL') . '/membership-packages/payment-cancel');
+        return redirect()->to(env('FRONTEND_URL') . 'my/profile/upgrade/canceled?subscriptionPlanId=' . $request->subscriptionPlanUuid);
     }
 }

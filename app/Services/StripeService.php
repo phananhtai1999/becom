@@ -137,7 +137,7 @@ class StripeService extends AbstractService
 
             return [
                 'status' => true,
-                'redirect_url' => env('FRONTEND_URL') . '/membership-packages/subscription-completed'
+                'redirect_url' => env('FRONTEND_URL') . 'my/profile/upgrade/success?subscriptionPlanId=' . $subscriptionPlan->uuid
             ];
         } catch (\Exception $e) {
 

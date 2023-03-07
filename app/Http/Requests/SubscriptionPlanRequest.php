@@ -26,7 +26,7 @@ class SubscriptionPlanRequest extends FormRequest
     {
         return [
             'duration_type' => ['required', Rule::in(['month', 'year'])],
-            'duration' => ['required', 'integer', 'min:1', 'max:12'],
+            'duration' => ['integer', 'min:1', 'max:12'],
             'platform_package_uuid' => ['required', 'exists:platform_packages,uuid'],
         ];
     }

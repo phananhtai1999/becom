@@ -9,9 +9,13 @@ use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\PlatformPackageRequest;
 use App\Http\Resources\PlatformPackageResource;
 use App\Http\Resources\PlatformPackageResourceCollection;
+use App\Services\ConfigService;
 use App\Services\PaypalService;
 use App\Services\PlatformPackageService;
 use App\Services\StripeService;
+use App\Services\UserPlatformPackageService;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
 
 class PlatformPackageController extends AbstractRestAPIController
 {
@@ -20,14 +24,18 @@ class PlatformPackageController extends AbstractRestAPIController
     public function __construct(
         PlatformPackageService $service,
         PaypalService          $paypalService,
-        StripeService          $stripeService
+        StripeService          $stripeService,
+        UserPlatformPackageService $userPlatformPackageService,
+        ConfigService $configService
     )
     {
         $this->service = $service;
         $this->stripeService = $stripeService;
         $this->paypalService = $paypalService;
+        $this->userPlatformPackageService = $userPlatformPackageService;
         $this->resourceClass = PlatformPackageResource::class;
         $this->resourceCollectionClass = PlatformPackageResourceCollection::class;
+        $this->configService = $configService;
     }
 
     public function store(PlatformPackageRequest $request)
@@ -50,5 +58,11 @@ class PlatformPackageController extends AbstractRestAPIController
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
         );
+    }
+
+    public function myPlatformPackage() {
+        $myPlatformPackage = $this->userPlatformPackageService->findOneWhereOrFail(['user_uuid' => auth()->user()->getKey()]);
+
+        return $this->sendOkJsonResponse(['data' => $myPlatformPackage]);
     }
 }
