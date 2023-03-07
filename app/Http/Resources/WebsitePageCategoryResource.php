@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Abstracts\AbstractJsonResource;
+use App\Services\UserService;
 
 class WebsitePageCategoryResource extends AbstractJsonResource
 {
@@ -18,7 +19,7 @@ class WebsitePageCategoryResource extends AbstractJsonResource
 
         $data = [
             'uuid' => $this->uuid,
-            'title' => auth()->user()->roles->where('slug', 'admin')->isEmpty() ? $this->title : $this->getTranslations('title'),
+            'title' => app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('title') : $this->title,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

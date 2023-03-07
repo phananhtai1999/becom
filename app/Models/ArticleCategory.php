@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Abstracts\AbstractModel;
+use App\Http\Controllers\Traits\ModelFilterLanguageTrait;
+use App\Services\LanguageService;
 use Baum\NestedSet\Node as WorksAsNestedSet;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -14,7 +16,9 @@ use Spatie\Translatable\HasTranslations;
 
 class ArticleCategory extends AbstractModel
 {
-    use HasFactory, WorksAsNestedSet, SoftDeletes, HasTranslations;
+    use HasFactory, WorksAsNestedSet,
+        SoftDeletes, HasTranslations,
+        ModelFilterLanguageTrait;
 
     /**
      * @var string
@@ -115,5 +119,4 @@ class ArticleCategory extends AbstractModel
             return $query->whereNull('parent_uuid');
         }
     }
-
 }

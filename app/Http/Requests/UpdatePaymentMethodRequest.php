@@ -25,8 +25,8 @@ class UpdatePaymentMethodRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'name' => ['string', Rule::unique('payment_methods')->whereNull('deleted_at')],
-            'slug' => ['string', Rule::unique('payment_methods')->whereNull('deleted_at')],
+            'name' => ['string', Rule::unique('payment_methods')->ignore($this->id, 'uuid')->whereNull('deleted_at')],
+            'slug' => ['string', Rule::unique('payment_methods')->ignore($this->id, 'uuid')->whereNull('deleted_at')],
         ];
     }
 }
