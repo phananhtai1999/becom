@@ -154,7 +154,7 @@ class PaypalService extends AbstractService
                             'expirationDate=' . $expirationDate,
                             'platformPackageUuid=' . $subscriptionPlan->platform_package_uuid
                     ]),
-                    "cancel_url" => route('paypal.cancelPaymentSubscription'),
+                    "cancel_url" => route('paypal.cancelPaymentSubscription', ['subscriptionPlanUuid=' . $subscriptionPlan->uuid,]),
                 ],
             ]);
 
