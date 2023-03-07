@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\Api\ActivityHistoryController;
 use App\Http\Controllers\Api\ArticleCategoryController;
 use App\Http\Controllers\Api\ArticleController;
 use App\Http\Controllers\Api\CampaignController;
+use App\Http\Controllers\Api\CompanyController;
 use App\Http\Controllers\Api\CreditPackageController;
 use App\Http\Controllers\Api\EmailController;
 use App\Http\Controllers\Api\FormController;
@@ -11,12 +13,16 @@ use App\Http\Controllers\Api\LanguageController;
 use App\Http\Controllers\Api\MailOpenTrackingController;
 use App\Http\Controllers\Api\MailSendingHistoryController;
 use App\Http\Controllers\Api\MailTemplateController;
+use App\Http\Controllers\Api\NoteController;
 use App\Http\Controllers\Api\Payment\PaymentController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\PlatformPackageController;
+use App\Http\Controllers\Api\PositionController;
+use App\Http\Controllers\Api\RemindController;
 use App\Http\Controllers\Api\ScenarioController;
 use App\Http\Controllers\Api\SectionTemplateController;
 use App\Http\Controllers\Api\SmtpAccountController;
+use App\Http\Controllers\Api\StatusController;
 use App\Http\Controllers\Api\SubscriptionPlanController;
 use App\Http\Controllers\Api\User\UserController;
 use App\Http\Controllers\Api\WebsiteController;
@@ -677,5 +683,105 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'article.'], function () {
 Route::get('public/articles', [ArticleController::class, 'index'])->name('article-public.index');
 Route::get('public/article/{id}', [ArticleController::class, 'show'])->name('article-public.index');
 
+
+Route::group(['middleware' => ['auth:api'], 'as' => 'status.'], function () {
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/status', [StatusController::class, 'index'])->name('index');
+        Route::post('/status', [StatusController::class, 'store'])->name('store');
+        Route::get('/status/{id}', [StatusController::class, 'show'])->name('show');
+        Route::put('/status/{id}', [StatusController::class, 'edit'])->name('edit');
+        Route::delete('/status/{id}', [StatusController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::group(['as' => 'my.'], function () {
+        Route::get('/my/status', [StatusController::class, 'indexMyStatus'])->name('index');
+        Route::post('/my/status', [StatusController::class, 'storeMyStatus'])->name('store');
+        Route::get('/my/status/{id}', [StatusController::class, 'showMyStatus'])->name('show');
+        Route::put('/my/status/{id}', [StatusController::class, 'editMyStatus'])->name('edit');
+        Route::delete('/my/status/{id}', [StatusController::class, 'destroyMyStatus'])->name('destroy');
+    });
+});
+
+Route::group(['middleware' => ['auth:api'], 'as' => 'company.'], function () {
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/companies', [CompanyController::class, 'index'])->name('index');
+        Route::post('/company', [CompanyController::class, 'store'])->name('store');
+        Route::get('/company/{id}', [CompanyController::class, 'show'])->name('show');
+        Route::put('/company/{id}', [CompanyController::class, 'edit'])->name('edit');
+        Route::delete('/company/{id}', [CompanyController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::group(['as' => 'my.'], function () {
+        Route::get('/my/companies', [CompanyController::class, 'indexMyCompany'])->name('index');
+        Route::post('/my/company', [CompanyController::class, 'storeMyCompany'])->name('store');
+        Route::get('/my/company/{id}', [CompanyController::class, 'showMyCompany'])->name('show');
+        Route::put('/my/company/{id}', [CompanyController::class, 'editMyCompany'])->name('edit');
+        Route::delete('/my/company/{id}', [CompanyController::class, 'destroyMyCompany'])->name('destroy');
+    });
+});
+
+Route::group(['middleware' => ['auth:api'], 'as' => 'position.'], function () {
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/positions', [PositionController::class, 'index'])->name('index');
+        Route::post('/position', [PositionController::class, 'store'])->name('store');
+        Route::get('/position/{id}', [PositionController::class, 'show'])->name('show');
+        Route::put('/position/{id}', [PositionController::class, 'edit'])->name('edit');
+        Route::delete('/position/{id}', [PositionController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::group(['as' => 'my.'], function () {
+        Route::get('/my/positions', [PositionController::class, 'indexMyPosition'])->name('index');
+        Route::post('/my/position', [PositionController::class, 'storeMyPosition'])->name('store');
+        Route::get('/my/position/{id}', [PositionController::class, 'showMyPosition'])->name('show');
+        Route::put('/my/position/{id}', [PositionController::class, 'editMyPosition'])->name('edit');
+        Route::delete('/my/position/{id}', [PositionController::class, 'destroyMyPosition'])->name('destroy');
+    });
+});
+
+Route::group(['middleware' => ['auth:api'], 'as' => 'note.'], function () {
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/notes', [NoteController::class, 'index'])->name('index');
+        Route::post('/note', [NoteController::class, 'store'])->name('store');
+        Route::get('/note/{id}', [NoteController::class, 'show'])->name('show');
+        Route::put('/note/{id}', [NoteController::class, 'edit'])->name('edit');
+        Route::delete('/note/{id}', [NoteController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::group(['as' => 'my.'], function () {
+        Route::get('/my/notes', [NoteController::class, 'indexMyNote'])->name('index');
+        Route::post('/my/note', [NoteController::class, 'storeMyNote'])->name('store');
+        Route::get('/my/note/{id}', [NoteController::class, 'showMyNote'])->name('show');
+        Route::put('/my/note/{id}', [NoteController::class, 'editMyNote'])->name('edit');
+        Route::delete('/my/note/{id}', [NoteController::class, 'destroyMyNote'])->name('destroy');
+    });
+});
+
+Route::group(['middleware' => ['auth:api'], 'as' => 'remind.'], function () {
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/reminds', [RemindController::class, 'index'])->name('index');
+        Route::post('/remind', [RemindController::class, 'store'])->name('store');
+        Route::get('/remind/{id}', [RemindController::class, 'show'])->name('show');
+        Route::put('/remind/{id}', [RemindController::class, 'edit'])->name('edit');
+        Route::delete('/remind/{id}', [RemindController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::group(['as' => 'my.'], function () {
+        Route::get('/my/reminds', [RemindController::class, 'indexMyRemind'])->name('index');
+        Route::post('/my/remind', [RemindController::class, 'storeMyRemind'])->name('store');
+        Route::get('/my/remind/{id}', [RemindController::class, 'showMyRemind'])->name('show');
+        Route::put('/my/remind/{id}', [RemindController::class, 'editMyRemind'])->name('edit');
+        Route::delete('/my/remind/{id}', [RemindController::class, 'destroyMyRemind'])->name('destroy');
+    });
+});
+
+Route::group(['middleware' => ['auth:api'], 'as' => 'activity_history.'], function () {
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/activity-histories', [ActivityHistoryController::class, 'index'])->name('index');
+        Route::post('/activity-history', [ActivityHistoryController::class, 'store'])->name('store');
+        Route::get('/activity-history/{id}', [ActivityHistoryController::class, 'show'])->name('show');
+        Route::put('/activity-history/{id}', [ActivityHistoryController::class, 'edit'])->name('edit');
+        Route::delete('/activity-history/{id}', [ActivityHistoryController::class, 'destroy'])->name('destroy');
+    });
+});
 
 

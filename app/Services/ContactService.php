@@ -25,26 +25,6 @@ class ContactService extends AbstractService
     protected $modelQueryBuilderClass = ContactQueryBuilder::class;
 
     /**
-     * @param $model
-     * @return array|void
-     */
-    public function findContactListKeyByContact($model)
-    {
-        $contactLists = $model->contactLists()->get();
-
-        if (empty($contactLists)) {
-
-            return [];
-        } else {
-            foreach ($contactLists as $contactList) {
-                $contactListUuid[] = $contactList->uuid;
-
-                return $contactListUuid;
-            }
-        }
-    }
-
-    /**
      * @param $campaignUuid
      * @return array
      */
@@ -638,6 +618,8 @@ class ContactService extends AbstractService
                 'dob',
                 'city',
                 'country',
+                'avatar',
+                'status_uuid',
                 'user_uuid'
             ])
             ->defaultSort('-created_at')
@@ -653,6 +635,8 @@ class ContactService extends AbstractService
                 'dob',
                 'city',
                 'country',
+                'avatar',
+                'status_uuid',
                 'user_uuid'
             ])
             ->allowedFilters([
@@ -678,6 +662,10 @@ class ContactService extends AbstractService
                 AllowedFilter::exact('exact__city', 'city'),
                 'country',
                 AllowedFilter::exact('exact__country', 'country'),
+                'avatar',
+                AllowedFilter::exact('exact__avatar', 'avatar'),
+                'status_uuid',
+                AllowedFilter::exact('exact__status_uuid', 'status_uuid'),
                 'user_uuid',
                 AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
                 'user.username',

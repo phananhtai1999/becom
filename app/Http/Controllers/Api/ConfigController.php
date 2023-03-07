@@ -7,7 +7,7 @@ use App\Http\Requests\ConfigRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\UpdateConfigRequest;
 use App\Http\Requests\UpsertConfigRequest;
-use App\Http\Resources\ConfigResourceResourceCollection;
+use App\Http\Resources\ConfigResourceCollection;
 use App\Http\Resources\ConfigResource;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
@@ -26,7 +26,7 @@ class ConfigController extends AbstractRestAPIController
     public function __construct(ConfigService $service)
     {
         $this->service = $service;
-        $this->resourceCollectionClass = ConfigResourceResourceCollection::class;
+        $this->resourceCollectionClass = ConfigResourceCollection::class;
         $this->resourceClass = ConfigResource::class;
         $this->storeRequest = ConfigRequest::class;
         $this->editRequest = UpdateConfigRequest::class;

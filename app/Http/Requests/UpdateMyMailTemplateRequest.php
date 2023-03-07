@@ -31,7 +31,7 @@ class UpdateMyMailTemplateRequest extends AbstractRequest
                 return $query->where('user_uuid', auth()->user()->getkey())->whereNull('deleted_at');
             })],
             'design' => 'string',
-            'type' => ['string', 'in:sms,email'],
+            'type' => ['string', 'in:sms,email,telegram,viber'],
             'image' => ['nullable', 'array'],
             'image.*' => ['string'],
         ];

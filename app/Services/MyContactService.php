@@ -439,6 +439,8 @@ class MyContactService extends AbstractService
                 'dob',
                 'city',
                 'country',
+                'avatar',
+                'status_uuid',
                 'user_uuid'
             ])
             ->defaultSort('-created_at')
@@ -454,6 +456,8 @@ class MyContactService extends AbstractService
                 'dob',
                 'city',
                 'country',
+                'avatar',
+                'status_uuid',
                 'user_uuid'
             ])
             ->allowedFilters([
@@ -479,6 +483,10 @@ class MyContactService extends AbstractService
                 AllowedFilter::exact('exact__city', 'city'),
                 'country',
                 AllowedFilter::exact('exact__country', 'country'),
+                'avatar',
+                AllowedFilter::exact('exact__avatar', 'avatar'),
+                'status_uuid',
+                AllowedFilter::exact('exact__status_uuid', 'status_uuid'),
                 'user_uuid',
                 AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
                 'user.username',
