@@ -32,22 +32,21 @@ class PermissionQueryBuilder extends AbstractQueryBuilder
         return static::for(static::baseQuery())
             ->allowedFields([
                 $modelKeyName,
-                'platform_package_uuid',
+                'name',
                 'code',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
                 $modelKeyName,
-                'platform_package_uuid',
+                'name',
                 'code',
             ])
             ->allowedFilters([
                 $modelKeyName,
                 AllowedFilter::exact('exact__' . $modelKeyName, $modelKeyName),
-                'platform_package_uuid',
-                AllowedFilter::exact('exact__platform_package_uuid', 'platform_package_uuid'),
                 'code',
                 AllowedFilter::exact('exact__code', 'code'),
+                AllowedFilter::scope('name')
             ]);
     }
 

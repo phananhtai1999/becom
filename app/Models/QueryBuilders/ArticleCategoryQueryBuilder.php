@@ -49,8 +49,6 @@ class ArticleCategoryQueryBuilder extends AbstractQueryBuilder
             ->allowedFilters([
                 $modelKeyName,
                 AllowedFilter::exact('exact__' . $modelKeyName, $modelKeyName),
-                'title',
-                AllowedFilter::exact('exact__title', 'title'),
                 'image',
                 AllowedFilter::exact('exact__image', 'image'),
                 'slug',
@@ -65,7 +63,8 @@ class ArticleCategoryQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__user.username', 'user.username'),
                 'user.email',
                 AllowedFilter::exact('exact__user.email', 'user.email'),
-                AllowedFilter::scope('category_root')
+                AllowedFilter::scope('category_root'),
+                AllowedFilter::scope('title'),
             ]);
     }
 

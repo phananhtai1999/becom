@@ -40,8 +40,7 @@ class WebsitePageCategoryQueryBuilder extends AbstractQueryBuilder
             ->allowedFilters([
                 $modelKeyName,
                 AllowedFilter::exact('exact__' . $modelKeyName, $modelKeyName),
-                'title',
-                AllowedFilter::exact('exact__title', 'title'),
+                AllowedFilter::scope('title'),
             ]);
     }
 

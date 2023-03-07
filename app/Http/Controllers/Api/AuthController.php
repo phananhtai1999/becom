@@ -185,7 +185,7 @@ class AuthController extends AbstractRestAPIController
         /** @var User $user */
         $user = $this->userService->create(array_merge($registerRequest->all(), [
             'password' => Hash::make($registerRequest->get('password')),
-            'can_add_smtp_account' => "0"
+            'can_add_smtp_account' => "1"
         ]));
 
         if ($user) {
