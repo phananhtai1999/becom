@@ -33,7 +33,7 @@ class SectionTemplateQueryBuilder extends AbstractQueryBuilder
                 'template',
                 'template_json',
                 'user_uuid',
-                'website_page_category_uuid',
+                'section_category_uuid',
                 'publish_status',
             ])
             ->defaultSort('-created_at')
@@ -43,7 +43,7 @@ class SectionTemplateQueryBuilder extends AbstractQueryBuilder
                 'template',
                 'template_json',
                 'user_uuid',
-                'website_page_category_uuid',
+                'section_category_uuid',
                 'publish_status',
             ])
             ->allowedFilters([
@@ -57,10 +57,10 @@ class SectionTemplateQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__template_json', 'template_json'),
                 'user_uuid',
                 AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
-                'website_page_category_uuid',
-                AllowedFilter::exact('exact__website_page_category_uuid', 'website_page_category_uuid'),
-                'websitePageCategory.title',
-                AllowedFilter::exact('exact__websitePageCategory.name', 'websitePageCategory.title'),
+                'section_category_uuid',
+                AllowedFilter::exact('exact__section_category_uuid', 'section_category_uuid'),
+                'section_category_uuid.title',
+                AllowedFilter::exact('exact__section_category_uuid.title', 'section_category_uuid.title'),
                 'publish_status',
                 AllowedFilter::exact('exact__publish_status', 'publish_status'),
                 'user.username',

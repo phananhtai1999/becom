@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\PlatformPackageController;
 use App\Http\Controllers\Api\PositionController;
 use App\Http\Controllers\Api\RemindController;
 use App\Http\Controllers\Api\ScenarioController;
+use App\Http\Controllers\Api\SectionCategoryController;
 use App\Http\Controllers\Api\SectionTemplateController;
 use App\Http\Controllers\Api\SmtpAccountController;
 use App\Http\Controllers\Api\StatusController;
@@ -802,4 +803,19 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'activity_history.'], functi
     });
 });
 
+//Website_page_categories
+Route::group(['middleware' => ['auth:api'], 'as' => 'section_category.'], function () {
+
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::post('/section-category', [SectionCategoryController::class, 'store'])->name('store');
+        Route::put('/section-category/{id}', [SectionCategoryController::class, 'edit'])->name('edit');
+        Route::delete('/section-category/{id}', [SectionCategoryController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::group(['as' => 'my.'], function () {
+        Route::get('/section-categories', [SectionCategoryController::class, 'index'])->name('index');
+        Route::get('/section-category/{id}', [SectionCategoryController::class, 'show'])->name('show');
+    });
+
+});
 
