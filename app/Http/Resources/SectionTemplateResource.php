@@ -20,7 +20,7 @@ class SectionTemplateResource extends AbstractJsonResource
             'uuid' => $this->getKey(),
             'title' => $this->title,
             'user_uuid' => $this->user_uuid,
-            'website_page_category_uuid' => $this->website_page_category_uuid,
+            'section_category_uuid' => $this->section_category_uuid,
             'template' => $this->template,
             'template_json' => $this->template_json,
             'publish_status' => $this->publish_status,
@@ -30,12 +30,12 @@ class SectionTemplateResource extends AbstractJsonResource
         ];
 
 
-        if (\in_array('website_page__user', $expand)) {
+        if (\in_array('section_template__user', $expand)) {
             $data['user'] = new UserResource($this->user);
         }
 
-        if (\in_array('website_page__website_page_category', $expand)) {
-            $data['website_page_category'] = new WebsitePageCategoryResource($this->websitePageCategory);
+        if (\in_array('section_template__section_category', $expand)) {
+            $data['section_category'] = new SectionCategoryResource($this->sectionCategory);
         }
 
         return $data;

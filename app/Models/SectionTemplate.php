@@ -33,7 +33,7 @@ class SectionTemplate extends AbstractModel
         'template_json',
         'user_uuid',
         'publish_status',
-        'website_page_category_uuid'
+        'section_category_uuid'
     ];
 
     /**
@@ -45,7 +45,7 @@ class SectionTemplate extends AbstractModel
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
         'user_uuid' =>  'integer',
-        'website_page_category_uuid' => 'integer'
+        'section_category_uuid' => 'integer'
     ];
 
     /**
@@ -59,8 +59,8 @@ class SectionTemplate extends AbstractModel
     /**
      * @return BelongsTo
      */
-    public function websitePageCategory()
+    public function sectionCategory()
     {
-        return $this->belongsTo(WebsitePageCategory::class, 'website_page_category_uuid', 'uuid',);
+        return $this->belongsTo(WebsitePageCategory::class, 'section_category_uuid', 'uuid',);
     }
 }
