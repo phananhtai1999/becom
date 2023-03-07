@@ -38,6 +38,8 @@ class Contact extends AbstractModel
         'city',
         'country',
         'user_uuid',
+        'avatar',
+        'status_uuid'
     ];
 
     /**
@@ -49,6 +51,21 @@ class Contact extends AbstractModel
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
     ];
+
+    /**
+     * @var string[]
+     */
+    protected $appends = [
+        'full_name',
+    ];
+
+    /**
+     * @return string
+     */
+    public function getFullNameAttribute()
+    {
+        return $this->first_name . ' '. $this->middle_name . ' '. $this->last_name;
+    }
 
     /**
      * @return BelongsToMany
@@ -114,5 +131,21 @@ class Contact extends AbstractModel
     public function status()
     {
         return $this->belongsTo(Status::class, 'status_uuid', 'uuid');
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function companies()
+    {
+        return $this->belongsToMany(Company::class, 'company_contact', 'contact_uuid', 'company_uuid')->withTimestamps();
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function positions()
+    {
+        return $this->belongsToMany(Position::class, 'company_contact', 'contact_uuid', 'position_uuid')->withTimestamps();
     }
 }

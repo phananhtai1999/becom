@@ -43,4 +43,12 @@ class Position extends AbstractModel
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
     ];
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function contacts()
+    {
+        return $this->belongsToMany(Contact::class, 'company_contact', 'position_uuid', 'contact_uuid')->withTimestamps();
+    }
 }

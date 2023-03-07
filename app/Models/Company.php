@@ -36,4 +36,12 @@ class Company extends AbstractModel
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
     ];
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function contacts()
+    {
+        return $this->belongsToMany(Contact::class, 'company_contact', 'company_uuid', 'contact_uuid')->withTimestamps();
+    }
 }

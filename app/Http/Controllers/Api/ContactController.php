@@ -10,6 +10,7 @@ use App\Http\Requests\ImportJsonFileRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyContactRequest;
 use App\Http\Requests\UpdateContactRequest;
+use App\Http\Requests\UpdateMyContactRequest;
 use App\Http\Resources\ContactResource;
 use App\Http\Resources\ContactResourceCollection;
 use App\Http\Controllers\Traits\RestShowTrait;
@@ -106,15 +107,9 @@ class ContactController extends AbstractRestAPIController
     {
         $request = app($this->storeRequest);
 
-        if (empty($request->user_uuid)) {
-            $data = array_merge($request->all(), [
-                'user_uuid' => auth()->user()->getkey(),
-            ]);
-        } else {
-            $data = $request->all();
-        }
-
-        $model = $this->service->create($data);
+        $model = $this->service->create(array_merge($request->all(), [
+            'user_uuid' => $request->get('user_uuid') ?? auth()->user()->getKey()
+        ]));
 
         $model->contactLists()->attach($request->get('contact_list', []));
 
@@ -135,15 +130,11 @@ class ContactController extends AbstractRestAPIController
 
         $model = $this->service->findOrFailById($id);
 
-        $this->service->update($model, $request->except("points"));
+        $this->service->update($model, array_merge($request->except("points"), [
+            'user_uuid' => $request->get('user_uuid') ?? auth()->user()->getKey()
+        ]));
 
-        $contactListUuid = $this->service->findContactListKeyByContact($model);
-
-        if ($contactListUuid == null) {
-            $model->contactLists()->sync($request->get('contact_list', []));
-        } else {
-            $model->contactLists()->sync($request->get('contact_list', $contactListUuid));
-        }
+        $model->contactLists()->sync($request->contact_list ?? $model->contactLists);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -218,11 +209,11 @@ class ContactController extends AbstractRestAPIController
     }
 
     /**
-     * @param UpdateContactRequest $request
+     * @param UpdateMyContactRequest $request
      * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function editMyContact(UpdateContactRequest $request, $id)
+    public function editMyContact(UpdateMyContactRequest $request, $id)
     {
         $model = $this->myService->findMyContactByKeyOrAbort($id);
 
@@ -230,13 +221,7 @@ class ContactController extends AbstractRestAPIController
             'user_uuid' => auth()->user()->getkey(),
         ]));
 
-        $contactListUuid = $this->service->findContactListKeyByContact($model);
-
-        if ($contactListUuid == null) {
-            $model->contactLists()->sync($request->get('contact_list', []));
-        } else {
-            $model->contactLists()->sync($request->get('contact_list', $contactListUuid));
-        }
+        $model->contactLists()->sync($request->contact_list ?? $model->contactLists);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
