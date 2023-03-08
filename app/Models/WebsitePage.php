@@ -33,6 +33,7 @@ class WebsitePage extends AbstractModel
         'template_json',
         'user_uuid',
         'publish_status',
+        'is_default',
         'website_page_category_uuid'
     ];
 
@@ -45,7 +46,8 @@ class WebsitePage extends AbstractModel
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
         'user_uuid' =>  'integer',
-        'website_page_category_uuid' => 'integer'
+        'website_page_category_uuid' => 'integer',
+        'is_default' => 'boolean',
     ];
 
     /**

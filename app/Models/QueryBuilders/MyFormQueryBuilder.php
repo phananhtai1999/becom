@@ -34,6 +34,7 @@ class MyFormQueryBuilder extends AbstractQueryBuilder
                 'user_uuid'.
                 'template',
                 'template_json',
+                'publish_status',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -43,6 +44,7 @@ class MyFormQueryBuilder extends AbstractQueryBuilder
                 'user_uuid'.
                 'template',
                 'template_json',
+                'publish_status',
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -63,6 +65,8 @@ class MyFormQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__user.email', 'user.email'),
                 'contactList.name',
                 AllowedFilter::exact('exact__contactList.name', 'contactList.name'),
+                'publish_status',
+                AllowedFilter::exact('exact__publish_status', 'publish_status'),
             ]);
     }
 

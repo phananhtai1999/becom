@@ -3,9 +3,11 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
+use App\Models\Form;
+use App\Models\MailTemplate;
 use Illuminate\Validation\Rule;
 
-class MyFormRequest extends AbstractRequest
+class AcceptPublishFormRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,11 +27,10 @@ class MyFormRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'title' => ['required', 'string'],
-            'template' => ['required', 'string'],
-            'template_json' => ['required', 'string'],
-            'contact_list_uuid' => ['required', 'numeric', 'min:1', Rule::exists('contact_lists', 'uuid')->where(function ($query) {
-                return $query->where('user_uuid', auth()->user()->getkey())->whereNull('deleted_at');
+            'forms' => ['required', 'array', 'min:1'],
+            'forms.*' => ['numeric', 'min:1', Rule::exists('forms', 'uuid')->where(function ($query) {
+
+                return $query->where('publish_status', Form::PENDING_PUBLISH_STATUS)->whereNull('deleted_at');
             })],
         ];
     }

@@ -529,10 +529,16 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website_page'], function ()
         Route::get('website-page/{id}', [WebsitePageController::class, 'show'])->name('show');
         Route::put('website-page/{id}', [WebsitePageController::class, 'edit'])->name('edit');
         Route::delete('/website-page/{id}', [WebsitePageController::class, 'destroy'])->name('destroy');
-        Route::get('/unpublished-website-pages', [WebsitePageController::class, 'indexUnpublishedWebsitePage'])->name('index-unpublished');
-        Route::get('/unpublished-website-page/{id}', [WebsitePageController::class, 'showUnpublishedWebsitePage'])->name('show-unpublished');
         Route::post('website-page/accept-publish', [WebsitePageController::class, 'acceptPublishWebsitePage'])->name('acceptPublishWebsitePage');
     });
+
+    Route::group(['middleware' => ['role:admin,editor']], function () {
+        Route::get('/unpublished-website-pages', [WebsitePageController::class, 'indexUnpublishedWebsitePage'])->name('index-unpublished');
+        Route::get('/unpublished-website-page/{id}', [WebsitePageController::class, 'showUnpublishedWebsitePage'])->name('show-unpublished');
+        Route::post('/unpublished-website-page', [WebsitePageController::class, 'storeUnpublishedWebsitePage'])->name('store-unpublished');
+        Route::put('/unpublished-website-page/{id}', [WebsitePageController::class, 'editUnpublishedWebsitePage'])->name('edit-unpublished');
+    });
+
     Route::group(['as' => 'my.'], function () {
         Route::get('my/website-pages', [WebsitePageController::class, 'indexMy'])->name('indexMyWebsitePage');
         Route::post('my/website-page', [WebsitePageController::class, 'storeMyWebsitePage'])->name('storeMyWebsitePage');
@@ -540,6 +546,9 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website_page'], function ()
         Route::put('my/website-page/{id}', [WebsitePageController::class, 'editMyWebsitePage'])->name('editMyWebsitePage');
         Route::delete('my/website-page/{id}', [WebsitePageController::class, 'destroyMyWebsitePage'])->name('destroyMyWebsitePage');
     });
+
+    Route::get('/website-pages-default', [WebsitePageController::class, 'getWebsitePagesDefault'])->name('getWebsitePagesDefault');
+
 });
 
 //Platform Package
@@ -613,10 +622,16 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'section-template'], functio
         Route::get('section-template/{id}', [SectionTemplateController::class, 'show'])->name('show');
         Route::put('section-template/{id}', [SectionTemplateController::class, 'edit'])->name('edit');
         Route::delete('/section-template/{id}', [SectionTemplateController::class, 'destroy'])->name('destroy');
-        Route::get('/unpublished-section-templates', [SectionTemplateController::class, 'indexUnpublishedSectionTemplate'])->name('index-unpublished');
-        Route::get('/unpublished-section-template/{id}', [SectionTemplateController::class, 'showUnpublishedSectionTemplate'])->name('show-unpublished');
         Route::post('section-template/accept-publish', [SectionTemplateController::class, 'acceptPublishSectionTemplate'])->name('acceptPublishSectionTemplate');
     });
+
+    Route::group(['middleware' => ['role:admin,editor']], function () {
+        Route::get('/unpublished-section-templates', [SectionTemplateController::class, 'indexUnpublishedSectionTemplate'])->name('index-unpublished');
+        Route::get('/unpublished-section-template/{id}', [SectionTemplateController::class, 'showUnpublishedSectionTemplate'])->name('show-unpublished');
+        Route::post('/unpublished-section-template', [SectionTemplateController::class, 'storeUnpublishedSectionTemplate'])->name('store-unpublished');
+        Route::put('/unpublished-section-template/{id}', [SectionTemplateController::class, 'editUnpublishedSectionTemplate'])->name('edit-unpublished');
+    });
+
     Route::group(['as' => 'my.'], function () {
         Route::get('my/section-templates', [SectionTemplateController::class, 'indexMy'])->name('indexMySectionTemplate');
         Route::post('my/section-template', [SectionTemplateController::class, 'storeMySectionTemplate'])->name('storeMySectionTemplate');
@@ -624,6 +639,8 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'section-template'], functio
         Route::put('my/section-template/{id}', [SectionTemplateController::class, 'editMySectionTemplate'])->name('editMySectionTemplate');
         Route::delete('my/section-template/{id}', [SectionTemplateController::class, 'destroyMySectionTemplate'])->name('destroyMySectionTemplate');
     });
+
+    Route::get('/section-templates-default', [SectionTemplateController::class, 'getSectionTemplatesDefault'])->name('getWebsitePagesDefault');
 });
 
 //Form
@@ -634,6 +651,14 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'form.'], function () {
         Route::get('/form/{id}', [FormController::class, 'show'])->name('show');
         Route::put('/form/{id}', [FormController::class, 'edit'])->name('edit');
         Route::delete('/form/{id}', [FormController::class, 'destroy'])->name('destroy');
+        Route::post('form/accept-publish', [FormController::class, 'acceptPublishForm'])->name('acceptPublishForm');
+    });
+
+    Route::group(['middleware' => ['role:admin,editor']], function () {
+        Route::get('/unpublished-forms', [FormController::class, 'indexUnpublishedForm'])->name('index-unpublished');
+        Route::get('/unpublished-form/{id}', [FormController::class, 'showUnpublishedForm'])->name('show-unpublished');
+        Route::post('/unpublished-form', [FormController::class, 'storeUnpublishedForm'])->name('store-unpublished');
+        Route::put('/unpublished-form/{id}', [FormController::class, 'editUnpublishedForm'])->name('edit-unpublished');
     });
 
     Route::group(['as' => 'my.'], function () {
@@ -643,6 +668,8 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'form.'], function () {
         Route::put('/my/form/{id}', [FormController::class, 'editMyForm'])->name('edit');
         Route::delete('/my/form/{id}', [FormController::class, 'destroyMyForm'])->name('destroy');
     });
+
+    Route::get('/forms-default', [FormController::class, 'getFormsDefault'])->name('getFormsDefault');
 });
 
 Route::post('/form/submit-contact', [FormController::class, 'submitContact'])->name('form.submitContact');

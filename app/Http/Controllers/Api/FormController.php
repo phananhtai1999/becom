@@ -8,14 +8,18 @@ use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestIndexMyTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
+use App\Http\Requests\AcceptPublishFormRequest;
 use App\Http\Requests\FormRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyFormRequest;
 use App\Http\Requests\SubmitContactForFormRequest;
+use App\Http\Requests\UnpublishedFormRequest;
 use App\Http\Requests\UpdateFormRequest;
 use App\Http\Requests\UpdateMyFormRequest;
+use App\Http\Requests\UpdateUnpublishedFormRequest;
 use App\Http\Resources\FormResource;
 use App\Http\Resources\FormResourceCollection;
+use App\Models\Form;
 use App\Services\ContactListService;
 use App\Services\ContactService;
 use App\Services\FormService;
@@ -65,10 +69,16 @@ class FormController extends AbstractRestAPIController
     {
         $request = app($this->storeRequest);
 
-        $contactList = $this->contactListService->findOneById($request->get('contact_list_uuid'));
+        if ($request->get('contact_list_uuid')) {
+            $contactList = $this->contactListService->findOneById($request->get('contact_list_uuid'));
+            $userUuid = $contactList->user_uuid;
+        }else{
+            $userUuid = auth()->user()->getKey();
+        }
 
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => $contactList->user_uuid
+            'publish_status' => Form::PUBLISHED_PUBLISH_STATUS,
+            'user_uuid' => $userUuid
         ]));
 
         return $this->sendCreatedJsonResponse(
@@ -82,7 +92,7 @@ class FormController extends AbstractRestAPIController
 
         $model = $this->service->findOrFailById($id);
 
-        $data = $request->except('user_uuid');
+        $data = $request->except(['user_uuid']);
 
         if ($request->get('contact_list_uuid') && $request->get('contact_list_uuid') != $model->contact_list_uuid) {
             $contactList = $this->contactListService->findOneById($request->get('contact_list_uuid'));
@@ -129,6 +139,7 @@ class FormController extends AbstractRestAPIController
     public function storeMyForm(MyFormRequest $request)
     {
         $model = $this->myService->create( array_merge($request->all(), [
+            'publish_status' => Form::PUBLISHED_PUBLISH_STATUS,
             'user_uuid' => auth()->user()->getKey()
         ]));
 
@@ -145,7 +156,7 @@ class FormController extends AbstractRestAPIController
     {
         $model = $this->myService->showMyForm($id);
 
-        $this->myService->update($model, $request->except('user_uuid'));
+        $this->myService->update($model, $request->except(['user_uuid', 'publish_status']));
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -175,4 +186,122 @@ class FormController extends AbstractRestAPIController
         return $this->sendOkJsonResponse();
     }
 
+    /**
+     * @param IndexRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function indexUnpublishedForm(IndexRequest $request)
+    {
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData(
+                $this->resourceCollectionClass,
+                $this->service->indexFormByPublishStatus(
+                    Form::PENDING_PUBLISH_STATUS,
+                    $request->get('per_page', '15'),
+                    $request->get('columns', '*'),
+                    $request->get('page_name', 'page'),
+                    $request->get('page', '1'),
+                    $request->get('search'),
+                    $request->get('search_by'),
+                )
+            )
+        );
+    }
+
+    /**
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function showUnpublishedForm($id)
+    {
+        $model = $this->service->findFormByKeyAndPublishStatus(Form::PENDING_PUBLISH_STATUS, $id);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    /**
+     * @param UnpublishedFormRequest $request
+     * @return JsonResponse
+     */
+    public function storeUnpublishedForm(UnpublishedFormRequest $request)
+    {
+        if ($request->get('contact_list_uuid')) {
+            $contactList = $this->contactListService->findOneById($request->get('contact_list_uuid'));
+            $userUuid = $contactList->user_uuid;
+        }else{
+            $userUuid = auth()->user()->getKey();
+        }
+
+        $model = $this->service->create(array_merge($request->all(), [
+            'publish_status' => Form::PENDING_PUBLISH_STATUS,
+            'user_uuid' => $userUuid
+        ]));
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    /**
+     * @param UpdateUnpublishedFormRequest $request
+     * @return JsonResponse
+     */
+    public function editUnpublishedForm(UpdateUnpublishedFormRequest $request, $id)
+    {
+        $model = $this->service->findFormByKeyAndPublishStatus(Form::PENDING_PUBLISH_STATUS, $id);
+
+        $data = $request->except(['user_uuid', 'publish_status']);
+
+        if ($request->get('contact_list_uuid') && $request->get('contact_list_uuid') != $model->contact_list_uuid) {
+            $contactList = $this->contactListService->findOneById($request->get('contact_list_uuid'));
+            $data = array_merge($request->all(), [
+                'user_uuid' => $contactList->user_uuid,
+            ]);
+        }
+
+        $this->service->update($model, $data);
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    /**
+     * @param AcceptPublishFormRequest $request
+     * @return JsonResponse
+     */
+    public function acceptPublishForm(AcceptPublishFormRequest $request)
+    {
+        $FormUuids = $request->forms;
+        foreach ($FormUuids as $FormUuid)
+        {
+            $model = $this->service->findOneById($FormUuid);
+            $this->service->update($model, ['publish_status' => Form::PUBLISHED_PUBLISH_STATUS]);
+        }
+
+        return $this->sendOkJsonResponse();
+    }
+
+    /**
+     * @param IndexRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getFormsDefault(IndexRequest $request)
+    {
+        $models = $this->service->getFormDefaultWithPagination(
+            Form::PUBLISHED_PUBLISH_STATUS,
+            $request->get('per_page', '15'),
+            $request->get('page', '1'),
+            $request->get('columns', '*'),
+            $request->get('page_name', 'page'),
+            $request->get('search'),
+            $request->get('search_by'),
+        );
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+        );
+    }
 }

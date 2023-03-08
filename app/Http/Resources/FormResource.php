@@ -24,6 +24,7 @@ class FormResource extends AbstractJsonResource
             'title' => $this->title,
             'user_uuid' => $this->user_uuid,
             'contact_list_uuid' => $this->contact_list_uuid,
+            'publish_status' => $this->publish_status,
             'template' => $this->template,
             'template_json' => $this->template_json,
             'deleted_at' => $this->deleted_at,
