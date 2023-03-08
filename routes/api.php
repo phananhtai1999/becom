@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\MailSendingHistoryController;
 use App\Http\Controllers\Api\MailTemplateController;
 use App\Http\Controllers\Api\NoteController;
 use App\Http\Controllers\Api\Payment\PaymentController;
+use App\Http\Controllers\Api\Payment\PaypalController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\PlatformPackageController;
 use App\Http\Controllers\Api\PositionController;
@@ -47,9 +48,6 @@ use App\Http\Controllers\Api\UserCreditHistoryController;
 use App\Http\Controllers\Api\CreditTransactionHistoryController;
 use App\Http\Controllers\Api\PaymentMethodController;
 use App\Http\Controllers\Api\OrderController;
-use App\Http\Controllers\Api\CheckoutController;
-use App\Http\Controllers\Api\MomoController;
-use App\Http\Controllers\Api\PaypalController;
 
 /*
 |--------------------------------------------------------------------------
@@ -476,18 +474,6 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'order.'], function () {
     });
 });
 
-//Momo
-Route::get('/momo/success-transaction', [MomoController::class, 'successTransaction'])->name('momo.successTransaction');
-
-//Paypal
-Route::get('/paypal/success-transaction', [PayPalController::class, 'successTransaction'])->name('paypal.successTransaction');
-Route::get('/paypal/cancel-transaction', [PayPalController::class, 'cancelTransaction'])->name('paypal.cancelTransaction');
-
-// checkout
-Route::group(['middleware' => ['auth:api'], 'as' => 'checkout.'], function () {
-    Route::post('/checkout', [CheckoutController::class, 'checkout'])->name('checkout');
-    Route::post('/payment-again', [CheckoutController::class, 'paymentAgain'])->name('paymentAgain');
-});
 
 //Scenario
 Route::group(['middleware' => ['auth:api'], 'as' => 'scenario.'], function () {
@@ -555,9 +541,9 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website_page'], function ()
 Route::group(['middleware' => ['auth:api'], 'as' => 'platformPackage.'], function () {
     Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
         Route::post('/platform-package', [PlatformPackageController::class, 'store']);
-        Route::get('/platform-packages', [PlatformPackageController::class, 'index']);
         Route::delete('/platform-package/{id}', [PlatformPackageController::class, 'destroy']);
     });
+    Route::get('/platform-packages', [PlatformPackageController::class, 'index']);
     Route::get('/platform-package/{id}', [PlatformPackageController::class, 'show']);
     Route::get('/my-platform-package', [PlatformPackageController::class, 'myPlatformPackage']);
 });
@@ -569,6 +555,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'platformPackage.'], functio
         Route::get('/cache-platform-config/{membership_package_uuid}', [ConfigController::class, 'getCachePlatformConfig']);
         Route::get('/platform-packages', [PlatformPackageController::class, 'index']);
         Route::delete('/platform-package/{id}', [PlatformPackageController::class, 'destroy']);
+        Route::put('/platform-package/{id}', [PlatformPackageController::class, 'edit']);
     });
     Route::get('/platform-package/{id}', [PlatformPackageController::class, 'show']);
     Route::get('/my-platform-package', [PlatformPackageController::class, 'myPlatformPackage']);
@@ -579,19 +566,19 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'platformPackage.'], functio
 Route::group(['middleware' => ['auth:api'], 'as' => 'creditPackage.'], function () {
     Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
         Route::post('/credit-package', [CreditPackageController::class, 'store']);
-        Route::get('/credit-package/{id}', [CreditPackageController::class, 'show']);
         Route::put('/credit-package/{id}', [CreditPackageController::class, 'edit']);
-        Route::get('/credit-packages', [CreditPackageController::class, 'index']);
         Route::delete('/credit-package/{id}', [CreditPackageController::class, 'destroy']);
     });
+    Route::get('/credit-package/{id}', [CreditPackageController::class, 'show']);
+    Route::get('/credit-packages', [CreditPackageController::class, 'index']);
 });
 Route::group(['middleware' => ['auth:api'], 'as' => 'subscriptionPlan.'], function () {
     Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
         Route::post('/subscription-plan', [SubscriptionPlanController::class, 'store']);
-        Route::get('/subscription-plan/{id}', [SubscriptionPlanController::class, 'show']);
-        Route::get('/subscription-plans', [SubscriptionPlanController::class, 'index']);
         Route::delete('/subscription-plan/{id}', [SubscriptionPlanController::class, 'destroy']);
     });
+    Route::get('/subscription-plan/{id}', [SubscriptionPlanController::class, 'show']);
+    Route::get('/subscription-plans', [SubscriptionPlanController::class, 'index']);
 });
 Route::group(['middleware' => ['auth:api'], 'as' => 'permission.'], function () {
     Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
@@ -609,10 +596,10 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'payment.'], function () {
     Route::post('/upgrade-user', [PaymentController::class, 'upgradeUser']);
 });
 
-Route::get('/paypal/success-payment', [\App\Http\Controllers\Api\Payment\PaypalController::class, 'successPayment'])->name('paypal.successPayment');
-Route::get('/paypal/success-payment-subscription', [\App\Http\Controllers\Api\Payment\PaypalController::class, 'successPaymentSubscription'])->name('paypal.successPaymentSubscription');
-Route::get('/paypal/cancel-payment', [\App\Http\Controllers\Api\Payment\PaypalController::class, 'cancelPayment'])->name('paypal.cancelPayment');
-Route::get('/paypal/cancel-payment-subscription', [\App\Http\Controllers\Api\Payment\PaypalController::class, 'cancelPaymentSubscription'])->name('paypal.cancelPaymentSubscription');
+Route::get('/paypal/success-payment', [PaypalController::class, 'successPayment'])->name('paypal.successPayment');
+Route::get('/paypal/success-payment-subscription', [PaypalController::class, 'successPaymentSubscription'])->name('paypal.successPaymentSubscription');
+Route::get('/paypal/cancel-payment', [PaypalController::class, 'cancelPayment'])->name('paypal.cancelPayment');
+Route::get('/paypal/cancel-payment-subscription', [PaypalController::class, 'cancelPaymentSubscription'])->name('paypal.cancelPaymentSubscription');
 
 //Section Template
 Route::group(['middleware' => ['auth:api'], 'as' => 'section-template'], function () {

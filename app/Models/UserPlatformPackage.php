@@ -39,4 +39,11 @@ class UserPlatformPackage extends Model
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
     ];
+
+    public function platformPackage() {
+        return $this->belongsTo(PlatformPackage::class, 'platform_package_uuid', 'uuid');
+    }
+    public function subscriptionPlan() {
+        return $this->belongsTo(SubscriptionPlan::class, 'subscription_plan_uuid', 'uuid');
+    }
 }

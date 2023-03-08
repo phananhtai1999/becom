@@ -44,6 +44,9 @@ use App\Services\UserService;
 use Carbon\Carbon;
 use App\Services\MyCampaignService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
@@ -502,6 +505,14 @@ class CampaignController extends AbstractRestAPIController
      */
     public function sendEmailsByCampaign(SendEmailByCampaignRequest $request)
     {
+        $campaign = $this->service->findOrFailById($request->get('campaign_uuid'));
+        $code = 'birthday_campaigns';
+        if ($campaign->send_type == 'sms') {
+            $code = 'sms_campaigns';
+        }
+        if (!Gate::allows('permission', $code)) {
+            return $this->sendJsonResponse(false, 'You need to upgrade platform package', [], 403);
+        }
         $result = $this->checkAndSendCampaign($request->get('campaign_uuid'));
         if ($result['status']) {
             return $this->sendOkJsonResponse(["message" => $result['messages']]);
@@ -516,6 +527,14 @@ class CampaignController extends AbstractRestAPIController
      */
     public function sendEmailByMyCampaign(SendEmailByMyCampaignRequest $request)
     {
+        $campaign = $this->service->findOrFailById($request->get('campaign_uuid'));
+        $code = 'birthday_campaigns';
+        if ($campaign->send_type == 'sms') {
+            $code = 'sms_campaigns';
+        }
+        if (!Gate::allows('permission', $code)) {
+            return $this->sendJsonResponse(false, 'You need to upgrade platform package', [], 403);
+        }
         $result = $this->checkAndSendCampaign($request->get('campaign_uuid'));
         if ($result['status']) {
             return $this->sendOkJsonResponse(["message" => $result['messages']]);

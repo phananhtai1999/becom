@@ -17,7 +17,8 @@ class DatabaseSeeder extends Seeder {
             UserSeeder::class,
             SmtpAccountEncryptionSeeder::class,
             MailTemplateDefaultSeeder::class,
-            ConfigSeeder::class
+            ConfigSeeder::class,
+            PermissionSeeder::class
         ]);
         if (!App::environment('production')) {
             $this->call([
