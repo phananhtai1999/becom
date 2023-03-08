@@ -26,6 +26,9 @@ class PlatformPackageResource extends JsonResource
         if (\in_array('platform_package__permissions', $expand)) {
             $data['permissions'] = PermissionResource::collection($this->permissions);
         }
+        if (\in_array('platform_package__subscription_plan', $expand)) {
+            $data['subscription_plan'] = SubscriptionPlanResource::collection($this->subscriptionPlans);
+        }
 
         return $data;
     }

@@ -7,13 +7,17 @@ use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\PlatformPackageRequest;
+use App\Http\Requests\UpdatePlatformPackageRequest;
 use App\Http\Resources\PlatformPackageResource;
 use App\Http\Resources\PlatformPackageResourceCollection;
+use App\Http\Resources\UserPlatformPackageResource;
+use App\Models\UserPlatformPackage;
 use App\Services\ConfigService;
 use App\Services\PaypalService;
 use App\Services\PlatformPackageService;
 use App\Services\StripeService;
 use App\Services\UserPlatformPackageService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redis;
 
@@ -34,10 +38,15 @@ class PlatformPackageController extends AbstractRestAPIController
         $this->paypalService = $paypalService;
         $this->userPlatformPackageService = $userPlatformPackageService;
         $this->resourceClass = PlatformPackageResource::class;
+        $this->userPlatformResourceClass = UserPlatformPackageResource::class;
         $this->resourceCollectionClass = PlatformPackageResourceCollection::class;
         $this->configService = $configService;
     }
 
+    /**
+     * @param PlatformPackageRequest $request
+     * @return JsonResponse
+     */
     public function store(PlatformPackageRequest $request)
     {
         $paypalProduct = $this->paypalService->createProduct($request);
@@ -60,9 +69,14 @@ class PlatformPackageController extends AbstractRestAPIController
         );
     }
 
+    /**
+     * @return JsonResponse
+     */
     public function myPlatformPackage() {
-        $myPlatformPackage = $this->userPlatformPackageService->findOneWhereOrFail(['user_uuid' => auth()->user()->getKey()]);
+        $myPlatformPackage = $this->userPlatformPackageService->findOneWhere(['user_uuid' => auth()->user()->getKey()]);
 
-        return $this->sendOkJsonResponse(['data' => $myPlatformPackage]);
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->userPlatformResourceClass, $myPlatformPackage)
+        );
     }
 }

@@ -26,8 +26,8 @@ class PlatformPackageRequest extends FormRequest
         return [
             'name' => ['required', 'unique:platform_packages,uuid'],
             'description' => ['required'],
-            'monthly' => ['required', 'min:0', 'integer'],
-            'yearly' => ['required', 'min:0', 'integer'],
+            'monthly' => ['required', 'min:-1', 'integer'],
+            'yearly' => ['required', 'min:-1', 'integer'],
             'permission_uuid' => ['required', 'array'],
             'permission_uuid.*' => ['required', 'integer', 'exists:permissions,uuid'],
         ];
