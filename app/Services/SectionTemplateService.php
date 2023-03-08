@@ -13,6 +13,21 @@ class SectionTemplateService extends AbstractService
     protected $modelQueryBuilderClass = SectionTemplateQueryBuilder::class;
 
     /**
+     * @param $perPage
+     * @param $page
+     * @param $columns
+     * @param $pageName
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     */
+    public function getSectionTemplateDefaultWithPagination($publishedStatus, $perPage, $page, $columns, $pageName, $search, $searchBy)
+    {
+        return SectionTemplateQueryBuilder::searchQuery($search, $searchBy)
+            ->where('publish_status', $publishedStatus)
+            ->where('is_default', true)
+            ->paginate($perPage, $columns, $pageName, $page);
+    }
+
+    /**
      * @param $publishStatus
      * @param $perPage
      * @param $columns

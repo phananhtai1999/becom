@@ -29,8 +29,7 @@ class WebsitePageRequest extends AbstractRequest
             'template' => ['required', 'string'],
             'template_json' => ['required', 'string'],
             'website_page_category_uuid' => ['required', 'numeric', Rule::exists('website_page_categories','uuid')->whereNull('deleted_at')],
-            'publish_status' => ['required', 'numeric', 'min:1', 'max:2'],
-            'user_uuid' => ['nullable', 'numeric', Rule::exists('users','uuid')->whereNull('deleted_at')],
+            'is_default' => ['required', 'boolean']
         ];
     }
 }

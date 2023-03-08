@@ -28,7 +28,7 @@ class FormRequest extends AbstractRequest
             'title' => ['required', 'string'],
             'template' => ['required', 'string'],
             'template_json' => ['required', 'string'],
-            'contact_list_uuid' => ['required', 'numeric', Rule::exists('contact_lists','uuid')->whereNull('deleted_at')],
+            'contact_list_uuid' => ['nullable', 'numeric', Rule::exists('contact_lists','uuid')->whereNull('deleted_at')],
         ];
     }
 }

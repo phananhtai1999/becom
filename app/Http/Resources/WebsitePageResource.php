@@ -24,6 +24,7 @@ class WebsitePageResource extends AbstractJsonResource
             'template' => $this->template,
             'template_json' => $this->template_json,
             'publish_status' => $this->publish_status,
+            'is_default' => $this->is_default,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at

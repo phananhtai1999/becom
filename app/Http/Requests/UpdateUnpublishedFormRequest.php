@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use App\Abstracts\AbstractRequest;
 use Illuminate\Validation\Rule;
 
-class MyFormRequest extends AbstractRequest
+class UpdateUnpublishedFormRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,12 +25,10 @@ class MyFormRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'title' => ['required', 'string'],
-            'template' => ['required', 'string'],
-            'template_json' => ['required', 'string'],
-            'contact_list_uuid' => ['required', 'numeric', 'min:1', Rule::exists('contact_lists', 'uuid')->where(function ($query) {
-                return $query->where('user_uuid', auth()->user()->getkey())->whereNull('deleted_at');
-            })],
+            'title' => ['string'],
+            'template' => ['string'],
+            'template_json' => ['string'],
+            'contact_list_uuid' => ['nullable', 'numeric', Rule::exists('contact_lists','uuid')->whereNull('deleted_at')],
         ];
     }
 }

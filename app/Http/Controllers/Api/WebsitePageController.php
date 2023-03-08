@@ -11,7 +11,9 @@ use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\AcceptPublishWebsitePageRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyWebsitePageRequest;
+use App\Http\Requests\UnpublishedWebsitePageRequest;
 use App\Http\Requests\UpdateMyWebsitePageRequest;
+use App\Http\Requests\UpdateUnpublishedWebsitePageRequest;
 use App\Http\Requests\UpdateWebsitePageRequest;
 use App\Http\Requests\WebsitePageRequest;
 use App\Http\Resources\WebsitePageResource;
@@ -57,7 +59,8 @@ class WebsitePageController extends AbstractRestAPIController
         $request = app($this->storeRequest);
 
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => $request->get('user_uuid') ?? auth()->user()->getKey()
+            'publish_status' => WebsitePage::PUBLISHED_PUBLISH_STATUS,
+            'user_uuid' => auth()->user()->getKey()
         ]));
 
         return $this->sendCreatedJsonResponse(
@@ -74,9 +77,7 @@ class WebsitePageController extends AbstractRestAPIController
 
         $model = $this->service->findOrFailById($id);
 
-        $this->service->update($model, array_merge($request->all(), [
-            'user_uuid' => $request->get('user_uuid') ?? auth()->user()->getKey()
-        ]));
+        $this->service->update($model, $request->except('user_uuid'));
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -89,9 +90,10 @@ class WebsitePageController extends AbstractRestAPIController
      */
     public function storeMyWebsitePage(MyWebsitePageRequest $request)
     {
-        $model = $this->service->create(array_merge($request->except(['user_uuid', 'publish_status']), [
-            'publish_status' => WebsitePage::PENDING_PUBLISH_STATUS,
+        $model = $this->service->create(array_merge($request->all(), [
+            'publish_status' => WebsitePage::PUBLISHED_PUBLISH_STATUS,
             'user_uuid' => auth()->user()->getkey(),
+            'is_default' => false
         ]));
 
         return $this->sendCreatedJsonResponse(
@@ -119,7 +121,7 @@ class WebsitePageController extends AbstractRestAPIController
     public function editMyWebsitePage(UpdateMyWebsitePageRequest $request, $id)
     {
         $model = $this->myService->showMyWebsitePageByUuid($id);
-        $this->service->update($model, $request->except(['user_uuid', 'publish_status']));
+        $this->service->update($model, $request->except(['user_uuid', 'is_default', 'publish_status']));
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -173,6 +175,36 @@ class WebsitePageController extends AbstractRestAPIController
     }
 
     /**
+     * @param UnpublishedWebsitePageRequest $request
+     * @return JsonResponse
+     */
+    public function storeUnpublishedWebsitePage(UnpublishedWebsitePageRequest $request)
+    {
+        $model = $this->service->create(array_merge($request->all(), [
+            'publish_status' => WebsitePage::PENDING_PUBLISH_STATUS,
+            'user_uuid' => auth()->user()->getKey()
+        ]));
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    /**
+     * @param UpdateUnpublishedWebsitePageRequest $request
+     * @return JsonResponse
+     */
+    public function editUnpublishedWebsitePage(UpdateUnpublishedWebsitePageRequest $request, $id)
+    {
+        $model = $this->service->findWebsitePageByKeyAndPublishStatus(WebsitePage::PENDING_PUBLISH_STATUS, $id);
+        $this->service->update($model, $request->except(['user_uuid', 'publish_status']));
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    /**
      * @param AcceptPublishWebsitePageRequest $request
      * @return JsonResponse
      */
@@ -186,6 +218,27 @@ class WebsitePageController extends AbstractRestAPIController
         }
 
         return $this->sendOkJsonResponse();
+    }
+
+    /**
+     * @param IndexRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getWebsitePagesDefault(IndexRequest $request)
+    {
+        $models = $this->service->getWebsitePageDefaultWithPagination(
+            WebsitePage::PUBLISHED_PUBLISH_STATUS,
+            $request->get('per_page', '15'),
+            $request->get('page', '1'),
+            $request->get('columns', '*'),
+            $request->get('page_name', 'page'),
+            $request->get('search'),
+            $request->get('search_by'),
+        );
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+        );
     }
 
 }

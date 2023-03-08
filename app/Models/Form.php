@@ -11,6 +11,9 @@ class Form extends AbstractModel
 {
     use HasFactory, SoftDeletes;
 
+    const PUBLISHED_PUBLISH_STATUS = 1;
+    const PENDING_PUBLISH_STATUS = 2;
+
     /**
      * @var string
      */
@@ -29,7 +32,8 @@ class Form extends AbstractModel
         'template',
         'template_json',
         'contact_list_uuid',
-        'user_uuid'
+        'user_uuid',
+        'publish_status'
     ];
 
     /**

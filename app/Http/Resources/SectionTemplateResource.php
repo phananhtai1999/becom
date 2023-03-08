@@ -21,9 +21,10 @@ class SectionTemplateResource extends AbstractJsonResource
             'title' => $this->title,
             'user_uuid' => $this->user_uuid,
             'section_category_uuid' => $this->section_category_uuid,
+            'publish_status' => $this->publish_status,
+            'is_default' => $this->is_default,
             'template' => $this->template,
             'template_json' => $this->template_json,
-            'publish_status' => $this->publish_status,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at

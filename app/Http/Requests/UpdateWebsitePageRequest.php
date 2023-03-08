@@ -30,7 +30,7 @@ class UpdateWebsitePageRequest extends AbstractRequest
             'template_json' => ['string'],
             'website_page_category_uuid' => ['numeric', Rule::exists('website_page_categories','uuid')->whereNull('deleted_at')],
             'publish_status' => ['numeric', 'min:1', 'max:2'],
-            'user_uuid' => ['nullable', 'numeric', Rule::exists('users','uuid')->whereNull('deleted_at')],
+            'is_default' => ['boolean']
         ];
     }
 }

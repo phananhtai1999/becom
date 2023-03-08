@@ -33,6 +33,7 @@ class SectionTemplate extends AbstractModel
         'template_json',
         'user_uuid',
         'publish_status',
+        'is_default',
         'section_category_uuid'
     ];
 
@@ -45,7 +46,8 @@ class SectionTemplate extends AbstractModel
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
         'user_uuid' =>  'integer',
-        'section_category_uuid' => 'integer'
+        'section_category_uuid' => 'integer',
+        'is_default' => 'boolean',
     ];
 
     /**
