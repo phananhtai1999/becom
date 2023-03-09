@@ -59,9 +59,9 @@ class LanguageSeeder extends Seeder
         ];
 
         foreach ($languages as $language) {
-            $jsonFe = File::exists(public_path("translate_json/{$language['code']}.json"))
-                ? File::get(public_path("translate_json/{$language['code']}.json"))
-                : File::get(public_path("translate_json/en.json"));
+            $jsonFe = File::exists(storage_path("translate_json/{$language['code']}.json"))
+                ? File::get(storage_path("translate_json/{$language['code']}.json"))
+                : File::get(storage_path("translate_json/en.json"));
 
             if ($lang = Language::find($language['code'])) {
                 $lang->update([
