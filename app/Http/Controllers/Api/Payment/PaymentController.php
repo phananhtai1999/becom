@@ -5,8 +5,11 @@ namespace App\Http\Controllers\Api\Payment;
 use App\Abstracts\AbstractRestAPIController;
 use App\Http\Requests\PaymentRequest;
 use App\Http\Requests\UpgradeUserRequest;
+use App\Http\Resources\CreditPackageHistoryResource;
+use App\Http\Resources\CreditPackageHistoryResourceCollection;
 use App\Models\PaymentMethod;
-use App\Services\CreditPackageService;
+use App\Services\CreditPackageHistoryService;
+use App\Services\SubscriptionHistoryService;
 use App\Services\PaypalService;
 use App\Services\PlatformPackageService;
 use App\Services\StripeService;
@@ -18,12 +21,13 @@ use Illuminate\Support\Facades\Auth;
 class PaymentController extends AbstractRestAPIController
 {
     public function __construct(
-        PaypalService           $paypalService,
-        StripeService           $stripeService,
-        UserService             $userService,
-        SubscriptionPlanService $subscriptionPlanService,
-        PlatformPackageService  $platformPackageService,
-        CreditPackageService    $creditPackageService
+        PaypalService               $paypalService,
+        StripeService               $stripeService,
+        UserService                 $userService,
+        SubscriptionPlanService     $subscriptionPlanService,
+        PlatformPackageService      $platformPackageService,
+        SubscriptionHistoryService  $creditPackageService,
+        CreditPackageHistoryService $creditPackageHistoryService
     )
     {
         $this->paypalService = $paypalService;
@@ -32,13 +36,15 @@ class PaymentController extends AbstractRestAPIController
         $this->subscriptionPlanService = $subscriptionPlanService;
         $this->platformPackageService = $platformPackageService;
         $this->creditPackageService = $creditPackageService;
+        $this->creditPackageHistoryService = $creditPackageHistoryService;
+        $this->creditPackageHistoryResourceCollection = CreditPackageHistoryResourceCollection::class;
     }
 
-    public function payment(PaymentRequest $request)
+    public function topUp(PaymentRequest $request)
     {
         try {
             $creditPackage = $this->creditPackageService->findOrFailById($request->get('credit_package_uuid'));
-            if ($request->get('payment_method') == 'paypal') {
+            if ($request->get('payment_method_uuid') == PaymentMethod::PAYPAL) {
                 $processResult = $this->paypalService->processTransaction($creditPackage, Auth::user()->getKey());
             } else {
                 $processResult = $this->stripeService->processTransaction($creditPackage, Auth::user()->getKey(), $request->all());
@@ -93,5 +99,21 @@ class PaymentController extends AbstractRestAPIController
                 ]
             ]);
         }
+    }
+
+    public function topUpHistory()
+    {
+        $topUpHistory = $this->creditPackageHistoryService->findAllWhere(['user_uuid' => auth()->user()->getKey()]);
+
+        return $this->sendOkJsonResponse(
+            $this->creditPackageHistoryService->resourceCollectionToData($this->creditPackageHistoryResourceCollection, $topUpHistory));
+    }
+
+    public function subscriptionHistory()
+    {
+        $topUpHistory = $this->creditPackageHistoryService->findAllWhere(['user_uuid' => auth()->user()->getKey()]);
+
+        return $this->sendOkJsonResponse(
+            $this->creditPackageHistoryService->resourceCollectionToData($this->creditPackageHistoryResourceCollection, $topUpHistory));
     }
 }

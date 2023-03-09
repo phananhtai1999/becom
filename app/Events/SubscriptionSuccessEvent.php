@@ -16,6 +16,7 @@ class SubscriptionSuccessEvent
 
     public $subscriptionHistory;
     public $userPlatformPackage;
+    public $userUuid;
 
     /**
      * Create a new event instance.
@@ -23,10 +24,12 @@ class SubscriptionSuccessEvent
      * @return void
      */
     public function __construct(
+        $userUuid,
         $subscriptionHistory,
         $userPlatformPackage
     )
     {
+        $this->userUuid = $userUuid;
         $this->subscriptionHistory = $subscriptionHistory;
         $this->userPlatformPackage = $userPlatformPackage;
     }

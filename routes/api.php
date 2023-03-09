@@ -31,6 +31,7 @@ use App\Http\Controllers\Api\WebsiteController;
 use App\Http\Controllers\Api\WebsitePageCategoryController;
 use App\Http\Controllers\Api\WebsitePageController;
 use App\Http\Controllers\Api\WebsiteVerificationController;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\UploadImgController;
@@ -592,8 +593,10 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'permission.'], function () 
 
 //Payment and subscription
 Route::group(['middleware' => ['auth:api'], 'as' => 'payment.'], function () {
-    Route::post('/payment', [PaymentController::class, 'payment']);
+    Route::post('/top-up', [PaymentController::class, 'topUp']);
     Route::post('/upgrade-user', [PaymentController::class, 'upgradeUser']);
+    Route::get('/top-up-history', [PaymentController::class, 'topUpHistory']);
+    Route::get('/subscription-history', [PaymentController::class, 'subscriptionHistory']);
 });
 
 Route::get('/paypal/success-payment', [PaypalController::class, 'successPayment'])->name('paypal.successPayment');
@@ -831,5 +834,9 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'section_category.'], functi
         Route::get('/section-category/{id}', [SectionCategoryController::class, 'show'])->name('show');
     });
 
+});
+
+Route::group(['middleware' => ['auth:api'], 'as' => 'api.'], function () {
+    Route::get('/all-api', [Controller::class, 'allApi']);
 });
 
