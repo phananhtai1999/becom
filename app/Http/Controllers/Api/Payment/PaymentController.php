@@ -7,9 +7,12 @@ use App\Http\Requests\PaymentRequest;
 use App\Http\Requests\UpgradeUserRequest;
 use App\Http\Resources\CreditPackageHistoryResource;
 use App\Http\Resources\CreditPackageHistoryResourceCollection;
+use App\Http\Resources\SubscriptionHistoryResourceCollection;
+use App\Http\Resources\SubscriptionPlanResourceCollection;
 use App\Models\PaymentMethod;
 use App\Services\CreditPackageHistoryService;
 use App\Services\SubscriptionHistoryService;
+use App\Services\CreditPackageService;
 use App\Services\PaypalService;
 use App\Services\PlatformPackageService;
 use App\Services\StripeService;
@@ -26,8 +29,9 @@ class PaymentController extends AbstractRestAPIController
         UserService                 $userService,
         SubscriptionPlanService     $subscriptionPlanService,
         PlatformPackageService      $platformPackageService,
-        SubscriptionHistoryService  $creditPackageService,
-        CreditPackageHistoryService $creditPackageHistoryService
+        CreditPackageService        $creditPackageService,
+        CreditPackageHistoryService $creditPackageHistoryService,
+        SubscriptionHistoryService  $subscriptionHistoryService
     )
     {
         $this->paypalService = $paypalService;
@@ -37,7 +41,9 @@ class PaymentController extends AbstractRestAPIController
         $this->platformPackageService = $platformPackageService;
         $this->creditPackageService = $creditPackageService;
         $this->creditPackageHistoryService = $creditPackageHistoryService;
+        $this->subscriptionHistoryService = $subscriptionHistoryService;
         $this->creditPackageHistoryResourceCollection = CreditPackageHistoryResourceCollection::class;
+        $this->subscriptionPlanResourceCollection = SubscriptionHistoryResourceCollection::class;
     }
 
     public function topUp(PaymentRequest $request)
@@ -111,9 +117,8 @@ class PaymentController extends AbstractRestAPIController
 
     public function subscriptionHistory()
     {
-        $topUpHistory = $this->creditPackageHistoryService->findAllWhere(['user_uuid' => auth()->user()->getKey()]);
-
+        $topUpHistory = $this->subscriptionHistoryService->findAllWhere(['user_uuid' => auth()->user()->getKey()]);
         return $this->sendOkJsonResponse(
-            $this->creditPackageHistoryService->resourceCollectionToData($this->creditPackageHistoryResourceCollection, $topUpHistory));
+            $this->subscriptionHistoryService->resourceCollectionToData($this->subscriptionPlanResourceCollection, $topUpHistory));
     }
 }
