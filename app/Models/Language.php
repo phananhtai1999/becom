@@ -39,9 +39,9 @@ class Language extends AbstractModel
     ];
 
 
-    public function __construct()
+    public function __construct($attributes = array())
     {
-        parent::__construct();
+        parent::__construct($attributes);
         $this->languagesSupport = array_map('basename', File::directories(resource_path('lang')));
     }
 

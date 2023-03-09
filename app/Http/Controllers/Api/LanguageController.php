@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
 use App\Http\Controllers\Traits\RestDestroyTrait;
-use App\Http\Controllers\Traits\RestEditTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestStoreTrait;
@@ -16,13 +15,12 @@ use App\Http\Resources\LanguageResource;
 use App\Http\Resources\LanguageResourceCollection;
 use App\Models\Language;
 use App\Services\LanguageService;
-use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\File;
 
 class LanguageController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestShowTrait, RestEditTrait, RestDestroyTrait, RestStoreTrait;
+    use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestStoreTrait;
 
     /**
      * @param LanguageService $service
@@ -35,6 +33,42 @@ class LanguageController extends AbstractRestAPIController
         $this->storeRequest = LanguageRequest::class;
         $this->editRequest = UpdateLanguageRequest::class;
         $this->indexRequest = IndexRequest::class;
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function store()
+    {
+        $request = app($this->storeRequest);
+
+        File::put(public_path("translate_json/".strtolower($request->get('code')).".json"), $request->get('fe'));
+        $model = $this->service->create($request->all());
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
+    public function edit($id)
+    {
+        $request = app($this->editRequest);
+
+        $model = $this->service->findOrFailById($id);
+
+        if ($request->get('fe')) {
+            File::put(public_path("translate_json/".strtolower($id).".json"), $request->get('fe'));
+        }
+
+        $this->service->update($model, $request->all());
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
     }
 
     /**

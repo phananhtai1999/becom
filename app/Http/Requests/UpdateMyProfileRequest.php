@@ -24,8 +24,8 @@ class UpdateMyProfileRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'first_name' => ['nullable', 'string'],
-            'last_name' => ['nullable', 'string'],
+            'first_name' => ['nullable', 'string',"regex:/^[^(\|\]~`!@#$%^&*+=\-_{}\\\;:\"'?><,.\/’)\[]*$/"],
+            'last_name' => ['nullable', 'string',"regex:/^[^(\|\]~`!@#$%^&*+=\-_{}\\\;:\"'?><,.\/’)\[]*$/"],
             'avatar_img' => ['nullable', 'string'],
             'cover_img' => ['nullable', 'string'],
         ];

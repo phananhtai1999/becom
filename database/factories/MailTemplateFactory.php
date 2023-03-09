@@ -21,10 +21,10 @@ class MailTemplateFactory extends Factory {
 			'subject' => $this->faker->sentence(3),
 			'body' => $this->faker->sentence(10),
 			'design' => "{}",
-			'website_uuid' => Website::inRandomOrder()->first()->uuid,
+			'website_uuid' => optional(Website::inRandomOrder()->first())->uuid,
             "user_uuid" => User::inRandomOrder()->first()->uuid,
             "publish_status" => true,
-            "type" => $optionType[array_rand($optionType)]
+            "type" => $optionType[array_rand($optionType)],
 		];
 	}
 }

@@ -24,11 +24,11 @@ class UpdateUserRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'username' => ['string', 'unique:users,username,'.$this->id.',uuid,deleted_at,NULL'],
+            'username' => ['string',"regex:/^[^(\|\]~`!@#$%^&*+=\-_{}\\\;:\"'?><,.\/’)\[]*$/", 'unique:users,username,'.$this->id.',uuid,deleted_at,NULL'],
             'email' => ['string', 'email:rfc,dns', 'unique:users,email,'.$this->id.',uuid,deleted_at,NULL'],
             'password' => ['string', 'confirmed'],
-            'first_name' => ['nullable', 'string'],
-            'last_name' => ['nullable', 'string'],
+            'first_name' => ['nullable', 'string', "regex:/^[^(\|\]~`!@#$%^&*+=\-_{}\\\;:\"'?><,.\/’)\[]*$/"],
+            'last_name' => ['nullable', 'string', "regex:/^[^(\|\]~`!@#$%^&*+=\-_{}\\\;:\"'?><,.\/’)\[]*$/"],
             'avatar_img' => ['nullable', 'string'],
             'cover_img' => ['nullable', 'string'],
             'can_add_smtp_account' => ['nullable', 'boolean'],

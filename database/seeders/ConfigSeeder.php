@@ -81,7 +81,10 @@ class ConfigSeeder extends Seeder
         foreach ($configs as $config) {
             Config::firstOrCreate(
                 ["key" => $config['key']],
-                ["value" => $config['value']]
+                [
+                    "value" => $config['value'],
+                    "group_id" => $config['group_id']
+                ]
             );
         }
     }

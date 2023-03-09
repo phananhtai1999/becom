@@ -14,8 +14,13 @@ class SmtpAccountFactory extends Factory {
 	 * @return array
 	 */
 	public function definition() {
+        $optionMailMailer = array(
+            'smtp',
+            'telegram',
+            'viber',
+        );
 		return [
-			'mail_mailer' => $this->faker->lexify('mail-????'),
+			'mail_mailer' => $optionMailMailer[array_rand($optionMailMailer)],
 			'mail_host' => $this->faker->domainWord() .'.' . $this->faker->domainWord() .'.'. $this->faker->domainName(),
 			'mail_port' => 587,
 			'mail_username' => $this->faker->userName(),

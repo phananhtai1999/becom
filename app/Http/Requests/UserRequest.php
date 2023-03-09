@@ -25,9 +25,9 @@ class UserRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'username' => ['required', 'string', Rule::unique('users')->whereNull('deleted_at')],
-            'first_name' => ['nullable', 'string'],
-            'last_name' => ['nullable', 'string'],
+            'username' => ['required', 'string', "regex:/^[^(\|\]~`!@#$%^&*+=\-_{}\\\;:\"'?><,.\/’)\[]*$/", Rule::unique('users')->whereNull('deleted_at')],
+            'first_name' => ['nullable', 'string', "regex:/^[^(\|\]~`!@#$%^&*+=\-_{}\\\;:\"'?><,.\/’)\[]*$/"],
+            'last_name' => ['nullable', 'string', "regex:/^[^(\|\]~`!@#$%^&*+=\-_{}\\\;:\"'?><,.\/’)\[]*$/"],
             'email' => ['required', 'string', 'email:rfc,dns', Rule::unique('users')->whereNull('deleted_at')],
             'password' => ['required', 'string', 'confirmed'],
             'avatar_img' => ['nullable', 'string'],
