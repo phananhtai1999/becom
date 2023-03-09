@@ -133,7 +133,7 @@ class StripeService extends AbstractService
                 'expiration_date' => $expirationDate,
                 'auto_renew' => true
             ];
-            Event::dispatch(new SubscriptionSuccessEvent($subscriptionHistory, $userPlatformPackage));
+            Event::dispatch(new SubscriptionSuccessEvent(Auth::user()->getKey(), $subscriptionHistory, $userPlatformPackage));
 
             return [
                 'status' => true,

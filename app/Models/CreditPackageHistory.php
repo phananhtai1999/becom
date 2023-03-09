@@ -29,4 +29,15 @@ class CreditPackageHistory extends AbstractModel
         'credit_package_uuid',
         'payment_method_uuid',
         'logs'
-    ];}
+    ];
+
+    public function creditPackage() {
+        return $this->belongsTo(CreditPackage::class, 'credit_package_uuid', 'uuid');
+    }
+    public function paymentMethod() {
+        return $this->belongsTo(PaymentMethod::class, 'payment_method_uuid', 'uuid');
+    }
+    public function user() {
+        return $this->belongsTo(User::class, 'user_uuid', 'uuid');
+    }
+}

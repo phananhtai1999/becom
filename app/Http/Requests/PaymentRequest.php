@@ -24,7 +24,8 @@ class PaymentRequest extends FormRequest
     public function rules(): array
     {
         $rule = [
-            'payment_method' => ['required', Rule::in('stripe', 'paypal')],
+            'payment_method_uuid' => ['required', 'exists:payment_methods,uuid'],
+            'credit_package_uuid' => ['required', 'exists:credit_packages,uuid'],
             "card_number" => ['required_if:payment_method,==,stripe', 'integer', 'digits:16'],
             "exp_month" => ['required_if:payment_method,==,stripe', 'integer'],
             "exp_year" => ['required_if:payment_method,==,stripe', 'integer', 'min:' . Carbon::now()->year],

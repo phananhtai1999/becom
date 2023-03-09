@@ -28,7 +28,7 @@ class SubscriptionSuccessListener
     public function handle($event)
     {
         SubscriptionHistory::create($event->subscriptionHistory);
-        UserPlatformPackage::where('user_uuid', auth()->user()->getKey())->delete();
+        UserPlatformPackage::where('user_uuid', $event->userUuid)->delete();
         UserPlatformPackage::create($event->userPlatformPackage);
     }
 }

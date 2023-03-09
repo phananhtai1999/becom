@@ -2,12 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Abstracts\AbstractRestAPIController;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
-use Illuminate\Routing\Controller as BaseController;
 
-class Controller extends BaseController
+class Controller extends AbstractRestAPIController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+
+    public function allApi() {
+
+        return $this->sendOkJsonResponse(['data' => config('api')]);
+    }
 }

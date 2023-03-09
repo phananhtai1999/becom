@@ -80,7 +80,7 @@ class PaypalController extends AbstractRestAPIController
             'auto_renew' => true
         ];
         if (isset($response['status']) && $response['status'] == 'ACTIVE') {
-            Event::dispatch(new SubscriptionSuccessEvent($subscriptionHistory, $userPlatformPackage));
+            Event::dispatch(new SubscriptionSuccessEvent($request->userUuid, $subscriptionHistory, $userPlatformPackage));
 
             return redirect()->to(env('FRONTEND_URL') . 'my/profile/upgrade/success?subscriptionPlanId=' . $request->subscriptionPlanUuid);
         } else {

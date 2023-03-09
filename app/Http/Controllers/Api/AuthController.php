@@ -20,6 +20,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Redis;
 
 class AuthController extends AbstractRestAPIController
 {
@@ -92,7 +93,6 @@ class AuthController extends AbstractRestAPIController
 
             $userData['data']['token'] = $this->userAccessTokenService->storeNewForUser($user)->getKey();
             $userData['data']['token_type'] = 'Bearer';
-
             return \response()->json(array_merge([
                 'status' => true,
                 "code" => 0,
@@ -100,9 +100,9 @@ class AuthController extends AbstractRestAPIController
                 'message' => __("messages.login_success")
             ], $userData))
                 ->withCookie(
-                    \cookie('accessToken', $userData['data']['token'], config('auth.password_timeout'), null, null, true, true)
+                    \cookie('accessToken', $userData['data']['token'], config('auth.password_timeout'), null, null, false, true)
                 )->withCookie(
-                    \cookie('logged', true, config('auth.password_timeout'), null, null, true, false)
+                    \cookie('logged', true, config('auth.password_timeout'), null, null, false, false)
                 );
         }
 
@@ -134,7 +134,6 @@ class AuthController extends AbstractRestAPIController
     {
         /** @var User $user */
         $user = $this->userService->currentUser();
-
         if ($user) {
             return $this->sendOkJsonResponse(
                 app(UserResource::class, ['resource' => $user])
@@ -205,9 +204,9 @@ class AuthController extends AbstractRestAPIController
                 'message' => __("messages.register_success")
             ], $userData))
                 ->withCookie(
-                    \cookie('accessToken', $userData['data']['token'], config('auth.password_timeout'), null, null, true, true)
+                    \cookie('accessToken', $userData['data']['token'], config('auth.password_timeout'), null, null, false, true)
                 )->withCookie(
-                    \cookie('logged', true, config('auth.password_timeout'), null, null, true, false)
+                    \cookie('logged', true, config('auth.password_timeout'), null, null, false, false)
                 );
         }
 
