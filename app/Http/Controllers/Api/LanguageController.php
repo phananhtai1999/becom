@@ -42,7 +42,7 @@ class LanguageController extends AbstractRestAPIController
     {
         $request = app($this->storeRequest);
 
-        File::put(public_path("translate_json/".strtolower($request->get('code')).".json"), $request->get('fe'));
+        File::put(storage_path("translate_json/".strtolower($request->get('code')).".json"), $request->get('fe'));
         $model = $this->service->create($request->all());
 
         return $this->sendCreatedJsonResponse(
@@ -61,7 +61,7 @@ class LanguageController extends AbstractRestAPIController
         $model = $this->service->findOrFailById($id);
 
         if ($request->get('fe')) {
-            File::put(public_path("translate_json/".strtolower($id).".json"), $request->get('fe'));
+            File::put(storage_path("translate_json/".strtolower($id).".json"), $request->get('fe'));
         }
 
         $this->service->update($model, $request->all());
