@@ -29,11 +29,13 @@ class Permission extends AbstractModel
      */
     protected $fillable = [
         'name',
-        'code'
+        'code',
+        'api_methods'
     ];
 
     protected $casts = [
-        'name' => 'array'
+        'name' => 'array',
+        'api_methods' => 'array',
     ];
 
     /**

@@ -42,5 +42,14 @@ class SubscriptionHistory extends Model
         'deleted_at' => 'datetime',
         'logs' => 'array'
     ];
+    public function subscriptionPlan() {
+        return $this->belongsTo(SubscriptionPlan::class, 'subscription_plan_uuid', 'uuid');
+    }
+    public function paymentMethod() {
+        return $this->belongsTo(PaymentMethod::class, 'payment_method_uuid', 'uuid');
+    }
+    public function user() {
+        return $this->belongsTo(User::class, 'user_uuid', 'uuid');
+    }
 }
 
