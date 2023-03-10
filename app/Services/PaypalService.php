@@ -29,7 +29,7 @@ class PaypalService extends AbstractService
      * @return array
      * @throws Throwable
      */
-    public function processTransaction($creditPackage, $userUuid)
+    public function processTransaction($creditPackage, $userUuid, $request)
     {
         try {
             $provider = new PayPalClient();
@@ -39,8 +39,8 @@ class PaypalService extends AbstractService
             $response = $provider->createOrder([
                 "intent" => "CAPTURE",
                 "application_context" => [
-                    "return_url" => route('paypal.successPayment', ['userUuid=' . $userUuid, 'creditPackageUuid=' . $creditPackage->uuid]),
-                    "cancel_url" => route('paypal.cancelPayment', ['userUuid=' . $userUuid, 'creditPackageUuid=' . $creditPackage->uuid]),
+                    "return_url" => route('paypal.successPayment', ['goBackUrl=' . $request['go_back_url'], 'userUuid=' . $userUuid, 'creditPackageUuid=' . $creditPackage->uuid]),
+                    "cancel_url" => route('paypal.cancelPayment', ['goBackUrl=' . $request['go_back_url'], 'userUuid=' . $userUuid, 'creditPackageUuid=' . $creditPackage->uuid]),
                 ],
                 "purchase_units" => [
                     0 => [
@@ -136,7 +136,7 @@ class PaypalService extends AbstractService
     /**
      * @throws Throwable
      */
-    public function processSubscription($subscriptionPlan, $subscriptionDate, $expirationDate, $plan)
+    public function processSubscription($subscriptionPlan, $subscriptionDate, $expirationDate, $plan, $request)
     {
         try {
             $provider = $this->accessServer();
@@ -148,13 +148,14 @@ class PaypalService extends AbstractService
                 ],
                 "application_context" => [
                     "return_url" => route('paypal.successPaymentSubscription', [
+                            'goBackUrl=' . $request['go_back_url'],
                             'subscriptionPlanUuid=' . $subscriptionPlan->uuid,
                             'subscriptionDate=' . $subscriptionDate,
                             'userUuid=' . Auth::user()->getKey(),
                             'expirationDate=' . $expirationDate,
                             'platformPackageUuid=' . $subscriptionPlan->platform_package_uuid
                     ]),
-                    "cancel_url" => route('paypal.cancelPaymentSubscription', ['subscriptionPlanUuid=' . $subscriptionPlan->uuid,]),
+                    "cancel_url" => route('paypal.cancelPaymentSubscription', ['goBackUrl=' . $request['go_back_url'], 'subscriptionPlanUuid=' . $subscriptionPlan->uuid,]),
                 ],
             ]);
 

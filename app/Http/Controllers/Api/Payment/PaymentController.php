@@ -51,7 +51,7 @@ class PaymentController extends AbstractRestAPIController
         try {
             $creditPackage = $this->creditPackageService->findOrFailById($request->get('credit_package_uuid'));
             if ($request->get('payment_method_uuid') == PaymentMethod::PAYPAL) {
-                $processResult = $this->paypalService->processTransaction($creditPackage, Auth::user()->getKey());
+                $processResult = $this->paypalService->processTransaction($creditPackage, Auth::user()->getKey(), $request->all());
             } else {
                 $processResult = $this->stripeService->processTransaction($creditPackage, Auth::user()->getKey(), $request->all());
             }
@@ -86,7 +86,7 @@ class PaymentController extends AbstractRestAPIController
         if ($request->get('payment_method_uuid') == PaymentMethod::STRIPE) {
             $processResult = $this->stripeService->processSubscription($subscriptionPlan, $fromDate, $toDate, $plan->stripe, $request->all());
         } elseif ($request->get('payment_method_uuid') == PaymentMethod::PAYPAL) {
-            $processResult = $this->paypalService->processSubscription($subscriptionPlan, $fromDate, $toDate, $plan->paypal);
+            $processResult = $this->paypalService->processSubscription($subscriptionPlan, $fromDate, $toDate, $plan->paypal, $request->all());
         }
         if (!$processResult['status']) {
 
@@ -94,7 +94,7 @@ class PaymentController extends AbstractRestAPIController
                 false,
                 $processResult['message'] ?? 'failed',
                 ['data' => [
-                    'redirect_url' => env('FRONTEND_URL') . 'my/profile/upgrade/failed?subscriptionPlanId=' . $subscriptionPlan->uuid
+                    'redirect_url' => env('FRONTEND_URL') . 'my/profile/upgrade/failed?plan_id=' . $subscriptionPlan->uuid
                 ]]
             );
         } else {

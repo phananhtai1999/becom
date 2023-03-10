@@ -27,7 +27,7 @@ class SubscriptionHistoryResource extends JsonResource
             'logs' => $this->logs,
         ];
         if (\in_array('subscription_history__subscription_plan', $expand)) {
-            $data['subscription_plan'] = new SubscriptionPlanResource($this->subscriptionPlan);
+            $data['subscription_plan'] = new PlatformPackageResource(optional($this->subscriptionPlan)->platformPackage);
         }
         if (\in_array('subscription_history__payment_method', $expand)) {
             $data['payment_method'] = new PaymentMethodResource($this->paymentMethod);

@@ -24,7 +24,7 @@ class PaypalController extends AbstractRestAPIController
     public function cancelPayment(Request $request)
     {
 
-        return redirect()->to(env('FRONTEND_URL') . '/checkout/payment-cancel/' . $request->get('transactionHistoryUuid'));
+        return redirect()->to(env('FRONTEND_URL') . 'my/profile/top-up/cancel?packageID=' . $request->creditPackageUuid);
     }
 
     /**
@@ -45,10 +45,10 @@ class PaypalController extends AbstractRestAPIController
         if (isset($response['status']) && $response['status'] == 'COMPLETED') {
             Event::dispatch(new PaymentCreditPackageSuccessEvent($request->creditPackageUuid, $paymentData, $request->userUuid, PaymentMethod::PAYPAL));
 
-            return redirect()->to(env('FRONTEND_URL') . '/payment/payment-completed/' . $request->get('userUuid'));
+            return redirect()->to(env('FRONTEND_URL') . 'my/profile/top-up/success?go_back_url='. $request->goBackUrl .'&package_id=' . $request->creditPackageUuid);
         } else {
 
-            return redirect()->to(env('FRONTEND_URL') . '/payment/payment-error/' . $request->get('userUuid'));
+            return redirect()->to(env('FRONTEND_URL') . 'my/profile/top-up/failed?go_back_url='. $request->goBackUrl .'&package_id=' . $request->creditPackageUuid);
         }
     }
 
@@ -82,15 +82,15 @@ class PaypalController extends AbstractRestAPIController
         if (isset($response['status']) && $response['status'] == 'ACTIVE') {
             Event::dispatch(new SubscriptionSuccessEvent($request->userUuid, $subscriptionHistory, $userPlatformPackage));
 
-            return redirect()->to(env('FRONTEND_URL') . 'my/profile/upgrade/success?subscriptionPlanId=' . $request->subscriptionPlanUuid);
+            return redirect()->to(env('FRONTEND_URL') . 'my/profile/upgrade/success?go_back_url='. $request['goBackUrl'] . '&plan_id=' . $request->subscriptionPlanUuid);
         } else {
 
-            return redirect()->to(env('FRONTEND_URL') . 'my/profile/upgrade/failed?subscriptionPlanId=' . $request->subscriptionPlanUuid);
+            return redirect()->to(env('FRONTEND_URL') . 'my/profile/upgrade/failed?go_back_url='. $request['goBackUrl'] . '&plan_id=' . $request->subscriptionPlanUuid);
         }
     }
 
     public function cancelPaymentSubscription(Request $request)
     {
-        return redirect()->to(env('FRONTEND_URL') . 'my/profile/upgrade/canceled?subscriptionPlanId=' . $request->subscriptionPlanUuid);
+        return redirect()->to(env('FRONTEND_URL') . 'my/profile/upgrade/canceled?go_back_url='. $request['goBackUrl'] . '&plan_id=' . $request->subscriptionPlanUuid);
     }
 }

@@ -25,6 +25,22 @@ class StripeService extends AbstractService
         $stripe = new StripeClient(config('payment.stripe.client_secret'));
 
         try {
+//            $checkout_session = $stripe->checkout->sessions->create([
+//                'line_items' => [[
+//                    'price_data' => [
+//                        'currency' => 'usd',
+//                        'product_data' => [
+//                            'name' => 'Credit-Package',
+//                        ],
+//                        'unit_amount' => $creditPackage->price * 100,
+//                    ],
+//                    'quantity' => 1,
+//                ]],
+//                'mode' => 'payment',
+//                'success_url' => env('FRONTEND_URL') . 'my/profile/top-up/success?packageID=' . $creditPackage->uuid,
+//                'cancel_url' => env('FRONTEND_URL') . 'my/profile/top-up/failed?packageID=' . $creditPackage->uuid,
+//            ]);
+
             $token = $stripe->tokens->create([
                 'card' => [
                     'name' => $request['card_name'],
@@ -46,7 +62,7 @@ class StripeService extends AbstractService
 
             return [
                 'status' => true,
-                'redirect_url' => env('FRONTEND_URL') . '/payment/payment-completed/' . $userUuid
+                'redirect_url' => env('FRONTEND_URL') . 'my/profile/top-up/success?go_back_url='. $request['go_back_url'] .'&package_id=' . $creditPackage->uuid
             ];
 
         } catch (InvalidRequestException|Exception $e) {
@@ -137,7 +153,7 @@ class StripeService extends AbstractService
 
             return [
                 'status' => true,
-                'redirect_url' => env('FRONTEND_URL') . 'my/profile/upgrade/success?subscriptionPlanId=' . $subscriptionPlan->uuid
+                'redirect_url' => env('FRONTEND_URL') . 'my/profile/upgrade/success?go_back_url='. $request['go_back_url'] .'&plan_id=' . $subscriptionPlan->uuid
             ];
         } catch (\Exception $e) {
 
