@@ -206,4 +206,44 @@ class User extends Authenticatable
     {
         return $this->userPlatformPackage->platform_package_uuid ?? null;
     }
+
+    /**
+     * @return HasMany
+     */
+    public function reminds()
+    {
+        return $this->hasMany(Remind::class, 'user_uuid', 'uuid');
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function notes()
+    {
+        return $this->hasMany(Note::class, 'user_uuid', 'uuid');
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function positions()
+    {
+        return $this->hasMany(Position::class, 'user_uuid', 'uuid');
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function companies()
+    {
+        return $this->hasMany(Company::class, 'user_uuid', 'uuid');
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function status()
+    {
+        return $this->hasMany(Status::class, 'user_uuid', 'uuid');
+    }
 }

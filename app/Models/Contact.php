@@ -148,4 +148,28 @@ class Contact extends AbstractModel
     {
         return $this->belongsToMany(Position::class, 'company_contact', 'contact_uuid', 'position_uuid')->withTimestamps();
     }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function notes()
+    {
+        return $this->hasMany(Note::class, 'contact_uuid', 'uuid');
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function reminds()
+    {
+        return $this->belongsToMany(Remind::class, 'contact_remind', 'contact_uuid', 'remind_uuid')->withTimestamps();
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function activityHistories()
+    {
+        return $this->hasMany(ActivityHistory::class, 'contact_uuid', 'uuid');
+    }
 }

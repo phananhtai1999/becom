@@ -45,6 +45,30 @@ class ContactResource extends AbstractJsonResource
             $data['user'] = new UserResource($this->user);
         }
 
+        if (\in_array('contact__status', $expand)) {
+            $data['status'] = new StatusResource($this->status);
+        }
+
+        if (\in_array('contact__companies', $expand)) {
+            $data['company'] = CompanyResource::collection($this->companies);
+        }
+
+        if (\in_array('contact__positions', $expand)) {
+            $data['position'] = PositionResource::collection($this->positions);
+        }
+
+        if (\in_array('contact__notes', $expand)) {
+            $data['note'] = NoteResource::collection($this->notes);
+        }
+
+        if (\in_array('contact__reminds', $expand)) {
+            $data['remind'] = RemindResource::collection($this->reminds);
+        }
+
+        if (\in_array('contact__activity_histories', $expand)) {
+            $data['activity_histories'] = ActivityHistoryResource::collection($this->activityHistories);
+        }
+
         return $data;
     }
 }

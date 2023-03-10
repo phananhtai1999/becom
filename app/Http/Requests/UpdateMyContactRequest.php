@@ -40,12 +40,15 @@ class UpdateMyContactRequest extends AbstractRequest
 
                 return $query->where('user_uuid', auth()->user()->getkey())->whereNull('deleted_at');
             })],
-            'company' => ['nullable', 'array', 'min:1'],
-            'company.*' => ['numeric', 'min:1', Rule::exists('contact_lists', 'uuid')->where(function ($query) {
+            'remind' => ['nullable', 'array', 'min:1'],
+            'remind.*' => ['numeric', 'min:1', Rule::exists('reminds','uuid')->where(function ($query) {
                 return $query->where('user_uuid', auth()->user()->getKey());
             })->whereNull('deleted_at')],
-            'position' => ['nullable', 'array', 'min:1'],
-            'position.*' => ['numeric', 'min:1', Rule::exists('contact_lists', 'uuid')->where(function ($query) {
+            'contact_company_position' => ['nullable', 'array', 'min:1'],
+            'contact_company_position.*.company_uuid' => ['numeric', Rule::exists('companies','uuid')->where(function ($query) {
+                return $query->where('user_uuid', auth()->user()->getKey());
+            })->whereNull('deleted_at')],
+            'contact_company_position.*.position_uuid' => ['numeric', Rule::exists('positions','uuid')->where(function ($query) {
                 return $query->where('user_uuid', auth()->user()->getKey());
             })->whereNull('deleted_at')],
             'status_uuid' => ['numeric', 'min:1', Rule::exists('status','uuid')->where(function ($query) {

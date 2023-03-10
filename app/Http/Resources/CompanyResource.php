@@ -7,14 +7,16 @@ use App\Abstracts\AbstractJsonResource;
 class CompanyResource extends AbstractJsonResource
 {
     /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
+     * @param $request
+     * @return array
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function toArray($request)
     {
-        return [
+        $expand = request()->get('expand', []);
+
+        $data = [
             'uuid' => $this->getKey(),
             'name' => $this->name,
             'user_uuid' => $this->user_uuid,
@@ -22,5 +24,11 @@ class CompanyResource extends AbstractJsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
         ];
+
+        if (\in_array('company__user', $expand)) {
+            $data['user'] = new UserResource($this->user);
+        }
+
+        return $data;
     }
 }

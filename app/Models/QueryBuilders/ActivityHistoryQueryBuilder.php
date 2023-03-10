@@ -32,7 +32,8 @@ class ActivityHistoryQueryBuilder extends AbstractQueryBuilder
                 'type',
                 'type_id',
                 'content',
-                'date'
+                'date',
+                'contact_uuid'
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -40,7 +41,8 @@ class ActivityHistoryQueryBuilder extends AbstractQueryBuilder
                 'type',
                 'type_id',
                 'content',
-                'date'
+                'date',
+                'contact_uuid'
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -53,6 +55,12 @@ class ActivityHistoryQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__content', 'content'),
                 'date',
                 AllowedFilter::exact('exact__date', 'date'),
+                'contact_uuid',
+                AllowedFilter::exact('exact__contact_uuid', 'contact_uuid'),
+                AllowedFilter::scope('from__created_at'),
+                AllowedFilter::scope('to__created_at'),
+                AllowedFilter::scope('from__date'),
+                AllowedFilter::scope('to__date'),
             ]);
     }
 

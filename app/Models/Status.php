@@ -51,4 +51,12 @@ class Status extends AbstractModel
     {
         return $this->hasMany(Contact::class, 'status_uuid', 'uuid');
     }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_uuid', 'uuid');
+    }
 }

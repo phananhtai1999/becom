@@ -112,6 +112,8 @@ class ContactController extends AbstractRestAPIController
         ]));
 
         $model->contactLists()->attach($request->get('contact_list', []));
+        $model->reminds()->attach($request->get('remind', []));
+        $model->companies()->attach(array_unique($request->get('contact_company_position', []), SORT_REGULAR));
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -135,6 +137,8 @@ class ContactController extends AbstractRestAPIController
         ]));
 
         $model->contactLists()->sync($request->contact_list ?? $model->contactLists);
+        $model->reminds()->sync($request->get('remind', []));
+        $model->companies()->sync(array_unique($request->get('contact_company_position', []), SORT_REGULAR));
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -189,6 +193,8 @@ class ContactController extends AbstractRestAPIController
         ]));
 
         $model->contactLists()->attach($request->get('contact_list', []));
+        $model->reminds()->attach($request->get('remind', []));
+        $model->companies()->attach(array_unique($request->get('contact_company_position', []), SORT_REGULAR));
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -222,6 +228,8 @@ class ContactController extends AbstractRestAPIController
         ]));
 
         $model->contactLists()->sync($request->contact_list ?? $model->contactLists);
+        $model->reminds()->sync($request->get('remind', []));
+        $model->companies()->sync(array_unique($request->get('contact_company_position', []), SORT_REGULAR));
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
