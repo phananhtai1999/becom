@@ -22,4 +22,9 @@ class CreditPackageHistoryService extends AbstractService
     protected $modelClass = CreditPackageHistory::class;
 
     protected $modelQueryBuilderClass = CreditPackageHistoryQueryBuilder::class;
+
+    public function myTopUpHistories() {
+
+        return $this->model->where(['user_uuid' => auth()->user()->getKey()])->orderBy('uuid', 'DESC')->get();
+    }
 }
