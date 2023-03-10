@@ -109,7 +109,7 @@ class PaymentController extends AbstractRestAPIController
 
     public function topUpHistory()
     {
-        $topUpHistory = $this->creditPackageHistoryService->findAllWhere(['user_uuid' => auth()->user()->getKey()]);
+        $topUpHistory = $this->creditPackageHistoryService->myTopUpHistories();
 
         return $this->sendOkJsonResponse(
             $this->creditPackageHistoryService->resourceCollectionToData($this->creditPackageHistoryResourceCollection, $topUpHistory));
@@ -117,8 +117,9 @@ class PaymentController extends AbstractRestAPIController
 
     public function subscriptionHistory()
     {
-        $topUpHistory = $this->subscriptionHistoryService->findAllWhere(['user_uuid' => auth()->user()->getKey()]);
+        $subscriptionHistory = $this->subscriptionHistoryService->mySubscriptionHistories();
+
         return $this->sendOkJsonResponse(
-            $this->subscriptionHistoryService->resourceCollectionToData($this->subscriptionPlanResourceCollection, $topUpHistory));
+            $this->subscriptionHistoryService->resourceCollectionToData($this->subscriptionPlanResourceCollection, $subscriptionHistory));
     }
 }

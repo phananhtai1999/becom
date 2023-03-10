@@ -106,9 +106,6 @@ class ContactController extends AbstractRestAPIController
      */
     public function store()
     {
-        if (!Gate::allows('permission', 'create_contacts')) {
-            return $this->sendJsonResponse(false, 'You need to upgrade platform package', [], 403);
-        }
         $request = app($this->storeRequest);
 
         $model = $this->service->create(array_merge($request->all(), [
@@ -132,9 +129,6 @@ class ContactController extends AbstractRestAPIController
      */
     public function edit($id)
     {
-        if (!Gate::allows('permission', 'update_contacts_test_fail')) {
-            return $this->sendJsonResponse(false, 'You need to upgrade platform package', [], 403);
-        }
         $request = app($this->editRequest);
 
         $model = $this->service->findOrFailById($id);
