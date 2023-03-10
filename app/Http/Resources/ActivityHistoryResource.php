@@ -7,14 +7,16 @@ use App\Abstracts\AbstractJsonResource;
 class ActivityHistoryResource extends AbstractJsonResource
 {
     /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
+     * @param $request
+     * @return array
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function toArray($request)
     {
-        return [
+        $expand = request()->get('expand', []);
+
+        $data = [
             'uuid' => $this->getKey(),
             'type' => $this->type,
             'type_id' => $this->type_id,
@@ -25,5 +27,11 @@ class ActivityHistoryResource extends AbstractJsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
         ];
+
+        if (\in_array('activity_history__contact', $expand)) {
+            $data['contact'] = new ContactResource($this->contact);
+        }
+
+        return $data;
     }
 }
