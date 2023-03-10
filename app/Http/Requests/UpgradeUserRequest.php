@@ -27,6 +27,7 @@ class UpgradeUserRequest extends AbstractRequest
     {
         $rule = [
             'payment_method_uuid' => ['required', Rule::in('1', '2')],
+            'go_back_url' => ['required'],
             "card_number" => ['required_if:payment_method,==,2', 'integer', 'digits:16'],
             "exp_month" => ['required_if:payment_method,==,2', 'integer'],
             "exp_year" => ['required_if:payment_method,==,2', 'integer', 'min:' . Carbon::now()->year],

@@ -44,14 +44,12 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         Gate::define('permission', function ($user, $code) {
-
             $permissions = Cache::rememberForever($user->userPlatformPackage->platform_package_uuid . '_permission', function () use ($user) {
                 $platformPackage = PlatformPackage::findOrFail($user->userPlatformPackage->platform_package_uuid);
-                return $platformPackage->permissions->pluck('name', 'code');
+                return $platformPackage->permissions()->select('api_methods', 'name', 'code')->get();
             });
             foreach ($permissions as $permissionCode => $permission) {
-                if ($permissionCode == $code) {
-
+                if(in_array($code, $permission->api_methods ?? [])){
                     return true;
                 }
             }

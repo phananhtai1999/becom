@@ -25,6 +25,7 @@ class PaymentRequest extends FormRequest
     {
         $rule = [
             'payment_method_uuid' => ['required', 'exists:payment_methods,uuid'],
+            'go_back_url' => ['required'],
             'credit_package_uuid' => ['required', 'exists:credit_packages,uuid'],
             "card_number" => ['required_if:payment_method,==,stripe', 'integer', 'digits:16'],
             "exp_month" => ['required_if:payment_method,==,stripe', 'integer'],
