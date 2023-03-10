@@ -15,6 +15,7 @@ use App\Http\Resources\WebsitePageCategoryResource;
 use App\Http\Resources\WebsitePageCategoryResourceCollection;
 use App\Models\Language;
 use App\Models\WebsitePageCategory;
+use App\Services\LanguageService;
 use App\Services\WebsitePageCategoryService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -23,7 +24,15 @@ class WebsitePageCategoryController extends AbstractRestAPIController
 {
     use RestIndexTrait, RestShowTrait, RestEditTrait, RestDestroyTrait;
 
-    public function __construct(WebsitePageCategoryService $service)
+    /**
+     * @var LanguageService
+     */
+    protected $languageService;
+
+    public function __construct(
+        WebsitePageCategoryService $service,
+        LanguageService $languageService
+    )
     {
         $this->service = $service;
         $this->resourceCollectionClass = WebsitePageCategoryResourceCollection::class;
@@ -31,6 +40,7 @@ class WebsitePageCategoryController extends AbstractRestAPIController
         $this->storeRequest = WebsitePageCategoryRequest::class;
         $this->editRequest = UpdateWebsitePageCategoryRequest::class;
         $this->indexRequest = IndexRequest::class;
+        $this->languageService = $languageService;
     }
 
     /**
@@ -40,10 +50,8 @@ class WebsitePageCategoryController extends AbstractRestAPIController
     {
         $request = app($this->storeRequest);
 
-        foreach ($request->title as $lang => $value) {
-            if (!in_array($lang, Language::LANGUAGES_SUPPORT)) {
-                return $this->sendValidationFailedJsonResponse();
-            }
+        if (!$this->languageService->checkLanguages($request->title)) {
+            return $this->sendValidationFailedJsonResponse();
         }
 
         $model = $this->service->create($request->all());
@@ -61,10 +69,8 @@ class WebsitePageCategoryController extends AbstractRestAPIController
     {
         $request = app($this->editRequest);
 
-        foreach ($request->title as $lang => $value) {
-            if (!in_array($lang, Language::LANGUAGES_SUPPORT)) {
-                return $this->sendValidationFailedJsonResponse();
-            }
+        if ($request->title && !$this->languageService->checkLanguages($request->title)) {
+            return $this->sendValidationFailedJsonResponse();
         }
 
         $model = $this->service->findOrFailById($id);

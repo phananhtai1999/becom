@@ -10,10 +10,6 @@ class Language extends AbstractModel
 {
     use HasFactory;
 
-    CONST LANGUAGES_SUPPORT = [
-      'vi','en','fr','ch'
-    ];
-
     protected $table = 'languages';
 
     protected $primaryKey = "code";

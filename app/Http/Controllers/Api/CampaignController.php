@@ -608,22 +608,25 @@ class CampaignController extends AbstractRestAPIController
      * @param $campaignUuid
      * @return array
      */
-    public function checkAndSendCampaign($campaignUuid)
+    public function  checkAndSendCampaign($campaignUuid)
     {
-        //validate campaign
-        $columns = ['type', 'status', 'from_date', 'to_date', 'was_finished', 'was_stopped_by_owner'];
+        $campaign = $this->service->findOneById($campaignUuid);
+        $campaignsScenario = $campaign->campaignsScenario;
+        $campaignRootScenario = $campaignsScenario->filter(function ($value) {
+            return $value->parent_uuid === null;
+        });
+        if ($campaignRootScenario->count()) {
+            $columns = ['type', 'status', 'was_finished', 'was_stopped_by_owner'];
+
+        }else{
+            $columns = ['type', 'status', 'from_date', 'to_date', 'was_finished', 'was_stopped_by_owner'];
+        }
         foreach ($columns as $column) {
             if (!$this->service->checkActiveCampainByColumn($column, $campaignUuid)) {
                 return ['status' => false,
                     'messages' => ["campaign_" . $column => __("messages.{$column}_campaign_invalid")]];
             }
         }
-
-        $campaign = $this->service->findOneById($campaignUuid);
-        $campaignsScenario = $campaign->campaignsScenario;
-        $campaignRootScenario = $campaignsScenario->filter(function ($value) {
-            return $value->parent_uuid === null;
-        });
         if ($this->sendEmailScheduleLogService->checkActiveCampaignbyCampaignUuid($campaignUuid)) {
             $creditNumberSendEmail = $campaign->number_credit_needed_to_start_campaign * ($campaignRootScenario->count() > 0 ? $campaignRootScenario->count() : 1);
             if ($this->userService->checkCredit($creditNumberSendEmail, $campaign->user_uuid)) {

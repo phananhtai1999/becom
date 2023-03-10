@@ -324,7 +324,6 @@ class CampaignService extends AbstractService
     {
         return $this->model->where([
             ['uuid', $campaignUuid],
-            ['to_date', '>=', Carbon::now('Asia/Ho_Chi_Minh')],
             ['was_finished', false],
             ['status', "active"]
         ])->with(['mailTemplate', 'website', 'smtpAccount'])->first();
