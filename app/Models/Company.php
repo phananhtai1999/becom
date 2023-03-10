@@ -44,4 +44,12 @@ class Company extends AbstractModel
     {
         return $this->belongsToMany(Contact::class, 'company_contact', 'company_uuid', 'contact_uuid')->withTimestamps();
     }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_uuid', 'uuid');
+    }
 }

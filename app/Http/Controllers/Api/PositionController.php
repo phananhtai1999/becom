@@ -13,8 +13,8 @@ use App\Http\Requests\UpdateMyStatusRequest;
 use App\Http\Requests\UpdatePositionRequest;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
-use App\Http\Resources\PostionResource;
-use App\Http\Resources\PostionResourceCollection;
+use App\Http\Resources\PositionResource;
+use App\Http\Resources\PositionResourceCollection;
 use App\Services\MyPositionService;
 use App\Services\MyStatusService;
 use App\Services\PositionService;
@@ -39,8 +39,8 @@ class PositionController extends AbstractRestAPIController
     {
         $this->service = $service;
         $this->myService = $myService;
-        $this->resourceCollectionClass = PostionResourceCollection::class;
-        $this->resourceClass = PostionResource::class;
+        $this->resourceCollectionClass = PositionResourceCollection::class;
+        $this->resourceClass = PositionResource::class;
         $this->storeRequest = PositionRequest::class;
         $this->editRequest = UpdatePositionRequest::class;
         $this->indexRequest = IndexRequest::class;

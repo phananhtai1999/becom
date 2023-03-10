@@ -18,6 +18,7 @@ class ActivityHistoryResource extends AbstractJsonResource
             'uuid' => $this->getKey(),
             'type' => $this->type,
             'type_id' => $this->type_id,
+            'contact_uuid' => $this->contact_uuid,
             'date' => $this->date,
             'content' => auth()->user()->roles->where('slug', 'admin')->isEmpty() ? $this->content : $this->getTranslations('content'),
             'deleted_at' => $this->deleted_at,

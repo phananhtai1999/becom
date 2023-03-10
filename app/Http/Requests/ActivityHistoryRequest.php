@@ -26,7 +26,8 @@ class ActivityHistoryRequest extends AbstractRequest
     {
         return [
             'type' => ['string'],
-            'type_id' => ['nullable', 'numeric', Rule::exists('mail_sending_history','uuid')->whereNull('deleted_at')],
+            'type_id' => ['nullable', 'numeric', 'min:1', Rule::exists('mail_sending_history','uuid')->whereNull('deleted_at')],
+            'contact_uuid' => ['required', 'numeric', 'min:1', Rule::exists('contacts','uuid')->whereNull('deleted_at')],
             'date' => ['date'],
             'content' => ['required', 'array', 'min:1'],
             'content.en' => ['required', 'string'],
