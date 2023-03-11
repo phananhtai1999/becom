@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\ContactList;
+use App\Services\PlatformPackageService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\App;
 
@@ -20,7 +21,8 @@ class DatabaseSeeder extends Seeder {
             GroupSeeder::class,
             ConfigSeeder::class,
             PermissionSeeder::class,
-            LanguageSeeder::class
+            LanguageSeeder::class,
+            PlatformPackageSeeder::class
         ]);
         if (!App::environment('production')) {
             $this->call([

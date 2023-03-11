@@ -550,16 +550,11 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'platformPackage.'], functio
 });
 
 //Cache config
-Route::group(['middleware' => ['auth:api'], 'as' => 'platformPackage.'], function () {
+Route::group(['middleware' => ['auth:api'], 'as' => 'cacheConfig.'], function () {
     Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
         Route::put('/cache-platform-config/{membership_package_uuid}', [ConfigController::class, 'editCachePlatformConfig']);
         Route::get('/cache-platform-config/{membership_package_uuid}', [ConfigController::class, 'getCachePlatformConfig']);
-        Route::get('/platform-packages', [PlatformPackageController::class, 'index']);
-        Route::delete('/platform-package/{id}', [PlatformPackageController::class, 'destroy']);
-        Route::put('/platform-package/{id}', [PlatformPackageController::class, 'edit']);
     });
-    Route::get('/platform-package/{id}', [PlatformPackageController::class, 'show']);
-    Route::get('/my-platform-package', [PlatformPackageController::class, 'myPlatformPackage']);
 });
 
 
