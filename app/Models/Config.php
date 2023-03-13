@@ -28,6 +28,7 @@ class Config extends AbstractModel
         'value',
         'default_value',
         'group_id',
+        'type'
     ];
 
     /**
