@@ -21,18 +21,46 @@ use App\Http\Resources\PermissionResourceCollection;
 use App\Models\Permission;
 use App\Services\CreditPackageService;
 use App\Services\PermissionService;
+use Illuminate\Support\Facades\Cache;
 
 class PermissionController extends AbstractRestAPIController
 {
-    use RestStoreTrait, RestDestroyTrait, RestEditTrait, RestShowTrait, RestIndexTrait;
+
+    use RestShowTrait, RestIndexTrait;
 
     public function __construct(PermissionService $service)
     {
         $this->service = $service;
         $this->resourceCollectionClass = PermissionResourceCollection::class;
         $this->resourceClass = PermissionResource::class;
-        $this->storeRequest = PermissionRequest::class;
-        $this->editRequest = UpdatePermissionRequest::class;
         $this->indexRequest = IndexRequest::class;
+    }
+
+    public function store(PermissionRequest $request)
+    {
+        $model = $this->service->create($request->all());
+        Cache::flush();
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    public function edit(UpdatePermissionRequest $request, $id)
+    {
+        $model = $this->service->findOrFailById($id);
+
+        $this->service->update($model, $request->all());
+        Cache::flush();
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+    public function destroy($id)
+    {
+        $this->service->destroy($id);
+        Cache::flush();
+        return $this->sendOkJsonResponse();
     }
 }
