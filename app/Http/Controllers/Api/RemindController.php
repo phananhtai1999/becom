@@ -24,6 +24,7 @@ use App\Services\MyCompanyService;
 use App\Services\MyRemindService;
 use App\Services\MyStatusService;
 use App\Services\RemindService;
+use Illuminate\Support\Facades\Gate;
 
 class RemindController extends AbstractRestAPIController
 {
@@ -112,6 +113,9 @@ class RemindController extends AbstractRestAPIController
      */
     public function storeMyRemind(MyRemindRequest $request)
     {
+        if (!Gate::allows('permission', config('api.remind.create'))) {
+            return $this->sendJsonResponse(false, 'You need to upgrade platform package', [], 403);
+        }
         $model = $this->service->create(array_merge($request->all(), [
             'user_uuid' => auth()->user()->getkey(),
         ]));
