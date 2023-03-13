@@ -44,6 +44,9 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         Gate::define('permission', function ($user, $code) {
+            if (!$user->userPlatformPackage->platform_package_uuid) {
+                return false;
+            }
             $permissions = Cache::rememberForever($user->userPlatformPackage->platform_package_uuid . '_permission', function () use ($user) {
                 $platformPackage = PlatformPackage::findOrFail($user->userPlatformPackage->platform_package_uuid);
                 return $platformPackage->permissions()->select('api_methods', 'name', 'code')->get();
