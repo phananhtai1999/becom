@@ -20,6 +20,7 @@ class ConfigResource extends AbstractJsonResource
             'uuid' => $this->getKey(),
             'key' => $this->key,
             'value' => $this->value,
+            'type' => $this->type,
             'group_id' => $this->group_id,
             'default_value' => $this->default_value,
             'deleted_at' => $this->deleted_at,

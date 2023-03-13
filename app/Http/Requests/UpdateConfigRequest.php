@@ -24,11 +24,25 @@ class UpdateConfigRequest extends AbstractRequest
      */
     public function rules()
     {
-        return [
+        $validate = [
             'key' => ['string', 'unique:configs,key,'.$this->id .',uuid,deleted_at,NULL'],
             'value' => ['nullable', 'string'],
+            'type' => ['in:image,boolean,number,string'],
             'default_value' => ['nullable', 'string'],
             'group_id' => ['numeric', 'min:1', Rule::exists('groups', 'uuid')->whereNull('deleted_at')],
         ];
+
+        if ($this->request->get('type') === 'image' || $this->request->get('type') === 'string') {
+
+            $validate['value'] = ['nullable', 'string'];
+        } elseif ($this->request->get('type') === 'boolean') {
+
+            $validate['value'] = ['nullable', 'in:true,false'];
+        } elseif ($this->request->get('type') === 'number') {
+
+            $validate['value'] = ['nullable', 'numeric'];
+        }
+
+        return $validate;
     }
 }

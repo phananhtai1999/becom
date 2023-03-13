@@ -33,6 +33,7 @@ class ConfigQueryBuilder extends AbstractQueryBuilder
                 'value',
                 'default_value',
                 'group_id',
+                'type'
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -41,6 +42,7 @@ class ConfigQueryBuilder extends AbstractQueryBuilder
                 'value',
                 'default_value',
                 'group_id',
+                'type'
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -49,6 +51,8 @@ class ConfigQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__key', 'key'),
                 'value',
                 AllowedFilter::exact('exact__value', 'value'),
+                'type',
+                AllowedFilter::exact('exact__type', 'type'),
                 'default_value',
                 AllowedFilter::exact('exact__default_value', 'default_value'),
                 'group_id',
