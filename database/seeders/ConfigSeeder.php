@@ -76,6 +76,26 @@ class ConfigSeeder extends Seeder
                 'value' => 1,
                 'group_id' => 1
             ],
+            [
+                'key' => 'paypal_sandbox_client_id',
+                'value' => 'AQfFudqpGq23ZIWGvKobd3a78GX_UdfwOx-w9Ui9TwQnen2l_5X66pu9wG2Yp1fpcLS03GChh-4lm_tw',
+                'group_id' => 1
+            ],
+            [
+                'key' => 'paypal_sandbox_client_secret',
+                'value' => 'EOSUPJirjSyoq9mbKYRxFUDCyrjO35J_VpjRfIzWo7dYBc338Div_jBkMEeH2RbnDK5Cs_jo7SctXP2z',
+                'group_id' => 1
+            ],
+            [
+                'key' => 'stripe_secret_key',
+                'value' => 'sk_test_51Kd3VBICYCkcIoDDo8WsLk3tSPwU3VATNZJxXPSwHCzW2raGtYIWsUNFPK5cxdgNCxNAEGU51oevF8YwtKKTRlsT00ffEHXQF3',
+                'group_id' => 1
+            ],
+            [
+                'key' => 'stripe_endpoint_secret_key',
+                'value' => 'whsec_ffee58f7a216e44bc30f933a1721f2015fdc59cfad949e6dc019bfd14ea4b28b',
+                'group_id' => 1
+            ],
         ];
 
         foreach ($configs as $config) {
