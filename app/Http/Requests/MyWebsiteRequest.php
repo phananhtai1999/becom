@@ -25,7 +25,7 @@ class MyWebsiteRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'domain' => ['required', 'string', Rule::unique('websites')->where(function ($query) {
+            'domain' => ['nullable', 'string', Rule::unique('websites')->where(function ($query) {
                 return $query->where('user_uuid', auth()->user()->getKey())->whereNull('deleted_at');
             })],
             'name' => ['required', 'string'],

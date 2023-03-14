@@ -71,6 +71,8 @@ class MailTemplateQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__publish_status', 'publish_status'),
                 'website.domain',
                 AllowedFilter::exact('exact__website.domain', 'website.domain'),
+                'website.name',
+                AllowedFilter::exact('exact__website.name', 'website.name'),
                 'user.username',
                 AllowedFilter::exact('exact__user.username', 'user.username'),
                 'user.email',

@@ -61,6 +61,7 @@ class WebsiteQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__user.username', 'user.username'),
                 'user.email',
                 AllowedFilter::exact('exact__user.email', 'user.email'),
+                AllowedFilter::scope('domain_is_null'),
             ]);
     }
 

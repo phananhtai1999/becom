@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Abstracts\AbstractModel;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -100,5 +101,18 @@ class Website extends AbstractModel
     public function mailTemplates()
     {
         return $this->hasMany(MailTemplate::class, 'website_uuid', 'uuid');
+    }
+
+    /**
+     * @param Builder $query
+     * @param $check
+     * @return Builder
+     */
+    public function scopeDomainIsNull(Builder $query, $check)
+    {
+        if ($check) {
+            return $query->whereNull('domain');
+        }
+        return $query->whereNotNull('domain');
     }
 }

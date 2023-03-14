@@ -72,6 +72,8 @@ class MyMailSendingHistoryQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__campaign.smtpAccount.mail_from_name', 'campaign.smtpAccount.mail_from_name'),
                 'campaign.website.domain',
                 AllowedFilter::exact('exact__campaign.website.domain', 'campaign.website.domain'),
+                'campaign.website.name',
+                AllowedFilter::exact('exact__campaign.website.name', 'campaign.website.name'),
                 'campaign.user.username',
                 AllowedFilter::exact('exact__campaign.user.username', 'campaign.user.username'),
                 'campaign.user.email',
