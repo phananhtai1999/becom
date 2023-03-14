@@ -92,9 +92,8 @@ class PlatformPackageController extends AbstractRestAPIController
     }
     public function disablePlatformPackage($id) {
         $platformPackage = $this->service->findOrFailById($id);
-        $this->paypalService->disableProduct(json_decode($platformPackage->payment_product_id)->paypal);
         $this->stripeService->disableProduct(json_decode($platformPackage->payment_product_id)->stripe);
-        $model = $this->service->update($platformPackage,[
+        $this->service->update($platformPackage,[
             'status' => 'disable'
         ]);
 
