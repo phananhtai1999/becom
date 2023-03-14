@@ -49,7 +49,7 @@ class AuthServiceProvider extends ServiceProvider
             }
             $permissions = Cache::rememberForever($user->userPlatformPackage->platform_package_uuid . '_permission', function () use ($user) {
                 $platformPackage = PlatformPackage::findOrFail($user->userPlatformPackage->platform_package_uuid);
-                return $platformPackage->permissions()->select('api_methods', 'name', 'code')->get();
+                return $platformPackage->permissions()->select('api_methods', 'name', 'code', 'uuid')->get();
             });
             foreach ($permissions as $permissionCode => $permission) {
                 if(in_array($code, $permission->api_methods ?? [])){

@@ -57,7 +57,7 @@ class PlatformPackageSeeder extends Seeder
                 'paypal' => $paypalProduct['id'],
                 'stripe' => $stripeProduct['id']
             ];
-            $model = PlatformPackage::firstOrCreate(['uuid' => $request->get('name')], [
+            $model = PlatformPackage::updateOrCreate(['uuid' => $request->get('name')], [
                 'uuid' => $request->get('name'),
                 'description' => $request->get('description'),
                 'monthly' => $request->get('monthly'),

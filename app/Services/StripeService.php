@@ -79,7 +79,15 @@ class StripeService extends AbstractService
         $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
 
         return $stripe->products->create([
-            'name' => $request->get('name'),
+            'name' => $request->uuid,
+        ]);
+    }
+    public function disableProduct($id)
+    {
+        $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+
+        return $stripe->products->update($id, [
+            'active' => false,
         ]);
     }
 
