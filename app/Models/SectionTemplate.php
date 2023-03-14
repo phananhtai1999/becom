@@ -63,6 +63,6 @@ class SectionTemplate extends AbstractModel
      */
     public function sectionCategory()
     {
-        return $this->belongsTo(WebsitePageCategory::class, 'section_category_uuid', 'uuid',);
+        return $this->belongsTo(SectionCategory::class, 'section_category_uuid', 'uuid',);
     }
 }
