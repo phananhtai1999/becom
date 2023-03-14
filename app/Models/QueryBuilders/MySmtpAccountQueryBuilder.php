@@ -88,6 +88,8 @@ class MySmtpAccountQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__user.email', 'user.email'),
                 'website.domain',
                 AllowedFilter::exact('exact__website.domain', 'website.domain'),
+                'website.name',
+                AllowedFilter::exact('exact__website.name', 'website.name'),
                 'smtpAccountEncryption.name',
                 AllowedFilter::exact('exact__smtpAccountEncryption.name', 'smtpAccountEncryption.name'),
             ]);

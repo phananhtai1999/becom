@@ -25,7 +25,7 @@ class UpdateWebsiteRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'domain' => ['string', Rule::unique('websites')->ignore($this->id, 'uuid')->where(function ($query) {
+            'domain' => ['nullable', 'string', Rule::unique('websites')->ignore($this->id, 'uuid')->where(function ($query) {
                 return $query->where('user_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey())
                     ->whereNull('deleted_at');
             })],
