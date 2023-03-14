@@ -91,7 +91,6 @@ class WebsitePageController extends AbstractRestAPIController
     public function storeMyWebsitePage(MyWebsitePageRequest $request)
     {
         $model = $this->service->create(array_merge($request->all(), [
-            'publish_status' => WebsitePage::PUBLISHED_PUBLISH_STATUS,
             'user_uuid' => auth()->user()->getkey(),
             'is_default' => false
         ]));
@@ -121,7 +120,7 @@ class WebsitePageController extends AbstractRestAPIController
     public function editMyWebsitePage(UpdateMyWebsitePageRequest $request, $id)
     {
         $model = $this->myService->showMyWebsitePageByUuid($id);
-        $this->service->update($model, $request->except(['user_uuid', 'is_default', 'publish_status']));
+        $this->service->update($model, $request->except(['user_uuid', 'is_default']));
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
