@@ -82,11 +82,11 @@ class StripeService extends AbstractService
             'name' => $request->uuid,
         ]);
     }
-    public function díableProduct($id)
+    public function disableProduct($id)
     {
         $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
 
-        return $stripe->products->update([
+        return $stripe->products->update($id, [
             'active' => false,
         ]);
     }
