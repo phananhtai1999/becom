@@ -814,6 +814,10 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'activity_history.'], functi
         Route::put('/activity-history/{id}', [ActivityHistoryController::class, 'edit'])->name('edit');
         Route::delete('/activity-history/{id}', [ActivityHistoryController::class, 'destroy'])->name('destroy');
     });
+
+    Route::group(['as' => 'my.'], function () {
+        Route::get('/my/activity-histories', [ActivityHistoryController::class, 'indexMyActivityHistories'])->name('index');
+    });
 });
 
 //Website_page_categories

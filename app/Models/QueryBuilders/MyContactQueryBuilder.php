@@ -87,6 +87,8 @@ class MyContactQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__avatar', 'avatar'),
                 'status_uuid',
                 AllowedFilter::exact('exact_status_uuid', 'status_uuid'),
+                'status.name',
+                AllowedFilter::exact('exact__status.name', 'status.name'),
                 'user_uuid',
                 AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
                 'user.username',
