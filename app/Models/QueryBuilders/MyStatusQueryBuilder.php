@@ -16,7 +16,10 @@ class MyStatusQueryBuilder extends AbstractQueryBuilder
      */
     public static function baseQuery()
     {
-        return Status::where('user_uuid', auth()->user()->getkey());
+        return Status::where(function ($query) {
+            $query->where('user_uuid', auth()->user()->getkey())
+                ->orWhereNull('user_uuid');
+        });
     }
 
     /**

@@ -28,6 +28,18 @@ class MyPositionService extends AbstractService
      * @param $id
      * @return mixed
      */
+    public function showMyAndPublicPosition($id)
+    {
+        return $this->model->where('uuid', $id)->where(function ($query) {
+            $query->where('user_uuid', auth()->user()->getkey())
+                ->orWhereNull('user_uuid');
+        })->firstOrFail();
+    }
+
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function deleteMyPosition($id)
     {
         $position = $this->showMyPosition($id);

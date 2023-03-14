@@ -56,7 +56,7 @@ class PositionController extends AbstractRestAPIController
         $request = app($this->storeRequest);
 
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => $request->get('user_uuid') ?? auth()->user()->getKey()
+            'user_uuid' => $request->get('user_uuid') ?? null
         ]));
 
         return $this->sendCreatedJsonResponse(
@@ -77,7 +77,7 @@ class PositionController extends AbstractRestAPIController
         $model = $this->service->findOrFailById($id);
 
         $this->service->update($model, array_merge($request->all(), [
-            'user_uuid' => $request->get('user_uuid') ?? auth()->user()->getKey()
+            'user_uuid' => $request->get('user_uuid') ?? null
         ]));
 
         return $this->sendOkJsonResponse(
@@ -121,7 +121,7 @@ class PositionController extends AbstractRestAPIController
      */
     public function showMyPosition($id)
     {
-        $model = $this->myService->showMyPosition($id);
+        $model = $this->myService->showMyAndPublicPosition($id);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
