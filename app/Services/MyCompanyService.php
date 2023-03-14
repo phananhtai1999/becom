@@ -28,6 +28,18 @@ class MyCompanyService extends AbstractService
      * @param $id
      * @return mixed
      */
+    public function showMyAndPublicCompany($id)
+    {
+        return $this->model->where('uuid', $id)->where(function ($query) {
+            $query->where('user_uuid', auth()->user()->getkey())
+                ->orWhereNull('user_uuid');
+        })->firstOrFail();
+    }
+
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function deleteMyCompany($id)
     {
         $company = $this->showMyCompany($id);

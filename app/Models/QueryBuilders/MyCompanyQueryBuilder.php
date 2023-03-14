@@ -16,7 +16,10 @@ class MyCompanyQueryBuilder extends AbstractQueryBuilder
      */
     public static function baseQuery()
     {
-        return Company::where('user_uuid', auth()->user()->getkey());
+        return Company::where(function ($query) {
+            $query->where('user_uuid', auth()->user()->getkey())
+                ->orWhereNull('user_uuid');
+        });
     }
 
     /**
