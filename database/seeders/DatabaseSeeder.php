@@ -2,18 +2,18 @@
 
 namespace Database\Seeders;
 
-use App\Models\ContactList;
-use App\Services\PlatformPackageService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\App;
 
-class DatabaseSeeder extends Seeder {
-	/**
-	 * Seed the application's database.
-	 *
-	 * @return void
-	 */
-	public function run() {
+class DatabaseSeeder extends Seeder
+{
+    /**
+     * Seed the application's database.
+     *
+     * @return void
+     */
+    public function run()
+    {
         $this->call([
             UserSeeder::class,
             SmtpAccountEncryptionSeeder::class,
@@ -30,7 +30,10 @@ class DatabaseSeeder extends Seeder {
                 MailTemplateSeeder::class,
                 SmtpAccountSeeder::class,
                 ContactListSeeder::class,
-                CampaignSeeder::class
+                ContactSeeder::class,
+                NoteSeeder::class,
+                CampaignSeeder::class,
+                ActivityHistorySeeder::class
             ]);
 
 
@@ -42,5 +45,5 @@ class DatabaseSeeder extends Seeder {
             \App\Models\MailTemplate::factory(100)->create();
             \App\Models\Campaign::factory(100)->create();
         }
-	}
+    }
 }

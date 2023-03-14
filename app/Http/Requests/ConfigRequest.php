@@ -37,7 +37,7 @@ class ConfigRequest extends AbstractRequest
             $validate['value'] = ['nullable', 'string'];
         } elseif ($this->request->get('type') === 'boolean') {
 
-            $validate['value'] = ['nullable', 'in:true,false'];
+            $validate['value'] = ['nullable', 'boolean'];
         } elseif ($this->request->get('type') === 'number') {
 
             $validate['value'] = ['nullable', 'numeric'];

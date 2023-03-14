@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Status;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -28,6 +29,8 @@ class ContactFactory extends Factory
             'sex' => $optionType[array_rand($optionType)],
             'city' => $this->faker->city(),
             'country' => $this->faker->country(),
+            'avatar' => null,
+            'status_uuid' => Status::inRandomOrder()->first()->uuid,
             'user_uuid' => User::inRandomOrder()->first()->uuid,
         ];
     }

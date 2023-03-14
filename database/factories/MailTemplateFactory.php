@@ -16,6 +16,8 @@ class MailTemplateFactory extends Factory {
         $optionType = array(
             'email',
             'sms',
+            'telegram',
+            'viber'
         );
 		return [
 			'subject' => $this->faker->sentence(3),
