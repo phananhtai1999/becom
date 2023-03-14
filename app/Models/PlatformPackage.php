@@ -30,7 +30,8 @@ class PlatformPackage extends Model
         'monthly',
         'yearly',
         'payment_product_id',
-        'description'
+        'description',
+        'status'
     ];
 
     /**

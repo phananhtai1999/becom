@@ -22,6 +22,7 @@ class PlatformPackageResource extends JsonResource
             'yearly' => $this->yearly,
             'description' => $this->description,
             'payment_product_id' => $this->payment_product_id,
+            'status' => $this->status,
         ];
         if (\in_array('platform_package__permissions', $expand)) {
             $data['permissions'] = PermissionResource::collection($this->permissions);

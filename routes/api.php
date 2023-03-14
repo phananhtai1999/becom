@@ -546,6 +546,8 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'platformPackage.'], functio
         Route::delete('/platform-package/{id}', [PlatformPackageController::class, 'destroy']);
     });
     Route::get('/platform-packages', [PlatformPackageController::class, 'index']);
+    Route::put('/publish-platform-package/{id}', [PlatformPackageController::class, 'publishPlatformPackage']);
+    Route::put('/disable-platform-package/{id}', [PlatformPackageController::class, 'disablePlatformPackage']);
     Route::get('/platform-package/{id}', [PlatformPackageController::class, 'show']);
     Route::get('/my-platform-package', [PlatformPackageController::class, 'myPlatformPackage']);
 });

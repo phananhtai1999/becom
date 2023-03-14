@@ -2,6 +2,8 @@
 
 namespace App\Abstracts;
 
+use App\Models\Permission;
+use App\Models\PlatformPackage;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -11,6 +13,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Gate;
 
 class AbstractRestAPIController extends BaseController
 {
@@ -122,5 +126,24 @@ class AbstractRestAPIController extends BaseController
     public function sendBadRequestJsonResponse(array $data = [])
     {
         return $this->sendJsonResponse(false, __('messages.bad_request'), $data, Response::HTTP_BAD_REQUEST);
+    }
+
+    protected function getPlatformByPermission($code)
+    {
+        $cacheNames = ['starter', 'business', 'professional'];
+        foreach ($cacheNames as $cacheName) {
+            $permissionCaches = Cache::rememberForever($cacheName . '_permission', function () use ($cacheName) {
+                $platformPackage = PlatformPackage::findOrFail($cacheName);
+                return $platformPackage->permissions()->select('api_methods', 'name', 'code', 'uuid')->get();
+            });
+            foreach ($permissionCaches as $permissionCache) {
+                if (in_array($code, $permissionCache->api_methods ?? [])) {
+                    $permissions = Permission::findOrFail($permissionCache->uuid)->platformPackages;
+                    foreach ($permissions as $permission) {
+                        return ['plan' => 'plan_' . $permission->uuid];
+                    }
+                }
+            }
+        }
     }
 }

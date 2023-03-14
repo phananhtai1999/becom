@@ -48,4 +48,8 @@ class Permission extends AbstractModel
         $lang = app()->getLocale();
         return $query->where("name->$lang", 'like', "%$name%");
     }
+
+    public function platformPackages() {
+        return $this->belongsToMany(PlatformPackage::class, 'platform_package_permission', 'permission_uuid', 'platform_package_uuid');
+    }
 }

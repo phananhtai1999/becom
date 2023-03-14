@@ -87,7 +87,17 @@ class PaypalService extends AbstractService
         $apiContext = new ApiContext();
 
         return $provider->createProduct([
-            'name' => $request->get('name'),
+            'name' => $request->uuid,
+            'type' => 'SERVICE',
+        ], $apiContext->getRequestId());
+    }
+    public function disableProduct($request)
+    {
+        $provider = $this->accessServer();
+        $apiContext = new ApiContext();
+
+        return $provider->createProduct([
+            'name' => $request->uuid,
             'type' => 'SERVICE',
         ], $apiContext->getRequestId());
     }

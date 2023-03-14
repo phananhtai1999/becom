@@ -7,6 +7,7 @@ use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\PlatformPackageRequest;
+use App\Http\Requests\PublishPlatformRequest;
 use App\Http\Requests\UpdatePlatformPackageRequest;
 use App\Http\Resources\PlatformPackageResource;
 use App\Http\Resources\PlatformPackageResourceCollection;
@@ -49,18 +50,11 @@ class PlatformPackageController extends AbstractRestAPIController
      */
     public function store(PlatformPackageRequest $request)
     {
-        $paypalProduct = $this->paypalService->createProduct($request);
-        $stripeProduct = $this->stripeService->createProduct($request);
-        $product = [
-            'paypal' => $paypalProduct['id'],
-            'stripe' => $stripeProduct['id']
-        ];
         $model = $this->service->create([
             'uuid' => $request->get('name'),
             'description' => $request->get('description'),
             'monthly' => $request->get('monthly'),
-            'yearly' => $request->get('yearly'),
-            'payment_product_id' => json_encode($product)
+            'yearly' => $request->get('yearly')
         ]);
         $model->permissions()->attach($request->get('permission_uuid'));
 
@@ -77,6 +71,33 @@ class PlatformPackageController extends AbstractRestAPIController
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->userPlatformResourceClass, $myPlatformPackage)
+        );
+    }
+
+    public function publishPlatformPackage($id) {
+        $platformPackage = $this->service->findOrFailById($id);
+        $paypalProduct = $this->paypalService->createProduct($platformPackage);
+        $stripeProduct = $this->stripeService->createProduct($platformPackage);
+        $product = [
+            'paypal' => $paypalProduct['id'],
+            'stripe' => $stripeProduct['id']
+        ];
+        $this->service->update($platformPackage,[
+            'payment_product_id' => json_encode($product),
+            'status' => 'publish'
+        ]);
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $platformPackage)
+        );
+    }
+    public function disablePlatformPackage($id) {
+        $platformPackage = $this->service->findOrFailById($id);
+        $model = $this->service->update($platformPackage,[
+            'status' => 'disable'
+        ]);
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $platformPackage)
         );
     }
 }
