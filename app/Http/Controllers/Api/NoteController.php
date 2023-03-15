@@ -3,26 +3,24 @@
 namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
-use App\Http\Controllers\Traits\RestDestroyTrait;
+use App\Events\ActivityHistoryEvent;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyNoteRequest;
-use App\Http\Requests\MyStatusRequest;
 use App\Http\Requests\NoteRequest;
 use App\Http\Requests\UpdateMyNoteRequest;
-use App\Http\Requests\UpdateMyStatusRequest;
 use App\Http\Requests\UpdateNoteRequest;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Resources\NoteResource;
 use App\Http\Resources\NoteResourceCollection;
+use App\Models\Note;
 use App\Services\MyNoteService;
 use App\Services\MyStatusService;
 use App\Services\NoteService;
-use App\Services\StatusService;
 
 class NoteController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestShowTrait, RestDestroyTrait;
+    use RestIndexTrait, RestShowTrait;
 
     /**
      * @var MyStatusService
@@ -60,6 +58,9 @@ class NoteController extends AbstractRestAPIController
             'user_uuid' => $request->get('user_uuid') ?? auth()->user()->getKey()
         ]));
 
+        //Add activity history
+        ActivityHistoryEvent::dispatch($model, Note::NOTE_TYPE, Note::NOTE_CREATED_ACTION);
+
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
         );
@@ -81,9 +82,29 @@ class NoteController extends AbstractRestAPIController
             'user_uuid' => $request->get('user_uuid') ?? auth()->user()->getKey()
         ]));
 
+        //Add activity history
+        if (!empty($request->all())) {
+            ActivityHistoryEvent::dispatch($model, Note::NOTE_TYPE, Note::NOTE_UPDATED_ACTION);
+        }
+
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
         );
+    }
+
+    /**
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function destroy($id)
+    {
+        $this->service->destroy($id);
+        $getDeletedRecord = $this->service->withTrashed($id);
+
+        //Add activity history
+        ActivityHistoryEvent::dispatch($getDeletedRecord, Note::NOTE_TYPE, Note::NOTE_DELETED_ACTION);
+
+        return $this->sendOkJsonResponse();
     }
 
     /**
@@ -110,6 +131,9 @@ class NoteController extends AbstractRestAPIController
         $model = $this->service->create(array_merge($request->all(), [
             'user_uuid' => auth()->user()->getkey(),
         ]));
+
+        //Add activity history
+        ActivityHistoryEvent::dispatch($model, Note::NOTE_TYPE, Note::NOTE_CREATED_ACTION);
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -142,6 +166,11 @@ class NoteController extends AbstractRestAPIController
             'user_uuid' => auth()->user()->getkey(),
         ]));
 
+        //Add activity history
+        if (!empty($request->all())) {
+            ActivityHistoryEvent::dispatch($model, Note::NOTE_TYPE, Note::NOTE_UPDATED_ACTION);
+        }
+
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
         );
@@ -154,6 +183,10 @@ class NoteController extends AbstractRestAPIController
     public function destroyMyNote($id)
     {
         $this->myService->deleteMyNote($id);
+        $getDeletedRecord = $this->service->withTrashed($id);
+
+        //Add activity history
+        ActivityHistoryEvent::dispatch($getDeletedRecord, Note::NOTE_TYPE, Note::NOTE_DELETED_ACTION);
 
         return $this->sendOkJsonResponse();
     }

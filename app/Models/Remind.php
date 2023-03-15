@@ -10,6 +10,11 @@ class Remind extends AbstractModel
 {
     use HasFactory, SoftDeletes;
 
+    const REMIND_TYPE = 'remind';
+    const REMIND_CREATED_ACTION = 'created';
+    const REMIND_UPDATED_ACTION = 'updated';
+    const REMIND_DELETED_ACTION = 'deleted';
+
     /**
      * @var string
      */

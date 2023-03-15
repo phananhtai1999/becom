@@ -11,4 +11,13 @@ class RemindService extends AbstractService
     protected $modelClass = Remind::class;
 
     protected $modelQueryBuilderClass = RemindQueryBuilder::class;
+
+    /**
+     * @param $id
+     * @return mixed
+     */
+    public function withTrashed($id)
+    {
+        return $this->model->withTrashed()->where('uuid', $id)->first();
+    }
 }

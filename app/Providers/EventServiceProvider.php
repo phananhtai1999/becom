@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Events\ActivityHistoryEvent;
 use App\Events\PaymentCreditPackageSuccessEvent;
 use App\Events\PaymentSuccessfullyEvent;
 use App\Events\SendByBirthdayCampaignEvent;
@@ -12,6 +13,7 @@ use App\Events\SendEmailRecoveryPasswordEvent;
 use App\Events\SendEmailVerifyEmailEvent;
 use App\Events\SendNextByScenarioCampaignEvent;
 use App\Events\SubscriptionSuccessEvent;
+use App\Listeners\ActivityHistoryListener;
 use App\Listeners\PaymentCreditPackageSuccessListener;
 use App\Listeners\PaymentSuccessfullyListener;
 use App\Listeners\SendByBirthdayCampaignListener;
@@ -80,6 +82,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         SubscriptionSuccessEvent::class => [
             SubscriptionSuccessListener::class
+        ],
+        ActivityHistoryEvent::class => [
+            ActivityHistoryListener::class
         ],
     ];
 
