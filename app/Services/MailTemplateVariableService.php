@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Abstracts\AbstractService;
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 
@@ -117,6 +119,17 @@ class MailTemplateVariableService extends AbstractService
 
         $mailTemplate->setRenderedBodyAttribute($html);
 
+        return $mailTemplate;
+    }
+
+    /**
+     * @param $footerTemplate
+     * @param $mailTemplate
+     * @return mixed
+     */
+    public function insertFooterTemplateInRenderBody($footerTemplate, $mailTemplate)
+    {
+        $mailTemplate->setRenderedBodyAttribute($mailTemplate->rendered_body.$footerTemplate->template);
         return $mailTemplate;
     }
 
