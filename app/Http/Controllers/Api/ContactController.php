@@ -115,9 +115,12 @@ class ContactController extends AbstractRestAPIController
             'user_uuid' => $request->get('user_uuid') ?? auth()->user()->getKey()
         ]));
 
+        //Add Pivot contact_company_position
+        $pivot = $this->addPivotContactCompanyPosition($request->get('contact_company_position', []));
+
         $model->contactLists()->attach($request->get('contact_list', []));
         $model->reminds()->attach($request->get('remind', []));
-        $model->companies()->attach(array_unique($request->get('contact_company_position', []), SORT_REGULAR));
+        $model->companies()->attach($pivot);
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -140,9 +143,12 @@ class ContactController extends AbstractRestAPIController
             'user_uuid' => $request->get('user_uuid') ?? auth()->user()->getKey()
         ]));
 
+        //Add Pivot contact_company_position
+        $pivot = $this->addPivotContactCompanyPosition($request->get('contact_company_position', []));
+
         $model->contactLists()->sync($request->contact_list ?? $model->contactLists);
         $model->reminds()->sync($request->remind ?? $model->reminds);
-        $model->companies()->sync($request->contact_company_position ? array_unique($request->contact_company_position, SORT_REGULAR) : $model->companies);
+        $model->companies()->sync($request->contact_company_position ? $pivot : $model->companies);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -202,9 +208,12 @@ class ContactController extends AbstractRestAPIController
             'user_uuid' => auth()->user()->getkey(),
         ]));
 
+        //Add Pivot contact_company_position
+        $pivot = $this->addPivotContactCompanyPosition($request->get('contact_company_position', []));
+
         $model->contactLists()->attach($request->get('contact_list', []));
         $model->reminds()->attach($request->get('remind', []));
-        $model->companies()->attach(array_unique($request->get('contact_company_position', []), SORT_REGULAR));
+        $model->companies()->attach($pivot);
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -243,9 +252,12 @@ class ContactController extends AbstractRestAPIController
             'user_uuid' => auth()->user()->getkey(),
         ]));
 
+        //Add Pivot contact_company_position
+        $pivot = $this->addPivotContactCompanyPosition($request->get('contact_company_position', []));
+
         $model->contactLists()->sync($request->contact_list ?? $model->contactLists);
         $model->reminds()->sync($request->remind ?? $model->reminds);
-        $model->companies()->sync($request->contact_company_position ? array_unique($request->contact_company_position, SORT_REGULAR) : $model->companies);
+        $model->companies()->sync($request->contact_company_position ? $pivot : $model->companies);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -456,5 +468,25 @@ class ContactController extends AbstractRestAPIController
         } catch (\ValueError|\ErrorException $error) {
             return $this->sendValidationFailedJsonResponse();
         }
+    }
+
+    /**
+     * @param $arrayContactCompanyPosition
+     * @return array
+     */
+    public function addPivotContactCompanyPosition($arrayContactCompanyPosition)
+    {
+        //Add Pivot contact_company_position
+        $array = [];
+        $arrayPivot = array_unique($arrayContactCompanyPosition, SORT_REGULAR);
+        foreach ($arrayPivot as $value) {
+            $arrayPush = [
+                'company_uuid' => $value['company_uuid'],
+                'position_uuid' => $value['position_uuid'] ?? null
+            ];
+            array_push($array, $arrayPush);
+        }
+
+        return $array;
     }
 }

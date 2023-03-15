@@ -22,7 +22,8 @@ class DatabaseSeeder extends Seeder
             ConfigSeeder::class,
             PermissionSeeder::class,
             LanguageSeeder::class,
-            PlatformPackageSeeder::class
+            PlatformPackageSeeder::class,
+            StatusSeeder::class
         ]);
         if (!App::environment('production')) {
             $this->call([

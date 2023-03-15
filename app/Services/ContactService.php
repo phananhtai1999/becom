@@ -243,7 +243,8 @@ class ContactService extends AbstractService
                     'dob' => $row['dob'],
                     'city' => $row['city'],
                     'country' => $row['country'],
-                    'user_uuid' => auth()->user()->getkey()
+                    'user_uuid' => auth()->user()->getkey(),
+                    'status_uuid' => 1
                 ];
                 $validator = Validator::make($data, $rules);
                 if ($validator->fails()) {
@@ -346,7 +347,9 @@ class ContactService extends AbstractService
                 'dob' => $content->dob,
                 'city' => $content->city,
                 'country' => $content->country,
-                'user_uuid' => auth()->user()->getkey()
+                'user_uuid' => auth()->user()->getkey(),
+                'status_uuid' => 1
+
             ];
             $validator = Validator::make($data, $rules);
             if ($validator->fails()) {
