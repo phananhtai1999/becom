@@ -10,6 +10,7 @@ use App\Http\Resources\CreditPackageHistoryResourceCollection;
 use App\Http\Resources\SubscriptionHistoryResourceCollection;
 use App\Http\Resources\SubscriptionPlanResourceCollection;
 use App\Models\PaymentMethod;
+use App\Models\UserCreditHistory;
 use App\Services\CreditPackageHistoryService;
 use App\Services\SubscriptionHistoryService;
 use App\Services\CreditPackageService;
@@ -17,9 +18,11 @@ use App\Services\PaypalService;
 use App\Services\PlatformPackageService;
 use App\Services\StripeService;
 use App\Services\SubscriptionPlanService;
+use App\Services\UserCreditHistoryService;
 use App\Services\UserService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PaymentController extends AbstractRestAPIController
 {
@@ -31,7 +34,8 @@ class PaymentController extends AbstractRestAPIController
         PlatformPackageService      $platformPackageService,
         CreditPackageService        $creditPackageService,
         CreditPackageHistoryService $creditPackageHistoryService,
-        SubscriptionHistoryService  $subscriptionHistoryService
+        SubscriptionHistoryService  $subscriptionHistoryService,
+        UserCreditHistoryService    $userCreditHistoryService
     )
     {
         $this->paypalService = $paypalService;
@@ -44,6 +48,7 @@ class PaymentController extends AbstractRestAPIController
         $this->subscriptionHistoryService = $subscriptionHistoryService;
         $this->creditPackageHistoryResourceCollection = CreditPackageHistoryResourceCollection::class;
         $this->subscriptionPlanResourceCollection = SubscriptionHistoryResourceCollection::class;
+        $this->userCreditHistoryService = $userCreditHistoryService;
     }
 
     public function topUp(PaymentRequest $request)
@@ -57,7 +62,6 @@ class PaymentController extends AbstractRestAPIController
             }
 
             if ($processResult['status']) {
-
                 return $this->sendOkJsonResponse(['data' => ['redirect_url' => $processResult['redirect_url']]]);
             } else {
 

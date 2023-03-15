@@ -12,6 +12,7 @@ use App\Http\Requests\UpdatePlatformPackageRequest;
 use App\Http\Resources\PlatformPackageResource;
 use App\Http\Resources\PlatformPackageResourceCollection;
 use App\Http\Resources\UserPlatformPackageResource;
+use App\Models\PlatformPackage;
 use App\Models\UserPlatformPackage;
 use App\Services\ConfigService;
 use App\Services\PaypalService;
@@ -84,7 +85,7 @@ class PlatformPackageController extends AbstractRestAPIController
         ];
         $this->service->update($platformPackage,[
             'payment_product_id' => json_encode($product),
-            'status' => 'publish'
+            'status' => PlatformPackage::PLATFORM_PACKAGE_PUBLISH
         ]);
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $platformPackage)
@@ -94,8 +95,20 @@ class PlatformPackageController extends AbstractRestAPIController
         $platformPackage = $this->service->findOrFailById($id);
         $this->stripeService->disableProduct(json_decode($platformPackage->payment_product_id)->stripe);
         $this->service->update($platformPackage,[
-            'status' => 'disable'
+            'status' => PlatformPackage::PLATFORM_PACKAGE_DISABLE
         ]);
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $platformPackage)
+        );
+    }
+
+    public function edit(UpdatePlatformPackageRequest $request, $id) {
+        $platformPackage = $this->service->findOrFailById($id);
+        if ($platformPackage->status == PlatformPackage::PLATFORM_PACKAGE_DISABLE) {
+            return $this->sendJsonResponse(false, 'Can not edit this platform', [], 403);
+        }
+        $this->service->update($platformPackage, $request->all());
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $platformPackage)
