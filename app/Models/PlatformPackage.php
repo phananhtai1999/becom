@@ -9,7 +9,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class PlatformPackage extends Model
 {
     use HasFactory,SoftDeletes;
-
+    const DEFAULT_PLATFORM_PACKAGE_1 = 'starter';
+    const DEFAULT_PLATFORM_PACKAGE_2 = 'professional';
+    const DEFAULT_PLATFORM_PACKAGE_3 = 'business';
     /**
      * @var string
      */

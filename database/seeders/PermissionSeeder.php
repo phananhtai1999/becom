@@ -16,6 +16,7 @@ class PermissionSeeder extends Seeder
     {
         $permissions = [
             [
+                'uuid' => 1,
                 'code' => 'unlimited_contacts',
                 'name' => ['vi' => 'Liên hệ không giới hạn', 'en' => 'unlimited contacts'],
                 'api_methods' => [
@@ -26,6 +27,7 @@ class PermissionSeeder extends Seeder
                 ]
             ],
             [
+                'uuid' => 2,
                 'code' => '499_emails_day',
                 'name' => ['vi' => '499 emails/ngày', 'en' => '499 emails/day'],
                 'api_methods' => [
@@ -36,6 +38,7 @@ class PermissionSeeder extends Seeder
                 ]
             ],
             [
+                'uuid' => 3,
                 'code' => 'drag_drop_editor',
                 'name' => ['vi' => 'Trình soạn thảo kéo và thả', 'en' => 'Drag & Drop Editor'],
                 'api_methods' => [
@@ -43,6 +46,7 @@ class PermissionSeeder extends Seeder
                 ]
             ],
             [
+                'uuid' => 4,
                 'code' => 'birthday_campaigns',
                 'name' => ['vi' => 'Chiến dịch sinh nhật', 'en' => 'Birthday Campaigns'],
                 'api_methods' => [
@@ -52,6 +56,7 @@ class PermissionSeeder extends Seeder
                 ]
             ],
             [
+                'uuid' => 4,
                 'code' => 'simple_automation_marketing',
                 'name' => ['vi' => 'Tiếp thị tự động cơ bản', 'en' => 'Simple Automation Marketing'],
                 'api_methods' => [
@@ -62,6 +67,7 @@ class PermissionSeeder extends Seeder
                 ]
             ],
             [
+                'uuid' => 5,
                 'code' => 'tracking_open_emails',
                 'name' => ['vi' => 'Theo dõi email mở', 'en' => 'Tracking Open Emails'],
                 'api_methods' => [
@@ -69,6 +75,7 @@ class PermissionSeeder extends Seeder
                 ]
             ],
             [
+                'uuid' => 6,
                 'code' => 'simple_sale_crm',
                 'name' => ['vi' => 'Bán hàng cơ bản CRM', 'en' => 'Simple Sale CRM'],
                 'api_methods' => [
@@ -76,6 +83,7 @@ class PermissionSeeder extends Seeder
                 ]
             ],
             [
+                'uuid' => 7,
                 'code' => 'basic_reporting_analytics',
                 'name' => ['vi' => 'Báo cáo và phân tích cơ bản', 'en' => 'Basic reporting & analytics'],
                 'api_methods' => [
@@ -83,6 +91,7 @@ class PermissionSeeder extends Seeder
                 ]
             ],
             [
+                'uuid' => 8,
                 'code' => 'no_daily_sending_limit',
                 'name' => ['vi' => 'Không có giới hạn số chiến dịch gửi trong hàng ngày', 'en' => 'No daily sending limit'],
                 'api_methods' => [
@@ -93,6 +102,7 @@ class PermissionSeeder extends Seeder
                 ]
             ],
             [
+                'uuid' => 9,
                 'code' => 'no_mail_logo_add_on',
                 'name' => ['vi' => 'Không có {{siteName}} logo (add-on)', 'en' => 'No Mail logo (add-on)'],
                 'api_methods' => [
@@ -100,6 +110,7 @@ class PermissionSeeder extends Seeder
                 ]
             ],
             [
+                'uuid' => 10,
                 'code' => 'sending_optimization',
                 'name' => ['vi' => 'Tối ưu hóa gửi chiến dịch', 'en' => 'Sending optimization'],
                 'api_methods' => [
@@ -110,6 +121,7 @@ class PermissionSeeder extends Seeder
                 ]
             ],
             [
+                'uuid' => 11,
                 'code' => 'sms_campaigns',
                 'name' => ['vi' => 'Chiến dịch SMS', 'en' => 'SMS Campaigns'],
                 'api_methods' => [
@@ -120,6 +132,7 @@ class PermissionSeeder extends Seeder
                 ]
             ],
             [
+                'uuid' => 12,
                 'code' => 'advance_automation_marketing',
                 'name' => ['vi' => 'Tiếp thị tự động nâng cao', 'en' => 'Advance Automation Marketing'],
                 'api_methods' => [
@@ -127,6 +140,7 @@ class PermissionSeeder extends Seeder
                 ]
             ],
             [
+                'uuid' => 13,
                 'code' => 'advance_reporting_analytics',
                 'name' => ['vi' => 'Báo cáo & Phân tích nâng cao', 'en' => 'Advance reporting & analytics'],
                 'api_methods' => [
@@ -134,6 +148,7 @@ class PermissionSeeder extends Seeder
                 ]
             ],
             [
+                'uuid' => 14,
                 'code' => 'advance_sale_crm',
                 'name' => ['vi' => 'Bán hàng nâng cao CRM', 'en' => 'Advance Sale CRM'],
                 'api_methods' => [
@@ -141,6 +156,7 @@ class PermissionSeeder extends Seeder
                 ]
             ],
             [
+                'uuid' => 15,
                 'code' => 'multi_user_access',
                 'name' => ['vi' => 'Hỗ trợ nhiều người dùng truy cập', 'en' => 'Multi-user access'],
                 'api_methods' => [
@@ -148,6 +164,7 @@ class PermissionSeeder extends Seeder
                 ]
             ],
             [
+                'uuid' => 16,
                 'code' => 'email_support',
                 'name' => ['vi' => 'Hỗ trợ email', 'en' => 'Email support'],
                 'api_methods' => [
@@ -155,15 +172,17 @@ class PermissionSeeder extends Seeder
                 ]
             ],
             [
+                'uuid' => 17,
                 'code' => 'telegram_campaigns',
                 'name' => ['vi' => 'Chiến dịch Telegram', 'en' => 'Telegram Campaigns'],
                 'api_methods' => [
                     'create_campaigns',
                     'update_campaigns',
                     'delete_campaigns',
-                    'send_campaigns_by_telegram',                ]
+                    'send_campaigns_by_telegram',]
             ],
             [
+                'uuid' => 18,
                 'code' => 'viber_campaigns',
                 'name' => ['vi' => 'Chiến dịch Viber', 'en' => 'Viber Campaigns'],
                 'api_methods' => [
@@ -174,6 +193,7 @@ class PermissionSeeder extends Seeder
                 ]
             ],
             [
+                'uuid' => 19,
                 'code' => 'fast_sending_optimization',
                 'name' => ['vi' => 'Tối ưu gửi chiến dịch nhanh chóng', 'en' => 'Fast sending optimization'],
                 'api_methods' => [
@@ -181,6 +201,7 @@ class PermissionSeeder extends Seeder
                 ]
             ],
             [
+                'uuid' => 20,
                 'code' => 'advanced_marketing_automation',
                 'name' => ['vi' => 'Tự động tiếp thị nâng cao', 'en' => 'Advanced Marketing Automation'],
                 'api_methods' => [
@@ -188,6 +209,7 @@ class PermissionSeeder extends Seeder
                 ]
             ],
             [
+                'uuid' => 21,
                 'code' => 'send_gpt_marketing_automation',
                 'name' => ['vi' => 'Sendgpt tiếp thị tự động', 'en' => 'SendGPT Marketing Automation'],
                 'api_methods' => [
@@ -195,6 +217,7 @@ class PermissionSeeder extends Seeder
                 ]
             ],
             [
+                'uuid' => 22,
                 'code' => 'send_gpt_marketing_automation',
                 'name' => ['vi' => 'Sendgpt tiếp thị tự động', 'en' => 'Advanced Statistics'],
                 'api_methods' => [
@@ -202,6 +225,7 @@ class PermissionSeeder extends Seeder
                 ]
             ],
             [
+                'uuid' => 23,
                 'code' => 'advanced_statistics',
                 'name' => ['vi' => 'Thống kê nâng cao', 'en' => 'SendGPT Marketing Automation'],
                 'api_methods' => [
@@ -209,6 +233,7 @@ class PermissionSeeder extends Seeder
                 ]
             ],
             [
+                'uuid' => 24,
                 'code' => 'team_access_management',
                 'name' => ['vi' => 'Quản lý truy cập nhóm', 'en' => 'Team Access Management'],
                 'api_methods' => [
@@ -216,6 +241,7 @@ class PermissionSeeder extends Seeder
                 ]
             ],
             [
+                'uuid' => 25,
                 'code' => 'form_integration',
                 'name' => ['vi' => 'Biểu mẫu tích hợp', 'en' => 'Form Integration'],
                 'api_methods' => [
@@ -223,6 +249,7 @@ class PermissionSeeder extends Seeder
                 ]
             ],
             [
+                'uuid' => 26,
                 'code' => 'landing_page_creator',
                 'name' => ['vi' => 'Tạo trang quảng cáo', 'en' => 'Landing Page Creator'],
                 'api_methods' => [
@@ -230,6 +257,7 @@ class PermissionSeeder extends Seeder
                 ]
             ],
             [
+                'uuid' => 27,
                 'code' => '247_chat_support',
                 'name' => ['vi' => 'Chăm sóc khách hàng 247', 'en' => '247 chat support'],
                 'api_methods' => [
@@ -237,6 +265,7 @@ class PermissionSeeder extends Seeder
                 ]
             ],
             [
+                'uuid' => 28,
                 'code' => 'enterprise_grade_security',
                 'name' => ['vi' => 'Bảo mật cấp doanh nghiệp', 'en' => 'Enterprise-grade Security'],
                 'api_methods' => [
@@ -244,6 +273,7 @@ class PermissionSeeder extends Seeder
                 ]
             ],
             [
+                'uuid' => 29,
                 'code' => 'advanced_integrations',
                 'name' => ['vi' => 'Tích hợp nâng cao', 'en' => 'Advanced Integrations'],
                 'api_methods' => [
@@ -251,6 +281,7 @@ class PermissionSeeder extends Seeder
                 ]
             ],
             [
+                'uuid' => 30,
                 'code' => 'sub_account_management',
                 'name' => ['vi' => 'Quản lý tài khoản phụ', 'en' => 'Sub-account Management'],
                 'api_methods' => [
@@ -258,6 +289,7 @@ class PermissionSeeder extends Seeder
                 ]
             ],
             [
+                'uuid' => 31,
                 'code' => 'tailored_onboarding',
                 'name' => ['vi' => 'Phù hợp cho quá trình phát triển', 'en' => 'Tailored Onboarding'],
                 'api_methods' => [
@@ -265,6 +297,7 @@ class PermissionSeeder extends Seeder
                 ]
             ],
             [
+                'uuid' => 32,
                 'code' => 'personalized_support',
                 'name' => ['vi' => 'Hỗ trợ cá nhân hóa', 'en' => 'Personalized support'],
                 'api_methods' => [
@@ -272,6 +305,7 @@ class PermissionSeeder extends Seeder
                 ]
             ],
             [
+                'uuid' => 33,
                 'code' => 'flexible_contract',
                 'name' => ['vi' => 'Hợp đồng linh hoạt', 'en' => 'Flexible contract'],
                 'api_methods' => [
@@ -279,6 +313,7 @@ class PermissionSeeder extends Seeder
                 ]
             ],
             [
+                'uuid' => 34,
                 'code' => 'telephone_support',
                 'name' => ['vi' => 'Hỗ trợ điện thoại', 'en' => 'Telephone Support'],
                 'api_methods' => [
@@ -287,9 +322,8 @@ class PermissionSeeder extends Seeder
             ],
 
         ];
-
         foreach ($permissions as $permission) {
-            Permission::updateOrCreate(['code' =>  $permission['code']], $permission);
+            Permission::updateOrCreate(['uuid' => $permission['uuid']], $permission);
         }
     }
 }

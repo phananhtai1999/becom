@@ -10,6 +10,7 @@ use App\Http\Requests\SendResetPasswordEmailRequest;
 use App\Http\Resources\UserResource;
 use App\Http\Requests\LoginRequest;
 use App\Models\PasswordReset;
+use App\Models\PlatformPackage;
 use App\Models\User;
 use App\Services\RoleService;
 use App\Services\AuthenticationService;
@@ -189,7 +190,7 @@ class AuthController extends AbstractRestAPIController
 
         if ($user) {
             $user->roles()->attach([config('user.default_role_uuid')]);
-
+            $user->userPlatformPackage()->create(['platform_package_uuid' => PlatformPackage::DEFAULT_PLATFORM_PACKAGE_1]);
             $userData = app(UserResource::class, ['resource' => $user])
                 ->toResponse(app('Request'))
                 ->getData(true);
