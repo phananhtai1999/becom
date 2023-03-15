@@ -5,6 +5,7 @@ namespace App\Notifications;
 use App\Services\ConfigService;
 use App\Services\ContactService;
 use App\Services\CreditHistoryService;
+use App\Services\FooterTemplateService;
 use App\Services\MailSendingHistoryService;
 use App\Services\MailTemplateVariableService;
 use App\Services\SendEmailScheduleLogService;
@@ -72,6 +73,8 @@ class BaseNotification
      */
     protected $mailTemplateVariableService;
 
+    protected $footerTemplateService;
+
     /**
      * @param $campaign
      * @param ConfigService $configService
@@ -92,7 +95,8 @@ class BaseNotification
         UserService $userService,
         CreditHistoryService $creditHistoryService,
         MailSendingHistoryService $mailSendingHistoryService,
-        MailTemplateVariableService $mailTemplateVariableService
+        MailTemplateVariableService $mailTemplateVariableService,
+        FooterTemplateService $footerTemplateService
     )
     {
         $this->campaign = $campaign;
@@ -104,6 +108,7 @@ class BaseNotification
         $this->creditHistoryService = $creditHistoryService;
         $this->mailSendingHistoryService = $mailSendingHistoryService;
         $this->mailTemplateVariableService = $mailTemplateVariableService;
+        $this->footerTemplateService = $footerTemplateService;
     }
 
     /**
@@ -115,6 +120,7 @@ class BaseNotification
     public function send($contacts, $scenario, $creditTotal)
     {
         $user = $this->campaign->user;
+
         if (!empty($creditTotal))
         {
             $creditNumberSendByCampaign = $creditTotal;

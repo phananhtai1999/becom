@@ -2,6 +2,7 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\CheckCanRemoveFooterTemplate;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
@@ -66,5 +67,6 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'language' => \App\Http\Middleware\Localization::class, // Change language
         'role' => \App\Http\Middleware\CheckCurrentRole::class,
+        'footerTemplate' => CheckCanRemoveFooterTemplate::class
     ];
 }

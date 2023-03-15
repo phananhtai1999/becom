@@ -72,8 +72,17 @@ class User extends Authenticatable
         'name',
         'avatar_img_absolute',
         'cover_img_absolute ',
-        'platform_package'
+        'platform_package',
+        'can_remove_footer_template'
     ];
+
+    /**
+     * @return string
+     */
+    public function getCanRemoveFooterTemplateAttribute()
+    {
+        return $this->first_name ? false : true; //Check tạm thời
+    }
 
     /**
      * @return string

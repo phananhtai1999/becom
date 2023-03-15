@@ -6,6 +6,7 @@ use App\Mail\SendCampaign;
 use App\Services\ConfigService;
 use App\Services\ContactService;
 use App\Services\CreditHistoryService;
+use App\Services\FooterTemplateService;
 use App\Services\MailSendingHistoryService;
 use App\Services\MailTemplateVariableService;
 use App\Services\SendEmailScheduleLogService;
@@ -62,6 +63,8 @@ class EmailNotification extends BaseNotification
      */
     protected $mailTemplateVariableService;
 
+    protected $footerTemplateService;
+
     /**
      * @param $campaign
      * @param ConfigService $configService
@@ -82,7 +85,8 @@ class EmailNotification extends BaseNotification
         UserService $userService,
         CreditHistoryService $creditHistoryService,
         MailSendingHistoryService $mailSendingHistoryService,
-        MailTemplateVariableService $mailTemplateVariableService
+        MailTemplateVariableService $mailTemplateVariableService,
+        FooterTemplateService $footerTemplateService
     )
     {
         $this->campaign = $campaign;
@@ -94,6 +98,7 @@ class EmailNotification extends BaseNotification
         $this->creditHistoryService = $creditHistoryService;
         $this->mailSendingHistoryService = $mailSendingHistoryService;
         $this->mailTemplateVariableService = $mailTemplateVariableService;
+        $this->footerTemplateService = $footerTemplateService;
     }
 
     /**
@@ -137,7 +142,9 @@ class EmailNotification extends BaseNotification
     public function getContent($contact, $smtpAccount, $mailSendingHistory)
     {
         $mailTemplate = $this->mailTemplateVariableService->renderBody($this->campaign->mailTemplate, $contact, $smtpAccount, $this->campaign);
-
+        if ($footerTemplate = $this->footerTemplateService->getFooterTemplateForSendCampaignByType($mailTemplate->type, $mailTemplate->user)) {
+            $mailTemplate = $this->mailTemplateVariableService->insertFooterTemplateInRenderBody($footerTemplate, $mailTemplate);
+        }
         return $this->mailTemplateVariableService->injectTrackingImage($mailTemplate, $mailSendingHistory->uuid);
     }
 

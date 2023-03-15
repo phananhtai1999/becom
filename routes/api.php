@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\CampaignController;
 use App\Http\Controllers\Api\CompanyController;
 use App\Http\Controllers\Api\CreditPackageController;
 use App\Http\Controllers\Api\EmailController;
+use App\Http\Controllers\Api\FooterTemplateController;
 use App\Http\Controllers\Api\FormController;
 use App\Http\Controllers\Api\GroupController;
 use App\Http\Controllers\Api\LanguageController;
@@ -841,5 +842,24 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'section_category.'], functi
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'api.'], function () {
     Route::get('/all-api', [Controller::class, 'allApi']);
+});
+
+Route::group(['middleware' => ['auth:api'], 'as' => 'footer_template.'], function () {
+
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/footer-templates', [FooterTemplateController::class, 'index'])->name('index');
+        Route::post('/footer-template', [FooterTemplateController::class, 'store'])->name('store');
+        Route::get('/footer-template/{id}', [FooterTemplateController::class, 'show'])->name('show');
+        Route::put('/footer-template/{id}', [FooterTemplateController::class, 'edit'])->name('edit');
+        Route::delete('/footer-template/{id}', [FooterTemplateController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::group(['middleware' => ['footerTemplate'], 'as' => 'my.'], function () {
+        Route::get('/my/footer-templates', [FooterTemplateController::class, 'indexMyFooterTemplate'])->name('index');
+        Route::post('/my/footer-template', [FooterTemplateController::class, 'storeMyFooterTemplate'])->name('store');
+        Route::get('/my/footer-template/{id}', [FooterTemplateController::class, 'showMyFooterTemplate'])->name('show');
+        Route::put('/my/footer-template/{id}', [FooterTemplateController::class, 'editMyFooterTemplate'])->name('edit');
+        Route::delete('/my/footer-template/{id}', [FooterTemplateController::class, 'destroyMyFooterTemplate'])->name('destroy');
+    });
 });
 
