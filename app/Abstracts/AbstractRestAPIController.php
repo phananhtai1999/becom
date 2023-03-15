@@ -130,7 +130,7 @@ class AbstractRestAPIController extends BaseController
 
     protected function getPlatformByPermission($code)
     {
-        $cacheNames = ['starter', 'business', 'professional'];
+        $cacheNames = [PlatformPackage::DEFAULT_PLATFORM_PACKAGE_1, PlatformPackage::DEFAULT_PLATFORM_PACKAGE_2, PlatformPackage::DEFAULT_PLATFORM_PACKAGE_3];
         foreach ($cacheNames as $cacheName) {
             $permissionCaches = Cache::rememberForever($cacheName . '_permission', function () use ($cacheName) {
                 $platformPackage = PlatformPackage::findOrFail($cacheName);
@@ -145,5 +145,7 @@ class AbstractRestAPIController extends BaseController
                 }
             }
         }
+
+        return ['plan' => 'Does not have package for this feature. Comeback Later!!'];
     }
 }

@@ -540,12 +540,12 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website_page'], function ()
 Route::get('public/website-page/{id}', [WebsitePageController::class, 'show'])->name('website_page_public.show');
 
 //Platform Package
+Route::get('/platform-packages', [PlatformPackageController::class, 'index']);
 Route::group(['middleware' => ['auth:api'], 'as' => 'platformPackage.'], function () {
     Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
         Route::post('/platform-package', [PlatformPackageController::class, 'store']);
         Route::delete('/platform-package/{id}', [PlatformPackageController::class, 'destroy']);
     });
-    Route::get('/platform-packages', [PlatformPackageController::class, 'index']);
     Route::put('/publish-platform-package/{id}', [PlatformPackageController::class, 'publishPlatformPackage']);
     Route::put('/disable-platform-package/{id}', [PlatformPackageController::class, 'disablePlatformPackage']);
     Route::get('/platform-package/{id}', [PlatformPackageController::class, 'show']);
