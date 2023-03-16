@@ -5,6 +5,7 @@ namespace App\Models\QueryBuilders;
 use App\Abstracts\AbstractQueryBuilder;
 use App\Models\SearchQueryBuilders\SearchQueryBuilder;
 use App\Models\Status;
+use Illuminate\Database\Eloquent\Builder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\Concerns\SortsQuery;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -43,8 +44,34 @@ class StatusQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__' . $modelKeyName, $modelKeyName),
                 'name',
                 AllowedFilter::exact('exact__name', 'name'),
-                'user_uuid',
                 AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
+                AllowedFilter::callback("user_uuid", function (Builder $query, $value) {
+                    if ($value === 'null') {
+                        $query->whereNull('user_uuid');
+                    } else {
+                        if (is_array($value)) {
+                            if (in_array('null', $value)) {
+                                $query->where(function ($query) use ($value) {
+                                    for ($i = 1; $i <= count($value); $i++) {
+                                        if ($value[$i - 1] === 'null') {
+                                            $query->orWhereNull('user_uuid');
+                                        } else {
+                                            $query->orWhere('user_uuid', 'like', '%' . $value[$i - 1] . '%');
+                                        }
+                                    }
+                                });
+                            } else {
+                                $query->where(function ($query) use ($value) {
+                                    for ($i = 1; $i <= count($value); $i++) {
+                                        $query->orWhere('user_uuid', 'like', '%' . $value[$i - 1] . '%');
+                                    }
+                                });
+                            }
+                        } else {
+                            $query->where('user_uuid', 'like', '%' . $value . '%');
+                        }
+                    }
+                })
             ]);
     }
 
