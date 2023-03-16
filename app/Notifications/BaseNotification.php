@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Events\ActivityHistoryOfSendByCampaignEvent;
 use App\Services\ConfigService;
 use App\Services\ContactService;
 use App\Services\CreditHistoryService;
@@ -85,6 +86,7 @@ class BaseNotification
      * @param CreditHistoryService $creditHistoryService
      * @param MailSendingHistoryService $mailSendingHistoryService
      * @param MailTemplateVariableService $mailTemplateVariableService
+     * @param FooterTemplateService $footerTemplateService
      */
     public function __construct(
         $campaign,
@@ -170,6 +172,7 @@ class BaseNotification
                     'log' => $e->getMessage()
                 ]);
             }
+            ActivityHistoryOfSendByCampaignEvent::dispatch($mailSendingHistory, $this->campaign->send_type, $contact->uuid);
         }
 
         if ($this->creditReturn > 0) {
