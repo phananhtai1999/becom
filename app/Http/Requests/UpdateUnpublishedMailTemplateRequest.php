@@ -28,7 +28,7 @@ class UpdateUnpublishedMailTemplateRequest extends AbstractRequest
             'body' => ['string'],
             'website_uuid' => ['nullable', 'numeric', 'min:1', 'exists:websites,uuid'],
             'design' => ['string'],
-            'type' => ['string', 'in:sms,email'],
+            'type' => ['string', 'in:sms,email,telegram,viber'],
         ];
     }
 }
