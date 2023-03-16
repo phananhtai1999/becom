@@ -40,15 +40,14 @@ class UserSeeder extends Seeder {
                 $user = User::factory()->create([
                     'email' => $item['email'],
                     'password' => Hash::make($item['password']),
-                    'can_add_smtp_account' => true,
-                    'credit' => 1000
+                    'can_add_smtp_account' => true
                 ]);
                 $current_role = $item['role'] === 'admin' ? $roleadmin : $role;
                 $user->roles()->sync([$current_role->uuid]);
             }
-            User::factory(10)->create()->each(function ($user) use ($role) {
-                $user->roles()->sync([$role->uuid]);
-            });
+//            User::factory(10)->create()->each(function ($user) use ($role) {
+//                $user->roles()->sync([$role->uuid]);
+//            });
 
         }
 

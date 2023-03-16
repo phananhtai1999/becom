@@ -86,4 +86,35 @@ class ArticleController extends AbstractRestAPIController
             $this->service->resourceToData($this->resourceClass, $model)
         );
     }
+
+    /**
+     * @param IndexRequest $request
+     * @return JsonResponse
+     */
+    public function indexPublic(IndexRequest $request)
+    {
+        $models = $this->service->getArticlePublicWithPagination(
+            $request->get('per_page', '15'),
+            $request->get('page', '1'),
+            $request->get('columns', '*'),
+            $request->get('page_name', 'page')
+        );
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+        );
+    }
+
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
+    public function showPublic($id)
+    {
+        $model = $this->service->showArticlePublic($id);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
 }

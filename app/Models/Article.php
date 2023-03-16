@@ -16,6 +16,8 @@ class Article extends AbstractModel
     use HasFactory, SoftDeletes,
         HasTranslations, ModelFilterLanguageTrait;
 
+    const PUBLISHED_PUBLISH_STATUS = 1;
+
     /**
      * @var string
      */

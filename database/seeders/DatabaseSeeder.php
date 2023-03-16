@@ -38,13 +38,13 @@ class DatabaseSeeder extends Seeder
             ]);
 
 
-            \App\Models\User::factory(50)->create();
-            \App\Models\Website::factory(200)->create();
-            \App\Models\SmtpAccount::factory(100)->create();
-            \App\Models\Contact::factory(100)->create();
-            \App\Models\ContactList::factory(100)->create();
-            \App\Models\MailTemplate::factory(100)->create();
-            \App\Models\Campaign::factory(100)->create();
+//            \App\Models\User::factory(50)->create();
+//            \App\Models\Website::factory(200)->create();
+//            \App\Models\SmtpAccount::factory(100)->create();
+//            \App\Models\Contact::factory(100)->create();
+//            \App\Models\ContactList::factory(100)->create();
+//            \App\Models\MailTemplate::factory(100)->create();
+//            \App\Models\Campaign::factory(100)->create();
         }
     }
 }

@@ -20,6 +20,10 @@ class ArticleCategory extends AbstractModel
         SoftDeletes, HasTranslations,
         ModelFilterLanguageTrait;
 
+    const PUBLISHED_PUBLISH_STATUS = 1;
+    const PENDING_PUBLISH_STATUS = 2;
+
+
     /**
      * @var string
      */
