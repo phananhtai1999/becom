@@ -205,9 +205,9 @@ class AuthController extends AbstractRestAPIController
                 'message' => __("messages.register_success")
             ], $userData))
                 ->withCookie(
-                    \cookie('accessToken', $userData['data']['token'], config('auth.password_timeout'), null, null, false, true)
+                    \cookie('accessToken', $userData['data']['token'], config('auth.password_timeout'), null, null, true, true)
                 )->withCookie(
-                    \cookie('logged', true, config('auth.password_timeout'), null, null, false, false)
+                    \cookie('logged', true, config('auth.password_timeout'), null, null, true, false)
                 );
         }
 
