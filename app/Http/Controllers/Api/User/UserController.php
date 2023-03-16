@@ -66,7 +66,7 @@ class UserController extends AbstractRestAPIController
         if (empty($request->can_add_smtp_account)) {
             $model = $this->service->create(array_merge($request->all(), [
                 'password' => Hash::make($request->get('password')),
-                'can_add_smtp_account' => '1'
+                'can_add_smtp_account' => '0'
             ]));
         } else {
             $model = $this->service->create(array_merge($request->all(), [

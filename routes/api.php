@@ -691,8 +691,8 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'article-category.'], functi
         Route::get('/article-category/{id}', [ArticleCategoryController::class, 'show'])->name('show');
     });
 });
-Route::get('public/article-categories', [ArticleCategoryController::class, 'index'])->name('article-categories-public.index');
-Route::get('public/article-category/{id}', [ArticleCategoryController::class, 'show'])->name('article-categories-public.show');
+Route::get('public/article-categories', [ArticleCategoryController::class, 'indexPublic'])->name('article-categories-public.index');
+Route::get('public/article-category/{id}', [ArticleCategoryController::class, 'showPublic'])->name('article-categories-public.show');
 
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'group.'], function () {
@@ -716,8 +716,8 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'article.'], function () {
         Route::get('/article/{id}', [ArticleController::class, 'show'])->name('article.show');
     });
 });
-Route::get('public/articles', [ArticleController::class, 'index'])->name('article-public.index');
-Route::get('public/article/{id}', [ArticleController::class, 'show'])->name('article-public.index');
+Route::get('public/articles', [ArticleController::class, 'indexPublic'])->name('article-public.index');
+Route::get('public/article/{id}', [ArticleController::class, 'showPublic'])->name('article-public.index');
 
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'status.'], function () {

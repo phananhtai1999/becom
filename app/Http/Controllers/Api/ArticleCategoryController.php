@@ -83,4 +83,29 @@ class ArticleCategoryController extends AbstractRestAPIController
             $this->service->resourceToData($this->resourceClass, $model)
         );
     }
+
+    /**
+     * @return JsonResponse
+     */
+    public function indexPublic()
+    {
+        $data = $this->service->getChildrenCategories();
+        return $this->sendOkJsonResponse(["data" => $data]);
+    }
+
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
+    public function showPublic($id)
+    {
+        $model = $this->service->showArticleCategoryPublic($id);
+        if ($model) {
+            return $this->sendOkJsonResponse(
+                $this->service->resourceToData($this->resourceClass, $model)
+            );
+        }
+        return $this->sendValidationFailedJsonResponse();
+
+    }
 }
