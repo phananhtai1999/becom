@@ -89,7 +89,19 @@ class User extends Authenticatable
      */
     public function getAvatarImgAbsoluteAttribute()
     {
-        return !empty($this->avatar_img) ? Storage::disk('s3')->url($this->avatar_img) : '';
+        return !empty($this->avatar_img) ? Storage::disk('s3')->url($this->avatar_img) : $this->getValueAvatarDefault();
+    }
+
+    /**
+     * @return string
+     */
+    public function getValueAvatarDefault()
+    {
+        $configDefaultAvatar = Config::where('key', 'user_default_avatar')->first();
+        if (!$configDefaultAvatar) {
+            return "";
+        }
+        return $configDefaultAvatar->value;
     }
 
     /**

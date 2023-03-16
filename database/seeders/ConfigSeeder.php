@@ -112,6 +112,12 @@ class ConfigSeeder extends Seeder
                 'type' => 'string',
                 'group_id' => 1
             ],
+            [
+                'key' => 'user_default_avatar',
+                'value' => 'https://file.storage.techupzone.com/linkstar-stg/public/upload/f1846881-7c9c-4d4a-84e7-77436444f6c1_1678936901.jpg',
+                'type' => 'string',
+                'group_id' => 1
+            ]
         ];
 
         foreach ($configs as $config) {
