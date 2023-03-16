@@ -3,24 +3,17 @@
 namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
-use App\Http\Controllers\Traits\RestDestroyTrait;
-use App\Http\Requests\CompanyRequest;
+use App\Events\ActivityHistoryEvent;
 use App\Http\Requests\IndexRequest;
-use App\Http\Requests\MyCompanyRequest;
 use App\Http\Requests\MyRemindRequest;
 use App\Http\Requests\RemindRequest;
-use App\Http\Requests\UpdateCompanyRequest;
-use App\Http\Requests\UpdateMyCompanyRequest;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\UpdateMyRemindRequest;
 use App\Http\Requests\UpdateRemindRequest;
-use App\Http\Resources\CompanyResource;
-use App\Http\Resources\CompanyResourceCollection;
 use App\Http\Resources\RemindResource;
 use App\Http\Resources\RemindResourceCollection;
-use App\Services\CompanyService;
-use App\Services\MyCompanyService;
+use App\Models\Remind;
 use App\Services\MyRemindService;
 use App\Services\MyStatusService;
 use App\Services\RemindService;
@@ -28,7 +21,7 @@ use Illuminate\Support\Facades\Gate;
 
 class RemindController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestShowTrait, RestDestroyTrait;
+    use RestIndexTrait, RestShowTrait;
 
     /**
      * @var MyStatusService
@@ -66,6 +59,11 @@ class RemindController extends AbstractRestAPIController
             'user_uuid' => $request->get('user_uuid') ?? auth()->user()->getKey()
         ]));
 
+        $model->contacts()->attach($request->get('contact', []));
+
+        //Add activity history
+        ActivityHistoryEvent::dispatch($model, Remind::REMIND_TYPE, Remind::REMIND_CREATED_ACTION);
+
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
         );
@@ -87,9 +85,31 @@ class RemindController extends AbstractRestAPIController
             'user_uuid' => $request->get('user_uuid') ?? auth()->user()->getKey()
         ]));
 
+        $model->contacts()->sync($request->contact ?? $model->contacts);
+
+        //Add activity history
+        if (!empty($request->all())) {
+            ActivityHistoryEvent::dispatch($model, Remind::REMIND_TYPE, Remind::REMIND_UPDATED_ACTION);
+        }
+
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
         );
+    }
+
+    /**
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function destroy($id)
+    {
+        $this->service->destroy($id);
+        $getDeletedRecord = $this->service->withTrashed($id);
+
+        //Add activity history
+        ActivityHistoryEvent::dispatch($getDeletedRecord, Remind::REMIND_TYPE, Remind::REMIND_DELETED_ACTION);
+
+        return $this->sendOkJsonResponse();
     }
 
     /**
@@ -113,12 +133,17 @@ class RemindController extends AbstractRestAPIController
      */
     public function storeMyRemind(MyRemindRequest $request)
     {
-        if (!Gate::allows('permission', config('api.remind.create'))) {
-            return $this->sendJsonResponse(false, 'You need to upgrade platform package', [], 403);
-        }
+//        if (!Gate::allows('permission', config('api.remind.create'))) {
+//            return $this->sendJsonResponse(false, 'You need to upgrade platform package', [], 403);
+//        }
         $model = $this->service->create(array_merge($request->all(), [
             'user_uuid' => auth()->user()->getkey(),
         ]));
+
+        $model->contacts()->attach($request->get('contact', []));
+
+        //Add activity history
+        ActivityHistoryEvent::dispatch($model, Remind::REMIND_TYPE, Remind::REMIND_CREATED_ACTION);
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -151,6 +176,13 @@ class RemindController extends AbstractRestAPIController
             'user_uuid' => auth()->user()->getkey(),
         ]));
 
+        $model->contacts()->sync($request->contact ?? $model->contacts);
+
+        //Add activity history
+        if (!empty($request->all())) {
+            ActivityHistoryEvent::dispatch($model, Remind::REMIND_TYPE, Remind::REMIND_UPDATED_ACTION);
+        }
+
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
         );
@@ -163,6 +195,10 @@ class RemindController extends AbstractRestAPIController
     public function destroyMyRemind($id)
     {
         $this->myService->deleteMyRemind($id);
+        $getDeletedRecord = $this->service->withTrashed($id);
+
+        //Add activity history
+        ActivityHistoryEvent::dispatch($getDeletedRecord, Remind::REMIND_TYPE, Remind::REMIND_DELETED_ACTION);
 
         return $this->sendOkJsonResponse();
     }

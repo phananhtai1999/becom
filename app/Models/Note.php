@@ -10,6 +10,11 @@ class Note extends AbstractModel
 {
     use HasFactory, SoftDeletes;
 
+    const NOTE_TYPE = 'note';
+    const NOTE_CREATED_ACTION = 'created';
+    const NOTE_UPDATED_ACTION = 'updated';
+    const NOTE_DELETED_ACTION = 'deleted';
+
     /**
      * @var string
      */
