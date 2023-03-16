@@ -57,7 +57,7 @@ class UpdateContactRequest extends AbstractRequest
             })->whereNull('deleted_at')],
         ];
 
-        if ($this->request->get('contact_company_position')) {
+        if (is_array($this->request->get('contact_company_position'))) {
             foreach ($this->request->get('contact_company_position') as $key => $value) {
                 if (!is_integer($key)) {
                     $validate['contact_company_position.*'] = ['numeric', 'min:0'];

@@ -116,7 +116,7 @@ class ContactController extends AbstractRestAPIController
         ]));
 
         //Add Pivot contact_company_position
-        $pivot = $this->addPivotContactCompanyPosition($request->get('contact_company_position', []));
+        $pivot = $this->addPivotContactCompanyPosition($request->get('contact_company_position', []) ?? []);
 
         $model->contactLists()->attach($request->get('contact_list', []));
         $model->reminds()->attach($request->get('remind', []));
@@ -144,7 +144,7 @@ class ContactController extends AbstractRestAPIController
         ]));
 
         //Add Pivot contact_company_position
-        $pivot = $this->addPivotContactCompanyPosition($request->get('contact_company_position', []));
+        $pivot = $this->addPivotContactCompanyPosition($request->get('contact_company_position', []) ?? []);
 
         $model->contactLists()->sync($request->contact_list ?? $model->contactLists);
         $model->reminds()->sync($request->remind ?? $model->reminds);
@@ -209,7 +209,7 @@ class ContactController extends AbstractRestAPIController
         ]));
 
         //Add Pivot contact_company_position
-        $pivot = $this->addPivotContactCompanyPosition($request->get('contact_company_position', []));
+        $pivot = $this->addPivotContactCompanyPosition($request->get('contact_company_position', []) ?? []);
 
         $model->contactLists()->attach($request->get('contact_list', []));
         $model->reminds()->attach($request->get('remind', []));
@@ -253,7 +253,7 @@ class ContactController extends AbstractRestAPIController
         ]));
 
         //Add Pivot contact_company_position
-        $pivot = $this->addPivotContactCompanyPosition($request->get('contact_company_position', []));
+        $pivot = $this->addPivotContactCompanyPosition($request->get('contact_company_position', []) ?? []);
 
         $model->contactLists()->sync($request->contact_list ?? $model->contactLists);
         $model->reminds()->sync($request->remind ?? $model->reminds);
