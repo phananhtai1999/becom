@@ -291,11 +291,10 @@ class CampaignController extends AbstractRestAPIController
     {
         $sortTotalCredit = explode(',', $request->sort);
 
-        if($sortTotalCredit[0] == 'number_credit_needed_to_start_campaign' || $sortTotalCredit[0] == '-number_credit_needed_to_start_campaign')
-        {
-            $models= $this->myService->sortMyTotalCredit($request->get('per_page', '15'), $sortTotalCredit[0], $request->search, $request->search_by);
+        if ($sortTotalCredit[0] == 'number_credit_needed_to_start_campaign' || $sortTotalCredit[0] == '-number_credit_needed_to_start_campaign') {
+            $models = $this->myService->sortMyTotalCredit($request->get('per_page', '15'), $sortTotalCredit[0], $request->search, $request->search_by);
         } else {
-            $models =$this->myService->getCollectionWithPagination();
+            $models = $this->myService->getCollectionWithPagination();
         }
 
         return $this->sendOkJsonResponse(
@@ -316,15 +315,13 @@ class CampaignController extends AbstractRestAPIController
             return $this->sendValidationFailedJsonResponse(["errors" => ['campaign' => __('messages.scenario_campaign_only_one_contact_list')]]);
         }
 
-        if ($request->get('send_type') === "email") {
-            if (($user->can_add_smtp_account == 1 || $configSmtpAuto->value == 0)) {
-                if (empty($request->get('smtp_account_uuid'))) {
-                    return $this->sendValidationFailedJsonResponse(["errors" => ['smtp_account_uuid' => __('messages.smtp_account_invalid')]]);
-                }
-            } else {
-                if (!empty($request->get('smtp_account_uuid'))) {
-                    return $this->sendValidationFailedJsonResponse(["errors" => ['smtp_account_uuid' => __('messages.smtp_account_invalid')]]);
-                }
+        if (($user->can_add_smtp_account == 1 || $configSmtpAuto->value == 0) && $request->get('send_type') != "sms") {
+            if (empty($request->get('smtp_account_uuid'))) {
+                return $this->sendValidationFailedJsonResponse(["errors" => ['smtp_account_uuid' => __('messages.smtp_account_invalid')]]);
+            }
+        } else {
+            if (!empty($request->get('smtp_account_uuid'))) {
+                return $this->sendValidationFailedJsonResponse(["errors" => ['smtp_account_uuid' => __('messages.smtp_account_invalid')]]);
             }
         }
 
@@ -377,12 +374,22 @@ class CampaignController extends AbstractRestAPIController
             return $this->sendValidationFailedJsonResponse(["errors" => ['campaign' => __('messages.scenario_campaign_only_one_contact_list')]]);
         }
 
+        //Check send_type and mail_template same type
         if (!empty($request->get('send_type')) && $model->mailTemplate->type != $request->get('send_type')) {
             return $this->sendValidationFailedJsonResponse(["errors" => ['send_type' => __('messages.send_type_campaign_error')]]);
         }
 
-        if (array_key_exists('smtp_account_uuid', $request->all()) && (($request->get('send_type') ?? $model->send_type) === "email")) {
-            if (($user->can_add_smtp_account == 1 || $config->value == 0)) {
+        //Check send_type and smtp_account same type
+        if (!empty($request->get('send_type')) && $request->get('send_type') != 'sms') {
+            if (($request->get('send_type') === 'email' && $model->smtpAccount->mail_mailer != 'smtp') ||
+                ($request->get('send_type') != 'email' && $model->smtpAccount->mail_mailer != $request->get('send_type'))
+            ) {
+                return $this->sendValidationFailedJsonResponse(["errors" => ['smtp_account' => __('messages.smtp_account_error')]]);
+            }
+        }
+
+        if (array_key_exists('smtp_account_uuid', $request->all()) && (($request->get('send_type') ?? $model->send_type) != "sms")) {
+            if (($user->can_add_smtp_account == 1 || $config->value == 0) && $request->get('send_type') != 'sms') {
                 if (empty($request->get('smtp_account_uuid'))) {
                     return $this->sendValidationFailedJsonResponse(["errors" => ['smtp_account_uuid' => __('messages.smtp_account_invalid')]]);
                 }
@@ -513,6 +520,36 @@ class CampaignController extends AbstractRestAPIController
         if (!Gate::allows('permission', $code)) {
             return $this->sendJsonResponse(false, 'You need to upgrade platform package', [], 403);
         }
+
+        $configSmtpAuto = $this->configService->findConfigByKey('smtp_auto');
+        //Check random smtp_account with role admin and send_type exists or not
+        if ($campaign->send_type != 'sms') {
+            if ($campaign->send_type === 'email') {
+                $mailMailer = 'smtp';
+            } else {
+                $mailMailer = $campaign->send_type;
+            }
+
+            if ($campaign->user->can_add_smtp_account == 1 || $configSmtpAuto->value == 0) {
+                if (!$campaign->smtpAccount && !$this->smtpAccountService->getRandomSmtpAccountAdmin($campaign->send_type)) {
+                    return $this->sendValidationFailedJsonResponse([
+                        'error' => [
+                            'get_random_smtp_account_admin' => __("messages.{$mailMailer}_smtp_account_invalid")
+                        ]
+                    ]);
+                }
+            } else {
+                if (!$this->smtpAccountService->getRandomSmtpAccountAdmin($campaign->send_type)) {
+                    return $this->sendValidationFailedJsonResponse([
+                        'error' => [
+                            'get_random_smtp_account_admin' => __("messages.{$mailMailer}_smtp_account_invalid")
+                        ]
+                    ]);
+                }
+            }
+        }
+
+        //Send
         $result = $this->checkAndSendCampaign($request->get('campaign_uuid'));
         if ($result['status']) {
             return $this->sendOkJsonResponse(["message" => $result['messages']]);
@@ -535,6 +572,36 @@ class CampaignController extends AbstractRestAPIController
         if (!Gate::allows('permission', $code)) {
             return $this->sendJsonResponse(false, 'You need to upgrade platform package', [], 403);
         }
+
+        $configSmtpAuto = $this->configService->findConfigByKey('smtp_auto');
+        //Check random smtp_account with role admin and send_type exists or not
+        if ($campaign->send_type != 'sms') {
+            if ($campaign->send_type === 'email') {
+                $mailMailer = 'smtp';
+            } else {
+                $mailMailer = $campaign->send_type;
+            }
+
+            if ($campaign->user->can_add_smtp_account == 1 || $configSmtpAuto->value == 0) {
+                if (!$campaign->smtpAccount && !$this->smtpAccountService->getRandomSmtpAccountAdmin($campaign->send_type)) {
+                    return $this->sendValidationFailedJsonResponse([
+                        'error' => [
+                            'get_random_smtp_account_admin' => __("messages.{$mailMailer}_smtp_account_invalid")
+                        ]
+                    ]);
+                }
+            } else {
+                if (!$this->smtpAccountService->getRandomSmtpAccountAdmin($campaign->send_type)) {
+                    return $this->sendValidationFailedJsonResponse([
+                        'error' => [
+                            'get_random_smtp_account_admin' => __("messages.{$mailMailer}_smtp_account_invalid")
+                        ]
+                    ]);
+                }
+            }
+        }
+
+        //Send
         $result = $this->checkAndSendCampaign($request->get('campaign_uuid'));
         if ($result['status']) {
             return $this->sendOkJsonResponse(["message" => $result['messages']]);
@@ -552,7 +619,7 @@ class CampaignController extends AbstractRestAPIController
         $campaign = $this->service->findOneById($request->get('campaign_uuid'));
         if ($request->get('was_stopped_by_owner')) {
             $this->service->update($campaign, [
-               'was_stopped_by_owner' => $request->get('was_stopped_by_owner')
+                'was_stopped_by_owner' => $request->get('was_stopped_by_owner')
             ]);
 
             return $this->sendOkJsonResponse();
@@ -608,7 +675,7 @@ class CampaignController extends AbstractRestAPIController
      * @param $campaignUuid
      * @return array
      */
-    public function  checkAndSendCampaign($campaignUuid)
+    public function checkAndSendCampaign($campaignUuid)
     {
         $campaign = $this->service->findOneById($campaignUuid);
         $campaignsScenario = $campaign->campaignsScenario;
@@ -618,7 +685,7 @@ class CampaignController extends AbstractRestAPIController
         if ($campaignRootScenario->count()) {
             $columns = ['type', 'status', 'was_finished', 'was_stopped_by_owner'];
 
-        }else{
+        } else {
             $columns = ['type', 'status', 'from_date', 'to_date', 'was_finished', 'was_stopped_by_owner'];
         }
         foreach ($columns as $column) {
@@ -704,17 +771,16 @@ class CampaignController extends AbstractRestAPIController
     {
         $campaign = $this->service->getInfoRelationshipCampaignByUuid($request->campaign_uuid);
         $user = auth()->user();
-        if($campaign->send_type == 'email')
-        {
+        if ($campaign->send_type == 'email') {
             $config = $this->configService->findConfigByKey('smtp_auto');
             try {
-                if($user->can_add_smtp_account == 1 || $config->value == 0){
-                    if(!empty($campaign->smtpAccount)){
+                if ($user->can_add_smtp_account == 1 || $config->value == 0) {
+                    if (!empty($campaign->smtpAccount)) {
                         $smtpAccount = $campaign->smtpAccount;
-                    }else{
+                    } else {
                         $smtpAccount = $this->smtpAccountService->getRandomSmtpAccountAdmin();
                     }
-                }else{
+                } else {
                     $smtpAccount = $this->smtpAccountService->getRandomSmtpAccountAdmin();
                 }
                 $this->smtpAccountService->setSmtpAccountForSendEmail($smtpAccount);
@@ -722,7 +788,7 @@ class CampaignController extends AbstractRestAPIController
                 Mail::to($user->email)->send(new SendCampaign($mailTemplate, $smtpAccount->mail_from_name, $smtpAccount->mail_from_address));
 
                 return $this->sendOkJsonResponse(['message' => __('messages.test_send_campaign_success')]);
-            }catch (\Exception $e){
+            } catch (\Exception $e) {
 
                 return $this->sendValidationFailedJsonResponse(["smtp_account" => $e->getMessage()]);
             }
@@ -730,8 +796,7 @@ class CampaignController extends AbstractRestAPIController
             $contacts = $this->contactService->getContactsSendSms($campaign->uuid);
             $content = $campaign->mailTemplate->body;
 
-            foreach ($contacts as $contact)
-            {
+            foreach ($contacts as $contact) {
                 Log::info('Phone:' . "$contact->phone" . '|' . 'Content:' . "$content");
             }
 
@@ -747,17 +812,16 @@ class CampaignController extends AbstractRestAPIController
     {
         $campaign = $this->service->getInfoRelationshipCampaignByUuid($request->campaign_uuid);
         $user = auth()->user();
-        if ($campaign->send_type == 'email')
-        {
+        if ($campaign->send_type == 'email') {
             $config = $this->configService->findConfigByKey('smtp_auto');
             try {
-                if($user->can_add_smtp_account == 1 || $config->value == 0){
-                    if(!empty($campaign->smtpAccount)){
+                if ($user->can_add_smtp_account == 1 || $config->value == 0) {
+                    if (!empty($campaign->smtpAccount)) {
                         $smtpAccount = $campaign->smtpAccount;
-                    }else{
+                    } else {
                         $smtpAccount = $this->smtpAccountService->getRandomSmtpAccountAdmin();
                     }
-                }else{
+                } else {
                     $smtpAccount = $this->smtpAccountService->getRandomSmtpAccountAdmin();
                 }
                 $this->smtpAccountService->setSmtpAccountForSendEmail($smtpAccount);
@@ -765,17 +829,15 @@ class CampaignController extends AbstractRestAPIController
                 Mail::to($user->email)->send(new SendCampaign($mailTemplate, $smtpAccount->mail_from_name, $smtpAccount->mail_from_address));
 
                 return $this->sendOkJsonResponse(['message' => __('messages.test_send_campaign_success')]);
-            }catch (\Exception $e){
+            } catch (\Exception $e) {
 
                 return $this->sendValidationFailedJsonResponse(["smtp_account" => $e->getMessage()]);
             }
-        } elseif ($campaign->send_type == 'sms')
-        {
+        } elseif ($campaign->send_type == 'sms') {
             $contacts = $this->contactService->getContactsSendSms($campaign->uuid);
             $content = $campaign->mailTemplate->body;
 
-            foreach ($contacts as $contact)
-            {
+            foreach ($contacts as $contact) {
                 Log::info('Phone:' . "$contact->phone" . '|' . 'Content:' . "$content");
             }
 

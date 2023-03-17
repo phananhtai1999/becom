@@ -6,6 +6,7 @@ use App\Models\MailTemplate;
 use App\Models\SmtpAccount;
 use App\Models\SmtpAccountEncryption;
 use App\Models\User;
+use App\Models\Website;
 use Illuminate\Database\Seeder;
 
 class SmtpAccountSeeder extends Seeder
@@ -27,10 +28,38 @@ class SmtpAccountSeeder extends Seeder
                 "mail_username"=> "phongphunguyen7575b@gmail.com",
                 "mail_password"=> "cnneowuovtkbvagi",
                 "mail_from_address"=> "phongphunguyen7575b@gmail.com",
-            ]
+            ],
         ];
 
+        $smtpAccountsAdminRanDom = [
+            [
+                "mail_mailer"=> "smtp",
+            ],
+            [
+                "mail_mailer"=> "telegram",
+            ],
+            [
+                "mail_mailer"=> "viber",
+            ],
+        ];
+
+        $admin = User::where('email', 'admin@sendemail.techupcorp')->first();
         $user = User::where('email', 'user1@sendemail.techupcorp')->first();
+
+        foreach ($smtpAccountsAdminRanDom as $smtpAccount) {
+            $website = Website::where('user_uuid', $admin->uuid)->inRandomOrder()->first();
+            $smtpAdmin = SmtpAccount::where([
+                ['mail_mailer', $smtpAccount['mail_mailer']],
+                ['user_uuid', $admin->uuid]
+            ])->first();
+            if (!$smtpAdmin) {
+                SmtpAccount::factory()->create([
+                    "mail_mailer"=> $smtpAccount['mail_mailer'],
+                    "user_uuid"=> $admin->uuid,
+                    'website_uuid' => $website->uuid
+                ]);
+            }
+        }
 
         foreach ($smtpAccounts as $smtpAccount) {
             $mailTemplate = MailTemplate::where('user_uuid', $user->uuid)->where('type', 'email')->inRandomOrder()->first();
