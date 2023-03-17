@@ -48,17 +48,23 @@ class CampaignRequest extends AbstractRequest
                         ['website_uuid', $this->request->get('website_uuid')],
                         ['user_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey()],
                         ['mail_mailer', 'smtp'],
+                        ['status', 'work'],
+                        ['publish', true],
                     ])->whereNull('deleted_at');
                 } elseif ($sendType == 'sms') {
                     return $query->where([
                         ['website_uuid', $this->request->get('website_uuid')],
                         ['user_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey()],
+                        ['status', 'work'],
+                        ['publish', true],
                     ])->whereNull('deleted_at');
                 } else {
                     return $query->where([
                         ['website_uuid', $this->request->get('website_uuid')],
                         ['user_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey()],
                         ['mail_mailer', $sendType],
+                        ['status', 'work'],
+                        ['publish', true],
                     ])->whereNull('deleted_at');
                 }
             })],

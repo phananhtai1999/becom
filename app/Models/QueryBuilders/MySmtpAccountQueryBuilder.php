@@ -40,6 +40,8 @@ class MySmtpAccountQueryBuilder extends AbstractQueryBuilder
                 'secret_key',
                 'website_uuid',
                 'user_uuid',
+                'status',
+                'publish'
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -55,6 +57,8 @@ class MySmtpAccountQueryBuilder extends AbstractQueryBuilder
                 'secret_key',
                 'website_uuid',
                 'user_uuid',
+                'status',
+                'publish'
 
             ])
             ->allowedFilters([
@@ -82,6 +86,10 @@ class MySmtpAccountQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__website_uuid', 'website_uuid'),
                 'user_uuid',
                 AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
+                'status',
+                AllowedFilter::exact('exact__status', 'status'),
+                'publish',
+                AllowedFilter::exact('exact__publish', 'publish'),
                 'user.username',
                 AllowedFilter::exact('exact__user.username', 'user.username'),
                 'user.email',

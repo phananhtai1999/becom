@@ -91,18 +91,32 @@ class SmtpAccountController extends AbstractRestAPIController
     {
         $request = app($this->storeRequest);
 
-        $website = $this->websiteService->findOneById($request->get('website_uuid'));
-
-        if ($this->service->checkMailUserNameUnique($request->get('mail_username'), $website->user_uuid)) {
-            $model = $this->service->create(array_merge($request->all(), [
-                'user_uuid' => $website->user_uuid,
-            ]));
-
-            return $this->sendCreatedJsonResponse(
-                $this->service->resourceToData($this->resourceClass, $model)
-            );
+        if ($request->get('website_uuid')) {
+            $website = $this->websiteService->findOneById($request->get('website_uuid'));
+            $userUuid = $website->user_uuid;
+        }else{
+            $userUuid = auth()->user()->getKey();
         }
-        return $this->sendValidationFailedJsonResponse(["errors" => ["mail_username" => __('messages.mail_username_already_taken')]]);
+
+        if (!$this->service->checkMailUserNameUnique($request->get('mail_username'), $userUuid)) {
+            return $this->sendValidationFailedJsonResponse(["errors" => ["mail_username" => __('messages.mail_username_already_taken')]]);
+        }
+
+        $model = $this->service->create(array_merge($request->except(['status','publish']), [
+            'user_uuid' => $userUuid,
+        ]));
+
+        //Test smtp account khi tạo 1 smtp
+        if (!$this->service->testSmtpAccount($model)) {
+            $this->service->update($model, [
+                'status' => 'error',
+                'publish' => false
+            ]);
+        }
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+
     }
 
     /**
@@ -114,20 +128,19 @@ class SmtpAccountController extends AbstractRestAPIController
         $request = app($this->editRequest);
 
         $model = $this->service->findOrFailById($id);
-
         if (empty($request->get('website_uuid')) || $model->website_uuid == $request->get('website_uuid')) {
             if ($request->get('mail_username') && $model->mail_username != $request->get('mail_username')
                 && !$this->service->checkMailUserNameUnique($request->get('mail_username'), $model->user_uuid)) {
                 return $this->sendValidationFailedJsonResponse(["errors" => ["mail_username" => __('messages.mail_username_already_taken')]]);
             }
-            $data = $request->except('user_uuid');
+            $data = $request->except(['status', 'user_uuid']);
         }else {
             if (!$this->service->checkExistsSmtpAccountInTables($id)) {
                 $website = $this->websiteService->findOneById($request->get('website_uuid'));
                 if (!$this->service->checkMailUserNameUnique($request->get('mail_username'), $website->user_uuid)) {
                     return $this->sendValidationFailedJsonResponse(["errors" => ["mail_username" => __('messages.mail_username_already_taken')]]);
                 }
-                $data = array_merge($request->all(), [
+                $data = array_merge($request->except('status'), [
                     'user_uuid' => $website->user_uuid,
                 ]);
             } else {
@@ -135,6 +148,21 @@ class SmtpAccountController extends AbstractRestAPIController
             }
         }
         $this->service->update($model, $data);
+
+        //Test smtp khi update lại smtp
+        if ($request->hasAny(['mail_mailer', 'mail_host', 'mail_port',
+            'mail_username', 'mail_password', 'smtp_mail_encryption_uuid'])) {
+            if (!$this->service->testSmtpAccount($model)) {
+                $this->service->update($model, [
+                    'status' => 'error',
+                    'publish' => false
+                ]);
+            }else{
+                $this->service->update($model, [
+                    'status' => 'work',
+                ]);
+            }
+        }
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -168,9 +196,17 @@ class SmtpAccountController extends AbstractRestAPIController
 
         if($user->can_add_smtp_account == 1 || $config->value == 0)
         {
-            $model = $this->service->create(array_merge($request->all(), [
+            $model = $this->service->create(array_merge($request->except(['status', 'publish']), [
                 'user_uuid' => auth()->user()->getkey(),
             ]));
+
+            //Test smtp account khi tạo 1 smtp
+            if (!$this->service->testSmtpAccount($model)) {
+                $this->service->update($model, [
+                    'status' => 'error',
+                    'publish' => false
+                ]);
+            }
 
             return $this->sendCreatedJsonResponse(
                 $this->service->resourceToData($this->resourceClass, $model)
@@ -208,12 +244,28 @@ class SmtpAccountController extends AbstractRestAPIController
             if (empty($request->get('website_uuid')) || $model->website_uuid == $request->get('website_uuid') ||
                 !$this->service->checkExistsSmtpAccountInTables($id)) {
 
-                $data = $request->except('user_uuid');
+                $data = $request->except(['user_uuid','status','publish']);
             }else {
                 return $this->sendValidationFailedJsonResponse(["errors" => ["website_uuid" => __('messages.website_uuid_not_changed')]]);
             }
 
             $this->service->update($model, $data);
+
+            //Test smtp khi update lại smtp
+            if ($request->hasAny(['mail_mailer', 'mail_host', 'mail_port',
+                'mail_username', 'mail_password', 'smtp_mail_encryption_uuid'])) {
+                if (!$this->service->testSmtpAccount($model)) {
+                    $this->service->update($model, [
+                        'status' => 'error',
+                        'publish' => false
+                    ]);
+                }else{
+                    $this->service->update($model, [
+                        'status' => 'work',
+                        'publish' => true
+                    ]);
+                }
+            }
 
             return $this->sendOkJsonResponse(
                 $this->service->resourceToData($this->resourceClass, $model)

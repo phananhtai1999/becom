@@ -35,7 +35,9 @@ class SmtpAccount extends AbstractModel
         'mail_from_name',
         'secret_key',
         'website_uuid',
-        'user_uuid'
+        'user_uuid',
+        'status',
+        'publish'
     ];
 
     /**
@@ -47,6 +49,7 @@ class SmtpAccount extends AbstractModel
         'deleted_at' => 'datetime',
         'website_uuid' =>  'integer',
         'user_uuid' =>  'integer',
+        'publish' => 'boolean'
     ];
 
     /**
