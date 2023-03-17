@@ -16,7 +16,7 @@ class ArticleCategoryService extends AbstractService
      * @param $parentId
      * @return array
      */
-    function getChildrenCategories($parentId = null) {
+    function getArticleCategoriesPublic($parentId = null) {
 //        Cách 1
         $all_categories = [];
         $categories = $this->model->where('publish_status', ArticleCategory::PUBLISHED_PUBLISH_STATUS)->where('parent_uuid', $parentId)
@@ -24,7 +24,7 @@ class ArticleCategoryService extends AbstractService
                 'user_uuid', 'publish_status', 'parent_uuid',
                 'created_at', 'updated_at', 'deleted_at')->get();
         foreach ($categories as $cate) {
-            $cate['children'] = $this->getChildrenCategories($cate->uuid);
+            $cate['children'] = $this->getArticleCategoriesPublic($cate->uuid);
             $all_categories[] = $cate;
         }
 
@@ -35,7 +35,7 @@ class ArticleCategoryService extends AbstractService
 //        $categories = $this->model->where('publish_status' , 1)->where('parent_uuid', $parentId)->get();
 //        foreach ($categories as $cate) {
 //            $allCategory[] = $cate;
-//            $allCategory = array_merge($allCategory, $this->getChildrenCategories($cate->uuid));
+//            $allCategory = array_merge($allCategory, $this->getArticleCategoriesPublic($cate->uuid));
 //        }
 //
 //        return $allCategory;
@@ -57,6 +57,31 @@ class ArticleCategoryService extends AbstractService
             return false;
         }
         return $model;
+    }
+
+    /**
+     * @param $parentId
+     * @return array|mixed
+     */
+    public function getListArticleCategoriesPublic($parentId = null)
+    {
+        $allCategory = [];
+        $categories = $this->model->where('publish_status' , 1)->where('parent_uuid', $parentId)->get();
+        foreach ($categories as $cate) {
+            $allCategory[] = $cate;
+            $allCategory = array_merge($allCategory, $this->getListArticleCategoriesPublic($cate->uuid));
+        }
+
+        return $allCategory;
+    }
+
+    /**
+     * @return array
+     */
+    public function getListArticleCategoryUuidsPublic()
+    {
+        $articleCategoryPublic = $this->getListArticleCategoriesPublic();
+        return (collect($articleCategoryPublic)->pluck('uuid')->toArray());
     }
 
 }
