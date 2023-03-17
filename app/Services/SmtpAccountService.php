@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Abstracts\AbstractService;
+use App\Mail\SendEmails;
 use App\Models\QueryBuilders\SmtpAccountQueryBuilder;
 use App\Models\SmtpAccount;
 use Carbon\Carbon;
@@ -96,13 +97,19 @@ class SmtpAccountService extends AbstractService
 
                     return $query->where([
                         ['role_user.role_uuid', config('user.default_admin_role_uuid')],
-                        ['smtp_accounts.mail_mailer', 'smtp']
+                        ['smtp_accounts.mail_mailer', 'smtp'],
+                        ['smtp_accounts.status', 'work'],
+                        ['smtp_accounts.publish', true],
+                        ['smtp_accounts.website_uuid', null]
                     ]);
                 } else {
 
                     return $query->where([
                         ['role_user.role_uuid', config('user.default_admin_role_uuid')],
-                        ['smtp_accounts.mail_mailer', $sendTypeCampaign]
+                        ['smtp_accounts.mail_mailer', $sendTypeCampaign],
+                        ['smtp_accounts.status', 'work'],
+                        ['smtp_accounts.publish', true],
+                        ['smtp_accounts.website_uuid', null]
                     ]);
                 }
             })->inRandomOrder()->first();
@@ -268,5 +275,28 @@ class SmtpAccountService extends AbstractService
         }
 
         return $result;
+    }
+
+    /**
+     * @param $smtpAccount
+     * @return bool
+     */
+    public function testSmtpAccount($smtpAccount)
+    {
+        if ($smtpAccount->mail_mailer === 'smtp') {
+            try {
+                $subject = "Test SMTP ACCOUNT";
+                $body = "Test SMTP ACCOUNT";
+
+                $this->setSmtpAccountForSendEmail($smtpAccount);
+
+                Mail::to(config('user.email_test'))->send(new SendEmails($subject, $body));
+
+                return true;
+            }catch (\Exception $e){
+                return false;
+            }
+        }
+        return true;
     }
 }

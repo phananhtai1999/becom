@@ -97,11 +97,7 @@ class User extends Authenticatable
      */
     public function getValueAvatarDefault()
     {
-        $configDefaultAvatar = Config::where('key', 'user_default_avatar')->first();
-        if (!$configDefaultAvatar) {
-            return "";
-        }
-        return $configDefaultAvatar->value;
+        return optional(Config::where('key', 'user_default_avatar')->first())->value;
     }
 
     /**
@@ -109,7 +105,7 @@ class User extends Authenticatable
      */
     public function getCoverImgAbsoluteAttribute()
     {
-        return !empty($this->cover_img) ? Storage::disk('s3')->url($this->cover_img) : '';
+        return !empty($this->cover_img) ? Storage::disk('s3')->url($this->cover_img) : null;
     }
 
     /**

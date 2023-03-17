@@ -35,7 +35,8 @@ class UpdateSmtpAccountRequest extends AbstractRequest
             'mail_from_address' => ['required_if:mail_mailer,===,smtp', 'string'],
             'mail_from_name' => ['required_if:mail_mailer,===,smtp', 'string'],
             'secret_key' => ['required_if:mail_mailer,===,telegram,viber', 'string'],
-            'website_uuid' => ['numeric', 'min:1', 'exists:websites,uuid']
+            'website_uuid' => ['nullable', 'numeric', 'min:1', 'exists:websites,uuid'],
+            'publish' => ['boolean']
         ];
     }
 }

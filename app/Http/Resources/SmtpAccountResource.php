@@ -31,6 +31,8 @@ class SmtpAccountResource extends AbstractJsonResource
             'mail_from_name' => $this->mail_from_name,
             'secret_key' => $this->secret_key,
             'website_uuid' => $this->website_uuid,
+            'status' => $this->status,
+            'publish' => $this->publish,
             'user_uuid' => $this->user_uuid,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,

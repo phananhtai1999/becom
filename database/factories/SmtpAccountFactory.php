@@ -31,6 +31,8 @@ class SmtpAccountFactory extends Factory {
 			'secret_key' => $this->faker->lexify('key-????????'),
 			'website_uuid' => Website::inRandomOrder()->first()->uuid,
             'user_uuid' => User::inRandomOrder()->first()->uuid,
+            'status' => 'work',
+            'publish' => true
 		];
 	}
 }
