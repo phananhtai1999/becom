@@ -21,8 +21,13 @@ class ArticleService extends AbstractService
      */
     public function getArticlePublicWithPagination($perPage, $page, $columns, $pageName )
     {
+        $articleCategoryPublicByUuids = (new ArticleCategoryService())->getListArticleCategoryUuidsPublic();
         return ArticleQueryBuilder::initialQuery()
             ->where('publish_status', Article::PUBLISHED_PUBLISH_STATUS)
+            ->where(function ($query) use ($articleCategoryPublicByUuids) {
+                $query->whereIn('article_category_uuid', $articleCategoryPublicByUuids)
+                    ->orWhereNull('article_category_uuid');
+            })
             ->paginate($perPage, $columns, $pageName, $page);
     }
 
@@ -32,9 +37,13 @@ class ArticleService extends AbstractService
      */
     public function showArticlePublic($id)
     {
-        return $this->findOneWhereOrFail([
-           'uuid' => $id,
-           'publish_status' => Article::PUBLISHED_PUBLISH_STATUS
-        ]);
+        $articleCategoryPublicByUuids = (new ArticleCategoryService())->getListArticleCategoryUuidsPublic();
+        return $this->model->where([
+           ['uuid', $id],
+           ['publish_status', Article::PUBLISHED_PUBLISH_STATUS],
+        ]) ->where(function ($query) use ($articleCategoryPublicByUuids) {
+            $query->whereIn('article_category_uuid', $articleCategoryPublicByUuids)
+                ->orWhereNull('article_category_uuid');
+        })->firstOrFail();
     }
 }

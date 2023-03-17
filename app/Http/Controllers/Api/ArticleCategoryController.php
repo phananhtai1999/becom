@@ -89,7 +89,7 @@ class ArticleCategoryController extends AbstractRestAPIController
      */
     public function indexPublic()
     {
-        $data = $this->service->getChildrenCategories();
+        $data = $this->service->getArticleCategoriesPublic();
         return $this->sendOkJsonResponse(["data" => $data]);
     }
 
