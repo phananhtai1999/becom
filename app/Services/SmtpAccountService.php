@@ -98,16 +98,18 @@ class SmtpAccountService extends AbstractService
                     return $query->where([
                         ['role_user.role_uuid', config('user.default_admin_role_uuid')],
                         ['smtp_accounts.mail_mailer', 'smtp'],
-                        ['status', 'work'],
-                        ['publish', true]
+                        ['smtp_accounts.status', 'work'],
+                        ['smtp_accounts.publish', true],
+                        ['smtp_accounts.website_uuid', null]
                     ]);
                 } else {
 
                     return $query->where([
                         ['role_user.role_uuid', config('user.default_admin_role_uuid')],
                         ['smtp_accounts.mail_mailer', $sendTypeCampaign],
-                        ['status', 'work'],
-                        ['publish', true],
+                        ['smtp_accounts.status', 'work'],
+                        ['smtp_accounts.publish', true],
+                        ['smtp_accounts.website_uuid', null]
                     ]);
                 }
             })->inRandomOrder()->first();
