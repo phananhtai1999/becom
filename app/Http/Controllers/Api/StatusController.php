@@ -13,6 +13,7 @@ use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Resources\StatusResource;
 use App\Http\Resources\StatusResourceCollection;
+use App\Services\LanguageService;
 use App\Services\MyStatusService;
 use App\Services\StatusService;
 
@@ -26,16 +27,24 @@ class StatusController extends AbstractRestAPIController
     protected $myService;
 
     /**
+     * @var
+     */
+    protected $languageService;
+
+    /**
      * @param StatusService $service
      * @param MyStatusService $myService
+     * @param LanguageService $languageService
      */
     public function __construct(
         StatusService   $service,
-        MyStatusService $myService
+        MyStatusService $myService,
+        LanguageService $languageService
     )
     {
         $this->service = $service;
         $this->myService = $myService;
+        $this->languageService = $languageService;
         $this->resourceCollectionClass = StatusResourceCollection::class;
         $this->resourceClass = StatusResource::class;
         $this->storeRequest = StatusRequest::class;
@@ -51,6 +60,11 @@ class StatusController extends AbstractRestAPIController
     public function store()
     {
         $request = app($this->storeRequest);
+
+        //Allowed language
+        if (!$this->languageService->checkLanguages($request->name)) {
+            return $this->sendValidationFailedJsonResponse();
+        }
 
         $model = $this->service->create(array_merge($request->all(), [
             'user_uuid' => $request->get('user_uuid') ?? null
@@ -72,6 +86,11 @@ class StatusController extends AbstractRestAPIController
         $request = app($this->editRequest);
 
         $model = $this->service->findOrFailById($id);
+
+        //Allowed language
+        if ($request->name && !$this->languageService->checkLanguages($request->name)) {
+            return $this->sendValidationFailedJsonResponse();
+        }
 
         $this->service->update($model, array_merge($request->all(), [
             'user_uuid' => $request->get('user_uuid') ?? null
@@ -103,6 +122,11 @@ class StatusController extends AbstractRestAPIController
      */
     public function storeMyStatus(MyStatusRequest $request)
     {
+        //Allowed language
+        if (!$this->languageService->checkLanguages($request->name)) {
+            return $this->sendValidationFailedJsonResponse();
+        }
+
         $model = $this->service->create(array_merge($request->all(), [
             'user_uuid' => auth()->user()->getkey(),
         ]));
@@ -133,6 +157,11 @@ class StatusController extends AbstractRestAPIController
     public function editMyStatus(UpdateMyStatusRequest $request, $id)
     {
         $model = $this->myService->showMyStatus($id);
+
+        //Allowed language
+        if ($request->name && !$this->languageService->checkLanguages($request->name)) {
+            return $this->sendValidationFailedJsonResponse();
+        }
 
         $this->service->update($model, array_merge($request->all(), [
             'user_uuid' => auth()->user()->getkey(),

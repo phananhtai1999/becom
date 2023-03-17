@@ -13,6 +13,7 @@ use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Resources\PositionResource;
 use App\Http\Resources\PositionResourceCollection;
+use App\Services\LanguageService;
 use App\Services\MyPositionService;
 use App\Services\MyStatusService;
 use App\Services\PositionService;
@@ -27,16 +28,24 @@ class PositionController extends AbstractRestAPIController
     protected $myService;
 
     /**
+     * @var
+     */
+    protected $languageService;
+
+    /**
      * @param PositionService $service
      * @param MyPositionService $myService
+     * @param LanguageService $languageService
      */
     public function __construct(
         PositionService   $service,
-        MyPositionService $myService
+        MyPositionService $myService,
+        LanguageService $languageService
     )
     {
         $this->service = $service;
         $this->myService = $myService;
+        $this->languageService = $languageService;
         $this->resourceCollectionClass = PositionResourceCollection::class;
         $this->resourceClass = PositionResource::class;
         $this->storeRequest = PositionRequest::class;
@@ -52,6 +61,11 @@ class PositionController extends AbstractRestAPIController
     public function store()
     {
         $request = app($this->storeRequest);
+
+        //Allowed language
+        if (!$this->languageService->checkLanguages($request->name)) {
+            return $this->sendValidationFailedJsonResponse();
+        }
 
         $model = $this->service->create(array_merge($request->all(), [
             'user_uuid' => $request->get('user_uuid') ?? null
@@ -73,6 +87,11 @@ class PositionController extends AbstractRestAPIController
         $request = app($this->editRequest);
 
         $model = $this->service->findOrFailById($id);
+
+        //Allowed language
+        if ($request->name && !$this->languageService->checkLanguages($request->name)) {
+            return $this->sendValidationFailedJsonResponse();
+        }
 
         $this->service->update($model, array_merge($request->all(), [
             'user_uuid' => $request->get('user_uuid') ?? null
@@ -104,6 +123,11 @@ class PositionController extends AbstractRestAPIController
      */
     public function storeMyPosition(MyPositionRequest $request)
     {
+        //Allowed language
+        if (!$this->languageService->checkLanguages($request->name)) {
+            return $this->sendValidationFailedJsonResponse();
+        }
+
         $model = $this->service->create(array_merge($request->all(), [
             'user_uuid' => auth()->user()->getkey(),
         ]));
@@ -134,6 +158,11 @@ class PositionController extends AbstractRestAPIController
     public function editMyPosition(UpdateMyPositionRequest $request, $id)
     {
         $model = $this->myService->showMyPosition($id);
+
+        //Allowed language
+        if ($request->name && !$this->languageService->checkLanguages($request->name)) {
+            return $this->sendValidationFailedJsonResponse();
+        }
 
         $this->service->update($model, array_merge($request->all(), [
             'user_uuid' => auth()->user()->getkey(),
