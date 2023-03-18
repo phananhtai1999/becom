@@ -46,10 +46,12 @@ class UpdateMyContactRequest extends AbstractRequest
             })->whereNull('deleted_at')],
             'contact_company_position' => ['nullable', 'array', 'min:1'],
             'contact_company_position.*.company_uuid' => ['numeric', Rule::exists('companies', 'uuid')->where(function ($query) {
-                return $query->where('user_uuid', auth()->user()->getKey());
+                return $query->where('user_uuid', auth()->user()->getKey())
+                    ->orWhereNull('user_uuid');
             })->whereNull('deleted_at')],
             'contact_company_position.*.position_uuid' => ['nullable', 'numeric', Rule::exists('positions', 'uuid')->where(function ($query) {
-                return $query->where('user_uuid', auth()->user()->getKey());
+                return $query->where('user_uuid', auth()->user()->getKey())
+                    ->orWhereNull('user_uuid');
             })->whereNull('deleted_at')],
             'status_uuid' => ['numeric', 'min:1', Rule::exists('status', 'uuid')->where(function ($query) {
                 return $query->where('user_uuid', auth()->user()->getKey())

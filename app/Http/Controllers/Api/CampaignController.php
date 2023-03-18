@@ -248,7 +248,7 @@ class CampaignController extends AbstractRestAPIController
         }
 
         $model = $this->service->findOrFailById($id);
-        if (!empty($request->get('send_type')) && $model->mailTemplate->type != $request->get('send_type')) {
+        if (!empty($request->get('send_type')) && empty($request->get('mail_template_uuid')) && $model->mailTemplate->type != $request->get('send_type')) {
             return $this->sendValidationFailedJsonResponse(["errors" => ['send_type' => __('messages.send_type_campaign_error')]]);
         }
         $this->service->update($model, $request->all());
@@ -375,27 +375,37 @@ class CampaignController extends AbstractRestAPIController
         }
 
         //Check send_type and mail_template same type
-        if (!empty($request->get('send_type')) && $model->mailTemplate->type != $request->get('send_type')) {
+        if (!empty($request->get('send_type')) && empty($request->get('mail_template_uuid')) && $model->mailTemplate->type != $request->get('send_type')) {
             return $this->sendValidationFailedJsonResponse(["errors" => ['send_type' => __('messages.send_type_campaign_error')]]);
         }
 
-        //Check send_type and smtp_account same type
-        if (!empty($request->get('send_type')) && $request->get('send_type') != 'sms') {
-            if (($request->get('send_type') === 'email' && $model->smtpAccount->mail_mailer != 'smtp') ||
-                ($request->get('send_type') != 'email' && $model->smtpAccount->mail_mailer != $request->get('send_type'))
-            ) {
-                return $this->sendValidationFailedJsonResponse(["errors" => ['smtp_account' => __('messages.smtp_account_error')]]);
-            }
-        }
-
-        if (array_key_exists('smtp_account_uuid', $request->all()) && (($request->get('send_type') ?? $model->send_type) != "sms")) {
-            if (($user->can_add_smtp_account == 1 || $config->value == 0) && $request->get('send_type') != 'sms') {
+        if (array_key_exists('smtp_account_uuid', $request->all())) {
+            if (($user->can_add_smtp_account == 1 || $config->value == 0) && (($request->get('send_type') ?? $model->send_type) != "sms")) {
                 if (empty($request->get('smtp_account_uuid'))) {
                     return $this->sendValidationFailedJsonResponse(["errors" => ['smtp_account_uuid' => __('messages.smtp_account_invalid')]]);
                 }
             } else {
                 if (!empty($request->get('smtp_account_uuid'))) {
                     return $this->sendValidationFailedJsonResponse(["errors" => ['smtp_account_uuid' => __('messages.smtp_account_invalid')]]);
+                }
+            }
+        } else {
+            //Check send_type and smtp_account same type
+            if (!empty($request->get('send_type'))) {
+                if (($user->can_add_smtp_account == 1 || $config->value == 0) && (($request->get('send_type') ?? $model->send_type) != "sms")) {
+                    if (!$model->smtpAccount) {
+
+                        return $this->sendValidationFailedJsonResponse(["errors" => ['smtp_account_uuid' => __('messages.smtp_account_invalid')]]);
+                    } elseif (($request->get('send_type') === 'email' && $model->smtpAccount->mail_mailer != 'smtp') ||
+                        ($request->get('send_type') != 'email' && $model->smtpAccount->mail_mailer != $request->get('send_type'))) {
+
+                        return $this->sendValidationFailedJsonResponse(["errors" => ['smtp_account' => __('messages.smtp_account_error')]]);
+                    }
+                } else {
+                    if ($model->smtpAccount) {
+
+                        return $this->sendValidationFailedJsonResponse(["errors" => ['smtp_account_uuid' => __('messages.smtp_account_invalid')]]);
+                    }
                 }
             }
         }
