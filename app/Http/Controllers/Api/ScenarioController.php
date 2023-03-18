@@ -11,6 +11,7 @@ use App\Http\Requests\ScenarioRequest;
 use App\Http\Resources\ScenarioResourceCollection;
 use App\Services\CampaignScenarioService;
 use App\Services\CampaignService;
+use App\Services\MailSendingHistoryService;
 use App\Services\MyScenarioService;
 use App\Services\ScenarioService;
 use Illuminate\Http\Request;
@@ -29,6 +30,8 @@ class ScenarioController extends AbstractRestAPIController
      */
     protected $campaignScenarioService;
 
+    protected $mailSendingHistoryService;
+
     /**
      * @param ScenarioService $service
      * @param MyScenarioService $myService
@@ -37,13 +40,15 @@ class ScenarioController extends AbstractRestAPIController
     public function __construct(
         ScenarioService $service,
         MyScenarioService $myService,
-        CampaignScenarioService $campaignScenarioService
+        CampaignScenarioService $campaignScenarioService,
+        MailSendingHistoryService $mailSendingHistoryService
     )
     {
         $this->service = $service;
         $this->myService = $myService;
         $this->campaignScenarioService = $campaignScenarioService;
         $this->resourceCollectionClass = ScenarioResourceCollection::class;
+        $this->mailSendingHistoryService = $mailSendingHistoryService;
     }
 
     /**
@@ -337,4 +342,21 @@ class ScenarioController extends AbstractRestAPIController
         return $this->sendOkJsonResponse((['message' => __('messages.edit_scenario_success')]));
     }
 
+    /**
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function deleteMyScenario($id)
+    {
+        $myScenario = $this->myService->findMyScenarioByUuid($id);
+        $campaignScenarioRoot = $this->campaignScenarioService->getCampaignScenarioRootByScenarioUuid($myScenario->uuid);
+        if ($campaignScenarioRoot && count($this->mailSendingHistoryService->showMailSendingByCampaignScenarioUuid($campaignScenarioRoot->uuid))) {
+            return $this->sendValidationFailedJsonResponse(["errors" => ["scenario_uuid" => __('messages.scenario_running')]]);
+        }
+        if ($campaignScenarioRoot){
+            $this->campaignScenarioService->destroy($campaignScenarioRoot->uuid);
+        }
+        $this->myService->destroy($id);
+        return $this->sendOkJsonResponse();
+    }
 }

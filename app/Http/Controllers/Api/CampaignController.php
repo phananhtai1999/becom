@@ -30,6 +30,7 @@ use App\Mail\SendCampaign;
 use App\Services\CampaignDailyTrackingService;
 use App\Services\CampaignLinkDailyTrackingService;
 use App\Services\CampaignLinkTrackingService;
+use App\Services\CampaignScenarioService;
 use App\Services\CampaignService;
 use App\Services\CampaignTrackingService;
 use App\Services\ConfigService;
@@ -124,6 +125,8 @@ class CampaignController extends AbstractRestAPIController
      */
     protected $configService;
 
+    protected $campaignScenarioService;
+
     /**
      * @param CampaignService $service
      * @param MyCampaignService $myService
@@ -157,7 +160,8 @@ class CampaignController extends AbstractRestAPIController
         MailSendingHistoryService        $mailSendingHistoryService,
         ContactService                   $contactService,
         UserService                      $userService,
-        ConfigService                    $configService
+        ConfigService                    $configService,
+        CampaignScenarioService          $campaignScenarioService
     )
     {
         $this->service = $service;
@@ -180,6 +184,7 @@ class CampaignController extends AbstractRestAPIController
         $this->contactService = $contactService;
         $this->userService = $userService;
         $this->configService = $configService;
+        $this->campaignScenarioService = $campaignScenarioService;
     }
 
     /**
@@ -280,6 +285,21 @@ class CampaignController extends AbstractRestAPIController
             'failed_count' => $failedCount,
             'opened_count' => $openedCount
         ])]);
+    }
+
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
+    public function destroy($id)
+    {
+        $model = $this->service->findOrFailById($id);
+        if (count($this->campaignScenarioService->showCampaignScenarioByCampaignUuid($model->uuid))) {
+            return $this->sendValidationFailedJsonResponse(["errors" => ["campaign_uuid" => __('messages.campaign_in_scenario')]]);
+        }
+        $this->service->destroy($id);
+
+        return $this->sendOkJsonResponse();
     }
 
     /**
@@ -428,7 +448,11 @@ class CampaignController extends AbstractRestAPIController
      */
     public function destroyMyCampaign($id)
     {
-        $this->myService->deleteMyCampaignByKey($id);
+        $model = $this->myService->findMyCampaignByKeyOrAbort($id);
+        if (count($this->campaignScenarioService->showCampaignScenarioByCampaignUuid($model->uuid))) {
+            return $this->sendValidationFailedJsonResponse(["errors" => ["campaign_uuid" => __('messages.campaign_in_scenario')]]);
+        }
+        $this->service->destroy($id);
 
         return $this->sendOkJsonResponse();
     }

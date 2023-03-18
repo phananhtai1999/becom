@@ -51,5 +51,7 @@ return array(
     'smtp_account_error' => 'Vui lòng nhập giống với loại của tài khoản smtp.',
     'smtp_smtp_account_invalid' => 'Không có tài khoản smtp trong hệ thống với loại email',
     'telegram_smtp_account_invalid' => 'Không có tài khoản smtp trong hệ thống với loại telegram',
-    'viber_smtp_account_invalid' => 'Không có tài khoản smtp trong hệ thống với loại viber'
+    'viber_smtp_account_invalid' => 'Không có tài khoản smtp trong hệ thống với loại viber',
+    'scenario_running' => 'Chiến dịch kịch bản đang hoạt động.',
+    'campaign_in_scenario' => 'Chiến dịch nằm trong chiến dịch kịch bản.'
 );

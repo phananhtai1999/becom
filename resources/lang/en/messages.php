@@ -54,5 +54,7 @@ return array(
     'smtp_account_error' => 'Please enter the same type of smtp account.',
     'smtp_smtp_account_invalid' => 'Haven\'t SMTP account in the system with email type',
     'telegram_smtp_account_invalid' => 'Haven\'t SMTP account in the system with telegram type',
-    'viber_smtp_account_invalid' => 'Haven\'t SMTP account in the system with viber type'
+    'viber_smtp_account_invalid' => 'Haven\'t SMTP account in the system with viber type',
+    'scenario_running' => 'The scenario campaign is working.',
+    'campaign_in_scenario' => 'The campaign is in the scenario campaign.'
 );

@@ -51,5 +51,7 @@ return array(
     'smtp_account_error' => 'Veuillez entrer le même type de compte smtp.',
     'smtp_smtp_account_invalid' => 'Il n\'y a pas de compte SMTP dans le système avec le type de courrier électronique',
     'telegram_smtp_account_invalid' => 'Il n\'y a pas de compte SMTP dans le système avec le type de télégramme',
-    'viber_smtp_account_invalid' => 'Il n\'y a pas de compte SMTP dans le système avec le type viber'
+    'viber_smtp_account_invalid' => 'Il n\'y a pas de compte SMTP dans le système avec le type viber',
+    'scenario_running' => 'La campagne Scénario fonctionne',
+    'campaign_in_scenario' => 'La campagne est dans le scénario campagne'
 );
