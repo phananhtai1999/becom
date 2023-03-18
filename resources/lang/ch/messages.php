@@ -51,5 +51,7 @@ return array(
     'smtp_account_error' => '请输入相同的帐号类型 smtp.',
     'smtp_smtp_account_invalid' => '系统中没有电子邮件类型的 SMTP 帐户',
     'telegram_smtp_account_invalid' => '系统中没有telegram类型的SMTP账号',
-    'viber_smtp_account_invalid' => '系统没有viber类型的SMTP账号'
+    'viber_smtp_account_invalid' => '系统没有viber类型的SMTP账号',
+    'scenario_running' => '场景活动正在运作',
+    'campaign_in_scenario' => '该活动在场景活动中。'
 );

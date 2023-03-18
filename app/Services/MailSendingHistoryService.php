@@ -236,4 +236,9 @@ class MailSendingHistoryService extends AbstractService
         //Kiểm tra trường hợp not open chưa tồn tại trong mailsendinghistory
 
     }
+
+    public function showMailSendingByCampaignScenarioUuid($campaignScenarioUuid)
+    {
+        return $this->model->where('campaign_scenario_uuid', $campaignScenarioUuid)->whereNotIn('status', ["fail"])->get();
+    }
 }

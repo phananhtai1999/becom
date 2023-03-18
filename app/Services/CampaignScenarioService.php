@@ -77,4 +77,18 @@ class CampaignScenarioService extends AbstractService
             ['type', "not_open"]
         ])->first();
     }
+
+    /**
+     * @param $scenarioUuid
+     * @return mixed
+     */
+    public function showCampaignScenarioByCampaignUuid($campaignUuid)
+    {
+        return $this->model->where('campaign_uuid', $campaignUuid)->get();
+    }
+
+    public function getCampaignScenarioRootByScenarioUuid($scenarioUuid)
+    {
+        return $this->model->where('scenario_uuid', $scenarioUuid)->whereNull('parent_uuid')->first();
+    }
 }

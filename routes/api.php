@@ -490,6 +490,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'scenario.'], function () {
         Route::post('my/scenario', [ScenarioController::class, 'storeMyScenario'])->name('storeMyScenario');
         Route::get('my/scenario/{id}', [ScenarioController::class, 'showMyScenario'])->name('showMyScenario');
         Route::put('my/scenario/{id}', [ScenarioController::class, 'editMyScenario'])->name('editMyScenario');
+        Route::delete('my/scenario/{id}', [ScenarioController::class, 'deleteMyScenario'])->name('editMyScenario');
     });
 });
 
