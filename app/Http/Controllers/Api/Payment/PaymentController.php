@@ -19,7 +19,9 @@ use App\Services\PlatformPackageService;
 use App\Services\StripeService;
 use App\Services\SubscriptionPlanService;
 use App\Services\UserCreditHistoryService;
+use App\Services\UserPlatformPackageService;
 use App\Services\UserService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -35,7 +37,8 @@ class PaymentController extends AbstractRestAPIController
         CreditPackageService        $creditPackageService,
         CreditPackageHistoryService $creditPackageHistoryService,
         SubscriptionHistoryService  $subscriptionHistoryService,
-        UserCreditHistoryService    $userCreditHistoryService
+        UserCreditHistoryService    $userCreditHistoryService,
+        UserPlatformPackageService $userPlatformPackageService
     )
     {
         $this->paypalService = $paypalService;
@@ -49,6 +52,7 @@ class PaymentController extends AbstractRestAPIController
         $this->creditPackageHistoryResourceCollection = CreditPackageHistoryResourceCollection::class;
         $this->subscriptionPlanResourceCollection = SubscriptionHistoryResourceCollection::class;
         $this->userCreditHistoryService = $userCreditHistoryService;
+        $this->userPlatformPackageService = $userPlatformPackageService;
     }
 
     public function topUp(PaymentRequest $request)
@@ -125,5 +129,26 @@ class PaymentController extends AbstractRestAPIController
 
         return $this->sendOkJsonResponse(
             $this->subscriptionHistoryService->resourceCollectionToData($this->subscriptionPlanResourceCollection, $subscriptionHistory));
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function cancelSubscription() {
+        $currentSubscriptionHistory = $this->subscriptionHistoryService->currentSubscriptionHistory();
+        $userPlatformPackage = $this->userPlatformPackageService->findOneWhere(['user_uuid' => auth()->user()->getKey()]);
+        try {
+            if ($currentSubscriptionHistory->payment_method_uuid == PaymentMethod::PAYPAL) {
+                $this->paypalService->cancelSubscription($currentSubscriptionHistory->logs['id']);
+            } else {
+                $this->stripeService->cancelSubscription($currentSubscriptionHistory->logs['id']);
+            }
+            $this->userPlatformPackageService->update($userPlatformPackage, ['auto_renew' => false]);
+
+            return $this->sendOkJsonResponse(['message' => 'Successfully']);
+        } catch (\Exception $exception) {
+
+            return $this->sendBadRequestJsonResponse(['message' => $exception->getMessage()]);
+        }
     }
 }
