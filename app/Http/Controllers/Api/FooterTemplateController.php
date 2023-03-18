@@ -90,7 +90,7 @@ class FooterTemplateController extends AbstractRestAPIController
 
             return $this->sendOkJsonResponse();
         }
-        return $this->sendValidationFailedJsonResponse(["errors" => ["deleted_uuid" => __('messages.data_not_deleted')]]);return $this->sendValidationFailedJsonResponse();
+        return $this->sendValidationFailedJsonResponse(["errors" => ["deleted_uuid" => __('messages.data_not_deleted')]]);
     }
 
     /**
@@ -151,6 +151,6 @@ class FooterTemplateController extends AbstractRestAPIController
 
             return $this->sendOkJsonResponse();
         }
-        return $this->sendValidationFailedJsonResponse(["errors" => ["deleted_uuid" => __('messages.data_not_deleted')]]);return $this->sendValidationFailedJsonResponse();
+        return $this->sendValidationFailedJsonResponse(["errors" => ["deleted_uuid" => __('messages.data_not_deleted')]]);
     }
 }
