@@ -47,7 +47,6 @@ class SmtpAccountSeeder extends Seeder
         $user = User::where('email', 'user1@sendemail.techupcorp')->first();
 
         foreach ($smtpAccountsAdminRanDom as $smtpAccount) {
-            $website = Website::where('user_uuid', $admin->uuid)->inRandomOrder()->first();
             $smtpAdmin = SmtpAccount::where([
                 ['mail_mailer', $smtpAccount['mail_mailer']],
                 ['user_uuid', $admin->uuid]
@@ -56,7 +55,7 @@ class SmtpAccountSeeder extends Seeder
                 SmtpAccount::factory()->create([
                     "mail_mailer"=> $smtpAccount['mail_mailer'],
                     "user_uuid"=> $admin->uuid,
-                    'website_uuid' => $website->uuid
+                    'website_uuid' => null
                 ]);
             }
         }

@@ -63,6 +63,10 @@ class ArticleCategoryQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__user.username', 'user.username'),
                 'user.email',
                 AllowedFilter::exact('exact__user.email', 'user.email'),
+                'created_at',
+                AllowedFilter::exact('exact__created_at', 'created_at'),
+                'updated_at',
+                AllowedFilter::exact('exact__updated_at', 'updated_at'),
                 AllowedFilter::scope('category_root'),
                 AllowedFilter::scope('title'),
             ]);
