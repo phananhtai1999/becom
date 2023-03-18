@@ -15,6 +15,14 @@ use Stripe\StripeClient;
 class StripeService extends AbstractService
 {
     /**
+     * @return StripeClient
+     */
+    public function getStripeClient(): StripeClient
+    {
+        return new StripeClient(env('STRIPE_SECRET_KEY'));
+    }
+
+    /**
      * @param $totalPriceCart
      * @param $order
      * @param $request
@@ -22,7 +30,7 @@ class StripeService extends AbstractService
      */
     public function processTransaction($creditPackage, $userUuid, $request)
     {
-        $stripe = new StripeClient(config('payment.stripe.client_secret'));
+        $stripe = $this->getStripeClient();
 
         try {
 //            $checkout_session = $stripe->checkout->sessions->create([
@@ -62,7 +70,7 @@ class StripeService extends AbstractService
 
             return [
                 'status' => true,
-                'redirect_url' => env('FRONTEND_URL') . 'my/profile/top-up/success?go_back_url='. $request['go_back_url'] .'&package_id=' . $creditPackage->uuid
+                'redirect_url' => env('FRONTEND_URL') . 'my/profile/top-up/success?go_back_url=' . $request['go_back_url'] . '&package_id=' . $creditPackage->uuid
             ];
 
         } catch (InvalidRequestException|Exception $e) {
@@ -76,15 +84,16 @@ class StripeService extends AbstractService
 
     public function createProduct($request)
     {
-        $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+        $stripe = $this->getStripeClient();
 
         return $stripe->products->create([
             'name' => $request->uuid,
         ]);
     }
+
     public function disableProduct($id)
     {
-        $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+        $stripe = $this->getStripeClient();
 
         return $stripe->products->update($id, [
             'active' => false,
@@ -93,7 +102,7 @@ class StripeService extends AbstractService
 
     public function createPlan($productID, $request, $price)
     {
-        $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+        $stripe = $this->getStripeClient();
 
         $product = $stripe->products->retrieve($productID);
         $plan = $stripe->plans->create([
@@ -111,7 +120,7 @@ class StripeService extends AbstractService
 
     public function processSubscription($subscriptionPlan, $subscriptionDate, $expirationDate, $plan, $request)
     {
-        $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+        $stripe = $this->getStripeClient();
 
         try {
             $token = $stripe->tokens->create([
@@ -161,7 +170,7 @@ class StripeService extends AbstractService
 
             return [
                 'status' => true,
-                'redirect_url' => env('FRONTEND_URL') . 'my/profile/upgrade/success?go_back_url='. $request['go_back_url'] .'&plan_id=' . $subscriptionPlan->uuid
+                'redirect_url' => env('FRONTEND_URL') . 'my/profile/upgrade/success?go_back_url=' . $request['go_back_url'] . '&plan_id=' . $subscriptionPlan->uuid
             ];
         } catch (\Exception $e) {
 
@@ -172,4 +181,14 @@ class StripeService extends AbstractService
         }
     }
 
+    /**
+     * @param $id
+     * @return void
+     * @throws \Stripe\Exception\ApiErrorException
+     */
+    public function cancelSubscription($id)
+    {
+        $stripe = $this->getStripeClient();
+        $stripe->subscriptions->cancel($id);
+    }
 }

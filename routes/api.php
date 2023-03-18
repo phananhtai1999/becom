@@ -597,6 +597,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'payment.'], function () {
     Route::post('/upgrade-user', [PaymentController::class, 'upgradeUser']);
     Route::get('/top-up-history', [PaymentController::class, 'topUpHistory']);
     Route::get('/subscription-history', [PaymentController::class, 'subscriptionHistory']);
+    Route::get('/cancel-subscription', [PaymentController::class, 'cancelSubscription']);
 });
 
 Route::get('/paypal/success-payment', [PaypalController::class, 'successPayment'])->name('paypal.successPayment');

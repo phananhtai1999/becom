@@ -185,4 +185,15 @@ class PaypalService extends AbstractService
             ];
         }
     }
+
+    /**
+     * @param mixed $id
+     * @return void
+     * @throws Throwable
+     */
+    public function cancelSubscription($id)
+    {
+        $provider = $this->accessServer();
+        $provider->cancelSubscription($id, 'Cancel Subscription');
+    }
 }
