@@ -310,7 +310,7 @@ class SmtpAccountService extends AbstractService
     public function getSmtpAccountDefaultWithPagination($perPage, $page, $columns, $pageName, $search, $searchBy)
     {
         return SmtpAccountQueryBuilder::searchQuery($search, $searchBy)
-            ->where('is_default', true)
+            ->whereNull('website_uuid')
             ->paginate($perPage, $columns, $pageName, $page);
     }
 }
