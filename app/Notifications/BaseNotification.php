@@ -172,6 +172,7 @@ class BaseNotification
                     'log' => $e->getMessage()
                 ]);
             }
+            //Activity histories
             ActivityHistoryOfSendByCampaignEvent::dispatch($mailSendingHistory, $this->campaign->send_type, $contact->uuid);
         }
 

@@ -2,7 +2,6 @@
 
 namespace App\Listeners;
 
-use App\Events\ActivityHistoryEvent;
 use App\Events\ActivityHistoryOfSendByCampaignEvent;
 use App\Services\ActivityHistoryService;
 
@@ -33,28 +32,20 @@ class ActivityHistoryOfSendByCampaignListener
 
         if ($type === 'email') {
             $sendType = 'email';
-            $sendTypeTranslate = 'thư';
         } else {
             $sendType = 'messages';
-            $sendTypeTranslate = 'tin nhắn';
         }
 
         if ($mailSendingHistories->status === 'sent') {
             $status = 'success';
-            $statusTranslate = 'thành công';
-            $messages = "You sent $sendType to $mailSendingHistories->email $status at $mailSendingHistories->created_at";
-            $messagesTranslate = "Bạn đã gửi $sendTypeTranslate đến $mailSendingHistories->email $statusTranslate lúc $mailSendingHistories->created_at";
         } elseif ($mailSendingHistories->status === 'fail') {
             $status = 'failed';
-            $statusTranslate = 'thất bại';
-            $messages = "You sent $sendType to $mailSendingHistories->email $status at $mailSendingHistories->created_at";
-            $messagesTranslate = "Bạn đã gửi $sendTypeTranslate đến $mailSendingHistories->email $statusTranslate lúc $mailSendingHistories->created_at";
         }
 
         $this->activityHistoryService->create([
             'type' => $type,
             'type_id' => $mailSendingHistories->uuid,
-            'content' => ['en' => $messages, 'vi' => $messagesTranslate],
+            'content' => ['langkey' => 'sent', 'send_type' => $sendType, 'email' => $mailSendingHistories->email, 'status' => $status, 'date' => $mailSendingHistories->created_at],
             'date' => $mailSendingHistories->created_at,
             'contact_uuid' => $contactUuid,
         ]);
