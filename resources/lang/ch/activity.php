@@ -7,4 +7,5 @@ return array(
     'created.remind' => '您在 :date 为 :contact 创建了提醒',
     'updated.remind' => '您在 :date 更新了 :contact 的提醒',
     'deleted.remind' => '您在 :date 删除了 :contact 的提醒',
+    'sent' => '您在 :date 将 :send_type 发送到 :email :status',
 );
