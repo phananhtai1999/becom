@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
-use App\Events\SendByCampaginRootScenarioEvent;
+use App\Events\SendByCampaignRootScenarioEvent;
 use App\Events\SendByCampaignEvent;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Requests\CampaignLinkTrackingRequest;
@@ -631,7 +631,7 @@ class CampaignController extends AbstractRestAPIController
             $creditNumberSendEmail = $campaign->number_credit_needed_to_start_campaign * ($campaignRootScenario->count() > 0 ? $campaignRootScenario->count() : 1);
             if ($this->userService->checkCredit($creditNumberSendEmail, $campaign->user_uuid)) {
                 if ($campaignRootScenario->count()) {
-                    SendByCampaginRootScenarioEvent::dispatch($campaign, $creditNumberSendEmail, $campaignRootScenario);
+                    SendByCampaignRootScenarioEvent::dispatch($campaign, $creditNumberSendEmail, $campaignRootScenario);
                 } else {
                     SendByCampaignEvent::dispatch($campaign, $creditNumberSendEmail);
                 }
