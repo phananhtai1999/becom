@@ -299,4 +299,18 @@ class SmtpAccountService extends AbstractService
         }
         return true;
     }
+
+    /**
+     * @param $perPage
+     * @param $page
+     * @param $columns
+     * @param $pageName
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     */
+    public function getSmtpAccountDefaultWithPagination($perPage, $page, $columns, $pageName, $search, $searchBy)
+    {
+        return SmtpAccountQueryBuilder::searchQuery($search, $searchBy)
+            ->where('is_default', true)
+            ->paginate($perPage, $columns, $pageName, $page);
+    }
 }

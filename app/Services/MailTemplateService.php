@@ -36,9 +36,9 @@ class MailTemplateService extends AbstractService
      * @param $pageName
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function getMailTemplateDefaultWithPagination($publishedStatus, $perPage, $page, $columns, $pageName)
+    public function getMailTemplateDefaultWithPagination($publishedStatus, $perPage, $page, $columns, $pageName, $search, $searchBy)
     {
-        return MailTemplateQueryBuilder::initialQuery()
+        return MailTemplateQueryBuilder::searchQuery($search, $searchBy)
             ->where('publish_status', $publishedStatus)
             ->whereNull('website_uuid')
             ->paginate($perPage, $columns, $pageName, $page);

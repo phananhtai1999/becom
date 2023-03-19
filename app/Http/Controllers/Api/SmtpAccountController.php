@@ -365,4 +365,24 @@ class SmtpAccountController extends AbstractRestAPIController
             'data' => config('mailmailer')
         ]);
     }
+
+    /***
+     * @param IndexRequest $request
+     * @return JsonResponse
+     */
+    public function getDefault(IndexRequest $request)
+    {
+        $models = $this->service->getSmtpAccountDefaultWithPagination(
+            $request->get('per_page', '15'),
+            $request->get('page', '1'),
+            $request->get('columns', '*'),
+            $request->get('page_name', 'page'),
+            $request->get('search'),
+            $request->get('search_by'),
+        );
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+        );
+    }
 }
