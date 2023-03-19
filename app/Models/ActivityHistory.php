@@ -10,7 +10,7 @@ use Spatie\Translatable\HasTranslations;
 
 class ActivityHistory extends AbstractModel
 {
-    use HasFactory, SoftDeletes, HasTranslations;
+    use HasFactory, SoftDeletes;
 
     /**
      * @var string
@@ -32,11 +32,6 @@ class ActivityHistory extends AbstractModel
         'date',
         'contact_uuid'
     ];
-
-    /**
-     * @var string[]
-     */
-    public $translatable = ['content'];
 
     /**
      * @var string[]

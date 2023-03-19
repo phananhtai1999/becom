@@ -46,7 +46,7 @@ class Note extends AbstractModel
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function notes()
+    public function contact()
     {
         return $this->belongsTo(Contact::class, 'contact_uuid', 'uuid');
     }
