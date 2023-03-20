@@ -64,6 +64,10 @@ class ArticleQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__article_category_uuid', 'article_category_uuid'),
                 'publish_status',
                 AllowedFilter::exact('exact__publish_status', 'publish_status'),
+                'created_at',
+                AllowedFilter::exact('exact__created_at', 'created_at'),
+                'updated_at',
+                AllowedFilter::exact('exact__updated_at', 'updated_at'),
                 'user.username',
                 AllowedFilter::exact('exact__user.username', 'user.username'),
                 'user.email',
@@ -71,6 +75,10 @@ class ArticleQueryBuilder extends AbstractQueryBuilder
                 'articleCategory.title',
                 AllowedFilter::exact('exact__articleCategory.title', 'articleCategory.title'),
                 AllowedFilter::scope('title'),
+                AllowedFilter::scope('from__created_at'),
+                AllowedFilter::scope('to__created_at'),
+                AllowedFilter::scope('from__updated_at'),
+                AllowedFilter::scope('to__updated_at'),
             ]);
 
     }

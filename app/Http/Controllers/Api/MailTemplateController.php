@@ -310,6 +310,8 @@ class MailTemplateController extends AbstractRestAPIController
             $request->get('page', '1'),
             $request->get('columns', '*'),
             $request->get('page_name', 'page'),
+            $request->get('search'),
+            $request->get('search_by'),
         );
 
         return $this->sendOkJsonResponse(
