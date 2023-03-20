@@ -4,6 +4,7 @@ namespace App\Listeners;
 
 use App\Events\ActivityHistoryOfSendByCampaignEvent;
 use App\Services\ActivityHistoryService;
+use App\Services\ContactService;
 
 class ActivityHistoryOfSendByCampaignListener
 {
@@ -13,11 +14,21 @@ class ActivityHistoryOfSendByCampaignListener
     public $activityHistoryService;
 
     /**
-     * @param ActivityHistoryService $activityHistoryService
+     * @var ContactService
      */
-    public function __construct(ActivityHistoryService $activityHistoryService)
+    public $contactService;
+
+    /**
+     * @param ActivityHistoryService $activityHistoryService
+     * @param ContactService $contactService
+     */
+    public function __construct(
+        ActivityHistoryService $activityHistoryService,
+        ContactService         $contactService
+    )
     {
         $this->activityHistoryService = $activityHistoryService;
+        $this->contactService = $contactService;
     }
 
     /**
@@ -28,7 +39,6 @@ class ActivityHistoryOfSendByCampaignListener
     {
         $mailSendingHistories = $event->model;
         $type = $event->type;
-        $contactUuid = $event->contact;
 
         if ($type === 'email') {
             $sendType = 'email';
@@ -36,17 +46,21 @@ class ActivityHistoryOfSendByCampaignListener
             $sendType = 'messages';
         }
 
-        if ($mailSendingHistories->status === 'sent') {
-            $status = 'success';
-        } elseif ($mailSendingHistories->status === 'fail') {
-            $status = 'failed';
+        if ($mailSendingHistories->status === 'sent' || $mailSendingHistories->status === 'fail') {
+            $contactUuid = $event->contact;
+            $date = $mailSendingHistories->created_at;
+            $content = ['langkey' => $mailSendingHistories->status === 'sent' ? 'sent.success' : 'sent.failed', 'send_type' => $sendType, 'email' => $mailSendingHistories->email, 'status' => $mailSendingHistories->status === 'sent' ? 'success' : 'failed', 'date' => $mailSendingHistories->created_at];
+        } elseif ($mailSendingHistories->status === 'opened') {
+            $contactUuid = $this->contactService->getContactByCampaignTypeEmail($mailSendingHistories->campaign->uuid, $mailSendingHistories->email)->toArray()[0]['uuid'];
+            $date = $mailSendingHistories->updated_at;
+            $content = ['langkey' => 'opened', 'email' => $mailSendingHistories->email, 'date' => $mailSendingHistories->updated_at];
         }
 
         $this->activityHistoryService->create([
             'type' => $type,
             'type_id' => $mailSendingHistories->uuid,
-            'content' => ['langkey' => 'sent', 'send_type' => $sendType, 'email' => $mailSendingHistories->email, 'status' => $status, 'date' => $mailSendingHistories->created_at],
-            'date' => $mailSendingHistories->created_at,
+            'content' => $content,
+            'date' => $date,
             'contact_uuid' => $contactUuid,
         ]);
     }
