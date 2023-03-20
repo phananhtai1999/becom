@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Config;
+use App\Models\Group;
 use Illuminate\Database\Seeder;
 
 class ConfigSeeder extends Seeder
@@ -17,7 +18,7 @@ class ConfigSeeder extends Seeder
         $configs = [
             [
                 'key' => 'smtp_auto',
-                'value' => false,
+                'value' => 1,
                 'type' => 'boolean',
                 'group_id' => 1
             ],
@@ -66,13 +67,13 @@ class ConfigSeeder extends Seeder
             [
                 'key' => 'logo',
                 'value' => 'https://file.storage.techupzone.com/linkstar-stg/public/upload/c690285d-4348-4ba4-b982-1e12d2334a5f_1677036055.png',
-                'type' => 'string',
+                'type' => 'image',
                 'group_id' => 1
             ],
             [
                 'key' => 'favicon_icon',
                 'value' => 'https://file.storage.techupzone.com/linkstar-stg/public/upload/c690285d-4348-4ba4-b982-1e12d2334a5f_1677036055.png',
-                'type' => 'string',
+                'type' => 'image',
                 'group_id' => 1
 
             ],
@@ -115,9 +116,23 @@ class ConfigSeeder extends Seeder
             [
                 'key' => 'user_default_avatar',
                 'value' => 'https://file.storage.techupzone.com/linkstar-stg/public/upload/f1846881-7c9c-4d4a-84e7-77436444f6c1_1678936901.jpg',
-                'type' => 'string',
+                'type' => 'image',
                 'group_id' => 1
-            ]
+            ],
+            [
+                'key' => 'smtp_account',
+                'value' => [
+                    'mail_host' => 'smtp.mailtrap.io',
+                    'mail_port' => 2525,
+                    'mail_username' => '42ba760e85ce70',
+                    'mail_password' => 'e1357279191d55',
+                    'mail_encryption' => 'tls',
+                    'mail_from_address' => 'Admin123@techupcorp.com',
+                    'mail_from_name' => 'Sending Email',
+                ],
+                'type' => 'array',
+                'group_id' => 1
+            ],
         ];
 
         foreach ($configs as $config) {

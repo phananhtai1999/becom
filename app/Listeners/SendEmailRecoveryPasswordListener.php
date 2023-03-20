@@ -4,6 +4,8 @@ namespace App\Listeners;
 
 use App\Events\SendEmailRecoveryPasswordEvent;
 use App\Mail\SendRecoveryPasswordEmailToUser;
+use App\Services\ConfigService;
+use App\Services\SmtpAccountService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 use App\Services\UserService;
@@ -22,6 +24,9 @@ class SendEmailRecoveryPasswordListener
      */
     private $passwordResetService;
 
+    private $smtpAccountService;
+
+    private $configService;
     /**
      * Create the event listener.
      *
@@ -30,11 +35,15 @@ class SendEmailRecoveryPasswordListener
      */
     public function __construct(
         UserService $userService,
-        PasswordResetService $passwordResetService
+        PasswordResetService $passwordResetService,
+        SmtpAccountService $smtpAccountService,
+        ConfigService $configService
     )
     {
         $this->userService = $userService;
         $this->passwordResetService = $passwordResetService;
+        $this->smtpAccountService = $smtpAccountService;
+        $this->configService = $configService;
     }
 
     /**
@@ -47,6 +56,10 @@ class SendEmailRecoveryPasswordListener
     public function handle(SendEmailRecoveryPasswordEvent $event)
     {
         $user = $event->user;
+
+        $smtpAccountConfig = $this->configService->findOneWhere([
+            'key' => 'smtp_account'
+        ]);
 
         $passwordReset = $this->passwordResetService->findOneWhere([[
             'email', $user->email
@@ -62,6 +75,7 @@ class SendEmailRecoveryPasswordListener
             'created_at' => Carbon::now()
         ]);
 
+        $this->smtpAccountService->setSmtpAccountForSendEmail($smtpAccountConfig->value);
         Mail::to($user->email)->send(new SendRecoveryPasswordEmailToUser($user, $passwordReset));
     }
 }

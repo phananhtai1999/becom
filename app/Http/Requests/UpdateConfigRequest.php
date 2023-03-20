@@ -27,7 +27,7 @@ class UpdateConfigRequest extends AbstractRequest
         $validate = [
             'key' => ['string', 'unique:configs,key,'.$this->id .',uuid,deleted_at,NULL'],
             'value' => ['nullable', 'string'],
-            'type' => ['in:image,boolean,number,string'],
+            'type' => ['in:image,boolean,number,string,array'],
             'default_value' => ['nullable', 'string'],
             'group_id' => ['numeric', 'min:1', Rule::exists('groups', 'uuid')->whereNull('deleted_at')],
         ];
@@ -41,6 +41,9 @@ class UpdateConfigRequest extends AbstractRequest
         } elseif ($this->request->get('type') === 'number') {
 
             $validate['value'] = ['nullable', 'numeric'];
+        } elseif ($this->request->get('type') === 'array') {
+
+            $validate['value'] = ['array'];
         }
 
         return $validate;
