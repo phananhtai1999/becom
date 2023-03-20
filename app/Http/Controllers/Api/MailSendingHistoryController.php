@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
+use App\Events\ActivityHistoryOfSendByCampaignEvent;
 use App\Events\SendNextByScenarioCampaignEvent;
 use App\Http\Controllers\Traits\RestIndexMyTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
@@ -112,8 +113,8 @@ class MailSendingHistoryController extends AbstractRestAPIController
         $statusMailSendingHistory = $mailSendingHistory->status;
         if ($statusMailSendingHistory !== "opened") {
             $this->service->update($mailSendingHistory, ['status' => 'opened']);
+            ActivityHistoryOfSendByCampaignEvent::dispatch($mailSendingHistory, $mailSendingHistory->campaign->send_type, null);
         }
-
         if ($mailSendingHistory->campaign_scenario_uuid) {
             $campaignScenario = $this->campaignScenarioService->findOneById($mailSendingHistory->campaign_scenario_uuid);        //Add 1 point when open mail
             //Add 1 point when open mail or phone
@@ -123,7 +124,7 @@ class MailSendingHistoryController extends AbstractRestAPIController
                     && ($nextCampaign = $this->campaignService->checkActiveCampaignScenario($nextCampaignScenario->campaign_uuid))) {
                     if ($nextCampaign->send_type === "email") {
                         $contactOpenMail = $this->contactService->getContactByCampaignTypeEmail($nextCampaignScenario->getRoot()->campaign_uuid, $mailSendingHistory->email);
-                    } elseif ($nextCampaign->send_type === "sms") {
+                    } else {
                         $contactOpenMail = $this->contactService->getContactByCampaignTypeSms($nextCampaignScenario->getRoot()->campaign_uuid, $mailSendingHistory->email);
                     }
                     SendNextByScenarioCampaignEvent::dispatch($nextCampaign, $contactOpenMail, $nextCampaignScenario);

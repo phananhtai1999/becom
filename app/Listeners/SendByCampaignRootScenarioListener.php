@@ -2,7 +2,7 @@
 
 namespace App\Listeners;
 
-use App\Events\SendByCampaginRootScenarioEvent;
+use App\Events\SendByCampaignRootScenarioEvent;
 use App\Notifications\BaseNotification;
 use App\Services\CampaignService;
 use App\Services\ConfigService;
@@ -16,7 +16,7 @@ use App\Services\SmtpAccountService;
 use App\Services\UserService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class SendByCampaginRootScenarioListener implements ShouldQueue
+class SendByCampaignRootScenarioListener implements ShouldQueue
 {
     /**
      * @var MailTemplateVariableService
@@ -121,11 +121,11 @@ class SendByCampaginRootScenarioListener implements ShouldQueue
     }
 
     /**
-     * @param SendByCampaginRootScenarioEvent $event
+     * @param SendByCampaignRootScenarioEvent $event
      * @return void
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
-    public function handle(SendByCampaginRootScenarioEvent $event)
+    public function handle(SendByCampaignRootScenarioEvent $event)
     {
         $campaign = $event->campaign;
         $campaignRootScenario = $event->campaignRootScenario;

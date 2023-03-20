@@ -159,7 +159,8 @@ class EmailNotification extends BaseNotification
             'email' => $contact->email,
             'campaign_uuid' => $this->campaign->uuid,
             'campaign_scenario_uuid' => $scenario,
-            'time' => Carbon::now()
+            'time' => Carbon::now(),
+            'status' => 'sent'
         ]);
     }
 

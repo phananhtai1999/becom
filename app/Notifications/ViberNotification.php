@@ -69,6 +69,7 @@ class ViberNotification extends BaseNotification {
      * @param CreditHistoryService $creditHistoryService
      * @param MailSendingHistoryService $mailSendingHistoryService
      * @param MailTemplateVariableService $mailTemplateVariableService
+     * @param FooterTemplateService $footerTemplateService
      */
     public function __construct(
         $campaign,
@@ -153,7 +154,8 @@ class ViberNotification extends BaseNotification {
             'email' => $contact->phone,
             'campaign_uuid' => $this->campaign->uuid,
             'campaign_scenario_uuid' => $scenario,
-            'time' => Carbon::now()
+            'time' => Carbon::now(),
+            'status' => 'sent'
         ]);
     }
 
