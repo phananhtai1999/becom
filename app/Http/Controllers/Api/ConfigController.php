@@ -12,17 +12,24 @@ use App\Http\Resources\ConfigResourceCollection;
 use App\Http\Resources\ConfigResource;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
+use App\Mail\SendEmails;
 use App\Services\ConfigService;
+use App\Services\SmtpAccountService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Mail;
 
 class ConfigController extends AbstractRestAPIController
 {
     use RestIndexTrait, RestShowTrait;
 
+    protected $smtpAccountService;
     /**
      * @param ConfigService $service
      */
-    public function __construct(ConfigService $service)
+    public function __construct(
+        ConfigService $service,
+        SmtpAccountService $smtpAccountService
+    )
     {
         $this->service = $service;
         $this->resourceCollectionClass = ConfigResourceCollection::class;
@@ -30,6 +37,7 @@ class ConfigController extends AbstractRestAPIController
         $this->storeRequest = ConfigRequest::class;
         $this->editRequest = UpdateConfigRequest::class;
         $this->indexRequest = IndexRequest::class;
+        $this->smtpAccountService = $smtpAccountService;
     }
 
     /**
@@ -142,5 +150,22 @@ class ConfigController extends AbstractRestAPIController
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
         );
+    }
+
+    public function testSmtpAccount()
+    {
+        $smtpAccount = $this->service->findOneWhereOrFail(['key' => 'smtp_account']);
+        try {
+            $subject = "Test SMTP ACCOUNT";
+            $body = "Test SMTP ACCOUNT";
+
+            $this->smtpAccountService->setSmtpAccountForSendEmail($smtpAccount->value);
+
+            Mail::to(config('user.email_test'))->send(new SendEmails($subject, $body));
+
+            return $this->sendOkJsonResponse(['message' => __('messages.sent_mail_success')]);
+        }catch (\Exception $e){
+            return $this->sendValidationFailedJsonResponse(["smtp_account" => $e->getMessage()]);
+        }
     }
 }
