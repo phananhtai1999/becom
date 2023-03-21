@@ -3,10 +3,11 @@
 namespace App\Providers;
 
 use App\Events\ActivityHistoryEvent;
+use App\Events\ActivityHistoryOfSendByCampaignEvent;
 use App\Events\PaymentCreditPackageSuccessEvent;
 use App\Events\PaymentSuccessfullyEvent;
 use App\Events\SendByBirthdayCampaignEvent;
-use App\Events\SendByCampaginRootScenarioEvent;
+use App\Events\SendByCampaignRootScenarioEvent;
 use App\Events\SendByCampaignEvent;
 use App\Events\SendNotOpenByScenarioCampaignEvent;
 use App\Events\SendEmailRecoveryPasswordEvent;
@@ -14,10 +15,11 @@ use App\Events\SendEmailVerifyEmailEvent;
 use App\Events\SendNextByScenarioCampaignEvent;
 use App\Events\SubscriptionSuccessEvent;
 use App\Listeners\ActivityHistoryListener;
+use App\Listeners\ActivityHistoryOfSendByCampaignListener;
 use App\Listeners\PaymentCreditPackageSuccessListener;
 use App\Listeners\PaymentSuccessfullyListener;
 use App\Listeners\SendByBirthdayCampaignListener;
-use App\Listeners\SendByCampaginRootScenarioListener;
+use App\Listeners\SendByCampaignRootScenarioListener;
 use App\Listeners\SendByCampaignListener;
 use App\Listeners\SendNotOpenByScenarioCampaignListener;
 use App\Listeners\SendEmailRecoveryPasswordListener;
@@ -77,14 +79,17 @@ class EventServiceProvider extends ServiceProvider
         PaymentCreditPackageSuccessEvent::class => [
             PaymentCreditPackageSuccessListener::class
         ],
-        SendByCampaginRootScenarioEvent::class => [
-            SendByCampaginRootScenarioListener::class
+        SendByCampaignRootScenarioEvent::class => [
+            SendByCampaignRootScenarioListener::class
         ],
         SubscriptionSuccessEvent::class => [
             SubscriptionSuccessListener::class
         ],
         ActivityHistoryEvent::class => [
             ActivityHistoryListener::class
+        ],
+        ActivityHistoryOfSendByCampaignEvent::class => [
+            ActivityHistoryOfSendByCampaignListener::class
         ],
     ];
 

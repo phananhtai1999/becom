@@ -31,36 +31,39 @@ class ActivityHistoryListener
         $action = $event->action;
 
         if ($action === 'created') {
-            $actionTranslate = 'đã tạo';
             $date = $model->created_at;
         } elseif ($action === 'updated') {
-            $actionTranslate = 'đã sửa';
             $date = $model->updated_at;
         } elseif ($action === 'deleted') {
-            $actionTranslate = 'đã xóa';
             $date = $model->deleted_at;
         }
 
         if ($type === 'note') {
-            $typeTranslate = 'ghi chú';
-            $this->activityHistoryService->create([
-                'type' => $type,
-                'type_id' => null,
-                'content' => ['en' => "You $action $type at $date", 'vi' => "Bạn $actionTranslate $typeTranslate lúc $date"],
-                'date' => $date,
-                'contact_uuid' => $model->contact_uuid,
-            ]);
+            $this->activityHistories($type, $model->uuid, $action, $model->contact->email, $date, $model->contact_uuid);
         } elseif ($type === 'remind') {
-            $typeTranslate = 'lời nhắc';
             foreach ($model->contacts as $contact) {
-                $this->activityHistoryService->create([
-                    'type' => $type,
-                    'type_id' => null,
-                    'content' => ['en' => "You $action $type at $date", 'vi' => "Bạn $actionTranslate $typeTranslate lúc $date"],
-                    'date' => $date,
-                    'contact_uuid' => $contact->uuid,
-                ]);
+                $this->activityHistories($type, $model->uuid, $action, $contact->email, $date, $contact->uuid);
             }
         }
+    }
+
+    /**
+     * @param $type
+     * @param $typeId
+     * @param $action
+     * @param $contact
+     * @param $date
+     * @param $contactUuid
+     * @return mixed
+     */
+    public function activityHistories($type, $typeId, $action, $contact, $date, $contactUuid)
+    {
+        return $this->activityHistoryService->create([
+            'type' => $type,
+            'type_id' => $typeId,
+            'content' => ['langkey' => $action . '.' . $type, 'type' => $type, 'contact' => $contact, 'date' => $date],
+            'date' => $date,
+            'contact_uuid' => $contactUuid,
+        ]);
     }
 }

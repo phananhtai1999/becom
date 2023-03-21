@@ -147,6 +147,7 @@ Route::group(['middleware' => ['auth:api', 'role:admin'], 'as' => 'config.admin'
     Route::put('/config/upsert', [ConfigController::class, 'upsertConfig'])->name('upsertConfig');
     Route::get('/config/{id}', [ConfigController::class, 'show'])->name('show');
     Route::put('/config/{id}', [ConfigController::class, 'edit'])->name('edit');
+    Route::get('test-smtp-account-config', [ConfigController::class, 'testSmtpAccount'])->name('testSmtpAccount');
 });
 
 //Load permission config

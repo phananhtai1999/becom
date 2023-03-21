@@ -27,8 +27,8 @@ class ConfigRequest extends AbstractRequest
         $validate = [
             'key' => ['required', 'string', Rule::unique('configs')->whereNull('deleted_at')],
             'value' => ['nullable', 'string'],
+            'type' => ['required', 'in:image,boolean,number,string,array'],
             'status' => ['required', 'in:public,system,private'],
-            'type' => ['required', 'in:image,boolean,number,string'],
             'default_value' => ['nullable', 'string'],
             'group_id' => ['required', 'numeric', 'min:1', Rule::exists('groups', 'uuid')->whereNull('deleted_at')],
         ];
@@ -42,6 +42,9 @@ class ConfigRequest extends AbstractRequest
         } elseif ($this->request->get('type') === 'number') {
 
             $validate['value'] = ['nullable', 'numeric'];
+        } elseif ($this->request->get('type') === 'array') {
+
+            $validate['value'] = ['array'];
         }
 
         return $validate;
