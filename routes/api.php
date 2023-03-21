@@ -149,7 +149,12 @@ Route::group(['middleware' => ['auth:api', 'role:admin'], 'as' => 'config.admin'
     Route::put('/config/{id}', [ConfigController::class, 'edit'])->name('edit');
 });
 
-Route::get('/configs/all', [ConfigController::class, 'loadAllConfig'])->name('config.loadAllConfig');
+//Load permission config
+Route::group(['middleware' => ['auth:api'], 'as' => 'config.'], function () {
+    Route::get('/configs/permission', [ConfigController::class, 'loadConfigPermission'])->name('config.loadConfigPermission');
+});
+//Load public config
+Route::get('/configs/public', [ConfigController::class, 'loadPublicConfig'])->name('config.loadPublicConfig');
 
 //Website
 Route::group(['middleware' => ['auth:api'], 'as' => 'website.'], function () {

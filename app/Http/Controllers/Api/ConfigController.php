@@ -94,9 +94,21 @@ class ConfigController extends AbstractRestAPIController
     /**
      * @return JsonResponse
      */
-    public function loadAllConfig(): JsonResponse
+    public function loadPublicConfig(): JsonResponse
     {
-        $models = $this->service->loadAllConfig();
+        $models = $this->service->loadPublicConfig();
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+        );
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function loadConfigPermission(): JsonResponse
+    {
+        $models = $this->service->loadConfigPermission();
 
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
