@@ -313,4 +313,20 @@ class SmtpAccountService extends AbstractService
             ->whereNull('website_uuid')
             ->paginate($perPage, $columns, $pageName, $page);
     }
+
+    /**
+     * @param $perPage
+     * @param $page
+     * @param $columns
+     * @param $pageName
+     * @param $search
+     * @param $searchBy
+     * @return mixed
+     */
+    public function getAllSmtpAccountWithoutDefault($perPage, $page, $columns, $pageName, $search, $searchBy)
+    {
+        return SmtpAccountQueryBuilder::searchQuery($search, $searchBy)
+            ->whereNotNull('website_uuid')
+            ->paginate($perPage, $columns, $pageName, $page);
+    }
 }

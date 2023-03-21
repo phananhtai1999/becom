@@ -84,4 +84,11 @@ class ArticleCategoryService extends AbstractService
         return (collect($articleCategoryPublic)->pluck('uuid')->toArray());
     }
 
+    public function getArticleCategoriesPublicWithPagination($perPage, $page, $columns, $pageName, $search, $searchBy)
+    {
+        return ArticleCategoryQueryBuilder::searchQuery($search, $searchBy)
+            ->whereIn('uuid', $this->getListArticleCategoryUuidsPublic())
+            ->paginate($perPage, $columns, $pageName, $page);
+    }
+
 }
