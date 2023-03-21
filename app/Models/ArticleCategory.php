@@ -113,6 +113,14 @@ class ArticleCategory extends AbstractModel
     }
 
     /**
+     * @return HasMany
+     */
+    public function childrenArticleCategoryPublic()
+    {
+        return $this->hasMany(__CLASS__, 'parent_uuid')->where('publish_status', true);
+    }
+
+    /**
      * @param Builder $query
      * @param $data
      * @return Builder|void
