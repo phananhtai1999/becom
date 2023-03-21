@@ -25,6 +25,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redis;
 
 class AuthController extends AbstractRestAPIController
@@ -237,11 +238,11 @@ class AuthController extends AbstractRestAPIController
                 'refresh_time' => Carbon::now()->addSeconds(config('otp.refresh_time')),
             ]);
         } else {
-            $otp = $this->otpService->findOrFailById(1);
-            if ($otp->blocked_time > Carbon::now()) {
+            $otp = $this->otpService->firstOrCreate(['user_uuid' => $user->uuid], ['user_uuid' => $user->uuid]);
+            if (!empty($otp->blocked_time) && $otp->blocked_time > Carbon::now()) {
 
                 return $this->sendValidationFailedJsonResponse(['message' => 'Your account is blocked. Contact admin to take a help!']);
-            } elseif ($otp->expired_time > Carbon::now()) {
+            } elseif (!empty($otp->expired_time) && $otp->expired_time > Carbon::now()) {
 
                 return $this->sendOkJsonResponse(['data' => [
                     'is_verified' => false,

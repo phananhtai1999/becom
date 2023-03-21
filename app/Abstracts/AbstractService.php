@@ -147,5 +147,9 @@ abstract class AbstractService
     {
         return $this->model->where($where)->get();
     }
+    public function firstOrCreate($where, $data)
+    {
+        return $this->model->firstOrCreate($where, $data);
+    }
 
 }
