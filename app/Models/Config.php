@@ -10,6 +10,14 @@ class Config extends AbstractModel
 {
     use HasFactory, SoftDeletes;
 
+    const CONFIG_PUBLIC_STATUS = 'public';
+    const CONFIG_SYSTEM_STATUS = 'system';
+    const CONFIG_PRIVATE_STATUS = 'private';
+    const CONFIG_SMS_PRICE = 'sms_price';
+    const CONFIG_EMAIL_PRICE = 'email_price';
+    const CONFIG_TELEGRAM_PRICE = 'telegram_price';
+    const CONFIG_VIBER_PRICE = 'viber_price';
+
     /**
      * @var string
      */
@@ -28,7 +36,8 @@ class Config extends AbstractModel
         'value',
         'default_value',
         'group_id',
-        'type'
+        'type',
+        'status'
     ];
 
     /**

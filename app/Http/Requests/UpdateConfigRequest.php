@@ -28,6 +28,7 @@ class UpdateConfigRequest extends AbstractRequest
             'key' => ['string', 'unique:configs,key,'.$this->id .',uuid,deleted_at,NULL'],
             'value' => ['nullable', 'string'],
             'type' => ['in:image,boolean,number,string,array'],
+            'status' => ['in:public,system,private'],
             'default_value' => ['nullable', 'string'],
             'group_id' => ['numeric', 'min:1', Rule::exists('groups', 'uuid')->whereNull('deleted_at')],
         ];
