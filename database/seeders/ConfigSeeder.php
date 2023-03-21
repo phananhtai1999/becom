@@ -76,14 +76,14 @@ class ConfigSeeder extends Seeder
                 'key' => 'logo',
                 'value' => 'https://file.storage.techupzone.com/linkstar-stg/public/upload/c690285d-4348-4ba4-b982-1e12d2334a5f_1677036055.png',
                 'type' => 'image',
-                'group_id' => 1
+                'group_id' => 1,
                 'status' => 'public'
             ],
             [
                 'key' => 'favicon_icon',
                 'value' => 'https://file.storage.techupzone.com/linkstar-stg/public/upload/c690285d-4348-4ba4-b982-1e12d2334a5f_1677036055.png',
                 'type' => 'image',
-                'group_id' => 1
+                'group_id' => 1,
                 'status' => 'public'
 
             ],
@@ -155,31 +155,36 @@ class ConfigSeeder extends Seeder
                 'key' => 'expired_time',
                 'value' => 5,
                 'type' => 'integer',
-                'group_id' => 1
+                'group_id' => 1,
+                'status' => 'system'
             ],
             [
                 'key' => 'blocked_time',
                 'value' => 1,
                 'type' => 'integer',
-                'group_id' => 1
+                'group_id' => 1,
+                'status' => 'system'
             ],
             [
                 'key' => 'refresh_time',
                 'value' => 90,
                 'type' => 'integer',
-                'group_id' => 1
+                'group_id' => 1,
+                'status' => 'system'
             ],
             [
                 'key' => 'refresh_count',
                 'value' => 3,
                 'type' => 'integer',
-                'group_id' => 1
+                'group_id' => 1,
+                'status' => 'system'
             ],
             [
                 'key' => 'wrong_count',
                 'value' => 5,
                 'type' => 'integer',
-                'group_id' => 1
+                'group_id' => 1,
+                'status' => 'system'
             ],
         ];
 
