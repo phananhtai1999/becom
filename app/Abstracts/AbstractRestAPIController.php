@@ -148,4 +148,14 @@ class AbstractRestAPIController extends BaseController
 
         return ['plan' => 'Does not have package for this feature. Comeback Later!!'];
     }
+
+    /**
+     * @param int $length
+     * @return string
+     */
+    public function generateRandomString(int $length = 4): string
+    {
+        $permittedChars = '0123456789abcdefghijklmnopqrstuvwxyz';
+        return substr(str_shuffle($permittedChars), 0, $length);
+    }
 }
