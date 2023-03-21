@@ -59,7 +59,7 @@ class ActivityHistory extends AbstractModel
      */
     public function scopeFromCreatedAt(Builder $query, $fromCreatedAt): Builder
     {
-        return $query->whereDate('created_at', '>=', $fromCreatedAt);
+        return $query->whereDate('activity_histories.created_at', '>=', $fromCreatedAt);
     }
 
     /**
@@ -69,7 +69,7 @@ class ActivityHistory extends AbstractModel
      */
     public function scopeToCreatedAt(Builder $query, $toCreatedAt): Builder
     {
-        return $query->whereDate('created_at', '<=', $toCreatedAt);
+        return $query->whereDate('activity_histories.created_at', '<=', $toCreatedAt);
     }
 
     /**
