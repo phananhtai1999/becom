@@ -133,6 +133,36 @@ class ConfigSeeder extends Seeder
                 'type' => 'array',
                 'group_id' => 1
             ],
+            [
+                'key' => 'expired_time',
+                'value' => 5,
+                'type' => 'integer',
+                'group_id' => 1
+            ],
+            [
+                'key' => 'blocked_time',
+                'value' => 1,
+                'type' => 'integer',
+                'group_id' => 1
+            ],
+            [
+                'key' => 'refresh_time',
+                'value' => 90,
+                'type' => 'integer',
+                'group_id' => 1
+            ],
+            [
+                'key' => 'refresh_count',
+                'value' => 3,
+                'type' => 'integer',
+                'group_id' => 1
+            ],
+            [
+                'key' => 'wrong_count',
+                'value' => 5,
+                'type' => 'integer',
+                'group_id' => 1
+            ],
         ];
 
         foreach ($configs as $config) {

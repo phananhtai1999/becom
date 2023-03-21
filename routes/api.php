@@ -72,6 +72,14 @@ Route::group(['as' => 'auth.'], function () {
     Route::get('/check-token', [AuthController::class, 'checkToken'])->name('check-token');
 });
 
+Route::group(['as' => 'otp.'], function () {
+    Route::get('/otp', [AuthController::class, 'sendOtp'])->name('otp');
+    Route::post('/refresh-otp', [AuthController::class, 'refreshOtp'])->name('refreshOtp');
+    Route::post('/verify-active-code', [AuthController::class, 'verifyActiveCode'])->name('verifyActiveCode');
+});
+
+
+
 //Social API
 Route::get('/auth/url/{driver}', [AuthBySocialNetworkController::class, 'loginUrl'])->name('loginUrl');
 Route::get('/auth/callback/google', [AuthBySocialNetworkController::class, 'loginByGoogleCallback'])->name('loginByGoogleCallback');
