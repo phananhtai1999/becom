@@ -15,6 +15,7 @@ class Otp extends Model
      * @var string
      */
     protected $primaryKey = 'user_uuid';
+    public $incrementing = false;
 
     /**
      * @var string[]
