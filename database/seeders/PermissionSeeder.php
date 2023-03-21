@@ -323,7 +323,7 @@ class PermissionSeeder extends Seeder
 
         ];
         foreach ($permissions as $permission) {
-            Permission::updateOrCreate(['uuid' => $permission['uuid']], $permission);
+            Permission::withTrashed()->updateOrCreate(['uuid' => $permission['uuid']], $permission);
         }
     }
 }
