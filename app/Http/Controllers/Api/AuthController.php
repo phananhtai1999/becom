@@ -255,12 +255,12 @@ class AuthController extends AbstractRestAPIController
             $otp = $this->otpService->findOrFailById($user->uuid);
             if (!empty($otp->blocked_time) && $otp->blocked_time > Carbon::now()) {
 
-                return $this->sendValidationFailedJsonResponse(['message' => 'Your account is blocked. Contact admin to take a help!']);
+                return $this->sendValidationFailedJsonResponse(['message' => __('auth.account_blocked')]);
             } elseif (!empty($otp->expired_time) && $otp->expired_time > Carbon::now()) {
 
                 return $this->sendOkJsonResponse(['data' => [
                     'is_verified' => false,
-                    'role' => $user->roles,
+                    'roles' => $user->roles,
                     'email' => $user->email
                 ]]);
             }
@@ -273,7 +273,7 @@ class AuthController extends AbstractRestAPIController
         //send otp to email here
         return $this->sendOkJsonResponse(['data' => [
             'is_verified' => false,
-            'role' => $user->roles,
+            'roles' => $user->roles,
             'email' => $user->email
         ]]);
     }
@@ -291,7 +291,7 @@ class AuthController extends AbstractRestAPIController
         $refreshCount = $otp->refresh_count + 1;
         if ($refreshCount > config('otp.refresh_count')) {
 
-            return $this->sendValidationFailedJsonResponse(['message' => 'The number of refreshes allowed has been exceeded']);
+            return $this->sendValidationFailedJsonResponse(['message' => __('auth.refresh_exceeded')]);
         }
         $this->otpService->update($otp, [
             'active_code' => $activeCode,
@@ -300,7 +300,7 @@ class AuthController extends AbstractRestAPIController
             'refresh_count' => $refreshCount,
         ]);
 
-        return $this->sendOkJsonResponse(['message' => 'Refresh otp successfully']);
+        return $this->sendOkJsonResponse(['message' => __('auth.refresh_code')]);
     }
 
     public function verifyActiveCode(VerifyActiveCodeRequest $request) {
@@ -308,10 +308,10 @@ class AuthController extends AbstractRestAPIController
         $otp = $this->otpService->findOrFailById($user->uuid);
         if ($otp->expired_time < Carbon::now()) {
 
-            return $this->sendValidationFailedJsonResponse(['message' => 'Your code was expired. Please refresh new code']);
+            return $this->sendValidationFailedJsonResponse(['message' => __('auth.expired_code')]);
         } elseif ($otp->blocked_time > Carbon::now()) {
 
-            return $this->sendValidationFailedJsonResponse(['message' => 'Your account is blocked. Contact admin to take a help!']);
+            return $this->sendValidationFailedJsonResponse(['message' => __('auth.account_blocked')]);
         } elseif ($otp->active_code != $request->get('active_code')) {
             $wrongCount = $otp->wrong_count + 1;
             if ($wrongCount == config('otp.wrong_count')){
@@ -325,7 +325,7 @@ class AuthController extends AbstractRestAPIController
             } else {
                 $this->otpService->update($otp, ['wrong_count' => $wrongCount]);
 
-                return $this->sendValidationFailedJsonResponse(['message' => 'Your code is wrong. Please check it again']);
+                return $this->sendValidationFailedJsonResponse(['message' => __('auth.wrong_code')]);
             }
         }
 
