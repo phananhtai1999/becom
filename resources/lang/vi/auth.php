@@ -8,6 +8,6 @@ return array (
   'wrong_code' => 'Mã của bạn sai. Vui lòng kiểm tra lại',
   'expired_code' => 'Mã của bạn đã hết hạn. Vui lòng tạo mới mã',
   'refresh_code' => 'Tạo mã mới thành công',
-  'refresh_exceeded' => 'The number of refreshes allowed has been exceeded',
+  'refresh_exceeded' => 'Đã vượt quá số lần làm mới cho phép',
 
 );
