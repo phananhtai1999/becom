@@ -14,6 +14,7 @@ use App\Http\Requests\LoginRequest;
 use App\Models\PasswordReset;
 use App\Models\PlatformPackage;
 use App\Models\User;
+use App\Services\ConfigService;
 use App\Services\OtpService;
 use App\Services\RoleService;
 use App\Services\AuthenticationService;
@@ -68,7 +69,8 @@ class AuthController extends AbstractRestAPIController
         PasswordResetService   $passwordResetService,
         RoleService            $roleService,
         UserAccessTokenService $userAccessTokenService,
-        OtpService             $otpService
+        OtpService             $otpService,
+        ConfigService $configService
     )
     {
         $this->userService = $userService;
@@ -77,6 +79,7 @@ class AuthController extends AbstractRestAPIController
         $this->roleService = $roleService;
         $this->userAccessTokenService = $userAccessTokenService;
         $this->otpService = $otpService;
+        $this->configService = $configService;
     }
 
     /**
@@ -95,8 +98,13 @@ class AuthController extends AbstractRestAPIController
             $this->guard()
                 ->attempt($loginRequest->only(['email', 'password']), $loginRequest->filled('remember'))
         ) {
+            $otpConfig = $this->configService->findOneWhereOrFail(['key' => 'otp_status']);
+            if ($otpConfig->value) {
 
-            return $this->sendOtp('login', $user);
+                return $this->sendOtp('login', $user);
+            }
+
+            return $this->generateCookie($user, __("messages.login_success"));
         }
 
         return $this->sendUnAuthorizedJsonResponse();
@@ -183,8 +191,13 @@ class AuthController extends AbstractRestAPIController
         if ($user) {
             $user->roles()->attach([config('user.default_role_uuid')]);
             $user->userPlatformPackage()->create(['platform_package_uuid' => PlatformPackage::DEFAULT_PLATFORM_PACKAGE_1]);
+            $otpConfig = $this->configService->findOneWhereOrFail(['key' => 'otp_status']);
+            if ($otpConfig->value) {
 
-            return $this->sendOtp('register', $user);
+                return $this->sendOtp('register', $user);
+            }
+
+            return $this->generateCookie($user, __("messages.register_success"));
         }
 
         return $this->sendInternalServerErrorJsonResponse();
@@ -238,7 +251,8 @@ class AuthController extends AbstractRestAPIController
                 'refresh_time' => Carbon::now()->addSeconds(config('otp.refresh_time')),
             ]);
         } else {
-            $otp = $this->otpService->firstOrCreate(['user_uuid' => $user->uuid], ['user_uuid' => $user->uuid]);
+            $this->otpService->firstOrCreate(['user_uuid' => $user->uuid], ['user_uuid' => $user->uuid]);
+            $otp = $this->otpService->findOrFailById($user->uuid);
             if (!empty($otp->blocked_time) && $otp->blocked_time > Carbon::now()) {
 
                 return $this->sendValidationFailedJsonResponse(['message' => 'Your account is blocked. Contact admin to take a help!']);
@@ -246,6 +260,7 @@ class AuthController extends AbstractRestAPIController
 
                 return $this->sendOkJsonResponse(['data' => [
                     'is_verified' => false,
+                    'role' => $user->roles,
                     'email' => $user->email
                 ]]);
             }
@@ -258,6 +273,7 @@ class AuthController extends AbstractRestAPIController
         //send otp to email here
         return $this->sendOkJsonResponse(['data' => [
             'is_verified' => false,
+            'role' => $user->roles,
             'email' => $user->email
         ]]);
     }
@@ -318,24 +334,34 @@ class AuthController extends AbstractRestAPIController
                 'wrong_count' => 0,
                 'refresh_count' => 0,
             ]);
-            $userData = app(UserResource::class, ['resource' => $user])
-                ->toResponse(app('Request'))
-                ->getData(true);
 
-            $userData['data']['token'] = $this->userAccessTokenService->storeNewForUser($user)->getKey();
-            $userData['data']['token_type'] = 'Bearer';
-
-            return \response()->json(array_merge([
-                'status' => true,
-                "code" => 0,
-                "locale" => app()->getLocale(),
-                'message' => __("messages.login_success")
-            ], $userData))
-                ->withCookie(
-                    \cookie('accessToken', $userData['data']['token'], config('auth.password_timeout'), null, null, true, true)
-                )->withCookie(
-                    \cookie('logged', true, config('auth.password_timeout'), null, null, true, false)
-                );
+            return $this->generateCookie($user, __("messages.login_success"));
         }
+    }
+
+    /**
+     * @param mixed $user
+     * @return JsonResponse
+     */
+    public function generateCookie(mixed $user, $message): JsonResponse
+    {
+        $userData = app(UserResource::class, ['resource' => $user])
+            ->toResponse(app('Request'))
+            ->getData(true);
+
+        $userData['data']['token'] = $this->userAccessTokenService->storeNewForUser($user)->getKey();
+        $userData['data']['token_type'] = 'Bearer';
+
+        return \response()->json(array_merge([
+            'status' => true,
+            "code" => 0,
+            "locale" => app()->getLocale(),
+            'message' => $message
+        ], $userData))
+            ->withCookie(
+                \cookie('accessToken', $userData['data']['token'], config('auth.password_timeout'), null, null, true, true)
+            )->withCookie(
+                \cookie('logged', true, config('auth.password_timeout'), null, null, true, false)
+            );
     }
 }
