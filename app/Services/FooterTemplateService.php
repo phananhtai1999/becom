@@ -29,11 +29,12 @@ class FooterTemplateService extends AbstractService
             ->paginate($perPage, $columns, $pageName, $page);
     }
 
-    public function changeIsDefaultFooterTemplateByType($type)
+    public function changeIsDefaultFooterTemplateByType($type, $templateType)
     {
         $footerTemplate = $this->findOneWhere([
-           'type' => $type,
-           'is_default' => true,
+            'type' => $type,
+            'is_default' => true,
+            'template_type' => $templateType
         ]);
 
         if ($footerTemplate) {
@@ -57,20 +58,31 @@ class FooterTemplateService extends AbstractService
         }
     }
 
-    public function getFooterTemplateForSendCampaignByType($type, $user)
+    public function getFooterTemplateAdsForSendCampaignByType($type, $user)
     {
         if ($user->can_remove_footer_template) {
             $footerTemplate = $this->findOneWhere([
                 'type' => $type,
                 'active_by_uuid' => $user->uuid,
+                'template_type' => 'ads'
             ]);
         }else{
             $footerTemplate = $this->findOneWhere([
                 'type' => $type,
                 'is_default' => true,
+                'template_type' => 'ads'
             ]);
         }
 
         return $footerTemplate;
+    }
+
+    public function getFooterTemplateSubscribeForSendCampaignByType($type)
+    {
+        return $this->findOneWhere([
+                'type' => $type,
+                'is_default' => true,
+                'template_type' => 'subscribe'
+            ]);
     }
 }

@@ -127,9 +127,9 @@ class MailTemplateVariableService extends AbstractService
      * @param $mailTemplate
      * @return mixed
      */
-    public function insertFooterTemplateInRenderBody($footerTemplate, $mailTemplate)
+    public function insertFooterTemplateInRenderBody($footerTemplateAds, $footerTemplateSubscribe, $mailTemplate)
     {
-        $mailTemplate->setRenderedBodyAttribute($mailTemplate->rendered_body.$footerTemplate->template);
+        $mailTemplate->setRenderedBodyAttribute($mailTemplate->rendered_body.optional($footerTemplateAds)->template.optional($footerTemplateSubscribe)->template);
         return $mailTemplate;
     }
 

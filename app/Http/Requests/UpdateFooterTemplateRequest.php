@@ -29,7 +29,8 @@ class UpdateFooterTemplateRequest extends AbstractRequest
             'template' => ['string'],
             'template_json' => ['string'],
             'type' => ['string', 'in:sms,email,telegram,viber'],
-            'is_default' => ['boolean']
+            'is_default' => ['boolean'],
+            'template_type' => ['in:ads,subscribe']
         ];
     }
 }

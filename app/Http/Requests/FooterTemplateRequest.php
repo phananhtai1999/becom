@@ -29,6 +29,7 @@ class FooterTemplateRequest extends AbstractRequest
             'template' => ['required', 'string'],
             'template_json' => ['required', 'string'],
             'type' => ['required', 'string', 'in:sms,email,telegram,viber'],
+            'template_type' => ['required', 'in:ads,subscribe']
         ];
     }
 }
