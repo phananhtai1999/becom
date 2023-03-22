@@ -41,6 +41,25 @@ class FooterTemplateController extends AbstractRestAPIController
     /**
      * @return JsonResponse
      */
+    public function index(IndexRequest $request)
+    {
+        $models = $this->service->getFooterTemplatesWithTopDefault(
+            $request->get('per_page', '15'),
+            $request->get('page', '1'),
+            $request->get('columns', '*'),
+            $request->get('page_name', 'page'),
+            $request->get('search'),
+            $request->get('search_by'),
+        );
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+        );
+    }
+
+    /**
+     * @return JsonResponse
+     */
     public function store()
     {
         $request = app($this->storeRequest);
@@ -102,7 +121,14 @@ class FooterTemplateController extends AbstractRestAPIController
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData(
                 $this->resourceCollectionClass,
-                $this->myService->getCollectionWithPagination()
+                $this->myService->getMyFooterTemplatesWithTopActive(
+                    $request->get('per_page', '15'),
+                    $request->get('page', '1'),
+                    $request->get('columns', '*'),
+                    $request->get('page_name', 'page'),
+                    $request->get('search'),
+                    $request->get('search_by'),
+                )
             ));
     }
 

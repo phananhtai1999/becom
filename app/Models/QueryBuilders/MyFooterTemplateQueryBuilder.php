@@ -39,7 +39,7 @@ class MyFooterTemplateQueryBuilder extends AbstractQueryBuilder
                 'is_default',
                 'type'
             ])
-            ->defaultSort('-created_at')
+            ->defaultSort('-active_by_uuid')
             ->allowedSorts([
                 $modelKeyName,
                 'title',

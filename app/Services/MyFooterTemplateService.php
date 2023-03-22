@@ -13,6 +13,22 @@ class MyFooterTemplateService extends AbstractService
 
     protected $modelQueryBuilderClass = MyFooterTemplateQueryBuilder::class;
 
+    /**
+     * @param $perPage
+     * @param $page
+     * @param $columns
+     * @param $pageName
+     * @param $search
+     * @param $searchBy
+     * @return mixed
+     */
+    public function getMyFooterTemplatesWithTopActive($perPage, $page, $columns, $pageName, $search, $searchBy)
+    {
+        return MyFooterTemplateQueryBuilder::searchQuery($search, $searchBy)
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage, $columns, $pageName, $page);
+    }
+
     public function showMyFooterTemplate($id)
     {
         return $this->findOneWhereOrFail([
