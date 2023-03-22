@@ -39,7 +39,7 @@ class FooterTemplateQueryBuilder extends AbstractQueryBuilder
                 'is_default',
                 'type'
             ])
-            ->defaultSort('-created_at')
+            ->defaultSort('-is_default')
             ->allowedSorts([
                 $modelKeyName,
                 'title',

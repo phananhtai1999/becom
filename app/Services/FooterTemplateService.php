@@ -13,6 +13,22 @@ class FooterTemplateService extends AbstractService
 
     protected $modelQueryBuilderClass = FooterTemplateQueryBuilder::class;
 
+    /**
+     * @param $perPage
+     * @param $page
+     * @param $columns
+     * @param $pageName
+     * @param $search
+     * @param $searchBy
+     * @return mixed
+     */
+    public function getFooterTemplatesWithTopDefault($perPage, $page, $columns, $pageName, $search, $searchBy)
+    {
+        return FooterTemplateQueryBuilder::searchQuery($search, $searchBy)
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage, $columns, $pageName, $page);
+    }
+
     public function changeIsDefaultFooterTemplateByType($type)
     {
         $footerTemplate = $this->findOneWhere([
