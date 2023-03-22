@@ -48,7 +48,7 @@ class ConfigController extends AbstractRestAPIController
         $request = app($this->storeRequest);
 
         // Cast value to integer
-        if ($request->type === 'boolean' || $request->type === 'number') {
+        if ($request->type === 'boolean' || $request->type === 'numeric') {
             if ($request->value == 0) {
                 $value = '00';
                 $castValue = (float)$value;
@@ -79,7 +79,7 @@ class ConfigController extends AbstractRestAPIController
         $model = $this->service->findOrFailById($id);
 
         // Cast value to integer
-        if ($request->type === 'boolean' || $request->type === 'number') {
+        if ($request->type === 'boolean' || $request->type === 'numeric') {
             if ($request->value == 0) {
                 $value = '00';
                 $castValue = (float)$value;
