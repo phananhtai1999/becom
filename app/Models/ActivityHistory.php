@@ -6,7 +6,6 @@ use App\Abstracts\AbstractModel;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Translatable\HasTranslations;
 
 class ActivityHistory extends AbstractModel
 {
@@ -90,5 +89,30 @@ class ActivityHistory extends AbstractModel
     public function scopeToDate(Builder $query, $toDate): Builder
     {
         return $query->whereDate('date', '<=', $toDate);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function remind()
+    {
+        return $this->belongsTo(Remind::class, 'type_id', 'uuid');
+//        $a = $this->
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function note()
+    {
+        return $this->belongsTo(Note::class, 'type_id', 'uuid');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function mailsendingHistory()
+    {
+        return $this->belongsTo(MailSendingHistory::class, 'type_id', 'uuid');
     }
 }

@@ -92,4 +92,12 @@ class MailSendingHistory extends AbstractModel
     {
         return $query->whereDate('time', '<=', $time);
     }
+
+    /**
+     * @return HasMany
+     */
+    public function activityHistories()
+    {
+        return $this->hasMany(ActivityHistory::class, 'type_id', 'uuid');
+    }
 }
