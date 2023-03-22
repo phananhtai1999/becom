@@ -137,8 +137,10 @@ class TelegramNotification extends BaseNotification {
     public function getContent($contact, $smtpAccount, $mailSendingHistory)
     {
         $mailTemplate = $this->mailTemplateVariableService->renderBody($this->campaign->mailTemplate, $contact, $smtpAccount, $this->campaign);
-        if ($footerTemplate = $this->footerTemplateService->getFooterTemplateForSendCampaignByType($mailTemplate->type, $mailTemplate->user)) {
-            $mailTemplate = $this->mailTemplateVariableService->insertFooterTemplateInRenderBody($footerTemplate, $mailTemplate);
+        $footerTemplateAds = $this->footerTemplateService->getFooterTemplateAdsForSendCampaignByType($mailTemplate->type, $mailTemplate->user);
+        $footerTemplateSubscribe = $this->footerTemplateService->getFooterTemplateSubscribeForSendCampaignByType($mailTemplate->type);
+        if ($footerTemplateAds || $footerTemplateSubscribe) {
+            $mailTemplate = $this->mailTemplateVariableService->insertFooterTemplateInRenderBody($footerTemplateAds, $footerTemplateSubscribe, $mailTemplate);
         }
         return $mailTemplate->rendered_body;
     }

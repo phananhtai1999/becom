@@ -24,6 +24,7 @@ class FooterTemplateResource extends AbstractJsonResource
             'is_default' => $this->is_default,
             'type' => $this->type,
             'publish_status' => $this->publish_status,
+            'template_type' => $this->template_type,
             'template' => $this->template,
             'template_json' => $this->template_json,
             'deleted_at' => $this->deleted_at,

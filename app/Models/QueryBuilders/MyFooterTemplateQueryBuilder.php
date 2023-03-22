@@ -31,6 +31,7 @@ class MyFooterTemplateQueryBuilder extends AbstractQueryBuilder
             ->allowedFields([
                 $modelKeyName,
                 'title',
+                'template_type',
                 'template',
                 'template_json',
                 'user_uuid',
@@ -43,6 +44,7 @@ class MyFooterTemplateQueryBuilder extends AbstractQueryBuilder
             ->allowedSorts([
                 $modelKeyName,
                 'title',
+                'template_type',
                 'template',
                 'template_json',
                 'user_uuid',
@@ -56,6 +58,8 @@ class MyFooterTemplateQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__' . $modelKeyName, $modelKeyName),
                 'title',
                 AllowedFilter::exact('exact__title', 'title'),
+                'template_type',
+                AllowedFilter::exact('exact__template_type', 'template_type'),
                 'template',
                 AllowedFilter::exact('exact__template', 'template'),
                 'template_json',

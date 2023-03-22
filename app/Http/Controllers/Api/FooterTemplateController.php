@@ -83,11 +83,12 @@ class FooterTemplateController extends AbstractRestAPIController
 
         $model = $this->service->findOrFailById($id);
 
-        if ($request->get('is_default') && $model->is_default != $request->get('is_default')) {
+        if ($request->get('is_default')) {
             if ($model->user_uuid != auth()->user()->getKey()) {
                 return $this->sendValidationFailedJsonResponse();
             }
-                $this->service->changeIsDefaultFooterTemplateByType($model->type);
+            $this->service->changeIsDefaultFooterTemplateByType($request->get('type') ?? $model->type,
+                $request->get('template_type') ?? $model->template_type);
         }
 
         $this->service->update($model, $request->except(['user_uuid', 'publish_status', 'active_by_uuid']));
@@ -137,7 +138,8 @@ class FooterTemplateController extends AbstractRestAPIController
         $model = $this->service->create(array_merge($request->except('active_by_uuid'), [
             'user_uuid' => auth()->user()->getKey(),
             'is_default' => false,
-            'publish_status' => FooterTemplate::PUBLISHED_PUBLISH_STATUS
+            'publish_status' => FooterTemplate::PUBLISHED_PUBLISH_STATUS,
+            'template_type' => 'ads'
         ]));
 
         return $this->sendCreatedJsonResponse(
@@ -159,10 +161,10 @@ class FooterTemplateController extends AbstractRestAPIController
     {
         $model = $this->myService->showMyFooterTemplate($id);
 
-        if ($request->get('active_by_uuid') && $model->active_by_uuid != $request->get('active_by_uuid')) {
-            $this->service->changeActiveByFooterTemplateByType($model->type);
+        if ($request->get('active_by_uuid')) {
+            $this->service->changeActiveByFooterTemplateByType($request->get('type') ?? $model->type);
         }
-        $this->service->update($model, $request->except(['user_uuid', 'publish_status', 'is_default']));
+        $this->service->update($model, $request->except(['user_uuid', 'publish_status', 'is_default', 'template_type']));
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)

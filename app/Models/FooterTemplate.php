@@ -30,6 +30,7 @@ class FooterTemplate extends AbstractModel
      */
     protected $fillable = [
         'title',
+        'template_type',
         'template',
         'template_json',
         'user_uuid',
