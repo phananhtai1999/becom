@@ -69,6 +69,8 @@ class ArticleCategoryQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__updated_at', 'updated_at'),
                 'parentArticleCategory.title',
                 AllowedFilter::exact('exact__parentArticleCategory.title', 'parentArticleCategory.title'),
+                'parentArticleCategory.slug',
+                AllowedFilter::exact('exact__parentArticleCategory.slug', 'parentArticleCategory.slug'),
                 AllowedFilter::scope('category_root'),
                 AllowedFilter::scope('title'),
                 AllowedFilter::scope('from__created_at'),
