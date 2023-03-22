@@ -26,14 +26,14 @@ class ConfigSeeder extends Seeder
             [
                 'key' => 'email_price',
                 'value' => 1,
-                'type' => 'integer',
+                'type' => 'number',
                 'group_id' => 1,
                 'status' => 'system'
             ],
             [
                 'key' => 'sms_price',
                 'value' => 5,
-                'type' => 'integer',
+                'type' => 'number',
                 'group_id' => 1,
                 'status' => 'system'
             ],
@@ -90,14 +90,14 @@ class ConfigSeeder extends Seeder
             [
                 'key' => 'telegram_price',
                 'value' => 1,
-                'type' => 'integer',
+                'type' => 'number',
                 'group_id' => 1,
                 'status' => 'system'
             ],
             [
                 'key' => 'viber_price',
                 'value' => 1,
-                'type' => 'integer',
+                'type' => 'number',
                 'group_id' => 1,
                 'status' => 'system'
             ],
@@ -154,35 +154,35 @@ class ConfigSeeder extends Seeder
             [
                 'key' => 'expired_time',
                 'value' => 5,
-                'type' => 'integer',
+                'type' => 'number',
                 'group_id' => 1,
                 'status' => 'system'
             ],
             [
                 'key' => 'blocked_time',
                 'value' => 1,
-                'type' => 'integer',
+                'type' => 'number',
                 'group_id' => 1,
                 'status' => 'system'
             ],
             [
                 'key' => 'refresh_time',
                 'value' => 90,
-                'type' => 'integer',
+                'type' => 'number',
                 'group_id' => 1,
                 'status' => 'system'
             ],
             [
                 'key' => 'refresh_count',
                 'value' => 3,
-                'type' => 'integer',
+                'type' => 'number',
                 'group_id' => 1,
                 'status' => 'system'
             ],
             [
                 'key' => 'wrong_count',
                 'value' => 5,
-                'type' => 'integer',
+                'type' => 'number',
                 'group_id' => 1,
                 'status' => 'system'
             ],

@@ -58,4 +58,12 @@ class Note extends AbstractModel
     {
         return $this->belongsTo(User::class, 'user_uuid', 'uuid');
     }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function activityHistories()
+    {
+        return $this->hasMany(ActivityHistory::class, 'type_id', 'uuid')->where('type', 'note');
+    }
 }

@@ -30,6 +30,14 @@ class NoteResource extends AbstractJsonResource
             $data['user'] = new UserResource($this->user);
         }
 
+        if (\in_array('note__contact', $expand)) {
+            $data['contact'] = new ContactResource($this->contact);
+        }
+
+        if (\in_array('note__activity_histories', $expand)) {
+            $data['activity_histories'] = ActivityHistoryResource::collection($this->activityHistories);
+        }
+
         return $data;
     }
 }

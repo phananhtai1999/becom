@@ -31,6 +31,14 @@ class RemindResource extends AbstractJsonResource
             $data['user'] = new UserResource($this->user);
         }
 
+        if (\in_array('remind__contacts', $expand)) {
+            $data['contact'] = ContactResource::collection($this->contacts);
+        }
+
+        if (\in_array('remind__activity_histories', $expand)) {
+            $data['activity_histories'] = ActivityHistoryResource::collection($this->activityHistories);
+        }
+
         return $data;
     }
 }

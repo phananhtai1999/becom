@@ -32,6 +32,22 @@ class ActivityHistoryResource extends AbstractJsonResource
             $data['contact'] = new ContactResource($this->contact);
         }
 
+        if (\in_array('activity_history__remind', $expand) && $this->type === 'remind') {
+            $data['remind'] = new RemindResource($this->remind);
+        }
+
+        if (\in_array('activity_history__note', $expand) && $this->type === 'note') {
+            $data['note'] = new NoteResource($this->note);
+        }
+
+        if (\in_array('activity_history__mail_sending_history', $expand) && $this->type != 'note' && $this->type != 'remind') {
+            $data['mail_sending_history'] = new MailSendingHistoryResource($this->mailsendingHistory);
+        }
+
+        if (\in_array('activity_history__campaign', $expand) && $this->type != 'note' && $this->type != 'remind') {
+            $data['campaign'] = new CampaignResource(optional($this->mailsendingHistory)->campaign);
+        }
+
         return $data;
     }
 }
