@@ -186,6 +186,13 @@ class ConfigSeeder extends Seeder
                 'group_id' => 1,
                 'status' => 'system'
             ],
+            [
+                'key' => 'otp_status',
+                'value' => true,
+                'type' => 'boolean',
+                'group_id' => 1,
+                'status' => 'system'
+            ],
         ];
 
         foreach ($configs as $config) {
