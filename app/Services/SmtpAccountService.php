@@ -329,4 +329,16 @@ class SmtpAccountService extends AbstractService
             ->whereNotNull('website_uuid')
             ->paginate($perPage, $columns, $pageName, $page);
     }
+
+    /**
+     * @param $user
+     * @param $mail
+     * @return void
+     */
+    public function sendEmail($user, $mail) {
+        $smtpAccount = \App\Models\Config::where(['key' => 'smtp_account'])->first();
+        $this->setSmtpAccountForSendEmail($smtpAccount->value);
+
+        Mail::to($user->email)->send($mail);
+    }
 }
