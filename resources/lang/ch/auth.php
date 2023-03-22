@@ -9,5 +9,6 @@ return array(
     'expired_code' => '您的代码已过期。请刷新新代码',
     'refresh_code' => '刷新otp成功',
     'refresh_exceeded' => '已超过允许的刷新次数',
+    'active_code_null' => '您需要登录或注册才能接收激活码',
 
 );

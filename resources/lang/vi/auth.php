@@ -9,5 +9,6 @@ return array (
   'expired_code' => 'Mã của bạn đã hết hạn. Vui lòng tạo mới mã',
   'refresh_code' => 'Tạo mã mới thành công',
   'refresh_exceeded' => 'Đã vượt quá số lần làm mới cho phép',
+  'active_code_null' => 'Bạn cần đăng nhập hoặc đăng ký dể nhận mã',
 
 );

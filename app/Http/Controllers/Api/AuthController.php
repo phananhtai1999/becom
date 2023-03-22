@@ -11,6 +11,7 @@ use App\Http\Requests\SendResetPasswordEmailRequest;
 use App\Http\Requests\VerifyActiveCodeRequest;
 use App\Http\Resources\UserResource;
 use App\Http\Requests\LoginRequest;
+use App\Mail\SendActiveCode;
 use App\Models\PasswordReset;
 use App\Models\PlatformPackage;
 use App\Models\User;
@@ -19,6 +20,7 @@ use App\Services\OtpService;
 use App\Services\RoleService;
 use App\Services\AuthenticationService;
 use App\Services\PasswordResetService;
+use App\Services\SmtpAccountService;
 use App\Services\UserAccessTokenService;
 use App\Services\UserService;
 use Carbon\Carbon;
@@ -70,7 +72,8 @@ class AuthController extends AbstractRestAPIController
         RoleService            $roleService,
         UserAccessTokenService $userAccessTokenService,
         OtpService             $otpService,
-        ConfigService $configService
+        ConfigService $configService,
+        SmtpAccountService $smtpAccountService
     )
     {
         $this->userService = $userService;
@@ -80,6 +83,7 @@ class AuthController extends AbstractRestAPIController
         $this->userAccessTokenService = $userAccessTokenService;
         $this->otpService = $otpService;
         $this->configService = $configService;
+        $this->smtpAccountService = $smtpAccountService;
     }
 
     /**
@@ -239,10 +243,14 @@ class AuthController extends AbstractRestAPIController
         return $this->sendValidationFailedJsonResponse(['token' => __('messages.token_does_not_exists')]);
     }
 
+    /**
+     * @param $type
+     * @param $user
+     * @return JsonResponse
+     */
     public function sendOtp($type, $user)
     {
-//        $activeCode = $this->generateRandomString();
-        $activeCode = 1234;
+        $activeCode = $this->generateRandomString();
         if ($type == 'register') {
             $this->otpService->create([
                 'active_code' => $activeCode,
@@ -270,7 +278,8 @@ class AuthController extends AbstractRestAPIController
                 'refresh_time' => Carbon::now()->addSeconds(config('otp.refresh_time')),
             ]);
         }
-        //send otp to email here
+        $this->smtpAccountService->sendEmail($user, new SendActiveCode($user, $otp));
+
         return $this->sendOkJsonResponse(['data' => [
             'is_verified' => false,
             'roles' => $user->roles,
@@ -278,6 +287,10 @@ class AuthController extends AbstractRestAPIController
         ]]);
     }
 
+    /**
+     * @param RefreshOtpRequest $request
+     * @return JsonResponse
+     */
     public function refreshOtp(RefreshOtpRequest $request)
     {
         $user = $this->userService->findByEmail($request->get('email'));
@@ -285,9 +298,12 @@ class AuthController extends AbstractRestAPIController
         if ($otp->refresh_time > Carbon::now()) {
 
             return $this->sendValidationFailedJsonResponse(['message'=> 'Please wait ' . config('otp.refresh_time') . ' second to refresh!']);
+        } elseif (empty($otp->active_code)) {
+
+            return $this->sendValidationFailedJsonResponse(['message' => __('auth.active_code_null')]);
         }
-//        $activeCode = $this->generateRandomString();
-        $activeCode = 5678;
+        $activeCode = $this->generateRandomString();
+//        $activeCode = 5678;
         $refreshCount = $otp->refresh_count + 1;
         if ($refreshCount > config('otp.refresh_count')) {
 
@@ -299,10 +315,15 @@ class AuthController extends AbstractRestAPIController
             'refresh_time' => Carbon::now()->addSeconds(config('otp.refresh_time')),
             'refresh_count' => $refreshCount,
         ]);
+        $this->smtpAccountService->sendEmail($user, new SendActiveCode($user, $otp));
 
         return $this->sendOkJsonResponse(['message' => __('auth.refresh_code')]);
     }
 
+    /**
+     * @param VerifyActiveCodeRequest $request
+     * @return JsonResponse|void
+     */
     public function verifyActiveCode(VerifyActiveCodeRequest $request) {
         $user = $this->userService->findByEmail($request->get('email'));
         $otp = $this->otpService->findOrFailById($user->uuid);
@@ -333,6 +354,9 @@ class AuthController extends AbstractRestAPIController
             $this->otpService->update($otp, [
                 'wrong_count' => 0,
                 'refresh_count' => 0,
+                'active_code' => null,
+                'refresh_time' => null,
+                'expired_time' => null,
             ]);
 
             return $this->generateCookie($user, __("messages.login_success"));
@@ -341,6 +365,7 @@ class AuthController extends AbstractRestAPIController
 
     /**
      * @param mixed $user
+     * @param $message
      * @return JsonResponse
      */
     public function generateCookie(mixed $user, $message): JsonResponse

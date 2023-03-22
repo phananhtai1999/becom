@@ -9,5 +9,6 @@ return array (
     'expired_code' => "Your code was expired. Please refresh new code",
     'refresh_code' => "Refresh otp successfully",
     'refresh_exceeded' => 'The number of refreshes allowed has been exceeded',
+    'active_code_null' => 'You need to login or register to receive active code',
 
 );
