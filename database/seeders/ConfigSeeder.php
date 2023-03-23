@@ -21,7 +21,7 @@ class ConfigSeeder extends Seeder
                 'value' => 1,
                 'type' => 'boolean',
                 'group_id' => 1,
-                'status' => 'system'
+                'status' => 'public'
             ],
             [
                 'key' => 'email_price',
@@ -140,14 +140,14 @@ class ConfigSeeder extends Seeder
                 'key' => 'smtp_account',
                 'value' => [
                     'mail_host' => 'smtp.mailtrap.io',
-                    'mail_port' => 2525,
+                    'mail_port' => '2525',
                     'mail_username' => '42ba760e85ce70',
                     'mail_password' => 'e1357279191d55',
                     'mail_encryption' => 'tls',
                     'mail_from_address' => 'Admin123@techupcorp.com',
                     'mail_from_name' => 'Sending Email',
                 ],
-                'type' => 'array',
+                'type' => 'smtp_account',
                 'group_id' => 1,
                 'status' => 'system'
             ],
