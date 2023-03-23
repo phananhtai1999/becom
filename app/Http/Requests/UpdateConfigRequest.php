@@ -27,7 +27,7 @@ class UpdateConfigRequest extends AbstractRequest
         $validate = [
             'key' => ['string', 'unique:configs,key,'.$this->id .',uuid,deleted_at,NULL'],
             'value' => ['nullable', 'string'],
-            'type' => ['in:image,boolean,numeric,string,array'],
+            'type' => ['in:image,boolean,numeric,string,smtp_account'],
             'status' => ['in:public,system,private'],
             'default_value' => ['nullable', 'string'],
             'group_id' => ['numeric', 'min:1', Rule::exists('groups', 'uuid')->whereNull('deleted_at')],
@@ -42,9 +42,16 @@ class UpdateConfigRequest extends AbstractRequest
         } elseif ($this->request->get('type') === 'numeric') {
 
             $validate['value'] = ['nullable', 'numeric'];
-        } elseif ($this->request->get('type') === 'array') {
+        }elseif ($this->request->get('type') === 'smtp_account') {
 
             $validate['value'] = ['array'];
+            $validate['value.mail_host'] = ['string'];
+            $validate['value.mail_port'] = ['string'];
+            $validate['value.mail_username'] = ['string'];
+            $validate['value.mail_password'] = ['string'];
+            $validate['value.mail_encryption'] = ['string'];
+            $validate['value.mail_from_address'] = ['string'];
+            $validate['value.mail_from_name'] = ['string'];
         }
 
         return $validate;

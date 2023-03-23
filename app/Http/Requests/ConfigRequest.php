@@ -27,7 +27,7 @@ class ConfigRequest extends AbstractRequest
         $validate = [
             'key' => ['required', 'string', Rule::unique('configs')->whereNull('deleted_at')],
             'value' => ['nullable', 'string'],
-            'type' => ['required', 'in:image,boolean,numeric,string,array'],
+            'type' => ['required', 'in:image,boolean,numeric,string,smtp_account'],
             'status' => ['required', 'in:public,system,private'],
             'default_value' => ['nullable', 'string'],
             'group_id' => ['required', 'numeric', 'min:1', Rule::exists('groups', 'uuid')->whereNull('deleted_at')],
@@ -42,9 +42,16 @@ class ConfigRequest extends AbstractRequest
         } elseif ($this->request->get('type') === 'numeric') {
 
             $validate['value'] = ['nullable', 'numeric'];
-        } elseif ($this->request->get('type') === 'array') {
+        }elseif ($this->request->get('type') === 'smtp_account') {
 
-            $validate['value'] = ['array'];
+            $validate['value'] = ['required', 'array'];
+            $validate['value.mail_host'] = ['required', 'string'];
+            $validate['value.mail_port'] = ['required', 'string'];
+            $validate['value.mail_username'] = ['required', 'string'];
+            $validate['value.mail_password'] = ['required', 'string'];
+            $validate['value.mail_encryption'] = ['required', 'string'];
+            $validate['value.mail_from_address'] = ['required', 'string'];
+            $validate['value.mail_from_name'] = ['required', 'string'];
         }
 
         return $validate;
