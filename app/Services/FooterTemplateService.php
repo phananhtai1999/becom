@@ -29,12 +29,13 @@ class FooterTemplateService extends AbstractService
             ->paginate($perPage, $columns, $pageName, $page);
     }
 
-    public function changeIsDefaultFooterTemplateByType($type, $templateType)
+    public function changeIsDefaultFooterTemplateByType($type, $templateType, $uuid)
     {
         $footerTemplate = $this->findOneWhere([
-            'type' => $type,
-            'is_default' => true,
-            'template_type' => $templateType
+            ['type',  $type],
+            ['is_default', true],
+            ['template_type', $templateType],
+            ['uuid', '<>', $uuid]
         ]);
 
         if ($footerTemplate) {
@@ -44,12 +45,18 @@ class FooterTemplateService extends AbstractService
         }
     }
 
-    public function changeActiveByFooterTemplateByType($type)
+    public function changeActiveByFooterTemplateByType($type, $uuid)
     {
+//        $footerTemplate = $this->findOneWhere([
+//            'type' => $type,
+//            'active_by_uuid' => auth()->user()->getKey(),
+//            'user_uuid' => auth()->user()->getKey()
+//        ]);
         $footerTemplate = $this->findOneWhere([
-            'type' => $type,
-            'active_by_uuid' => auth()->user()->getKey(),
-            'user_uuid' => auth()->user()->getKey()
+            ['type', $type],
+            ['active_by_uuid', auth()->user()->getKey()],
+            ['user_uuid', auth()->user()->getKey()],
+            ['uuid', '<>', $uuid]
         ]);
         if ($footerTemplate) {
             $footerTemplate->update([

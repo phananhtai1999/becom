@@ -88,7 +88,7 @@ class FooterTemplateController extends AbstractRestAPIController
                 return $this->sendValidationFailedJsonResponse();
             }
             $this->service->changeIsDefaultFooterTemplateByType($request->get('type') ?? $model->type,
-                $request->get('template_type') ?? $model->template_type);
+                $request->get('template_type') ?? $model->template_type, $id);
         }
 
         $this->service->update($model, $request->except(['user_uuid', 'publish_status', 'active_by_uuid']));
@@ -162,7 +162,7 @@ class FooterTemplateController extends AbstractRestAPIController
         $model = $this->myService->showMyFooterTemplate($id);
 
         if ($request->get('active_by_uuid')) {
-            $this->service->changeActiveByFooterTemplateByType($request->get('type') ?? $model->type);
+            $this->service->changeActiveByFooterTemplateByType($request->get('type') ?? $model->type, $id);
         }
         $this->service->update($model, $request->except(['user_uuid', 'publish_status', 'is_default', 'template_type']));
 
