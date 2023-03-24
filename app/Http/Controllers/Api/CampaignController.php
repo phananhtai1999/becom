@@ -712,16 +712,7 @@ class CampaignController extends AbstractRestAPIController
     public function checkAndSendCampaign($campaignUuid)
     {
         $campaign = $this->service->findOneById($campaignUuid);
-        $campaignsScenario = $campaign->campaignsScenario;
-        $campaignRootScenario = $campaignsScenario->filter(function ($value) {
-            return $value->parent_uuid === null;
-        });
-        if ($campaignRootScenario->count()) {
-            $columns = ['type', 'status', 'was_finished', 'was_stopped_by_owner'];
-
-        } else {
-            $columns = ['type', 'status', 'from_date', 'to_date', 'was_finished', 'was_stopped_by_owner'];
-        }
+        $columns = ['type', 'status', 'from_date', 'to_date', 'was_finished', 'was_stopped_by_owner'];
         foreach ($columns as $column) {
             if (!$this->service->checkActiveCampainByColumn($column, $campaignUuid)) {
                 return ['status' => false,
@@ -729,13 +720,9 @@ class CampaignController extends AbstractRestAPIController
             }
         }
         if ($this->sendEmailScheduleLogService->checkActiveCampaignbyCampaignUuid($campaignUuid)) {
-            $creditNumberSendEmail = $campaign->number_credit_needed_to_start_campaign * ($campaignRootScenario->count() > 0 ? $campaignRootScenario->count() : 1);
+            $creditNumberSendEmail = $campaign->number_credit_needed_to_start_campaign;
             if ($this->userService->checkCredit($creditNumberSendEmail, $campaign->user_uuid)) {
-                if ($campaignRootScenario->count()) {
-                    SendByCampaignRootScenarioEvent::dispatch($campaign, $creditNumberSendEmail, $campaignRootScenario);
-                } else {
-                    SendByCampaignEvent::dispatch($campaign, $creditNumberSendEmail);
-                }
+                SendByCampaignEvent::dispatch($campaign, $creditNumberSendEmail);
 
                 return ['status' => true,
                     'messages' => __('messages.send_campaign_success')];

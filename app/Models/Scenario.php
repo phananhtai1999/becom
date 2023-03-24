@@ -27,7 +27,9 @@ class Scenario extends AbstractModel
      */
     protected $fillable = [
         'name',
-        'user_uuid'
+        'user_uuid',
+        'status',
+        'last_stopped_at'
     ];
 
     /**
@@ -37,6 +39,7 @@ class Scenario extends AbstractModel
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
+        'last_stopped_at' => 'datetime',
     ];
 
     /**

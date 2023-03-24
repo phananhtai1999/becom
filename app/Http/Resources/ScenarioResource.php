@@ -20,6 +20,8 @@ class ScenarioResource extends AbstractJsonResource
             'uuid' => $this->getKey(),
             'name' => $this->name,
             'user_uuid' => $this->user_uuid,
+            'status' => $this->status,
+            'last_stopped_at' => $this->last_stopped_at,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at

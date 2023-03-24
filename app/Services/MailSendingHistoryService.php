@@ -212,9 +212,11 @@ class MailSendingHistoryService extends AbstractService
     {
         return $this->model->with('campaignScenario')->select("mail_sending_history.*")
             ->join('campaign_scenario as c', 'c.parent_uuid', '=', 'mail_sending_history.campaign_scenario_uuid')
+            ->join('scenarios', 'scenarios.uuid', '=', 'c.scenario_uuid')
             ->where('c.type', 'not_open')
             ->where('mail_sending_history.status', 'sent')
             ->whereRaw('CURDATE() - date(mail_sending_history.updated_at) > c.open_within')
+            ->whereRaw('IF(scenarios.last_stopped_at is not null, scenarios.last_stopped_at, scenarios.created_at) < mail_sending_history.updated_at')
             ->whereNotIn('c.uuid', function ($query) {
                 $query->select('m.campaign_scenario_uuid')
                     ->from('mail_sending_history as m')
