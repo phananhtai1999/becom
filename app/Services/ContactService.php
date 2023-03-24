@@ -207,11 +207,11 @@ class ContactService extends AbstractService
                 ['contacts.phone', $email]
             ])->orWhere([
                 ['campaigns.send_type', 'telegram'],
-                ['campaigns.uuid', $campaignUuid],  //add point campaign send_type is sms
+                ['campaigns.uuid', $campaignUuid],  //add point campaign send_type is telegram
                 ['contacts.phone', $email]
             ])->orWhere([
                 ['campaigns.send_type', 'viber'],
-                ['campaigns.uuid', $campaignUuid],  //add point campaign send_type is sms
+                ['campaigns.uuid', $campaignUuid],  //add point campaign send_type is viber
                 ['contacts.phone', $email]
             ])
             ->get();
