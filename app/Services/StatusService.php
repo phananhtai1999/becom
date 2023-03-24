@@ -15,11 +15,24 @@ class StatusService extends AbstractService
     /**
      * @return array
      */
-    public function firstStatus() {
-        $silver = $this->model->where('name->en', Status::STATUS_SILVER)->first();
-        $gold = $this->model->where('name->en', Status::STATUS_GOLD)->first();
-        $platinum = $this->model->where('name->en', Status::STATUS_PLATINUM)->first();
-        $diamond = $this->model->where('name->en', Status::STATUS_DIAMOND)->first();
+    public function firstStatus()
+    {
+        $silver = $this->model->where([
+            ['name->en', Status::STATUS_SILVER],
+            ['user_uuid', null]
+        ])->first();
+        $gold = $this->model->where([
+            ['name->en', Status::STATUS_GOLD],
+            ['user_uuid', null]
+        ])->first();
+        $platinum = $this->model->where([
+            ['name->en', Status::STATUS_PLATINUM],
+            ['user_uuid', null]
+        ])->first();
+        $diamond = $this->model->where([
+            ['name->en', Status::STATUS_DIAMOND],
+            ['user_uuid', null]
+        ])->first();
 
         return [
             'silver' => $silver,
