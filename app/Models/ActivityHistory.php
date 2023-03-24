@@ -97,7 +97,6 @@ class ActivityHistory extends AbstractModel
     public function remind()
     {
         return $this->belongsTo(Remind::class, 'type_id', 'uuid');
-//        $a = $this->
     }
 
     /**

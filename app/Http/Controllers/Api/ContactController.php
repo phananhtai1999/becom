@@ -17,6 +17,7 @@ use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Models\Permission;
 use App\Models\PlatformPackage;
+use App\Models\Status;
 use App\Services\ContactListService;
 use App\Services\ContactService;
 use App\Services\MyContactListService;
@@ -112,7 +113,8 @@ class ContactController extends AbstractRestAPIController
         $request = app($this->storeRequest);
 
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => $request->get('user_uuid') ?? auth()->user()->getKey()
+            'user_uuid' => $request->get('user_uuid') ?? auth()->user()->getKey(),
+            'status_uuid' => $request->get('status_uuid') ?: Status::STATUS_DEFAULT
         ]));
 
         //Add Pivot contact_company_position
@@ -206,6 +208,7 @@ class ContactController extends AbstractRestAPIController
         }
         $model = $this->service->create(array_merge($request->all(), [
             'user_uuid' => auth()->user()->getkey(),
+            'status_uuid' => $request->get('status_uuid') ?: Status::STATUS_DEFAULT
         ]));
 
         //Add Pivot contact_company_position

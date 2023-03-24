@@ -176,7 +176,23 @@ class ContactService extends AbstractService
      */
     public function addPointContactOpenByCampaign($campaignUuid, $email)
     {
-        $contactsOpenMail = $this->model->select('contacts.*')
+        $contactsOpenMail = $this->getContactOpenByCampaign($campaignUuid, $email);
+
+        foreach ($contactsOpenMail as $contactOpenMail) {
+            $this->update($contactOpenMail, [
+                'points' => $contactOpenMail->points + 1
+            ]);
+        }
+    }
+
+    /**
+     * @param $campaignUuid
+     * @param $email
+     * @return mixed
+     */
+    public function getContactOpenByCampaign($campaignUuid, $email)
+    {
+        return $this->model->select('contacts.*')
             ->join('contact_contact_list', 'contact_contact_list.contact_uuid', '=', 'contacts.uuid')
             ->join('contact_lists', 'contact_lists.uuid', '=', 'contact_contact_list.contact_list_uuid')
             ->join('campaign_contact_list', 'campaign_contact_list.contact_list_uuid', '=', 'contact_lists.uuid')
@@ -189,13 +205,16 @@ class ContactService extends AbstractService
                 ['campaigns.send_type', 'sms'],
                 ['campaigns.uuid', $campaignUuid],  //add point campaign send_type is sms
                 ['contacts.phone', $email]
-            ])->get();
-
-        foreach ($contactsOpenMail as $contactOpenMail) {
-            $this->update($contactOpenMail, [
-                'points' => $contactOpenMail->points + 1
-            ]);
-        }
+            ])->orWhere([
+                ['campaigns.send_type', 'telegram'],
+                ['campaigns.uuid', $campaignUuid],  //add point campaign send_type is sms
+                ['contacts.phone', $email]
+            ])->orWhere([
+                ['campaigns.send_type', 'viber'],
+                ['campaigns.uuid', $campaignUuid],  //add point campaign send_type is sms
+                ['contacts.phone', $email]
+            ])
+            ->get();
     }
 
     /**

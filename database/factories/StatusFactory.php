@@ -19,6 +19,7 @@ class StatusFactory extends Factory
                 'en' => $this->faker->name(2),
                 'vi' => $this->faker->name(2)
             ],
+            'points' => $this->faker->randomDigit(),
             'user_uuid' => User::inRandomOrder()->first()->uuid,
         ];
     }

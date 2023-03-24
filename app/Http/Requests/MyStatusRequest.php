@@ -27,6 +27,7 @@ class MyStatusRequest extends AbstractRequest
             'name' => ['required', 'array', 'min:1'],
             'name.en' => ['required', 'string'],
             'name.*' => ['required', 'string'],
+            'points' => ['required', 'numeric', 'min:0'],
         ];
     }
 }
