@@ -164,9 +164,13 @@ class ConfigController extends AbstractRestAPIController
         );
     }
 
-    public function testSmtpAccount()
+    public function testSmtpAccount($id)
     {
-        $smtpAccount = $this->service->findOneWhereOrFail(['key' => 'smtp_account']);
+        $smtpAccount = $this->service->findOneWhereOrFail([
+            'type' => 'smtp_account',
+            'uuid' => $id
+        ]);
+
         try {
             $subject = "Test SMTP ACCOUNT";
             $body = "Test SMTP ACCOUNT";
