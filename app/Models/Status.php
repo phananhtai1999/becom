@@ -11,6 +11,12 @@ class Status extends AbstractModel
 {
     use HasFactory, SoftDeletes, HasTranslations;
 
+    const STATUS_DEFAULT = 1;
+    const STATUS_SILVER = 'silver';
+    const STATUS_GOLD = 'gold';
+    const STATUS_PLATINUM = 'platinum';
+    const STATUS_DIAMOND = 'diamond';
+
     /**
      * @var string
      */
@@ -26,7 +32,8 @@ class Status extends AbstractModel
      */
     protected $fillable = [
         'name',
-        'user_uuid'
+        'user_uuid',
+        'points'
     ];
 
     /**

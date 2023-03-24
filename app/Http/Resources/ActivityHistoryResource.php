@@ -48,6 +48,9 @@ class ActivityHistoryResource extends AbstractJsonResource
             $data['campaign'] = new CampaignResource(optional($this->mailsendingHistory)->campaign);
         }
 
+        if (\in_array('activity_history__mail_template', $expand) && $this->type != 'note' && $this->type != 'remind') {
+            $data['mail_template'] = optional(new CampaignResource(optional($this->mailsendingHistory)->campaign))->mailTemplate;
+        }
         return $data;
     }
 }

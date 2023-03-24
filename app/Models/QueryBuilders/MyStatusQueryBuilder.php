@@ -17,10 +17,7 @@ class MyStatusQueryBuilder extends AbstractQueryBuilder
      */
     public static function baseQuery()
     {
-        return Status::where(function ($query) {
-            $query->where('user_uuid', auth()->user()->getkey())
-                ->orWhereNull('user_uuid');
-        });
+        return Status::where('user_uuid', auth()->user()->getkey());
     }
 
     /**
@@ -47,6 +44,8 @@ class MyStatusQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__' . $modelKeyName, $modelKeyName),
                 'name',
                 AllowedFilter::exact('exact__name', 'name'),
+                'points',
+                AllowedFilter::exact('exact__points', 'points'),
                 AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
                 AllowedFilter::callback("user_uuid", function (Builder $query, $value) {
                     if ($value === 'null') {

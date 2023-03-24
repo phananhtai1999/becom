@@ -26,6 +26,7 @@ class UpdateMyStatusRequest extends AbstractRequest
         return [
             'name' => ['array', 'min:1'],
             'name.*' => ['string'],
+            'points' => ['numeric', 'min:0'],
         ];
     }
 }

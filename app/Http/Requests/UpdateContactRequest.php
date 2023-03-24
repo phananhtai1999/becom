@@ -53,7 +53,7 @@ class UpdateContactRequest extends AbstractRequest
                     ->orWhereNull('user_uuid');
             })->whereNull('deleted_at')],
             'user_uuid' => ['numeric', 'min:1', Rule::exists('users', 'uuid')->whereNull('deleted_at')],
-            'status_uuid' => ['numeric', 'min:1', Rule::exists('status', 'uuid')->where(function ($query) {
+            'status_uuid' => ['nullable', 'numeric', 'min:1', Rule::exists('status', 'uuid')->where(function ($query) {
                 return $query->where('user_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey())
                     ->orWhereNull('user_uuid');
             })->whereNull('deleted_at')],

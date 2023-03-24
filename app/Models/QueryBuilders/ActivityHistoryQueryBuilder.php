@@ -5,6 +5,7 @@ namespace App\Models\QueryBuilders;
 use App\Abstracts\AbstractQueryBuilder;
 use App\Models\ActivityHistory;
 use App\Models\SearchQueryBuilders\SearchQueryBuilder;
+use Illuminate\Database\Eloquent\Builder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\Concerns\SortsQuery;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -61,6 +62,35 @@ class ActivityHistoryQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::scope('to__created_at'),
                 AllowedFilter::scope('from__date'),
                 AllowedFilter::scope('to__date'),
+                AllowedFilter::callback("mailsendingHistory.status", function (Builder $query, $value) {
+                    if (is_array($value)) {
+                        $query->where(function ($query) use ($value) {
+                            for ($i = 1; $i <= count($value); $i++) {
+                                $query->orWhereExists(function ($query) use ($value, $i) {
+                                    $query->select("mail_sending_history.uuid")
+                                        ->from('mail_sending_history')
+                                        ->whereRaw('activity_histories.type_id = mail_sending_history.uuid')
+                                        ->where([
+                                            ['activity_histories.type', '!=', 'remind'],
+                                            ['activity_histories.type', '!=', 'note'],
+                                            ['mail_sending_history.status', '=', $value[$i - 1]],
+                                        ]);
+                                });
+                            }
+                        });
+                    } else {
+                        $query->whereExists(function ($mailSendingHistory) use ($value) {
+                            $mailSendingHistory->select("mail_sending_history.uuid")
+                                ->from('mail_sending_history')
+                                ->whereRaw('activity_histories.type_id = mail_sending_history.uuid')
+                                ->where([
+                                    ['activity_histories.type', '!=', 'remind'],
+                                    ['activity_histories.type', '!=', 'note'],
+                                    ['mail_sending_history.status', '=', $value],
+                                ]);
+                        });
+                    }
+                })
             ]);
     }
 
