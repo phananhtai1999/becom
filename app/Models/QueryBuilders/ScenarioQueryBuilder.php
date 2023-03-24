@@ -30,13 +30,17 @@ class ScenarioQueryBuilder extends AbstractQueryBuilder
             ->allowedFields([
                 $modelKeyName,
                 'name',
-                'user_uuid'
+                'user_uuid',
+                'status',
+                'last_stopped_at'
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
                 $modelKeyName,
                 'name',
-                'user_uuid'
+                'user_uuid',
+                'status',
+                'last_stopped_at'
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -47,6 +51,10 @@ class ScenarioQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
                 'user.username',
                 AllowedFilter::exact('exact__user.username', 'user.username'),
+                'status',
+                AllowedFilter::exact('exact__status', 'status'),
+                'last_stopped_at',
+                AllowedFilter::exact('exact__last_stopped_at', 'last_stopped_at'),
             ]);
     }
 

@@ -53,5 +53,6 @@ return array(
     'telegram_smtp_account_invalid' => 'Không có tài khoản smtp trong hệ thống với loại telegram',
     'viber_smtp_account_invalid' => 'Không có tài khoản smtp trong hệ thống với loại viber',
     'scenario_running' => 'Chiến dịch kịch bản đang hoạt động.',
-    'campaign_in_scenario' => 'Chiến dịch nằm trong chiến dịch kịch bản.'
+    'campaign_in_scenario' => 'Chiến dịch nằm trong chiến dịch kịch bản.',
+    'send_scenario_success' => 'Gửi Email Theo Kịch Bản Thành Công.',
 );

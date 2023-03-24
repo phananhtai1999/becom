@@ -3,17 +3,21 @@
 namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
+use App\Events\SendByCampaignRootScenarioEvent;
 use App\Http\Controllers\Traits\RestIndexMyTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Requests\EditScenarioRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\ScenarioRequest;
+use App\Http\Requests\StatusMyScenarioRequest;
 use App\Http\Resources\ScenarioResourceCollection;
 use App\Services\CampaignScenarioService;
 use App\Services\CampaignService;
 use App\Services\MailSendingHistoryService;
 use App\Services\MyScenarioService;
 use App\Services\ScenarioService;
+use App\Services\UserService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class ScenarioController extends AbstractRestAPIController
@@ -32,6 +36,10 @@ class ScenarioController extends AbstractRestAPIController
 
     protected $mailSendingHistoryService;
 
+    protected $campaignService;
+
+    protected $userService;
+
     /**
      * @param ScenarioService $service
      * @param MyScenarioService $myService
@@ -41,7 +49,9 @@ class ScenarioController extends AbstractRestAPIController
         ScenarioService $service,
         MyScenarioService $myService,
         CampaignScenarioService $campaignScenarioService,
-        MailSendingHistoryService $mailSendingHistoryService
+        MailSendingHistoryService $mailSendingHistoryService,
+        CampaignService $campaignService,
+        UserService  $userService
     )
     {
         $this->service = $service;
@@ -49,6 +59,8 @@ class ScenarioController extends AbstractRestAPIController
         $this->campaignScenarioService = $campaignScenarioService;
         $this->resourceCollectionClass = ScenarioResourceCollection::class;
         $this->mailSendingHistoryService = $mailSendingHistoryService;
+        $this->campaignService = $campaignService;
+        $this->userService = $userService;
     }
 
     /**
@@ -358,5 +370,49 @@ class ScenarioController extends AbstractRestAPIController
         }
         $this->myService->destroy($id);
         return $this->sendOkJsonResponse();
+    }
+
+    public function statusMyScenario(StatusMyScenarioRequest $request)
+    {
+        $scenario = $this->service->findOneById($request->get('scenario_uuid'));
+        if ($request->get('status') === 'stopped') {
+            $this->service->update($scenario, [
+                'status' => $request->get('status'),
+                'last_stopped_at' => Carbon::now(),
+            ]);
+
+            return $this->sendOkJsonResponse();
+        }
+
+        $this->service->update($scenario, [
+            'status' => $request->get('status')
+        ]);
+
+        $result = $this->checkAndSendScenario($scenario);
+
+        if (!$result['status']) {
+            $this->service->update($scenario, [
+                'status' => 'stopped',
+                'last_stopped_at' => Carbon::now(),
+            ]);
+            return $this->sendValidationFailedJsonResponse(['errors' => $result['messages']]);
+        }
+
+        return $this->sendOkJsonResponse(["message" => $result['messages']]);
+    }
+
+    public function checkAndSendScenario($scenario)
+    {
+        $campaignRootScenario = $this->campaignScenarioService->getCampaignScenarioRootByScenarioUuid($scenario->uuid);
+
+        $campaign = $this->campaignService->checkActiveCampaignScenario($campaignRootScenario->campaign_uuid);
+        $creditNumberSendEmail = $campaign->number_credit_needed_to_start_campaign;
+        if ($this->userService->checkCredit($creditNumberSendEmail, $campaign->user_uuid)) {
+            SendByCampaignRootScenarioEvent::dispatch($campaign, $creditNumberSendEmail, $campaignRootScenario);
+            return ['status' => true,
+                'messages' => __('messages.send_scenario_success')];
+        }
+        return ['status' => false,
+            'messages' => ['credit' => __('messages.credit_invalid')]];
     }
 }

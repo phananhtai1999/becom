@@ -53,5 +53,6 @@ return array(
     'telegram_smtp_account_invalid' => 'Il n\'y a pas de compte SMTP dans le système avec le type de télégramme',
     'viber_smtp_account_invalid' => 'Il n\'y a pas de compte SMTP dans le système avec le type viber',
     'scenario_running' => 'La campagne Scénario fonctionne',
-    'campaign_in_scenario' => 'La campagne est dans le scénario campagne'
+    'campaign_in_scenario' => 'La campagne est dans le scénario campagne',
+    'send_scenario_success' => 'Envoyer un e-mail par scénario réussi',
 );

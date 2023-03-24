@@ -53,5 +53,6 @@ return array(
     'telegram_smtp_account_invalid' => '系统中没有telegram类型的SMTP账号',
     'viber_smtp_account_invalid' => '系统没有viber类型的SMTP账号',
     'scenario_running' => '场景活动正在运作',
-    'campaign_in_scenario' => '该活动在场景活动中。'
+    'campaign_in_scenario' => '该活动在场景活动中。',
+    'send_scenario_success' => '按场景成功发送电子邮件',
 );
