@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 use Spatie\Translatable\HasTranslations;
 
 class Article extends AbstractModel
@@ -55,6 +56,15 @@ class Article extends AbstractModel
         'user_uuid' => 'integer',
         'article_category_uuid' => 'integer',
     ];
+
+    protected $appends = [
+        'short_content'
+    ];
+
+    public function getShortContentAttribute()
+    {
+        return Str::limit(strip_tags($this->content), 500);
+    }
 
     /**
      * @return BelongsTo

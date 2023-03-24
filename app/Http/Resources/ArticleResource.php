@@ -26,6 +26,7 @@ class ArticleResource extends AbstractJsonResource
             'publish_status' => $this->publish_status,
             'title' => app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('title') : $this->title,
             'content' => app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('content') : $this->content,
+            'short_content' => $this->short_content,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
