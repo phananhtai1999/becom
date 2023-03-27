@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Abstracts\AbstractModel;
 use App\Http\Controllers\Traits\ModelFilterLanguageTrait;
+use App\Services\UserService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -58,7 +59,9 @@ class Article extends AbstractModel
     ];
 
     protected $appends = [
-        'short_content'
+        'short_content',
+        'title_translate',
+        'content_translate',
     ];
 
     public function getShortContentAttribute()
@@ -120,5 +123,21 @@ class Article extends AbstractModel
     public function scopeToUpdatedAt(Builder $query, $date): Builder
     {
         return $query->whereDate('updated_at', '<=', $date);
+    }
+
+    /**
+     * @return array|mixed
+     */
+    public function getContentTranslateAttribute()
+    {
+        return app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('content') : $this->content;
+    }
+
+    /**
+     * @return array|mixed
+     */
+    public function getTitleTranslateAttribute()
+    {
+        return app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('title') : $this->title;
     }
 }

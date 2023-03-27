@@ -19,7 +19,8 @@ class PermissionResource extends AbstractJsonResource
             'uuid' => $this->uuid,
             'code' => $this->code,
             'api_methods' => $this->api_methods,
-            'name' => app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('name') : $this->name,
+            'name' => $this->name,
+            'name_translate' => $this->name_stranlate,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at

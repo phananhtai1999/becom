@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Abstracts\AbstractModel;
+use App\Services\UserService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -39,6 +40,13 @@ class Permission extends AbstractModel
     ];
 
     /**
+     * @var string[]
+     */
+    protected $appends = [
+        'name_translate',
+    ];
+
+    /**
      * @param Builder $query
      * @param $name
      * @return Builder
@@ -51,5 +59,13 @@ class Permission extends AbstractModel
 
     public function platformPackages() {
         return $this->belongsToMany(PlatformPackage::class, 'platform_package_permission', 'permission_uuid', 'platform_package_uuid');
+    }
+
+    /**
+     * @return array|mixed
+     */
+    public function getNameTranslateAttribute()
+    {
+        return app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('name') : $this->name;
     }
 }
