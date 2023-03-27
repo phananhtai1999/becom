@@ -19,7 +19,8 @@ class WebsitePageCategoryResource extends AbstractJsonResource
 
         $data = [
             'uuid' => $this->uuid,
-            'title' => app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('title') : $this->title,
+            'title' => $this->title,
+            'title_translate' => $this->title_translate,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

@@ -20,7 +20,8 @@ class ArticleCategoryResource extends AbstractJsonResource
         $data = [
             'uuid' => $this->uuid,
             'slug' => $this->slug,
-            'title' => app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('title') : $this->title,
+            'title' => $this->title,
+            'title_translate' => $this->title_translate,
             'image' => $this->image,
             'parent_uuid' => $this->parent_uuid,
             'user_uuid' => $this->user_uuid,

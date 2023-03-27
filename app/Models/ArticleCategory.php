@@ -4,10 +4,9 @@ namespace App\Models;
 
 use App\Abstracts\AbstractModel;
 use App\Http\Controllers\Traits\ModelFilterLanguageTrait;
-use App\Services\LanguageService;
+use App\Services\UserService;
 use Baum\NestedSet\Node as WorksAsNestedSet;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -86,6 +85,13 @@ class ArticleCategory extends AbstractModel
         'user_uuid' => 'integer',
         'parent_uuid' => 'integer',
         'title' => 'array'
+    ];
+
+    /**
+     * @var string[]
+     */
+    protected $appends = [
+        'title_translate',
     ];
 
     /**
@@ -170,5 +176,13 @@ class ArticleCategory extends AbstractModel
     public function scopeToUpdatedAt(Builder $query, $date): Builder
     {
         return $query->whereDate('updated_at', '<=', $date);
+    }
+
+    /**
+     * @return array|mixed
+     */
+    public function getTitleTranslateAttribute()
+    {
+        return app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('title') : $this->title;
     }
 }

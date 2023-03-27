@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Abstracts\AbstractModel;
 use App\Http\Controllers\Traits\ModelFilterLanguageTrait;
+use App\Services\UserService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -45,10 +46,25 @@ class SectionCategory extends AbstractModel
     ];
 
     /**
+     * @var string[]
+     */
+    protected $appends = [
+        'title_translate',
+    ];
+
+    /**
      * @return HasMany
      */
     public function sectionTemplates()
     {
         return $this->hasMany(SectionTemplate::class, 'section_category_uuid', 'uuid');
+    }
+
+    /**
+     * @return array|mixed
+     */
+    public function getTitleTranslateAttribute()
+    {
+        return app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('title') : $this->title;
     }
 }
