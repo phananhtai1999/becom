@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Payment;
 
 use App\Abstracts\AbstractRestAPIController;
+use App\Events\SubscriptionSuccessEvent;
 use App\Http\Requests\PaymentRequest;
 use App\Http\Requests\UpgradeUserRequest;
 use App\Http\Resources\CreditPackageHistoryResource;
@@ -25,6 +26,9 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
+use Srmklive\PayPal\Services\PayPal as PayPalClient;
+use Stripe\StripeClient;
 
 class PaymentController extends AbstractRestAPIController
 {
@@ -38,7 +42,7 @@ class PaymentController extends AbstractRestAPIController
         CreditPackageHistoryService $creditPackageHistoryService,
         SubscriptionHistoryService  $subscriptionHistoryService,
         UserCreditHistoryService    $userCreditHistoryService,
-        UserPlatformPackageService $userPlatformPackageService
+        UserPlatformPackageService  $userPlatformPackageService
     )
     {
         $this->paypalService = $paypalService;
@@ -134,7 +138,8 @@ class PaymentController extends AbstractRestAPIController
     /**
      * @return JsonResponse
      */
-    public function cancelSubscription() {
+    public function cancelSubscription()
+    {
         $currentSubscriptionHistory = $this->subscriptionHistoryService->currentSubscriptionHistory();
         $userPlatformPackage = $this->userPlatformPackageService->findOneWhere(['user_uuid' => auth()->user()->getKey()]);
         try {
@@ -151,4 +156,96 @@ class PaymentController extends AbstractRestAPIController
             return $this->sendBadRequestJsonResponse(['message' => $exception->getMessage()]);
         }
     }
+
+    /**
+     * @return void
+     */
+    public function renewByStripe()
+    {
+        new StripeClient(config('payment.stripe.client_secret'));
+        $endpointSecret = config('payment.stripe.endpoint_secret');
+        $payload = @file_get_contents('php://input');
+        $sig_header = $_SERVER['HTTP_STRIPE_SIGNATURE'];
+
+        try {
+            $event = \Stripe\Webhook::constructEvent(
+                $payload, $sig_header, $endpointSecret
+            );
+        } catch (\UnexpectedValueException|\Stripe\Exception\SignatureVerificationException $e) {
+            $this->sendBadRequestJsonResponse();
+            exit();
+        }
+//         Handle the event
+        if ($event->type == 'invoice.payment_succeeded') {
+            $invoice = $event->data->object;
+            $subscriptionHistory = $this->subscriptionHistoryService->findByLog($invoice->lines->data[0]->subscription);
+            $subscriptionPlan = $subscriptionHistory->subscriptionPlan;
+            if ($subscriptionPlan->duration_type == 'year') {
+                $expirationDate = Carbon::now()->addYears($subscriptionPlan->duration);
+            } else {
+                $expirationDate = Carbon::now()->addMonths($subscriptionPlan->duration);
+            }
+            $subscriptionHistoryData = [
+                'user_uuid' => $subscriptionHistory->user_uuid,
+                'subscription_plan_uuid' => $subscriptionHistory->subscription_plan_uuid,
+                'subscription_date' => $subscriptionHistory->subscription_date,
+                'expiration_date' => $expirationDate,
+                'payment_method_uuid' => PaymentMethod::STRIPE,
+                'logs' => $subscriptionHistory->logs,
+                'status' => 'success'
+            ];
+
+            $userPlatformPackage = [
+                'user_uuid' => $subscriptionHistory->user_uuid,
+                'platform_package_uuid' => $subscriptionPlan->platform_package_uuid,
+                'subscription_plan_uuid' => $subscriptionPlan->uuid,
+                'expiration_date' => $expirationDate,
+                'auto_renew' => true
+            ];
+
+            Event::dispatch(new SubscriptionSuccessEvent($subscriptionHistory->user_uuid, $subscriptionHistoryData, $userPlatformPackage));
+        }
+    }
+
+    public function renewByPaypal()
+    {
+        $provider = new PayPalClient();
+        $provider->setApiCredentials(config('payment.paypal'));
+        $provider->getAccessToken();
+
+        $payload = @file_get_contents('php://input');
+        $event = \json_decode($payload, true);
+
+        $subscription = $provider->showSubscriptionDetails($event['resource']['billing_agreement_id']);
+
+        if ($event['event_type'] == 'PAYMENT.SALE.COMPLETED' && $subscription['billing_info']['cycle_executions'][0]['cycles_completed'] > 1) {
+            $subscriptionHistory = $this->subscriptionHistoryService->findByLog($event['resource']['billing_agreement_id']);
+            $subscriptionPlan = $subscriptionHistory->subscriptionPlan;
+            if ($subscriptionPlan->duration_type == 'year') {
+                $expirationDate = Carbon::now()->addYears($subscriptionPlan->duration);
+            } else {
+                $expirationDate = Carbon::now()->addMonths($subscriptionPlan->duration);
+            }
+            $subscriptionHistoryData = [
+                'user_uuid' => $subscriptionHistory->user_uuid,
+                'subscription_plan_uuid' => $subscriptionHistory->subscription_plan_uuid,
+                'subscription_date' => $subscriptionHistory->subscription_date,
+                'expiration_date' => $expirationDate,
+                'payment_method_uuid' => PaymentMethod::STRIPE,
+                'logs' => $subscriptionHistory->logs,
+                'status' => 'success'
+            ];
+
+            $userPlatformPackage = [
+                'user_uuid' => $subscriptionHistory->user_uuid,
+                'platform_package_uuid' => $subscriptionPlan->platform_package_uuid,
+                'subscription_plan_uuid' => $subscriptionPlan->uuid,
+                'expiration_date' => $expirationDate,
+                'auto_renew' => true
+            ];
+
+            Event::dispatch(new SubscriptionSuccessEvent($subscriptionHistory->user_uuid, $subscriptionHistoryData, $userPlatformPackage));
+        }
+    }
+
 }

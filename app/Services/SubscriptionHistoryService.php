@@ -22,13 +22,20 @@ class SubscriptionHistoryService extends AbstractService
 
     protected $modelQueryBuilderClass = SubscriptionHistoryQueryBuilder::class;
 
-    public function mySubscriptionHistories() {
+    public function mySubscriptionHistories()
+    {
 
         return $this->model->where(['user_uuid' => auth()->user()->getKey()])->orderBy('uuid', 'DESC')->get();
     }
 
-    public function currentSubscriptionHistory() {
+    public function currentSubscriptionHistory()
+    {
 
         return $this->model->where(['user_uuid' => auth()->user()->getKey()])->orderBy('uuid', 'DESC')->first();
+    }
+
+    public function findByLog($log)
+    {
+        return $this->model->where('logs->id', $log)->first();
     }
 }

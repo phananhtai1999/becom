@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\ArticleCategoryController;
 use App\Http\Controllers\Api\ArticleController;
 use App\Http\Controllers\Api\CampaignController;
 use App\Http\Controllers\Api\CompanyController;
+use App\Http\Controllers\Api\CountryController;
 use App\Http\Controllers\Api\CreditPackageController;
 use App\Http\Controllers\Api\EmailController;
 use App\Http\Controllers\Api\FooterTemplateController;
@@ -879,4 +880,18 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'footer_template.'], functio
         Route::delete('/my/footer-template/{id}', [FooterTemplateController::class, 'destroyMyFooterTemplate'])->name('destroy');
     });
 });
+
+Route::group(['middleware' => ['auth:api'], 'as' => 'country.'], function () {
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/countries', [CountryController::class, 'index'])->name('index');
+        Route::post('/country', [CountryController::class, 'store'])->name('store');
+        Route::get('/country/{id}', [CountryController::class, 'show'])->name('show');
+        Route::put('/country/{id}', [CountryController::class, 'edit'])->name('edit');
+        Route::delete('/country/{id}', [CountryController::class, 'destroy'])->name('destroy');
+    });
+});
+
+//renew membership package
+Route::post('/platform-packages/renew-by-stripe', [PaymentController::class, 'renewByStripe'])->name('renewByStripe');
+Route::post('/platform-packages/renew-by-paypal', [PaymentController::class, 'renewByPaypal'])->name('renewByPaypal');
 
