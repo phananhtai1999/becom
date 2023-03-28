@@ -13,32 +13,22 @@ class StatusService extends AbstractService
     protected $modelQueryBuilderClass = StatusQueryBuilder::class;
 
     /**
-     * @return array
+     * @return mixed
      */
-    public function firstStatus()
+    public function defaultStatus()
     {
-        $silver = $this->model->where([
-            ['name->en', Status::STATUS_SILVER],
-            ['user_uuid', null]
-        ])->first();
-        $gold = $this->model->where([
-            ['name->en', Status::STATUS_GOLD],
-            ['user_uuid', null]
-        ])->first();
-        $platinum = $this->model->where([
-            ['name->en', Status::STATUS_PLATINUM],
-            ['user_uuid', null]
-        ])->first();
-        $diamond = $this->model->where([
-            ['name->en', Status::STATUS_DIAMOND],
-            ['user_uuid', null]
-        ])->first();
+        return $this->model->where('user_uuid', null)->orderBy('points', 'ASC')->first();
+    }
 
-        return [
-            'silver' => $silver,
-            'gold' => $gold,
-            'platinum' => $platinum,
-            'diamond' => $diamond,
-        ];
+    /**
+     * @param $points
+     * @return mixed
+     */
+    public function firstStatusByPoint($points)
+    {
+        return $this->model->where([
+            ['user_uuid', null],
+            ['points', '<=', $points]
+        ])->orderBy('points', 'DESC')->first();
     }
 }

@@ -30,6 +30,7 @@ class UpdateActivityHistoryRequest extends AbstractRequest
             'contact_uuid' => ['numeric', 'min:1', Rule::exists('contacts','uuid')->whereNull('deleted_at')],
             'date' => ['date'],
             'content' => ['array', 'min:1'],
+            'content.langkey' => ['required', 'string'],
             'content.*' => ['string']
         ];
     }

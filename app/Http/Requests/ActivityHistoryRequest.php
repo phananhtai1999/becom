@@ -31,6 +31,7 @@ class ActivityHistoryRequest extends AbstractRequest
             'date' => ['date'],
             'content' => ['required', 'array', 'min:1'],
             'content.en' => ['required', 'string'],
+            'content.langkey' => ['required', 'string'],
             'content.*' => ['required', 'string'],
         ];
     }

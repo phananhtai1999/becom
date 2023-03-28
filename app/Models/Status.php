@@ -11,11 +11,10 @@ class Status extends AbstractModel
 {
     use HasFactory, SoftDeletes, HasTranslations;
 
-    const STATUS_DEFAULT = 1;
-    const STATUS_SILVER = 'silver';
-    const STATUS_GOLD = 'gold';
-    const STATUS_PLATINUM = 'platinum';
-    const STATUS_DIAMOND = 'diamond';
+    const STATUS_CLIENT = 'Client';
+    const STATUS_LEAD = 'Lead';
+    const STATUS_CUSTOMER = 'Customer';
+    const STATUS_LOYAL_CUSTOMER = 'Loyal Customer';
 
     /**
      * @var string
