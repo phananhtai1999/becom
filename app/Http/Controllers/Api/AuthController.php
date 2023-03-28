@@ -252,7 +252,7 @@ class AuthController extends AbstractRestAPIController
     {
         $activeCode = $this->generateRandomString();
         if ($type == 'register') {
-            $this->otpService->create([
+            $otp = $this->otpService->create([
                 'active_code' => $activeCode,
                 'user_uuid' => $user->uuid,
                 'expired_time' => Carbon::now()->addMinutes(config('otp.expired_time')),
