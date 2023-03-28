@@ -16,22 +16,22 @@ class StatusSeeder extends Seeder
     {
         $status = [
             [
-                'name' => ['en' => 'silver', 'vi' => 'bạc'],
+                'name' => ['en' => 'Client', 'vi' => 'khách hàng'],
                 'points' => 0,
                 'user_uuid' => null,
             ],
             [
-                'name' => ['en' => 'gold', 'vi' => 'vàng'],
+                'name' => ['en' => 'Lead', 'vi' => 'khách hàng tiềm năng'],
                 'points' => 2,
                 'user_uuid' => null,
             ],
             [
-                'name' => ['en' => 'platinum', 'vi' => 'bạch kim'],
+                'name' => ['en' => 'Customer', 'vi' => 'khách hàng thân thiết'],
                 'points' => 4,
                 'user_uuid' => null,
             ],
             [
-                'name' => ['en' => 'diamond', 'vi' => 'kim cương'],
+                'name' => ['en' => 'Loyal Customer', 'vi' => 'khách vip'],
                 'points' => 6,
                 'user_uuid' => null,
             ],

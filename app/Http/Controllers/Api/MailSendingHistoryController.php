@@ -118,10 +118,8 @@ class MailSendingHistoryController extends AbstractRestAPIController
         }
         if ($mailSendingHistory->campaign_scenario_uuid) {
             $campaignScenario = $this->campaignScenarioService->findOneById($mailSendingHistory->campaign_scenario_uuid);        //Add 1 point when open mail
-            //Add 1 point when open mail or phone
-            $this->contactService->addPointContactOpenByCampaign($campaignScenario->getRoot()->campaign_uuid, $mailSendingHistory->email);
-            //Update status contact
-            ActiveStatusEvent::dispatch($mailSendingHistory->campaign_uuid, $mailSendingHistory->email);
+            //Add 1 point when open mail or phone And Update status contact
+            ActiveStatusEvent::dispatch($campaignScenario->getRoot()->campaign_uuid, $mailSendingHistory->email);
             if ($statusMailSendingHistory !== "opened") {
                 if (($nextCampaignScenario = $this->campaignScenarioService->getCampaignWhenOpenEmailByUuid($mailSendingHistory->campaign_scenario_uuid, $mailSendingHistory->created_at))
                     && ($nextCampaign = $this->campaignService->checkActiveCampaignScenario($nextCampaignScenario->campaign_uuid))) {
@@ -134,9 +132,7 @@ class MailSendingHistoryController extends AbstractRestAPIController
                 }
             }
         } else {
-            //Add 1 point when open mail or phone
-            $this->contactService->addPointContactOpenByCampaign($mailSendingHistory->campaign_uuid, $mailSendingHistory->email);
-            //Update status contact
+            //Add 1 point when open mail or phone And Update status contact
             ActiveStatusEvent::dispatch($mailSendingHistory->campaign_uuid, $mailSendingHistory->email);
         }
 

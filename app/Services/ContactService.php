@@ -172,25 +172,9 @@ class ContactService extends AbstractService
     /**
      * @param $campaignUuid
      * @param $email
-     * @return void
-     */
-    public function addPointContactOpenByCampaign($campaignUuid, $email)
-    {
-        $contactsOpenMail = $this->getContactOpenByCampaign($campaignUuid, $email);
-
-        foreach ($contactsOpenMail as $contactOpenMail) {
-            $this->update($contactOpenMail, [
-                'points' => $contactOpenMail->points + 1
-            ]);
-        }
-    }
-
-    /**
-     * @param $campaignUuid
-     * @param $email
      * @return mixed
      */
-    public function getContactOpenByCampaign($campaignUuid, $email)
+    public function addPointContactOpenByCampaign($campaignUuid, $email)
     {
         return $this->model->select('contacts.*')
             ->join('contact_contact_list', 'contact_contact_list.contact_uuid', '=', 'contacts.uuid')

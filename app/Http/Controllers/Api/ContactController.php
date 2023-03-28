@@ -17,11 +17,11 @@ use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Models\Permission;
 use App\Models\PlatformPackage;
-use App\Models\Status;
 use App\Services\ContactListService;
 use App\Services\ContactService;
 use App\Services\MyContactListService;
 use App\Services\MyContactService;
+use App\Services\StatusService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Gate;
@@ -46,16 +46,23 @@ class ContactController extends AbstractRestAPIController
     protected $contactListService;
 
     /**
+     * @var
+     */
+    protected $statusService;
+
+    /**
      * @param ContactService $service
      * @param MyContactService $myService
      * @param MyContactListService $myContactListService
      * @param ContactListService $contactListService
+     * @param StatusService $statusService
      */
     public function __construct(
         ContactService       $service,
         MyContactService     $myService,
         MyContactListService $myContactListService,
-        ContactListService   $contactListService
+        ContactListService   $contactListService,
+        StatusService $statusService
     )
     {
         $this->service = $service;
@@ -67,6 +74,7 @@ class ContactController extends AbstractRestAPIController
         $this->editRequest = UpdateContactRequest::class;
         $this->indexRequest = IndexRequest::class;
         $this->contactListService = $contactListService;
+        $this->statusService = $statusService;
     }
 
     /**
@@ -111,10 +119,11 @@ class ContactController extends AbstractRestAPIController
     public function store()
     {
         $request = app($this->storeRequest);
+        $defaultStatus = $this->statusService->defaultStatus() ? $this->statusService->defaultStatus()->uuid : null;
 
         $model = $this->service->create(array_merge($request->all(), [
             'user_uuid' => $request->get('user_uuid') ?? auth()->user()->getKey(),
-            'status_uuid' => $request->get('status_uuid') ?: Status::STATUS_DEFAULT
+            'status_uuid' => $request->get('status_uuid') ?: $defaultStatus
         ]));
 
         //Add Pivot contact_company_position
@@ -206,9 +215,11 @@ class ContactController extends AbstractRestAPIController
         if (!Gate::allows('permission', config('api.contact.create'))) {
             return $this->sendJsonResponse(false, 'You need to upgrade platform package', ['data' => $this->getPlatformByPermission(config('api.contact.create'))], 403);
         }
+
+        $defaultStatus = $this->statusService->defaultStatus() ? $this->statusService->defaultStatus()->uuid : null;
         $model = $this->service->create(array_merge($request->all(), [
             'user_uuid' => auth()->user()->getkey(),
-            'status_uuid' => $request->get('status_uuid') ?: Status::STATUS_DEFAULT
+            'status_uuid' => $request->get('status_uuid') ?: $defaultStatus
         ]));
 
         //Add Pivot contact_company_position

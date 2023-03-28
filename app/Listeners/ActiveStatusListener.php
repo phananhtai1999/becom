@@ -38,41 +38,20 @@ class ActiveStatusListener
      */
     public function handle(ActiveStatusEvent $event)
     {
-        $contactsOpenMail = $this->contactService->getContactOpenByCampaign($event->campaign, $event->email);
-        $activeStatus = $this->statusService->firstStatus();
-        $silverStatus = $activeStatus['silver'];
-        $goldStatus = $activeStatus['gold'];
-        $platinumStatus = $activeStatus['platinum'];
-        $diamondStatus = $activeStatus['diamond'];
+        $contactsOpenMail = $this->contactService->addPointContactOpenByCampaign($event->campaign, $event->email);
 
-        if ($silverStatus && $goldStatus && $platinumStatus && $diamondStatus) {
-            foreach ($contactsOpenMail as $contactOpenMail) {
-                $points = $contactOpenMail->points;
-                if ($silverStatus->points <= $points && $points <= $goldStatus->points) {
-                    $this->updateContact($contactOpenMail, $silverStatus->uuid);
-
-                } elseif ($goldStatus->points < $points && $points <= $platinumStatus->points) {
-                    $this->updateContact($contactOpenMail, $goldStatus->uuid);
-
-                } elseif ($platinumStatus->points < $points && $points <= $diamondStatus->points) {
-                    $this->updateContact($contactOpenMail, $platinumStatus->uuid);
-
-                } elseif ($diamondStatus->points < $points) {
-                    $this->updateContact($contactOpenMail, $diamondStatus->uuid);
-                }
+        foreach ($contactsOpenMail as $contactOpenMail) {
+            //Add 1 point when open mail or phone
+            $this->contactService->update($contactOpenMail, [
+                'points' => $contactOpenMail->points + 1
+            ]);
+            //Update status contact
+            $statusAdmin = $this->statusService->firstStatusByPoint($contactOpenMail->points);
+            if ($contactOpenMail->status_uuid && $contactOpenMail->status && $contactOpenMail->status->user_uuid == null && $statusAdmin) {
+                $this->contactService->update($contactOpenMail, [
+                    'status_uuid' => $statusAdmin->uuid
+                ]);
             }
         }
-    }
-
-    /**
-     * @param $contactOpenMail
-     * @param $statusUuid
-     * @return void
-     */
-    public function updateContact($contactOpenMail, $statusUuid)
-    {
-        $this->contactService->update($contactOpenMail, [
-            'status_uuid' => $statusUuid
-        ]);
     }
 }
