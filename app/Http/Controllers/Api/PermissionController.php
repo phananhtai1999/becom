@@ -19,6 +19,7 @@ use App\Http\Resources\CreditPackageResourceCollection;
 use App\Http\Resources\PermissionResource;
 use App\Http\Resources\PermissionResourceCollection;
 use App\Models\Permission;
+use App\Services\AddOnService;
 use App\Services\CreditPackageService;
 use App\Services\PermissionService;
 use Illuminate\Support\Facades\Cache;
@@ -28,9 +29,10 @@ class PermissionController extends AbstractRestAPIController
 
     use RestShowTrait, RestIndexTrait;
 
-    public function __construct(PermissionService $service)
+    public function __construct(PermissionService $service, AddOnService $addOnService)
     {
         $this->service = $service;
+        $this->addOnService = $addOnService;
         $this->resourceCollectionClass = PermissionResourceCollection::class;
         $this->resourceClass = PermissionResource::class;
         $this->indexRequest = IndexRequest::class;
@@ -62,5 +64,21 @@ class PermissionController extends AbstractRestAPIController
         $this->service->destroy($id);
         Cache::flush();
         return $this->sendOkJsonResponse();
+    }
+
+    public function permissionForPlatform() {
+        $addOns = $this->addOnService->findAllWhere([]);
+        $permissionAddOnUuid = [];
+        foreach ($addOns as $addOn) {
+            foreach ($addOn->permissions as $permission) {
+                $permissionAddOnUuid[] = $permission->uuid;
+            }
+        }
+        $models = $this->service->getPermissionForPlatform(array_unique($permissionAddOnUuid));
+        Cache::flush();
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+        );
     }
 }

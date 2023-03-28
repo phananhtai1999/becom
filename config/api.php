@@ -93,11 +93,11 @@ return [
         'index' => 'index_mail_template',
     ],
     'smtp_account' => [
-        'create_smtp_account',
-        'edit_smtp_account',
-        'delete_smtp_account',
-        'show_smtp_account',
-        'index_smtp_account',
+        'create' => 'create_smtp_account',
+        'edit' => 'edit_smtp_account',
+        'delete' => 'delete_smtp_account',
+        'show' => 'show_smtp_account',
+        'index' => 'index_smtp_account',
     ],
     'website' => [
         'create' => 'create_website',
@@ -105,5 +105,12 @@ return [
         'delete' => 'delete_website',
         'show' => 'show_website',
         'index' => 'index_website',
+    ],
+    'footer' => [
+        'create' => 'create_footer',
+        'edit' => 'edit_footer',
+        'delete' => 'delete_footer',
+        'show' => 'show_footer',
+        'index' => 'index_footer',
     ],
 ];

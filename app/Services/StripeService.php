@@ -181,6 +181,24 @@ class StripeService extends AbstractService
         }
     }
 
+    public function processSubscriptionAddOn($subscriptionDate, $expirationDate, $plan, $request) {
+
+        try {
+            $this->subscription($request, $plan);
+
+            return [
+                'status' => true,
+                'redirect_url' => env('FRONTEND_URL') . 'my/profile/upgrade/success?go_back_url=' . $request['go_back_url'] . '&plan_id=' . $request['add_on_uuid']
+            ];
+        } catch (\Exception $e) {
+
+            return [
+                'status' => false,
+                'message' => $e->getMessage(),
+            ];
+        }
+    }
+
     /**
      * @param $id
      * @return void
@@ -190,5 +208,44 @@ class StripeService extends AbstractService
     {
         $stripe = $this->getStripeClient();
         $stripe->subscriptions->cancel($id);
+    }
+
+    /**
+     * @param $request
+     * @param $plan
+     * @return array
+     * @throws \Stripe\Exception\ApiErrorException
+     */
+    public function subscription($request, $plan)
+    {
+        $stripe = $this->getStripeClient();
+
+        $token = $stripe->tokens->create([
+            'card' => [
+                'name' => Auth::user()->name,
+                'number' => $request['card_number'],
+                'exp_month' => $request['exp_month'],
+                'exp_year' => $request['exp_year'],
+                'cvc' => $request['cvc'],
+            ]
+        ]);
+
+        $customer = $stripe->customers->create([
+            'email' => auth()->user()->email,
+            'source' => $token
+        ]);
+
+        $subscription = $stripe->subscriptions->create([
+            'customer' => $customer,
+            'items' => [
+                ['price' => $plan],
+            ]
+        ]);
+
+        $stripe->subscriptionSchedules->create([
+            'from_subscription' => $subscription
+        ]);
+
+        return ["id" => $subscription->id];
     }
 }
