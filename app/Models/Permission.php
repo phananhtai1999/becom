@@ -68,4 +68,8 @@ class Permission extends AbstractModel
     {
         return app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('name') : $this->name;
     }
+
+    public function addOns() {
+        return $this->belongsToMany(AddOn::class, 'add_on_permissions', 'permission_uuid', 'add_on_uuid');
+    }
 }

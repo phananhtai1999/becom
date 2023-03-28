@@ -21,4 +21,9 @@ class PermissionService extends AbstractService
     protected $modelClass = Permission::class;
 
     protected $modelQueryBuilderClass = PermissionQueryBuilder::class;
+
+    public function getPermissionForPlatform($permissionAddOnUuid)
+    {
+        return $this->model->whereNotIn('uuid', $permissionAddOnUuid)->get();
+    }
 }
