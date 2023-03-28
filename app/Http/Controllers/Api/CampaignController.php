@@ -806,14 +806,14 @@ class CampaignController extends AbstractRestAPIController
                 }
                 $this->smtpAccountService->setSmtpAccountForSendEmail($smtpAccount);
                 $mailTemplate = $this->mailTemplateVariableService->renderBody($campaign->mailTemplate, $user->email, $smtpAccount, $campaign);
-                Mail::to($user->email)->send(new SendCampaign($mailTemplate, $smtpAccount->mail_from_name, $smtpAccount->mail_from_address));
+                Mail::to($user->email)->send(new SendCampaign($mailTemplate, $smtpAccount->mail_from_name, $smtpAccount->mail_from_address, $campaign->reply_to_email, $campaign->reply_name));
 
                 return $this->sendOkJsonResponse(['message' => __('messages.test_send_campaign_success')]);
             } catch (\Exception $e) {
 
                 return $this->sendValidationFailedJsonResponse(["smtp_account" => $e->getMessage()]);
             }
-        } elseif ($campaign->send_type == 'sms') {
+        } else {
             $contacts = $this->contactService->getContactsSendSms($campaign->uuid);
             $content = $campaign->mailTemplate->body;
 
@@ -847,14 +847,14 @@ class CampaignController extends AbstractRestAPIController
                 }
                 $this->smtpAccountService->setSmtpAccountForSendEmail($smtpAccount);
                 $mailTemplate = $this->mailTemplateVariableService->renderBody($campaign->mailTemplate, $user->email, $smtpAccount, $campaign);
-                Mail::to($user->email)->send(new SendCampaign($mailTemplate, $smtpAccount->mail_from_name, $smtpAccount->mail_from_address));
+                Mail::to($user->email)->send(new SendCampaign($mailTemplate, $smtpAccount->mail_from_name, $smtpAccount->mail_from_address, $campaign->reply_to_email, $campaign->reply_name));
 
                 return $this->sendOkJsonResponse(['message' => __('messages.test_send_campaign_success')]);
             } catch (\Exception $e) {
 
                 return $this->sendValidationFailedJsonResponse(["smtp_account" => $e->getMessage()]);
             }
-        } elseif ($campaign->send_type == 'sms') {
+        } else {
             $contacts = $this->contactService->getContactsSendSms($campaign->uuid);
             $content = $campaign->mailTemplate->body;
 

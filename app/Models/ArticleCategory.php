@@ -185,4 +185,21 @@ class ArticleCategory extends AbstractModel
     {
         return app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('title') : $this->title;
     }
+
+    /**
+     * @param Builder $query
+     * @param $title
+     * @return Builder
+     */
+    public function scopeParentArticleCategoryTitle(Builder $query, $title)
+    {
+        return $query->where('parent_uuid', function ($q) use ($title) {
+            $lang = app()->getLocale();
+            $langDefault = config('app.fallback_locale');
+            $q->select('a.uuid')
+                ->from('article_categories as a')
+                ->whereColumn('a.uuid', 'article_categories.parent_uuid')
+                ->whereRaw("IFNULL(JSON_UNQUOTE(JSON_EXTRACT(a.title, '$.$lang')),JSON_UNQUOTE(JSON_EXTRACT(a.title, '$.$langDefault'))) = '$title'");
+        });
+    }
 }
