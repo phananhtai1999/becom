@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Abstracts\AbstractRestAPIController;
 use App\Events\SendByCampaignRootScenarioEvent;
 use App\Events\SendByCampaignEvent;
+use App\Events\SendNotificationSystemEvent;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Requests\CampaignLinkTrackingRequest;
 use App\Http\Requests\CampaignRequest;
@@ -27,6 +28,7 @@ use App\Http\Resources\CampaignLinkTrackingResource;
 use App\Http\Resources\CampaignResource;
 use App\Http\Resources\CampaignTrackingResource;
 use App\Mail\SendCampaign;
+use App\Models\Notification;
 use App\Services\CampaignDailyTrackingService;
 use App\Services\CampaignLinkDailyTrackingService;
 use App\Services\CampaignLinkTrackingService;
@@ -655,7 +657,7 @@ class CampaignController extends AbstractRestAPIController
             $this->service->update($campaign, [
                 'was_stopped_by_owner' => $request->get('was_stopped_by_owner')
             ]);
-
+            SendNotificationSystemEvent::dispatch($campaign->user, Notification::CAMPAIGN_TYPE, Notification::STOP_ACTION, $campaign);
             return $this->sendOkJsonResponse();
         }
 
@@ -668,6 +670,7 @@ class CampaignController extends AbstractRestAPIController
             $this->service->update($campaign, [
                 'was_stopped_by_owner' => !$request->get('was_stopped_by_owner')
             ]);
+            SendNotificationSystemEvent::dispatch($campaign->user, Notification::CAMPAIGN_TYPE, Notification::STOP_ACTION, $campaign);
             return $this->sendValidationFailedJsonResponse(['errors' => $result['messages']]);
         }
 
@@ -686,7 +689,7 @@ class CampaignController extends AbstractRestAPIController
             $this->service->update($campaign, [
                 'was_stopped_by_owner' => $request->get('was_stopped_by_owner')
             ]);
-
+            SendNotificationSystemEvent::dispatch($campaign->user, Notification::CAMPAIGN_TYPE, Notification::STOP_ACTION, $campaign);
             return $this->sendOkJsonResponse();
         }
 
@@ -699,6 +702,7 @@ class CampaignController extends AbstractRestAPIController
             $this->service->update($campaign, [
                 'was_stopped_by_owner' => !$request->get('was_stopped_by_owner')
             ]);
+            SendNotificationSystemEvent::dispatch($campaign->user, Notification::CAMPAIGN_TYPE, Notification::STOP_ACTION, $campaign);
             return $this->sendValidationFailedJsonResponse(['errors' => $result['messages']]);
         }
 
@@ -723,7 +727,7 @@ class CampaignController extends AbstractRestAPIController
             $creditNumberSendEmail = $campaign->number_credit_needed_to_start_campaign;
             if ($this->userService->checkCredit($creditNumberSendEmail, $campaign->user_uuid)) {
                 SendByCampaignEvent::dispatch($campaign, $creditNumberSendEmail);
-
+                SendNotificationSystemEvent::dispatch($campaign->user, Notification::CAMPAIGN_TYPE, Notification::START_ACTION, $campaign);
                 return ['status' => true,
                     'messages' => __('messages.send_campaign_success')];
             }

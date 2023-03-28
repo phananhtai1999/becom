@@ -23,6 +23,7 @@ use App\Services\PasswordResetService;
 use App\Services\SmtpAccountService;
 use App\Services\UserAccessTokenService;
 use App\Services\UserService;
+use App\Services\UserTrackingService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -58,6 +59,8 @@ class AuthController extends AbstractRestAPIController
      */
     private $userAccessTokenService;
 
+    protected $userTrackingService;
+
     /**
      * @param UserService $userService
      * @param AuthenticationService $authenticationService
@@ -73,7 +76,8 @@ class AuthController extends AbstractRestAPIController
         UserAccessTokenService $userAccessTokenService,
         OtpService             $otpService,
         ConfigService $configService,
-        SmtpAccountService $smtpAccountService
+        SmtpAccountService $smtpAccountService,
+        UserTrackingService $userTrackingService
     )
     {
         $this->userService = $userService;
@@ -84,6 +88,7 @@ class AuthController extends AbstractRestAPIController
         $this->otpService = $otpService;
         $this->configService = $configService;
         $this->smtpAccountService = $smtpAccountService;
+        $this->userTrackingService = $userTrackingService;
     }
 
     /**
@@ -376,6 +381,9 @@ class AuthController extends AbstractRestAPIController
 
         $userData['data']['token'] = $this->userAccessTokenService->storeNewForUser($user)->getKey();
         $userData['data']['token_type'] = 'Bearer';
+
+        //Kiểm tra country và gửi email khi khác country
+        $this->userTrackingService->checkAndSendUserLogin($user);
 
         return \response()->json(array_merge([
             'status' => true,

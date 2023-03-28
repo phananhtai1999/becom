@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\MailOpenTrackingController;
 use App\Http\Controllers\Api\MailSendingHistoryController;
 use App\Http\Controllers\Api\MailTemplateController;
 use App\Http\Controllers\Api\NoteController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\Payment\PaymentController;
 use App\Http\Controllers\Api\Payment\PaypalController;
 use App\Http\Controllers\Api\PermissionController;
@@ -896,3 +897,14 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'country.'], function () {
 Route::post('/platform-packages/renew-by-stripe', [PaymentController::class, 'renewByStripe'])->name('renewByStripe');
 Route::post('/platform-packages/renew-by-paypal', [PaymentController::class, 'renewByPaypal'])->name('renewByPaypal');
 
+Route::group(['middleware' => ['auth:api'], 'as' => 'notification.'], function () {
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/notifications', [NotificationController::class, 'index'])->name('index');
+    });
+
+    Route::group(['as' => 'my.'], function () {
+        Route::get('/my/notifications', [NotificationController::class, 'indexMy'])->name('index');
+    });
+
+    Route::post('/read-notifications', [NotificationController::class, 'readNotifications'])->name('index');
+});
