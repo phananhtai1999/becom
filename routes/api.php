@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\ActivityHistoryController;
 use App\Http\Controllers\Api\AddOnController;
 use App\Http\Controllers\Api\ArticleCategoryController;
 use App\Http\Controllers\Api\ArticleController;
+use App\Http\Controllers\Api\BusinessCategoryController;
 use App\Http\Controllers\Api\CampaignController;
 use App\Http\Controllers\Api\CompanyController;
 use App\Http\Controllers\Api\CountryController;
@@ -936,3 +937,16 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'user-tracking.'], function 
         Route::delete('/user-tracking/{id}', [UserTrackingController::class, 'destroy'])->name('destroy');
     });
 });
+
+//Article Category
+Route::group(['middleware' => ['auth:api'], 'as' => 'business-category.'], function () {
+    Route::group(['middleware' => ['role:admin,editor'], 'as' => 'author.'], function () {
+        Route::post('/business-category', [BusinessCategoryController::class, 'store'])->name('store');
+        Route::put('/business-category/{id}', [BusinessCategoryController::class, 'edit'])->name('edit');
+        Route::delete('/business-category/{id}', [BusinessCategoryController::class, 'destroy'])->name('destroy');
+        Route::get('/business-categories', [BusinessCategoryController::class, 'index'])->name('index');
+        Route::get('/business-category/{id}', [BusinessCategoryController::class, 'show'])->name('show');
+    });
+});
+Route::get('public/business-categories', [BusinessCategoryController::class, 'indexPublic'])->name('business-categories-public.index');
+Route::get('public/business-category/{id}', [BusinessCategoryController::class, 'showPublic'])->name('business-categories-public.show');
