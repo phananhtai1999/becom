@@ -836,10 +836,12 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'activity_history.'], functi
         Route::get('/activity-history/{id}', [ActivityHistoryController::class, 'show'])->name('show');
         Route::put('/activity-history/{id}', [ActivityHistoryController::class, 'edit'])->name('edit');
         Route::delete('/activity-history/{id}', [ActivityHistoryController::class, 'destroy'])->name('destroy');
+        Route::post('/render-body-mail-template', [ActivityHistoryController::class, 'renderBodyMailTemplate'])->name('renderBodyMailtemplate');
     });
 
     Route::group(['as' => 'my.'], function () {
         Route::get('/my/activity-histories', [ActivityHistoryController::class, 'indexMyActivityHistories'])->name('index');
+        Route::post('/my/render-body-mail-template', [ActivityHistoryController::class, 'renderMyBodyMailTemplate'])->name('renderMyBodyMailtemplate');
     });
 });
 
