@@ -906,6 +906,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'notification.'], function (
 
     Route::group(['as' => 'my.'], function () {
         Route::get('/my/notifications', [NotificationController::class, 'indexMy'])->name('index');
+        Route::delete('my/notification/{id}', [NotificationController::class, 'destroyMy'])->name('destroyMy');
     });
     Route::post('/read-notifications', [NotificationController::class, 'readNotifications'])->name('index');
 });

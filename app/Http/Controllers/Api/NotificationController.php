@@ -37,6 +37,22 @@ class NotificationController extends AbstractRestAPIController
         $this->indexRequest = IndexRequest::class;
     }
 
+    /**
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function destroyMy($id)
+    {
+        $model = $this->myService->findOneWhereOrFail([
+            ['uuid' => $id],
+            ['user_uuid' => auth()->user()->getKey()],
+        ]);
+
+        $this->myService->destroy($model->getKey());
+
+        return $this->sendOkJsonResponse();
+    }
+
     public function readNotifications(ReadNotificationsRequest $request)
     {
         $notifications = $request->get('notifications');
