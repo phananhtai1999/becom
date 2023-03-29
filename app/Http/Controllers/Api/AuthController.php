@@ -74,7 +74,7 @@ class AuthController extends AbstractRestAPIController
         UserAccessTokenService $userAccessTokenService,
         OtpService             $otpService,
         ConfigService $configService,
-        SmtpAccountService $smtpAccountService,
+        SmtpAccountService $smtpAccountService
     )
     {
         $this->userService = $userService;
