@@ -107,7 +107,7 @@ class EventServiceProvider extends ServiceProvider
         ],
         SendNotificationSystemForLoginEvent::class => [
             SendNotificationSystemForLoginListener::class
-        ]
+        ],
         SubscriptionAddOnSuccessEvent::class => [
             SubscriptionAddOnSuccessListener::class
         ],
