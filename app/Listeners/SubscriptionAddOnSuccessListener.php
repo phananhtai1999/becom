@@ -28,7 +28,6 @@ class SubscriptionAddOnSuccessListener
     public function handle($event)
     {
         AddOnHistory::create($event->subscriptionHistoryData);
-        UserAddOn::where('user_uuid', $event->userUuid)->delete();
         UserAddOn::create($event->userAddOnData);
     }
 }

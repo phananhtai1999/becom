@@ -10,11 +10,14 @@ use App\Http\Requests\PaymentAddOnRequest;
 use App\Http\Requests\UpdateAddOnRequest;
 use App\Http\Resources\AddOnResource;
 use App\Http\Resources\AddOnResourceCollection;
+use App\Http\Resources\UserAddOnResource;
 use App\Models\AddOn;
 use App\Models\PaymentMethod;
 use App\Services\AddOnService;
 use App\Services\PaypalService;
 use App\Services\StripeService;
+use App\Services\UserAddOnService;
+use App\Services\UserPlatformPackageService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -28,13 +31,16 @@ class AddOnController extends AbstractRestAPIController
         AddOnService  $service,
         PaypalService $paypalService,
         StripeService $stripeService,
+        UserAddOnService $userAddOnService
     )
     {
         $this->service = $service;
         $this->stripeService = $stripeService;
         $this->paypalService = $paypalService;
+        $this->userAddOnService = $userAddOnService;
         $this->resourceClass = AddOnResource::class;
         $this->resourceCollectionClass = AddOnResourceCollection::class;
+        $this->userAddOnResourceClass = UserAddOnResource::class;
     }
 
     /**
@@ -142,5 +148,13 @@ class AddOnController extends AbstractRestAPIController
                 ]
             ]);
         }
+    }
+
+    public function myAddOn() {
+        $myAddOn = $this->userAddOnService->findOneWhere(['user_uuid' => auth()->user()->getKey()]);
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->userAddOnResourceClass, $myAddOn)
+        );
     }
 }
