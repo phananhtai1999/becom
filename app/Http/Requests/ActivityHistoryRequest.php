@@ -25,7 +25,7 @@ class ActivityHistoryRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'type' => ['string'],
+            'type' => ['required', 'string', 'in:email,sms,telegram,viber,note,remind'],
             'type_id' => ['nullable', 'numeric', 'min:1', Rule::exists('mail_sending_history','uuid')->whereNull('deleted_at')],
             'contact_uuid' => ['required', 'numeric', 'min:1', Rule::exists('contacts','uuid')->whereNull('deleted_at')],
             'date' => ['date'],

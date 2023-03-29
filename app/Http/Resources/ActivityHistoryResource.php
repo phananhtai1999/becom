@@ -23,6 +23,7 @@ class ActivityHistoryResource extends AbstractJsonResource
             'contact_uuid' => $this->contact_uuid,
             'date' => $this->date,
             'content' => __('activity.'. $this->content['langkey'], $this->content),
+            'render_body_mail_template' => $this->render_body_mail_template,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at

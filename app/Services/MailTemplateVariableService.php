@@ -35,42 +35,42 @@ class MailTemplateVariableService extends AbstractService
         $current = Carbon::now('Asia/Ho_Chi_Minh');
         $currentDay = $current->toDateString();
         $currentTime = $current->toTimeString();
-//        $search = [
-//            '{{ $website_name }}',
-//            '{{ $website_domain }}',
-//            '{{ $website_description }}',
-//            '{{ $from_email }}',
-//            '{{ $to_email }}',
-//            '{{ $contact_first_name }}',
-//            '{{ $contact_middle_name }}',
-//            '{{ $contact_last_name }}',
-//            '{{ $contact_phone }}',
-//            '{{ $contact_sex }}',
-//            '{{ $contact_dob }}',
-//            '{{ $contact_country }}',
-//            '{{ $contact_city }}',
-//            '{{ $current_day }}',
-//            '{{ $current_time }}'
-//
-//        ];
         $search = [
-            '{ website_name }',
-            '{ website_domain }',
-            '{ website_description }',
-            '{ from_email }',
-            '{ to_email }',
-            '{ contact_first_name }',
-            '{ contact_middle_name }',
-            '{ contact_last_name }',
-            '{ contact_phone }',
-            '{ contact_sex }',
-            '{ contact_dob }',
-            '{ contact_country }',
-            '{ contact_city }',
-            '{ current_day }',
-            '{ current_time }'
+            '{{website_name}}',
+            '{{website_domain}}',
+            '{{website_description}}',
+            '{{from_email}}',
+            '{{to_email}}',
+            '{{contact_first_name}}',
+            '{{contact_middle_name}}',
+            '{{contact_last_name}}',
+            '{{contact_phone}}',
+            '{{contact_sex}}',
+            '{{contact_dob}}',
+            '{{contact_country}}',
+            '{{contact_city}}',
+            '{{current_day}}',
+            '{{current_tim }}'
 
         ];
+//        $search = [
+//            '{ website_name }',
+//            '{ website_domain }',
+//            '{ website_description }',
+//            '{ from_email }',
+//            '{ to_email }',
+//            '{ contact_first_name }',
+//            '{ contact_middle_name }',
+//            '{ contact_last_name }',
+//            '{ contact_phone }',
+//            '{ contact_sex }',
+//            '{ contact_dob }',
+//            '{ contact_country }',
+//            '{ contact_city }',
+//            '{ current_day }',
+//            '{ current_time }'
+//
+//        ];
         $replace = [
             $websiteName, $websiteDomain, $websiteDescription,
             $fromEmail, $toEmail, $contactFirstName, $contactMiddleName, $contactLastName, $contactPhone, $contactSex, $contactDob, $contactCountry, $contactCity,
@@ -80,16 +80,16 @@ class MailTemplateVariableService extends AbstractService
             $campaignFromDate = $campaign->from_date;
             $campaignToDate = $campaign->to_date;
             $campaignTrackingKey = $campaign->tracking_key;
-//            $search = array_merge($search, [
-//                '{{ $campaign_from_date }}',
-//                '{{ $campaign_to_date }}',
-//                '{{ $campaign_tracking_key }}',
-//            ]);
             $search = array_merge($search, [
-                '{ campaign_from_date }',
-                '{ campaign_to_date }',
-                '{ campaign_tracking_key }',
+                '{{campaign_from_date}}',
+                '{{campaign_to_date}}',
+                '{{campaign_tracking_key}}',
             ]);
+//            $search = array_merge($search, [
+//                '{ campaign_from_date }',
+//                '{ campaign_to_date }',
+//                '{ campaign_tracking_key }',
+//            ]);
             $replace = array_merge($replace, [
                 $campaignFromDate, $campaignToDate, $campaignTrackingKey
             ]);

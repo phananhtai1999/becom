@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Abstracts\AbstractModel;
+use App\Services\ActivityHistoryService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -41,6 +42,13 @@ class ActivityHistory extends AbstractModel
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
+    ];
+
+    /**
+     * @var string[]
+     */
+    protected $appends = [
+        'render_body_mail_template',
     ];
 
     /**
@@ -113,5 +121,10 @@ class ActivityHistory extends AbstractModel
     public function mailsendingHistory()
     {
         return $this->belongsTo(MailSendingHistory::class, 'type_id', 'uuid');
+    }
+
+    public function getRenderBodyMailTemplateAttribute()
+    {
+        return app(ActivityHistoryService::class)->renderBody($this->uuid, $this->type, 'body');
     }
 }
