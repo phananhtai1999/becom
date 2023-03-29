@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Abstracts\AbstractService;
 use App\Events\PaymentCreditPackageSuccessEvent;
+use App\Events\SubscriptionAddOnSuccessEvent;
 use App\Events\SubscriptionSuccessEvent;
 use App\Models\PaymentMethod;
 use Exception;
@@ -184,7 +185,22 @@ class StripeService extends AbstractService
     public function processSubscriptionAddOn($subscriptionDate, $expirationDate, $plan, $request) {
 
         try {
-            $this->subscription($request, $plan);
+            $subscriptionData = $this->subscription($request, $plan);
+            $subscriptionHistoryData = [
+                'user_uuid' => Auth::user()->getKey(),
+                'add_on_uuid' => $request['add_on_uuid'],
+                'subscription_date' => $subscriptionDate,
+                'expiration_date' => $expirationDate,
+                'payment_method_uuid' => PaymentMethod::STRIPE,
+                'logs' => $subscriptionData,
+            ];
+            $userAddOnData = [
+                'user_uuid' => Auth::user()->getKey(),
+                'add_on_uuid' => $request['add_on_uuid'],
+                'expiration_date' => $expirationDate,
+                'auto_renew' => true
+            ];
+            Event::dispatch(new SubscriptionAddOnSuccessEvent(Auth::user()->getKey(), $subscriptionHistoryData, $userAddOnData));
 
             return [
                 'status' => true,

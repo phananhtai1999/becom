@@ -16,6 +16,7 @@ use App\Events\SendNotOpenByScenarioCampaignEvent;
 use App\Events\SendEmailRecoveryPasswordEvent;
 use App\Events\SendEmailVerifyEmailEvent;
 use App\Events\SendNextByScenarioCampaignEvent;
+use App\Events\SubscriptionAddOnSuccessEvent;
 use App\Events\SubscriptionSuccessEvent;
 use App\Listeners\ActiveStatusListener;
 use App\Listeners\ActivityHistoryListener;
@@ -31,6 +32,7 @@ use App\Listeners\SendNotOpenByScenarioCampaignListener;
 use App\Listeners\SendEmailRecoveryPasswordListener;
 use App\Listeners\SendEmailVerifyEmailListener;
 use App\Listeners\SendNextByScenarioCampaignListener;
+use App\Listeners\SubscriptionAddOnSuccessListener;
 use App\Listeners\SubscriptionSuccessListener;
 use App\Models\Config;
 use App\Models\Contact;
@@ -106,6 +108,9 @@ class EventServiceProvider extends ServiceProvider
         SendNotificationSystemForLoginEvent::class => [
             SendNotificationSystemForLoginListener::class
         ]
+        SubscriptionAddOnSuccessEvent::class => [
+            SubscriptionAddOnSuccessListener::class
+        ],
     ];
 
     /**
