@@ -196,4 +196,53 @@ class PaypalService extends AbstractService
         $provider = $this->accessServer();
         $provider->cancelSubscription($id, 'Cancel Subscription');
     }
+
+    public function processSubscriptionAddOn($subscriptionDate, $expirationDate, $plan, $request)
+    {
+        try {
+            $provider = $this->accessServer();
+            $subscription = $provider->createSubscription([
+                "plan_id" => $plan,
+                "shipping_amount" => [
+                    "currency_code" => "USD",
+                    "value" => "0"
+                ],
+                "application_context" => [
+                    "return_url" => route('paypal.successPaymentSubscriptionAddOn', [
+                        'goBackUrl=' . $request['go_back_url'],
+                        'subscriptionDate=' . $subscriptionDate,
+                        'userUuid=' . Auth::user()->getKey(),
+                        'expirationDate=' . $expirationDate,
+                        'addOnUuid=' . $request['add_on_uuid'],
+                    ]),
+                    "cancel_url" => route('paypal.cancelPaymentSubscriptionAddOn', ['goBackUrl=' . $request['go_back_url'], 'addOnUuid=' . $request['add_on_uuid'],]),
+                ],
+            ]);
+
+            if (isset($subscription['id']) && $subscription['id'] != null) {
+                foreach ($subscription['links'] as $links) {
+                    if ($links['rel'] == 'approve') {
+
+                        return [
+                            'status' => true,
+                            'redirect_url' => $links['href']
+                        ];
+                    }
+                }
+            }
+            if ($subscription['type'] == 'error') {
+
+                return [
+                    'status' => false,
+                    'message' => $subscription['message']
+                ];
+            }
+        } catch (PayPalConfigurationException|PayPalConnectionException|PayPalInvalidCredentialException|PayPalMissingCredentialException $e) {
+
+            return [
+                'status' => false,
+                'message' => $e->getMessage()
+            ];
+        }
+    }
 }

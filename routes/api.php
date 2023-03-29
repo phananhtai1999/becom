@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\ActivityHistoryController;
+use App\Http\Controllers\Api\AddOnController;
 use App\Http\Controllers\Api\ArticleCategoryController;
 use App\Http\Controllers\Api\ArticleController;
 use App\Http\Controllers\Api\CampaignController;
@@ -607,6 +608,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'permission.'], function () 
         Route::get('/permission/{id}', [PermissionController::class, 'show']);
         Route::put('/permission/{id}', [PermissionController::class, 'edit']);
         Route::get('/permissions', [PermissionController::class, 'index']);
+        Route::get('/permissions-for-platform', [PermissionController::class, 'permissionForPlatform']);
         Route::delete('/permission/{id}', [PermissionController::class, 'destroy']);
     });
 });
@@ -893,6 +895,21 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'country.'], function () {
         Route::delete('/country/{id}', [CountryController::class, 'destroy'])->name('destroy');
     });
 });
+Route::group(['middleware' => ['auth:api'], 'as' => 'addOn.'], function () {
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/add-ons', [AddOnController::class, 'index'])->name('index');
+        Route::post('/add-on', [AddOnController::class, 'store'])->name('store');
+        Route::get('/publish-add-on/{id}', [AddOnController::class, 'publishAddOn'])->name('publish');
+        Route::get('/add-on/{id}', [AddOnController::class, 'show'])->name('show');
+        Route::put('/add-on/{id}', [AddOnController::class, 'edit'])->name('edit');
+        Route::get('/disable-add-on/{id}', [AddOnController::class, 'disableAddOn'])->name('edit');
+        Route::delete('/country/{id}', [AddOnController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::post('/payment-add-on', [AddOnController::class, 'paymentAddOn'])->name('store');
+});
+Route::get('/paypal/success-payment-subscription-add-on', [PaypalController::class, 'successPaymentSubscriptionAddOn'])->name('paypal.successPaymentSubscriptionAddOn');
+Route::get('/paypal/cancel-payment-subscription-add-on', [PaypalController::class, 'cancelPaymentSubscriptionAddOn'])->name('paypal.cancelPaymentSubscriptionAddOn');
 
 //renew membership package
 Route::post('/platform-packages/renew-by-stripe', [PaymentController::class, 'renewByStripe'])->name('renewByStripe');

@@ -93,4 +93,29 @@ class PaypalController extends AbstractRestAPIController
     {
         return redirect()->to(env('FRONTEND_URL') . 'my/profile/upgrade/canceled?go_back_url='. $request['goBackUrl'] . '&plan_id=' . $request->subscriptionPlanUuid);
     }
+
+    public function successPaymentSubscriptionAddOn(Request $request)
+    {
+        $provider = new PayPalClient();
+        $provider->setApiCredentials(config('paypal'));
+        $provider->getAccessToken();
+
+        $provider->updateSubscription($request['subscription_id'], ["start_time" => Carbon::now()->addMinute(1)]);
+
+        $response = $provider->showSubscriptionDetails($request['subscription_id']);
+        $subscriptionData = ["id" => $response['id']];
+
+        if (isset($response['status']) && $response['status'] == 'ACTIVE') {
+
+            return redirect()->to(env('FRONTEND_URL') . 'my/profile/add-on/success?go_back_url='. $request['goBackUrl'] . '&addOnUuid=' . $request['addOnUuid']);
+        } else {
+
+            return redirect()->to(env('FRONTEND_URL') . 'my/profile/add-on/failed?go_back_url='. $request['goBackUrl'] . '&addOnUuid=' . $request['addOnUuid']);
+        }
+    }
+
+    public function cancelPaymentSubscriptionAddOn(Request $request)
+    {
+        return redirect()->to(env('FRONTEND_URL') . 'my/profile/add-on/canceled?go_back_url='. $request['goBackUrl'] . '&addOnUuid=' . $request['addOnUuid']);
+    }
 }

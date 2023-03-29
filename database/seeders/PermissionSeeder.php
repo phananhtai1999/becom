@@ -320,6 +320,18 @@ class PermissionSeeder extends Seeder
                     'telephone_support'
                 ]
             ],
+            [
+                'uuid' => 35,
+                'code' => 'footer',
+                'name' => ['vi' => 'Mẫu chân trang', 'en' => 'Footer Template'],
+                'api_methods' => [
+                    'create_footer',
+                    'edit_footer',
+                    'delete_footer',
+                    'show_footer',
+                    'index_footer',
+                ]
+            ],
 
         ];
         foreach ($permissions as $permission) {
