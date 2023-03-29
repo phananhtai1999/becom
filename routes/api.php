@@ -940,7 +940,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'user-tracking.'], function 
 
 //Article Category
 Route::group(['middleware' => ['auth:api'], 'as' => 'business-category.'], function () {
-    Route::group(['middleware' => ['role:admin,editor'], 'as' => 'author.'], function () {
+    Route::group(['middleware' => ['role:admin'], 'as' => 'business-category.'], function () {
         Route::post('/business-category', [BusinessCategoryController::class, 'store'])->name('store');
         Route::put('/business-category/{id}', [BusinessCategoryController::class, 'edit'])->name('edit');
         Route::delete('/business-category/{id}', [BusinessCategoryController::class, 'destroy'])->name('destroy');
