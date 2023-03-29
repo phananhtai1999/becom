@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Api\Payment;
 
 use App\Abstracts\AbstractRestAPIController;
 use App\Events\PaymentCreditPackageSuccessEvent;
+use App\Events\SubscriptionAddOnSuccessEvent;
 use App\Events\SubscriptionSuccessEvent;
 use App\Models\PaymentMethod;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
 use PayPal\Api\Payment;
 use Srmklive\PayPal\Services\PayPal as PayPalClient;
@@ -104,8 +106,22 @@ class PaypalController extends AbstractRestAPIController
 
         $response = $provider->showSubscriptionDetails($request['subscription_id']);
         $subscriptionData = ["id" => $response['id']];
-
+        $subscriptionHistoryData = [
+            'user_uuid' => $request->userUuid,
+            'add_on_uuid' => $request->addOnUuid,
+            'subscription_date' => $request->subscriptionDate,
+            'expiration_date' => $request->expirationDate,
+            'payment_method_uuid' => PaymentMethod::PAYPAL,
+            'logs' => $subscriptionData,
+        ];
+        $userAddOnData = [
+            'user_uuid' => $request->userUuid,
+            'add_on_uuid' => $request->addOnUuid,
+            'expiration_date' => $request->expirationDate,
+            'auto_renew' => true
+        ];
         if (isset($response['status']) && $response['status'] == 'ACTIVE') {
+            Event::dispatch(new SubscriptionAddOnSuccessEvent($request->userUuid, $subscriptionHistoryData, $userAddOnData));
 
             return redirect()->to(env('FRONTEND_URL') . 'my/profile/add-on/success?go_back_url='. $request['goBackUrl'] . '&addOnUuid=' . $request['addOnUuid']);
         } else {
