@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
+use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestIndexMyTrait;
 use App\Http\Requests\IndexRequest;
 use App\Http\Controllers\Traits\RestIndexTrait;
@@ -14,7 +15,7 @@ use App\Services\NotificationService;
 
 class NotificationController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestIndexMyTrait;
+    use RestIndexTrait, RestDestroyTrait, RestIndexMyTrait;
     /**
      * @var
      */

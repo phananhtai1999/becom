@@ -670,7 +670,6 @@ class CampaignController extends AbstractRestAPIController
             $this->service->update($campaign, [
                 'was_stopped_by_owner' => !$request->get('was_stopped_by_owner')
             ]);
-            SendNotificationSystemEvent::dispatch($campaign->user, Notification::CAMPAIGN_TYPE, Notification::STOP_ACTION, $campaign);
             return $this->sendValidationFailedJsonResponse(['errors' => $result['messages']]);
         }
 
@@ -702,7 +701,6 @@ class CampaignController extends AbstractRestAPIController
             $this->service->update($campaign, [
                 'was_stopped_by_owner' => !$request->get('was_stopped_by_owner')
             ]);
-            SendNotificationSystemEvent::dispatch($campaign->user, Notification::CAMPAIGN_TYPE, Notification::STOP_ACTION, $campaign);
             return $this->sendValidationFailedJsonResponse(['errors' => $result['messages']]);
         }
 

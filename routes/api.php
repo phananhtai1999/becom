@@ -30,6 +30,7 @@ use App\Http\Controllers\Api\SmtpAccountController;
 use App\Http\Controllers\Api\StatusController;
 use App\Http\Controllers\Api\SubscriptionPlanController;
 use App\Http\Controllers\Api\User\UserController;
+use App\Http\Controllers\Api\User\UserTrackingController;
 use App\Http\Controllers\Api\WebsiteController;
 use App\Http\Controllers\Api\WebsitePageCategoryController;
 use App\Http\Controllers\Api\WebsitePageController;
@@ -900,11 +901,20 @@ Route::post('/platform-packages/renew-by-paypal', [PaymentController::class, 're
 Route::group(['middleware' => ['auth:api'], 'as' => 'notification.'], function () {
     Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
         Route::get('/notifications', [NotificationController::class, 'index'])->name('index');
+        Route::delete('/notification/{id}', [NotificationController::class, 'destroy'])->name('destroy');
     });
 
     Route::group(['as' => 'my.'], function () {
         Route::get('/my/notifications', [NotificationController::class, 'indexMy'])->name('index');
     });
-
     Route::post('/read-notifications', [NotificationController::class, 'readNotifications'])->name('index');
+});
+
+Route::group(['middleware' => ['auth:api'], 'as' => 'user-tracking.'], function () {
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/user-trackings', [UserTrackingController::class, 'index'])->name('index');
+        Route::get('/user-tracking/{id}', [UserTrackingController::class, 'show'])->name('show');
+        Route::put('/user-tracking/{id}', [UserTrackingController::class, 'edit'])->name('edit');
+        Route::delete('/user-tracking/{id}', [UserTrackingController::class, 'destroy'])->name('destroy');
+    });
 });

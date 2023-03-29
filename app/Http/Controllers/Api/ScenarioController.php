@@ -398,8 +398,6 @@ class ScenarioController extends AbstractRestAPIController
                 'status' => 'stopped',
                 'last_stopped_at' => Carbon::now(),
             ]);
-
-            SendNotificationSystemEvent::dispatch($scenario->user, Notification::SCENARIO_TYPE, Notification::STOP_ACTION, $scenario);
             return $this->sendValidationFailedJsonResponse(['errors' => $result['messages']]);
         }
 
