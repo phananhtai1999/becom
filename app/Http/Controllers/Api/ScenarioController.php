@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
 use App\Events\SendByCampaignRootScenarioEvent;
+use App\Events\SendNotificationSystemEvent;
 use App\Http\Controllers\Traits\RestIndexMyTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Requests\EditScenarioRequest;
@@ -11,6 +12,7 @@ use App\Http\Requests\IndexRequest;
 use App\Http\Requests\ScenarioRequest;
 use App\Http\Requests\StatusMyScenarioRequest;
 use App\Http\Resources\ScenarioResourceCollection;
+use App\Models\Notification;
 use App\Services\CampaignScenarioService;
 use App\Services\CampaignService;
 use App\Services\MailSendingHistoryService;
@@ -381,6 +383,7 @@ class ScenarioController extends AbstractRestAPIController
                 'last_stopped_at' => Carbon::now(),
             ]);
 
+            SendNotificationSystemEvent::dispatch($scenario->user, Notification::SCENARIO_TYPE, Notification::STOP_ACTION, $scenario);
             return $this->sendOkJsonResponse();
         }
 
@@ -408,6 +411,7 @@ class ScenarioController extends AbstractRestAPIController
         $campaign = $this->campaignService->checkActiveCampaignScenario($campaignRootScenario->campaign_uuid);
         $creditNumberSendEmail = $campaign->number_credit_needed_to_start_campaign;
         if ($this->userService->checkCredit($creditNumberSendEmail, $campaign->user_uuid)) {
+            SendNotificationSystemEvent::dispatch($scenario->user, Notification::SCENARIO_TYPE, Notification::START_ACTION, $scenario);
             SendByCampaignRootScenarioEvent::dispatch($campaign, $creditNumberSendEmail, $campaignRootScenario);
             return ['status' => true,
                 'messages' => __('messages.send_scenario_success')];

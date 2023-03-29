@@ -76,11 +76,12 @@ class SmtpAccountService extends AbstractService
      */
     public function setSwiftSmtpAccountForSendEmail($smtpAccount) //Thiết lập đổi smtp account khi gửi email bằng queue
     {
-        $transport = new Swift_SmtpTransport($smtpAccount->mail_host, $smtpAccount->mail_port, $smtpAccount->smtpAccountEncryption->name);
-        $transport->setUsername($smtpAccount->mail_username);
-        $transport->setPassword($smtpAccount->mail_password);
+        $transport = new Swift_SmtpTransport($smtpAccount['mail_host'], $smtpAccount['mail_port'], $smtpAccount->smtpAccountEncryption->name ?? $smtpAccount['mail_encryption']);
+        $transport->setUsername($smtpAccount['mail_username']);
+        $transport->setPassword($smtpAccount['mail_password']);
         $mailtrap = new Swift_Mailer($transport);
         Mail::setSwiftMailer($mailtrap);
+        Mail::alwaysFrom($smtpAccount['mail_from_address'], $smtpAccount['mail_from_name']);
     }
 
     /**
@@ -335,9 +336,9 @@ class SmtpAccountService extends AbstractService
      * @param $mail
      * @return void
      */
-    public function sendEmail($user, $mail) {
+    public function sendEmailNotificationSystem($user, $mail) {
         $smtpAccount = \App\Models\Config::where(['key' => 'smtp_account'])->first();
-        $this->setSmtpAccountForSendEmail($smtpAccount->value);
+        $this->setSwiftSmtpAccountForSendEmail($smtpAccount->value);
 
         Mail::to($user->email)->send($mail);
     }

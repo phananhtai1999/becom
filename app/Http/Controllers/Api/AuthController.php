@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
 use App\Events\SendEmailRecoveryPasswordEvent;
+use App\Events\SendNotificationSystemForLoginEvent;
 use App\Http\Requests\RecoveryPasswordRequest;
 use App\Http\Requests\RefreshOtpRequest;
 use App\Http\Requests\RegisterRequest;
@@ -278,7 +279,7 @@ class AuthController extends AbstractRestAPIController
                 'refresh_time' => Carbon::now()->addSeconds(config('otp.refresh_time')),
             ]);
         }
-        $this->smtpAccountService->sendEmail($user, new SendActiveCode($user, $otp));
+        $this->smtpAccountService->sendEmailNotificationSystem($user, new SendActiveCode($user, $otp));
 
         return $this->sendOkJsonResponse(['data' => [
             'is_verified' => false,
@@ -315,7 +316,7 @@ class AuthController extends AbstractRestAPIController
             'refresh_time' => Carbon::now()->addSeconds(config('otp.refresh_time')),
             'refresh_count' => $refreshCount,
         ]);
-        $this->smtpAccountService->sendEmail($user, new SendActiveCode($user, $otp));
+        $this->smtpAccountService->sendEmailNotificationSystem($user, new SendActiveCode($user, $otp));
 
         return $this->sendOkJsonResponse(['message' => __('auth.refresh_code')]);
     }
@@ -377,6 +378,8 @@ class AuthController extends AbstractRestAPIController
         $userData['data']['token'] = $this->userAccessTokenService->storeNewForUser($user)->getKey();
         $userData['data']['token_type'] = 'Bearer';
 
+        //Kiểm tra country và gửi email khi khác country
+        SendNotificationSystemForLoginEvent::dispatch($user, \request()->ip());
         return \response()->json(array_merge([
             'status' => true,
             "code" => 0,
@@ -390,3 +393,4 @@ class AuthController extends AbstractRestAPIController
             );
     }
 }
+
