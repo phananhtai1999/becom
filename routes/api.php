@@ -887,14 +887,13 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'footer_template.'], functio
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'country.'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
         Route::get('/countries', [CountryController::class, 'index'])->name('index');
         Route::post('/country', [CountryController::class, 'store'])->name('store');
         Route::get('/country/{id}', [CountryController::class, 'show'])->name('show');
         Route::put('/country/{id}', [CountryController::class, 'edit'])->name('edit');
         Route::delete('/country/{id}', [CountryController::class, 'destroy'])->name('destroy');
-    });
 });
+
 Route::group(['middleware' => ['auth:api'], 'as' => 'addOn.'], function () {
     Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
         Route::get('/add-ons', [AddOnController::class, 'index'])->name('index');
@@ -903,7 +902,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'addOn.'], function () {
         Route::get('/add-on/{id}', [AddOnController::class, 'show'])->name('show');
         Route::put('/add-on/{id}', [AddOnController::class, 'edit'])->name('edit');
         Route::get('/disable-add-on/{id}', [AddOnController::class, 'disableAddOn'])->name('edit');
-        Route::delete('/country/{id}', [AddOnController::class, 'destroy'])->name('destroy');
+        Route::get('/my/add-on', [AddOnController::class, 'myAddOn'])->name('myAddOn');
     });
 
     Route::post('/payment-add-on', [AddOnController::class, 'paymentAddOn'])->name('store');

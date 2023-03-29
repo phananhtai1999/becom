@@ -218,8 +218,8 @@ class PermissionSeeder extends Seeder
             ],
             [
                 'uuid' => 22,
-                'code' => 'send_gpt_marketing_automation',
-                'name' => ['vi' => 'Sendgpt tiếp thị tự động', 'en' => 'Advanced Statistics'],
+                'code' => 'mail_open_tracking',
+                'name' => ['vi' => 'Sendgpt tiếp thị tự động', 'en' => 'Tracking Open Emails'],
                 'api_methods' => [
                     'mail_open_tracking'
                 ]

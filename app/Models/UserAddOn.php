@@ -38,4 +38,8 @@ class UserAddOn extends Model
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
     ];
+
+    public function addOn() {
+        return $this->belongsTo(AddOn::class, 'add_on_uuid', 'uuid');
+    }
 }
