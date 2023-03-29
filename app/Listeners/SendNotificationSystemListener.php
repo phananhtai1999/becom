@@ -10,7 +10,7 @@ use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
-class SendNotificationSystemListener
+class SendNotificationSystemListener implements ShouldQueue
 {
     private $smtpAccountService;
 
@@ -41,10 +41,8 @@ class SendNotificationSystemListener
         $model = $event->model;
 
         $mail = new SendNotificationSystem($user, $type, $action, $model);
-        $this->smtpAccountService->sendEmail($user, $mail);
-        if ($type === 'login') {
-            $content = ['langkey' => $type, 'country' => $action];
-        } elseif ($type === 'campaign') {
+        $this->smtpAccountService->sendEmailNotificationSystem($user, $mail);
+        if ($type === 'campaign') {
             $content = ['langkey' => $type.'_'.$action, 'type' => $type , 'name' => $model->tracking_key  , 'date' => Carbon::now()->toDateTimeString()];
         } else {
             $content = ['langkey' => $type.'_'.$action, 'type' => $type , 'name' => $model->name, 'date' => Carbon::now()->toDateTimeString()];
@@ -52,7 +50,7 @@ class SendNotificationSystemListener
 
         $this->notificationService->create([
             'type' => $type,
-            'type_uuid' => $type !== 'login' ? $model->uuid: null,
+            'type_uuid' => $model->uuid,
             'content' => $content,
             'user_uuid' => $user->uuid,
         ]);

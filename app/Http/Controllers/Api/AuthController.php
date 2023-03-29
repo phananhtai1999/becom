@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
 use App\Events\SendEmailRecoveryPasswordEvent;
+use App\Events\SendNotificationSystemForLoginEvent;
 use App\Http\Requests\RecoveryPasswordRequest;
 use App\Http\Requests\RefreshOtpRequest;
 use App\Http\Requests\RegisterRequest;
@@ -23,7 +24,6 @@ use App\Services\PasswordResetService;
 use App\Services\SmtpAccountService;
 use App\Services\UserAccessTokenService;
 use App\Services\UserService;
-use App\Services\UserTrackingService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -59,8 +59,6 @@ class AuthController extends AbstractRestAPIController
      */
     private $userAccessTokenService;
 
-    protected $userTrackingService;
-
     /**
      * @param UserService $userService
      * @param AuthenticationService $authenticationService
@@ -77,7 +75,6 @@ class AuthController extends AbstractRestAPIController
         OtpService             $otpService,
         ConfigService $configService,
         SmtpAccountService $smtpAccountService,
-        UserTrackingService $userTrackingService
     )
     {
         $this->userService = $userService;
@@ -88,7 +85,6 @@ class AuthController extends AbstractRestAPIController
         $this->otpService = $otpService;
         $this->configService = $configService;
         $this->smtpAccountService = $smtpAccountService;
-        $this->userTrackingService = $userTrackingService;
     }
 
     /**
@@ -283,7 +279,7 @@ class AuthController extends AbstractRestAPIController
                 'refresh_time' => Carbon::now()->addSeconds(config('otp.refresh_time')),
             ]);
         }
-        $this->smtpAccountService->sendEmail($user, new SendActiveCode($user, $otp));
+        $this->smtpAccountService->sendEmailNotificationSystem($user, new SendActiveCode($user, $otp));
 
         return $this->sendOkJsonResponse(['data' => [
             'is_verified' => false,
@@ -320,7 +316,7 @@ class AuthController extends AbstractRestAPIController
             'refresh_time' => Carbon::now()->addSeconds(config('otp.refresh_time')),
             'refresh_count' => $refreshCount,
         ]);
-        $this->smtpAccountService->sendEmail($user, new SendActiveCode($user, $otp));
+        $this->smtpAccountService->sendEmailNotificationSystem($user, new SendActiveCode($user, $otp));
 
         return $this->sendOkJsonResponse(['message' => __('auth.refresh_code')]);
     }
@@ -383,8 +379,7 @@ class AuthController extends AbstractRestAPIController
         $userData['data']['token_type'] = 'Bearer';
 
         //Kiểm tra country và gửi email khi khác country
-        $this->userTrackingService->checkAndSendUserLogin($user);
-
+        SendNotificationSystemForLoginEvent::dispatch($user, \request()->ip());
         return \response()->json(array_merge([
             'status' => true,
             "code" => 0,
@@ -398,3 +393,4 @@ class AuthController extends AbstractRestAPIController
             );
     }
 }
+

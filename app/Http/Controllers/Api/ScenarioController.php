@@ -411,8 +411,8 @@ class ScenarioController extends AbstractRestAPIController
         $campaign = $this->campaignService->checkActiveCampaignScenario($campaignRootScenario->campaign_uuid);
         $creditNumberSendEmail = $campaign->number_credit_needed_to_start_campaign;
         if ($this->userService->checkCredit($creditNumberSendEmail, $campaign->user_uuid)) {
-            SendByCampaignRootScenarioEvent::dispatch($campaign, $creditNumberSendEmail, $campaignRootScenario);
             SendNotificationSystemEvent::dispatch($scenario->user, Notification::SCENARIO_TYPE, Notification::START_ACTION, $scenario);
+            SendByCampaignRootScenarioEvent::dispatch($campaign, $creditNumberSendEmail, $campaignRootScenario);
             return ['status' => true,
                 'messages' => __('messages.send_scenario_success')];
         }

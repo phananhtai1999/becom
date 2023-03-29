@@ -9,6 +9,7 @@ use App\Models\SmtpAccount;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Swift_SmtpTransport;
 use Swift_Mailer;
 use Illuminate\Support\Facades\Mail;
@@ -76,11 +77,13 @@ class SmtpAccountService extends AbstractService
      */
     public function setSwiftSmtpAccountForSendEmail($smtpAccount) //Thiết lập đổi smtp account khi gửi email bằng queue
     {
-        $transport = new Swift_SmtpTransport($smtpAccount->mail_host, $smtpAccount->mail_port, $smtpAccount->smtpAccountEncryption->name);
-        $transport->setUsername($smtpAccount->mail_username);
-        $transport->setPassword($smtpAccount->mail_password);
+        Log::info($smtpAccount);
+        $transport = new Swift_SmtpTransport($smtpAccount['mail_host'], $smtpAccount['mail_port'], $smtpAccount->smtpAccountEncryption->name ?? $smtpAccount['mail_encryption']);
+        $transport->setUsername($smtpAccount['mail_username']);
+        $transport->setPassword($smtpAccount['mail_password']);
         $mailtrap = new Swift_Mailer($transport);
         Mail::setSwiftMailer($mailtrap);
+        Mail::alwaysFrom($smtpAccount['mail_from_address'], $smtpAccount['mail_from_name']);
     }
 
     /**
@@ -335,7 +338,7 @@ class SmtpAccountService extends AbstractService
      * @param $mail
      * @return void
      */
-    public function sendEmail($user, $mail) {
+    public function sendEmailNotificationSystem($user, $mail) {
         $smtpAccount = \App\Models\Config::where(['key' => 'smtp_account'])->first();
         $this->setSmtpAccountForSendEmail($smtpAccount->value);
 
