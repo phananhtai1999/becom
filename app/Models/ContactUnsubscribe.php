@@ -2,41 +2,30 @@
 
 namespace App\Models;
 
-use App\Abstracts\AbstractModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Unsubscribe extends AbstractModel
+class ContactUnsubscribe extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     /**
      * @var string
      */
-    protected $table = "unsubscribes";
+    protected $table = "contact_unsubscribes";
 
     /**
      * @var string
      */
-    protected $primaryKey = 'code';
-
-    /**
-     * @var bool
-     */
-    public $incrementing = false;
-
-    /**
-     * @var string
-     */
-    protected $keyType = 'string';
+    protected $primaryKey = 'uuid';
 
     /**
      * @var string[]
      */
     protected $fillable = [
-        'code',
         'contact_uuid',
+        'unsubscribe'
     ];
 
     /**
@@ -45,16 +34,16 @@ class Unsubscribe extends AbstractModel
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
-        'contact_uuid' => 'integer'
+        'deleted_at' => 'datetime',
+        'contact_uuid' => 'integer',
+        'unsubscribe' => 'array'
     ];
 
     /**
-     * @return BelongsTo
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function contact()
     {
         return $this->belongsTo(Contact::class, 'contact_uuid', 'uuid');
     }
-
-
 }
