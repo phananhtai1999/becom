@@ -48,5 +48,13 @@ class Unsubscribe extends AbstractModel
         'contact_uuid' => 'integer'
     ];
 
+    /**
+     * @return BelongsTo
+     */
+    public function contact()
+    {
+        return $this->belongsTo(Contact::class, 'contact_uuid', 'uuid');
+    }
+
 
 }

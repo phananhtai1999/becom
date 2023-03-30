@@ -974,4 +974,4 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'contact-unsubscribe.'], fun
         Route::get('my/contact-unsubscribes', [ContactUnsubscribeController::class, 'indexMy'])->name('index');
     });
 });
-Route::get('unsubscribe/{code}', [UnsubscribeController::class, 'showUnsubscribe'])->name('showUnsubscribe');
+Route::get('unsubscribe/{code}', [UnsubscribeController::class, 'show'])->name('showUnsubscribe');
