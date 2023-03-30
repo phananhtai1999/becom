@@ -12,6 +12,8 @@ class AddOn extends Model
     const ADD_ON_DRAFT = 'draft';
     const ADD_ON_PUBLISH = 'publish';
     const ADD_ON_DISABLE = 'disable';
+    const ADD_ON_DURATION_MONTH = 'month';
+    const ADD_ON_DURATION_YEAR = 'year';
     /**
      * @var string
      */
@@ -27,19 +29,20 @@ class AddOn extends Model
      */
     protected $fillable = [
         'uuid',
-        'price',
+        'monthly',
+        'yearly',
         'name',
         'description',
         'thumbnail',
         'status',
-        'payment_id'
+        'payment_product_id'
     ];
 
     /**
      * @var string[]
      */
     protected $casts = [
-        'payment_id' => 'array',
+        'payment_product_id' => 'array',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',

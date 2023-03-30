@@ -182,13 +182,13 @@ class StripeService extends AbstractService
         }
     }
 
-    public function processSubscriptionAddOn($subscriptionDate, $expirationDate, $plan, $request) {
+    public function processSubscriptionAddOn($addOnSubscriptionPlan, $subscriptionDate, $expirationDate, $plan, $request) {
 
         try {
             $subscriptionData = $this->subscription($request, $plan);
             $subscriptionHistoryData = [
                 'user_uuid' => Auth::user()->getKey(),
-                'add_on_uuid' => $request['add_on_uuid'],
+                'add_on_uuid' => $addOnSubscriptionPlan->add_on_uuid,
                 'subscription_date' => $subscriptionDate,
                 'expiration_date' => $expirationDate,
                 'payment_method_uuid' => PaymentMethod::STRIPE,
@@ -196,7 +196,7 @@ class StripeService extends AbstractService
             ];
             $userAddOnData = [
                 'user_uuid' => Auth::user()->getKey(),
-                'add_on_uuid' => $request['add_on_uuid'],
+                'add_on_uuid' => $addOnSubscriptionPlan->add_on_uuid,
                 'expiration_date' => $expirationDate,
                 'auto_renew' => true
             ];
@@ -204,7 +204,7 @@ class StripeService extends AbstractService
 
             return [
                 'status' => true,
-                'redirect_url' => env('FRONTEND_URL') . 'my/profile/upgrade/success?go_back_url=' . $request['go_back_url'] . '&plan_id=' . $request['add_on_uuid']
+                'redirect_url' => env('FRONTEND_URL') . 'my/profile/upgrade/success?go_back_url=' . $request['go_back_url'] . '&plan_id=' . $request['add_on_subscription_plan_uuid']
             ];
         } catch (\Exception $e) {
 

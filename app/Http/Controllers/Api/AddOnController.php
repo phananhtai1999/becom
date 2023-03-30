@@ -14,6 +14,7 @@ use App\Http\Resources\UserAddOnResource;
 use App\Models\AddOn;
 use App\Models\PaymentMethod;
 use App\Services\AddOnService;
+use App\Services\AddOnSubscriptionPlanService;
 use App\Services\PaypalService;
 use App\Services\StripeService;
 use App\Services\UserAddOnService;
@@ -31,13 +32,15 @@ class AddOnController extends AbstractRestAPIController
         AddOnService  $service,
         PaypalService $paypalService,
         StripeService $stripeService,
-        UserAddOnService $userAddOnService
+        UserAddOnService $userAddOnService,
+        AddOnSubscriptionPlanService $addOnSubscriptionPlanService
     )
     {
         $this->service = $service;
         $this->stripeService = $stripeService;
         $this->paypalService = $paypalService;
         $this->userAddOnService = $userAddOnService;
+        $this->addOnSubscriptionPlanService = $addOnSubscriptionPlanService;
         $this->resourceClass = AddOnResource::class;
         $this->resourceCollectionClass = AddOnResourceCollection::class;
         $this->userAddOnResourceClass = UserAddOnResource::class;
@@ -67,15 +70,12 @@ class AddOnController extends AbstractRestAPIController
         $addOn = $this->service->findOrFailById($id);
         $paypalProduct = $this->paypalService->createProduct($addOn);
         $stripeProduct = $this->stripeService->createProduct($addOn);
-        $request = new Request(['duration_type' => 'month']);
-        $paypalPlan = $this->paypalService->createPlan($paypalProduct['id'], $request, $addOn->price);
-        $stripePlan = $this->stripeService->createPlan($stripeProduct['id'], $request, $addOn->price);
         $product = [
-            'paypal' => $paypalPlan['plan_id'],
-            'stripe' => $stripePlan['plan_id']
+            'paypal' => $paypalProduct['id'],
+            'stripe' => $stripeProduct['id']
         ];
         $this->service->update($addOn, [
-            'payment_id' => $product,
+            'payment_product_id' => $product,
             'status' => AddOn::ADD_ON_PUBLISH
         ]);
 
@@ -121,15 +121,18 @@ class AddOnController extends AbstractRestAPIController
 
     public function paymentAddOn(PaymentAddOnRequest $request)
     {
-        $addOn = $this->service->findOrFailById($request->get('add_on_uuid'));
+        $addOnSubscriptionPlan = $this->addOnSubscriptionPlanService->findOrFailById($request->get('add_on_subscription_plan_uuid'));
         $fromDate = Carbon::now();
-        $toDate = Carbon::now()->addMonths(1);
-
+        if ($addOnSubscriptionPlan->duration_type == AddOn::ADD_ON_DURATION_YEAR) {
+            $toDate = Carbon::now()->addYears($addOnSubscriptionPlan->duration);
+        } elseif ($addOnSubscriptionPlan->duration_type == AddOn::ADD_ON_DURATION_MONTH) {
+            $toDate = Carbon::now()->addMonths($addOnSubscriptionPlan->duration);
+        }
         $processResult = ['status' => false];
         if ($request->get('payment_method_uuid') == PaymentMethod::STRIPE) {
-            $processResult = $this->stripeService->processSubscriptionAddOn($fromDate, $toDate, $addOn->payment_id['stripe'], $request->all());
+            $processResult = $this->stripeService->processSubscriptionAddOn($addOnSubscriptionPlan, $fromDate, $toDate, $addOnSubscriptionPlan->payment_plan_id['stripe'], $request->all());
         } elseif ($request->get('payment_method_uuid') == PaymentMethod::PAYPAL) {
-            $processResult = $this->paypalService->processSubscriptionAddOn($fromDate, $toDate, $addOn->payment_id['paypal'], $request->all());
+            $processResult = $this->paypalService->processSubscriptionAddOn($addOnSubscriptionPlan, $fromDate, $toDate, $addOnSubscriptionPlan->payment_plan_id['paypal'], $request->all());
         }
         if (!$processResult['status']) {
 
@@ -137,7 +140,7 @@ class AddOnController extends AbstractRestAPIController
                 false,
                 $processResult['message'] ?? 'failed',
                 ['data' => [
-                    'redirect_url' => env('FRONTEND_URL') . 'my/profile/upgrade/failed?add_on_id=' . $addOn->uuid
+                    'redirect_url' => env('FRONTEND_URL') . 'my/profile/upgrade/failed?add_on_id=' . $addOnSubscriptionPlan->uuid
                 ]]
             );
         } else {

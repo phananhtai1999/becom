@@ -22,7 +22,8 @@ class AddOnResource extends JsonResource
             'description' => $this->description,
             'thumbnail' => $this->thumbnail,
             'status' => $this->status,
-            'price' => $this->price
+            'monthly' => $this->monthly,
+            'yearly' => $this->yearly
         ];
         if (\in_array('add_on__permissions', $expand)) {
             $data['permissions'] = PermissionResource::collection($this->permissions);
