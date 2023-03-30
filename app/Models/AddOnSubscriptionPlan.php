@@ -42,5 +42,6 @@ class AddOnSubscriptionPlan extends Model
 
     public function addOn()
     {
-        return $this->belongsTo(AddOn::class, 'add_on_uuid', 'uuid')->withTrashed();
-    }}
+        return $this->belongsTo(AddOn::class, 'add_on_uuid', 'uuid');
+    }
+}

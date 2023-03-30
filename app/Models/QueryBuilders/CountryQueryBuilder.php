@@ -26,7 +26,7 @@ class CountryQueryBuilder extends AbstractQueryBuilder
      */
     public static function initialQuery()
     {
-        $modelKeyName = (new Remind())->getKeyName();
+        $modelKeyName = (new Country())->getKeyName();
 
         return static::for(static::baseQuery())
             ->allowedFields([

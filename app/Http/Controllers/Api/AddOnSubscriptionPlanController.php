@@ -12,6 +12,7 @@ use App\Http\Resources\AddOnSubscriptionPlanResource;
 use App\Http\Resources\AddOnSubscriptionPlanResourceCollection;
 use App\Http\Resources\SubscriptionPlanResource;
 use App\Http\Resources\SubscriptionPlanResourceCollection;
+use App\Models\AddOn;
 use App\Models\AddOnSubscriptionPlan;
 use App\Services\AddOnService;
 use App\Services\AddOnSubscriptionPlanService;
@@ -45,7 +46,10 @@ class AddOnSubscriptionPlanController extends AbstractRestAPIController
             return $this->sendJsonResponse(false, 'This plan for this add-on already exists', [], 400);
         }
         $addOn = $this->addOnService->findOrFailById($request->get('add_on_uuid'));
-        if ($request->get('duration_type') == "month") {
+        if ($addOn->status !== AddOn::ADD_ON_PUBLISH) {
+            return $this->sendJsonResponse(false, 'You need to publish add-on first', [], 400);
+        }
+        if ($request->get('duration_type') == AddOn::ADD_ON_DURATION_MONTH) {
             $price = $addOn->monthly;
         } else {
             $price = $addOn->yearly;

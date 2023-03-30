@@ -11,6 +11,7 @@ use App\Http\Requests\UpdateAddOnRequest;
 use App\Http\Resources\AddOnResource;
 use App\Http\Resources\AddOnResourceCollection;
 use App\Http\Resources\UserAddOnResource;
+use App\Http\Resources\UserAddOnResourceCollection;
 use App\Models\AddOn;
 use App\Models\PaymentMethod;
 use App\Services\AddOnService;
@@ -43,7 +44,7 @@ class AddOnController extends AbstractRestAPIController
         $this->addOnSubscriptionPlanService = $addOnSubscriptionPlanService;
         $this->resourceClass = AddOnResource::class;
         $this->resourceCollectionClass = AddOnResourceCollection::class;
-        $this->userAddOnResourceClass = UserAddOnResource::class;
+        $this->userAddOnResourceCollectionClass = UserAddOnResourceCollection::class;
     }
 
     /**
@@ -154,10 +155,10 @@ class AddOnController extends AbstractRestAPIController
     }
 
     public function myAddOn() {
-        $myAddOn = $this->userAddOnService->findOneWhere(['user_uuid' => auth()->user()->getKey()]);
+        $myAddOn = $this->userAddOnService->findAllWhere(['user_uuid' => auth()->user()->getKey()]);
 
-        return $this->sendCreatedJsonResponse(
-            $this->service->resourceToData($this->userAddOnResourceClass, $myAddOn)
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->userAddOnResourceCollectionClass, $myAddOn)
         );
     }
 }

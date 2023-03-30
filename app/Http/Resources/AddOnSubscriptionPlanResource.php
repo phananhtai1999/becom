@@ -23,7 +23,7 @@ class AddOnSubscriptionPlanResource extends JsonResource
             'duration_type' => $this->duration_type,
             'duration' => $this->duration,
         ];
-        if (\in_array('subscription_plan__add_on', $expand)) {
+        if (\in_array('add_on_subscription_plan__add_on', $expand)) {
             $data['add_on'] = new AddOnResource($this->addOn);
         }
 
