@@ -27,19 +27,20 @@ class AddOn extends Model
      */
     protected $fillable = [
         'uuid',
-        'price',
+        'monthly',
+        'yearly',
         'name',
         'description',
         'thumbnail',
         'status',
-        'payment_id'
+        'payment_product_id'
     ];
 
     /**
      * @var string[]
      */
     protected $casts = [
-        'payment_id' => 'array',
+        'payment_product_id' => 'array',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',

@@ -158,7 +158,6 @@ class PaypalService extends AbstractService
                     "cancel_url" => route('paypal.cancelPaymentSubscription', ['goBackUrl=' . $request['go_back_url'], 'subscriptionPlanUuid=' . $subscriptionPlan->uuid,]),
                 ],
             ]);
-
             if (isset($subscription['id']) && $subscription['id'] != null) {
                 foreach ($subscription['links'] as $links) {
                     if ($links['rel'] == 'approve') {
@@ -197,10 +196,11 @@ class PaypalService extends AbstractService
         $provider->cancelSubscription($id, 'Cancel Subscription');
     }
 
-    public function processSubscriptionAddOn($subscriptionDate, $expirationDate, $plan, $request)
+    public function processSubscriptionAddOn($addOnSubscriptionPlan, $subscriptionDate, $expirationDate, $plan, $request)
     {
         try {
             $provider = $this->accessServer();
+
             $subscription = $provider->createSubscription([
                 "plan_id" => $plan,
                 "shipping_amount" => [
@@ -213,12 +213,11 @@ class PaypalService extends AbstractService
                         'subscriptionDate=' . $subscriptionDate,
                         'userUuid=' . Auth::user()->getKey(),
                         'expirationDate=' . $expirationDate,
-                        'addOnUuid=' . $request['add_on_uuid'],
+                        'addOnUuid=' . $addOnSubscriptionPlan->add_on_uuid,
                     ]),
-                    "cancel_url" => route('paypal.cancelPaymentSubscriptionAddOn', ['goBackUrl=' . $request['go_back_url'], 'addOnUuid=' . $request['add_on_uuid'],]),
+                    "cancel_url" => route('paypal.cancelPaymentSubscriptionAddOn', ['goBackUrl=' . $request['go_back_url'], 'addOnUuid=' . $addOnSubscriptionPlan->add_on_uuid,]),
                 ],
             ]);
-
             if (isset($subscription['id']) && $subscription['id'] != null) {
                 foreach ($subscription['links'] as $links) {
                     if ($links['rel'] == 'approve') {
