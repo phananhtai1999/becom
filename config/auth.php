@@ -120,4 +120,6 @@ return [
 
     'recovery_password_url' => env('FRONTEND_URL') . '/auth/recovery-password',
 
+    'unsubscribe_url' => env('FRONTEND_URL').'/unsubscribe/',
+
 ];

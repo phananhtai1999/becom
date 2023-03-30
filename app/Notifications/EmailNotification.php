@@ -145,7 +145,11 @@ class EmailNotification extends BaseNotification
         $footerTemplateAds = $this->footerTemplateService->getFooterTemplateAdsForSendCampaignByType($mailTemplate->type, $mailTemplate->user);
         $footerTemplateSubscribe = $this->footerTemplateService->getFooterTemplateSubscribeForSendCampaignByType($mailTemplate->type);
         if ($footerTemplateAds || $footerTemplateSubscribe) {
-            $mailTemplate = $this->mailTemplateVariableService->insertFooterTemplateInRenderBody($footerTemplateAds, $footerTemplateSubscribe, $mailTemplate);
+            $renderedFooterSub = null;
+            if ($footerTemplateSubscribe) {
+                $renderedFooterSub = $this->mailTemplateVariableService->renderedFooterByContactUuid($footerTemplateSubscribe->template ,$contact->uuid);
+            }
+            $mailTemplate = $this->mailTemplateVariableService->insertFooterTemplateInRenderBody(optional($footerTemplateAds)->template, $renderedFooterSub, $mailTemplate);
         }
         return $this->mailTemplateVariableService->injectTrackingImage($mailTemplate, $mailSendingHistory->uuid);
     }
