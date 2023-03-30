@@ -21,6 +21,7 @@ class AddOnResource extends JsonResource
             'name' => $this->name,
             'description' => $this->description,
             'thumbnail' => $this->thumbnail,
+            'payment_product_id' => $this->payment_product_id,
             'status' => $this->status,
             'monthly' => $this->monthly,
             'yearly' => $this->yearly
@@ -28,7 +29,9 @@ class AddOnResource extends JsonResource
         if (\in_array('add_on__permissions', $expand)) {
             $data['permissions'] = PermissionResource::collection($this->permissions);
         }
-
+        if (\in_array('add_on__add_on_subscription_plan', $expand)) {
+            $data['add_on_subscription_plan'] = AddOnSubscriptionPlanResource::collection($this->addOnSubscriptionPlans);
+        }
         return $data;
     }
 }

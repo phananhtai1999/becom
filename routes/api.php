@@ -605,14 +605,16 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'subscriptionPlan.'], functi
     Route::get('/subscription-plans', [SubscriptionPlanController::class, 'index']);
 });
 
+//add-on subscription plan
 Route::group(['middleware' => ['auth:api'], 'as' => 'addOnSubscriptionPlan.'], function () {
     Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
         Route::post('/add-on-subscription-plan', [AddOnSubscriptionPlanController::class, 'store']);
         Route::delete('/add-on-subscription-plan/{id}', [AddOnSubscriptionPlanController::class, 'destroy']);
     });
     Route::get('/add-on-subscription-plan/{id}', [AddOnSubscriptionPlanController::class, 'show']);
-    Route::get('/add-on-subscription-plans', [AddOnSubscriptionPlanController::class, 'index']);
 });
+Route::get('/add-on-subscription-plans', [AddOnSubscriptionPlanController::class, 'index']);
+
 Route::group(['middleware' => ['auth:api'], 'as' => 'permission.'], function () {
     Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
         Route::post('/permission', [PermissionController::class, 'store']);

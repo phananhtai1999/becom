@@ -51,4 +51,9 @@ class AddOn extends Model
     public function permissions() {
         return $this->belongsToMany(Permission::class, 'add_on_permissions', 'add_on_uuid', 'permission_uuid');
     }
+
+    public function addOnSubscriptionPlans()
+    {
+        return $this->hasMany(AddOnSubscriptionPlan::class, 'add_on_uuid', 'uuid');
+    }
 }
