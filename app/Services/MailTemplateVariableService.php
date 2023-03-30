@@ -123,13 +123,27 @@ class MailTemplateVariableService extends AbstractService
     }
 
     /**
-     * @param $footerTemplate
+     * @param $template
+     * @param $contactUuid
+     * @return string
+     */
+    public function renderedFooterByContactUuid($template, $contactUuid): string
+    {
+        $unsubscribe = (new UnsubscribeService())->createUnsubscribe($contactUuid);
+        $replace = config('auth.unsubscribe_url').$unsubscribe->code;
+
+        return Str::replace("{{url_unsubscribe}}", $replace, $template);
+    }
+
+    /**
+     * @param $templateFooterAds
+     * @param $templateFooterSub
      * @param $mailTemplate
      * @return mixed
      */
-    public function insertFooterTemplateInRenderBody($footerTemplateAds, $footerTemplateSubscribe, $mailTemplate)
+    public function insertFooterTemplateInRenderBody($templateFooterAds, $templateFooterSub, $mailTemplate)
     {
-        $mailTemplate->setRenderedBodyAttribute($mailTemplate->rendered_body.optional($footerTemplateAds)->template.optional($footerTemplateSubscribe)->template);
+        $mailTemplate->setRenderedBodyAttribute($mailTemplate->rendered_body.$templateFooterAds.$templateFooterSub);
         return $mailTemplate;
     }
 
