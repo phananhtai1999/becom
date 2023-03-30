@@ -123,9 +123,9 @@ class AddOnController extends AbstractRestAPIController
     {
         $addOnSubscriptionPlan = $this->addOnSubscriptionPlanService->findOrFailById($request->get('add_on_subscription_plan_uuid'));
         $fromDate = Carbon::now();
-        if ($addOnSubscriptionPlan->duration_type == 'year') {
+        if ($addOnSubscriptionPlan->duration_type == AddOn::ADD_ON_DURATION_YEAR) {
             $toDate = Carbon::now()->addYears($addOnSubscriptionPlan->duration);
-        } elseif ($addOnSubscriptionPlan->duration_type == 'month') {
+        } elseif ($addOnSubscriptionPlan->duration_type == AddOn::ADD_ON_DURATION_MONTH) {
             $toDate = Carbon::now()->addMonths($addOnSubscriptionPlan->duration);
         }
         $processResult = ['status' => false];

@@ -12,6 +12,8 @@ class AddOn extends Model
     const ADD_ON_DRAFT = 'draft';
     const ADD_ON_PUBLISH = 'publish';
     const ADD_ON_DISABLE = 'disable';
+    const ADD_ON_DURATION_MONTH = 'month';
+    const ADD_ON_DURATION_YEAR = 'year';
     /**
      * @var string
      */
