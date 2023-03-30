@@ -13,7 +13,7 @@ class UnsubscribeService extends AbstractService
     public function createUnsubscribe($contactUuid = null)
     {
         do {
-            $code = Str::random(10);
+            $code = Str::random(config('unsubscribe.unsubscribe_code_length'));
             $model = $this->findOneWhere(['code' => $code]);
         } while($model !== null);
 
