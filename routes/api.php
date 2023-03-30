@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\ArticleController;
 use App\Http\Controllers\Api\BusinessCategoryController;
 use App\Http\Controllers\Api\CampaignController;
 use App\Http\Controllers\Api\CompanyController;
+use App\Http\Controllers\Api\ContactUnsubscribeController;
 use App\Http\Controllers\Api\CountryController;
 use App\Http\Controllers\Api\CreditPackageController;
 use App\Http\Controllers\Api\EmailController;
@@ -32,6 +33,7 @@ use App\Http\Controllers\Api\SectionTemplateController;
 use App\Http\Controllers\Api\SmtpAccountController;
 use App\Http\Controllers\Api\StatusController;
 use App\Http\Controllers\Api\SubscriptionPlanController;
+use App\Http\Controllers\Api\UnsubscribeController;
 use App\Http\Controllers\Api\User\UserController;
 use App\Http\Controllers\Api\User\UserTrackingController;
 use App\Http\Controllers\Api\WebsiteController;
@@ -961,3 +963,15 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'business-category.'], funct
 });
 Route::get('public/business-categories', [BusinessCategoryController::class, 'indexPublic'])->name('business-categories-public.index');
 Route::get('public/business-category/{id}', [BusinessCategoryController::class, 'showPublic'])->name('business-categories-public.show');
+
+//Contact Unsubscribe
+Route::group(['middleware' => ['auth:api'], 'as' => 'contact-unsubscribe.'], function () {
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/contact-unsubscribes', [ContactUnsubscribeController::class, 'index'])->name('index');
+    });
+
+    Route::group(['as' => 'my.'], function () {
+        Route::get('my/contact-unsubscribes', [ContactUnsubscribeController::class, 'indexMy'])->name('index');
+    });
+});
+Route::get('unsubscribe/{code}', [UnsubscribeController::class, 'showUnsubscribe'])->name('showUnsubscribe');
