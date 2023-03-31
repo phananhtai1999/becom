@@ -28,6 +28,10 @@ class UserAddOnResource extends JsonResource
         ];
         if (\in_array('user_add_on__add_on_subscription_plan', $expand)) {
             $data['add_on_subscription_plan'] = new AddOnSubscriptionPlanResource($this->addOnSubscriptionPlan);
+            $data['add_on'] = new AddOnResource(optional($this->addOnSubscriptionPlan)->addOn);
+        }
+        if (\in_array('user_add_on__user', $expand)) {
+            $data['user'] = new UserResource($this->user);
         }
 
         return $data;

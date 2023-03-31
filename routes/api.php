@@ -917,11 +917,13 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'addOn.'], function () {
         Route::get('/publish-add-on/{id}', [AddOnController::class, 'publishAddOn'])->name('publish');
         Route::get('/add-on/{id}', [AddOnController::class, 'show'])->name('show');
         Route::put('/add-on/{id}', [AddOnController::class, 'edit'])->name('edit');
-        Route::get('/disable-add-on/{id}', [AddOnController::class, 'disableAddOn'])->name('edit');
+        Route::get('/disable-add-on/{id}', [AddOnController::class, 'disableAddOn'])->name('disableAddOn');
+        Route::delete('add-on/{id}', [AddOnController::class, 'destroy'])->name('destroy');
+
     });
     Route::get('/add-ons', [AddOnController::class, 'index'])->name('index');
     Route::get('/add-on-subscription-histories', [AddOnController::class, 'addOnSubscriptionHistory'])->name('addOnSubscriptionHistory');
-    Route::get('/my/add-on', [AddOnController::class, 'myAddOn'])->name('myAddOn');
+    Route::get('/my-add-on', [AddOnController::class, 'myAddOn'])->name('myAddOn');
     Route::post('/payment-add-on', [AddOnController::class, 'paymentAddOn'])->name('store');
 });
 Route::get('/paypal/success-payment-subscription-add-on', [PaypalController::class, 'successPaymentSubscriptionAddOn'])->name('paypal.successPaymentSubscriptionAddOn');
