@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class AddOnHistory extends Model
+class AddOnSubscriptionHistory extends Model
 {
     use HasFactory;
 
-    protected $table = "add_on_histories";
+    protected $table = "add_on_subscription_histories";
 
     /**
      * @var string
@@ -21,7 +21,7 @@ class AddOnHistory extends Model
      */
     protected $fillable = [
         'user_uuid',
-        'add_on_uuid',
+        'add_on_subscription_plan_uuid',
         'subscription_date',
         'expiration_date',
         'payment_method_uuid',
@@ -37,4 +37,14 @@ class AddOnHistory extends Model
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
     ];
+
+    public function addOnSubscriptionPlan() {
+        return $this->belongsTo(AddOnSubscriptionPlan::class, 'add_on_subscription_plan_uuid', 'uuid');
+    }
+    public function paymentMethod() {
+        return $this->belongsTo(PaymentMethod::class, 'payment_method_uuid', 'uuid');
+    }
+    public function user() {
+        return $this->belongsTo(User::class, 'user_uuid', 'uuid');
+    }
 }

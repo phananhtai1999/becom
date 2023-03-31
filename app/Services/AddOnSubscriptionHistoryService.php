@@ -1,0 +1,33 @@
+<?php
+
+namespace App\Services;
+
+use App\Abstracts\AbstractService;
+use App\Models\AddOnSubscriptionHistory;
+use App\Models\QueryBuilders\AddOnSubscriptionHistoryQueryBuilder;
+
+class AddOnSubscriptionHistoryService extends AbstractService
+{
+
+    protected $modelClass = AddOnSubscriptionHistory::class;
+
+    protected $modelQueryBuilderClass = AddOnSubscriptionHistoryQueryBuilder::class;
+
+    public function myAddOnSubscriptionHistories()
+    {
+
+        return $this->model->where(['user_uuid' => auth()->user()->getKey()])->orderBy('uuid', 'DESC')->get();
+    }
+
+    public function currentSubscriptionHistory()
+    {
+
+        return $this->model->where(['user_uuid' => auth()->user()->getKey()])->orderBy('uuid', 'DESC')->first();
+    }
+
+    public function findByLog($log)
+    {
+        return $this->model->where('logs->id', $log)->first();
+    }
+
+}

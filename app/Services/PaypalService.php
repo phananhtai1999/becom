@@ -213,9 +213,9 @@ class PaypalService extends AbstractService
                         'subscriptionDate=' . $subscriptionDate,
                         'userUuid=' . Auth::user()->getKey(),
                         'expirationDate=' . $expirationDate,
-                        'addOnUuid=' . $addOnSubscriptionPlan->add_on_uuid,
+                        'addOnSubscriptionPlanUuid=' . $addOnSubscriptionPlan->uuid,
                     ]),
-                    "cancel_url" => route('paypal.cancelPaymentSubscriptionAddOn', ['goBackUrl=' . $request['go_back_url'], 'addOnUuid=' . $addOnSubscriptionPlan->add_on_uuid,]),
+                    "cancel_url" => route('paypal.cancelPaymentSubscriptionAddOn', ['goBackUrl=' . $request['go_back_url'], 'addOnSubscriptionPlanUuid=' . $addOnSubscriptionPlan->uuid,]),
                 ],
             ]);
             if (isset($subscription['id']) && $subscription['id'] != null) {
