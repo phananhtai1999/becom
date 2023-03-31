@@ -17,6 +17,7 @@ use App\Services\FooterTemplateService;
 use App\Services\MyFooterTemplateService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class FooterTemplateController extends AbstractRestAPIController
 {
@@ -62,6 +63,9 @@ class FooterTemplateController extends AbstractRestAPIController
      */
     public function store()
     {
+//        if (!Gate::allows('permission', config('api.footer.create'))) {
+//            return $this->sendJsonResponse(false, 'You need to buy add-on', ['data' => '123'], 403);
+//        }
         $request = app($this->storeRequest);
         $model = $this->service->create(array_merge($request->except('active_by_uuid'), [
             'user_uuid' => auth()->user()->getKey(),

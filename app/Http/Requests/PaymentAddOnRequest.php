@@ -27,7 +27,7 @@ class PaymentAddOnRequest extends FormRequest
         $rule = [
             'payment_method_uuid' => ['required', 'exists:payment_methods,uuid'],
             'go_back_url' => ['required'],
-            'add_on_subscription_plan_uuid' => ['required', 'exists:add_ons,uuid'],
+            'add_on_subscription_plan_uuid' => ['required', 'exists:add_on_subscription_plans,uuid'],
             "card_number" => ['required_if:payment_method,==,stripe', 'integer', 'digits:16'],
             "exp_month" => ['required_if:payment_method,==,stripe', 'integer'],
             "exp_year" => ['required_if:payment_method,==,stripe', 'integer', 'min:' . Carbon::now()->year],
