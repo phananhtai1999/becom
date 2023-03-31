@@ -25,7 +25,7 @@ class UserAddOn extends Model
      */
     protected $fillable = [
         'user_uuid',
-        'add_on_uuid',
+        'add_on_subscription_plan_uuid',
         'expiration_date',
         'auto_renew'
     ];
@@ -39,7 +39,10 @@ class UserAddOn extends Model
         'deleted_at' => 'datetime',
     ];
 
-    public function addOn() {
-        return $this->belongsTo(AddOn::class, 'add_on_uuid', 'uuid');
+    public function addOnSubscriptionPlan() {
+        return $this->belongsTo(AddOnSubscriptionPlan::class, 'add_on_subscription_plan_uuid', 'uuid');
+    }
+    public function user() {
+        return $this->belongsTo(User::class, 'user_uuid', 'uuid');
     }
 }

@@ -607,14 +607,16 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'subscriptionPlan.'], functi
     Route::get('/subscription-plans', [SubscriptionPlanController::class, 'index']);
 });
 
+//add-on subscription plan
 Route::group(['middleware' => ['auth:api'], 'as' => 'addOnSubscriptionPlan.'], function () {
     Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
         Route::post('/add-on-subscription-plan', [AddOnSubscriptionPlanController::class, 'store']);
         Route::delete('/add-on-subscription-plan/{id}', [AddOnSubscriptionPlanController::class, 'destroy']);
     });
     Route::get('/add-on-subscription-plan/{id}', [AddOnSubscriptionPlanController::class, 'show']);
-    Route::get('/add-on-subscription-plans', [AddOnSubscriptionPlanController::class, 'index']);
 });
+Route::get('/add-on-subscription-plans', [AddOnSubscriptionPlanController::class, 'index']);
+
 Route::group(['middleware' => ['auth:api'], 'as' => 'permission.'], function () {
     Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
         Route::post('/permission', [PermissionController::class, 'store']);
@@ -911,15 +913,17 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'country.'], function () {
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'addOn.'], function () {
     Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
-        Route::get('/add-ons', [AddOnController::class, 'index'])->name('index');
         Route::post('/add-on', [AddOnController::class, 'store'])->name('store');
         Route::get('/publish-add-on/{id}', [AddOnController::class, 'publishAddOn'])->name('publish');
         Route::get('/add-on/{id}', [AddOnController::class, 'show'])->name('show');
         Route::put('/add-on/{id}', [AddOnController::class, 'edit'])->name('edit');
-        Route::get('/disable-add-on/{id}', [AddOnController::class, 'disableAddOn'])->name('edit');
-        Route::get('/my/add-on', [AddOnController::class, 'myAddOn'])->name('myAddOn');
-    });
+        Route::get('/disable-add-on/{id}', [AddOnController::class, 'disableAddOn'])->name('disableAddOn');
+        Route::delete('add-on/{id}', [AddOnController::class, 'destroy'])->name('destroy');
 
+    });
+    Route::get('/add-ons', [AddOnController::class, 'index'])->name('index');
+    Route::get('/add-on-subscription-histories', [AddOnController::class, 'addOnSubscriptionHistory'])->name('addOnSubscriptionHistory');
+    Route::get('/my-add-on', [AddOnController::class, 'myAddOn'])->name('myAddOn');
     Route::post('/payment-add-on', [AddOnController::class, 'paymentAddOn'])->name('store');
 });
 Route::get('/paypal/success-payment-subscription-add-on', [PaypalController::class, 'successPaymentSubscriptionAddOn'])->name('paypal.successPaymentSubscriptionAddOn');

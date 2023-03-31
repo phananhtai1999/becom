@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class AddOn extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     const ADD_ON_DRAFT = 'draft';
     const ADD_ON_PUBLISH = 'publish';
@@ -50,5 +51,10 @@ class AddOn extends Model
 
     public function permissions() {
         return $this->belongsToMany(Permission::class, 'add_on_permissions', 'add_on_uuid', 'permission_uuid');
+    }
+
+    public function addOnSubscriptionPlans()
+    {
+        return $this->hasMany(AddOnSubscriptionPlan::class, 'add_on_uuid', 'uuid');
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
+use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\AddOnRequest;
@@ -10,10 +11,13 @@ use App\Http\Requests\PaymentAddOnRequest;
 use App\Http\Requests\UpdateAddOnRequest;
 use App\Http\Resources\AddOnResource;
 use App\Http\Resources\AddOnResourceCollection;
+use App\Http\Resources\AddOnSubscriptionHistoryResourceCollection;
 use App\Http\Resources\UserAddOnResource;
+use App\Http\Resources\UserAddOnResourceCollection;
 use App\Models\AddOn;
 use App\Models\PaymentMethod;
 use App\Services\AddOnService;
+use App\Services\AddOnSubscriptionHistoryService;
 use App\Services\AddOnSubscriptionPlanService;
 use App\Services\PaypalService;
 use App\Services\StripeService;
@@ -22,18 +26,20 @@ use App\Services\UserPlatformPackageService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Gate;
 use Throwable;
 
 class AddOnController extends AbstractRestAPIController
 {
-    use RestShowTrait, RestIndexTrait;
+    use RestShowTrait, RestIndexTrait, RestDestroyTrait;
 
     public function __construct(
         AddOnService  $service,
         PaypalService $paypalService,
         StripeService $stripeService,
         UserAddOnService $userAddOnService,
-        AddOnSubscriptionPlanService $addOnSubscriptionPlanService
+        AddOnSubscriptionPlanService $addOnSubscriptionPlanService,
+        AddOnSubscriptionHistoryService $addOnSubscriptionHistoryService
     )
     {
         $this->service = $service;
@@ -41,9 +47,11 @@ class AddOnController extends AbstractRestAPIController
         $this->paypalService = $paypalService;
         $this->userAddOnService = $userAddOnService;
         $this->addOnSubscriptionPlanService = $addOnSubscriptionPlanService;
+        $this->addOnSubscriptionHistoryService = $addOnSubscriptionHistoryService;
         $this->resourceClass = AddOnResource::class;
         $this->resourceCollectionClass = AddOnResourceCollection::class;
-        $this->userAddOnResourceClass = UserAddOnResource::class;
+        $this->userAddOnResourceCollectionClass = UserAddOnResourceCollection::class;
+        $this->addOnSubscriptionHistoryResourceCollectionClass = AddOnSubscriptionHistoryResourceCollection::class;
     }
 
     /**
@@ -154,10 +162,19 @@ class AddOnController extends AbstractRestAPIController
     }
 
     public function myAddOn() {
-        $myAddOn = $this->userAddOnService->findOneWhere(['user_uuid' => auth()->user()->getKey()]);
+        $myAddOn = $this->userAddOnService->findAllWhere(['user_uuid' => auth()->user()->getKey()]);
 
-        return $this->sendCreatedJsonResponse(
-            $this->service->resourceToData($this->userAddOnResourceClass, $myAddOn)
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->userAddOnResourceCollectionClass, $myAddOn)
         );
+    }
+
+
+    public function addOnSubscriptionHistory()
+    {
+        $subscriptionHistory = $this->addOnSubscriptionHistoryService->myAddOnSubscriptionHistories();
+
+        return $this->sendOkJsonResponse(
+            $this->addOnSubscriptionHistoryService->resourceCollectionToData($this->addOnSubscriptionHistoryResourceCollectionClass, $subscriptionHistory));
     }
 }

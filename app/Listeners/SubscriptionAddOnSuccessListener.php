@@ -2,7 +2,7 @@
 
 namespace App\Listeners;
 
-use App\Models\AddOnHistory;
+use App\Models\AddOnSubscriptionHistory;
 use App\Models\UserAddOn;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -27,7 +27,7 @@ class SubscriptionAddOnSuccessListener
      */
     public function handle($event)
     {
-        AddOnHistory::create($event->subscriptionHistoryData);
+        AddOnSubscriptionHistory::create($event->subscriptionHistoryData);
         UserAddOn::create($event->userAddOnData);
     }
 }

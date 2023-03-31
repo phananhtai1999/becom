@@ -3,65 +3,57 @@
 namespace App\Models\QueryBuilders;
 
 use App\Abstracts\AbstractQueryBuilder;
-use App\Models\Company;
-use App\Models\Country;
-use App\Models\Remind;
+use App\Models\AddOnSubscriptionHistory;
 use App\Models\SearchQueryBuilders\SearchQueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
-use Spatie\QueryBuilder\Concerns\SortsQuery;
-use Spatie\QueryBuilder\QueryBuilder;
 
-class CountryQueryBuilder extends AbstractQueryBuilder
+class AddOnSubscriptionHistoryQueryBuilder extends AbstractQueryBuilder
 {
-    /**
-     * @return string
-     */
     public static function baseQuery()
     {
-        return Country::class;
+        return AddOnSubscriptionHistory::class;
     }
 
     /**
-     * @return SortsQuery|QueryBuilder
+     * @return AddOnSubscriptionHistoryQueryBuilder|\Spatie\QueryBuilder\QueryBuilder
      */
     public static function initialQuery()
     {
-        $modelKeyName = (new Country())->getKeyName();
+        $modelKeyName = (new AddOnSubscriptionHistory())->getKeyName();
 
         return static::for(static::baseQuery())
             ->allowedFields([
                 $modelKeyName,
-                'national_flag',
-                'country_code',
                 'name',
-                'country_phone_code',
-                'sms_price',
-                'email_price',
-                'telegram_price',
-                'viber_price',
+                'description',
+                'thumbnail',
+                'status',
+                'price',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
                 $modelKeyName,
-                'national_flag',
-                'country_code',
                 'name',
-                'country_phone_code',
-                'sms_price',
-                'email_price',
-                'telegram_price',
-                'viber_price',
+                'description',
+                'thumbnail',
+                'status',
+                'price'
             ])
             ->allowedFilters([
                 $modelKeyName,
                 AllowedFilter::exact('exact__' . $modelKeyName, $modelKeyName),
                 'name',
                 AllowedFilter::exact('exact__name', 'name'),
-                'country_code',
-                AllowedFilter::exact('exact__country_code', 'country_code'),
-                'country_phone_code',
-                AllowedFilter::exact('exact__country_phone_code', 'country_phone_code'),
+                'description',
+                AllowedFilter::exact('exact__description', 'description'),
+                'thumbnail',
+                AllowedFilter::exact('exact__thumbnail', 'thumbnail'),
+                'status',
+                AllowedFilter::exact('exact__status', 'status'),
+                'price',
+                AllowedFilter::exact('exact__price', 'price'),
             ]);
+
     }
 
     /**
@@ -69,7 +61,7 @@ class CountryQueryBuilder extends AbstractQueryBuilder
      */
     public static function fillAble()
     {
-        return Country::class;
+        return AddOnSubscriptionHistory::class;
     }
 
     /**

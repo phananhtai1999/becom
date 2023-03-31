@@ -188,7 +188,7 @@ class StripeService extends AbstractService
             $subscriptionData = $this->subscription($request, $plan);
             $subscriptionHistoryData = [
                 'user_uuid' => Auth::user()->getKey(),
-                'add_on_uuid' => $addOnSubscriptionPlan->add_on_uuid,
+                'add_on_subscription_plan_uuid' => $addOnSubscriptionPlan->uuid,
                 'subscription_date' => $subscriptionDate,
                 'expiration_date' => $expirationDate,
                 'payment_method_uuid' => PaymentMethod::STRIPE,
@@ -196,7 +196,7 @@ class StripeService extends AbstractService
             ];
             $userAddOnData = [
                 'user_uuid' => Auth::user()->getKey(),
-                'add_on_uuid' => $addOnSubscriptionPlan->add_on_uuid,
+                'add_on_subscription_plan_uuid' => $addOnSubscriptionPlan->uuid,
                 'expiration_date' => $expirationDate,
                 'auto_renew' => true
             ];
