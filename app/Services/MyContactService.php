@@ -71,7 +71,7 @@ class MyContactService extends AbstractService
             ->whereDate('created_at', '>=', $startDate)
             ->whereDate('created_at', '<=', $endDate)
             ->whereNull('deleted_at')
-            ->where('user_uuid',auth()->user()->getkey())
+            ->where('user_uuid', auth()->user()->getkey())
             ->orderBy('label', 'ASC')
             ->groupby('label')
             ->get()->toArray();
@@ -89,7 +89,7 @@ class MyContactService extends AbstractService
             ->whereDate('created_at', '>=', $startDate)
             ->whereDate('created_at', '<=', $endDate)
             ->whereNull('deleted_at')
-            ->where('user_uuid',auth()->user()->getkey())
+            ->where('user_uuid', auth()->user()->getkey())
             ->orderBy('label', 'ASC')
             ->groupby('label')
             ->get()->toArray();
@@ -284,7 +284,7 @@ class MyContactService extends AbstractService
             ->whereDate('contacts.updated_at', '<=', $endDate)
             ->first();
 
-        return (int) $totalMyContact->points;
+        return (int)$totalMyContact->points;
     }
 
     /**
@@ -337,32 +337,32 @@ class MyContactService extends AbstractService
         $subDate = $startDate;
         $startDate = Carbon::parse($startDate);
 
-        if($groupBy === "hour"){
+        if ($groupBy === "hour") {
             $dateFormat = "%Y-%m-%d %H:00:00";
             $subDate = Carbon::parse($subDate)->subDay();
             $endDate = Carbon::parse($endDate)->endOfDay();
 
-            while($startDate <= $endDate){
+            while ($startDate <= $endDate) {
                 $times[] = $startDate->format('Y-m-d H:00:00');
                 $startDate = $startDate->addHour();
             }
         }
-        if($groupBy === "date"){
+        if ($groupBy === "date") {
             $dateFormat = "%Y-%m-%d";
             $subDate = Carbon::parse($subDate)->subDay();
             $endDate = Carbon::parse($endDate);
 
-            while($startDate <= $endDate){
+            while ($startDate <= $endDate) {
                 $times[] = $startDate->format('Y-m-d');
                 $startDate = $startDate->addDay();
             }
         }
-        if($groupBy === "month"){
+        if ($groupBy === "month") {
             $dateFormat = "%Y-%m";
             $subDate = Carbon::parse($subDate)->subMonth();
             $endDate = Carbon::parse($endDate);
 
-            while($startDate <= $endDate){
+            while ($startDate <= $endDate) {
                 $times[] = $startDate->format('Y-m');
                 $startDate = $startDate->addMonth();
             }
@@ -371,35 +371,35 @@ class MyContactService extends AbstractService
         $pointsContactsChart = $this->createQueryGetPointsContactByMyContactList($dateFormat, $subDate, $endDate, $groupBy === 'date' ? 'day' : $groupBy, $contactListUuid);
 
         $lastIncrease = 0;
-        foreach ($times as $time){
-            if(!empty($pointsContactsChart)) {
-                foreach ($pointsContactsChart as $pointsContactChart){
-                    if($time == $pointsContactChart->label) {
+        foreach ($times as $time) {
+            if (!empty($pointsContactsChart)) {
+                foreach ($pointsContactsChart as $pointsContactChart) {
+                    if ($time == $pointsContactChart->label) {
                         $result[] = [
                             'label' => $pointsContactChart->label,
                             'points' => (int)$pointsContactChart->points,
-                            'increase' => (int) ($pointsContactChart->increase ?? $pointsContactChart->points)
+                            'increase' => (int)($pointsContactChart->increase ?? $pointsContactChart->points)
                         ];
                         $check = true;
                         break;
-                    }else{
+                    } else {
                         $prevTime = $time;
-                        if($groupBy === 'hour'){
+                        if ($groupBy === 'hour') {
                             $prevTime = Carbon::parse($prevTime)->subHour()->toDateTimeString();
                         }
-                        if($groupBy === 'date'){
+                        if ($groupBy === 'date') {
                             $prevTime = Carbon::parse($prevTime)->subDay()->toDateString();
                         }
-                        if($groupBy === 'month'){
+                        if ($groupBy === 'month') {
                             $prevTime = Carbon::parse($prevTime)->subMonth()->format('Y-m');
                         }
-                        if($prevTime == $pointsContactChart->label){
+                        if ($prevTime == $pointsContactChart->label) {
                             $lastIncrease = $pointsContactChart->points;
                         }
                         $check = false;
                     }
                 }
-                if(!$check){
+                if (!$check) {
                     $result[] = [
                         'label' => $time,
                         'points' => 0,
@@ -407,7 +407,7 @@ class MyContactService extends AbstractService
                     ];
                     $lastIncrease = 0;
                 }
-            }else{
+            } else {
                 $result[] = [
                     'label' => $time,
                     'points' => 0,
@@ -723,5 +723,30 @@ class MyContactService extends AbstractService
             'path' => LengthAwarePaginator::resolveCurrentPath(),
             'pageName' => 'page',
         ]);
+    }
+
+    /**
+     * @param $contacts
+     * @return mixed
+     */
+    public function checkMyActiveStatus($contacts)
+    {
+        //Get All status Admin
+        $statusAdmin = app(StatusService::class)->getAllStatusDefault();
+        //Check status User exists or not
+        $userUuid = $contacts->unique('user_uuid')->pluck('user_uuid')->toArray();
+        $statusUser = app(MyStatusService::class)->getMyStatus($userUuid);
+
+        $contacts->each(function ($contact) use ($statusAdmin, $statusUser) {
+            if ($statusUser->count() != 0) {
+                $contact->status_active = $statusUser->where('points', '<=', $contact->points)->sortByDesc('points')->first();
+                $contact->status_list = $statusUser;
+            } else {
+                $contact->status_active = $statusAdmin->where('points', '<=', $contact->points)->sortByDesc('points')->first();
+                $contact->status_list = $statusAdmin;
+            }
+        });
+
+        return $contacts;
     }
 }

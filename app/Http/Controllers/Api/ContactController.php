@@ -62,7 +62,7 @@ class ContactController extends AbstractRestAPIController
         MyContactService     $myService,
         MyContactListService $myContactListService,
         ContactListService   $contactListService,
-        StatusService $statusService
+        StatusService        $statusService
     )
     {
         $this->service = $service;
@@ -103,8 +103,11 @@ class ContactController extends AbstractRestAPIController
                 );
             }
 
+            //Check Active Status
+            $checkActiveStatus = $this->service->checkActiveStatus($models);
+
             return $this->sendOkJsonResponse(
-                $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+                $this->service->resourceCollectionToData($this->resourceCollectionClass, $checkActiveStatus)
             );
         } catch (\ValueError|\ErrorException $error) {
             return $this->sendValidationFailedJsonResponse();
@@ -194,11 +197,13 @@ class ContactController extends AbstractRestAPIController
                     $request->get('page', '1')
                 );
             }
+            //Check Active Status
+            $checkActiveStatus = $this->myService->checkMyActiveStatus($models);
 
             return $this->sendOkJsonResponse(
                 $this->service->resourceCollectionToData(
                     $this->resourceCollectionClass,
-                    $models
+                    $checkActiveStatus
                 )
             );
         } catch (\ValueError|\ErrorException $error) {

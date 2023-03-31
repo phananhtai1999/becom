@@ -46,4 +46,13 @@ class MyStatusService extends AbstractService
 
         return $this->destroy($status->getKey());
     }
+
+    /**
+     * @param $userUuid
+     * @return mixed
+     */
+    public function getMyStatus($userUuid)
+    {
+        return $this->model->select(['uuid', 'name', 'points'])->whereIn('user_uuid', $userUuid)->get();
+    }
 }

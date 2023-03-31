@@ -21,14 +21,19 @@ class StatusService extends AbstractService
     }
 
     /**
-     * @param $points
-     * @return mixed
+     * @return void
      */
-    public function firstStatusByPoint($points)
+    public function getAllStatusDefault()
     {
-        return $this->model->where([
-            ['user_uuid', null],
-            ['points', '<=', $points]
-        ])->orderBy('points', 'DESC')->first();
+        return $this->model->select(['uuid', 'name'])->where('user_uuid', null)->get();
+    }
+
+    /**
+     * @param $userUuid
+     * @return void
+     */
+    public function getAllStatusByUserUuid($userUuid)
+    {
+        return $this->model->select(['uuid', 'name', 'points', 'user_uuid'])->where('user_uuid', $userUuid)->get();
     }
 }
