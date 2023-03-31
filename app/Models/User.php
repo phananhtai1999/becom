@@ -216,6 +216,11 @@ class User extends Authenticatable
         return $this->hasOne(UserPlatformPackage::class, 'user_uuid', 'uuid');
     }
 
+    public function userAddOns()
+    {
+        return $this->hasMany(UserAddOn::class, 'user_uuid', 'uuid');
+    }
+
     /**
      * @return null
      */
