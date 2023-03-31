@@ -42,4 +42,7 @@ class UserAddOn extends Model
     public function addOnSubscriptionPlan() {
         return $this->belongsTo(AddOnSubscriptionPlan::class, 'add_on_subscription_plan_uuid', 'uuid');
     }
+    public function user() {
+        return $this->belongsTo(User::class, 'user_uuid', 'uuid');
+    }
 }

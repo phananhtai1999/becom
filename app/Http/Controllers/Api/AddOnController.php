@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
+use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\AddOnRequest;
@@ -30,7 +31,7 @@ use Throwable;
 
 class AddOnController extends AbstractRestAPIController
 {
-    use RestShowTrait, RestIndexTrait;
+    use RestShowTrait, RestIndexTrait, RestDestroyTrait;
 
     public function __construct(
         AddOnService  $service,
