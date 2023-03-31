@@ -40,6 +40,10 @@ class BusinessCategoryResource extends AbstractJsonResource
             $data['children_category_public'] = self::collection($this->childrenBusinessCategoryPublic);
         }
 
+        if (\in_array('business_category__contacts', $expand)) {
+            $data['contacts'] = ContactResource::collection($this->contacts);
+        }
+
         return $data;
     }
 }

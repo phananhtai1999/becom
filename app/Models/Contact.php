@@ -84,6 +84,19 @@ class Contact extends AbstractModel
     }
 
     /**
+     * @return BelongsToMany
+     */
+    public function businessCategories()
+    {
+        return $this->belongsToMany(BusinessCategory::class, 'contact_business_category', 'contact_uuid', 'business_category_uuid')->withTimestamps();
+    }
+
+    public function contactUnsubscribe()
+    {
+        return $this->hasOne(ContactUnsubscribe::class, 'contact_uuid', 'uuid');
+    }
+
+    /**
      * @param Builder $query
      * @param ...$uuids
      * @return Builder
