@@ -114,12 +114,12 @@ return [
 
     'password_timeout' => 10800,
 
-    'login_succeed_redirect_url' => env('FRONTEND_URL') . '/auth/login/success',
+    'login_succeed_redirect_url' => env('FRONTEND_URL') . 'auth/login/success',
 
-    'login_failed_redirect_url' => env('FRONTEND_URL') . '/login/failed',
+    'login_failed_redirect_url' => env('FRONTEND_URL') . 'login/failed',
 
-    'recovery_password_url' => env('FRONTEND_URL') . '/auth/recovery-password',
+    'recovery_password_url' => env('FRONTEND_URL') . 'auth/recovery-password',
 
-    'unsubscribe_url' => env('FRONTEND_URL').'/unsubscribe/',
+    'unsubscribe_url' => env('FRONTEND_URL').'unsubscribe/',
 
 ];
