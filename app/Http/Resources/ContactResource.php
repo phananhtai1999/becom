@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Abstracts\AbstractJsonResource;
+use App\Models\BusinessCategory;
 
 class ContactResource extends AbstractJsonResource
 {
@@ -67,6 +68,14 @@ class ContactResource extends AbstractJsonResource
 
         if (\in_array('contact__activity_histories', $expand)) {
             $data['activity_histories'] = ActivityHistoryResource::collection($this->activityHistories);
+        }
+
+        if (\in_array('contact__business_categories', $expand)) {
+            $data['business_categories'] = BusinessCategoryResource::collection($this->businessCategories);
+        }
+
+        if (\in_array('contact__contact_unsubscribe', $expand)) {
+            $data['contact_unsubscribe'] = new ContactUnsubscribeResource($this->contactUnsubscribe);
         }
 
         return $data;

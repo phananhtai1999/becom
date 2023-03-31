@@ -975,3 +975,4 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'contact-unsubscribe.'], fun
     });
 });
 Route::get('unsubscribe/{code}', [UnsubscribeController::class, 'show'])->name('showUnsubscribe');
+Route::post('unsubscribe', [UnsubscribeController::class, 'storeUnsubscribe'])->name('storeUnsubscribe');

@@ -98,6 +98,11 @@ class BusinessCategory extends AbstractModel
         return $this->belongsTo(User::class, 'user_uuid', 'uuid');
     }
 
+    public function contacts()
+    {
+        return $this->belongsToMany(Contact::class, 'contact_business_category', 'business_category_uuid', 'contact_uuid')->withTimestamps();
+    }
+
     /**
      * @return BelongsTo
      */
