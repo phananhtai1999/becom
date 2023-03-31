@@ -19,15 +19,15 @@ class UserAddOnResource extends JsonResource
         $data = [
             'uuid' => $this->uuid,
             'user_uuid' => $this->user_uuid ,
-            'add_on_uuid' => $this->add_on_uuid,
+            'add_on_subscription_plan_uuid' => $this->add_on_subscription_plan_uuid,
             'expiration_date' => $this->expiration_date,
             'auto_renew' => $this->auto_renew,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
-        if (\in_array('user_add_on__add_on', $expand)) {
-            $data['add_on'] = new AddOnResource($this->addOn);
+        if (\in_array('user_add_on__add_on_subscription_plan', $expand)) {
+            $data['add_on_subscription_plan'] = new AddOnSubscriptionPlanResource($this->addOnSubscriptionPlan);
         }
 
         return $data;

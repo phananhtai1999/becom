@@ -108,7 +108,7 @@ class PaypalController extends AbstractRestAPIController
         $subscriptionData = ["id" => $response['id']];
         $subscriptionHistoryData = [
             'user_uuid' => $request->userUuid,
-            'add_on_uuid' => $request->addOnUuid,
+            'add_on_subscription_plan_uuid' => $request->addOnSubscriptionPlanUuid,
             'subscription_date' => $request->subscriptionDate,
             'expiration_date' => $request->expirationDate,
             'payment_method_uuid' => PaymentMethod::PAYPAL,
@@ -116,17 +116,17 @@ class PaypalController extends AbstractRestAPIController
         ];
         $userAddOnData = [
             'user_uuid' => $request->userUuid,
-            'add_on_uuid' => $request->addOnUuid,
+            'add_on_subscription_plan_uuid' => $request->addOnSubscriptionPlanUuid,
             'expiration_date' => $request->expirationDate,
             'auto_renew' => true
         ];
         if (isset($response['status']) && $response['status'] == 'ACTIVE') {
             Event::dispatch(new SubscriptionAddOnSuccessEvent($request->userUuid, $subscriptionHistoryData, $userAddOnData));
 
-            return redirect()->to(env('FRONTEND_URL') . 'my/profile/add-on/success?go_back_url='. $request['goBackUrl'] . '&addOnUuid=' . $request['addOnUuid']);
+            return redirect()->to(env('FRONTEND_URL') . 'my/profile/add-on/success?go_back_url='. $request['goBackUrl'] . '&addOnSubscriptionPlanUuid=' . $request->addOnSubscriptionPlanUuid);
         } else {
 
-            return redirect()->to(env('FRONTEND_URL') . 'my/profile/add-on/failed?go_back_url='. $request['goBackUrl'] . '&addOnUuid=' . $request['addOnUuid']);
+            return redirect()->to(env('FRONTEND_URL') . 'my/profile/add-on/failed?go_back_url='. $request['goBackUrl'] . '&addOnSubscriptionPlanUuid=' . $request->addOnSubscriptionPlanUuid);
         }
     }
 
