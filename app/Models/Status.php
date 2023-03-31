@@ -74,10 +74,10 @@ class Status extends AbstractModel
     }
 
     /**
-     * @return array|mixed
+     * @return mixed
      */
     public function getNameTranSlateAttribute()
     {
-        return auth()->user()->roles->where('slug', 'admin')->isEmpty() ? $this->name : $this->getTranslations('name');
+        return $this->name;
     }
 }

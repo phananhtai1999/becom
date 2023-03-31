@@ -17,7 +17,13 @@ class MyStatusQueryBuilder extends AbstractQueryBuilder
      */
     public static function baseQuery()
     {
-        return Status::where('user_uuid', auth()->user()->getkey());
+        $myStatus = Status::where('user_uuid', auth()->user()->getkey());
+        if ($myStatus->count() != 0) {
+
+            return $myStatus;
+        }
+
+        return Status::where('user_uuid', null);
     }
 
     /**

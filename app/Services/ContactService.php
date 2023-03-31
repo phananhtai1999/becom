@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Abstracts\AbstractService;
+use App\Http\Resources\StatusResource;
 use App\Models\Contact;
 use App\Models\QueryBuilders\ContactQueryBuilder;
 use Carbon\Carbon;
@@ -172,11 +173,11 @@ class ContactService extends AbstractService
     /**
      * @param $campaignUuid
      * @param $email
-     * @return mixed
+     * @return void
      */
     public function addPointContactOpenByCampaign($campaignUuid, $email)
     {
-        return $this->model->select('contacts.*')
+        $contactsOpenMail = $this->model->select('contacts.*')
             ->join('contact_contact_list', 'contact_contact_list.contact_uuid', '=', 'contacts.uuid')
             ->join('contact_lists', 'contact_lists.uuid', '=', 'contact_contact_list.contact_list_uuid')
             ->join('campaign_contact_list', 'campaign_contact_list.contact_list_uuid', '=', 'contact_lists.uuid')
@@ -199,6 +200,12 @@ class ContactService extends AbstractService
                 ['contacts.phone', $email]
             ])
             ->get();
+
+        foreach ($contactsOpenMail as $contactOpenMail) {
+            $this->update($contactOpenMail, [
+                'points' => $contactOpenMail->points + 1
+            ]);
+        }
     }
 
     /**
@@ -910,5 +917,30 @@ class ContactService extends AbstractService
             'path' => LengthAwarePaginator::resolveCurrentPath(),
             'pageName' => 'page',
         ]);
+    }
+
+    /**
+     * @param $contacts
+     * @return mixed
+     */
+    public function checkActiveStatus($contacts)
+    {
+        //Get All Status Admin
+        $statusAdmin = app(StatusService::class)->getAllStatusDefault();
+        $contacts->each(function ($contact) use ($statusAdmin) {
+            $statusUser = app(StatusService::class)->getAllStatusByUserUuid($contact->user_uuid);
+            if ($statusUser->count() != 0) {
+                $contact->status_active = $statusUser->where('points', '<=', $contact->points)->sortByDesc('points')->first();
+                $contact->status_list = $statusUser;
+            } else {
+                $contact->status_active = $statusAdmin->where('points', '<=', $contact->points)->sortByDesc('points')->first();
+                $contact->status_list = $statusAdmin;
+            }
+            //List status admin
+            $contact->admin_status_active = $statusAdmin->where('points', '<=', $contact->points)->sortByDesc('points')->first();
+            $contact->admin_status_list = $statusAdmin;
+        });
+
+        return $contacts;
     }
 }
