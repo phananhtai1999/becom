@@ -4,8 +4,7 @@ namespace App\Listeners;
 
 use App\Models\AddOnSubscriptionHistory;
 use App\Models\UserAddOn;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Cache;
 
 class SubscriptionAddOnSuccessListener
 {
@@ -29,5 +28,6 @@ class SubscriptionAddOnSuccessListener
     {
         AddOnSubscriptionHistory::create($event->subscriptionHistoryData);
         UserAddOn::create($event->userAddOnData);
+        Cache::flush();
     }
 }

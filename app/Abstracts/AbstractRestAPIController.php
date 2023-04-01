@@ -2,6 +2,7 @@
 
 namespace App\Abstracts;
 
+use App\Models\AddOn;
 use App\Models\Permission;
 use App\Models\PlatformPackage;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -140,13 +141,21 @@ class AbstractRestAPIController extends BaseController
                 if (in_array($code, $permissionCache->api_methods ?? [])) {
                     $permissions = Permission::findOrFail($permissionCache->uuid)->platformPackages;
                     foreach ($permissions as $permission) {
-                        return ['plan' => 'plan_' . $permission->uuid];
+                        return ['plan' => 'platform_package_' . $permission->uuid];
                     }
                 }
             }
         }
+        $addOns = AddOn::all();
+        foreach ($addOns as $addOn) {
+            foreach($addOn->permissions as $permission) {
+                if (in_array($code, $permission->api_methods ?? [])) {
+                    return ['plan' => 'add_on_' . $addOn->uuid];
+                }
+            }
+        }
 
-        return ['plan' => 'Does not have package for this feature. Comeback Later!!'];
+        return ['plan' => 'Does not have package/add-on for this feature. Comeback Later!!'];
     }
 
     /**

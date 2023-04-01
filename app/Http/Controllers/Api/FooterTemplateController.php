@@ -63,9 +63,6 @@ class FooterTemplateController extends AbstractRestAPIController
      */
     public function store()
     {
-//        if (!Gate::allows('permission', config('api.footer.create'))) {
-//            return $this->sendJsonResponse(false, 'You need to buy add-on', ['data' => '123'], 403);
-//        }
         $request = app($this->storeRequest);
         $model = $this->service->create(array_merge($request->except('active_by_uuid'), [
             'user_uuid' => auth()->user()->getKey(),
@@ -139,6 +136,9 @@ class FooterTemplateController extends AbstractRestAPIController
 
     public function storeMyFooterTemplate(MyFooterTemplateRequest $request)
     {
+        if (!Gate::allows('permission', config('api.footer.create'))) {
+            return $this->sendJsonResponse(false, 'You need to buy platform/add-on', ['data' => $this->getPlatformByPermission(config('api.footer.create'))], 403);
+        }
         $model = $this->service->create(array_merge($request->except('active_by_uuid'), [
             'user_uuid' => auth()->user()->getKey(),
             'is_default' => false,

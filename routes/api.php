@@ -892,7 +892,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'footer_template.'], functio
         Route::delete('/footer-template/{id}', [FooterTemplateController::class, 'destroy'])->name('destroy');
     });
 
-    Route::group(['middleware' => ['footerTemplate'], 'as' => 'my.'], function () {
+    Route::group(['as' => 'my.'], function () {
         Route::get('/my/footer-templates', [FooterTemplateController::class, 'indexMyFooterTemplate'])->name('index');
         Route::post('/my/footer-template', [FooterTemplateController::class, 'storeMyFooterTemplate'])->name('store');
         Route::get('/my/footer-template/{id}', [FooterTemplateController::class, 'showMyFooterTemplate'])->name('show');
