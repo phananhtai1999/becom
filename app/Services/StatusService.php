@@ -25,7 +25,7 @@ class StatusService extends AbstractService
      */
     public function getAllStatusDefault()
     {
-        return $this->model->select(['uuid', 'name'])->where('user_uuid', null)->get();
+        return $this->model->select(['uuid', 'name', 'points', 'user_uuid'])->where('user_uuid', null)->orderBy('points')->get();
     }
 
     /**
@@ -34,6 +34,6 @@ class StatusService extends AbstractService
      */
     public function getAllStatusByUserUuid($userUuid)
     {
-        return $this->model->select(['uuid', 'name', 'points', 'user_uuid'])->where('user_uuid', $userUuid)->get();
+        return $this->model->select(['uuid', 'name', 'points', 'user_uuid'])->where('user_uuid', $userUuid)->orderBy('points')->get();
     }
 }
