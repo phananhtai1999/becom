@@ -4,8 +4,7 @@ namespace App\Listeners;
 
 use App\Models\SubscriptionHistory;
 use App\Models\UserPlatformPackage;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Cache;
 
 class SubscriptionSuccessListener
 {
@@ -30,5 +29,6 @@ class SubscriptionSuccessListener
         SubscriptionHistory::create($event->subscriptionHistory);
         UserPlatformPackage::where('user_uuid', $event->userUuid)->delete();
         UserPlatformPackage::create($event->userPlatformPackage);
+        Cache::flush();
     }
 }

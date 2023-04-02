@@ -47,31 +47,34 @@ class AuthServiceProvider extends ServiceProvider
             if (!isset($user->userPlatformPackage->platform_package_uuid) && !isset($user->userAddOns)) {
                 return false;
             }
-
-            $permissions = Cache::rememberForever($user->userPlatformPackage->platform_package_uuid . '_permission', function () use ($user) {
-                $platformPackage = PlatformPackage::findOrFail($user->userPlatformPackage->platform_package_uuid);
-                return $platformPackage->permissions()->select('api_methods', 'name', 'code', 'uuid')->get();
-            });
-            foreach ($permissions as $permission) {
-                if(in_array($code, $permission->api_methods ?? [])){
-                    return true;
-                }
-            }
-
-            $cacheAddOns = Cache::rememberForever('add_on_permission', function () use ($user) {
-                $permissions = [];
-                foreach($user->userAddOns as $userAddOn) {
-                    $permissions[] = ($userAddOn->addOnSubscriptionPlan->addOn->permissions);
-                }
-                return $permissions;
-            });
-            foreach ($cacheAddOns as $permissions) {
+            if (isset($user->userPlatformPackage->platform_package_uuid)) {
+                $permissions = Cache::rememberForever($user->userPlatformPackage->platform_package_uuid . '_permission', function () use ($user) {
+                    $platformPackage = PlatformPackage::findOrFail($user->userPlatformPackage->platform_package_uuid);
+                    return $platformPackage->permissions()->select('api_methods', 'name', 'code', 'uuid')->get();
+                });
                 foreach ($permissions as $permission) {
-                    if(in_array($code, $permission->api_methods ?? [])){
+                    if (in_array($code, $permission->api_methods ?? [])) {
                         return true;
                     }
                 }
             }
+            if (isset($user->userAddOns)) {
+                $cacheAddOns = Cache::rememberForever('add_on_permission', function () use ($user) {
+                    $permissions = [];
+                    foreach ($user->userAddOns as $userAddOn) {
+                        $permissions[] = $userAddOn->addOnSubscriptionPlan->addOn->permissions ?? [];
+                    }
+                    return $permissions;
+                });
+                foreach ($cacheAddOns as $permissions) {
+                    foreach ($permissions as $permission) {
+                        if (in_array($code, $permission->api_methods ?? [])) {
+                            return true;
+                        }
+                    }
+                }
+            }
+
             return false;
         });
     }

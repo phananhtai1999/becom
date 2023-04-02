@@ -19,7 +19,7 @@ class UserAddOnService extends AbstractService
         return $this->model->where([
             'user_uuid' => auth()->user()->getKey(),
             'add_on_subscription_plan_uuid' => $addOnSubscriptionPlanUuid,
-        ])->where('expiration_date', '>', Carbon::now())->get();
+        ])->where('expiration_date', '>', Carbon::now())->first();
     }
 
 }

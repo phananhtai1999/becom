@@ -176,7 +176,7 @@ class ContactController extends AbstractRestAPIController
     public function indexMyContact(IndexRequest $request)
     {
         if (!Gate::allows('permission', config('api.contact.index'))) {
-            return $this->sendJsonResponse(false, 'You need to upgrade platform package', ['data' => ['plan' => 'plan_professional']], 403);
+            return $this->sendJsonResponse(false, 'You need to upgrade platform package', ['data' => $this->getPlatformByPermission(config('api.contact.create'))], 403);
         }
         try {
             $filters = $request->filter;
