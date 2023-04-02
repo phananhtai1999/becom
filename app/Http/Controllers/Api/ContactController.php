@@ -84,24 +84,32 @@ class ContactController extends AbstractRestAPIController
     public function index(IndexRequest $request)
     {
         try {
-            $filters = $request->filter;
-            if (!empty($filters['uuids_in']) && !empty($filters['uuids_not_in'])) {
+            // Sort Top Or Bottom
+//            $filters = $request->filter;
+//            if (!empty($filters['uuids_in']) && !empty($filters['uuids_not_in'])) {
+//
+//                $models = $this->service->sortContactsToTopOrBottomOfListByUuid($filters['uuids_in'], $filters['uuids_not_in'], $request->get('per_page', '15'), $request->search, $request->search_by);
+//            } elseif (!empty($filters['uuids_in']) && empty($filters['uuids_not_in'])) {
+//
+//                $models = $this->service->sortContactsToTopOrBottomOfListByUuid($filters['uuids_in'], '', $request->get('per_page', '15'), $request->search, $request->search_by);
+//            } elseif (!empty($filters['uuids_not_in']) && empty($filters['uuids_in'])) {
+//
+//                $models = $this->service->sortContactsToTopOrBottomOfListByUuid('', $filters['uuids_not_in'], $request->get('per_page', '15'), $request->search, $request->search_by);
+//            } else {
+//                $models = $this->service->sortContactsToTopOrBottomOfListByUuid('', '', $request->get('per_page', '15'), $request->search, $request->search_by)->paginate(
+//                    $request->get('per_page', '15'),
+//                    $request->get('columns', '*'),
+//                    $request->get('page_name', 'page'),
+//                    $request->get('page', '1')
+//                );
+//            }
 
-                $models = $this->service->sortContactsToTopOrBottomOfListByUuid($filters['uuids_in'], $filters['uuids_not_in'], $request->get('per_page', '15'), $request->search, $request->search_by);
-            } elseif (!empty($filters['uuids_in']) && empty($filters['uuids_not_in'])) {
-
-                $models = $this->service->sortContactsToTopOrBottomOfListByUuid($filters['uuids_in'], '', $request->get('per_page', '15'), $request->search, $request->search_by);
-            } elseif (!empty($filters['uuids_not_in']) && empty($filters['uuids_in'])) {
-
-                $models = $this->service->sortContactsToTopOrBottomOfListByUuid('', $filters['uuids_not_in'], $request->get('per_page', '15'), $request->search, $request->search_by);
-            } else {
-                $models = $this->service->sortContactsToTopOrBottomOfListByUuid('', '', $request->get('per_page', '15'), $request->search, $request->search_by)->paginate(
-                    $request->get('per_page', '15'),
-                    $request->get('columns', '*'),
-                    $request->get('page_name', 'page'),
-                    $request->get('page', '1')
-                );
-            }
+            $models = $this->service->search($request->search, $request->search_by)->paginate(
+                $request->get('per_page', '15'),
+                $request->get('columns', '*'),
+                $request->get('page_name', 'page'),
+                $request->get('page', '1')
+            );
 
             //Check Active Status
             $checkActiveStatus = $this->service->checkActiveStatus($models);
@@ -179,24 +187,33 @@ class ContactController extends AbstractRestAPIController
             return $this->sendJsonResponse(false, 'You need to upgrade platform package', ['data' => $this->getPlatformByPermission(config('api.contact.create'))], 403);
         }
         try {
-            $filters = $request->filter;
-            if (!empty($filters['uuids_in']) && !empty($filters['uuids_not_in'])) {
+            //Sort Top Or Bottom
+//            $filters = $request->filter;
+//            if (!empty($filters['uuids_in']) && !empty($filters['uuids_not_in'])) {
+//
+//                $models = $this->myService->sortMyContactsToTopOrBottomOfListByUuid($filters['uuids_in'], $filters['uuids_not_in'], $request->get('per_page', '15'), $request->search, $request->search_by);
+//            } elseif (!empty($filters['uuids_in']) && empty($filters['uuids_not_in'])) {
+//
+//                $models = $this->myService->sortMyContactsToTopOrBottomOfListByUuid($filters['uuids_in'], '', $request->get('per_page', '15'), $request->search, $request->search_by);
+//            } elseif (!empty($filters['uuids_not_in']) && empty($filters['uuids_in'])) {
+//
+//                $models = $this->myService->sortMyContactsToTopOrBottomOfListByUuid('', $filters['uuids_not_in'], $request->get('per_page', '15'), $request->search, $request->search_by);
+//            } else {
+//                $models = $this->myService->sortMyContactsToTopOrBottomOfListByUuid('', '', $request->get('per_page', '15'), $request->search, $request->search_by)->paginate(
+//                    $request->get('per_page', '15'),
+//                    $request->get('columns', '*'),
+//                    $request->get('page_name', 'page'),
+//                    $request->get('page', '1')
+//                );
+//            }
 
-                $models = $this->myService->sortMyContactsToTopOrBottomOfListByUuid($filters['uuids_in'], $filters['uuids_not_in'], $request->get('per_page', '15'), $request->search, $request->search_by);
-            } elseif (!empty($filters['uuids_in']) && empty($filters['uuids_not_in'])) {
+            $models = $this->myService->search($request->search, $request->search_by)->paginate(
+                $request->get('per_page', '15'),
+                $request->get('columns', '*'),
+                $request->get('page_name', 'page'),
+                $request->get('page', '1')
+            );
 
-                $models = $this->myService->sortMyContactsToTopOrBottomOfListByUuid($filters['uuids_in'], '', $request->get('per_page', '15'), $request->search, $request->search_by);
-            } elseif (!empty($filters['uuids_not_in']) && empty($filters['uuids_in'])) {
-
-                $models = $this->myService->sortMyContactsToTopOrBottomOfListByUuid('', $filters['uuids_not_in'], $request->get('per_page', '15'), $request->search, $request->search_by);
-            } else {
-                $models = $this->myService->sortMyContactsToTopOrBottomOfListByUuid('', '', $request->get('per_page', '15'), $request->search, $request->search_by)->paginate(
-                    $request->get('per_page', '15'),
-                    $request->get('columns', '*'),
-                    $request->get('page_name', 'page'),
-                    $request->get('page', '1')
-                );
-            }
             //Check Active Status
             $checkActiveStatus = $this->myService->checkMyActiveStatus($models);
 
