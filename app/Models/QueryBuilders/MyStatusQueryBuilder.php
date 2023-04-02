@@ -37,13 +37,15 @@ class MyStatusQueryBuilder extends AbstractQueryBuilder
             ->allowedFields([
                 $modelKeyName,
                 'name',
-                'user_uuid'
+                'user_uuid',
+                'points'
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
                 $modelKeyName,
                 'name',
-                'user_uuid'
+                'user_uuid',
+                'points'
             ])
             ->allowedFilters([
                 $modelKeyName,
