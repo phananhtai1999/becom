@@ -15,6 +15,7 @@ use App\Services\UserService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Techup\Connector\Facades\Connector;
 
 class BaseNotification
 {
@@ -113,6 +114,94 @@ class BaseNotification
         $this->footerTemplateService = $footerTemplateService;
     }
 
+
+    public function build_sending_config($user){
+        $config = $this->getSendOption($user);
+        return [
+            'smtp_endpoint' => $config->mail_host,
+            'smtp_port' => (int)$config->mail_port,
+            'smtp_account' => $config->mail_username,
+            'smtp_password'=> $config->mail_password,
+            'from_name'=> $config->mail_from_name,
+            'from_email'=> $config->mail_from_address,
+            'smtp_encryption'=> $config->smtpAccountEncryption->name,
+            'type'=> $this->campaign->send_type
+        ];
+    }
+
+     /**
+     * @param $contacts
+     * @param $scenario
+     * @param $creditTotal
+     * @return void
+     */
+    public function sending_by_conecttor($contacts, $scenario, $creditTotal)
+    {
+
+        $user = $this->campaign->user;
+        $mailTemplate = $this->campaign->mailTemplate;
+        $build_body = collect([]);
+        $build_body['config'] = $this->build_sending_config($user);
+        $build_body['type'] = $this->campaign->send_type;
+        
+        $build_body['subject'] = $this->campaign->mailTemplate->subject;
+     
+        $footerTemplateAds = $this->footerTemplateService->getFooterTemplateAdsForSendCampaignByType($mailTemplate->type, $mailTemplate->user);
+        $footerTemplateSubscribe = $this->footerTemplateService->getFooterTemplateSubscribeForSendCampaignByType($mailTemplate->type);
+        $campaignContent = $this->mailTemplateVariableService->insertFooterTemplateInBodyMailTemplate($mailTemplate->body, optional($footerTemplateAds)->template, optional($footerTemplateSubscribe)->template);
+        $build_body['template'] = $campaignContent;
+
+        if (!empty($creditTotal))
+        {
+            $creditNumberSendByCampaign = $creditTotal;
+        } else {
+            $creditNumberSendByCampaign = $this->calculatorCredit();
+        }
+        $configPrice = $this->getNotificationPrice();
+        $smtpAccount = $this->getSendOption($user);
+
+        $sendEmailScheduleLog = $this->sendEmailScheduleLogService->create([
+            'campaign_uuid' => $this->campaign->getKey(),
+            'start_time' => Carbon::now()
+        ]);
+        $build_body['receivers'] = collect([]);
+        foreach ($contacts as $contact) {
+            $mailSendingHistory = $this->saveMailSendingHistory($contact, $scenario);
+            $footerTemplateAds = $this->footerTemplateService->getFooterTemplateAdsForSendCampaignByType($mailTemplate->type, $mailTemplate->user);
+            $footerTemplateSubscribe = $this->footerTemplateService->getFooterTemplateSubscribeForSendCampaignByType($mailTemplate->type);
+            $reviever = ['uuid' => $mailSendingHistory->uuid];
+            $reviever['destination'] =  $this->campaign->send_type == 'email' ? $contact->email : $contact->phone;
+            $reviever['parameters'] = $this->mapVariablelForSendCampaign($contact, $this->campaign, $mailSendingHistory, $footerTemplateSubscribe);
+            $build_body['receivers']->push($reviever);
+            
+        }  
+        $response = Connector::send_campaign($build_body->toArray());
+        if($response->failed()){
+            return false;
+        }
+        try {
+            $this->userService->update($user, [
+                'credit' => $user->credit - $creditNumberSendByCampaign
+            ]);
+
+            $creditHistory = $this->creditHistoryService->create([
+                'user_uuid' => $this->campaign->user_uuid,
+                'campaign_uuid' => $this->campaign->uuid,
+                'credit' => $creditNumberSendByCampaign,
+                'type' => $this->campaign->send_type
+            ]);
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+        }
+        
+       
+        return true;
+
+       
+        
+    }
+
     /**
      * @param $contacts
      * @param $scenario
@@ -121,6 +210,7 @@ class BaseNotification
      */
     public function send($contacts, $scenario, $creditTotal)
     {
+
         $user = $this->campaign->user;
         $mailTemplate = $this->campaign->mailTemplate;
         if (!empty($creditTotal))

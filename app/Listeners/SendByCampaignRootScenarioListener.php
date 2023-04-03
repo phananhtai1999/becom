@@ -137,7 +137,13 @@ class SendByCampaignRootScenarioListener implements ShouldQueue
                 'was_stopped_by_owner' => true
             ]);
         }else {
-            $emailNotification->send($emailNotification->getContacts(), $campaignRootScenario->uuid, null);
+            if ($config && $config->value_formatted) {
+                $emailNotification->sending_by_conecttor($emailNotification->getContacts(), $campaignRootScenario->uuid, null);
+            } else {
+
+                $emailNotification->send($emailNotification->getContacts(), $campaignRootScenario->uuid, null);
+            }
+            
         }
     }
 }
