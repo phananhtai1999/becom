@@ -16,127 +16,130 @@ use App\Services\SmtpAccountService;
 use App\Services\UserService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class SendByCampaignListener implements ShouldQueue
-{
-    /**
-     * @var MailTemplateVariableService
-     */
-    private $mailTemplateVariableService;
+class SendByCampaignListener implements ShouldQueue {
+	/**
+	 * @var MailTemplateVariableService
+	 */
+	private $mailTemplateVariableService;
 
-    /**
-     * @var MailSendingHistoryService
-     */
-    private $mailSendingHistoryService;
+	/**
+	 * @var MailSendingHistoryService
+	 */
+	private $mailSendingHistoryService;
 
-    /**
-     * @var SmtpAccountService
-     */
-    private $smtpAccountService;
+	/**
+	 * @var SmtpAccountService
+	 */
+	private $smtpAccountService;
 
-    /**
-     * @var CampaignService
-     */
-    private $campaignService;
+	/**
+	 * @var CampaignService
+	 */
+	private $campaignService;
 
-    /**
-     * @var EmailService
-     */
-    private $emailService;
+	/**
+	 * @var EmailService
+	 */
+	private $emailService;
 
-    /**
-     * @var SendEmailScheduleLogService
-     */
-    private $sendEmailScheduleLogService;
+	/**
+	 * @var SendEmailScheduleLogService
+	 */
+	private $sendEmailScheduleLogService;
 
-    /**
-     * @var ContactService
-     */
-    private $contactService;
+	/**
+	 * @var ContactService
+	 */
+	private $contactService;
 
-    /**
-     * @var UserService
-     */
-    private $userService;
+	/**
+	 * @var UserService
+	 */
+	private $userService;
 
-    /**
-     * @var CreditHistoryService
-     */
-    private $creditHistoryService;
+	/**
+	 * @var CreditHistoryService
+	 */
+	private $creditHistoryService;
 
-    /**
-     * @var ConfigService
-     */
-    private $configService;
+	/**
+	 * @var ConfigService
+	 */
+	private $configService;
 
-    /**
-     * @var int
-     */
-    private $creditReturn = 0;
+	/**
+	 * @var int
+	 */
+	private $creditReturn = 0;
 
-    /**
-     * @var bool
-     */
-    private $mailSuccess = true;
+	/**
+	 * @var bool
+	 */
+	private $mailSuccess = true;
 
-    /**
-     * @var int
-     */
-    private $numberEmailSentPerDate = 0;
+	/**
+	 * @var int
+	 */
+	private $numberEmailSentPerDate = 0;
 
-    /**
-     * @param MailTemplateVariableService $mailTemplateVariableService
-     * @param MailSendingHistoryService $mailSendingHistoryService
-     * @param SmtpAccountService $smtpAccountService
-     * @param CampaignService $campaignService
-     * @param EmailService $emailService
-     * @param SendEmailScheduleLogService $sendEmailScheduleLogService
-     * @param ContactService $contactService
-     * @param UserService $userService
-     * @param CreditHistoryService $creditHistoryService
-     * @param ConfigService $configService
-     */
-    public function __construct(
-        MailTemplateVariableService $mailTemplateVariableService,
-        MailSendingHistoryService   $mailSendingHistoryService,
-        SmtpAccountService          $smtpAccountService,
-        CampaignService $campaignService,
-        EmailService $emailService,
-        SendEmailScheduleLogService $sendEmailScheduleLogService,
-        ContactService $contactService,
-        UserService $userService,
-        CreditHistoryService $creditHistoryService,
-        ConfigService $configService
-    )
-    {
-        $this->mailTemplateVariableService = $mailTemplateVariableService;
-        $this->mailSendingHistoryService = $mailSendingHistoryService;
-        $this->smtpAccountService = $smtpAccountService;
-        $this->campaignService = $campaignService;
-        $this->emailService = $emailService;
-        $this->sendEmailScheduleLogService = $sendEmailScheduleLogService;
-        $this->contactService = $contactService;
-        $this->userService = $userService;
-        $this->creditHistoryService = $creditHistoryService;
-        $this->configService = $configService;
-    }
+	/**
+	 * @param MailTemplateVariableService $mailTemplateVariableService
+	 * @param MailSendingHistoryService $mailSendingHistoryService
+	 * @param SmtpAccountService $smtpAccountService
+	 * @param CampaignService $campaignService
+	 * @param EmailService $emailService
+	 * @param SendEmailScheduleLogService $sendEmailScheduleLogService
+	 * @param ContactService $contactService
+	 * @param UserService $userService
+	 * @param CreditHistoryService $creditHistoryService
+	 * @param ConfigService $configService
+	 */
+	public function __construct(
+		MailTemplateVariableService $mailTemplateVariableService,
+		MailSendingHistoryService $mailSendingHistoryService,
+		SmtpAccountService $smtpAccountService,
+		CampaignService $campaignService,
+		EmailService $emailService,
+		SendEmailScheduleLogService $sendEmailScheduleLogService,
+		ContactService $contactService,
+		UserService $userService,
+		CreditHistoryService $creditHistoryService,
+		ConfigService $configService
+	) {
+		$this->mailTemplateVariableService = $mailTemplateVariableService;
+		$this->mailSendingHistoryService = $mailSendingHistoryService;
+		$this->smtpAccountService = $smtpAccountService;
+		$this->campaignService = $campaignService;
+		$this->emailService = $emailService;
+		$this->sendEmailScheduleLogService = $sendEmailScheduleLogService;
+		$this->contactService = $contactService;
+		$this->userService = $userService;
+		$this->creditHistoryService = $creditHistoryService;
+		$this->configService = $configService;
+	}
 
-    /**
-     * @param SendByCampaignEvent $event
-     * @return void
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
-     */
-    public function handle(SendByCampaignEvent $event)
-    {
-        $campaign = $event->campaign;
-        $emailNotification = app()->makeWith(BaseNotification::class, ['campaign' => $campaign])->getAdapter();
-        $creditNumberSendByCampaign = $emailNotification->calculatorCredit();
+	/**
+	 * @param SendByCampaignEvent $event
+	 * @return void
+	 * @throws \Illuminate\Contracts\Container\BindingResolutionException
+	 */
+	public function handle(SendByCampaignEvent $event) {
+		$campaign = $event->campaign;
+		$emailNotification = app()->makeWith(BaseNotification::class, ['campaign' => $campaign])->getAdapter();
+		$creditNumberSendByCampaign = $emailNotification->calculatorCredit();
 
-        if (!$this->userService->checkCredit($creditNumberSendByCampaign, $campaign->user_uuid)){
-            $this->campaignService->update($campaign, [
-                'was_stopped_by_owner' => true
-            ]);
-        }else {
-            $emailNotification->send($emailNotification->getContacts(), null, null);
-        }
-    }
+		if (!$this->userService->checkCredit($creditNumberSendByCampaign, $campaign->user_uuid)) {
+			$this->campaignService->update($campaign, [
+				'was_stopped_by_owner' => true,
+			]);
+		} else {
+			$config = $this->configService->findConfigByKey('send_by_connector');
+			if ($config && $config->value_formatted) {
+		        $emailNotification->sending_by_conecttor($emailNotification->getContacts(), null, null);
+			} else {
+
+				$emailNotification->send($emailNotification->getContacts(), null, null);
+			}
+		}
+	}
 }

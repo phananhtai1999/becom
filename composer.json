@@ -30,6 +30,7 @@
         "spatie/laravel-translatable": "*",
         "srmklive/paypal": "~3.0",
         "stripe/stripe-php": "^10.0",
+        "techup/connector": "dev-packagenew",
         "torann/geoip": "*"
     },
     "require-dev": {
@@ -79,5 +80,14 @@
         "sort-packages": true
     },
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "repositories": {
+        "techup/connector": {
+            "type": "path",
+            "url": "packages/techup/connector",
+            "options": {
+                "symlink": true
+            }
+        }
+    }
 }

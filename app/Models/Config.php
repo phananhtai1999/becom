@@ -57,4 +57,18 @@ class Config extends AbstractModel
     {
         return $this->belongsTo(Group::class, 'group_id', 'uuid');
     }
+
+    /**
+     * @return boolean
+     */
+    public function getValueFormattedAttribute()
+    {
+        if($this->type == 'boolean'){
+            if($this->value === 0 || $this->value === '0' || $this->value === 'false' || $this->value === false){
+                return false;
+            }
+            return true;
+        }
+        return $this->value;
+    }
 }

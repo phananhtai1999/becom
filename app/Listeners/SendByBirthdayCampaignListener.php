@@ -132,8 +132,13 @@ class SendByBirthdayCampaignListener implements ShouldQueue
                 ]);
                 continue;
             }
+            $config = $this->configService->findConfigByKey('send_by_connector');
+            if ($config && $config->value_formatted) {
+                $emailNotification->sending_by_conecttor($contacts, null, $creditNumberSendByCampaign);
+            } else {
 
-            $emailNotification->send($contacts, null, $creditNumberSendByCampaign);
+                $emailNotification->send($contacts, null, $creditNumberSendByCampaign);
+            }
         }
     }
 }
