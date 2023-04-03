@@ -247,7 +247,7 @@ class BaseNotification
             'campaign_tracking_key' => $campaign->tracking_key,
             'current_day' => $current->toDateString(),
             'current_time' => $current->toTimeString(),
-            'url_unsubscribe' => $footerTemplateSubscribe ? $this->mailTemplateVariableService->getUrlFooterSubscribeByContactUuid($contact->uuid) : null,
+            'url_unsubscribe' => $footerTemplateSubscribe ? $this->mailTemplateVariableService->getUrlUnsubscribeByContactUuid($contact->uuid) : null,
             'tracking_pixel_link' => route('mail-open-tracking', $mailSendingHistory->uuid)
         ];
     }

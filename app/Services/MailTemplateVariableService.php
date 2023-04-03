@@ -126,7 +126,7 @@ class MailTemplateVariableService extends AbstractService
      * @param $contactUuid
      * @return string
      */
-    public function getUrlFooterSubscribeByContactUuid($contactUuid): string
+    public function getUrlUnsubscribeByContactUuid($contactUuid): string
     {
         $unsubscribe = (new UnsubscribeService())->createUnsubscribe($contactUuid);
         return config('auth.unsubscribe_url').$unsubscribe->code;
