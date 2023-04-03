@@ -21,6 +21,8 @@ use App\Http\Controllers\Api\MailSendingHistoryController;
 use App\Http\Controllers\Api\MailTemplateController;
 use App\Http\Controllers\Api\NoteController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\PartnerCategoryController;
+use App\Http\Controllers\Api\PartnerController;
 use App\Http\Controllers\Api\Payment\PaymentController;
 use App\Http\Controllers\Api\Payment\PaypalController;
 use App\Http\Controllers\Api\PermissionController;
@@ -980,3 +982,28 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'contact-unsubscribe.'], fun
 });
 Route::get('unsubscribe/{code}', [UnsubscribeController::class, 'show'])->name('showUnsubscribe');
 Route::post('unsubscribe', [UnsubscribeController::class, 'storeUnsubscribe'])->name('storeUnsubscribe');
+
+//Partner_categories
+Route::group(['middleware' => ['auth:api'], 'as' => 'partner_category.'], function () {
+
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/partner-categories', [PartnerCategoryController::class, 'index'])->name('index');
+        Route::get('/partner-category/{id}', [PartnerCategoryController::class, 'show'])->name('show');
+        Route::post('/partner-category', [PartnerCategoryController::class, 'store'])->name('store');
+        Route::put('/partner-category/{id}', [PartnerCategoryController::class, 'edit'])->name('edit');
+        Route::delete('/partner-category/{id}', [PartnerCategoryController::class, 'destroy'])->name('destroy');
+    });
+});
+Route::get('public/partner-categories', [PartnerCategoryController::class, 'index'])->name('index');
+
+//Partners
+Route::group(['middleware' => ['auth:api'], 'as' => 'partner.'], function () {
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/partners', [PartnerController::class, 'index'])->name('index');
+        Route::get('/partner/{id}', [PartnerController::class, 'show'])->name('show');
+        Route::post('/partner', [PartnerController::class, 'store'])->name('store');
+        Route::put('/partner/{id}', [PartnerController::class, 'edit'])->name('edit');
+        Route::delete('/partner/{id}', [PartnerController::class, 'destroy'])->name('destroy');
+    });
+});
+Route::post('register-partner', [PartnerController::class, 'registerPartner'])->name('registerPartner');
