@@ -913,12 +913,12 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'addOn.'], function () {
     Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
         Route::post('/add-on', [AddOnController::class, 'store'])->name('store');
         Route::get('/publish-add-on/{id}', [AddOnController::class, 'publishAddOn'])->name('publish');
-        Route::get('/add-on/{id}', [AddOnController::class, 'show'])->name('show');
         Route::put('/add-on/{id}', [AddOnController::class, 'edit'])->name('edit');
         Route::get('/disable-add-on/{id}', [AddOnController::class, 'disableAddOn'])->name('disableAddOn');
         Route::delete('add-on/{id}', [AddOnController::class, 'destroy'])->name('destroy');
 
     });
+    Route::get('/add-on/{id}', [AddOnController::class, 'show'])->name('show');
     Route::get('/add-ons', [AddOnController::class, 'index'])->name('index');
     Route::get('/add-on-subscription-histories', [AddOnController::class, 'addOnSubscriptionHistory'])->name('addOnSubscriptionHistory');
     Route::get('/my-add-on', [AddOnController::class, 'myAddOn'])->name('myAddOn');
