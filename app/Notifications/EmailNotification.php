@@ -134,24 +134,14 @@ class EmailNotification extends BaseNotification
     }
 
     /**
-     * @param $contact
-     * @param $smtpAccount
-     * @param $mailSendingHistory
+     * @param $mailTemplate
+     * @param $campaignContent
+     * @param $variables
      * @return mixed
      */
-    public function getContent($contact, $smtpAccount, $mailSendingHistory)
+    public function getContent($mailTemplate, $campaignContent, $variables)
     {
-        $mailTemplate = $this->mailTemplateVariableService->renderBody($this->campaign->mailTemplate, $contact, $smtpAccount, $this->campaign);
-        $footerTemplateAds = $this->footerTemplateService->getFooterTemplateAdsForSendCampaignByType($mailTemplate->type, $mailTemplate->user);
-        $footerTemplateSubscribe = $this->footerTemplateService->getFooterTemplateSubscribeForSendCampaignByType($mailTemplate->type);
-        if ($footerTemplateAds || $footerTemplateSubscribe) {
-            $renderedFooterSub = null;
-            if ($footerTemplateSubscribe) {
-                $renderedFooterSub = $this->mailTemplateVariableService->renderedFooterByContactUuid($footerTemplateSubscribe->template ,$contact->uuid);
-            }
-            $mailTemplate = $this->mailTemplateVariableService->insertFooterTemplateInRenderBody(optional($footerTemplateAds)->template, $renderedFooterSub, $mailTemplate);
-        }
-        return $this->mailTemplateVariableService->injectTrackingImage($mailTemplate, $mailSendingHistory->uuid);
+        return $this->mailTemplateVariableService->renderBodyForSendCampaign($mailTemplate, $campaignContent, $variables);
     }
 
     /**
