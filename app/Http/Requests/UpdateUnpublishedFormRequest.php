@@ -29,6 +29,7 @@ class UpdateUnpublishedFormRequest extends AbstractRequest
             'template' => ['string'],
             'template_json' => ['string'],
             'contact_list_uuid' => ['nullable', 'numeric', Rule::exists('contact_lists','uuid')->whereNull('deleted_at')],
+            'display_type' => ['string', 'in:modal,in_page']
         ];
     }
 }

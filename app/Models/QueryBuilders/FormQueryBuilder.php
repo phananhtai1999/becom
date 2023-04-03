@@ -34,7 +34,8 @@ class FormQueryBuilder extends AbstractQueryBuilder
                 'user_uuid'.
                 'template',
                 'template_json',
-                'publish_status'
+                'publish_status',
+                'display_type'
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -44,7 +45,8 @@ class FormQueryBuilder extends AbstractQueryBuilder
                 'user_uuid'.
                 'template',
                 'template_json',
-                'publish_status'
+                'publish_status',
+                'display_type'
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -67,6 +69,8 @@ class FormQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__contactList.name', 'contactList.name'),
                 'publish_status',
                 AllowedFilter::exact('exact__publish_status', 'publish_status'),
+                'display_type',
+                AllowedFilter::exact('exact__display_type', 'display_type'),
             ]);
     }
 

@@ -30,7 +30,8 @@ class UnpublishedWebsitePageRequest extends AbstractRequest
             'template' => ['required', 'string'],
             'template_json' => ['required', 'string'],
             'website_page_category_uuid' => ['required', 'numeric', Rule::exists('website_page_categories','uuid')->whereNull('deleted_at')],
-            'is_default' => ['required', 'boolean']
+            'is_default' => ['required', 'boolean'],
+            'display_type' => ['required', 'string', 'in:page,in_page']
         ];
     }
 }

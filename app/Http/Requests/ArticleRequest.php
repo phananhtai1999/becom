@@ -33,7 +33,7 @@ class ArticleRequest extends AbstractRequest
             'content' => ['required', 'array', 'min:1'],
             'content.en' => ['required', 'string'],
             'content.*' => ['required', 'string'],
-            'publish_status' => ['required', 'numeric', 'min:1', 'max:2'],
+            'publish_status' => ['required', 'numeric', 'min:1', 'max:3'],
             'article_category_uuid' => ['nullable', 'numeric', Rule::exists('article_categories', 'uuid')->whereNull('deleted_at')]
         ];
     }

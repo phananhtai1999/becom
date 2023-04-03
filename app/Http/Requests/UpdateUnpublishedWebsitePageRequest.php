@@ -29,7 +29,8 @@ class UpdateUnpublishedWebsitePageRequest extends AbstractRequest
             'template' => ['string'],
             'template_json' => ['string'],
             'website_page_category_uuid' => ['numeric', Rule::exists('website_page_categories','uuid')->whereNull('deleted_at')],
-            'is_default' => ['boolean']
+            'is_default' => ['boolean'],
+            'display_type' => ['string', 'in:page,in_page']
         ];
     }
 }

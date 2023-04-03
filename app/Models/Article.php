@@ -19,6 +19,7 @@ class Article extends AbstractModel
         HasTranslations, ModelFilterLanguageTrait;
 
     const PUBLISHED_PUBLISH_STATUS = 1;
+    const BLOCKED_PUBLISH_STATUS = 2;
 
     /**
      * @var string

@@ -33,7 +33,8 @@ class Form extends AbstractModel
         'template_json',
         'contact_list_uuid',
         'user_uuid',
-        'publish_status'
+        'publish_status',
+        'display_type'
     ];
 
     /**

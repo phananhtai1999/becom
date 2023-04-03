@@ -34,7 +34,8 @@ class WebsitePage extends AbstractModel
         'user_uuid',
         'publish_status',
         'is_default',
-        'website_page_category_uuid'
+        'website_page_category_uuid',
+        'display_type'
     ];
 
     /**
