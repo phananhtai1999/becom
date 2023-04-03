@@ -122,7 +122,7 @@ class BaseNotification
     public function send($contacts, $scenario, $creditTotal)
     {
         $user = $this->campaign->user;
-
+        $mailTemplate = $this->campaign->mailTemplate;
         if (!empty($creditTotal))
         {
             $creditNumberSendByCampaign = $creditTotal;
@@ -155,11 +155,17 @@ class BaseNotification
             DB::rollback();
         }
 
+        $footerTemplateAds = $this->footerTemplateService->getFooterTemplateAdsForSendCampaignByType($mailTemplate->type, $mailTemplate->user);
+        $footerTemplateSubscribe = $this->footerTemplateService->getFooterTemplateSubscribeForSendCampaignByType($mailTemplate->type);
+        $campaignContent = $this->mailTemplateVariableService->insertFooterTemplateInBodyMailTemplate($mailTemplate->body, optional($footerTemplateAds)->template, optional($footerTemplateSubscribe)->template);
+
         foreach ($contacts as $contact) {
             $mailSendingHistory = $this->saveMailSendingHistory($contact, $scenario);
-            $emailTracking = $this->getContent($contact, $smtpAccount, $mailSendingHistory);
+            $variables = $this->mapVariablelForSendCampaign($contact, $this->campaign, $mailSendingHistory, $footerTemplateSubscribe);
+            $emailTracking = $this->getContent($mailTemplate, $campaignContent, $variables);
+
             try {
-                $this->sendContent($contact, $emailTracking, $smtpAccount, $this->campaign->mailTemplate);
+                $this->sendContent($contact, $emailTracking, $smtpAccount, $mailTemplate);
             } catch (\Exception $e) {
                 $this->mailSuccess = false;
                 $this->creditReturn += $configPrice;
@@ -213,6 +219,37 @@ class BaseNotification
         } catch (\Exception $e) {
             DB::rollback();
         }
+    }
+
+    /**
+     * @param $contact
+     * @param $campaign
+     * @param $mailSendingHistory
+     * @param $footerTemplateSubscribe
+     * @return array
+     */
+    public function mapVariablelForSendCampaign($contact, $campaign, $mailSendingHistory, $footerTemplateSubscribe){
+        $current = Carbon::now('Asia/Ho_Chi_Minh');
+        return [
+            'contact_first_name' => $contact->first_name,
+            'contact_middle_name' => $contact->middle_name,
+            'contact_last_name' => $contact->last_name,
+            'contact_phone' => $contact->phone,
+            'contact_sex' => $contact->sex,
+            'contact_dob' => $contact->dob->toDateString(),
+            'contact_country' => $contact->country,
+            'contact_city' => $contact->city,
+            'website_name' => optional($campaign->website)->name,
+            'website_domain' => optional($campaign->website)->domain,
+            'website_description' => optional($campaign->website)->description,
+            'campaign_from_date' => $campaign->from_date,
+            'campaign_to_date' => $campaign->to_date,
+            'campaign_tracking_key' => $campaign->tracking_key,
+            'current_day' => $current->toDateString(),
+            'current_time' => $current->toTimeString(),
+            'url_unsubscribe' => $footerTemplateSubscribe ? $this->mailTemplateVariableService->getUrlUnsubscribeByContactUuid($contact->uuid) : null,
+            'tracking_pixel_link' => route('mail-open-tracking', $mailSendingHistory->uuid)
+        ];
     }
 
     /**

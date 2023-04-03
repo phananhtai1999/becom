@@ -50,7 +50,7 @@ class MailTemplateVariableService extends AbstractService
             '{{contact_country}}',
             '{{contact_city}}',
             '{{current_day}}',
-            '{{current_tim }}'
+            '{{current_time}}'
 
         ];
 //        $search = [
@@ -123,16 +123,13 @@ class MailTemplateVariableService extends AbstractService
     }
 
     /**
-     * @param $template
      * @param $contactUuid
      * @return string
      */
-    public function renderedFooterByContactUuid($template, $contactUuid): string
+    public function getUrlUnsubscribeByContactUuid($contactUuid): string
     {
         $unsubscribe = (new UnsubscribeService())->createUnsubscribe($contactUuid);
-        $replace = config('auth.unsubscribe_url').$unsubscribe->code;
-
-        return Str::replace("{{url_unsubscribe}}", $replace, $template);
+        return config('auth.unsubscribe_url').$unsubscribe->code;
     }
 
     /**
@@ -144,6 +141,55 @@ class MailTemplateVariableService extends AbstractService
     public function insertFooterTemplateInRenderBody($templateFooterAds, $templateFooterSub, $mailTemplate)
     {
         $mailTemplate->setRenderedBodyAttribute($mailTemplate->rendered_body.$templateFooterAds.$templateFooterSub);
+        return $mailTemplate;
+    }
+
+    public function insertFooterTemplateInBodyMailTemplate($bodyMailTemplate, $templateFooterAds, $templateFooterSub) : string
+    {
+        $campaignContent = $bodyMailTemplate . $templateFooterAds . $templateFooterSub;
+        $tracking_image = '<img width=1 height=1 src="{{tracking_pixel_link}}" />';
+        $linebreak = app(Str::class)->random(32);
+        $html = str_replace("\n", $linebreak, $campaignContent);
+
+        if (preg_match("/^(.*<body[^>]*>)(.*)$/", $html, $matches)) {
+            $html = $matches[1].$matches[2].$tracking_image;
+        } else {
+            $html = $html . $tracking_image;
+        }
+        return str_replace($linebreak, "\n", $html);
+    }
+
+    /**
+     * @param $mailTemplate
+     * @param $campaignContent
+     * @param $variables
+     * @return mixed
+     */
+    public function renderBodyForSendCampaign($mailTemplate, $campaignContent,$variables)
+    {
+        $search = [
+            '{{contact_first_name}}',
+            '{{contact_middle_name}}',
+            '{{contact_last_name}}',
+            '{{contact_phone}}',
+            '{{contact_sex}}',
+            '{{contact_dob}}',
+            '{{contact_country}}',
+            '{{contact_city}}',
+            '{{website_name}}',
+            '{{website_domain}}',
+            '{{website_description}}',
+            '{{campaign_from_date}}',
+            '{{campaign_to_date}}',
+            '{{campaign_tracking_key}}',
+            '{{current_day}}',
+            '{{current_time}}',
+            '{{url_unsubscribe}}',
+            '{{tracking_pixel_link}}'
+        ];
+
+        $mailTemplate->setRenderedBodyAttribute(Str::replace($search, $variables, $campaignContent));
+
         return $mailTemplate;
     }
 
