@@ -31,6 +31,7 @@ class MyFormRequest extends AbstractRequest
             'contact_list_uuid' => ['required', 'numeric', 'min:1', Rule::exists('contact_lists', 'uuid')->where(function ($query) {
                 return $query->where('user_uuid', auth()->user()->getkey())->whereNull('deleted_at');
             })],
+            'display_type' => ['required', 'string', 'in:modal,in_page']
         ];
     }
 }

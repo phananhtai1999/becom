@@ -36,6 +36,7 @@ class MyWebsitePageQueryBuilder extends AbstractQueryBuilder
                 'website_page_category_uuid',
                 'publish_status',
                 'is_default',
+                'display_type'
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -47,6 +48,7 @@ class MyWebsitePageQueryBuilder extends AbstractQueryBuilder
                 'website_page_category_uuid',
                 'publish_status',
                 'is_default',
+                'display_type'
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -71,6 +73,8 @@ class MyWebsitePageQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__user.email', 'user.email'),
                 'is_default',
                 AllowedFilter::exact('exact__is_default', 'is_default'),
+                'display_type',
+                AllowedFilter::exact('exact__display_type', 'display_type'),
             ]);
     }
 
