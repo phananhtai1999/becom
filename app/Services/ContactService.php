@@ -173,11 +173,11 @@ class ContactService extends AbstractService
     /**
      * @param $campaignUuid
      * @param $email
-     * @return void
+     * @return mixed
      */
     public function addPointContactOpenByCampaign($campaignUuid, $email)
     {
-        $contactsOpenMail = $this->model->select('contacts.*')
+        return $this->model->select('contacts.*')
             ->join('contact_contact_list', 'contact_contact_list.contact_uuid', '=', 'contacts.uuid')
             ->join('contact_lists', 'contact_lists.uuid', '=', 'contact_contact_list.contact_list_uuid')
             ->join('campaign_contact_list', 'campaign_contact_list.contact_list_uuid', '=', 'contact_lists.uuid')
@@ -200,12 +200,6 @@ class ContactService extends AbstractService
                 ['contacts.phone', $email]
             ])
             ->get();
-
-        foreach ($contactsOpenMail as $contactOpenMail) {
-            $this->update($contactOpenMail, [
-                'points' => $contactOpenMail->points + 1
-            ]);
-        }
     }
 
     /**
@@ -254,7 +248,7 @@ class ContactService extends AbstractService
                     'city' => $row['city'],
                     'country' => $row['country'],
                     'user_uuid' => auth()->user()->getkey(),
-                    'status_uuid' => 1
+                    'status_uuid' => app(StatusService::class)->defaultStatus() ? app(StatusService::class)->defaultStatus()->uuid : null
                 ];
                 $validator = Validator::make($data, $rules);
                 if ($validator->fails()) {
@@ -358,7 +352,7 @@ class ContactService extends AbstractService
                 'city' => $content->city,
                 'country' => $content->country,
                 'user_uuid' => auth()->user()->getkey(),
-                'status_uuid' => 1
+                'status_uuid' => app(StatusService::class)->defaultStatus() ? app(StatusService::class)->defaultStatus()->uuid : null
 
             ];
             $validator = Validator::make($data, $rules);
