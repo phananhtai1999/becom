@@ -21,7 +21,7 @@ class StatusService extends AbstractService
     }
 
     /**
-     * @return void
+     * @return mixed
      */
     public function getAllStatusDefault()
     {
@@ -30,7 +30,7 @@ class StatusService extends AbstractService
 
     /**
      * @param $userUuid
-     * @return void
+     * @return mixed
      */
     public function getAllStatusByUserUuid($userUuid)
     {
