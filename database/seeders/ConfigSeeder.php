@@ -195,7 +195,6 @@ class ConfigSeeder extends Seeder {
 				'value' => true,
 				'type' => 'boolean',
 				'status' => 'system',
-				'default_value' '0',
 				'group_id' => '1',
 			]
 
