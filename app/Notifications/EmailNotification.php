@@ -14,6 +14,7 @@ use App\Services\SmtpAccountService;
 use App\Services\UserService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
+use App\Models\MailSendingHistory;
 
 class EmailNotification extends BaseNotification
 {
@@ -156,7 +157,7 @@ class EmailNotification extends BaseNotification
             'campaign_uuid' => $this->campaign->uuid,
             'campaign_scenario_uuid' => $scenario,
             'time' => Carbon::now(),
-            'status' => 'sent'
+            'status' => MailSendingHistory::PROCESSING
         ]);
     }
 
