@@ -114,22 +114,22 @@ class BaseNotification
         $this->footerTemplateService = $footerTemplateService;
     }
 
-
-    public function build_sending_config($user){
+    public function build_sending_config($user)
+    {
         $config = $this->getSendOption($user);
         return [
             'smtp_endpoint' => $config->mail_host,
             'smtp_port' => (int)$config->mail_port,
             'smtp_account' => $config->mail_username,
-            'smtp_password'=> $config->mail_password,
-            'from_name'=> $config->mail_from_name,
-            'from_email'=> $config->mail_from_address,
-            'smtp_encryption'=> $config->smtpAccountEncryption->name,
-            'type'=> $this->campaign->send_type
+            'smtp_password' => $config->mail_password,
+            'from_name' => $config->mail_from_name,
+            'from_email' => $config->mail_from_address,
+            'smtp_encryption' => $config->smtpAccountEncryption->name,
+            'type' => $this->campaign->send_type
         ];
     }
 
-     /**
+    /**
      * @param $contacts
      * @param $scenario
      * @param $creditTotal
@@ -143,16 +143,15 @@ class BaseNotification
         $build_body = collect([]);
         $build_body['config'] = $this->build_sending_config($user);
         $build_body['type'] = $this->campaign->send_type;
-        
+
         $build_body['subject'] = $this->campaign->mailTemplate->subject;
-     
+
         $footerTemplateAds = $this->footerTemplateService->getFooterTemplateAdsForSendCampaignByType($mailTemplate->type, $mailTemplate->user);
         $footerTemplateSubscribe = $this->footerTemplateService->getFooterTemplateSubscribeForSendCampaignByType($mailTemplate->type);
         $campaignContent = $this->mailTemplateVariableService->insertFooterTemplateInBodyMailTemplate($mailTemplate->body, optional($footerTemplateAds)->template, optional($footerTemplateSubscribe)->template);
         $build_body['template'] = $campaignContent;
 
-        if (!empty($creditTotal))
-        {
+        if (!empty($creditTotal)) {
             $creditNumberSendByCampaign = $creditTotal;
         } else {
             $creditNumberSendByCampaign = $this->calculatorCredit();
@@ -170,13 +169,14 @@ class BaseNotification
             $footerTemplateAds = $this->footerTemplateService->getFooterTemplateAdsForSendCampaignByType($mailTemplate->type, $mailTemplate->user);
             $footerTemplateSubscribe = $this->footerTemplateService->getFooterTemplateSubscribeForSendCampaignByType($mailTemplate->type);
             $reviever = ['uuid' => $mailSendingHistory->uuid];
-            $reviever['destination'] =  $this->campaign->send_type == 'email' ? $contact->email : $contact->phone;
+            $reviever['destination'] = $this->campaign->send_type == 'email' ? $contact->email : $contact->phone;
             $reviever['parameters'] = $this->mapVariablelForSendCampaign($contact, $this->campaign, $mailSendingHistory, $footerTemplateSubscribe);
             $build_body['receivers']->push($reviever);
-            
-        }  
+            //Activity histories
+            ActivityHistoryOfSendByCampaignEvent::dispatch($mailSendingHistory, $this->campaign->send_type, $contact->uuid);
+        }
         $response = Connector::send_campaign($build_body->toArray());
-        if($response->failed()){
+        if ($response->failed()) {
             return false;
         }
         try {
@@ -194,12 +194,8 @@ class BaseNotification
         } catch (\Exception $e) {
             DB::rollback();
         }
-        
-       
-        return true;
 
-       
-        
+        return true;
     }
 
     /**
@@ -213,8 +209,7 @@ class BaseNotification
 
         $user = $this->campaign->user;
         $mailTemplate = $this->campaign->mailTemplate;
-        if (!empty($creditTotal))
-        {
+        if (!empty($creditTotal)) {
             $creditNumberSendByCampaign = $creditTotal;
         } else {
             $creditNumberSendByCampaign = $this->calculatorCredit();
@@ -318,7 +313,8 @@ class BaseNotification
      * @param $footerTemplateSubscribe
      * @return array
      */
-    public function mapVariablelForSendCampaign($contact, $campaign, $mailSendingHistory, $footerTemplateSubscribe){
+    public function mapVariablelForSendCampaign($contact, $campaign, $mailSendingHistory, $footerTemplateSubscribe)
+    {
         $current = Carbon::now('Asia/Ho_Chi_Minh');
         return [
             'contact_first_name' => $contact->first_name,
