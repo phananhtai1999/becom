@@ -46,6 +46,8 @@ class ActivityHistoryOfSendByCampaignListener
             $sendType = 'messages';
         }
 
+        $content = null;
+
         if ($mailSendingHistories->status === 'sent' || $mailSendingHistories->status === 'fail') {
             $contactUuid = $event->contact;
             $date = $mailSendingHistories->created_at;
@@ -55,13 +57,16 @@ class ActivityHistoryOfSendByCampaignListener
             $date = $mailSendingHistories->updated_at;
             $content = ['langkey' => 'opened', 'email' => $mailSendingHistories->email, 'date' => $mailSendingHistories->updated_at];
         }
+        if($content){
+            $this->activityHistoryService->create([
+                'type' => $type,
+                'type_id' => $mailSendingHistories->uuid,
+                'content' => $content,
+                'date' => $date,
+                'contact_uuid' => $contactUuid,
+            ]); 
+        }
 
-        $this->activityHistoryService->create([
-            'type' => $type,
-            'type_id' => $mailSendingHistories->uuid,
-            'content' => $content,
-            'date' => $date,
-            'contact_uuid' => $contactUuid,
-        ]);
+
     }
 }

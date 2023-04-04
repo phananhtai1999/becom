@@ -13,6 +13,7 @@ class MailSendingHistory extends AbstractModel
 {
     use HasFactory, SoftDeletes;
 
+    const PROCESSING = 'processing';
     const SENT = 'sent';
     const FAIL = 'fail';
     const RECEIVED = 'received';

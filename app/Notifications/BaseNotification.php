@@ -16,6 +16,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Techup\Connector\Facades\Connector;
+use App\Models\MailSendingHistory;
 
 class BaseNotification
 {
@@ -145,6 +146,8 @@ class BaseNotification
         $build_body['type'] = $this->campaign->send_type;
 
         $build_body['subject'] = $this->campaign->mailTemplate->subject;
+        $build_body['campaign_uuid'] = $this->campaign->getKey();
+
 
         $footerTemplateAds = $this->footerTemplateService->getFooterTemplateAdsForSendCampaignByType($mailTemplate->type, $mailTemplate->user);
         $footerTemplateSubscribe = $this->footerTemplateService->getFooterTemplateSubscribeForSendCampaignByType($mailTemplate->type);
@@ -176,7 +179,13 @@ class BaseNotification
             ActivityHistoryOfSendByCampaignEvent::dispatch($mailSendingHistory, $this->campaign->send_type, $contact->uuid);
         }
         $response = Connector::send_campaign($build_body->toArray());
-        if ($response->failed()) {
+        if($response->failed()){
+            $this->mailSuccess = false;
+            $this->sendEmailScheduleLogService->update($sendEmailScheduleLog, [
+                'is_running' => false,
+                'was_crashed' => true,
+                'log' => 'Error when send to Csending'
+            ]);
             return false;
         }
         try {
@@ -251,6 +260,9 @@ class BaseNotification
 
             try {
                 $this->sendContent($contact, $emailTracking, $smtpAccount, $mailTemplate);
+                $this->mailSendingHistoryService->update($mailSendingHistory, [
+                    'status' => MailSendingHistory::SENT
+                ]);
             } catch (\Exception $e) {
                 $this->mailSuccess = false;
                 $this->creditReturn += $configPrice;
