@@ -73,10 +73,10 @@ use App\Http\Controllers\Api\OrderController;
 */
 
 Route::group(['as' => 'auth.'], function () {
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth:api');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware(['auth:api', 'removeCache']);
     Route::get('/me', [AuthController::class, 'me'])->name('me')->middleware('auth:api');
-    Route::post('/register', [AuthController::class, 'register'])->name('register');
-    Route::post('/login', [AuthController::class, 'login'])->name('login');
+    Route::post('/register', [AuthController::class, 'register'])->name('register')->middleware('removeCache');
+    Route::post('/login', [AuthController::class, 'login'])->name('login')->middleware('removeCache');
     Route::post('/forget-password', [AuthController::class, 'forgetPassword'])->name('forget-password');
     Route::post('/recovery-password', [AuthController::class, 'recoveryPassword'])->name('recovery-password');
     Route::get('/check-token', [AuthController::class, 'checkToken'])->name('check-token');
@@ -87,7 +87,6 @@ Route::group(['as' => 'otp.'], function () {
     Route::post('/refresh-otp', [AuthController::class, 'refreshOtp'])->name('refreshOtp');
     Route::post('/verify-active-code', [AuthController::class, 'verifyActiveCode'])->name('verifyActiveCode');
 });
-
 
 
 //Social API
@@ -621,12 +620,14 @@ Route::get('/add-on-subscription-plans', [AddOnSubscriptionPlanController::class
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'permission.'], function () {
     Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
-        Route::post('/permission', [PermissionController::class, 'store']);
+        Route::group(['middleware' => ['removeCache'], 'as' => 'admin.'], function () {
+            Route::post('/permission', [PermissionController::class, 'store']);
+            Route::put('/permission/{id}', [PermissionController::class, 'edit']);
+            Route::delete('/permission/{id}', [PermissionController::class, 'destroy']);
+        });
         Route::get('/permission/{id}', [PermissionController::class, 'show']);
-        Route::put('/permission/{id}', [PermissionController::class, 'edit']);
         Route::get('/permissions', [PermissionController::class, 'index']);
         Route::get('/permissions-for-platform', [PermissionController::class, 'permissionForPlatform']);
-        Route::delete('/permission/{id}', [PermissionController::class, 'destroy']);
     });
 });
 
@@ -906,11 +907,11 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'footer_template.'], functio
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'country.'], function () {
-        Route::get('/countries', [CountryController::class, 'index'])->name('index');
-        Route::post('/country', [CountryController::class, 'store'])->name('store');
-        Route::get('/country/{id}', [CountryController::class, 'show'])->name('show');
-        Route::put('/country/{id}', [CountryController::class, 'edit'])->name('edit');
-        Route::delete('/country/{id}', [CountryController::class, 'destroy'])->name('destroy');
+    Route::get('/countries', [CountryController::class, 'index'])->name('index');
+    Route::post('/country', [CountryController::class, 'store'])->name('store');
+    Route::get('/country/{id}', [CountryController::class, 'show'])->name('show');
+    Route::put('/country/{id}', [CountryController::class, 'edit'])->name('edit');
+    Route::delete('/country/{id}', [CountryController::class, 'destroy'])->name('destroy');
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'addOn.'], function () {
