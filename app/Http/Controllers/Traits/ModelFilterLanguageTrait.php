@@ -11,9 +11,14 @@ trait ModelFilterLanguageTrait
      * @param $title
      * @return Builder
      */
-    public function scopeTitle(Builder $query, $title)
+    public function scopeTitle(Builder $query, ...$titles)
     {
-        $lang = app()->getLocale();
-        return $query->where("title->$lang", 'like', "%$title%");
+        return $query->where(function ($q) use($titles){
+            $lang = app()->getLocale();
+            $langDefault = config('app.fallback_locale');
+            foreach ($titles as $title) {
+                $q->orWhereRaw("IFNULL(JSON_UNQUOTE(JSON_EXTRACT(title, '$.$lang')),JSON_UNQUOTE(JSON_EXTRACT(title, '$.$langDefault'))) like '%$title%'");
+            }
+        });
     }
 }

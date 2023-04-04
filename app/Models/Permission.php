@@ -51,10 +51,15 @@ class Permission extends AbstractModel
      * @param $name
      * @return Builder
      */
-    public function scopeName(Builder $query, $name)
+    public function scopeName(Builder $query, ...$names)
     {
-        $lang = app()->getLocale();
-        return $query->where("name->$lang", 'like', "%$name%");
+        return $query->where(function ($q) use($names){
+            $lang = app()->getLocale();
+            $langDefault = config('app.fallback_locale');
+            foreach ($names as $name){
+                $q->orWhereRaw("IFNULL(JSON_UNQUOTE(JSON_EXTRACT(name, '$.$lang')),JSON_UNQUOTE(JSON_EXTRACT(name, '$.$langDefault'))) like '%$name%'");
+            }
+        });
     }
 
     public function platformPackages() {
