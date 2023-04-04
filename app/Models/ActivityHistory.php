@@ -123,6 +123,9 @@ class ActivityHistory extends AbstractModel
         return $this->belongsTo(MailSendingHistory::class, 'type_id', 'uuid');
     }
 
+    /**
+     * @return mixed
+     */
     public function getRenderBodyMailTemplateAttribute()
     {
         return app(ActivityHistoryService::class)->renderBody($this->uuid, $this->type, 'body');
