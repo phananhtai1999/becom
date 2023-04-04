@@ -26,12 +26,12 @@ class UserResource extends AbstractJsonResource
             'email' => $this->email,
             'banned_at' => $this->banned_at,
             'can_add_smtp_account' => $this->can_add_smtp_account,
+            'can_remove_footer_template' => $this->can_remove_footer_template,
             'avatar_img' => $this->avatar_img,
             'avatar_img_absolute' => $this->avatar_img_absolute,
             'cover_img' => $this->cover_img,
             'cover_img_absolute' => $this->cover_img_absolute,
             'platform_package' => $this->platform_package,
-            'can_remove_footer_template' => $this->can_remove_footer_template,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at

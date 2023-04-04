@@ -40,6 +40,7 @@ class UserQueryBuilder extends AbstractQueryBuilder
                 'cover_img',
                 'credit',
                 'can_add_smtp_account',
+                'can_remove_footer_template'
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -55,6 +56,7 @@ class UserQueryBuilder extends AbstractQueryBuilder
                 'cover_img',
                 'credit',
                 'can_add_smtp_account',
+                'can_remove_footer_template'
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -83,6 +85,8 @@ class UserQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__credit', 'credit'),
                 'can_add_smtp_account',
                 AllowedFilter::exact('exact__can_add_smtp_account', 'can_add_smtp_account'),
+                'can_remove_footer_template',
+                AllowedFilter::exact('exact__can_remove_footer_template', 'can_remove_footer_template'),
                 AllowedFilter::scope('from__banned_at'),
                 AllowedFilter::scope('to__banned_at'),
             ]);

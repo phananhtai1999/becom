@@ -8,6 +8,7 @@ use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\FooterTemplateRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyFooterTemplateRequest;
+use App\Http\Requests\RemoveFooterTemplateRequest;
 use App\Http\Requests\UpdateFooterTemplateRequest;
 use App\Http\Requests\UpdateMyFooterTemplateRequest;
 use App\Http\Resources\FooterTemplateResource;
@@ -15,6 +16,7 @@ use App\Http\Resources\FooterTemplateResourceCollection;
 use App\Models\FooterTemplate;
 use App\Services\FooterTemplateService;
 use App\Services\MyFooterTemplateService;
+use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -25,9 +27,12 @@ class FooterTemplateController extends AbstractRestAPIController
 
     protected $myService;
 
+    protected $userService;
+
     public function __construct(
         FooterTemplateService $service,
-        MyFooterTemplateService $myService
+        MyFooterTemplateService $myService,
+        UserService $userService
     )
     {
         $this->service = $service;
@@ -37,6 +42,7 @@ class FooterTemplateController extends AbstractRestAPIController
         $this->storeRequest = FooterTemplateRequest::class;
         $this->editRequest = UpdateFooterTemplateRequest::class;
         $this->myService = $myService;
+        $this->userService = $userService;
     }
 
     /**
@@ -184,5 +190,14 @@ class FooterTemplateController extends AbstractRestAPIController
             return $this->sendOkJsonResponse();
         }
         return $this->sendValidationFailedJsonResponse(["errors" => ["deleted_uuid" => __('messages.data_not_deleted')]]);
+    }
+
+    public function removeFooterTemplate(RemoveFooterTemplateRequest $request)
+    {
+        $user = auth()->user();
+        $this->userService->update($user, [
+           'can_remove_footer_template' => $request->get('can_remove_footer_template')
+        ]);
+        return $this->sendOkJsonResponse();
     }
 }
