@@ -39,7 +39,8 @@ class User extends Authenticatable
         'avatar_img',
         'cover_img',
         'credit',
-        'can_add_smtp_account'
+        'can_add_smtp_account',
+        'can_remove_footer_template'
     ];
 
     /**
@@ -63,6 +64,7 @@ class User extends Authenticatable
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
+        'can_remove_footer_template' => 'boolean'
     ];
 
     /**
@@ -73,16 +75,7 @@ class User extends Authenticatable
         'avatar_img_absolute',
         'cover_img_absolute ',
         'platform_package',
-        'can_remove_footer_template'
     ];
-
-    /**
-     * @return string
-     */
-    public function getCanRemoveFooterTemplateAttribute()
-    {
-        return $this->first_name ? false : true; //Check tạm thời
-    }
 
     /**
      * @return string

@@ -902,7 +902,9 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'footer_template.'], functio
         Route::get('/my/footer-template/{id}', [FooterTemplateController::class, 'showMyFooterTemplate'])->name('show');
         Route::put('/my/footer-template/{id}', [FooterTemplateController::class, 'editMyFooterTemplate'])->name('edit');
         Route::delete('/my/footer-template/{id}', [FooterTemplateController::class, 'destroyMyFooterTemplate'])->name('destroy');
+        Route::post('my/remove-footer-template', [FooterTemplateController::class, 'removeFooterTemplate'])->name('removeFooterTemplate');
     });
+
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'country.'], function () {
