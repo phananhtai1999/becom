@@ -40,21 +40,21 @@ class ActivityHistorySeeder extends Seeder
             [
                 'type' => 'note',
                 'type_id' => $note->uuid,
-                'content' => ['en' => "You added a note at $note->created_at", 'vi' => "Bạn đã thêm một ghi chú lúc $note->created_at"],
+                'content' => ['langkey' => 'created' . '.' . 'note', 'type' => Note::NOTE_TYPE, 'contact' => $contact->email, 'date' => $note->created_at],
                 'date' => $note->created_at,
                 'contact_uuid' => $contact->uuid,
             ],
             [
                 'type' => 'remind',
                 'type_id' => $remind->uuid,
-                'content' => ['en' => "You added a reminder at $mailSendingHistory->time", 'vi' => "Bạn đã thêm một lời nhắc lúc $remind->created_at"],
+                'content' => ['langkey' => 'created' . '.' . 'remind', 'type' => Remind::REMIND_TYPE, 'contact' => $contact->email, 'date' => $remind->created_at],
                 'date' => $remind->created_at,
                 'contact_uuid' => $contact->uuid,
             ],
             [
                 'type' => $campaign->send_type,
                 'type_id' => $mailSendingHistory->uuid,
-                'content' => ['en' => "You send mail at $mailSendingHistory->time", 'vi' => "Bạn đã gửi mail lúc $mailSendingHistory->time"],
+                'content' => ['langkey' => $mailSendingHistory->status === 'sent' ? 'sent.success' : 'sent.failed', 'send_type' => $mailSendingHistory->campaign->send_type === 'email' ? 'email' : 'messages', 'email' => $mailSendingHistory->email, 'status' => $mailSendingHistory->status === 'sent' ? 'success' : 'failed', 'date' => $mailSendingHistory->time],
                 'date' => $mailSendingHistory->time,
                 'contact_uuid' => $contact->uuid,
             ]
@@ -63,7 +63,7 @@ class ActivityHistorySeeder extends Seeder
         foreach ($activityHistories as $activityHistory) {
             ActivityHistory::firstOrCreate([
                 'contact_uuid' => $contact->uuid,
-                "content->en" => $activityHistory['content']['en'],
+                'type' => $activityHistory['type'],
             ], $activityHistory);
         }
     }
