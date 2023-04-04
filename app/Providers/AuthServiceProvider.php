@@ -48,7 +48,7 @@ class AuthServiceProvider extends ServiceProvider
                 return false;
             }
             if (isset($user->userPlatformPackage->platform_package_uuid)) {
-                $permissions = Cache::rememberForever($user->userPlatformPackage->platform_package_uuid . '_permission', function () use ($user) {
+                $permissions = Cache::rememberForever('platform_permission_' . $user->uuid, function () use ($user) {
                     $platformPackage = PlatformPackage::findOrFail($user->userPlatformPackage->platform_package_uuid);
                     return $platformPackage->permissions()->select('api_methods', 'name', 'code', 'uuid')->get();
                 });
@@ -59,7 +59,7 @@ class AuthServiceProvider extends ServiceProvider
                 }
             }
             if (isset($user->userAddOns)) {
-                $cacheAddOns = Cache::rememberForever('add_on_permission', function () use ($user) {
+                $cacheAddOns = Cache::rememberForever('add_on_permission_' . $user->uuid, function () use ($user) {
                     $permissions = [];
                     foreach ($user->userAddOns as $userAddOn) {
                         $permissions[] = $userAddOn->addOnSubscriptionPlan->addOn->permissions ?? [];

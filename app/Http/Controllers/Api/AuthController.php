@@ -27,6 +27,7 @@ use App\Services\UserService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -380,6 +381,8 @@ class AuthController extends AbstractRestAPIController
 
         //Kiểm tra country và gửi email khi khác country
         SendNotificationSystemForLoginEvent::dispatch($user, \request()->ip());
+        Cache::forget('platform_permission' . $user->uuid);
+        Cache::forget('add_on_permission' . $user->uuid);
         return \response()->json(array_merge([
             'status' => true,
             "code" => 0,

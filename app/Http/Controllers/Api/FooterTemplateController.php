@@ -194,6 +194,9 @@ class FooterTemplateController extends AbstractRestAPIController
 
     public function removeFooterTemplate(RemoveFooterTemplateRequest $request)
     {
+        if (!Gate::allows('permission', config('api.footer.remove'))) {
+            return $this->sendJsonResponse(false, 'You need to buy platform/add-on', ['data' => $this->getPlatformByPermission(config('api.footer.remove'))], 403);
+        }
         $user = auth()->user();
         $this->userService->update($user, [
            'can_remove_footer_template' => $request->get('can_remove_footer_template')
