@@ -191,15 +191,19 @@ class ArticleCategory extends AbstractModel
      * @param $title
      * @return Builder
      */
-    public function scopeParentArticleCategoryTitle(Builder $query, $title)
+    public function scopeParentArticleCategoryTitle(Builder $query, ...$titles)
     {
-        return $query->where('parent_uuid', function ($q) use ($title) {
-            $lang = app()->getLocale();
-            $langDefault = config('app.fallback_locale');
+        return $query->where('parent_uuid', function ($q) use ($titles) {
             $q->select('a.uuid')
                 ->from('article_categories as a')
                 ->whereColumn('a.uuid', 'article_categories.parent_uuid')
-                ->whereRaw("IFNULL(JSON_UNQUOTE(JSON_EXTRACT(a.title, '$.$lang')),JSON_UNQUOTE(JSON_EXTRACT(a.title, '$.$langDefault'))) = '$title'");
+                ->where(function ($i) use ($titles) {
+                    $lang = app()->getLocale();
+                    $langDefault = config('app.fallback_locale');
+                    foreach ($titles as $title) {
+                        $i->orWhereRaw("IFNULL(JSON_UNQUOTE(JSON_EXTRACT(a.title, '$.$lang')),JSON_UNQUOTE(JSON_EXTRACT(a.title, '$.$langDefault'))) = '$title'");
+                    }
+                });
         });
     }
 }
