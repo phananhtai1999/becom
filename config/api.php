@@ -112,5 +112,6 @@ return [
         'delete' => 'delete_footer',
         'show' => 'show_footer',
         'index' => 'index_footer',
+        'remove' => 'remove_footer',
     ],
 ];
