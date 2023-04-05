@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\Partner;
 
 use App\Abstracts\AbstractRestAPIController;
 use App\Http\Controllers\Traits\RestDestroyTrait;
@@ -14,7 +14,6 @@ use App\Http\Resources\PartnerCategoryResourceCollection;
 use App\Services\LanguageService;
 use App\Services\PartnerCategoryService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class PartnerCategoryController extends AbstractRestAPIController
 {
