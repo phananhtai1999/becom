@@ -35,6 +35,7 @@ use App\Http\Controllers\Api\SectionTemplateController;
 use App\Http\Controllers\Api\SmtpAccountController;
 use App\Http\Controllers\Api\StatusController;
 use App\Http\Controllers\Api\SubscriptionPlanController;
+use App\Http\Controllers\Api\TeamController;
 use App\Http\Controllers\Api\UnsubscribeController;
 use App\Http\Controllers\Api\User\UserController;
 use App\Http\Controllers\Api\User\UserTrackingController;
@@ -913,6 +914,14 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'country.'], function () {
         Route::get('/country/{id}', [CountryController::class, 'show'])->name('show');
         Route::put('/country/{id}', [CountryController::class, 'edit'])->name('edit');
         Route::delete('/country/{id}', [CountryController::class, 'destroy'])->name('destroy');
+});
+
+Route::group(['middleware' => ['auth:api'], 'as' => 'team.'], function () {
+        Route::get('/teams', [TeamController::class, 'index'])->name('index');
+        Route::post('/team', [TeamController::class, 'store'])->name('store');
+        Route::get('/team/{id}', [TeamController::class, 'show'])->name('show');
+        Route::put('/team/{id}', [TeamController::class, 'edit'])->name('edit');
+        Route::delete('/team/{id}', [TeamController::class, 'destroy'])->name('destroy');
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'addOn.'], function () {
