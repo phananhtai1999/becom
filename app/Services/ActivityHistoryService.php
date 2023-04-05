@@ -45,8 +45,10 @@ class ActivityHistoryService extends AbstractService
                         $html = $matches[2];
                     }
 
-                    $stripTagHtml = strip_tags($html);
-                    $renderBody = preg_replace('/\s+/', ' ', $stripTagHtml);
+                    $pattern = '/<style\b[^>]*>(.*?)<\/style>/si';
+                    $renderBody = preg_replace($pattern, "", $html);
+                    $renderBody = strip_tags($renderBody);
+                    $renderBody = preg_replace('/\s+/', ' ', $renderBody);
                 } elseif ($require == 'html') {
                     $renderBody = $bodyMailTemplate;
                 }
@@ -90,6 +92,6 @@ class ActivityHistoryService extends AbstractService
             $toEmail, $contactFirstName, $contactMiddleName, $contactLastName, $contactPhone, $contactSex, $contactDob, $contactCountry, $contactCity
         ];
 
-        return Str::replace($search, $replace, $renderBody);
+        return html_entity_decode(htmlspecialchars_decode(Str::replace($search, $replace, $renderBody)));
     }
 }
