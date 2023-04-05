@@ -53,6 +53,14 @@ class MyStatusService extends AbstractService
      */
     public function getMyStatus($userUuid)
     {
-        return $this->model->select(['uuid', 'name', 'points'])->whereIn('user_uuid', $userUuid)->orderBy('points')->get();
+        return $this->model->select(['uuid', 'name', 'points', 'user_uuid'])->whereIn('user_uuid', $userUuid)->orderBy('points')->get();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function firstMyStatus()
+    {
+        return $this->model->select(['uuid', 'name', 'points', 'user_uuid'])->where('user_uuid', auth()->user()->getkey())->orderBy('points')->first();
     }
 }

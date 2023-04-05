@@ -3,13 +3,14 @@
 namespace App\Models;
 
 use App\Abstracts\AbstractModel;
+use App\Http\Controllers\Traits\ModelFilterNameLanguageTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Translatable\HasTranslations;
 
 class Position extends AbstractModel
 {
-    use HasFactory, SoftDeletes, HasTranslations;
+    use HasFactory, SoftDeletes, HasTranslations, ModelFilterNameLanguageTrait;
 
     /**
      * @var string

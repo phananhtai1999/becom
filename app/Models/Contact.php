@@ -185,4 +185,25 @@ class Contact extends AbstractModel
     {
         return $this->hasMany(ActivityHistory::class, 'contact_uuid', 'uuid');
     }
+
+    /**
+     * @param Builder $query
+     * @param ...$name
+     * @return Builder
+     */
+    public function scopeStatusName(Builder $query, ...$name)
+    {
+        return $query->where('status_uuid',function ($q) use ($name) {
+            $q->select('a.uuid')
+                ->from('status as a')
+                ->whereColumn('a.uuid', 'contacts.status_uuid')
+                ->where(function ($i) use ($name) {
+                    $lang = app()->getLocale();
+                    $langDefault = config('app.fallback_locale');
+                    foreach ($name as $value) {
+                        $i->orWhereRaw("IFNULL(JSON_UNQUOTE(JSON_EXTRACT(a.name, '$.$lang')),JSON_UNQUOTE(JSON_EXTRACT(a.name, '$.$langDefault'))) = '$value'");
+                    }
+                });
+        });
+    }
 }
