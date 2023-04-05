@@ -58,18 +58,14 @@ class ActiveStatusListener
 
             //Update status contact
             if ($statusUser->count() != 0) {
-                $statusUserActive = $statusUser->where('points', '<=', $contactOpenMail->points)->sortByDesc('points')->first();
+                $statusUserActive = $statusUser->where('points', '<=', $contactOpenMail->points)->sortByDesc('points')->first() ?: $this->statusService->firstStatusByUserUuid($contactOpenMail->user_uuid);
                 $this->contactService->update($contactOpenMail, [
                     'status_uuid' => optional($statusUserActive)->uuid
                 ]);
-            } elseif ($statusAdmin->count() != 0) {
-                $statusAdminActive = $statusAdmin->where('points', '<=', $contactOpenMail->points)->sortByDesc('points')->first();
+            } else {
+                $statusAdminActive = $statusAdmin->where('points', '<=', $contactOpenMail->points)->sortByDesc('points')->first() ?: $this->statusService->firstStatusAdmin();
                 $this->contactService->update($contactOpenMail, [
                     'status_uuid' => optional($statusAdminActive)->uuid
-                ]);
-            } else {
-                $this->contactService->update($contactOpenMail, [
-                    'status_uuid' => null
                 ]);
             }
         }

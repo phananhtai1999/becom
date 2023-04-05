@@ -130,11 +130,10 @@ class ContactController extends AbstractRestAPIController
     public function store()
     {
         $request = app($this->storeRequest);
-        $defaultStatus = $this->statusService->defaultStatus() ? $this->statusService->defaultStatus()->uuid : null;
 
         $model = $this->service->create(array_merge($request->all(), [
             'user_uuid' => $request->get('user_uuid') ?? auth()->user()->getKey(),
-            'status_uuid' => $request->get('status_uuid') ?: $defaultStatus
+            'status_uuid' => $request->get('status_uuid') ?: optional($this->statusService->selectStatusDefault($request->get('user_uuid') ?? auth()->user()->getKey()))->uuid
         ]));
 
         //Add Pivot contact_company_position
@@ -238,10 +237,9 @@ class ContactController extends AbstractRestAPIController
             return $this->sendJsonResponse(false, 'You need to upgrade platform package', ['data' => $this->getPlatformByPermission(config('api.contact.create'))], 403);
         }
 
-        $defaultStatus = $this->statusService->defaultStatus() ? $this->statusService->defaultStatus()->uuid : null;
         $model = $this->service->create(array_merge($request->all(), [
             'user_uuid' => auth()->user()->getkey(),
-            'status_uuid' => $request->get('status_uuid') ?: $defaultStatus
+            'status_uuid' => $request->get('status_uuid') ?: optional($this->statusService->selectStatusDefault(auth()->user()->getKey()))->uuid
         ]));
 
         //Add Pivot contact_company_position

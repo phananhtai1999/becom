@@ -248,7 +248,7 @@ class ContactService extends AbstractService
                     'city' => $row['city'],
                     'country' => $row['country'],
                     'user_uuid' => auth()->user()->getkey(),
-                    'status_uuid' => app(StatusService::class)->defaultStatus() ? app(StatusService::class)->defaultStatus()->uuid : null
+                    'status_uuid' => optional(app(StatusService::class)->selectStatusDefault(auth()->user()->getKey()))->uuid
                 ];
                 $validator = Validator::make($data, $rules);
                 if ($validator->fails()) {
@@ -352,7 +352,7 @@ class ContactService extends AbstractService
                 'city' => $content->city,
                 'country' => $content->country,
                 'user_uuid' => auth()->user()->getkey(),
-                'status_uuid' => app(StatusService::class)->defaultStatus() ? app(StatusService::class)->defaultStatus()->uuid : null
+                'status_uuid' => optional(app(StatusService::class)->selectStatusDefault(auth()->user()->getKey()))->uuid
 
             ];
             $validator = Validator::make($data, $rules);
@@ -673,8 +673,7 @@ class ContactService extends AbstractService
                 AllowedFilter::exact('exact__avatar', 'avatar'),
                 'status_uuid',
                 AllowedFilter::exact('exact__status_uuid', 'status_uuid'),
-                'status.name',
-                AllowedFilter::exact('exact__status.name', 'status.name'),
+                AllowedFilter::scope('exact__status.name', 'statusName'),
                 'user_uuid',
                 AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
                 'user.username',
@@ -926,14 +925,14 @@ class ContactService extends AbstractService
         $contacts->each(function ($contact) use ($statusAdmin) {
             $statusUser = app(StatusService::class)->getAllStatusByUserUuid($contact->user_uuid);
             if ($statusUser->count() != 0) {
-                $contact->status_active = $statusUser->where('points', '<=', $contact->points)->sortByDesc('points')->first();
+                $contact->status_active = $statusUser->where('points', '<=', $contact->points)->sortByDesc('points')->first() ?: app(StatusService::class)->firstStatusByUserUuid($contact->user_uuid);
                 $contact->status_list = $statusUser;
             } else {
-                $contact->status_active = $statusAdmin->where('points', '<=', $contact->points)->sortByDesc('points')->first();
+                $contact->status_active = $statusAdmin->where('points', '<=', $contact->points)->sortByDesc('points')->first() ?: app(StatusService::class)->firstStatusAdmin();
                 $contact->status_list = $statusAdmin;
             }
             //List status admin
-            $contact->admin_status_active = $statusAdmin->where('points', '<=', $contact->points)->sortByDesc('points')->first();
+            $contact->admin_status_active = $statusAdmin->where('points', '<=', $contact->points)->sortByDesc('points')->first() ?: app(StatusService::class)->firstStatusAdmin();
             $contact->admin_status_list = $statusAdmin;
         });
 
