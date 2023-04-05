@@ -5,12 +5,19 @@ use App\Http\Controllers\Api\AddOnController;
 use App\Http\Controllers\Api\AddOnSubscriptionPlanController;
 use App\Http\Controllers\Api\ArticleCategoryController;
 use App\Http\Controllers\Api\ArticleController;
+use App\Http\Controllers\Api\AuthBySocialNetworkController;
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BusinessCategoryController;
 use App\Http\Controllers\Api\CampaignController;
 use App\Http\Controllers\Api\CompanyController;
+use App\Http\Controllers\Api\ConfigController;
+use App\Http\Controllers\Api\ContactController;
+use App\Http\Controllers\Api\ContactListController;
 use App\Http\Controllers\Api\ContactUnsubscribeController;
 use App\Http\Controllers\Api\CountryController;
+use App\Http\Controllers\Api\CreditHistoryController;
 use App\Http\Controllers\Api\CreditPackageController;
+use App\Http\Controllers\Api\CreditTransactionHistoryController;
 use App\Http\Controllers\Api\EmailController;
 use App\Http\Controllers\Api\FooterTemplateController;
 use App\Http\Controllers\Api\FormController;
@@ -21,46 +28,41 @@ use App\Http\Controllers\Api\MailSendingHistoryController;
 use App\Http\Controllers\Api\MailTemplateController;
 use App\Http\Controllers\Api\NoteController;
 use App\Http\Controllers\Api\NotificationController;
-use App\Http\Controllers\Api\PartnerCategoryController;
-use App\Http\Controllers\Api\PartnerController;
+use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\Partner\PartnerCategoryController;
+use App\Http\Controllers\Api\Partner\PartnerController;
+use App\Http\Controllers\Api\Partner\PartnerLevelController;
+use App\Http\Controllers\Api\Partner\PartnerTrackingController;
 use App\Http\Controllers\Api\Payment\PaymentController;
 use App\Http\Controllers\Api\Payment\PaypalController;
+use App\Http\Controllers\Api\PaymentMethodController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\PlatformPackageController;
 use App\Http\Controllers\Api\PositionController;
 use App\Http\Controllers\Api\RemindController;
+use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\ScenarioController;
 use App\Http\Controllers\Api\SectionCategoryController;
 use App\Http\Controllers\Api\SectionTemplateController;
 use App\Http\Controllers\Api\SmtpAccountController;
+use App\Http\Controllers\Api\SmtpAccountEncryptionController;
 use App\Http\Controllers\Api\StatusController;
 use App\Http\Controllers\Api\SubscriptionPlanController;
 use App\Http\Controllers\Api\TeamController;
+use App\Http\Controllers\Api\SupportMultipleLanguagesController;
 use App\Http\Controllers\Api\UnsubscribeController;
+use App\Http\Controllers\Api\UploadImgController;
+use App\Http\Controllers\Api\User\UserConfigController;
 use App\Http\Controllers\Api\User\UserController;
+use App\Http\Controllers\Api\User\UserDetailController;
 use App\Http\Controllers\Api\User\UserTrackingController;
+use App\Http\Controllers\Api\UserCreditHistoryController;
 use App\Http\Controllers\Api\WebsiteController;
 use App\Http\Controllers\Api\WebsitePageCategoryController;
 use App\Http\Controllers\Api\WebsitePageController;
 use App\Http\Controllers\Api\WebsiteVerificationController;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\UploadImgController;
-use App\Http\Controllers\Api\RoleController;
-use App\Http\Controllers\Api\User\UserDetailController;
-use App\Http\Controllers\Api\User\UserConfigController;
-use App\Http\Controllers\Api\ConfigController;
-use App\Http\Controllers\Api\AuthBySocialNetworkController;
-use App\Http\Controllers\Api\SmtpAccountEncryptionController;
-use App\Http\Controllers\Api\SupportMultipleLanguagesController;
-use App\Http\Controllers\Api\ContactController;
-use App\Http\Controllers\Api\ContactListController;
-use App\Http\Controllers\Api\CreditHistoryController;
-use App\Http\Controllers\Api\UserCreditHistoryController;
-use App\Http\Controllers\Api\CreditTransactionHistoryController;
-use App\Http\Controllers\Api\PaymentMethodController;
-use App\Http\Controllers\Api\OrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -1020,3 +1022,27 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'partner.'], function () {
     });
 });
 Route::post('register-partner', [PartnerController::class, 'registerPartner'])->name('registerPartner');
+
+//Partner Level
+Route::group(['middleware' => ['auth:api'], 'as' => 'partner_level.'], function () {
+
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/partner-levels', [PartnerLevelController::class, 'index'])->name('index');
+        Route::get('/partner-level/{id}', [PartnerLevelController::class, 'show'])->name('show');
+        Route::post('/partner-level', [PartnerLevelController::class, 'store'])->name('store');
+        Route::put('/partner-level/{id}', [PartnerLevelController::class, 'edit'])->name('edit');
+        Route::delete('/partner-level/{id}', [PartnerLevelController::class, 'destroy'])->name('destroy');
+    });
+});
+Route::get('public/partner-levels', [PartnerLevelController::class, 'index'])->name('index');
+
+//Partner Tracking
+Route::group(['middleware' => ['auth:api'], 'as' => 'partner-tracking.'], function () {
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/partner-trackings', [PartnerTrackingController::class, 'index'])->name('index');
+        Route::post('/partner-tracking', [PartnerTrackingController::class, 'store'])->name('store');
+        Route::get('/partner-tracking/{id}', [PartnerTrackingController::class, 'show'])->name('show');
+        Route::put('/partner-tracking/{id}', [PartnerTrackingController::class, 'edit'])->name('edit');
+        Route::delete('/partner-tracking/{id}', [PartnerTrackingController::class, 'destroy'])->name('destroy');
+    });
+});
