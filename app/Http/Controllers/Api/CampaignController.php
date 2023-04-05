@@ -549,13 +549,6 @@ class CampaignController extends AbstractRestAPIController
     public function sendEmailsByCampaign(SendEmailByCampaignRequest $request)
     {
         $campaign = $this->service->findOrFailById($request->get('campaign_uuid'));
-        $code = 'birthday_campaigns';
-        if ($campaign->send_type == 'sms') {
-            $code = 'sms_campaigns';
-        }
-        if (!Gate::allows('permission', $code)) {
-            return $this->sendJsonResponse(false, 'You need to upgrade platform package', [], 403);
-        }
 
         $configSmtpAuto = $this->configService->findConfigByKey('smtp_auto');
         //Check random smtp_account with role admin and send_type exists or not
@@ -601,13 +594,6 @@ class CampaignController extends AbstractRestAPIController
     public function sendEmailByMyCampaign(SendEmailByMyCampaignRequest $request)
     {
         $campaign = $this->service->findOrFailById($request->get('campaign_uuid'));
-        $code = 'birthday_campaigns';
-        if ($campaign->send_type == 'sms') {
-            $code = 'sms_campaigns';
-        }
-        if (!Gate::allows('permission', $code)) {
-            return $this->sendJsonResponse(false, 'You need to upgrade platform package', [], 403);
-        }
 
         $configSmtpAuto = $this->configService->findConfigByKey('smtp_auto');
         //Check random smtp_account with role admin and send_type exists or not
