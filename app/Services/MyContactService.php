@@ -741,10 +741,10 @@ class MyContactService extends AbstractService
 
         $contacts->each(function ($contact) use ($statusAdmin, $statusUser) {
             if ($statusUser->count() != 0) {
-                $contact->status_active = $statusUser->where('points', '<=', $contact->points)->sortByDesc('points')->first();
+                $contact->status_active = $statusUser->where('points', '<=', $contact->points)->sortByDesc('points')->first() ?: app(MyStatusService::class)->firstMyStatus();
                 $contact->status_list = $statusUser;
             } else {
-                $contact->status_active = $statusAdmin->where('points', '<=', $contact->points)->sortByDesc('points')->first();
+                $contact->status_active = $statusAdmin->where('points', '<=', $contact->points)->sortByDesc('points')->first() ?: app(StatusService::class)->firstStatusAdmin();
                 $contact->status_list = $statusAdmin;
             }
         });

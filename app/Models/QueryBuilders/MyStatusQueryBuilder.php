@@ -50,8 +50,7 @@ class MyStatusQueryBuilder extends AbstractQueryBuilder
             ->allowedFilters([
                 $modelKeyName,
                 AllowedFilter::exact('exact__' . $modelKeyName, $modelKeyName),
-                'name',
-                AllowedFilter::exact('exact__name', 'name'),
+                AllowedFilter::scope('name'),
                 'points',
                 AllowedFilter::exact('exact__points', 'points'),
                 AllowedFilter::exact('exact__user_uuid', 'user_uuid'),

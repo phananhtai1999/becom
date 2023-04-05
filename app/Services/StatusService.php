@@ -13,11 +13,20 @@ class StatusService extends AbstractService
     protected $modelQueryBuilderClass = StatusQueryBuilder::class;
 
     /**
+     * @param $userUuid
      * @return mixed
      */
-    public function defaultStatus()
+    public function firstStatusByUserUuid($userUuid)
     {
-        return $this->model->where('user_uuid', null)->orderBy('points', 'ASC')->first();
+        return $this->model->select(['uuid', 'name', 'points', 'user_uuid'])->where('user_uuid', $userUuid)->orderBy('points')->first();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function firstStatusAdmin()
+    {
+        return $this->model->select(['uuid', 'name', 'points', 'user_uuid'])->where('user_uuid', null)->orderBy('points')->first();
     }
 
     /**
@@ -35,5 +44,14 @@ class StatusService extends AbstractService
     public function getAllStatusByUserUuid($userUuid)
     {
         return $this->model->select(['uuid', 'name', 'points', 'user_uuid'])->where('user_uuid', $userUuid)->orderBy('points')->get();
+    }
+
+    /**
+     * @param $userUuid
+     * @return mixed
+     */
+    public function selectStatusDefault($userUuid)
+    {
+        return $this->firstStatusByUserUuid($userUuid) ?: $this->firstStatusAdmin();
     }
 }
