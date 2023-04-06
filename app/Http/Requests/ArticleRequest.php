@@ -26,7 +26,7 @@ class ArticleRequest extends AbstractRequest
     {
         return [
             'image' => ['nullable', 'string'],
-            'slug' => ['required', 'string'],
+            'slug' => ['required', 'string', "regex:/^[a-z0-9-]+$/", Rule::unique('articles')->whereNull('deleted_at')],
             'title' => ['required', 'array', 'min:1'],
             'title.en' => ['required', 'string'],
             'title.*' => ['required', 'string'],

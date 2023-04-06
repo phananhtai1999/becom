@@ -5,5 +5,5 @@ return array(
     'campaign_started' => 'You started the :name :type at :date',
     'scenario_stopped' => 'You stopped the :name :type at :date',
     'scenario_started' => 'You started the :name :type at :date',
-    'login' => 'You logged in from a different country. You logged in from :country'
+    'account_login' => 'You logged in from a different country. You logged in from :country'
 );

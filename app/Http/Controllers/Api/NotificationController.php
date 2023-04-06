@@ -65,4 +65,9 @@ class NotificationController extends AbstractRestAPIController
 
         return $this->sendOkJsonResponse();
     }
+
+    public function getNotificationCategories()
+    {
+        return $this->sendOkJsonResponse(['data'=> config('notificationsystem.categories')]);
+    }
 }
