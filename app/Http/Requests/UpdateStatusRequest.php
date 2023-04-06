@@ -27,8 +27,11 @@ class UpdateStatusRequest extends AbstractRequest
         return [
             'name' => ['array', 'min:1'],
             'name.*' => ['string'],
-            'points' => ['numeric', 'min:0'],
-            'user_uuid' => ['nullable', 'numeric', Rule::exists('users','uuid')->whereNull('deleted_at')],
+            'points' => ['numeric', 'min:0', Rule::unique('status', 'points')
+                ->where('user_uuid', $this->get('user_uuid', null))
+                ->ignore($this->id, 'uuid')
+                ->whereNull('deleted_at')],
+            'user_uuid' => ['nullable', 'numeric', Rule::exists('users', 'uuid')->whereNull('deleted_at')],
         ];
     }
 }
