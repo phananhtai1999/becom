@@ -80,7 +80,7 @@ class PartnerQueryBuilder extends AbstractQueryBuilder
                 'partner_category_uuid',
                 AllowedFilter::exact('exact__partner_category_uuid', 'partner_category_uuid'),
                 'partnerCategory.title',
-                AllowedFilter::exact('exact__partnerCategory.title', 'partnerCategoryTitle'),
+                AllowedFilter::scope('exact__partnerCategory.title', 'partnerCategoryTitle'),
                 'user_uuid',
                 AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
                 'user.username',
@@ -90,7 +90,7 @@ class PartnerQueryBuilder extends AbstractQueryBuilder
                 'partner_level_uuid',
                 AllowedFilter::exact('exact__partner_level_uuid', 'partner_level_uuid'),
                 'partnerLevel.title',
-                AllowedFilter::exact('exact__partnerLevel.title', 'partnerLevelTitle'),
+                AllowedFilter::scope('exact__partnerLevel.title', 'partnerLevelTitle'),
                 'code',
                 AllowedFilter::exact('exact__code', 'code'),
             ]);
