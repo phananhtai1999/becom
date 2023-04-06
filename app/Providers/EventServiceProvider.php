@@ -18,6 +18,7 @@ use App\Events\SendEmailVerifyEmailEvent;
 use App\Events\SendNextByScenarioCampaignEvent;
 use App\Events\SubscriptionAddOnSuccessEvent;
 use App\Events\SubscriptionSuccessEvent;
+use App\Events\UpdateContactByStatusEvent;
 use App\Listeners\ActiveStatusListener;
 use App\Listeners\ActivityHistoryListener;
 use App\Listeners\ActivityHistoryOfSendByCampaignListener;
@@ -34,9 +35,11 @@ use App\Listeners\SendEmailVerifyEmailListener;
 use App\Listeners\SendNextByScenarioCampaignListener;
 use App\Listeners\SubscriptionAddOnSuccessListener;
 use App\Listeners\SubscriptionSuccessListener;
+use App\Listeners\UpdateContactByStatusListener;
 use App\Models\Config;
 use App\Models\Contact;
 use App\Models\Role;
+use App\Models\Status;
 use App\Models\User;
 use App\Models\UserAccessToken;
 use App\Models\UserConfig;
@@ -44,6 +47,7 @@ use App\Models\UserDetail;
 use App\Observers\ConfigObserver;
 use App\Observers\ContactObserver;
 use App\Observers\RoleObserver;
+use App\Observers\StatusObserver;
 use App\Observers\UserAccessTokenObserver;
 use App\Observers\UserConfigObserver;
 use App\Observers\UserDetailObserver;
@@ -111,6 +115,9 @@ class EventServiceProvider extends ServiceProvider
         ActiveStatusEvent::class => [
             ActiveStatusListener::class
         ],
+        UpdateContactByStatusEvent::class => [
+            UpdateContactByStatusListener::class
+        ],
     ];
 
     /**
@@ -127,5 +134,6 @@ class EventServiceProvider extends ServiceProvider
         Role::observe(RoleObserver::class);
         Config::observe(ConfigObserver::class);
         Contact::observe(ContactObserver::class);
+        Status::observe(StatusObserver::class);
     }
 }

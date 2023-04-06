@@ -94,7 +94,7 @@ class PositionController extends AbstractRestAPIController
         }
 
         $this->service->update($model, array_merge($request->all(), [
-            'user_uuid' => $request->get('user_uuid') ?? null
+            'user_uuid' => $request->get('user_uuid', $model->user_uuid)
         ]));
 
         return $this->sendOkJsonResponse(
