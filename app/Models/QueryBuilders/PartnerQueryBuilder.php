@@ -40,7 +40,10 @@ class PartnerQueryBuilder extends AbstractQueryBuilder
                 'publish_status',
                 'phone_number',
                 'answer',
-                'partner_category_uuid'
+                'partner_category_uuid',
+                'user_uuid',
+                'partner_level_uuid',
+                'code'
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -52,7 +55,10 @@ class PartnerQueryBuilder extends AbstractQueryBuilder
                 'publish_status',
                 'phone_number',
                 'answer',
-                'partner_category_uuid'
+                'partner_category_uuid',
+                'user_uuid',
+                'partner_level_uuid',
+                'code'
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -75,6 +81,18 @@ class PartnerQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__partner_category_uuid', 'partner_category_uuid'),
                 'partnerCategory.title',
                 AllowedFilter::exact('exact__partnerCategory.title', 'partnerCategoryTitle'),
+                'user_uuid',
+                AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
+                'user.username',
+                AllowedFilter::exact('exact__user.username', 'user.username'),
+                'user.email',
+                AllowedFilter::exact('exact__user.email', 'user.email'),
+                'partner_level_uuid',
+                AllowedFilter::exact('exact__partner_level_uuid', 'partner_level_uuid'),
+                'partnerLevel.title',
+                AllowedFilter::exact('exact__partnerLevel.title', 'partnerLevelTitle'),
+                'code',
+                AllowedFilter::exact('exact__code', 'code'),
             ]);
     }
 

@@ -11,4 +11,9 @@ class PartnerLevelService extends AbstractService
     protected $modelClass = PartnerLevel::class;
 
     protected $modelQueryBuilderClass = PartnerLevelQueryBuilder::class;
+
+    public function getDefaultPartnerLevel()
+    {
+        return $this->model->orderBy('number_of_references', 'ASC')->first();
+    }
 }

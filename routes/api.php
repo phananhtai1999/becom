@@ -1019,6 +1019,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'partner.'], function () {
         Route::post('/partner', [PartnerController::class, 'store'])->name('store');
         Route::put('/partner/{id}', [PartnerController::class, 'edit'])->name('edit');
         Route::delete('/partner/{id}', [PartnerController::class, 'destroy'])->name('destroy');
+        Route::post('/change-status-partner', [PartnerController::class, 'changeStatusPartner'])->name('changeStatusPartner');
     });
 });
 Route::post('register-partner', [PartnerController::class, 'registerPartner'])->name('registerPartner');

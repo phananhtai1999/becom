@@ -37,6 +37,10 @@ class UserResource extends AbstractJsonResource
             'updated_at' => $this->updated_at
         ];
 
+        if (\in_array('user__partner', $expand)) {
+            $data['partner'] = new PartnerResource($this->partner);
+        }
+
         if (\in_array('user__roles', $expand)) {
             $data['roles'] = RoleResource::collection($this->roles);
         }

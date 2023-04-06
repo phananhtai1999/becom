@@ -261,4 +261,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(Status::class, 'user_uuid', 'uuid');
     }
+
+    /**
+     * @return HasOne
+     */
+    public function partner()
+    {
+        return $this->hasOne(Partner::class, 'user_uuid', 'uuid');
+    }
 }

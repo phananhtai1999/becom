@@ -19,10 +19,10 @@ class ArticleService extends AbstractService
      * @param $pageName
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function getArticlePublicWithPagination($perPage, $page, $columns, $pageName )
+    public function getArticlePublicWithPagination($perPage, $page, $columns, $pageName, $search, $searchBy)
     {
         $articleCategoryPublicByUuids = (new ArticleCategoryService())->getListArticleCategoryUuidsPublic();
-        return ArticleQueryBuilder::initialQuery()
+        return ArticleQueryBuilder::searchQuery($search, $searchBy)
             ->where('publish_status', Article::PUBLISHED_PUBLISH_STATUS)
             ->where(function ($query) use ($articleCategoryPublicByUuids) {
                 $query->whereIn('article_category_uuid', $articleCategoryPublicByUuids)
