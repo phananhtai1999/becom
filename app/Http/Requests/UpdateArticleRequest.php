@@ -26,7 +26,7 @@ class UpdateArticleRequest extends AbstractRequest
     {
         return [
             'image' => ['nullable', 'string'],
-            'slug' => ['string'],
+            'slug' => ['string', "regex:/^[a-z0-9-]+$/", Rule::unique('articles')->ignore($this->id,'uuid')->whereNull('deleted_at')],
             'title' => ['array', 'min:1'],
             'title.*' => ['string'],
             'content' => ['array', 'min:1'],

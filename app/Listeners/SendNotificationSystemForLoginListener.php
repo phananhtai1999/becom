@@ -43,7 +43,7 @@ class SendNotificationSystemForLoginListener implements ShouldQueue
     {
         $user = $event->user;
         $ip = $event->ip;
-        $type = "login";
+        $type = "account";
 
 //        $ip = geoip()->getClientIP();
 //        // 92.38.148.61, 171.248.187.0
@@ -62,7 +62,7 @@ class SendNotificationSystemForLoginListener implements ShouldQueue
                     $this->notificationService->create([
                         'type' => $type,
                         'type_uuid' => null,
-                        'content' => ['langkey' => $type, 'country' => $country],
+                        'content' => ['langkey' => $type.'_login', 'country' => $country],
                         'user_uuid' => $user->uuid,
                     ]);
                 }

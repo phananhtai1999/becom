@@ -12,7 +12,7 @@ class Notification extends Model
 
     const CAMPAIGN_TYPE = "campaign";
     const SCENARIO_TYPE = "scenario";
-    const LOGIN_TYPE = "login";
+    const ACCOUNT_TYPE = "account";
     const START_ACTION = "started";
     const STOP_ACTION = "stopped";
 
