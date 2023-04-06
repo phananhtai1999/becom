@@ -34,6 +34,7 @@ class UserTeam extends Model
      * @var string[]
      */
     protected $casts = [
+        'permission_uuids'=> 'array',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
