@@ -45,7 +45,7 @@ class PartnerController extends AbstractRestAPIController
 
         $model = $this->service->create(array_merge($request->except('code'), [
             'publish_status' => 'active',
-            'partner_level_uuid' => ($this->partnerLevelService->getDefaultPartnerLevel())->uuid
+            'partner_level_uuid' => optional($this->partnerLevelService->getDefaultPartnerLevel())->uuid
         ]));
 
         return $this->sendOkJsonResponse($this->service->resourceToData($this->resourceClass, $model));
@@ -61,7 +61,7 @@ class PartnerController extends AbstractRestAPIController
 
         $model = $this->service->findOrFailById($id);
 
-        $this->service->update($model, $request->except(['code', 'publish_status', 'partner_level_uuid']));
+        $this->service->update($model, $request->except(['code', 'publish_status']));
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -72,7 +72,7 @@ class PartnerController extends AbstractRestAPIController
     {
         $model = $this->service->create(array_merge($request->except('code'), [
             'publish_status' => 'pending',
-            'partner_level_uuid' => ($this->partnerLevelService->getDefaultPartnerLevel())->uuid
+            'partner_level_uuid' => optional($this->partnerLevelService->getDefaultPartnerLevel())->uuid
         ]));
 
         return $this->sendOkJsonResponse($this->service->resourceToData($this->resourceClass, $model));
