@@ -103,27 +103,35 @@ class Partner extends AbstractModel
         return $this->belongsTo(PartnerLevel::class, 'partner_level_uuid', 'uuid');
     }
 
-    public function scopePartnerCategoryTitle(Builder $query, $title)
+    public function scopePartnerCategoryTitle(Builder $query, ...$titles)
     {
-        return $query->where('partner_category_uuid', function ($q) use ($title) {
-            $lang = app()->getLocale();
-            $langDefault = config('app.fallback_locale');
+        return $query->where('partner_category_uuid', function ($q) use ($titles) {
             $q->select('a.uuid')
                 ->from('partner_categories as a')
                 ->whereColumn('a.uuid', 'partners.partner_category_uuid')
-                ->whereRaw("IFNULL(JSON_UNQUOTE(JSON_EXTRACT(a.title, '$.$lang')),JSON_UNQUOTE(JSON_EXTRACT(a.title, '$.$langDefault'))) = '$title'");
+                ->where(function ($i) use ($titles) {
+                    $lang = app()->getLocale();
+                    $langDefault = config('app.fallback_locale');
+                    foreach ($titles as $title) {
+                        $i->orWhereRaw("IFNULL(JSON_UNQUOTE(JSON_EXTRACT(a.title, '$.$lang')),JSON_UNQUOTE(JSON_EXTRACT(a.title, '$.$langDefault'))) = '$title'");
+                    }
+                });
         });
     }
 
-    public function scopePartnerLevelTitle(Builder $query, $title)
+    public function scopePartnerLevelTitle(Builder $query, ...$titles)
     {
-        return $query->where('partner_level_uuid', function ($q) use ($title) {
-            $lang = app()->getLocale();
-            $langDefault = config('app.fallback_locale');
+        return $query->where('partner_level_uuid', function ($q) use ($titles) {
             $q->select('a.uuid')
                 ->from('partner_levels as a')
                 ->whereColumn('a.uuid', 'partners.partner_level_uuid')
-                ->whereRaw("IFNULL(JSON_UNQUOTE(JSON_EXTRACT(a.title, '$.$lang')),JSON_UNQUOTE(JSON_EXTRACT(a.title, '$.$langDefault'))) = '$title'");
+                ->where(function ($i) use ($titles) {
+                    $lang = app()->getLocale();
+                    $langDefault = config('app.fallback_locale');
+                    foreach ($titles as $title) {
+                        $i->orWhereRaw("IFNULL(JSON_UNQUOTE(JSON_EXTRACT(a.title, '$.$lang')),JSON_UNQUOTE(JSON_EXTRACT(a.title, '$.$langDefault'))) = '$title'");
+                    }
+                });
         });
     }
 }
