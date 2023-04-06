@@ -925,7 +925,8 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'team.'], function () {
         Route::put('/team/{id}', [TeamController::class, 'edit'])->name('edit');
         Route::delete('/team/{id}', [TeamController::class, 'destroy'])->name('destroy');
         Route::get('/join-team', [TeamController::class, 'joinTeam'])->name('joinTeam');
-        Route::get('/invite-user', [TeamController::class, 'inviteUser'])->name('inviteUser');
+        Route::get('/team/invite-user', [TeamController::class, 'inviteUser'])->name('inviteUser');
+        Route::post('/team/set-permission', [TeamController::class, 'setPermissionForTeam'])->name('setPermissionForTeam');
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'addOn.'], function () {

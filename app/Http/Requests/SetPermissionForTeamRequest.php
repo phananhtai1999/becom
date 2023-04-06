@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class InviteUserRequest extends FormRequest
+class SetPermissionForTeamRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,8 +24,8 @@ class InviteUserRequest extends FormRequest
     public function rules()
     {
         return [
-            'team_uuid' => ['required', 'exists:teams,uuid'],
-            'user_uuid' => ['required', 'exists:users,uuid']
+            'user_uuid' => ['required', 'integer', 'min:1', 'exists:users,uuid'],
+            'team_uuid' => ['required', 'integer', 'min:1', 'exists:teams,uuid']
         ];
     }
 }
