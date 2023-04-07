@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Abstracts\AbstractModel;
+use App\Services\UserService;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -67,5 +69,11 @@ class FooterTemplate extends AbstractModel
     public function activeBy()
     {
         return $this->belongsTo(User::class, 'active_by_uuid', 'uuid');
+    }
+
+    public function scopeGetFooterByRole(Builder $query, $role)
+    {
+        $usersByRoles = ((new UserService())->getUsersByRole($role))->pluck('uuid');
+        return $query->whereIn('user_uuid', $usersByRoles);
     }
 }

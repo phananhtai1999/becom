@@ -247,4 +247,19 @@ class UserService extends AbstractService
         return auth()->user()->roles->whereIn('slug', ["admin", "editor"])->count();
 
     }
+
+    public function getUsersByRole($role)
+    {
+        $users = $this->model->whereHas('roles', function ($query) use($role) {
+            $query->where('name', $role);
+        })->with('roles')->get();
+
+        if ($role === "user") {
+            $users = $users->filter(function ($user) {
+                return $user->roles->count() === 1;
+            })->values();
+        }
+
+        return $users;
+    }
 }

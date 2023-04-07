@@ -82,6 +82,7 @@ class FooterTemplateQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__activeBy.username', 'activeBy.username'),
                 'activeBy.email',
                 AllowedFilter::exact('exact__activeBy.email', 'activeBy.email'),
+                AllowedFilter::scope('by_role', 'getFooterByRole')
             ]);
     }
 
