@@ -214,6 +214,11 @@ class User extends Authenticatable
         return $this->hasMany(UserAddOn::class, 'user_uuid', 'uuid');
     }
 
+    public function userTeams()
+    {
+        return $this->hasMany(UserTeam::class, 'user_uuid', 'uuid');
+    }
+
     /**
      * @return null
      */
