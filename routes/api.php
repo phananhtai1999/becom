@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\ArticleController;
 use App\Http\Controllers\Api\AuthBySocialNetworkController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BusinessCategoryController;
+use App\Http\Controllers\Api\BusinessManagementController;
 use App\Http\Controllers\Api\CampaignController;
 use App\Http\Controllers\Api\CompanyController;
 use App\Http\Controllers\Api\ConfigController;
@@ -1047,5 +1048,23 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'partner-tracking.'], functi
         Route::get('/partner-tracking/{id}', [PartnerTrackingController::class, 'show'])->name('show');
         Route::put('/partner-tracking/{id}', [PartnerTrackingController::class, 'edit'])->name('edit');
         Route::delete('/partner-tracking/{id}', [PartnerTrackingController::class, 'destroy'])->name('destroy');
+    });
+});
+
+Route::group(['middleware' => ['auth:api'], 'as' => 'business-management.'], function () {
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/business-managements', [BusinessManagementController::class, 'index'])->name('index');
+        Route::post('/business-management', [BusinessManagementController::class, 'store'])->name('store');
+        Route::get('/business-management/{id}', [BusinessManagementController::class, 'show'])->name('show');
+        Route::put('/business-management/{id}', [BusinessManagementController::class, 'edit'])->name('edit');
+        Route::delete('/business-management/{id}', [BusinessManagementController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::group(['as' => 'my.'], function () {
+        Route::get('/my/business-managements', [BusinessManagementController::class, 'indexMyBusinessManagements'])->name('index');
+        Route::post('/my/business-management', [BusinessManagementController::class, 'storeMyBusinessManagement'])->name('store');
+        Route::get('/my/business-management/{id}', [BusinessManagementController::class, 'showMyBusinessManagement'])->name('show');
+        Route::put('/my/business-management/{id}', [BusinessManagementController::class, 'editMyBusinessManagement'])->name('edit');
+        Route::delete('/my/business-management/{id}', [BusinessManagementController::class, 'destroyMyBusinessManagement'])->name('destroy');
     });
 });
