@@ -22,6 +22,7 @@ class NotificationResource extends AbstractJsonResource
             'type_uuid' => $this->type_uuid,
             'user_uuid' => $this->user_uuid,
             'content' => __('notification.'. $this->content['langkey'], $this->content),
+            'read' => $this->read,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
