@@ -336,10 +336,10 @@ class SmtpAccountService extends AbstractService
      * @param $mail
      * @return void
      */
-    public function sendEmailNotificationSystem($user, $mail) {
+    public function sendEmailNotificationSystem($user, $mail, $email = null) {
         $smtpAccount = \App\Models\Config::where(['key' => 'smtp_account'])->first();
         $this->setSwiftSmtpAccountForSendEmail($smtpAccount->value);
 
-        Mail::to($user->email)->send($mail);
+        Mail::to($user->email ?? $email)->send($mail);
     }
 }

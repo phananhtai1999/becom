@@ -47,6 +47,7 @@ class AuthServiceProvider extends ServiceProvider
             if (!isset($user->userPlatformPackage->platform_package_uuid) && !isset($user->userAddOns)) {
                 return false;
             }
+            //check team
             if (isset($user->userPlatformPackage->platform_package_uuid)) {
                 $permissions = Cache::rememberForever('platform_permission_' . $user->uuid, function () use ($user) {
                     $platformPackage = PlatformPackage::findOrFail($user->userPlatformPackage->platform_package_uuid);

@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class InviteUserRequest extends FormRequest
 {
@@ -25,7 +26,8 @@ class InviteUserRequest extends FormRequest
     {
         return [
             'team_uuid' => ['required', 'exists:teams,uuid'],
-            'user_uuid' => ['required', 'exists:users,uuid']
+            'type' => ['required', Rule::in(['link', 'account'])],
+            'email' => ['required', 'string', 'email:rfc,dns'],
         ];
     }
 }
