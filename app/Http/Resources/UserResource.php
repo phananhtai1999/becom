@@ -61,6 +61,10 @@ class UserResource extends AbstractJsonResource
             $data['contact_lists'] = ContactListResource::collection($this->contactLists);
         }
 
+        if (\in_array('user__business_management', $expand)) {
+            $data['business_management'] = BusinessManagementResource::collection($this->businessManagements);
+        }
+
         return $data;
     }
 }

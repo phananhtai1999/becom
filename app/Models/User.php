@@ -269,4 +269,12 @@ class User extends Authenticatable
     {
         return $this->hasOne(Partner::class, 'user_uuid', 'uuid');
     }
+
+    /**
+     * @return HasMany
+     */
+    public function businessManagements()
+    {
+        return $this->hasMany(BusinessManagement::class, 'owner_uuid', 'uuid');
+    }
 }

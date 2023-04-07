@@ -146,4 +146,12 @@ class BusinessCategory extends AbstractModel
     {
         return app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('title') : $this->title;
     }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function businessManagements()
+    {
+        return $this->belongsToMany(BusinessManagement::class, 'management_categories', 'category_uuid', 'management_uuid')->withTimestamps();
+    }
 }
