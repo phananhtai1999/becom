@@ -29,7 +29,11 @@ class UpdateWebsiteRequest extends AbstractRequest
                 return $query->where('user_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey())
                     ->whereNull('deleted_at');
             })],
-            'user_uuid' => ['numeric', 'min:1', 'exists:users,uuid'],
+            'user_uuid' => ['numeric', 'min:1', Rule::exists('users', 'uuid')->whereNull('deleted_at')],
+            'domain_uuid' => ['nullable', 'numeric', Rule::exists('domains', 'uuid')->where(function ($query) {
+                return $query->where('owner_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey())
+                    ->whereNull('deleted_at');
+            })],
             'name' => ['string'],
             'description' => ['string'],
             'logo' => ['string'],

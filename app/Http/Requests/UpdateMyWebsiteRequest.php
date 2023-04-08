@@ -31,6 +31,10 @@ class UpdateMyWebsiteRequest extends AbstractRequest
             'name' => ['string'],
             'description' => ['string'],
             'logo' => ['string'],
+            'domain_uuid' => ['nullable', 'numeric', Rule::exists('domains', 'uuid')->where(function ($query) {
+                return $query->where('owner_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey())
+                    ->whereNull('deleted_at');
+            })],
         ];
     }
 }

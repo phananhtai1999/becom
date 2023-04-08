@@ -23,6 +23,7 @@ class WebsiteResource extends AbstractJsonResource
             'uuid' => $this->uuid,
             'domain' => $this->domain,
             'user_uuid' => $this->user_uuid,
+            'domain_uuid' => $this->domain_uuid,
             'name' => $this->name,
             'description' => $this->description,
             'logo' => $this->logo,
@@ -34,6 +35,10 @@ class WebsiteResource extends AbstractJsonResource
 
         if (\in_array('website__user', $expand)) {
             $data['user'] = new UserResource($this->user);
+        }
+
+        if (\in_array('website__domain', $expand)) {
+            $data['domains'] = new DomainResource($this->domains);
         }
 
         return $data;
