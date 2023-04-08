@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Abstracts\AbstractModel;
 use App\Http\Controllers\Traits\ModelFilterLanguageTrait;
+use App\Services\ArticleCategoryService;
 use App\Services\UserService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -156,5 +157,17 @@ class Article extends AbstractModel
                     }
                 });
         });
+    }
+
+    public function scopeTitleByRoot(Builder $query, ...$search)
+    {
+        $rootUuid = $search[0];
+        $title = $search[1] ?? null;
+        $lang = app()->getLocale();
+        $langDefault = config('app.fallback_locale');
+        $articleCategoryUuids = (new ArticleCategoryService())->getArticleCategoriesByRootUuid($rootUuid)->pluck('uuid');
+
+        return $query->whereIn('article_category_uuid', $articleCategoryUuids)
+            ->whereRaw("IFNULL(JSON_UNQUOTE(JSON_EXTRACT(title, '$.$lang')),JSON_UNQUOTE(JSON_EXTRACT(title, '$.$langDefault'))) like '%$title%'");
     }
 }

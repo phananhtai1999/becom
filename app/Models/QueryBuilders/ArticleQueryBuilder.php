@@ -81,6 +81,7 @@ class ArticleQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::scope('to__created_at'),
                 AllowedFilter::scope('from__updated_at'),
                 AllowedFilter::scope('to__updated_at'),
+                AllowedFilter::scope('title_by_root', 'titleByRoot')
             ]);
 
     }
