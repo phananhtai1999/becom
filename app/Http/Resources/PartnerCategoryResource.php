@@ -19,8 +19,11 @@ class PartnerCategoryResource extends AbstractJsonResource
 
         $data = [
             'uuid' => $this->uuid,
+            'image' => $this->image,
             'title' => $this->title,
             'title_translate' => $this->title_translate,
+            'content' => $this->content,
+            'content_translate' => $this->content_translate,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

@@ -31,9 +31,11 @@ class PartnerCategory extends AbstractModel
      */
     protected $fillable = [
         'title',
+        'content',
+        'image'
     ];
 
-    public $translatable = ['title'];
+    public $translatable = ['title','content'];
 
     /**
      * @var string[]
@@ -43,6 +45,7 @@ class PartnerCategory extends AbstractModel
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
         'title' => 'array',
+        'content' => 'array',
     ];
 
     /**
@@ -50,6 +53,7 @@ class PartnerCategory extends AbstractModel
      */
     protected $appends = [
         'title_translate',
+        'content_translate'
     ];
 
     /**
@@ -66,5 +70,13 @@ class PartnerCategory extends AbstractModel
     public function getTitleTranslateAttribute()
     {
         return app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('title') : $this->title;
+    }
+
+    /**
+     * @return array|mixed
+     */
+    public function getContentTranslateAttribute()
+    {
+        return app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('content') : $this->content;
     }
 }

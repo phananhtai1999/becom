@@ -33,16 +33,24 @@ class PartnerCategoryQueryBuilder extends AbstractQueryBuilder
             ->allowedFields([
                 $modelKeyName,
                 'title',
+                'content',
+                'image'
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
                 $modelKeyName,
                 'title',
+                'content',
+                'image'
             ])
             ->allowedFilters([
                 $modelKeyName,
                 AllowedFilter::exact('exact__' . $modelKeyName, $modelKeyName),
                 AllowedFilter::scope('title'),
+                'content',
+                AllowedFilter::exact('exact__content', 'content'),
+                'image',
+                AllowedFilter::exact('exact__image', 'image'),
             ]);
     }
 

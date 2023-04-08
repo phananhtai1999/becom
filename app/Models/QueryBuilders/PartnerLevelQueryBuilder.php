@@ -33,14 +33,18 @@ class PartnerLevelQueryBuilder extends AbstractQueryBuilder
                 $modelKeyName,
                 'title',
                 'number_of_references',
-                'commission'
+                'commission',
+                'content',
+                'image'
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
                 $modelKeyName,
                 'title',
                 'number_of_references',
-                'commission'
+                'commission',
+                'content',
+                'image'
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -49,6 +53,10 @@ class PartnerLevelQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__number_of_references', 'number_of_references'),
                 'commission',
                 AllowedFilter::exact('exact__commission', 'commission'),
+                'content',
+                AllowedFilter::exact('exact__content', 'content'),
+                'image',
+                AllowedFilter::exact('exact__image', 'image'),
                 AllowedFilter::scope('title'),
             ]);
     }

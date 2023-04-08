@@ -3,8 +3,9 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
+use Illuminate\Validation\Rule;
 
-class PartnerLevelRequest extends AbstractRequest
+class PartnerCategoryRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -28,13 +29,9 @@ class PartnerLevelRequest extends AbstractRequest
             'title' => ['required', 'array', 'min:1'],
             'title.en' => ['required', 'string'],
             'title.*' => ['required', 'string'],
-            'number_of_references' => ['required', 'numeric', 'min:0', 'unique:partner_levels,number_of_references'],
-            'commission' => ['required', 'numeric', 'min:0'],
             'content' => ['required', 'array', 'min:1'],
-            'content.en' => ['required', 'array', 'min:1'],
-            'content.en.*' => ['required', 'string'],
-            'content.*' => ['required', 'array', 'min:1'],
-            'content.*.*' => ['required', 'string'],
+            'content.en' => ['required', 'string'],
+            'content.*' => ['required', 'string'],
         ];
     }
 }
