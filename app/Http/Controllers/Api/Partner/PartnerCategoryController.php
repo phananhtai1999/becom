@@ -7,6 +7,8 @@ use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\IndexRequest;
+use App\Http\Requests\PartnerCategoryRequest;
+use App\Http\Requests\UpdatePartnerCategoryRequest;
 use App\Http\Requests\UpdateWebsitePageCategoryRequest;
 use App\Http\Requests\WebsitePageCategoryRequest;
 use App\Http\Resources\PartnerCategoryResource;
@@ -31,8 +33,8 @@ class PartnerCategoryController extends AbstractRestAPIController
         $this->service = $service;
         $this->resourceCollectionClass = PartnerCategoryResourceCollection::class;
         $this->resourceClass = PartnerCategoryResource::class;
-        $this->storeRequest = WebsitePageCategoryRequest::class;
-        $this->editRequest = UpdateWebsitePageCategoryRequest::class;
+        $this->storeRequest = PartnerCategoryRequest::class;
+        $this->editRequest = UpdatePartnerCategoryRequest::class;
         $this->indexRequest = IndexRequest::class;
         $this->languageService = $languageService;
     }
@@ -44,7 +46,8 @@ class PartnerCategoryController extends AbstractRestAPIController
     {
         $request = app($this->storeRequest);
 
-        if (!$this->languageService->checkLanguages($request->title)) {
+        if (!$this->languageService->checkLanguages($request->title)
+            || !$this->languageService->checkLanguages($request->content)) {
             return $this->sendValidationFailedJsonResponse();
         }
 
@@ -63,7 +66,8 @@ class PartnerCategoryController extends AbstractRestAPIController
     {
         $request = app($this->editRequest);
 
-        if ($request->title && !$this->languageService->checkLanguages($request->title)) {
+        if (($request->title && !$this->languageService->checkLanguages($request->title))
+            || ($request->content && !$this->languageService->checkLanguages($request->content))) {
             return $this->sendValidationFailedJsonResponse();
         }
 

@@ -28,19 +28,22 @@ class PartnerLevel extends AbstractModel
     protected $fillable = [
         'title',
         'number_of_references',
-        'commission'
+        'commission',
+        'content',
+        'image'
     ];
 
     /**
      * @var string[]
      */
-    public $translatable = ['title'];
+    public $translatable = ['title', 'content'];
 
     /**
      * @var string[]
      */
     protected $casts = [
         'title' => 'array',
+        'content' => 'array',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'number_of_references' => 'integer',
@@ -52,6 +55,7 @@ class PartnerLevel extends AbstractModel
      */
     protected $appends = [
         'title_translate',
+        'content_translate'
     ];
 
     /**
@@ -60,5 +64,13 @@ class PartnerLevel extends AbstractModel
     public function getTitleTranslateAttribute()
     {
         return $this->title;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getContentTranslateAttribute()
+    {
+        return $this->content;
     }
 }
