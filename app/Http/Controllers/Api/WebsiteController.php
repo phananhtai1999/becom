@@ -6,9 +6,6 @@ use App\Abstracts\AbstractRestAPIController;
 use App\Http\Controllers\Traits\RestIndexMyTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
-use App\Http\Controllers\Traits\RestDestroyTrait;
-use App\Http\Controllers\Traits\RestEditTrait;
-use App\Http\Controllers\Traits\RestStoreTrait;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyWebsiteRequest;
 use App\Http\Requests\UpdateMyWebsiteRequest;
@@ -70,6 +67,8 @@ class WebsiteController extends AbstractRestAPIController
 
     /**
      * @return JsonResponse
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function store()
     {
@@ -92,6 +91,8 @@ class WebsiteController extends AbstractRestAPIController
     /**
      * @param $id
      * @return JsonResponse
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function edit($id)
     {
@@ -107,7 +108,10 @@ class WebsiteController extends AbstractRestAPIController
             return $this->sendValidationFailedJsonResponse(["errors" => ["user_uuid" => __('messages.user_uuid_not_changed')]]);
         }
 
-        $this->service->update($model, $data);
+        $this->service->update($model, array_merge($data, [
+            'user_uuid' => $request->get('user_uuid') ?? auth()->user()->getkey(),
+            'domain_uuid' => $request->get('domain_uuid') ?? null
+        ]));
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)

@@ -34,6 +34,7 @@ class MyWebsiteQueryBuilder extends AbstractQueryBuilder
                 'name',
                 'description',
                 'logo',
+                'domain_uuid'
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -43,6 +44,7 @@ class MyWebsiteQueryBuilder extends AbstractQueryBuilder
                 'name',
                 'description',
                 'logo',
+                'domain_uuid'
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -57,6 +59,8 @@ class MyWebsiteQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__description', 'description'),
                 'logo',
                 AllowedFilter::exact('exact__logo', 'logo'),
+                'domain_uuid',
+                AllowedFilter::exact('exact__domain_uuid', 'domain_uuid'),
                 'user.username',
                 AllowedFilter::exact('exact__user.username', 'user.username'),
                 'user.email',

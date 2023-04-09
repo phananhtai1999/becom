@@ -31,6 +31,7 @@ class Website extends AbstractModel
         'name',
         'description',
         'logo',
+        'domain_uuid'
     ];
 
     /**
@@ -114,5 +115,13 @@ class Website extends AbstractModel
             return $query->whereNull('domain');
         }
         return $query->whereNotNull('domain');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function domains()
+    {
+        return $this->belongsTo(Domain::class, 'domain_uuid', 'uuid');
     }
 }

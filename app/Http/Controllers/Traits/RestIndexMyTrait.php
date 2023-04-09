@@ -8,6 +8,8 @@ trait RestIndexMyTrait
 {
     /**
      * @return JsonResponse
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function indexMy()
     {

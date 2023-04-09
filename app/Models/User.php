@@ -282,4 +282,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(BusinessManagement::class, 'owner_uuid', 'uuid');
     }
+
+    /**
+     * @return HasMany
+     */
+    public function domains()
+    {
+        return $this->hasMany(Domain::class, 'owner_uuid', 'uuid');
+    }
 }

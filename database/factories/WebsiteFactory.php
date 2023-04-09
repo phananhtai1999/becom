@@ -18,6 +18,7 @@ class WebsiteFactory extends Factory {
 			'name' => $this->faker->name(),
 			'description' => $this->faker->sentence(3),
 			'logo' => $this->faker->imageUrl(100, 100, 'animals', true),
+            'domain_uuid' => null
 		];
 	}
 }

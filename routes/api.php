@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\CountryController;
 use App\Http\Controllers\Api\CreditHistoryController;
 use App\Http\Controllers\Api\CreditPackageController;
 use App\Http\Controllers\Api\CreditTransactionHistoryController;
+use App\Http\Controllers\Api\DomainController;
 use App\Http\Controllers\Api\EmailController;
 use App\Http\Controllers\Api\FooterTemplateController;
 use App\Http\Controllers\Api\FormController;
@@ -1066,5 +1067,23 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'business-management.'], fun
         Route::get('/my/business-management/{id}', [BusinessManagementController::class, 'showMyBusinessManagement'])->name('show');
         Route::put('/my/business-management/{id}', [BusinessManagementController::class, 'editMyBusinessManagement'])->name('edit');
         Route::delete('/my/business-management/{id}', [BusinessManagementController::class, 'destroyMyBusinessManagement'])->name('destroy');
+    });
+});
+
+Route::group(['middleware' => ['auth:api'], 'as' => 'domain.'], function () {
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/domains', [DomainController::class, 'index'])->name('index');
+        Route::post('/domain', [DomainController::class, 'store'])->name('store');
+        Route::get('/domain/{id}', [DomainController::class, 'show'])->name('show');
+        Route::put('/domain/{id}', [DomainController::class, 'edit'])->name('edit');
+        Route::delete('/domain/{id}', [DomainController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::group(['as' => 'my.'], function () {
+        Route::get('/my/domains', [DomainController::class, 'indexMy'])->name('index');
+        Route::post('/my/domain', [DomainController::class, 'storeMyDomain'])->name('store');
+        Route::get('/my/domain/{id}', [DomainController::class, 'showMyDomain'])->name('show');
+        Route::put('/my/domain/{id}', [DomainController::class, 'editMyDomain'])->name('edit');
+        Route::delete('/my/domain/{id}', [DomainController::class, 'destroyMyDomain'])->name('destroy');
     });
 });

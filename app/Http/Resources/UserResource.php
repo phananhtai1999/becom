@@ -65,6 +65,10 @@ class UserResource extends AbstractJsonResource
             $data['business_management'] = BusinessManagementResource::collection($this->businessManagements);
         }
 
+        if (\in_array('user__domains', $expand)) {
+            $data['domains'] = DomainResource::collection($this->domains);
+        }
+
         return $data;
     }
 }
