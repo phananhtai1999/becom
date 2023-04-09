@@ -91,4 +91,9 @@ class ArticleCategoryService extends AbstractService
             ->paginate($perPage, $columns, $pageName, $page);
     }
 
+    public function getArticleCategoriesByRootUuid($uuid)
+    {
+        return $this->findOrFailById($uuid)->getDescendantsAndSelf();
+    }
+
 }
