@@ -8,9 +8,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Team extends Model
 {
-    use HasFactory,SoftDeletes;
+    use HasFactory, SoftDeletes;
 
-
+    const LINK_INVITE = 'link';
+    const ACCOUNT_INVITE = 'account';
     /**
      * @var string
      */

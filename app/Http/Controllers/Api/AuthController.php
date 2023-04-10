@@ -13,10 +13,12 @@ use App\Http\Requests\VerifyActiveCodeRequest;
 use App\Http\Resources\UserResource;
 use App\Http\Requests\LoginRequest;
 use App\Mail\SendActiveCode;
+use App\Models\Invite;
 use App\Models\PasswordReset;
 use App\Models\PlatformPackage;
 use App\Models\User;
 use App\Services\ConfigService;
+use App\Services\InviteService;
 use App\Services\OtpService;
 use App\Services\RoleService;
 use App\Services\AuthenticationService;
@@ -24,6 +26,7 @@ use App\Services\PasswordResetService;
 use App\Services\SmtpAccountService;
 use App\Services\UserAccessTokenService;
 use App\Services\UserService;
+use App\Services\UserTeamService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -75,7 +78,9 @@ class AuthController extends AbstractRestAPIController
         UserAccessTokenService $userAccessTokenService,
         OtpService             $otpService,
         ConfigService $configService,
-        SmtpAccountService $smtpAccountService
+        SmtpAccountService $smtpAccountService,
+        InviteService $inviteService,
+        UserTeamService $userTeamService
     )
     {
         $this->userService = $userService;
@@ -86,6 +91,8 @@ class AuthController extends AbstractRestAPIController
         $this->otpService = $otpService;
         $this->configService = $configService;
         $this->smtpAccountService = $smtpAccountService;
+        $this->inviteService = $inviteService;
+        $this->userTeamService = $userTeamService;
     }
 
     /**
@@ -195,6 +202,14 @@ class AuthController extends AbstractRestAPIController
         ]));
 
         if ($user) {
+            if ($registerRequest->get('invite_uuid')) {
+                $model = $this->inviteService->findOrFailById($registerRequest->get('invite_uuid'));
+                $this->inviteService->update($model, ['status' => Invite::JOINED_STATUS]);
+                $this->userTeamService->create([
+                    'team_uuid' => $model->team_uuid,
+                    'user_uuid' => $user->uuid,
+                ]);
+            }
             $user->roles()->attach([config('user.default_role_uuid')]);
             $user->userPlatformPackage()->create(['platform_package_uuid' => PlatformPackage::DEFAULT_PLATFORM_PACKAGE_1]);
             $otpConfig = $this->configService->findOneWhereOrFail(['key' => 'otp_status']);
