@@ -12,7 +12,7 @@ class Invite extends AbstractModel
     use HasFactory, SoftDeletes;
 
     const NEW_STATUS = 'new';
-    const JOINED_STATUS = 'joined';
+    const ACTIVE_STATUS = 'active';
     /**
      * @var string
      */
