@@ -290,4 +290,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Domain::class, 'owner_uuid', 'uuid');
     }
+
+    public function userTeam()
+    {
+        return $this->hasOne(UserTeam::class, 'user_uuid', 'uuid');
+    }
 }

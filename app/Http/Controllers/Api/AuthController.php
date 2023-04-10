@@ -204,7 +204,7 @@ class AuthController extends AbstractRestAPIController
         if ($user) {
             if ($registerRequest->get('invite_uuid')) {
                 $model = $this->inviteService->findOrFailById($registerRequest->get('invite_uuid'));
-                $this->inviteService->update($model, ['status' => Invite::JOINED_STATUS]);
+                $this->inviteService->update($model, ['status' => Invite::ACTIVE_STATUS]);
                 $this->userTeamService->create([
                     'team_uuid' => $model->team_uuid,
                     'user_uuid' => $user->uuid,

@@ -26,6 +26,7 @@ use App\Services\SmtpAccountService;
 use App\Services\TeamService;
 use App\Services\UserService;
 use App\Services\UserTeamService;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 
 class TeamController extends Controller
@@ -112,6 +113,7 @@ class TeamController extends Controller
             'user_uuid' => $request->get('user_uuid'),
             'team_uuid' => $request->get('team_uuid')
         ]);
+        Cache::forget('team_permission_' . $request->get('user_uuid'));
         if (empty($model)) {
 
             return $this->sendBadRequestJsonResponse(['message' => 'This user is not in the team']);

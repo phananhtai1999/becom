@@ -44,10 +44,22 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         Gate::define('permission', function ($user, $code) {
-            if (!isset($user->userPlatformPackage->platform_package_uuid) && !isset($user->userAddOns)) {
+            if (!isset($user->userPlatformPackage->platform_package_uuid) && !isset($user->userAddOns) && !isset($user->userTeam->permission_uuids)) {
                 return false;
             }
             //check team
+            if (isset($user->userTeam->permission_uuids)) {
+                $cacheTeams = Cache::rememberForever('team_permission_' . $user->uuid, function () use ($user) {
+
+                    return Permission::whereIn('uuid', $user->userTeam->permission_uuids)->get();
+                });
+                foreach ($cacheTeams as $permission) {
+                    if (in_array($code, $permission->api_methods ?? [])) {
+                        return true;
+                    }
+                }
+            }
+            //check platform
             if (isset($user->userPlatformPackage->platform_package_uuid)) {
                 $permissions = Cache::rememberForever('platform_permission_' . $user->uuid, function () use ($user) {
                     $platformPackage = PlatformPackage::findOrFail($user->userPlatformPackage->platform_package_uuid);
@@ -59,6 +71,7 @@ class AuthServiceProvider extends ServiceProvider
                     }
                 }
             }
+            //check add-on
             if (isset($user->userAddOns)) {
                 $cacheAddOns = Cache::rememberForever('add_on_permission_' . $user->uuid, function () use ($user) {
                     $permissions = [];
