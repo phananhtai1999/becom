@@ -31,9 +31,8 @@ class PartnerLevelRequest extends AbstractRequest
             'number_of_references' => ['required', 'numeric', 'min:0', 'unique:partner_levels,number_of_references'],
             'commission' => ['required', 'numeric', 'min:0'],
             'content' => ['required', 'array', 'min:1'],
-            'content.en' => ['required', 'array', 'min:1'],
-            'content.en.*' => ['required', 'string'],
             'content.*' => ['required', 'array', 'min:1'],
+            'content.*.en' => ['required', 'string'],
             'content.*.*' => ['required', 'string'],
         ];
     }
