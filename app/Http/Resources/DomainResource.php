@@ -35,6 +35,10 @@ class DomainResource extends AbstractJsonResource
             $data['websites'] = WebsiteResource::collection($this->websites);
         }
 
+        if (\in_array('domain__business_management', $expand)) {
+            $data['business_management'] = new BusinessManagementResource($this->businessManagement);
+        }
+
         return $data;
     }
 }

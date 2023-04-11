@@ -23,6 +23,7 @@ class BusinessManagementResource extends AbstractJsonResource
             'products_services' => $this->products_services,
             'customers' => $this->customers,
             'owner_uuid' => $this->owner_uuid,
+            'domain_uuid' => $this->domain_uuid,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
@@ -34,6 +35,10 @@ class BusinessManagementResource extends AbstractJsonResource
 
         if (\in_array('business_management__business_categories', $expand)) {
             $data['business_categories'] = BusinessCategoryResource::collection($this->businessCategories);
+        }
+
+        if (\in_array('business_management__domains', $expand)) {
+            $data['domains'] = DomainResource::collection($this->domains);
         }
 
         return $data;

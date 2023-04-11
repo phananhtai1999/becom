@@ -20,4 +20,14 @@ class BusinessManagementService extends AbstractService
     {
         return $this->model->where('owner_uuid', $userUuid)->first();
     }
+
+    /**
+     * @param $business
+     * @param $domainUuid
+     * @return mixed
+     */
+    public function setDomainDefault($business, $domainUuid)
+    {
+        return $business->update(['domain_uuid' => $domainUuid]);
+    }
 }

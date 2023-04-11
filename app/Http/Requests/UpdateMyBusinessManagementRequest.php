@@ -29,13 +29,17 @@ class UpdateMyBusinessManagementRequest extends AbstractRequest
             'introduce' => ['string'],
             'products_services' => ['array'],
             'products_services.products' => ['array'],
-            'products_services.products.*' => ['string'],
+            'products_services.products.*' => ['nullable', 'string'],
             'products_services.services' => ['array'],
-            'products_services.services.*' => ['string'],
+            'products_services.services.*' => ['nullable', 'string'],
             'customers' => ['array'],
             'customers.*' => ['string'],
             'business_categories' => ['nullable', 'array', 'min:1'],
             'business_categories.*' => ['numeric', 'min:1', Rule::exists('business_categories', 'uuid')->whereNull('deleted_at')],
+            'domain_uuid' => ['nullable', 'numeric', 'min:1', Rule::exists('domains', 'uuid')->where(function ($query) {
+                return $query->where('owner_uuid', auth()->user()->getKey());
+            })->whereNull('deleted_at')],
+            'domain' => ['required', 'string']
         ];
 
         if (is_array($this->request->get('products_services'))) {

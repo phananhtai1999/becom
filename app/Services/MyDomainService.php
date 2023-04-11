@@ -34,4 +34,61 @@ class MyDomainService extends AbstractService
 
         return $this->destroy($website->getKey());
     }
+
+    /**
+     * @param $domain
+     * @return mixed
+     */
+    public function checkDomainBusinessOfCurrentUser($domain)
+    {
+        return $this->model->where([
+            ['name', $domain],
+            ['owner_uuid', auth()->user()->getkey()],
+        ]);
+    }
+
+    /**
+     * @param $domain
+     * @param $business
+     * @return mixed
+     */
+    public function checkDomainOfBusiness($domain, $business)
+    {
+        return $this->model->where([
+            ['name', $domain],
+            ['owner_uuid', null],
+            ['business_uuid', $business->uuid],
+        ])->first();
+    }
+
+
+    /**
+     * @param $domain
+     * @param $business
+     * @return mixed
+     */
+    public function updateOrCreateDomainByBusiness($domain, $business)
+    {
+        //Domain of User
+        $domainOfCurrentUser = $this->checkDomainBusinessOfCurrentUser($domain)->first();
+        if ($domainOfCurrentUser) {
+            $this->checkDomainBusinessOfCurrentUser($domain)->update(['business_uuid' => $business->uuid]);
+
+            return $domainOfCurrentUser;
+        }
+
+        //Domain of Business
+        $domainOfBusiness = $this->checkDomainOfBusiness($domain, $business);
+        if ($domainOfBusiness) {
+
+            return $domainOfBusiness;
+        }
+
+        return $this->model->create([
+            'name' => $domain,
+            'owner_uuid' => null,
+            'business_uuid' => $business->uuid,
+            'verified_at' => null
+        ]);
+    }
 }
