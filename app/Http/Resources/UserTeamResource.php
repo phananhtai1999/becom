@@ -24,8 +24,11 @@ class UserTeamResource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
-        if (\in_array('team__owner', $expand)) {
-            $data['owner'] = new UserResource($this->owner);
+        if (\in_array('user_team__team', $expand)) {
+            $data['team'] = new TeamResource($this->team);
+        }
+        if (\in_array('user_team__user', $expand)) {
+            $data['user'] = new UserResource($this->user);
         }
 
         return $data;
