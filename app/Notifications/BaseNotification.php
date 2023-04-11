@@ -334,7 +334,7 @@ class BaseNotification
             'contact_last_name' => $contact->last_name,
             'contact_phone' => $contact->phone,
             'contact_sex' => $contact->sex,
-            'contact_dob' => $contact->dob->toDateString(),
+            'contact_dob' => optional($contact->dob)->toDateString(),
             'contact_country' => $contact->country,
             'contact_city' => $contact->city,
             'website_name' => optional($campaign->website)->name,
