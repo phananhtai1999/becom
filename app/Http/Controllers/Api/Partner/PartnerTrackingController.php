@@ -69,7 +69,7 @@ class PartnerTrackingController extends AbstractRestAPIController
             }
         }
         return $this->sendOkJsonResponse()->withCookie(
-            \cookie('invitePartner', $request->get('code'), config('user.invite_partner_timeout') * 24 * 60, null, null, false, true)
+            \cookie('invitePartner', $request->get('code'), config('user.invite_partner_timeout') * 24 * 60, null, null, true, true)
         );
     }
 }
