@@ -28,7 +28,8 @@ class BusinessManagement extends AbstractModel
         'introduce',
         'products_services',
         'customers',
-        'owner_uuid'
+        'owner_uuid',
+        'domain_uuid',
     ];
 
     /**
@@ -56,5 +57,13 @@ class BusinessManagement extends AbstractModel
     public function businessCategories()
     {
         return $this->belongsToMany(BusinessCategory::class, 'management_categories', 'management_uuid', 'category_uuid')->withTimestamps();
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function domains()
+    {
+        return $this->hasMany(Domain::class, 'business_uuid', 'uuid');
     }
 }

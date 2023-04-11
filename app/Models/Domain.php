@@ -55,4 +55,12 @@ class Domain extends AbstractModel
     {
         return $this->hasMany(Website::class, 'domain_uuid', 'uuid');
     }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function businessManagement()
+    {
+        return $this->belongsTo(BusinessManagement::class, 'business_uuid', 'uuid');
+    }
 }
