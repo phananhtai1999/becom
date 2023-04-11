@@ -31,9 +31,8 @@ class UpdatePartnerLevelRequest extends AbstractRequest
             'number_of_references' => ['numeric', 'min:0', 'unique:partner_levels,number_of_references,'.$this->id .',uuid'],
             'commission' => ['numeric', 'min:0'],
             'content' => ['array', 'min:1'],
-            'content.en' => ['array', 'min:1'],
-            'content.en.*' => ['string'],
             'content.*' => ['array', 'min:1'],
+            'content.*.en' => ['string'],
             'content.*.*' => ['string'],
         ];
     }
