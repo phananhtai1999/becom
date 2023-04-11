@@ -44,7 +44,7 @@ class MyDomainService extends AbstractService
         return $this->model->where([
             ['name', $domain],
             ['owner_uuid', auth()->user()->getkey()],
-        ])->first();
+        ]);
     }
 
     /**
@@ -70,9 +70,9 @@ class MyDomainService extends AbstractService
     public function updateOrCreateDomainByBusiness($domain, $business)
     {
         //Domain of User
-        $domainOfCurrentUser = $this->checkDomainBusinessOfCurrentUser($domain);
+        $domainOfCurrentUser = $this->checkDomainBusinessOfCurrentUser($domain)->first();
         if ($domainOfCurrentUser) {
-            $domainOfCurrentUser->update(['business_uuid' => $business->uuid]);
+            $this->checkDomainBusinessOfCurrentUser($domain)->update(['business_uuid' => $business->uuid]);
 
             return $domainOfCurrentUser;
         }
