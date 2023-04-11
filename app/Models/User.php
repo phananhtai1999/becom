@@ -75,6 +75,7 @@ class User extends Authenticatable
         'avatar_img_absolute',
         'cover_img_absolute ',
         'platform_package',
+        'team',
     ];
 
     /**
@@ -225,6 +226,14 @@ class User extends Authenticatable
     public function getPlatformPackageAttribute()
     {
         return $this->userPlatformPackage->platform_package_uuid ?? null;
+    }
+
+    /**
+     * @return null
+     */
+    public function getTeamAttribute()
+    {
+        return $this->userTeam->team_uuid ?? null;
     }
 
     /**

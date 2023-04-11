@@ -39,4 +39,14 @@ class UserTeam extends Model
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
     ];
+
+    public function user()
+    {
+        return $this->hasOne(User::class, 'uuid', 'user_uuid');
+    }
+
+    public function team()
+    {
+        return $this->hasOne(Team::class, 'uuid', 'team_uuid');
+    }
 }

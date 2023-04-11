@@ -17,11 +17,14 @@ use App\Http\Requests\UpdateTeamRequest;
 use App\Http\Resources\TeamResource;
 use App\Http\Resources\TeamResourceCollection;
 use App\Http\Resources\UserTeamResource;
+use App\Http\Resources\UserTeamResourceCollection;
 use App\Mail\SendInviteToTeam;
 use App\Mail\SendInviteToTeamByAccount;
 use App\Models\Invite;
+use App\Models\PlatformPackage;
 use App\Models\Team;
 use App\Services\InviteService;
+use App\Services\PermissionService;
 use App\Services\SmtpAccountService;
 use App\Services\TeamService;
 use App\Services\UserService;
@@ -38,7 +41,8 @@ class TeamController extends Controller
         UserTeamService    $userTeamService,
         SmtpAccountService $smtpAccountService,
         UserService        $userService,
-        InviteService      $inviteService
+        InviteService      $inviteService,
+        PermissionService $permissionService
     )
     {
         $this->service = $service;
@@ -46,8 +50,10 @@ class TeamController extends Controller
         $this->userTeamService = $userTeamService;
         $this->userService = $userService;
         $this->inviteService = $inviteService;
+        $this->permissionService = $permissionService;
         $this->resourceCollectionClass = TeamResourceCollection::class;
         $this->userTeamResourceClass = UserTeamResource::class;
+        $this->userTeamResourceCollectionClass = UserTeamResourceCollection::class;
         $this->resourceClass = TeamResource::class;
         $this->storeRequest = TeamRequest::class;
         $this->editRequest = UpdateTeamRequest::class;
@@ -128,10 +134,17 @@ class TeamController extends Controller
     }
 
     public function listMember($id){
-        $model = $this->userTeamService->findOrFailById($id);
+        $model = $this->userTeamService->findAllWhere(['team_uuid' => $id]);
 
         return $this->sendCreatedJsonResponse(
-            $this->service->resourceToData($this->userTeamResourceClass, $model)
+            $this->service->resourceToData($this->userTeamResourceCollectionClass, $model)
         );
+    }
+
+    public function permissionOfTeams($id) {
+        $team = $this->service->findOrFailById($id);
+        $permisions = $this->permissionService->getPermissionOfTeam($team->owner);
+
+        return $this->sendOkJsonResponse(['data' => $permisions]);
     }
 }
