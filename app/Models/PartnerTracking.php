@@ -17,6 +17,7 @@ class PartnerTracking extends AbstractModel
     protected $fillable = [
         'ip',
         'partner_uuid',
+        'country'
     ];
 
     protected $casts = [

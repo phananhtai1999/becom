@@ -26,7 +26,8 @@ class PartnerTrackingRequest extends AbstractRequest
     {
         return [
             'partner_uuid' => ['required', Rule::exists('partners','uuid')->whereNull('deleted_at')],
-            'ip' => ['required', 'string']
+            'ip' => ['required', 'string'],
+            'country' => ['required', 'string'],
         ];
     }
 }

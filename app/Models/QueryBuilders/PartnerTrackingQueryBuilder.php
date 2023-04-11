@@ -34,18 +34,22 @@ class PartnerTrackingQueryBuilder extends AbstractQueryBuilder
                 $modelKeyName,
                 'ip',
                 'partner_uuid',
+                'country'
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
                 $modelKeyName,
                 'ip',
                 'partner_uuid',
+                'country'
             ])
             ->allowedFilters([
                 $modelKeyName,
                 AllowedFilter::exact('exact__' . $modelKeyName, $modelKeyName),
                 'ip',
                 AllowedFilter::exact('exact__ip', 'ip'),
+                'country',
+                AllowedFilter::exact('exact__country', 'country'),
                 'partner_uuid',
                 AllowedFilter::exact('exact__partner_uuid', 'partner_uuid'),
                 'created_at',

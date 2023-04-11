@@ -1053,6 +1053,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'partner-tracking.'], functi
         Route::delete('/partner-tracking/{id}', [PartnerTrackingController::class, 'destroy'])->name('destroy');
     });
 });
+Route::get('tracking-invite-partner', [PartnerTrackingController::class, 'trackingInvitePartner']);
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'business-management.'], function () {
     Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {

@@ -23,7 +23,7 @@ class PartnerResource extends AbstractJsonResource
             'last_name' => $this->last_name,
             'full_name' => $this->full_name,
             'company_name' => $this->company_name,
-            'work_email' => $this->work_email,
+            'partner_email' => $this->partner_email,
             'phone_number' => $this->phone_number,
             'user_uuid' => $this->user_uuid,
             'partner_category_uuid' => $this->partner_category_uuid,

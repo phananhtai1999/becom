@@ -27,7 +27,7 @@ class PartnerRequest extends AbstractRequest
         $validate = [
             'first_name' => ['required', 'string', "regex:/^[^(\|\]~`!@#$%^&*+=\-_{}\\\;:\"'?><,.\/’)\[]*$/"],
             'last_name' => ['required', 'string', "regex:/^[^(\|\]~`!@#$%^&*+=\-_{}\\\;:\"'?><,.\/’)\[]*$/"],
-            'work_email' => ['required', 'string', 'email:rfc,dns', Rule::unique('partners')->whereNull('deleted_at')],
+            'partner_email' => ['required', 'string', Rule::unique('partners')->whereNull('deleted_at')],
             'company_name' => ['nullable', 'string'],
             'phone_number' => ['required', 'numeric'],
             'partner_category_uuid' => ['required', 'numeric', Rule::exists('partner_categories', 'uuid')->whereNull('deleted_at')],
@@ -35,8 +35,14 @@ class PartnerRequest extends AbstractRequest
         ];
 
         if (!$this->request->get('user_uuid')) {
-            $validate['work_email'][] = Rule::unique('users', 'email')->where(function ($query) {
-                $query->where('email', $this->request->get('work_email'));
+            $validate['partner_email'][] = 'email:rfc,dns';
+            $validate['partner_email'][] = Rule::unique('users', 'email')->where(function ($query) {
+                $query->where('email', $this->request->get('partner_email'));
+            });
+        }else{
+            $validate['partner_email'][] = Rule::exists('users', 'email')->where(function ($query) {
+                $query->where('email', $this->request->get('partner_email'))
+                ->where('uuid', $this->request->get('user_uuid'));
             });
         }
 

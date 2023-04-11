@@ -262,4 +262,18 @@ class UserService extends AbstractService
 
         return $users;
     }
+
+    public function getMinCodeByNumberOfUser()
+    {
+        $min = $power = 6;
+        $lastUser = ($this->model->orderBy('uuid', 'DESC')->first())->uuid;
+        $nextPower = pow(10, $power + 1);
+        while ($lastUser >= $nextPower) {
+            $min++;
+            $power++;
+            $nextPower = pow(10, $power + 1);
+        }
+
+        return $min;
+    }
 }

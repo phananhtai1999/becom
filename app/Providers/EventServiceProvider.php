@@ -7,6 +7,7 @@ use App\Events\ActivityHistoryEvent;
 use App\Events\ActivityHistoryOfSendByCampaignEvent;
 use App\Events\PaymentCreditPackageSuccessEvent;
 use App\Events\PaymentSuccessfullyEvent;
+use App\Events\SendAccountForNewPartnerEvent;
 use App\Events\SendByBirthdayCampaignEvent;
 use App\Events\SendByCampaignRootScenarioEvent;
 use App\Events\SendByCampaignEvent;
@@ -24,6 +25,7 @@ use App\Listeners\ActivityHistoryListener;
 use App\Listeners\ActivityHistoryOfSendByCampaignListener;
 use App\Listeners\PaymentCreditPackageSuccessListener;
 use App\Listeners\PaymentSuccessfullyListener;
+use App\Listeners\SendAccountForNewPartnerListener;
 use App\Listeners\SendByBirthdayCampaignListener;
 use App\Listeners\SendByCampaignRootScenarioListener;
 use App\Listeners\SendByCampaignListener;
@@ -118,6 +120,9 @@ class EventServiceProvider extends ServiceProvider
         UpdateContactByStatusEvent::class => [
             UpdateContactByStatusListener::class
         ],
+        SendAccountForNewPartnerEvent::class => [
+            SendAccountForNewPartnerListener::class
+        ]
     ];
 
     /**
