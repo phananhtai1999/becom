@@ -143,7 +143,7 @@ abstract class AbstractService
      * @param $where
      * @return mixed
      */
-    public function findAllWhere($where)
+    public function findAllWhere($where = null)
     {
         return $this->model->where($where)->get();
     }

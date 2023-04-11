@@ -12,10 +12,11 @@ use App\Http\Resources\NotificationResource;
 use App\Http\Resources\NotificationResourceCollection;
 use App\Services\MyNotificationService;
 use App\Services\NotificationService;
+use Illuminate\Http\JsonResponse;
 
 class NotificationController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestDestroyTrait, RestIndexMyTrait;
+    use  RestDestroyTrait;
     /**
      * @var
      */
@@ -35,6 +36,40 @@ class NotificationController extends AbstractRestAPIController
         $this->resourceCollectionClass = NotificationResourceCollection::class;
         $this->resourceClass = NotificationResource::class;
         $this->indexRequest = IndexRequest::class;
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function index()
+    {
+        app($this->indexRequest);
+
+        $models = $this->service->getCollectionWithPagination();
+        $statistical = $this->service->statisticalNotification();
+
+        $data = $this->service->resourceCollectionToData($this->resourceCollectionClass, $models);
+        $data['meta']['total_notifications'] = $statistical->total;
+        $data['meta']['total_read'] = $statistical->total_read;
+        $data['meta']['total_not_read'] = $statistical->total_not_read;
+
+        return $this->sendOkJsonResponse($data);
+    }
+
+    public function indexMy()
+    {
+        app($this->indexRequest);
+
+        $models = $this->myService->getCollectionWithPagination();
+        $statistical = $this->service->statisticalNotification(["user_uuid" => auth()->user()->getKey()]);
+
+        $data = $this->myService->resourceCollectionToData($this->resourceCollectionClass, $models);
+        $data['meta']['total_notifications'] = $statistical->total;
+        $data['meta']['total_read'] = $statistical->total_read;
+        $data['meta']['total_not_read'] = $statistical->total_not_read;
+
+        return $this->sendOkJsonResponse($data);
+
     }
 
     /**
