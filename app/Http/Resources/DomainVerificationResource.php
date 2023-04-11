@@ -3,18 +3,12 @@
 namespace App\Http\Resources;
 
 use App\Abstracts\AbstractJsonResource;
-use Illuminate\Http\Request;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 
 class DomainVerificationResource extends AbstractJsonResource
 {
-
     /**
-     * @param Request $request
+     * @param $request
      * @return array
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
      */
     public function toArray($request)
     {
