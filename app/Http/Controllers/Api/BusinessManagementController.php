@@ -116,7 +116,6 @@ class BusinessManagementController extends AbstractRestAPIController
         //Set Domain Default for Business
         if ($domain->verified_at) {
             $this->service->setDomainDefault($model, $domain->uuid);
-//            $this->domainService->setVerifiedDomainForBusiness($model, $domain);
         }
 
         return $this->sendOkJsonResponse(
@@ -199,7 +198,6 @@ class BusinessManagementController extends AbstractRestAPIController
         //Set Domain Default for Business
         if ($domain->verified_at) {
             $this->service->setDomainDefault($model, $domain->uuid);
-//            $this->domainService->setVerifiedDomainForBusiness($model, $domain);
         }
 
         return $this->sendOkJsonResponse(
