@@ -25,11 +25,20 @@ class ChangeStatusPartnerRequest extends AbstractRequest
      */
     public function rules()
     {
-        return [
+        $validate =  [
             'partner_uuid' => ['required', Rule::exists('partners','uuid')->whereNull('deleted_at')],
+            'user_uuid' => [Rule::exists('partners', 'user_uuid')->where(function ($query) {
+                $query->where('uuid', $this->request->get('partner_uuid'));
+            })],
             'publish_status' => ['required', 'in:active,block,pending', Rule::unique('partners','publish_status')->where(function ($query) {
                 $query->where('uuid', $this->request->get('partner_uuid'));
-            })]
+            })],
         ];
+
+        if ($this->request->get('publish_status') === 'active') {
+            $validate['partner_role'] = ['required_if:user_uuid,null', 'numeric','not_in:'.config('user.default_admin_role_uuid'),Rule::exists('roles', 'uuid')->whereNull('deleted_at')];
+        }
+
+        return $validate;
     }
 }

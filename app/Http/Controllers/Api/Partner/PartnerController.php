@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api\Partner;
 
 use App\Abstracts\AbstractRestAPIController;
+use App\Events\SendAccountForNewPartnerEvent;
+use App\Events\SendEmailRecoveryPasswordEvent;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestEditTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
@@ -14,10 +16,18 @@ use App\Http\Requests\RegisterPartnerRequest;
 use App\Http\Requests\UpdatePartnerRequest;
 use App\Http\Resources\PartnerResource;
 use App\Http\Resources\PartnerResourceCollection;
+use App\Mail\SendAccountForNewPartner;
 use App\Models\Partner;
+use App\Models\User;
 use App\Services\PartnerLevelService;
 use App\Services\PartnerService;
+use App\Services\PartnerUserService;
+use App\Services\SmtpAccountService;
+use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class PartnerController extends AbstractRestAPIController
 {
@@ -25,9 +35,18 @@ class PartnerController extends AbstractRestAPIController
 
     protected $partnerLevelService;
 
+    protected $userService;
+
+    protected $smtpAccountService;
+
+    protected $partnerUserService;
+
     public function __construct(
         PartnerService $service,
-        PartnerLevelService $partnerLevelService
+        PartnerLevelService $partnerLevelService,
+        UserService $userService,
+        SmtpAccountService $smtpAccountService,
+        PartnerUserService $partnerUserService
     )
     {
         $this->service = $service;
@@ -37,6 +56,9 @@ class PartnerController extends AbstractRestAPIController
         $this->editRequest = UpdatePartnerRequest::class;
         $this->indexRequest = IndexRequest::class;
         $this->partnerLevelService = $partnerLevelService;
+        $this->userService = $userService;
+        $this->smtpAccountService = $smtpAccountService;
+        $this->partnerUserService = $partnerUserService;
     }
 
     public function store()
@@ -81,9 +103,47 @@ class PartnerController extends AbstractRestAPIController
     public function changeStatusPartner(ChangeStatusPartnerRequest $request)
     {
         $model = $this->service->findOrFailById($request->get('partner_uuid'));
+        $code = $model->code;
+        $userUuid = $model->user_uuid;
+        if (!$model->code && $request->get('publish_status') === 'active') {
+            //Random code partner
+            $minCode = $this->userService->getMinCodeByNumberOfUser();
+            do {
+                $code = $this->generateRandomString($minCode);
+                $modelCode = $this->service->findOneWhere(['code' => $code]);
+            } while ($modelCode !== null);
+
+            //Tạo User khi partner chưa có tài khoản hệ thống
+            if (!$model->user_uuid) {
+                $password = $this->generateRandomString(6);
+                $newUser = $this->userService->create([
+                    'email' => $model->partner_email,
+                    'username' => $model->partner_email,
+                    'can_add_smtp_account' => 0,
+                    'password' => Hash::make($password)
+                ]);
+                $newUser->roles()->attach($request->get('partner_role'));
+                $userUuid = $newUser->uuid;
+                Event::dispatch(new SendAccountForNewPartnerEvent($newUser));
+            }
+            //Kiểm tra partner_user nếu có thì update, k có thì create
+            $partnerUser = $this->partnerUserService->findOneWhere(['user_uuid' => $userUuid]);
+            if ($partnerUser) {
+                $this->partnerUserService->update($partnerUser, [
+                   'partner_code' => $code
+                ]);
+            }else {
+                $this->partnerUserService->create([
+                    'user_uuid' => $userUuid,
+                    'partner_code' => $code
+                ]);
+            }
+        }
 
         $this->service->update($model, [
-           'publish_status' => $request->get('publish_status')
+            'publish_status' => $request->get('publish_status'),
+            'code' => $code,
+            'user_uuid' => $userUuid
         ]);
 
         return $this->sendOkJsonResponse();

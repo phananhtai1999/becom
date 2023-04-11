@@ -70,6 +70,14 @@ class UserResource extends AbstractJsonResource
             $data['domains'] = DomainResource::collection($this->domains);
         }
 
+        if (\in_array('user__domains', $expand)) {
+            $data['domains'] = DomainResource::collection($this->domains);
+        }
+
+        if (\in_array('user__partner_user', $expand)) {
+            $data['partner_user'] = new PartnerUserResource($this->partnerUser);
+        }
+
         return $data;
     }
 }

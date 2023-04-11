@@ -20,6 +20,8 @@ use App\Models\User;
 use App\Services\ConfigService;
 use App\Services\InviteService;
 use App\Services\OtpService;
+use App\Services\PartnerService;
+use App\Services\PartnerUserService;
 use App\Services\RoleService;
 use App\Services\AuthenticationService;
 use App\Services\PasswordResetService;
@@ -31,6 +33,7 @@ use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -63,6 +66,10 @@ class AuthController extends AbstractRestAPIController
      */
     private $userAccessTokenService;
 
+    private $partnerService;
+
+    private $partnerUserService;
+
     /**
      * @param UserService $userService
      * @param AuthenticationService $authenticationService
@@ -80,7 +87,9 @@ class AuthController extends AbstractRestAPIController
         ConfigService $configService,
         SmtpAccountService $smtpAccountService,
         InviteService $inviteService,
-        UserTeamService $userTeamService
+        UserTeamService $userTeamService,
+        PartnerService $partnerService,
+        PartnerUserService $partnerUserService
     )
     {
         $this->userService = $userService;
@@ -93,6 +102,8 @@ class AuthController extends AbstractRestAPIController
         $this->smtpAccountService = $smtpAccountService;
         $this->inviteService = $inviteService;
         $this->userTeamService = $userTeamService;
+        $this->partnerService = $partnerService;
+        $this->partnerUserService = $partnerUserService;
     }
 
     /**
@@ -208,6 +219,12 @@ class AuthController extends AbstractRestAPIController
                 $this->userTeamService->create([
                     'team_uuid' => $model->team_uuid,
                     'user_uuid' => $user->uuid,
+                ]);
+            }
+            if (Cookie::has('invitePartner')) {
+                $this->partnerUserService->create([
+                    'user_uuid' => $user->uuid,
+                    'registered_from_partner_code' => Cookie::get('invitePartner')
                 ]);
             }
             $user->roles()->attach([config('user.default_role_uuid')]);
@@ -405,10 +422,10 @@ class AuthController extends AbstractRestAPIController
             'message' => $message
         ], $userData))
             ->withCookie(
-                \cookie('accessToken', $userData['data']['token'], config('auth.password_timeout'), null, null, true, true)
+                \cookie('accessToken', $userData['data']['token'], config('auth.password_timeout'), null, null, false, true)
             )->withCookie(
-                \cookie('logged', true, config('auth.password_timeout'), null, null, true, false)
-            );
+                \cookie('logged', true, config('auth.password_timeout'), null, null, false, false)
+            )->withoutCookie('invitePartner');
     }
 }
 

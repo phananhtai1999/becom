@@ -304,4 +304,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(UserTeam::class, 'user_uuid', 'uuid');
     }
+
+    public function partnerUser()
+    {
+        return $this->hasOne(PartnerUser::class, 'user_uuid', 'uuid');
+    }
 }
