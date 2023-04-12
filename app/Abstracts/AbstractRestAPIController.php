@@ -167,4 +167,17 @@ class AbstractRestAPIController extends BaseController
         $permittedChars = '0123456789abcdefghijklmnopqrstuvwxyz';
         return substr(str_shuffle($permittedChars), 0, $length);
     }
+
+    /**
+     * @param $teamId
+     * @return bool
+     */
+    public function checkTeamOwner($teamId) {
+        if ($this->service->findOneById($teamId)->owner_uuid != auth()->user()->getKey()) {
+
+            return false;
+        }
+
+        return true;
+    }
 }

@@ -17,6 +17,7 @@ use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Services\ContactListService;
 use App\Services\ContactService;
 use App\Services\MyContactListService;
+use App\Services\UserService;
 use App\Services\UserTeamService;
 use Illuminate\Http\JsonResponse;
 
@@ -43,13 +44,15 @@ class ContactListController extends AbstractRestAPIController
         ContactListService   $service,
         MyContactListService $myService,
         ContactService       $contactService,
-        UserTeamService $userTeamService
+        UserTeamService $userTeamService,
+        UserService $userService
     )
     {
         $this->service = $service;
         $this->myService = $myService;
         $this->contactService = $contactService;
         $this->userTeamService = $userTeamService;
+        $this->userService = $userService;
         $this->resourceCollectionClass = ContactListResourceCollection::class;
         $this->resourceClass = ContactListResource::class;
         $this->storeRequest = ContactListRequest::class;
@@ -220,6 +223,10 @@ class ContactListController extends AbstractRestAPIController
                     $model = $this->service->create(array_merge($request->all(), [
                         'user_uuid' => $userUuid,
                     ]));
+                    if ($userUuid != auth()->user()->getKey()) {
+                        $user = $this->userService->findOrFailById(auth()->user()->getKey());
+                        $user->userTeamContactLists()->sync($model->uuid);
+                    }
                     $model->contacts()->attach(array_merge($request->get('contact', []), $import['data']));
                     if ($import['have_error_data'] === true) {
 
@@ -248,6 +255,10 @@ class ContactListController extends AbstractRestAPIController
             'user_uuid' => $userUuid,
         ]));
         $model->contacts()->attach($request->get('contact', []));
+        if ($userUuid != auth()->user()->getKey()) {
+            $user = $this->userService->findOrFailById(auth()->user()->getKey());
+            $user->userTeamContactLists()->sync($model->uuid);
+        }
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)

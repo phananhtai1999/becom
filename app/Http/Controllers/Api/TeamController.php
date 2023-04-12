@@ -35,6 +35,7 @@ use App\Services\TeamService;
 use App\Services\UserContactListService;
 use App\Services\UserService;
 use App\Services\UserTeamService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 
@@ -121,9 +122,9 @@ class TeamController extends Controller
 
     public function setPermissionForTeam(SetPermissionForTeamRequest $request)
     {
-        if ($this->service->findOneById($request->get('team_uuid'))->owner_uuid != auth()->user()->getKey()) {
+        if (!$this->checkTeamOwner($request->get('team_uuid'))) {
 
-            return $this->sendBadRequestJsonResponse(['message' => 'You are not owner of team to set permission']);
+            return $this->sendJsonResponse(false, 'You are not owner of team to set permission', [], 403);
         }
         $model = $this->userTeamService->findOneWhere([
             'user_uuid' => $request->get('user_uuid'),
@@ -143,12 +144,17 @@ class TeamController extends Controller
         );
     }
 
+    /**
+     * @param SetContactListRequest $request
+     * @return JsonResponse
+     */
     public function setContactList(SetContactListRequest $request)
     {
-        if ($this->service->findOneById($request->get('team_uuid'))->owner_uuid != auth()->user()->getKey()) {
+        if (!$this->checkTeamOwner($request->get('team_uuid'))) {
 
-            return $this->sendBadRequestJsonResponse(['message' => 'You are not owner of team to set permission']);
+            return $this->sendJsonResponse(false, 'You are not owner of team to set permission', [], 403);
         }
+
         $user = $this->userService->findOrFailById($request->get('user_uuid'));
         $model = $this->userTeamService->findOneWhere([
             'user_uuid' => $request->get('user_uuid'),
@@ -165,6 +171,10 @@ class TeamController extends Controller
         );
     }
 
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
     public function listMember($id){
         $model = $this->userTeamService->findAllWhere(['team_uuid' => $id]);
 
@@ -173,14 +183,30 @@ class TeamController extends Controller
         );
     }
 
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
     public function permissionOfTeams($id) {
+        if (!$this->checkTeamOwner($id)) {
+
+            return $this->sendJsonResponse(false, 'You are not owner of team to set permission', [], 403);
+        }
         $team = $this->service->findOrFailById($id);
         $permisions = $this->permissionService->getPermissionOfTeam($team->owner);
 
         return $this->sendOkJsonResponse(['data' => $permisions]);
     }
 
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
     public function contactListOfTeams($id) {
+        if (!$this->checkTeamOwner($id)) {
+
+            return $this->sendJsonResponse(false, 'You are not owner of team to set permission', [], 403);
+        }
         $team = $this->service->findOrFailById($id);
         $contactLists = $this->contactListService->findAllWhere(['user_uuid' => $team->owner->uuid]);
 
