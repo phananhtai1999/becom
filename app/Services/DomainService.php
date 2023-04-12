@@ -87,4 +87,13 @@ class DomainService extends AbstractService
             'owner_uuid' => auth()->user()->getkey()
         ]);
     }
+
+    /**
+     * @param $domainUuid
+     * @return mixed
+     */
+    public function findDomainByUuid($domainUuid)
+    {
+        return $this->findOneById($domainUuid);
+    }
 }

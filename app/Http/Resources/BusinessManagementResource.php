@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Abstracts\AbstractJsonResource;
+use App\Services\DomainService;
 
 class BusinessManagementResource extends AbstractJsonResource
 {
@@ -39,6 +40,10 @@ class BusinessManagementResource extends AbstractJsonResource
 
         if (\in_array('business_management__domains', $expand)) {
             $data['domains'] = DomainResource::collection($this->domains);
+        }
+
+        if (\in_array('business_management__domain_default', $expand)) {
+            $data['domain_default'] = app(DomainService::class)->findDomainByUuid($this->domain_uuid);
         }
 
         return $data;
