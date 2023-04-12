@@ -39,7 +39,7 @@ class MyBusinessManagementRequest extends AbstractRequest
             'domain_uuid' => ['nullable', 'numeric', 'min:1', Rule::exists('domains', 'uuid')->where(function ($query) {
                 return $query->where('owner_uuid', auth()->user()->getKey());
             })->whereNull('deleted_at')],
-            'domain' => ['required', 'string']
+            'domain' => ['required', 'string', 'regex:/^(?:[-A-Za-z0-9]+\.)+[A-Za-z]{2,6}$/']
         ];
 
         if (is_array($this->request->get('products_services'))) {
