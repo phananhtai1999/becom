@@ -21,6 +21,7 @@ use App\Models\Partner;
 use App\Models\User;
 use App\Services\PartnerLevelService;
 use App\Services\PartnerService;
+use App\Services\PartnerTrackingService;
 use App\Services\PartnerUserService;
 use App\Services\SmtpAccountService;
 use App\Services\UserService;
@@ -41,12 +42,15 @@ class PartnerController extends AbstractRestAPIController
 
     protected $partnerUserService;
 
+    protected $partnerTrackingService;
+
     public function __construct(
         PartnerService $service,
         PartnerLevelService $partnerLevelService,
         UserService $userService,
         SmtpAccountService $smtpAccountService,
-        PartnerUserService $partnerUserService
+        PartnerUserService $partnerUserService,
+        PartnerTrackingService $partnerTrackingService
     )
     {
         $this->service = $service;
@@ -59,6 +63,7 @@ class PartnerController extends AbstractRestAPIController
         $this->userService = $userService;
         $this->smtpAccountService = $smtpAccountService;
         $this->partnerUserService = $partnerUserService;
+        $this->partnerTrackingService = $partnerTrackingService;
     }
 
     public function store()
@@ -147,5 +152,20 @@ class PartnerController extends AbstractRestAPIController
         ]);
 
         return $this->sendOkJsonResponse();
+    }
+
+    public function partnerDashboard()
+    {
+        $partner = $this->service->findOneWhereOrFail(['user_uuid' => auth()->user()->getKey()]);
+        $referrals = $this->partnerUserService->findAllWhere(['registered_from_partner_code' => $partner->code])->count();
+        $clicks = $this->partnerTrackingService->findAllWhere(['partner_uuid' => $partner->uuid])->count();
+        $customers = $this->partnerUserService->customersPartner($partner->code)->count();
+
+        return $this->sendOkJsonResponse(["data" => [
+            "referrals" => $referrals,
+            "clicks" => $clicks,
+            "customers" => $customers,
+            "unpaid_earnings" => 0, //Tạm thời cho = 0
+        ]]);
     }
 }
