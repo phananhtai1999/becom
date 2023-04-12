@@ -14,7 +14,9 @@ use App\Http\Resources\BusinessManagementResourceCollection;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Services\BusinessManagementService;
+use App\Services\DomainService;
 use App\Services\MyBusinessManagementService;
+use App\Services\MyDomainService;
 
 class BusinessManagementController extends AbstractRestAPIController
 {
@@ -26,16 +28,32 @@ class BusinessManagementController extends AbstractRestAPIController
     protected $myService;
 
     /**
+     * @var DomainService
+     */
+    protected $domainService;
+
+    /**
+     * @var MyDomainService
+     */
+    protected $myDomainService;
+
+    /**
      * @param BusinessManagementService $service
      * @param MyBusinessManagementService $myService
+     * @param DomainService $domainService
+     * @param MyDomainService $myDomainService
      */
     public function __construct(
         BusinessManagementService   $service,
-        MyBusinessManagementService $myService
+        MyBusinessManagementService $myService,
+        DomainService $domainService,
+        MyDomainService $myDomainService
     )
     {
         $this->service = $service;
         $this->myService = $myService;
+        $this->domainService = $domainService;
+        $this->myDomainService = $myDomainService;
         $this->resourceCollectionClass = BusinessManagementResourceCollection::class;
         $this->resourceClass = BusinessManagementResource::class;
         $this->storeRequest = BusinessManagementRequest::class;
@@ -60,6 +78,12 @@ class BusinessManagementController extends AbstractRestAPIController
         $model = $this->service->create(array_merge($request->all(), [
             'owner_uuid' => $request->get('owner_uuid') ?? auth()->user()->getKey(),
         ]));
+
+        //check Domain Business Of User Exists Or Not
+        $domain = $this->domainService->updateOrCreateDomainByBusiness($request->domain, $model);
+        //Set Domain Default for Business
+        $this->service->setDomainDefault($model, $domain->uuid);
+
         $model->businessCategories()->attach($request->get('business_categories', []));
 
         return $this->sendCreatedJsonResponse(
@@ -86,6 +110,13 @@ class BusinessManagementController extends AbstractRestAPIController
         }
         $this->service->update($model, $request->all());
         $model->businessCategories()->sync($request->business_categories ?? $model->business_categories);
+
+        //check Domain Business Of User Exists Or Not
+        $domain = $this->domainService->updateOrCreateDomainByBusiness($request->domain, $model);
+        //Set Domain Default for Business
+        if ($domain->verified_at) {
+            $this->service->setDomainDefault($model, $domain->uuid);
+        }
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -122,6 +153,12 @@ class BusinessManagementController extends AbstractRestAPIController
         $model = $this->service->create(array_merge($request->all(), [
             'owner_uuid' => auth()->user()->getkey(),
         ]));
+
+        //check Domain Business Of User Exists Or Not
+        $domain = $this->myDomainService->updateOrCreateDomainByBusiness($request->domain, $model);
+        //Set Domain Default for Business
+        $this->service->setDomainDefault($model, $domain->uuid);
+
         $model->businessCategories()->attach($request->get('business_categories', []));
 
         return $this->sendCreatedJsonResponse(
@@ -155,6 +192,13 @@ class BusinessManagementController extends AbstractRestAPIController
             'owner_uuid' => auth()->user()->getkey(),
         ]));
         $model->businessCategories()->sync($request->business_categories ?? $model->business_categories);
+
+        //check Domain Business Of User Exists Or Not
+        $domain = $this->myDomainService->updateOrCreateDomainByBusiness($request->domain, $model);
+        //Set Domain Default for Business
+        if ($domain->verified_at) {
+            $this->service->setDomainDefault($model, $domain->uuid);
+        }
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)

@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use App\Abstracts\AbstractJsonResource;
 
-class PartnerTrackingResource extends AbstractJsonResource
+class PartnerUserResource extends AbstractJsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,21 +14,13 @@ class PartnerTrackingResource extends AbstractJsonResource
      */
     public function toArray($request)
     {
-        $expand = request()->get('expand', []);
-
-        $data = [
+        return [
             'uuid' => $this->getKey(),
-            'partner_uuid' => $this->partner_uuid,
-            'ip' => $this->ip,
-            'country' => $this->country,
+            'user_uuid' => $this->user_uuid,
+            'partner_code' => $this->partner_code,
+            'registered_from_partner_code' => $this->registered_from_partner_code,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
         ];
-
-        if (\in_array('partner_tracking__partner', $expand)) {
-            $data['partner'] = new PartnerResource($this->partner);
-        }
-
-        return $data;
     }
 }

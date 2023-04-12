@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\CreditHistoryController;
 use App\Http\Controllers\Api\CreditPackageController;
 use App\Http\Controllers\Api\CreditTransactionHistoryController;
 use App\Http\Controllers\Api\DomainController;
+use App\Http\Controllers\Api\DomainVerificationController;
 use App\Http\Controllers\Api\EmailController;
 use App\Http\Controllers\Api\FooterTemplateController;
 use App\Http\Controllers\Api\FormController;
@@ -1055,6 +1056,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'partner-tracking.'], functi
         Route::delete('/partner-tracking/{id}', [PartnerTrackingController::class, 'destroy'])->name('destroy');
     });
 });
+Route::get('tracking-invite-partner', [PartnerTrackingController::class, 'trackingInvitePartner']);
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'business-management.'], function () {
     Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
@@ -1089,5 +1091,18 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'domain.'], function () {
         Route::get('/my/domain/{id}', [DomainController::class, 'showMyDomain'])->name('show');
         Route::put('/my/domain/{id}', [DomainController::class, 'editMyDomain'])->name('edit');
         Route::delete('/my/domain/{id}', [DomainController::class, 'destroyMyDomain'])->name('destroy');
+    });
+});
+
+//DomainVerification
+Route::group(['middleware' => ['auth:api'], 'as' => 'domain-verification.'], function () {
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/domain-verifications', [DomainVerificationController::class, 'index'])->name('index');
+        Route::get('/domain-verification/{id}', [DomainVerificationController::class, 'show'])->name('show');
+        Route::delete('/domain-verification/{id}', [DomainVerificationController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::group(['as' => 'my.'], function () {
+        Route::get('/my/domain-verifications', [DomainVerificationController::class, 'indexMy'])->name('index');
     });
 });

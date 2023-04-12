@@ -13,9 +13,12 @@ class AddColumnsInPartnersTable extends Migration
      */
     public function up()
     {
-        Schema::table('partners', function (Blueprint $table) {
-            $table->dropColumn('publish_status');
-        });
+        if (Schema::hasColumn('partners', 'publish_status'))
+        {
+            Schema::table('partners', function (Blueprint $table) {
+                $table->dropColumn('publish_status');
+            });
+        }
         Schema::table('partners', function (Blueprint $table) {
             $table->unsignedBigInteger('user_uuid')->nullable()->after('work_email');
             $table->unsignedBigInteger('partner_level_uuid')->nullable()->after('partner_category_uuid');

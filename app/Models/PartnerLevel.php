@@ -36,7 +36,7 @@ class PartnerLevel extends AbstractModel
     /**
      * @var string[]
      */
-    public $translatable = ['title', 'content'];
+    public $translatable = ['title'];
 
     /**
      * @var string[]
@@ -71,6 +71,20 @@ class PartnerLevel extends AbstractModel
      */
     public function getContentTranslateAttribute()
     {
-        return $this->content;
+        $language = app()->getLocale();
+        $langDefault = config('app.fallback_locale');
+        $contents = $this->content;
+        if ($contents) {
+            $result = [];
+            foreach ($contents as $content) {
+                foreach ($content as $lang => $value) {
+                    $result[$lang][] = $value;
+                }
+            }
+            return array_key_exists($language, $result) ? $result[$language] : $result[$langDefault];
+        }
+
+        return null;
+
     }
 }

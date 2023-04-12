@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use App\Abstracts\AbstractRequest;
 use Illuminate\Validation\Rule;
 
-class PartnerTrackingRequest extends AbstractRequest
+class DomainVerificationRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,9 +25,7 @@ class PartnerTrackingRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'partner_uuid' => ['required', Rule::exists('partners','uuid')->whereNull('deleted_at')],
-            'ip' => ['required', 'string'],
-            'country' => ['required', 'string'],
+            'domain' => ['required', 'string','regex:/^(?:[-A-Za-z0-9]+\.)+[A-Za-z]{2,6}$/', Rule::exists('domains', 'name')->whereNull('deleted_at')]
         ];
     }
 }

@@ -44,11 +44,6 @@ class PartnerLevelController extends AbstractRestAPIController
     {
         $request = app($this->storeRequest);
 
-        if (!$this->languageService->checkLanguages($request->title)
-            || !$this->languageService->checkLanguages($request->content)) {
-            return $this->sendValidationFailedJsonResponse();
-        }
-
         $model = $this->service->create($request->all());
 
         return $this->sendCreatedJsonResponse(
@@ -63,11 +58,6 @@ class PartnerLevelController extends AbstractRestAPIController
     public function edit($id)
     {
         $request = app($this->editRequest);
-
-        if (($request->title && !$this->languageService->checkLanguages($request->title))
-            || ($request->content && !$this->languageService->checkLanguages($request->content))) {
-            return $this->sendValidationFailedJsonResponse();
-        }
 
         $model = $this->service->findOrFailById($id);
 

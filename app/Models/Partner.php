@@ -34,7 +34,7 @@ class Partner extends AbstractModel
         'first_name',
         'last_name',
         'company_name',
-        'work_email',
+        'partner_email',
         'user_uuid',
         'publish_status',
         'phone_number',
