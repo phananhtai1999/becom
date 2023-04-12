@@ -25,7 +25,7 @@ class UpdateMyDomainRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'name' => ['string'],
+            'name' => ['string', 'regex:/^(?:[-A-Za-z0-9]+\.)+[A-Za-z]{2,6}$/'],
             'verified_at' => ['nullable', 'date'],
             'business_uuid' => ['nullable', 'numeric', Rule::exists('business_managements', 'uuid')->where(function ($query) {
                 return $query->where('owner_uuid', auth()->user()->getKey());

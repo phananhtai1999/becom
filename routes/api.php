@@ -1090,6 +1090,8 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'domain.'], function () {
         Route::put('/my/domain/{id}', [DomainController::class, 'editMyDomain'])->name('edit');
         Route::delete('/my/domain/{id}', [DomainController::class, 'destroyMyDomain'])->name('destroy');
     });
+
+    Route::post('/domain-verification/dns-record', [DomainController::class, 'verifyByDnsRecord'])->name('verifyByDnsRecord');
 });
 
 //DomainVerification
