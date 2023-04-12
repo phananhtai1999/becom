@@ -11,11 +11,15 @@ use App\Http\Controllers\Traits\RestStoreTrait;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\InviteUserRequest;
 use App\Http\Requests\JoinTeamRequest;
+use App\Http\Requests\SetContactListRequest;
 use App\Http\Requests\SetPermissionForTeamRequest;
 use App\Http\Requests\TeamRequest;
 use App\Http\Requests\UpdateTeamRequest;
+use App\Http\Resources\ContactListResource;
+use App\Http\Resources\ContactListResourceCollection;
 use App\Http\Resources\TeamResource;
 use App\Http\Resources\TeamResourceCollection;
+use App\Http\Resources\UserResource;
 use App\Http\Resources\UserTeamResource;
 use App\Http\Resources\UserTeamResourceCollection;
 use App\Mail\SendInviteToTeam;
@@ -23,10 +27,12 @@ use App\Mail\SendInviteToTeamByAccount;
 use App\Models\Invite;
 use App\Models\PlatformPackage;
 use App\Models\Team;
+use App\Services\ContactListService;
 use App\Services\InviteService;
 use App\Services\PermissionService;
 use App\Services\SmtpAccountService;
 use App\Services\TeamService;
+use App\Services\UserContactListService;
 use App\Services\UserService;
 use App\Services\UserTeamService;
 use Illuminate\Support\Facades\Cache;
@@ -42,7 +48,8 @@ class TeamController extends Controller
         SmtpAccountService $smtpAccountService,
         UserService        $userService,
         InviteService      $inviteService,
-        PermissionService $permissionService
+        PermissionService $permissionService,
+        ContactListService $contactListService
     )
     {
         $this->service = $service;
@@ -51,10 +58,13 @@ class TeamController extends Controller
         $this->userService = $userService;
         $this->inviteService = $inviteService;
         $this->permissionService = $permissionService;
+        $this->contactListService = $contactListService;
         $this->resourceCollectionClass = TeamResourceCollection::class;
         $this->userTeamResourceClass = UserTeamResource::class;
+        $this->contactListresourceCollectionClass = ContactListResourceCollection::class;
         $this->userTeamResourceCollectionClass = UserTeamResourceCollection::class;
         $this->resourceClass = TeamResource::class;
+        $this->userResourceClass = UserResource::class;
         $this->storeRequest = TeamRequest::class;
         $this->editRequest = UpdateTeamRequest::class;
         $this->indexRequest = IndexRequest::class;
@@ -133,6 +143,28 @@ class TeamController extends Controller
         );
     }
 
+    public function setContactList(SetContactListRequest $request)
+    {
+        if ($this->service->findOneById($request->get('team_uuid'))->owner_uuid != auth()->user()->getKey()) {
+
+            return $this->sendBadRequestJsonResponse(['message' => 'You are not owner of team to set permission']);
+        }
+        $user = $this->userService->findOrFailById($request->get('user_uuid'));
+        $model = $this->userTeamService->findOneWhere([
+            'user_uuid' => $request->get('user_uuid'),
+            'team_uuid' => $request->get('team_uuid')
+        ]);
+        if (empty($model)) {
+
+            return $this->sendBadRequestJsonResponse(['message' => 'This user is not in the team']);
+        }
+        $user->userTeamContactLists()->sync($request->get('contact_list_uuids'));
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->userResourceClass, $user)
+        );
+    }
+
     public function listMember($id){
         $model = $this->userTeamService->findAllWhere(['team_uuid' => $id]);
 
@@ -146,5 +178,14 @@ class TeamController extends Controller
         $permisions = $this->permissionService->getPermissionOfTeam($team->owner);
 
         return $this->sendOkJsonResponse(['data' => $permisions]);
+    }
+
+    public function contactListOfTeams($id) {
+        $team = $this->service->findOrFailById($id);
+        $contactLists = $this->contactListService->findAllWhere(['user_uuid' => $team->owner->uuid]);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->contactListresourceCollectionClass, $contactLists)
+        );
     }
 }

@@ -267,13 +267,32 @@ class MyCampaignService extends AbstractService
      * @param $searchBy
      * @return LengthAwarePaginator
      */
-    public function sortMyTotalCredit($perPage, $sort, $search, $searchBy)
+    public function sortMyTotalCredit($perPage, $sort, $search, $searchBy, $contactLists = [])
     {
-        if ($sort == 'number_credit_needed_to_start_campaign') {
-            $sortTotalCredit = SortTotalCreditOfMyCampaignQueryBuilder::searchQuery($search, $searchBy)->get()->sortBy('number_credit_needed_to_start_campaign');
-        } elseif ($sort == '-number_credit_needed_to_start_campaign') {
-            $sortTotalCredit = SortTotalCreditOfMyCampaignQueryBuilder::searchQuery($search, $searchBy)->get()->sortByDesc('number_credit_needed_to_start_campaign');
+        if (empty($contactLists)) {
+            if ($sort == 'number_credit_needed_to_start_campaign') {
+                $sortTotalCredit = SortTotalCreditOfMyCampaignQueryBuilder::searchQuery($search, $searchBy)
+                    ->get()->sortBy('number_credit_needed_to_start_campaign');
+            } elseif ($sort == '-number_credit_needed_to_start_campaign') {
+                $sortTotalCredit = SortTotalCreditOfMyCampaignQueryBuilder::searchQuery($search, $searchBy)
+                    ->get()->sortByDesc('number_credit_needed_to_start_campaign');
+            }
+        } else {
+            $campaignUuids = $this->model->select('campaigns.*')
+                ->join('campaign_contact_list', 'campaigns.uuid', '=', 'campaign_contact_list.campaign_uuid')
+                ->WhereIn('campaign_contact_list.contact_list_uuid', $contactLists)->get()->pluck('uuid');
+
+            if ($sort == 'number_credit_needed_to_start_campaign') {
+                $sortTotalCredit = SortTotalCreditOfMyCampaignQueryBuilder::searchQuery($search, $searchBy)
+                    ->OrWhereIn('uuid', $campaignUuids)
+                    ->get()->sortBy('number_credit_needed_to_start_campaign');
+            } elseif ($sort == '-number_credit_needed_to_start_campaign') {
+                $sortTotalCredit = SortTotalCreditOfMyCampaignQueryBuilder::searchQuery($search, $searchBy)
+                    ->OrWhereIn('uuid', $campaignUuids)
+                    ->get()->sortByDesc('number_credit_needed_to_start_campaign');
+            }
         }
+
 
         return $this->collectionPagination($sortTotalCredit, $perPage);
     }
@@ -294,5 +313,28 @@ class MyCampaignService extends AbstractService
             'path' => LengthAwarePaginator::resolveCurrentPath(),
             'pageName' => 'page',
         ]);
+    }
+
+    public function myCampaigns($request, $contactLists = [])
+    {
+        $perPage = $request->get('per_page', 15);
+        $page = $request->get('page', 1);
+        $columns = $request->get('columns', '*');
+        $pageName = $request->get('page_name', 'page');
+        $search = $request->get('search', '');
+        $searchBy = $request->get('search_by', '');
+
+        if (empty($contactLists)) {
+
+            return $this->modelQueryBuilderClass::searchQuery($search, $searchBy)
+                ->paginate($perPage, $columns, $pageName, $page);
+        }
+        $campaignUuids = $this->model->select('campaigns.*')
+            ->join('campaign_contact_list', 'campaigns.uuid', '=', 'campaign_contact_list.campaign_uuid')
+            ->WhereIn('campaign_contact_list.contact_list_uuid', $contactLists)->get()->pluck('uuid');
+
+        return $this->modelQueryBuilderClass::searchQuery($search, $searchBy)
+            ->OrWhereIn('uuid', $campaignUuids)
+            ->paginate($perPage, $columns, $pageName, $page);
     }
 }

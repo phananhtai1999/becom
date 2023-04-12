@@ -393,7 +393,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'contact-list.'], function (
     });
 
     Route::group(['as' => 'my.'], function () {
-        Route::get('/my/contact-lists', [ContactListController::class, 'indexMy'])->name('index');
+        Route::get('/my/contact-lists', [ContactListController::class, 'indexMyContactList'])->name('index');
         Route::post('/my/contact-list', [ContactListController::class, 'storeMyContactListAndImportFile'])->name('store-my-contact-list-and-import-file');
         Route::get('/my/contact-list/{id}', [ContactListController::class, 'showMyContactList'])->name('show');
         Route::put('/my/contact-list/{id}', [ContactListController::class, 'editMyContactList'])->name('edit');
@@ -930,7 +930,9 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'team.'], function () {
         Route::get('/join-team', [TeamController::class, 'joinTeam'])->name('joinTeam');
         Route::get('/invite-user', [TeamController::class, 'inviteUser'])->name('inviteUser');
         Route::post('/team/set-permission', [TeamController::class, 'setPermissionForTeam'])->name('setPermissionForTeam');
+        Route::post('/team/set-contact-list', [TeamController::class, 'setContactList'])->name('setContactList');
         Route::get('/permission-of-team/{id}', [TeamController::class, 'permissionOfTeams'])->name('permissionOfTeams');
+        Route::get('/contact-list-of-team/{id}', [TeamController::class, 'contactListOfTeams'])->name('contactListOfTeams');
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'addOn.'], function () {
