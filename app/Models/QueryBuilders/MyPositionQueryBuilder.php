@@ -43,6 +43,7 @@ class MyPositionQueryBuilder extends AbstractQueryBuilder
                 $modelKeyName,
                 AllowedFilter::exact('exact__' . $modelKeyName, $modelKeyName),
                 AllowedFilter::scope('name'),
+                AllowedFilter::scope('exact__name','exactName'),
                 AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
                 AllowedFilter::callback("user_uuid", function (Builder $query, $value) {
                     if ($value === 'null') {
