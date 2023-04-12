@@ -44,29 +44,10 @@ class PartnerTrackingController extends AbstractRestAPIController
     {
         $partner = $this->partnerService->findOneWhereOrFail(['code' => $request->get('code')]);
         //Kiểm tra có cookie chưa
-        if (!Cookie::has('invitePartner')) {
-            try {
-                $iP = geoip()->getClientIP();
-                $this->service->create([
-                    'partner_uuid' => $partner->uuid,
-                    'ip' => $iP,
-                    'country' => geoip()->getLocation($iP)->country
-                ]);
-            }catch (\Exception $e) {
-                $this->service->create([
-                    'partner_uuid' => $partner->uuid,
-                    'ip' => $request->ip()
-                ]);
-            }
-        }
-        //Kiểm tra xem có cookie và nó trùng với cái code không nếu không thì update lại partner_tracking
-        if (Cookie::has('invitePartner') && $partner->code !== Cookie::get('invitePartner')) {
-            $partnerTracking = $this->service->findOneWhere(['ip' => geoip()->getClientIP()]);
-            if ($partnerTracking) {
-                $this->service->update($partnerTracking, [
-                    'partner_uuid' => $partner->uuid
-                ]);
-            }
+        //Hoặc Kiểm tra xem có cookie và nó trùng với cái code không nếu không thì tạo mới partner tracking
+        if ((!Cookie::has('invitePartner')) ||
+            (Cookie::has('invitePartner') && $partner->code !== Cookie::get('invitePartner'))) {
+            $this->service->storePartnerTracking($partner);
         }
         return $this->sendOkJsonResponse()->withCookie(
             \cookie('invitePartner', $request->get('code'), config('user.invite_partner_timeout') * 24 * 60, null, null, true, true)
