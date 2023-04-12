@@ -17,6 +17,7 @@ use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Services\ContactListService;
 use App\Services\ContactService;
 use App\Services\MyContactListService;
+use App\Services\UserTeamService;
 use Illuminate\Http\JsonResponse;
 
 class ContactListController extends AbstractRestAPIController
@@ -41,17 +42,18 @@ class ContactListController extends AbstractRestAPIController
     public function __construct(
         ContactListService   $service,
         MyContactListService $myService,
-        ContactService       $contactService
+        ContactService       $contactService,
+        UserTeamService $userTeamService
     )
     {
         $this->service = $service;
         $this->myService = $myService;
         $this->contactService = $contactService;
+        $this->userTeamService = $userTeamService;
         $this->resourceCollectionClass = ContactListResourceCollection::class;
         $this->resourceClass = ContactListResource::class;
         $this->storeRequest = ContactListRequest::class;
         $this->editRequest = UpdateContactListRequest::class;
-        $this->indexRequest = IndexRequest::class;
     }
 
     /**
@@ -201,6 +203,10 @@ class ContactListController extends AbstractRestAPIController
      */
     public function storeMyContactListAndImportFile(MyContactListRequest $request)
     {
+        $userUuid = auth()->user()->getKey();
+        if(!empty(auth()->user()->team)) {
+            $userUuid = auth()->user()->userTeam->team->owner_uuid;
+        }
         $file = $request->file;
         if (!empty($file)) {
             try {
@@ -212,7 +218,7 @@ class ContactListController extends AbstractRestAPIController
                 }
                 if (is_array($import)) {
                     $model = $this->service->create(array_merge($request->all(), [
-                        'user_uuid' => auth()->user()->getkey(),
+                        'user_uuid' => $userUuid,
                     ]));
                     $model->contacts()->attach(array_merge($request->get('contact', []), $import['data']));
                     if ($import['have_error_data'] === true) {
@@ -239,7 +245,7 @@ class ContactListController extends AbstractRestAPIController
             }
         }
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => auth()->user()->getkey(),
+            'user_uuid' => $userUuid,
         ]));
         $model->contacts()->attach($request->get('contact', []));
 
@@ -361,6 +367,23 @@ class ContactListController extends AbstractRestAPIController
         $model = $this->myService->findMyContactListByKeyOrAbort($id);
         $model->contacts()->detach($contact_id);
         return $this->sendOkJsonResponse();
+    }
+
+    /**
+     * @param IndexRequest $request
+     * @return JsonResponse
+     */
+    public function indexMyContactList(IndexRequest $request)
+    {
+        if(isset($this->user()->userTeamContactLists) && !empty($this->user()->userTeamContactLists)) {
+            $contactLists = $this->myService->myContactLists($request, $this->user()->userTeamContactLists()->pluck('contact_list_uuid'));
+        } else {
+            $contactLists = $this->myService->myContactLists($request);
+        }
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $contactLists)
+        );
     }
 
 }
