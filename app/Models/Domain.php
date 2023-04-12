@@ -63,4 +63,12 @@ class Domain extends AbstractModel
     {
         return $this->belongsTo(BusinessManagement::class, 'business_uuid', 'uuid');
     }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function domainVerification()
+    {
+        return $this->hasOne(DomainVerification::class, 'domain_uuid', 'uuid');
+    }
 }

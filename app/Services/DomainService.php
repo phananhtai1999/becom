@@ -69,4 +69,22 @@ class DomainService extends AbstractService
             'verified_at' => null
         ]);
     }
+
+    /**
+     * @param $domainVerified
+     * @return mixed
+     */
+    public function updateDomainVerified($domainVerified)
+    {
+        $this->model->where([
+            ['name', $domainVerified->domain->name],
+            ['uuid', '!=', $domainVerified->domain_uuid],
+            ['verified_at', '!=', null]
+        ])->update(['verified_at' => null]);
+
+        return $domainVerified->domain->update([
+            'verified_at' => $domainVerified->verified_at,
+            'owner_uuid' => auth()->user()->getkey()
+        ]);
+    }
 }

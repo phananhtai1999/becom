@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Abstracts\AbstractRestAPIController;
 use App\Http\Controllers\Traits\RestIndexMyTrait;
 use App\Http\Requests\DomainRequest;
+use App\Http\Requests\DomainVerificationRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyDomainRequest;
 use App\Http\Requests\UpdateDomainRequest;
@@ -14,12 +15,19 @@ use App\Http\Resources\DomainResourceCollection;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
+use App\Http\Resources\DomainVerificationResource;
 use App\Services\DomainService;
+use App\Services\DomainVerificationService;
 use App\Services\MyDomainService;
 
 class DomainController extends AbstractRestAPIController
 {
     use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestIndexMyTrait;
+
+    /**
+     * @var DomainVerificationService
+     */
+    protected $domainVerificationService;
 
     /**
      * @var MyDomainService
@@ -29,14 +37,18 @@ class DomainController extends AbstractRestAPIController
     /**
      * @param DomainService $service
      * @param MyDomainService $myService
+     * @param DomainVerificationService $domainVerificationService
      */
     public function __construct(
-        DomainService   $service,
-        MyDomainService $myService
+        DomainService             $service,
+        MyDomainService           $myService,
+        DomainVerificationService $domainVerificationService
+
     )
     {
         $this->service = $service;
         $this->myService = $myService;
+        $this->domainVerificationService = $domainVerificationService;
         $this->resourceCollectionClass = DomainResourceCollection::class;
         $this->resourceClass = DomainResource::class;
         $this->storeRequest = DomainRequest::class;
@@ -139,5 +151,30 @@ class DomainController extends AbstractRestAPIController
         $this->myService->deleteMyDomain($id);
 
         return $this->sendOkJsonResponse();
+    }
+
+    /**
+     * @param DomainVerificationRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function verifyByDnsRecord(DomainVerificationRequest $request)
+    {
+        try {
+            $domain = $this->service->findOneWhereOrFail([
+                'name' => $request->get('domain')
+            ]);
+
+            $domainVerify = $this->domainVerificationService->verifyByDnsRecord($domain->getKey());
+            //Update domain verified
+            if ($domainVerify->verified_at) {
+                $this->service->updateDomainVerified($domainVerify);
+            }
+
+            return $this->sendOkJsonResponse(
+                $this->service->resourceToData(DomainVerificationResource::class, $domainVerify)
+            );
+        } catch (\Exception $exception) {
+            return $this->sendValidationFailedJsonResponse();
+        }
     }
 }
