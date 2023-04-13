@@ -40,7 +40,7 @@ class PartnerResource extends AbstractJsonResource
         }
 
         if (\in_array('partner__partner_level', $expand)) {
-            $data['partner_level'] = new PartnerLevelResource($this->partnerLevel());
+            $data['partner_level'] = new PartnerLevelResource($this->partnerLevel);
         }
 
         if (\in_array('partner__user', $expand)) {
