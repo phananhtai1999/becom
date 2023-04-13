@@ -16,9 +16,11 @@ class PaymentMethodSeeder extends Seeder
     {
         $paymentMethods = [
             [
+                'uuid' => 1,
                 'name' => 'paypal'
             ],
             [
+                'uuid' => 2,
                 'name' => 'stripe'
             ]
         ];

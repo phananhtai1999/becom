@@ -34,6 +34,9 @@ use Stripe\StripeClient;
 
 class PaymentController extends AbstractRestAPIController
 {
+
+    const UPDATE_CARD_STRIPE = 'update';
+    const ADD_CARD_STRIPE = 'add';
     public function __construct(
         PaypalService               $paypalService,
         StripeService               $stripeService,
@@ -254,10 +257,10 @@ class PaymentController extends AbstractRestAPIController
         }
     }
 
-    public function updateCardStripe(UpdateCardStripeRequest $request)
+    public function CardStripe(UpdateCardStripeRequest $request)
     {
         $subscriptionHistory = $this->subscriptionHistoryService->findOneWhere([
-            'payment_method_uuid' => 2,
+            'payment_method_uuid' => PaymentMethod::STRIPE,
             'user_uuid' => auth()->user()->getKey()
         ]);
         $stripe = $this->stripeService->getStripeClient();
@@ -272,10 +275,18 @@ class PaymentController extends AbstractRestAPIController
                 'cvc' => $request['cvc'],
             ]
         ]);
-        $stripe->customers->update($customer->id,[
-            'source' => $token
-        ]);
+        if ($request->get('type') == self::UPDATE_CARD_STRIPE) {
+            $stripe->customers->update($customer->id,[
+                'source' => $token
+            ]);
+            $message = 'Update Card Successfully';
+        } else {
+            $stripe->customers->createSource($customer->id,[
+                'source' => $token
+            ]);
+            $message = 'Add new Card Successfully';
+        }
 
-        return $this->sendOkJsonResponse(['message' => 'Update Card Successfully']);
+        return $this->sendOkJsonResponse(['message' => $message]);
     }
 }
