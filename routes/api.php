@@ -60,7 +60,7 @@ use App\Http\Controllers\Api\User\UserController;
 use App\Http\Controllers\Api\User\UserDetailController;
 use App\Http\Controllers\Api\User\UserTrackingController;
 use App\Http\Controllers\Api\UserCreditHistoryController;
-use App\Http\Controllers\Api\WebsiteController;
+use App\Http\Controllers\Api\SendProjectController;
 use App\Http\Controllers\Api\WebsitePageCategoryController;
 use App\Http\Controllers\Api\WebsitePageController;
 use App\Http\Controllers\Api\WebsiteVerificationController;
@@ -185,25 +185,25 @@ Route::get('/configs/public', [ConfigController::class, 'loadPublicConfig'])->na
 Route::group(['middleware' => ['auth:api'], 'as' => 'website.'], function () {
 
     Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
-        Route::get('/websites', [WebsiteController::class, 'index'])->name('index');
-        Route::post('/website', [WebsiteController::class, 'store'])->name('store');
-        Route::get('/website/{id}', [WebsiteController::class, 'show'])->name('show');
-        Route::put('/website/{id}', [WebsiteController::class, 'edit'])->name('edit');
-        Route::delete('/website/{id}', [WebsiteController::class, 'destroy'])->name('destroy');
+        Route::get('/send-projects', [SendProjectController::class, 'index'])->name('index');
+        Route::post('/send-project', [SendProjectController::class, 'store'])->name('store');
+        Route::get('/send-project/{id}', [SendProjectController::class, 'show'])->name('show');
+        Route::put('/send-project/{id}', [SendProjectController::class, 'edit'])->name('edit');
+        Route::delete('/send-project/{id}', [SendProjectController::class, 'destroy'])->name('destroy');
     });
 
     Route::group(['as' => 'my.'], function () {
-        Route::get('/my/websites', [WebsiteController::class, 'indexMy'])->name('index');
-        Route::post('/my/website', [WebsiteController::class, 'storeMyWebsite'])->name('store');
-        Route::get('/my/website/{id}', [WebsiteController::class, 'showMyWebsite'])->name('show');
-        Route::put('/my/website/{id}', [WebsiteController::class, 'editMyWebsite'])->name('edit');
-        Route::delete('/my/website/{id}', [WebsiteController::class, 'destroyMyWebsite'])->name('destroy');
+        Route::get('/my/send-projects', [SendProjectController::class, 'indexMy'])->name('index');
+        Route::post('/my/send-project', [SendProjectController::class, 'storeMySendProject'])->name('store');
+        Route::get('/my/send-project/{id}', [SendProjectController::class, 'showMySendProject'])->name('show');
+        Route::put('/my/send-project/{id}', [SendProjectController::class, 'editMySendProject'])->name('edit');
+        Route::delete('/my/send-project/{id}', [SendProjectController::class, 'destroyMySendProject'])->name('destroy');
     });
 
-    Route::post('/website-verification/dns-record', [WebsiteController::class, 'verifyByDnsRecord'])->name('verifyByDnsRecord');
-    Route::post('/website-verification/html-tag', [WebsiteController::class, 'verifyByHtmlTag'])->name('verifyByHtmlTag');
-    Route::post('/website-verification/html-file', [WebsiteController::class, 'verifyByHtmlFile'])->name('verifyByHtmlFile');
-    Route::get('/verification-download/{token}', [WebsiteController::class, 'downloadHtmlFile'])->name('downloadHtmlFile');
+    Route::post('/send-project-verification/dns-record', [SendProjectController::class, 'verifyByDnsRecord'])->name('verifyByDnsRecord');
+    Route::post('/send-project-verification/html-tag', [SendProjectController::class, 'verifyByHtmlTag'])->name('verifyByHtmlTag');
+    Route::post('/send-project-verification/html-file', [SendProjectController::class, 'verifyByHtmlFile'])->name('verifyByHtmlFile');
+    Route::get('/verification-download/{token}', [SendProjectController::class, 'downloadHtmlFile'])->name('downloadHtmlFile');
 });
 
 

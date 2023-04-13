@@ -27,7 +27,7 @@ class DatabaseSeeder extends Seeder
         ]);
         if (!App::environment('production')) {
             $this->call([
-                WebsiteSeeder::class,
+                SendProjectSeeder::class,
                 MailTemplateSeeder::class,
                 SmtpAccountSeeder::class,
                 ContactListSeeder::class,

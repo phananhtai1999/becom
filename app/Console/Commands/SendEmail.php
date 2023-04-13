@@ -7,7 +7,7 @@ use App\Models\Campaign;
 use App\Models\Email;
 use App\Models\MailSendingHistory;
 use App\Models\MailTemplate;
-use App\Models\Website;
+use App\Models\SendProject;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Config;

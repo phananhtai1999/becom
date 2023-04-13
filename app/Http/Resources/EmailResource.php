@@ -34,8 +34,8 @@ class EmailResource extends AbstractJsonResource
             'updated_at' => $this->updated_at
         ];
 
-        if (\in_array('email__websites', $expand)) {
-            $data['websites'] = WebsiteResource::collection($this->websites);
+        if (\in_array('email__send_projects', $expand)) {
+            $data['send_projects'] = SendProjectResource::collection($this->sendProjects);
         }
 
         if (\in_array('email__user', $expand)) {

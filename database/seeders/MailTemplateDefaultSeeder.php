@@ -104,14 +104,14 @@ class MailTemplateDefaultSeeder extends Seeder
         ];
         $admin = User::where('email', 'admin@sendemail.techupcorp')->first();
         foreach ($mailTemplatesDefault as $mailTemplateDefault) {
-            $mailTemplate = MailTemplate::where('subject', $mailTemplateDefault['subject'])->whereNull('website_uuid')->first();
+            $mailTemplate = MailTemplate::where('subject', $mailTemplateDefault['subject'])->whereNull('send_project_uuid')->first();
             if(!$mailTemplate) {
                 MailTemplate::factory()->create([
                     'subject' => $mailTemplateDefault['subject'],
                     'body' => $mailTemplateDefault['body'],
                     'design' => $mailTemplateDefault['design'],
                     'user_uuid' => $admin->uuid,
-                    'website_uuid' => null,
+                    'send_project_uuid' => null,
                     'type' => 'email'
                 ]);
             }

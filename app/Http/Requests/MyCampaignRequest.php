@@ -32,8 +32,8 @@ class MyCampaignRequest extends AbstractRequest
                     ['user_uuid', auth()->user()->getKey()],
                     ['type', $sendType],
                     ['publish_status', true]])->where(function ($q) {
-                    $q->where('website_uuid', $this->request->get('website_uuid'))
-                        ->orWhere('website_uuid', null);
+                    $q->where('send_project_uuid', $this->request->get('send_project_uuid'))
+                        ->orWhere('send_project_uuid', null);
                 })->whereNull('deleted_at');
             })],
             'from_date' => ['required', 'date', 'before_or_equal:to_date'],
@@ -44,7 +44,7 @@ class MyCampaignRequest extends AbstractRequest
             'smtp_account_uuid' => ['nullable', 'numeric', 'min:1', Rule::exists('smtp_accounts', 'uuid')->where(function ($query) use ($sendType) {
                 if ($sendType == 'email') {
                     return $query->where([
-                        ['website_uuid', $this->request->get('website_uuid')],
+                        ['send_project_uuid', $this->request->get('send_project_uuid')],
                         ['user_uuid', auth()->user()->getKey()],
                         ['mail_mailer', 'smtp'],
                         ['status', 'work'],
@@ -52,14 +52,14 @@ class MyCampaignRequest extends AbstractRequest
                     ])->whereNull('deleted_at');
                 } elseif ($sendType == 'sms') {
                     return $query->where([
-                        ['website_uuid', $this->request->get('website_uuid')],
+                        ['send_project_uuid', $this->request->get('send_project_uuid')],
                         ['user_uuid', auth()->user()->getKey()],
                         ['status', 'work'],
                         ['publish', true],
                     ])->whereNull('deleted_at');
                 } else {
                     return $query->where([
-                        ['website_uuid', $this->request->get('website_uuid')],
+                        ['send_project_uuid', $this->request->get('send_project_uuid')],
                         ['user_uuid', auth()->user()->getKey()],
                         ['mail_mailer', $sendType],
                         ['status', 'work'],
@@ -67,7 +67,7 @@ class MyCampaignRequest extends AbstractRequest
                     ])->whereNull('deleted_at');
                 }
             })],
-            'website_uuid' => ['required', 'numeric', 'min:1', Rule::exists('websites', 'uuid')->where(function ($query) {
+            'send_project_uuid' => ['required', 'numeric', 'min:1', Rule::exists('send_projects', 'uuid')->where(function ($query) {
                 return $query->where('user_uuid', auth()->user()->getkey())->whereNull('deleted_at');
             })],
             'reply_to_email' => ['nullable', 'required_if:send_type,email', 'string', 'email:rfc,dns'],

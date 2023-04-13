@@ -4,9 +4,9 @@ namespace App\Services;
 
 use App\Abstracts\AbstractService;
 use App\Models\QueryBuilders\SubscriptionPlanQueryBuilder;
-use App\Models\QueryBuilders\WebsiteQueryBuilder;
+use App\Models\QueryBuilders\SendProjectQueryBuilder;
 use App\Models\SubscriptionPlan;
-use App\Models\Website;
+use App\Models\SendProject;
 
 class SubscriptionPlanService extends AbstractService
 {

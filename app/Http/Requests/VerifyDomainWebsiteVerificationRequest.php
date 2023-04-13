@@ -24,7 +24,7 @@ class VerifyDomainWebsiteVerificationRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'domain' => ['required','url','exists:websites,domain']
+            'domain' => ['required','url','exists:send_projects,domain']
         ];
     }
 }

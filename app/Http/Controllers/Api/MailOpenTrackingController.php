@@ -58,7 +58,7 @@ class MailOpenTrackingController extends AbstractRestAPIController
             $fromDate = Carbon::now()->subMonth();
         }
         $toDate = $request->get('to_date', Carbon::now());
-        $resultReport = $this->service->reportAnalyticDataCampaigns($fromDate, $toDate, $request->get('website_uuid'));
+        $resultReport = $this->service->reportAnalyticDataCampaigns($fromDate, $toDate, $request->get('send_project_uuid'));
 
         $data = [];
         foreach ($resultReport as $result){

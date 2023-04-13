@@ -53,7 +53,7 @@ class Domain extends AbstractModel
      */
     public function websites()
     {
-        return $this->hasMany(Website::class, 'domain_uuid', 'uuid');
+        return $this->hasMany(SendProject::class, 'domain_uuid', 'uuid');
     }
 
     /**

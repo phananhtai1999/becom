@@ -37,7 +37,7 @@ class Campaign extends AbstractModel
         'status',
         'type',
         'smtp_account_uuid',
-        'website_uuid',
+        'send_project_uuid',
         'user_uuid',
         'reply_to_email',
         'reply_name',
@@ -59,7 +59,7 @@ class Campaign extends AbstractModel
         'was_stopped_by_owner' => 'boolean',
         'mail_template_uuid' =>  'integer',
         'smtp_account_uuid' =>  'integer',
-        'website_uuid' =>  'integer',
+        'send_project_uuid' =>  'integer',
         'user_uuid' =>  'integer',
     ];
 
@@ -90,9 +90,9 @@ class Campaign extends AbstractModel
     /**
      * @return BelongsTo
      */
-    public function website()
+    public function sendProject()
     {
-        return $this->belongsTo(Website::class, 'website_uuid', 'uuid')->withTrashed();
+        return $this->belongsTo(SendProject::class, 'send_project_uuid', 'uuid')->withTrashed();
     }
 
     /**

@@ -7,27 +7,27 @@ use App\Http\Controllers\Traits\RestIndexMyTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\IndexRequest;
-use App\Http\Requests\MyWebsiteRequest;
-use App\Http\Requests\UpdateMyWebsiteRequest;
-use App\Http\Requests\UpdateWebsiteRequest;
+use App\Http\Requests\MySendProjectRequest;
+use App\Http\Requests\UpdateMySendProjectRequest;
+use App\Http\Requests\UpdateSendProjectRequest;
 use App\Http\Requests\VerifyDomainWebsiteVerificationRequest;
-use App\Http\Requests\WebsiteRequest;
+use App\Http\Requests\SendProjectRequest;
 use App\Http\Requests\WebsiteVerificationRequest;
-use App\Http\Resources\WebsiteResourceCollection;
-use App\Http\Resources\WebsiteResource;
+use App\Http\Resources\SendProjectResourceCollection;
+use App\Http\Resources\SendProjectResource;
 use App\Http\Resources\WebsiteVerificationResource;
 use App\Services\FileVerificationService;
-use App\Services\MyWebsiteService;
-use App\Services\WebsiteService;
+use App\Services\MySendProjectService;
+use App\Services\SendProjectService;
 use App\Services\WebsiteVerificationService;
 use Illuminate\Http\JsonResponse;
 
-class WebsiteController extends AbstractRestAPIController
+class SendProjectController extends AbstractRestAPIController
 {
     use RestIndexTrait, RestShowTrait, RestIndexMyTrait;
 
     /**
-     * @var MyWebsiteService
+     * @var MySendProjectService
      */
     protected $myService;
 
@@ -42,24 +42,24 @@ class WebsiteController extends AbstractRestAPIController
     protected $fileVerificationService;
 
     /**
-     * @param WebsiteService $service
+     * @param SendProjectService $service
      * @param WebsiteVerificationService $websiteVerificationService
      * @param FileVerificationService $fileVerificationService
-     * @param MyWebsiteService $myService
+     * @param MySendProjectService $myService
      */
     public function __construct(
-        WebsiteService $service,
+        SendProjectService         $service,
         WebsiteVerificationService $websiteVerificationService,
-        FileVerificationService $fileVerificationService,
-        MyWebsiteService $myService
+        FileVerificationService    $fileVerificationService,
+        MySendProjectService $myService
     )
     {
         $this->service = $service;
         $this->myService = $myService;
-        $this->resourceCollectionClass = WebsiteResourceCollection::class;
-        $this->resourceClass = WebsiteResource::class;
-        $this->storeRequest = WebsiteRequest::class;
-        $this->editRequest = UpdateWebsiteRequest::class;
+        $this->resourceCollectionClass = SendProjectResourceCollection::class;
+        $this->resourceClass = SendProjectResource::class;
+        $this->storeRequest = SendProjectRequest::class;
+        $this->editRequest = UpdateSendProjectRequest::class;
         $this->indexRequest = IndexRequest::class;
         $this->websiteVerificationService = $websiteVerificationService;
         $this->fileVerificationService = $fileVerificationService;
@@ -135,10 +135,10 @@ class WebsiteController extends AbstractRestAPIController
     }
 
     /**
-     * @param MyWebsiteRequest $request
+     * @param MySendProjectRequest $request
      * @return JsonResponse
      */
-    public function storeMyWebsite(MyWebsiteRequest $request)
+    public function storeMySendProject(MySendProjectRequest $request)
     {
         $model = $this->service->create(array_merge($request->all(), [
             'user_uuid' => auth()->user()->getkey(),
@@ -153,7 +153,7 @@ class WebsiteController extends AbstractRestAPIController
      * @param $id
      * @return JsonResponse
      */
-    public function showMyWebsite($id)
+    public function showMySendProject($id)
     {
         $model = $this->myService->showMyWebsite($id);
 
@@ -163,11 +163,11 @@ class WebsiteController extends AbstractRestAPIController
     }
 
     /**
-     * @param UpdateMyWebsiteRequest $request
+     * @param UpdateMySendProjectRequest $request
      * @param $id
      * @return JsonResponse
      */
-    public function editMyWebsite(UpdateMyWebsiteRequest $request, $id)
+    public function editMySendProject(UpdateMySendProjectRequest $request, $id)
     {
         $model = $this->myService->showMyWebsite($id);
 
@@ -184,7 +184,7 @@ class WebsiteController extends AbstractRestAPIController
      * @param $id
      * @return JsonResponse
      */
-    public function destroyMyWebsite($id)
+    public function destroyMySendProject($id)
     {
         if (!$this->service->checkExistsWebisteInTables($id)) {
             $this->myService->deleteMyWebsite($id);

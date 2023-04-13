@@ -16,7 +16,7 @@ class MoveValueWebsiteUuidToWebsiteEmailSeeder extends Seeder
     {
         $emails = Email::all();
         foreach ($emails as $email){
-            $email->websites()->attach($email->website_uuid);
+            $email->sendProjects()->attach($email->send_project_uuid);
         }
 
     }

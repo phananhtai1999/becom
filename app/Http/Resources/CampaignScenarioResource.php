@@ -30,7 +30,7 @@ class CampaignScenarioResource extends AbstractJsonResource
         ];
 
         if (\in_array('campaign_scenario__campaign', $expand)) {
-            $data['website'] = new CampaignResource($this->campaign);
+            $data['campaign'] = new CampaignResource($this->campaign);
         }
 
         if (\in_array('campaign_scenario__scenario', $expand)) {

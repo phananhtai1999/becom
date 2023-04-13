@@ -6,7 +6,7 @@ use App\Models\MailTemplate;
 use App\Models\SmtpAccount;
 use App\Models\SmtpAccountEncryption;
 use App\Models\User;
-use App\Models\Website;
+use App\Models\SendProject;
 use Illuminate\Database\Seeder;
 
 class SmtpAccountSeeder extends Seeder
@@ -55,7 +55,7 @@ class SmtpAccountSeeder extends Seeder
                 SmtpAccount::factory()->create([
                     "mail_mailer"=> $smtpAccount['mail_mailer'],
                     "user_uuid"=> $admin->uuid,
-                    'website_uuid' => null
+                    'send_project_uuid' => null
                 ]);
             }
         }
@@ -77,11 +77,11 @@ class SmtpAccountSeeder extends Seeder
                     "mail_from_address"=> $smtpAccount['mail_from_address'],
                     "secret_key"=> "smtp",
                     "user_uuid"=> $user->uuid,
-                    'website_uuid' => $mailTemplate->website_uuid
+                    'send_project_uuid' => $mailTemplate->send_project_uuid
                 ]);
             }else{
                 $smtp->update([
-                    'website_uuid' => $mailTemplate->website_uuid
+                    'send_project_uuid' => $mailTemplate->send_project_uuid
                 ]);
             }
         }

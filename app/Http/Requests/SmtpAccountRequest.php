@@ -34,7 +34,7 @@ class SmtpAccountRequest extends AbstractRequest
             'mail_from_address' => ['required_if:mail_mailer,===,smtp', 'string'],
             'mail_from_name' => ['required_if:mail_mailer,===,smtp', 'string'],
             'secret_key' => ['required_if:mail_mailer,===,telegram,viber', 'string'],
-            'website_uuid' => ['nullable', 'numeric', 'min:1', 'exists:websites,uuid']
+            'send_project_uuid' => ['nullable', 'numeric', 'min:1', 'exists:send_projects,uuid']
         ];
     }
 }

@@ -4,7 +4,7 @@ namespace Database\Factories;
 
 use App\Models\SmtpAccountEncryption;
 use App\Models\User;
-use App\Models\Website;
+use App\Models\SendProject;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class SmtpAccountFactory extends Factory {
@@ -29,7 +29,7 @@ class SmtpAccountFactory extends Factory {
 			'mail_from_address' => $this->faker->safeEmail(),
 			'mail_from_name' => $this->faker->name(),
 			'secret_key' => $this->faker->lexify('key-????????'),
-			'website_uuid' => Website::inRandomOrder()->first()->uuid,
+			'send_project_uuid' => SendProject::inRandomOrder()->first()->uuid,
             'user_uuid' => User::inRandomOrder()->first()->uuid,
             'status' => 'work',
             'publish' => true

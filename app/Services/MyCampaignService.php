@@ -91,10 +91,10 @@ class MyCampaignService extends AbstractService
     public function CheckMyCampaign($campaignUuid)
     {
         $myCampaign = $this->model->select('campaigns.*')
-            ->join('websites', 'websites.uuid', '=', 'campaigns.website_uuid')
+            ->join('send_projects', 'send_projects.uuid', '=', 'campaigns.send_project_uuid')
             ->where([
                 ['campaigns.uuid', $campaignUuid],
-                ['websites.user_uuid', auth()->user()->getKey()],
+                ['send_projects.user_uuid', auth()->user()->getKey()],
                 ['campaigns.from_date', '<=', Carbon::now('Asia/Ho_Chi_Minh')],
                 ['campaigns.to_date', '>=', Carbon::now('Asia/Ho_Chi_Minh')],
                 ['campaigns.was_finished', false],

@@ -24,7 +24,7 @@ use App\Services\ConfigService;
 use App\Services\MySmtpAccountService;
 use App\Services\SmtpAccountService;
 use App\Services\UserService;
-use App\Services\WebsiteService;
+use App\Services\SendProjectService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
@@ -51,23 +51,23 @@ class SmtpAccountController extends AbstractRestAPIController
     protected $configService;
 
     /**
-     * @var WebsiteService
+     * @var SendProjectService
      */
-    protected $websiteService;
+    protected $sendProjectService;
 
     /**
      * @param SmtpAccountService $service
      * @param MySmtpAccountService $myService
      * @param UserService $userService
      * @param ConfigService $configService
-     * @param WebsiteService $websiteService
+     * @param SendProjectService $sendProjectService
      */
     public function __construct(
         SmtpAccountService $service,
         MySmtpAccountService $myService,
         UserService $userService,
         ConfigService $configService,
-        WebsiteService $websiteService
+        SendProjectService $sendProjectService
     )
     {
         $this->service = $service;
@@ -79,7 +79,7 @@ class SmtpAccountController extends AbstractRestAPIController
         $this->storeRequest = SmtpAccountRequest::class;
         $this->editRequest = UpdateSmtpAccountRequest::class;
         $this->indexRequest = IndexRequest::class;
-        $this->websiteService = $websiteService;
+        $this->sendProjectService = $sendProjectService;
     }
 
     /**
@@ -110,8 +110,8 @@ class SmtpAccountController extends AbstractRestAPIController
     {
         $request = app($this->storeRequest);
 
-        if ($request->get('website_uuid')) {
-            $website = $this->websiteService->findOneById($request->get('website_uuid'));
+        if ($request->get('send_project_uuid')) {
+            $website = $this->sendProjectService->findOneById($request->get('send_project_uuid'));
             $userUuid = $website->user_uuid;
         }else{
             $userUuid = auth()->user()->getKey();
@@ -147,7 +147,7 @@ class SmtpAccountController extends AbstractRestAPIController
         $request = app($this->editRequest);
 
         $model = $this->service->findOrFailById($id);
-        if (empty($request->get('website_uuid')) || $model->website_uuid == $request->get('website_uuid')) {
+        if (empty($request->get('send_project_uuid')) || $model->send_project_uuid == $request->get('send_project_uuid')) {
             if ($request->get('mail_username') && $model->mail_username != $request->get('mail_username')
                 && !$this->service->checkMailUserNameUnique($request->get('mail_username'), $model->user_uuid)) {
                 return $this->sendValidationFailedJsonResponse(["errors" => ["mail_username" => __('messages.mail_username_already_taken')]]);
@@ -155,7 +155,7 @@ class SmtpAccountController extends AbstractRestAPIController
             $data = $request->except(['status', 'user_uuid']);
         }else {
             if (!$this->service->checkExistsSmtpAccountInTables($id)) {
-                $website = $this->websiteService->findOneById($request->get('website_uuid'));
+                $website = $this->sendProjectService->findOneById($request->get('send_project_uuid'));
                 if (!$this->service->checkMailUserNameUnique($request->get('mail_username'), $website->user_uuid)) {
                     return $this->sendValidationFailedJsonResponse(["errors" => ["mail_username" => __('messages.mail_username_already_taken')]]);
                 }
@@ -163,7 +163,7 @@ class SmtpAccountController extends AbstractRestAPIController
                     'user_uuid' => $website->user_uuid,
                 ]);
             } else {
-                return $this->sendValidationFailedJsonResponse(["errors" => ["website_uuid" => __('messages.website_uuid_not_changed')]]);
+                return $this->sendValidationFailedJsonResponse(["errors" => ["send_project_uuid" => __('messages.website_uuid_not_changed')]]);
             }
         }
         $this->service->update($model, $data);
@@ -260,12 +260,12 @@ class SmtpAccountController extends AbstractRestAPIController
 
         if($model->user->can_add_smtp_account == 1 || $config->value == 0)
         {
-            if (empty($request->get('website_uuid')) || $model->website_uuid == $request->get('website_uuid') ||
+            if (empty($request->get('send_project_uuid')) || $model->send_project_uuid == $request->get('send_project_uuid') ||
                 !$this->service->checkExistsSmtpAccountInTables($id)) {
 
                 $data = $request->except(['user_uuid','status','publish']);
             }else {
-                return $this->sendValidationFailedJsonResponse(["errors" => ["website_uuid" => __('messages.website_uuid_not_changed')]]);
+                return $this->sendValidationFailedJsonResponse(["errors" => ["send_project_uuid" => __('messages.website_uuid_not_changed')]]);
             }
 
             $this->service->update($model, $data);

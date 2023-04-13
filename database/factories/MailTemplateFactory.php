@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\User;
-use App\Models\Website;
+use App\Models\SendProject;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class MailTemplateFactory extends Factory {
@@ -23,7 +23,7 @@ class MailTemplateFactory extends Factory {
 			'subject' => $this->faker->sentence(3),
 			'body' => $this->faker->sentence(10),
 			'design' => "{}",
-			'website_uuid' => optional(Website::inRandomOrder()->first())->uuid,
+			'send_project_uuid' => optional(SendProject::inRandomOrder()->first())->uuid,
             "user_uuid" => User::inRandomOrder()->first()->uuid,
             "publish_status" => true,
             "type" => $optionType[array_rand($optionType)],

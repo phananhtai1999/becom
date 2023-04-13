@@ -34,7 +34,7 @@ class SmtpAccount extends AbstractModel
         'mail_from_address',
         'mail_from_name',
         'secret_key',
-        'website_uuid',
+        'send_project_uuid',
         'user_uuid',
         'status',
         'publish'
@@ -47,7 +47,7 @@ class SmtpAccount extends AbstractModel
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
-        'website_uuid' =>  'integer',
+        'send_project_uuid' =>  'integer',
         'user_uuid' =>  'integer',
         'publish' => 'boolean'
     ];
@@ -63,9 +63,9 @@ class SmtpAccount extends AbstractModel
     /**
      * @return BelongsTo
      */
-    public function website()
+    public function sendProject()
     {
-        return $this->belongsTo(Website::class, 'website_uuid', 'uuid');
+        return $this->belongsTo(SendProject::class, 'send_project_uuid', 'uuid');
     }
 
     /**

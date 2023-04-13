@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
-class WebsiteResource extends AbstractJsonResource
+class SendProjectResource extends AbstractJsonResource
 {
     /**
      * @param Request $request
@@ -33,11 +33,11 @@ class WebsiteResource extends AbstractJsonResource
             'was_verified' => $this->was_verified
         ];
 
-        if (\in_array('website__user', $expand)) {
+        if (\in_array('send_project__user', $expand)) {
             $data['user'] = new UserResource($this->user);
         }
 
-        if (\in_array('website__domain', $expand)) {
+        if (\in_array('send_project__domain', $expand)) {
             $data['domains'] = new DomainResource($this->domains);
         }
 

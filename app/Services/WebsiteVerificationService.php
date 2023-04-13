@@ -55,7 +55,7 @@ class WebsiteVerificationService extends AbstractService
     public function firstOrCreateByWebsiteUuid($websiteUuid)
     {
         return $this->model->firstOrCreate(
-            ['website_uuid' => $websiteUuid],
+            ['send_project_uuid' => $websiteUuid],
             ['token' => $this->generateToken()]
         );
 
@@ -68,7 +68,7 @@ class WebsiteVerificationService extends AbstractService
     public function verifyByDnsRecord($websiteUuid)
     {
         $record = $this->firstOrCreateByWebsiteUuid($websiteUuid);
-        if ($this->tokenExists($record->website->domain, $record->token)) {
+        if ($this->tokenExists($record->sendProject->domain, $record->token)) {
 
             return $this->setVerified($record);
         } else {
@@ -115,7 +115,7 @@ class WebsiteVerificationService extends AbstractService
     public function verifyByHtmlTag($websiteUuid)
     {
         $record = $this->firstOrCreateByWebsiteUuid($websiteUuid);
-        $domainToken = $this->getMetaTagToken($record->website->domain);
+        $domainToken = $this->getMetaTagToken($record->sendProject->domain);
 
         if ($record->token == $domainToken) {
             return $this->setVerified($record);
@@ -148,7 +148,7 @@ class WebsiteVerificationService extends AbstractService
     {
         $record = $this->firstOrCreateByWebsiteUuid($websiteUuid);
         $verificationToken = $record->token;
-        $domainToken = $this->getHtmlFileToken($record->website->domain);
+        $domainToken = $this->getHtmlFileToken($record->sendProject->domain);
 
         if ($domainToken == $verificationToken) {
             return $this->setVerified($record);

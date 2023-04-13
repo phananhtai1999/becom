@@ -4,19 +4,19 @@ namespace App\Models\QueryBuilders;
 
 use App\Abstracts\AbstractQueryBuilder;
 use App\Models\SearchQueryBuilders\SearchQueryBuilder;
-use App\Models\Website;
+use App\Models\SendProject;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\Concerns\SortsQuery;
 use Spatie\QueryBuilder\QueryBuilder;
 
-class WebsiteQueryBuilder extends AbstractQueryBuilder
+class SendProjectQueryBuilder extends AbstractQueryBuilder
 {
     /**
      * @return string
      */
     public static function baseQuery()
     {
-        return Website::class;
+        return SendProject::class;
     }
 
     /**
@@ -24,7 +24,7 @@ class WebsiteQueryBuilder extends AbstractQueryBuilder
      */
     public static function initialQuery()
     {
-        $modelKeyName = (new Website())->getKeyName();
+        $modelKeyName = (new SendProject())->getKeyName();
 
         return static::for(static::baseQuery())
             ->allowedFields([
@@ -74,7 +74,7 @@ class WebsiteQueryBuilder extends AbstractQueryBuilder
      */
     public static function fillAble()
     {
-        return Website::class;
+        return SendProject::class;
     }
 
     /**

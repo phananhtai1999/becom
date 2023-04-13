@@ -29,7 +29,7 @@ class WebsiteVerificationQueryBuilder extends AbstractQueryBuilder
         return static::for(static::baseQuery())
             ->allowedFields([
                 $modelKeyName,
-                'website_uuid',
+                'send_project_uuid',
                 'token',
                 'verified_at'
 
@@ -37,7 +37,7 @@ class WebsiteVerificationQueryBuilder extends AbstractQueryBuilder
             ->defaultSort('-created_at')
             ->allowedSorts([
                 $modelKeyName,
-                'website_uuid',
+                'send_project_uuid',
                 'token',
                 'verified_at'
 
@@ -45,8 +45,8 @@ class WebsiteVerificationQueryBuilder extends AbstractQueryBuilder
             ->allowedFilters([
                 $modelKeyName,
                 AllowedFilter::exact('exact__' . $modelKeyName, $modelKeyName),
-                'website_uuid',
-                AllowedFilter::exact('exact__website_uuid', 'website_uuid'),
+                'send_project_uuid',
+                AllowedFilter::exact('exact__send_project_uuid', 'send_project_uuid'),
                 'token',
                 AllowedFilter::exact('exact__token', 'token'),
                 'verified_at',

@@ -30,7 +30,7 @@ class SmtpAccountResource extends AbstractJsonResource
             'mail_from_address' => $this->mail_from_address,
             'mail_from_name' => $this->mail_from_name,
             'secret_key' => $this->secret_key,
-            'website_uuid' => $this->website_uuid,
+            'send_project_uuid' => $this->send_project_uuid,
             'status' => $this->status,
             'publish' => $this->publish,
             'user_uuid' => $this->user_uuid,
@@ -39,8 +39,8 @@ class SmtpAccountResource extends AbstractJsonResource
             'updated_at' => $this->updated_at
         ];
 
-        if (\in_array('smtp_account__website', $expand)) {
-            $data['website'] = new WebsiteResource($this->website);
+        if (\in_array('smtp_account__send_project', $expand)) {
+            $data['send_project'] = new SendProjectResource($this->sendProject);
         }
 
         if(\in_array('smtp_account__smtp_account_encryption', $expand)){

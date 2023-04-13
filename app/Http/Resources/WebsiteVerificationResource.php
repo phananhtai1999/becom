@@ -11,16 +11,14 @@ class WebsiteVerificationResource extends AbstractJsonResource
 {
 
     /**
-     * @param Request $request
+     * @param $request
      * @return array
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
      */
     public function toArray($request)
     {
         return [
             'uuid' => $this->uuid,
-            'website_uuid' => $this->website_uuid,
+            'send_project_uuid' => $this->send_project_uuid,
             'token' => $this->token,
             'verified_at' => $this->verified_at,
             'deleted_at' => $this->deleted_at,

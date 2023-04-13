@@ -40,7 +40,7 @@ class MailTemplateService extends AbstractService
     {
         return MailTemplateQueryBuilder::searchQuery($search, $searchBy)
             ->where('publish_status', $publishedStatus)
-            ->whereNull('website_uuid')
+            ->whereNull('send_project_uuid')
             ->paginate($perPage, $columns, $pageName, $page);
     }
 

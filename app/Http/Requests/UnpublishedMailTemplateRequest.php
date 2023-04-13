@@ -26,7 +26,7 @@ class UnpublishedMailTemplateRequest extends AbstractRequest
         return [
             'subject' => ['required', 'string'],
             'body' => ['required', 'string'],
-            'website_uuid' => ['nullable', 'numeric', 'min:1', 'exists:websites,uuid'],
+            'send_project_uuid' => ['nullable', 'numeric', 'min:1', 'exists:send_projects,uuid'],
             'design' => ['required', 'string'],
             'type' => ['required', 'string', 'in:sms,email,telegram,viber'],
         ];

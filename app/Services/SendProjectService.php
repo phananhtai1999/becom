@@ -3,14 +3,14 @@
 namespace App\Services;
 
 use App\Abstracts\AbstractService;
-use App\Models\QueryBuilders\WebsiteQueryBuilder;
-use App\Models\Website;
+use App\Models\QueryBuilders\SendProjectQueryBuilder;
+use App\Models\SendProject;
 
-class WebsiteService extends AbstractService
+class SendProjectService extends AbstractService
 {
-    protected $modelClass = Website::class;
+    protected $modelClass = SendProject::class;
 
-    protected $modelQueryBuilderClass = WebsiteQueryBuilder::class;
+    protected $modelQueryBuilderClass = SendProjectQueryBuilder::class;
 
     /**
      * @param $id

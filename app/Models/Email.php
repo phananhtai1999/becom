@@ -48,9 +48,9 @@ class Email extends AbstractModel
     /**
      * @return BelongsToMany
      */
-    public function websites()
+    public function sendProjects()
     {
-        return $this->belongsToMany(Website::class, 'website_email', 'email_uuid', 'website_uuid')->withTimestamps();
+        return $this->belongsToMany(SendProject::class, 'website_email', 'email_uuid', 'send_project_uuid')->withTimestamps();
     }
 
     /**
