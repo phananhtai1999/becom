@@ -124,7 +124,12 @@ class SendNextByScenarioCampaignListener implements  ShouldQueue
                 'was_stopped_by_owner' => true
             ]);
         } else {
-            $emailNotification->send($contact, $campaignScenario->uuid, $creditNumberSendByCampaign);
+            $config = $this->configService->findConfigByKey('send_by_connector');
+            if ($config && $config->value_formatted) {
+                $emailNotification->sending_by_conecttor($contact, $campaignScenario->uuid, $creditNumberSendByCampaign);
+            } else {
+                $emailNotification->send($contact, $campaignScenario->uuid, $creditNumberSendByCampaign);
+            }
         }
     }
 }

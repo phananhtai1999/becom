@@ -72,7 +72,6 @@ class PartnerController extends AbstractRestAPIController
 
         $model = $this->service->create(array_merge($request->except('code'), [
             'publish_status' => 'active',
-            'partner_level_uuid' => optional($this->partnerLevelService->getDefaultPartnerLevel())->uuid
         ]));
 
         return $this->sendOkJsonResponse($this->service->resourceToData($this->resourceClass, $model));
@@ -98,8 +97,7 @@ class PartnerController extends AbstractRestAPIController
     public function registerPartner(RegisterPartnerRequest $request)
     {
         $model = $this->service->create(array_merge($request->except('code'), [
-            'publish_status' => 'pending',
-            'partner_level_uuid' => optional($this->partnerLevelService->getDefaultPartnerLevel())->uuid
+            'publish_status' => 'pending'
         ]));
 
         return $this->sendOkJsonResponse($this->service->resourceToData($this->resourceClass, $model));

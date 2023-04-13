@@ -27,7 +27,6 @@ class PartnerResource extends AbstractJsonResource
             'phone_number' => $this->phone_number,
             'user_uuid' => $this->user_uuid,
             'partner_category_uuid' => $this->partner_category_uuid,
-            'partner_level_uuid' => $this->partner_level_uuid,
             'code' => $this->code,
             'publish_status' => $this->publish_status,
             'answer' => $this->answer,
