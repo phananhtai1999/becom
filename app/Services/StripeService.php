@@ -156,6 +156,7 @@ class StripeService extends AbstractService
                 'subscription_plan_uuid' => $subscriptionPlan->uuid,
                 'subscription_date' => $subscriptionDate,
                 'expiration_date' => $expirationDate,
+                'billing_address_uuid' => $request['billing_address_uuid'],
                 'payment_method_uuid' => PaymentMethod::STRIPE,
                 'logs' => $subscriptionData,
                 'status' => 'success'
@@ -191,6 +192,7 @@ class StripeService extends AbstractService
                 'add_on_subscription_plan_uuid' => $addOnSubscriptionPlan->uuid,
                 'subscription_date' => $subscriptionDate,
                 'expiration_date' => $expirationDate,
+                'billing_address_uuid' => $request['billing_address_uuid'],
                 'payment_method_uuid' => PaymentMethod::STRIPE,
                 'logs' => $subscriptionData,
             ];

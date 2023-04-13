@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\ArticleCategoryController;
 use App\Http\Controllers\Api\ArticleController;
 use App\Http\Controllers\Api\AuthBySocialNetworkController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\BillingAddressController;
 use App\Http\Controllers\Api\BusinessCategoryController;
 use App\Http\Controllers\Api\BusinessManagementController;
 use App\Http\Controllers\Api\CampaignController;
@@ -919,6 +920,15 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'country.'], function () {
         Route::get('/country/{id}', [CountryController::class, 'show'])->name('show');
         Route::put('/country/{id}', [CountryController::class, 'edit'])->name('edit');
         Route::delete('/country/{id}', [CountryController::class, 'destroy'])->name('destroy');
+});
+
+Route::group(['middleware' => ['auth:api'], 'as' => 'billingAddress.'], function () {
+        Route::get('/billing-addresses', [BillingAddressController::class, 'index'])->name('index');
+        Route::get('my/billing-addresses', [BillingAddressController::class, 'myIndex'])->name('myIndex');
+        Route::post('/billing-address', [BillingAddressController::class, 'store'])->name('store');
+        Route::get('/billing-address/{id}', [BillingAddressController::class, 'show'])->name('show');
+        Route::put('/billing-address/{id}', [BillingAddressController::class, 'edit'])->name('edit');
+        Route::delete('/billing-address/{id}', [BillingAddressController::class, 'destroy'])->name('destroy');
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'team.'], function () {
