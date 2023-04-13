@@ -25,6 +25,7 @@ class AddOnSubscriptionHistory extends Model
         'subscription_date',
         'expiration_date',
         'payment_method_uuid',
+        'billing_address_uuid',
         'logs',
     ];
 
