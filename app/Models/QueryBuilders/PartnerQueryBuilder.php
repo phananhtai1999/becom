@@ -42,7 +42,6 @@ class PartnerQueryBuilder extends AbstractQueryBuilder
                 'answer',
                 'partner_category_uuid',
                 'user_uuid',
-                'partner_level_uuid',
                 'code'
             ])
             ->defaultSort('-created_at')
@@ -57,7 +56,6 @@ class PartnerQueryBuilder extends AbstractQueryBuilder
                 'answer',
                 'partner_category_uuid',
                 'user_uuid',
-                'partner_level_uuid',
                 'code'
             ])
             ->allowedFilters([
@@ -87,10 +85,6 @@ class PartnerQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__user.username', 'user.username'),
                 'user.email',
                 AllowedFilter::exact('exact__user.email', 'user.email'),
-                'partner_level_uuid',
-                AllowedFilter::exact('exact__partner_level_uuid', 'partner_level_uuid'),
-                'partnerLevel.title',
-                AllowedFilter::scope('exact__partnerLevel.title', 'partnerLevelTitle'),
                 'code',
                 AllowedFilter::exact('exact__code', 'code'),
             ]);
