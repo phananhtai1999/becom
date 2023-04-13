@@ -196,6 +196,20 @@ class ConfigSeeder extends Seeder {
 				'type' => 'boolean',
 				'status' => 'system',
 				'group_id' => '1',
+			],
+			[
+				'key' => 'paypal_method',
+				'value' => true,
+				'type' => 'boolean',
+				'status' => 'system',
+				'group_id' => '1',
+			],
+			[
+				'key' => 'stripe_method',
+				'value' => true,
+				'type' => 'boolean',
+				'status' => 'system',
+				'group_id' => '1',
 			]
 
 		];

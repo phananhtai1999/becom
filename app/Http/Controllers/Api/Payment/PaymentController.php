@@ -12,6 +12,7 @@ use App\Http\Resources\SubscriptionHistoryResourceCollection;
 use App\Http\Resources\SubscriptionPlanResourceCollection;
 use App\Models\PaymentMethod;
 use App\Models\UserCreditHistory;
+use App\Services\ConfigService;
 use App\Services\CreditPackageHistoryService;
 use App\Services\SubscriptionHistoryService;
 use App\Services\CreditPackageService;
@@ -42,7 +43,8 @@ class PaymentController extends AbstractRestAPIController
         CreditPackageHistoryService $creditPackageHistoryService,
         SubscriptionHistoryService  $subscriptionHistoryService,
         UserCreditHistoryService    $userCreditHistoryService,
-        UserPlatformPackageService  $userPlatformPackageService
+        UserPlatformPackageService  $userPlatformPackageService,
+        ConfigService $configService
     )
     {
         $this->paypalService = $paypalService;
@@ -53,6 +55,7 @@ class PaymentController extends AbstractRestAPIController
         $this->creditPackageService = $creditPackageService;
         $this->creditPackageHistoryService = $creditPackageHistoryService;
         $this->subscriptionHistoryService = $subscriptionHistoryService;
+        $this->configService = $configService;
         $this->creditPackageHistoryResourceCollection = CreditPackageHistoryResourceCollection::class;
         $this->subscriptionPlanResourceCollection = SubscriptionHistoryResourceCollection::class;
         $this->userCreditHistoryService = $userCreditHistoryService;
@@ -95,10 +98,12 @@ class PaymentController extends AbstractRestAPIController
         }
 
         $processResult = ['status' => false];
-        if ($request->get('payment_method_uuid') == PaymentMethod::STRIPE) {
+        if ($request->get('payment_method_uuid') == PaymentMethod::STRIPE && $this->configService->findConfigByKey('stripe_method')->value) {
             $processResult = $this->stripeService->processSubscription($subscriptionPlan, $fromDate, $toDate, $plan->stripe, $request->all());
-        } elseif ($request->get('payment_method_uuid') == PaymentMethod::PAYPAL) {
+        } elseif ($request->get('payment_method_uuid') == PaymentMethod::PAYPAL && $this->configService->findConfigByKey('paypal_method')->value) {
             $processResult = $this->paypalService->processSubscription($subscriptionPlan, $fromDate, $toDate, $plan->paypal, $request->all());
+        } else {
+            $processResult['message'] = 'Your payment method is invalid';
         }
         if (!$processResult['status']) {
 

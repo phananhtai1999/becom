@@ -19,6 +19,7 @@ use App\Models\PaymentMethod;
 use App\Services\AddOnService;
 use App\Services\AddOnSubscriptionHistoryService;
 use App\Services\AddOnSubscriptionPlanService;
+use App\Services\ConfigService;
 use App\Services\PaypalService;
 use App\Services\StripeService;
 use App\Services\UserAddOnService;
@@ -39,13 +40,15 @@ class AddOnController extends AbstractRestAPIController
         StripeService $stripeService,
         UserAddOnService $userAddOnService,
         AddOnSubscriptionPlanService $addOnSubscriptionPlanService,
-        AddOnSubscriptionHistoryService $addOnSubscriptionHistoryService
+        AddOnSubscriptionHistoryService $addOnSubscriptionHistoryService,
+        ConfigService $configService
     )
     {
         $this->service = $service;
         $this->stripeService = $stripeService;
         $this->paypalService = $paypalService;
         $this->userAddOnService = $userAddOnService;
+        $this->configService = $configService;
         $this->addOnSubscriptionPlanService = $addOnSubscriptionPlanService;
         $this->addOnSubscriptionHistoryService = $addOnSubscriptionHistoryService;
         $this->resourceClass = AddOnResource::class;
@@ -141,10 +144,12 @@ class AddOnController extends AbstractRestAPIController
             $toDate = Carbon::now()->addMonths($addOnSubscriptionPlan->duration);
         }
         $processResult = ['status' => false];
-        if ($request->get('payment_method_uuid') == PaymentMethod::STRIPE) {
+        if ($request->get('payment_method_uuid') == PaymentMethod::STRIPE && $this->configService->findConfigByKey('stripe_method')->value) {
             $processResult = $this->stripeService->processSubscriptionAddOn($addOnSubscriptionPlan, $fromDate, $toDate, $addOnSubscriptionPlan->payment_plan_id['stripe'], $request->all());
-        } elseif ($request->get('payment_method_uuid') == PaymentMethod::PAYPAL) {
+        } elseif ($request->get('payment_method_uuid') == PaymentMethod::PAYPAL && $this->configService->findConfigByKey('paypal_method')->value) {
             $processResult = $this->paypalService->processSubscriptionAddOn($addOnSubscriptionPlan, $fromDate, $toDate, $addOnSubscriptionPlan->payment_plan_id['paypal'], $request->all());
+        } else {
+            $processResult['message'] = 'Your payment method is invalid';
         }
         if (!$processResult['status']) {
 
