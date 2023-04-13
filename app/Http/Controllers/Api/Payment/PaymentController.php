@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Payment;
 use App\Abstracts\AbstractRestAPIController;
 use App\Events\SubscriptionSuccessEvent;
 use App\Http\Requests\PaymentRequest;
+use App\Http\Requests\UpdateCardStripeRequest;
 use App\Http\Requests\UpgradeUserRequest;
 use App\Http\Resources\CreditPackageHistoryResource;
 use App\Http\Resources\CreditPackageHistoryResourceCollection;
@@ -44,7 +45,7 @@ class PaymentController extends AbstractRestAPIController
         SubscriptionHistoryService  $subscriptionHistoryService,
         UserCreditHistoryService    $userCreditHistoryService,
         UserPlatformPackageService  $userPlatformPackageService,
-        ConfigService $configService
+        ConfigService               $configService
     )
     {
         $this->paypalService = $paypalService;
@@ -253,4 +254,28 @@ class PaymentController extends AbstractRestAPIController
         }
     }
 
+    public function updateCardStripe(UpdateCardStripeRequest $request)
+    {
+        $subscriptionHistory = $this->subscriptionHistoryService->findOneWhere([
+            'payment_method_uuid' => 2,
+            'user_uuid' => auth()->user()->getKey()
+        ]);
+        $stripe = $this->stripeService->getStripeClient();
+        $subscription = $stripe->subscriptions->retrieve($subscriptionHistory->logs['id']);
+        $customer = $stripe->customers->retrieve($subscription->customer);
+        $token = $stripe->tokens->create([
+            'card' => [
+                'name' => $request['card_name'],
+                'number' => $request['card_number'],
+                'exp_month' => $request['exp_month'],
+                'exp_year' => $request['exp_year'],
+                'cvc' => $request['cvc'],
+            ]
+        ]);
+        $stripe->customers->update($customer->id,[
+            'source' => $token
+        ]);
+
+        return $this->sendOkJsonResponse(['message' => 'Update Card Successfully']);
+    }
 }

@@ -963,6 +963,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'addOn.'], function () {
 Route::get('/add-ons', [AddOnController::class, 'index'])->name('index');
 Route::get('/paypal/success-payment-subscription-add-on', [PaypalController::class, 'successPaymentSubscriptionAddOn'])->name('paypal.successPaymentSubscriptionAddOn');
 Route::get('/paypal/cancel-payment-subscription-add-on', [PaypalController::class, 'cancelPaymentSubscriptionAddOn'])->name('paypal.cancelPaymentSubscriptionAddOn');
+Route::post('/update-card-stripe', [PaymentController::class, 'updateCardStripe'])->name('updateCardStripe');
 
 //renew membership package
 Route::post('/platform-packages/renew-by-stripe', [PaymentController::class, 'renewByStripe'])->name('renewByStripe');
