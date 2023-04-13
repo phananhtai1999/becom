@@ -254,7 +254,7 @@ class PaymentController extends AbstractRestAPIController
         }
     }
 
-    public function updateCardStripe(UpdateCardStripeRequest $request)
+    public function CardStripe(UpdateCardStripeRequest $request)
     {
         $subscriptionHistory = $this->subscriptionHistoryService->findOneWhere([
             'payment_method_uuid' => 2,
@@ -272,10 +272,18 @@ class PaymentController extends AbstractRestAPIController
                 'cvc' => $request['cvc'],
             ]
         ]);
-        $stripe->customers->update($customer->id,[
-            'source' => $token
-        ]);
+        if ($request->get('type') == 'update') {
+            $stripe->customers->update($customer->id,[
+                'source' => $token
+            ]);
+            $message = 'Update Card Successfully';
+        } else {
+            $stripe->customers->createSource($customer->id,[
+                'source' => $token
+            ]);
+            $message = 'Add new Card Successfully';
+        }
 
-        return $this->sendOkJsonResponse(['message' => 'Update Card Successfully']);
+        return $this->sendOkJsonResponse(['message' => $message]);
     }
 }

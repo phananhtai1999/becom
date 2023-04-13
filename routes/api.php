@@ -644,6 +644,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'payment.'], function () {
     Route::get('/top-up-history', [PaymentController::class, 'topUpHistory']);
     Route::get('/subscription-history', [PaymentController::class, 'subscriptionHistory']);
     Route::get('/cancel-subscription', [PaymentController::class, 'cancelSubscription']);
+    Route::post('/card-stripe', [PaymentController::class, 'CardStripe'])->name('CardStripe');
 });
 
 Route::get('/paypal/success-payment', [PaypalController::class, 'successPayment'])->name('paypal.successPayment');
@@ -963,7 +964,6 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'addOn.'], function () {
 Route::get('/add-ons', [AddOnController::class, 'index'])->name('index');
 Route::get('/paypal/success-payment-subscription-add-on', [PaypalController::class, 'successPaymentSubscriptionAddOn'])->name('paypal.successPaymentSubscriptionAddOn');
 Route::get('/paypal/cancel-payment-subscription-add-on', [PaypalController::class, 'cancelPaymentSubscriptionAddOn'])->name('paypal.cancelPaymentSubscriptionAddOn');
-Route::post('/update-card-stripe', [PaymentController::class, 'updateCardStripe'])->name('updateCardStripe');
 
 //renew membership package
 Route::post('/platform-packages/renew-by-stripe', [PaymentController::class, 'renewByStripe'])->name('renewByStripe');
