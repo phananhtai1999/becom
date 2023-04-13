@@ -17,7 +17,7 @@ use App\Services\PaymentMethodService;
 
 class PaymentMethodController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestEditTrait, RestStoreTrait;
+    use RestIndexTrait, RestShowTrait;
 
     /**
      * @param PaymentMethodService $service
