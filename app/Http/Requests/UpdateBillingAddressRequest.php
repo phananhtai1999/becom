@@ -29,7 +29,10 @@ class UpdateBillingAddressRequest extends FormRequest
             'address' => ['string'],
             'phone' => ['string'],
             'company' => ['string'],
-            'billing_address' => ['string'],
+            'country' => ['string'],
+            'city' => ['string'],
+            'state' => ['string'],
+            'zipcode' => ['integer'],
         ];
     }
 }

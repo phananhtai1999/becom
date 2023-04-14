@@ -238,15 +238,7 @@ class StripeService extends AbstractService
     {
         $stripe = $this->getStripeClient();
 
-        $token = $stripe->tokens->create([
-            'card' => [
-                'name' => Auth::user()->name,
-                'number' => $request['card_number'],
-                'exp_month' => $request['exp_month'],
-                'exp_year' => $request['exp_year'],
-                'cvc' => $request['cvc'],
-            ]
-        ]);
+        $token = $this->createNewToken($request);
 
         $customer = $stripe->customers->create([
             'email' => auth()->user()->email,
@@ -265,5 +257,40 @@ class StripeService extends AbstractService
         ]);
 
         return ["id" => $subscription->id];
+    }
+
+    public function createNewToken($request) {
+        $stripe = $this->getStripeClient();
+
+        return $stripe->tokens->create([
+            'card' => [
+                'name' => $request['card_name'],
+                'number' => $request['card_number'],
+                'exp_month' => $request['exp_month'],
+                'exp_year' => $request['exp_year'],
+                'cvc' => $request['cvc'],
+            ]
+        ]);
+    }
+
+    public function updateCustomerCard($customerId, $token) {
+        $stripe = $this->getStripeClient();
+
+        return $stripe->customers->update($customerId,[
+            'source' => $token
+        ]);
+    }
+
+    public function addCard($customerId, $token) {
+        $stripe = $this->getStripeClient();
+
+        return $stripe->customers->createSource($customerId,[
+            'source' => $token
+        ]);
+    }
+    public function allCard($customerId) {
+        $stripe = $this->getStripeClient();
+
+        return $stripe->customers->allSources($customerId);
     }
 }

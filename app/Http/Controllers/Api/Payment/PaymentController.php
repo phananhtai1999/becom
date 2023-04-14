@@ -266,27 +266,29 @@ class PaymentController extends AbstractRestAPIController
         $stripe = $this->stripeService->getStripeClient();
         $subscription = $stripe->subscriptions->retrieve($subscriptionHistory->logs['id']);
         $customer = $stripe->customers->retrieve($subscription->customer);
-        $token = $stripe->tokens->create([
-            'card' => [
-                'name' => $request['card_name'],
-                'number' => $request['card_number'],
-                'exp_month' => $request['exp_month'],
-                'exp_year' => $request['exp_year'],
-                'cvc' => $request['cvc'],
-            ]
-        ]);
+        $token = $this->stripeService->createNewToken($request);
         if ($request->get('type') == self::UPDATE_CARD_STRIPE) {
-            $stripe->customers->update($customer->id,[
-                'source' => $token
-            ]);
+            $this->stripeService->updateCustomerCard($customer->id, $token);
             $message = 'Update Card Successfully';
         } else {
-            $stripe->customers->createSource($customer->id,[
-                'source' => $token
-            ]);
+            $this->stripeService->addCard($customer->id, $token);
             $message = 'Add new Card Successfully';
         }
 
         return $this->sendOkJsonResponse(['message' => $message]);
+    }
+
+    public function allCardStripe()
+    {
+        $subscriptionHistory = $this->subscriptionHistoryService->findOneWhere([
+            'payment_method_uuid' => PaymentMethod::STRIPE,
+            'user_uuid' => auth()->user()->getKey()
+        ]);
+        $stripe = $this->stripeService->getStripeClient();
+        $subscription = $stripe->subscriptions->retrieve($subscriptionHistory->logs['id']);
+        $customer = $stripe->customers->retrieve($subscription->customer);
+        $allCard = $this->stripeService->allCard($customer->id);
+
+        return $this->sendOkJsonResponse(['message' => $allCard]);
     }
 }
