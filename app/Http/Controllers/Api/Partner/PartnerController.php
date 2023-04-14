@@ -11,6 +11,7 @@ use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\ChangeStatusPartnerRequest;
 use App\Http\Requests\IndexRequest;
+use App\Http\Requests\PartnerReferralsRequest;
 use App\Http\Requests\PartnerRequest;
 use App\Http\Requests\RegisterPartnerRequest;
 use App\Http\Requests\UpdatePartnerRequest;
@@ -167,5 +168,14 @@ class PartnerController extends AbstractRestAPIController
             "customers" => $customers,
             "unpaid_earnings" => 0, //Tạm thời cho = 0
         ]]);
+    }
+
+    public function partnerReferrals(PartnerReferralsRequest $request)
+    {
+        //Email created customer_since
+        $partner = $this->service->findOneWhereOrFail(['user_uuid' => auth()->user()->getKey()]);
+
+        return $this->sendOkJsonResponse(["data" => $this->partnerUserService->referrerStatisticsOfPartnerbyType($partner->code, $request->get('type'))]);
+
     }
 }
