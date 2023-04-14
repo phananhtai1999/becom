@@ -168,6 +168,7 @@ class MailTemplateVariableService extends AbstractService
     public function renderBodyForSendCampaign($mailTemplate, $campaignContent,$variables)
     {
         $search = [
+            '{{to_email}}',
             '{{contact_first_name}}',
             '{{contact_middle_name}}',
             '{{contact_last_name}}',

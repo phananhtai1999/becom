@@ -329,6 +329,7 @@ class BaseNotification
     {
         $current = Carbon::now('Asia/Ho_Chi_Minh');
         return [
+            'to_email' => $contact->email,
             'contact_first_name' => $contact->first_name,
             'contact_middle_name' => $contact->middle_name,
             'contact_last_name' => $contact->last_name,
