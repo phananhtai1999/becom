@@ -1043,6 +1043,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'partner.'], function () {
     });
 
     Route::get('partner-dashboard', [PartnerController::class, 'partnerDashboard'])->name('partnerDashboard');
+    Route::get('partner-referrals', [PartnerController::class, 'partnerReferrals'])->name('partnerReferrals');
 
 });
 Route::post('register-partner', [PartnerController::class, 'registerPartner'])->name('registerPartner');
