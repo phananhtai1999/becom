@@ -645,6 +645,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'payment.'], function () {
     Route::get('/subscription-history', [PaymentController::class, 'subscriptionHistory']);
     Route::get('/cancel-subscription', [PaymentController::class, 'cancelSubscription']);
     Route::post('/card-stripe', [PaymentController::class, 'CardStripe'])->name('CardStripe');
+    Route::get('/all-card-stripe', [PaymentController::class, 'allCardStripe'])->name('allCardStripe');
 });
 
 Route::get('/paypal/success-payment', [PaypalController::class, 'successPayment'])->name('paypal.successPayment');

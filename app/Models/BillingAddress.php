@@ -30,7 +30,10 @@ class BillingAddress extends Model
         'address',
         'phone',
         'company',
-        'billing_address',
+        'country',
+        'city',
+        'state',
+        'zipcode',
     ];
 
     /**
