@@ -106,6 +106,8 @@ class UpdateReceivers extends Command {
                 ]);
                 $creditHistory = $this->creditHistoryService->findOneWhere(['campaign_uuid'=> $sendEmailScheduleLog->campaign_uuid]);
                 $campaign = $this->campaignService->findOneById($sendEmailScheduleLog->campaign_uuid);
+                $campaign->was_finished = true;
+                $campaign->save();
                 if($creditHistory && $campaign){
                     $emailNotification = app()->makeWith(BaseNotification::class, ['campaign' => $campaign])->getAdapter();
                     $configPrice = $emailNotification->getNotificationPrice();
