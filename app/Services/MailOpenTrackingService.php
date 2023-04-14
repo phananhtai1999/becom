@@ -41,7 +41,7 @@ class MailOpenTrackingService extends AbstractService
         return $this->model->selectRaw('mail_sending_history.campaign_uuid, count(mail_open_trackings.uuid) as opened')
             ->join('mail_sending_history', 'mail_sending_history.uuid', '=', 'mail_open_trackings.mail_sending_history_uuid')
             ->join('campaigns', 'campaigns.uuid', '=', 'mail_sending_history.campaign_uuid')
-            ->where('campaigns.website_uuid', $websiteUuid)
+            ->where('campaigns.send_project_uuid', $websiteUuid)
             ->whereDate('mail_open_trackings.created_at', '>=', $fromDate)
             ->whereDate('mail_open_trackings.created_at', '<=', $toDate)
             ->groupBy('mail_sending_history.campaign_uuid')->get();

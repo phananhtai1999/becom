@@ -101,7 +101,7 @@ class SmtpAccountService extends AbstractService
                         ['smtp_accounts.mail_mailer', 'smtp'],
                         ['smtp_accounts.status', 'work'],
                         ['smtp_accounts.publish', true],
-                        ['smtp_accounts.website_uuid', null]
+                        ['smtp_accounts.send_project_uuid', null]
                     ]);
                 } else {
 
@@ -110,7 +110,7 @@ class SmtpAccountService extends AbstractService
                         ['smtp_accounts.mail_mailer', $sendTypeCampaign],
                         ['smtp_accounts.status', 'work'],
                         ['smtp_accounts.publish', true],
-                        ['smtp_accounts.website_uuid', null]
+                        ['smtp_accounts.send_project_uuid', null]
                     ]);
                 }
             })->inRandomOrder()->first();
@@ -311,7 +311,7 @@ class SmtpAccountService extends AbstractService
     public function getSmtpAccountDefaultWithPagination($perPage, $page, $columns, $pageName, $search, $searchBy)
     {
         return SmtpAccountQueryBuilder::searchQuery($search, $searchBy)
-            ->whereNull('website_uuid')
+            ->whereNull('send_project_uuid')
             ->paginate($perPage, $columns, $pageName, $page);
     }
 
@@ -327,7 +327,7 @@ class SmtpAccountService extends AbstractService
     public function getAllSmtpAccountWithoutDefault($perPage, $page, $columns, $pageName, $search, $searchBy)
     {
         return SmtpAccountQueryBuilder::searchQuery($search, $searchBy)
-            ->whereNotNull('website_uuid')
+            ->whereNotNull('send_project_uuid')
             ->paginate($perPage, $columns, $pageName, $page);
     }
 

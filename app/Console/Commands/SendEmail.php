@@ -7,7 +7,7 @@ use App\Models\Campaign;
 use App\Models\Email;
 use App\Models\MailSendingHistory;
 use App\Models\MailTemplate;
-use App\Models\Website;
+use App\Models\SendProject;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Config;
@@ -82,7 +82,7 @@ class SendEmail extends Command
             }
         } else {
             foreach ($campaigns as $campaign) {
-                foreach ($campaign->website->emails as $email) {
+                foreach ($campaign->sendProject->emails as $email) {
                     Config::set('mail.mailers.smtp.transport', $campaign->smtpAccount->mail_mailer);
                     Config::set('mail.mailers.smtp.host', $campaign->smtpAccount->mail_host);
                     Config::set('mail.mailers.smtp.port', $campaign->smtpAccount->mail_port);

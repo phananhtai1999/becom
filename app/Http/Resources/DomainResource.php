@@ -31,8 +31,8 @@ class DomainResource extends AbstractJsonResource
             $data['user'] = new UserResource($this->user);
         }
 
-        if (\in_array('domain__websites', $expand)) {
-            $data['websites'] = WebsiteResource::collection($this->websites);
+        if (\in_array('domain__send_projects', $expand)) {
+            $data['send_projects'] = SendProjectResource::collection($this->sendProjects);
         }
 
         if (\in_array('domain__business_management', $expand)) {

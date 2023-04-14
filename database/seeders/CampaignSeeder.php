@@ -29,7 +29,7 @@ class CampaignSeeder extends Seeder
             for ($i = 1 ; $i < 5 ; $i++) {
                 $contactLists = ContactList::where('user_uuid', $user->uuid)->inRandomOrder()->limit(2)->get();
                 $mailTemplate = MailTemplate::where([
-                    ["website_uuid", $smtpAccount->website_uuid],
+                    ["send_project_uuid", $smtpAccount->send_project_uuid],
                     ['user_uuid', $user->uuid]
                 ])->inRandomOrder()->first();
 
@@ -38,7 +38,7 @@ class CampaignSeeder extends Seeder
                     'smtp_account_uuid' => $smtpAccount->uuid,
                     'was_finished' => false,
                     'was_stopped_by_owner' => true,
-                    'website_uuid' => $smtpAccount->website_uuid,
+                    'send_project_uuid' => $smtpAccount->send_project_uuid,
                     'send_type' => $mailTemplate->type,
                     'user_uuid' => $user->uuid,
                 ]);

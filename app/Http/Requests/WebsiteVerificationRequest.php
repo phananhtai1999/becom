@@ -24,7 +24,7 @@ class WebsiteVerificationRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'domain' => ['required', 'string','regex:/^(?:[-A-Za-z0-9]+\.)+[A-Za-z]{2,6}$/', 'exists:websites,domain']
+            'domain' => ['required', 'string','regex:/^(?:[-A-Za-z0-9]+\.)+[A-Za-z]{2,6}$/', 'exists:send_projects,domain']
         ];
     }
 }

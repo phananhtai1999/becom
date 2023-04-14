@@ -33,7 +33,7 @@ class EmailService extends AbstractService
             $email = $this->model->select('emails.*')
                 ->join('website_email', 'emails.uuid', '=', 'website_email.email_uuid')
                 ->where([
-                    ['website_email.website_uuid', $websiteUuid],
+                    ['website_email.send_project_uuid', $websiteUuid],
                     ['emails.email', $toEmail]
                 ])->first();
             if(!$email){
@@ -51,6 +51,6 @@ class EmailService extends AbstractService
     {
         return $this->model->select('emails.*')
             ->join('website_email', 'emails.uuid', '=', 'website_email.email_uuid')
-            ->where('website_email.website_uuid', $websiteUuid)->get();
+            ->where('website_email.send_project_uuid', $websiteUuid)->get();
     }
 }

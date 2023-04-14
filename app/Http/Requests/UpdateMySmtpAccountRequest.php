@@ -36,7 +36,7 @@ class UpdateMySmtpAccountRequest extends AbstractRequest
             'mail_from_address' => ['required_if:mail_mailer,===,smtp', 'string'],
             'mail_from_name' => ['required_if:mail_mailer,===,smtp', 'string'],
             'secret_key' => ['required_if:mail_mailer,===,telegram,viber', 'string'],
-            'website_uuid' => ['numeric', 'min:1', Rule::exists('websites', 'uuid')->where(function ($query) {
+            'send_project_uuid' => ['numeric', 'min:1', Rule::exists('send_projects', 'uuid')->where(function ($query) {
 
                 return $query->where('user_uuid', auth()->user()->getkey())->whereNull('deleted_at');
             })],

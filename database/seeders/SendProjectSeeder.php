@@ -3,10 +3,10 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use App\Models\Website;
+use App\Models\SendProject;
 use Illuminate\Database\Seeder;
 
-class WebsiteSeeder extends Seeder
+class SendProjectSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -18,10 +18,10 @@ class WebsiteSeeder extends Seeder
         $user = User::where('email', 'user1@sendemail.techupcorp')->first();
         $admin = User::where('email', 'admin@sendemail.techupcorp')->first();
 
-        Website::factory(5)->create([
+        SendProject::factory(5)->create([
             'user_uuid' => $user->uuid
         ]);
-        Website::factory(5)->create([
+        SendProject::factory(5)->create([
             'user_uuid' => $admin->uuid
         ]);
     }

@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\Website;
+use App\Models\SendProject;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class EmailFactory extends Factory {
@@ -20,7 +20,7 @@ class EmailFactory extends Factory {
 			'country' => 'VN',
 			'city' => 'Ho Chi Minh',
 			'job' => $this->faker->jobTitle(),
-			'website_uuid' => Website::where('uuid', '<=', 3)->inRandomOrder()->first()->uuid,
+			'send_project_uuid' => SendProject::where('uuid', '<=', 3)->inRandomOrder()->first()->uuid,
 		];
 	}
 }

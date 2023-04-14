@@ -71,8 +71,8 @@ class EmailQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
                 'user.username',
                 AllowedFilter::exact('exact__user.username', 'user.username'),
-                'websites.domain',
-                AllowedFilter::exact('exact__websites.domain', 'websites.domain'),
+                'sendProjects.domain',
+                AllowedFilter::exact('exact__sendProjects.domain', 'sendProjects.domain'),
             ]);
     }
 

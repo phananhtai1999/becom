@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use App\Abstracts\AbstractRequest;
 use Illuminate\Validation\Rule;
 
-class MyWebsiteRequest extends AbstractRequest
+class UpdateMySendProjectRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,12 +25,12 @@ class MyWebsiteRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'domain' => ['nullable', 'string', Rule::unique('websites')->where(function ($query) {
+            'domain' => ['nullable', 'string', Rule::unique('send_projects')->ignore($this->id, 'uuid')->where(function ($query) {
                 return $query->where('user_uuid', auth()->user()->getKey())->whereNull('deleted_at');
             })],
-            'name' => ['required', 'string'],
-            'description' => ['required', 'string'],
-            'logo' => ['required', 'string'],
+            'name' => ['string'],
+            'description' => ['string'],
+            'logo' => ['string'],
             'domain_uuid' => ['nullable', 'numeric', Rule::exists('domains', 'uuid')->where(function ($query) {
                 return $query->where('owner_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey())
                     ->whereNull('deleted_at');

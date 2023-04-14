@@ -107,7 +107,7 @@ class ContactService extends AbstractService
             ])
             //get contacts by campaign with send_type 'phone'
             ->orWhere([
-                ['campaigns.send_type', 'sms'],
+                ['campaigns.send_type', '!=', 'email'],
                 ['campaigns.uuid', $campaignUuid],
                 ['contacts.phone', $email]
             ])

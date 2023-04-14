@@ -31,7 +31,7 @@ class MailTemplate extends AbstractModel
     protected $fillable = [
         'subject',
         'body',
-        'website_uuid',
+        'send_project_uuid',
         'user_uuid',
         'design',
         'publish_status',
@@ -48,7 +48,7 @@ class MailTemplate extends AbstractModel
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
-        'website_uuid' => 'integer',
+        'send_project_uuid' => 'integer',
         'user_uuid' => 'integer',
     ];
 
@@ -87,9 +87,9 @@ class MailTemplate extends AbstractModel
     /**
      * @return BelongsTo
      */
-    public function website()
+    public function sendProject()
     {
-        return $this->belongsTo(Website::class, 'website_uuid', 'uuid');
+        return $this->belongsTo(SendProject::class, 'send_project_uuid', 'uuid');
     }
 
     /**

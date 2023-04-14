@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\User;
-use App\Models\Website;
+use App\Models\SendProject;
 use App\Models\MailTemplate;
 use App\Models\SmtpAccount;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -35,7 +35,7 @@ class CampaignFactory extends Factory {
 			'was_stopped_by_owner' => rand(0,1),
             'type' => $optionType[array_rand($optionType)],
             'send_type' => $optionSendType[array_rand($optionSendType)],
-			'website_uuid' => Website::where('uuid', '<=', 3)->inRandomOrder()->first()->uuid,
+			'send_project_uuid' => SendProject::where('uuid', '<=', 3)->inRandomOrder()->first()->uuid,
 			'user_uuid' => User::inRandomOrder()->first()->uuid,
             'reply_to_email' => $this->faker->safeEmail(),
             'reply_name' => $this->faker->name()

@@ -39,8 +39,8 @@ class MailSendingHistoryResource extends AbstractJsonResource
             $data['campaign_scenario'] = new CampaignScenarioResource($this->campaignScenario);
         }
 
-        if (\in_array('mail_sending_history__website', $expand)) {
-            $data['website'] = new WebsiteResource(optional($this->campaign)->website);
+        if (\in_array('mail_sending_history__send_project', $expand)) {
+            $data['send_project'] = new SendProjectResource(optional($this->campaign)->sendProject);
         }
 
         if (\in_array('mail_sending_history__mail_template', $expand)) {

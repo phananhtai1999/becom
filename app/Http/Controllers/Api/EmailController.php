@@ -67,7 +67,7 @@ class EmailController extends AbstractRestAPIController
 
         $model = $this->service->create($data);
 
-        $model->websites()->attach($request->get('websites'));
+        $model->sendProjects()->attach($request->get('send_project'));
 
         return $this->sendCreatedJsonResponse(
           $this->service->resourceToData($this->resourceClass, $model)
@@ -88,7 +88,7 @@ class EmailController extends AbstractRestAPIController
 
         $this->service->update($model, $request->all());
 
-        $model->websites()->sync($request->get('websites') ?? $model->websites);
+        $model->sendProjects()->sync($request->get('send_project') ?? $model->sendProjects);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -125,7 +125,7 @@ class EmailController extends AbstractRestAPIController
             'user_uuid' => auth()->user()->getkey(),
         ]));
 
-        $model->websites()->attach($request->get('websites'));
+        $model->sendProjects()->attach($request->get('send_project'));
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -158,7 +158,7 @@ class EmailController extends AbstractRestAPIController
             'user_uuid' => auth()->user()->getkey(),
         ]));
 
-        $model->websites()->sync($request->get('websites') ?? $model->websites);
+        $model->sendProjects()->sync($request->get('send_project') ?? $model->sendProjects);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)

@@ -30,7 +30,7 @@ class CampaignResource extends AbstractJsonResource
             'type' => $this->type,
             'send_type' => $this->send_type,
             'smtp_account_uuid' => $this->smtp_account_uuid,
-            'website_uuid' => $this->website_uuid,
+            'send_project_uuid' => $this->send_project_uuid,
             'user_uuid' => $this->user_uuid,
             'reply_to_email' => $this->reply_to_email,
             'reply_name' => $this->reply_name,
@@ -51,8 +51,8 @@ class CampaignResource extends AbstractJsonResource
             $data['smtp_account'] = new SmtpAccountResource($this->smtpAccount);
         }
 
-        if (\in_array('campaign__website', $expand)) {
-            $data['website'] = new WebsiteResource($this->website);
+        if (\in_array('campaign__send_project', $expand)) {
+            $data['send_project'] = new SendProjectResource($this->sendProject);
         }
 
         if (\in_array('campaign__user', $expand)) {

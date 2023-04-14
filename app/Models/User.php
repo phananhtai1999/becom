@@ -137,9 +137,9 @@ class User extends Authenticatable
     /**
      * @return HasMany
      */
-    public function websites()
+    public function sendProjects()
     {
-        return $this->hasMany(Website::class, 'user_uuid', 'uuid');
+        return $this->hasMany(SendProject::class, 'user_uuid', 'uuid');
     }
 
     /**

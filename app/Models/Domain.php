@@ -51,9 +51,9 @@ class Domain extends AbstractModel
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function websites()
+    public function sendProjects()
     {
-        return $this->hasMany(Website::class, 'domain_uuid', 'uuid');
+        return $this->hasMany(SendProject::class, 'domain_uuid', 'uuid');
     }
 
     /**

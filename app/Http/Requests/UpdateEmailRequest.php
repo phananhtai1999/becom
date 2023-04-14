@@ -31,8 +31,8 @@ class UpdateEmailRequest extends AbstractRequest
             'country' => ['string'],
             'city' => ['string'],
             'job' => ['string'],
-            'websites' => ['array', 'min:1'],
-            'websites.*' => ['numeric', 'min:1', 'exists:websites,uuid'],
+            'send_projects' => ['array', 'min:1'],
+            'send_projects.*' => ['numeric', 'min:1', 'exists:send_projects,uuid'],
             'user_uuid' => ['numeric', 'min:1', 'exists:users,uuid'],
         ];
     }

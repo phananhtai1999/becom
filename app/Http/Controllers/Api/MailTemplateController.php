@@ -19,7 +19,7 @@ use App\Http\Resources\MailTemplateResource;
 use App\Models\MailTemplate;
 use App\Services\MailTemplateService;
 use App\Services\MyMailTemplateService;
-use App\Services\WebsiteService;
+use App\Services\SendProjectService;
 use Illuminate\Http\JsonResponse;
 
 class MailTemplateController extends AbstractRestAPIController
@@ -32,19 +32,19 @@ class MailTemplateController extends AbstractRestAPIController
     protected $myService;
 
     /**
-     * @var WebsiteService
+     * @var SendProjectService
      */
-    protected $websiteService;
+    protected $sendProjectService;
 
     /**
      * @param MailTemplateService $service
      * @param MyMailTemplateService $myService
-     * @param WebsiteService $websiteService
+     * @param SendProjectService $sendProjectService
      */
     public function __construct(
         MailTemplateService $service,
         MyMailTemplateService $myService,
-        WebsiteService $websiteService
+        SendProjectService $sendProjectService
     )
     {
         $this->service = $service;
@@ -54,7 +54,7 @@ class MailTemplateController extends AbstractRestAPIController
         $this->storeRequest = MailTemplateRequest::class;
         $this->editRequest = UpdateMailTemplateRequest::class;
         $this->indexRequest = IndexRequest::class;
-        $this->websiteService = $websiteService;
+        $this->sendProjectService = $sendProjectService;
     }
 
     /**
@@ -66,10 +66,10 @@ class MailTemplateController extends AbstractRestAPIController
     {
         $request = app($this->storeRequest);
 
-        if (empty($request->get('website_uuid'))) {
+        if (empty($request->get('send_project_uuid'))) {
             $userUuid = auth()->user()->getKey();
         }else {
-            $website = $this->websiteService->findOneById($request->get('website_uuid'));
+            $website = $this->sendProjectService->findOneById($request->get('send_project_uuid'));
             $userUuid = $website->user_uuid;
         }
         $model = $this->service->create(array_merge($request->all(), [
@@ -93,16 +93,16 @@ class MailTemplateController extends AbstractRestAPIController
 
         $model = $this->service->findOrFailById($id);
 
-        if (empty($request->get('website_uuid')) || $model->website_uuid == $request->get('website_uuid')) {
+        if (empty($request->get('send_project_uuid')) || $model->send_project_uuid == $request->get('send_project_uuid')) {
             $data = $request->except('user_uuid');
         }else {
             if (!$this->service->checkExistsMailTemplateInTables($id)) {
-                $website = $this->websiteService->findOneById($request->get('website_uuid'));
+                $website = $this->sendProjectService->findOneById($request->get('send_project_uuid'));
                 $data = array_merge($request->all(), [
                     'user_uuid' => $website->user_uuid,
                 ]);
             } else {
-                return $this->sendValidationFailedJsonResponse(["errors" => ["website_uuid" => __('messages.website_uuid_not_changed')]]);
+                return $this->sendValidationFailedJsonResponse(["errors" => ["send_project_uuid" => __('messages.website_uuid_not_changed')]]);
             }
         }
         $this->service->update($model, $data);
@@ -165,7 +165,7 @@ class MailTemplateController extends AbstractRestAPIController
     {
         $model = $this->myService->findMyMailTemplateByKeyOrAbort($id);
 
-        if (empty($request->get('website_uuid')) || $model->website_uuid == $request->get('website_uuid') ||
+        if (empty($request->get('send_project_uuid')) || $model->send_project_uuid == $request->get('send_project_uuid') ||
             !$this->service->checkExistsMailTemplateInTables($id)) {
 
             $this->service->update($model, $request->except(['user_uuid', 'publish_status']));
@@ -175,7 +175,7 @@ class MailTemplateController extends AbstractRestAPIController
             );
         }
 
-        return $this->sendValidationFailedJsonResponse(["errors" => ["website_uuid" => __('messages.website_uuid_not_changed')]]);
+        return $this->sendValidationFailedJsonResponse(["errors" => ["send_project_uuid" => __('messages.website_uuid_not_changed')]]);
     }
 
     /**
@@ -221,10 +221,10 @@ class MailTemplateController extends AbstractRestAPIController
      */
     public function storeUnpublishedMailTemplate(UnpublishedMailTemplateRequest $request)
     {
-        if (empty($request->get('website_uuid'))) {
+        if (empty($request->get('send_project_uuid'))) {
             $userUuid = auth()->user()->getKey();
         }else {
-            $website = $this->websiteService->findOneById($request->get('website_uuid'));
+            $website = $this->sendProjectService->findOneById($request->get('send_project_uuid'));
             $userUuid = $website->user_uuid;
         }
 
@@ -260,16 +260,16 @@ class MailTemplateController extends AbstractRestAPIController
     {
         $model = $this->service->findMailTemplateByKeyAndPublishStatus(MailTemplate::PENDING_PUBLISH_STATUS, $id);
 
-        if (empty($request->get('website_uuid')) || $model->website_uuid == $request->get('website_uuid')) {
+        if (empty($request->get('send_project_uuid')) || $model->send_project_uuid == $request->get('send_project_uuid')) {
             $data = $request->except('user_uuid');
         }else {
             if (!$this->service->checkExistsMailTemplateInTables($id)) {
-                $website = $this->websiteService->findOneById($request->get('website_uuid'));
+                $website = $this->sendProjectService->findOneById($request->get('send_project_uuid'));
                 $data = array_merge($request->all(), [
                     'user_uuid' => $website->user_uuid,
                 ]);
             } else {
-                return $this->sendValidationFailedJsonResponse(["errors" => ["website_uuid" => __('messages.website_uuid_not_changed')]]);
+                return $this->sendValidationFailedJsonResponse(["errors" => ["send_project_uuid" => __('messages.website_uuid_not_changed')]]);
             }
         }
 

@@ -8,14 +8,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Website extends AbstractModel
+class SendProject extends AbstractModel
 {
     use HasFactory, SoftDeletes;
 
     /**
      * @var string
      */
-    protected $table = "websites";
+    protected $table = "send_projects";
 
     /**
      * @var string
@@ -57,11 +57,11 @@ class Website extends AbstractModel
     }
 
     /**
-     * @return mixed
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function campaigns()
     {
-        return $this->hasMany(Campaign::class, 'website_uuid', 'uuid');
+        return $this->hasMany(Campaign::class, 'send_project_uuid', 'uuid');
     }
 
     /**
@@ -69,7 +69,7 @@ class Website extends AbstractModel
      */
     public function emails()
     {
-        return $this->belongsToMany(Email::class, 'website_email', 'website_uuid', 'email_uuid')->withTimestamps();
+        return $this->belongsToMany(Email::class, 'website_email', 'send_project_uuid', 'email_uuid')->withTimestamps();
     }
 
     /**
@@ -77,7 +77,7 @@ class Website extends AbstractModel
      */
     public function smtpAccounts()
     {
-        return $this->hasMany(SmtpAccount::class, 'website_uuid', 'uuid');
+        return $this->hasMany(SmtpAccount::class, 'send_project_uuid', 'uuid');
     }
 
     /**
@@ -93,7 +93,7 @@ class Website extends AbstractModel
      */
     public function websiteVerification()
     {
-        return $this->hasOne(WebsiteVerification::class, 'website_uuid', 'uuid');
+        return $this->hasOne(WebsiteVerification::class, 'send_project_uuid', 'uuid');
     }
 
     /**
@@ -101,7 +101,7 @@ class Website extends AbstractModel
      */
     public function mailTemplates()
     {
-        return $this->hasMany(MailTemplate::class, 'website_uuid', 'uuid');
+        return $this->hasMany(MailTemplate::class, 'send_project_uuid', 'uuid');
     }
 
     /**

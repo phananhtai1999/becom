@@ -26,7 +26,7 @@ class WebsiteVerification extends AbstractModel
      * @var string[]
      */
     protected $fillable = [
-        'website_uuid',
+        'send_project_uuid',
         'token',
         'verified_at'
     ];
@@ -57,9 +57,9 @@ class WebsiteVerification extends AbstractModel
     /**
      * @return BelongsTo
      */
-    public function website()
+    public function sendProject()
     {
-        return $this->belongsTo(Website::class, 'website_uuid', 'uuid');
+        return $this->belongsTo(SendProject::class, 'send_project_uuid', 'uuid');
     }
 
     /**
