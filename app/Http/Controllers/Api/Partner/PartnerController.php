@@ -26,6 +26,7 @@ use App\Services\PartnerTrackingService;
 use App\Services\PartnerUserService;
 use App\Services\SmtpAccountService;
 use App\Services\UserService;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
@@ -123,6 +124,8 @@ class PartnerController extends AbstractRestAPIController
                 $newUser = $this->userService->create([
                     'email' => $model->partner_email,
                     'username' => $model->partner_email,
+                    'first_name' => $model->first_name,
+                    'last_name' => $model->last_name,
                     'can_add_smtp_account' => 0,
                     'password' => Hash::make($password)
                 ]);
@@ -134,12 +137,14 @@ class PartnerController extends AbstractRestAPIController
             $partnerUser = $this->partnerUserService->findOneWhere(['user_uuid' => $userUuid]);
             if ($partnerUser) {
                 $this->partnerUserService->update($partnerUser, [
-                   'partner_code' => $code
+                    'partner_code' => $code,
+                    'partnered_at' => Carbon::now()
                 ]);
             }else {
                 $this->partnerUserService->create([
                     'user_uuid' => $userUuid,
-                    'partner_code' => $code
+                    'partner_code' => $code,
+                    'partnered_at' => Carbon::now()
                 ]);
             }
         }
@@ -174,6 +179,14 @@ class PartnerController extends AbstractRestAPIController
         $partner = $this->service->findOneWhereOrFail(['user_uuid' => auth()->user()->getKey()]);
 
         return $this->sendOkJsonResponse(["data" => $this->partnerUserService->referrerStatisticsOfPartnerbyType($partner->code, $request->get('type'))]);
+
+    }
+
+    public function partnerSubAffiliates()
+    {
+        $partner = $this->service->findOneWhereOrFail(['user_uuid' => auth()->user()->getKey()]);
+
+        return $this->sendOkJsonResponse(["data" => $this->partnerUserService->subAffiliatesStatisticsOfPartner($partner->code)]);
 
     }
 }
