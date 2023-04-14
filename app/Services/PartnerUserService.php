@@ -83,4 +83,23 @@ class PartnerUserService extends AbstractService
 
         return array_values($results);
     }
+
+    public function subAffiliatesStatisticsOfPartner($partnerCode)
+    {
+        $referredUsers = $this->model->join('partners as a' , 'a.code' , '=' , 'partner_user.partner_code')
+            ->where('registered_from_partner_code', $partnerCode)
+            ->selectRaw("partner_user.user_uuid, concat(a.first_name, ' ', a.first_name) as full_name, partner_user.partner_code, partner_user.partnered_at")->get()->keyBy('user_uuid')->toArray();
+
+        $results = $referredUsers;
+        foreach ($referredUsers as $key => $value) {
+            $numberCustomersByPartnerCode =  $this->customersPartner($value['partner_code'])->count();
+            $results[$key] = [
+                'user_uuid' => $value['user_uuid'],
+                'name' => $value['full_name'],
+                'joined' => $value['partnered_at'],
+                'customers' => $numberCustomersByPartnerCode,
+            ];
+        }
+        return array_values($results);
+    }
 }

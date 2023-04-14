@@ -26,6 +26,7 @@ class PartnerUser extends AbstractModel
         'user_uuid',
         'partner_code',
         'registered_from_partner_code',
+        'partnered_at'
     ];
 
     /**
@@ -34,7 +35,8 @@ class PartnerUser extends AbstractModel
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
-        'user_uuid' => 'integer'
+        'user_uuid' => 'integer',
+        'partnered_at' => 'datetime'
     ];
 
     public function user()

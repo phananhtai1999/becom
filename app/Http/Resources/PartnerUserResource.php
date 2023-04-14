@@ -19,6 +19,7 @@ class PartnerUserResource extends AbstractJsonResource
             'user_uuid' => $this->user_uuid,
             'partner_code' => $this->partner_code,
             'registered_from_partner_code' => $this->registered_from_partner_code,
+            'partnered_at' => $this->partnered_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
         ];
