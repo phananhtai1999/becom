@@ -29,7 +29,10 @@ class BillingAddressRequest extends FormRequest
             'address' => ['required', 'string'],
             'phone' => ['required', 'string'],
             'company' => ['string'],
-            'billing_address' => ['required', 'string'],
+            'country' => ['required', 'string'],
+            'city' => ['required', 'string'],
+            'state' => ['required', 'string'],
+            'zipcode' => ['required', 'integer'],
         ];
     }
 }
