@@ -36,4 +36,9 @@ class PartnerUser extends AbstractModel
         'updated_at' => 'datetime',
         'user_uuid' => 'integer'
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_uuid', 'uuid');
+    }
 }
