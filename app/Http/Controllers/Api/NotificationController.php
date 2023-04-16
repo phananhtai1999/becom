@@ -8,6 +8,7 @@ use App\Http\Controllers\Traits\RestIndexMyTrait;
 use App\Http\Requests\IndexRequest;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Requests\ReadNotificationsRequest;
+use App\Http\Requests\UnReadNotificationsRequest;
 use App\Http\Resources\NotificationResource;
 use App\Http\Resources\NotificationResourceCollection;
 use App\Services\MyNotificationService;
@@ -88,15 +89,16 @@ class NotificationController extends AbstractRestAPIController
         return $this->sendOkJsonResponse();
     }
 
-    public function readNotifications(ReadNotificationsRequest $request)
+    public function readNotifications(ReadNotificationsRequest $request): JsonResponse
     {
-        $notifications = $request->get('notifications');
-        foreach ($notifications as $notificationUuid) {
-            $notification = $this->service->findOneById($notificationUuid);
-            $this->service->update($notification, [
-                'read' => true
-            ]);
-        }
+        $this->service->updateReadByNotifications($request->get('notifications'), true);
+
+        return $this->sendOkJsonResponse();
+    }
+
+    public function unreadNotifications(UnReadNotificationsRequest $request):JsonResponse
+    {
+        $this->service->updateReadByNotifications($request->get('notifications'), false);
 
         return $this->sendOkJsonResponse();
     }

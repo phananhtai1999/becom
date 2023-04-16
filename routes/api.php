@@ -981,6 +981,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'notification.'], function (
         Route::delete('my/notification/{id}', [NotificationController::class, 'destroyMy'])->name('destroyMy');
     });
     Route::post('/read-notifications', [NotificationController::class, 'readNotifications'])->name('index');
+    Route::post('/unread-notifications', [NotificationController::class, 'unreadNotifications'])->name('index');
     Route::get('get-notification-categories', [NotificationController::class, 'getNotificationCategories']);
 });
 
