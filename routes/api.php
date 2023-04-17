@@ -39,6 +39,7 @@ use App\Http\Controllers\Api\Partner\PartnerLevelController;
 use App\Http\Controllers\Api\Partner\PartnerTrackingController;
 use App\Http\Controllers\Api\Payment\PaymentController;
 use App\Http\Controllers\Api\Payment\PaypalController;
+use App\Http\Controllers\Api\Payment\StripeController;
 use App\Http\Controllers\Api\PaymentMethodController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\PlatformPackageController;
@@ -644,8 +645,12 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'payment.'], function () {
     Route::get('/top-up-history', [PaymentController::class, 'topUpHistory']);
     Route::get('/subscription-history', [PaymentController::class, 'subscriptionHistory']);
     Route::get('/cancel-subscription', [PaymentController::class, 'cancelSubscription']);
-    Route::post('/card-stripe', [PaymentController::class, 'CardStripe'])->name('CardStripe');
-    Route::get('/all-card-stripe', [PaymentController::class, 'allCardStripe'])->name('allCardStripe');
+});
+
+Route::group(['middleware' => ['auth:api'], 'as' => 'stripe.'], function () {
+    Route::post('/card-stripe', [StripeController::class, 'cardStripe'])->name('cardStripe');
+    Route::get('/all-card-stripe', [StripeController::class, 'allCardStripe'])->name('allCardStripe');
+    Route::post('/update-card-stripe/{id}', [StripeController::class, 'updateCard'])->name('updateCard');
 });
 
 Route::get('/paypal/success-payment', [PaypalController::class, 'successPayment'])->name('paypal.successPayment');
@@ -931,6 +936,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'billingAddress.'], function
         Route::get('/billing-address/{id}', [BillingAddressController::class, 'show'])->name('show');
         Route::put('/billing-address/{id}', [BillingAddressController::class, 'edit'])->name('edit');
         Route::delete('/billing-address/{id}', [BillingAddressController::class, 'destroy'])->name('destroy');
+        Route::get('/set-default/{id}', [BillingAddressController::class, 'setDefault'])->name('setDefault');
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'team.'], function () {

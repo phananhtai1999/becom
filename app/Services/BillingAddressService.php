@@ -11,4 +11,9 @@ class BillingAddressService extends AbstractService
     protected $modelClass = BillingAddress::class;
 
     protected $modelQueryBuilderClass = BillingAddressQueryBuilder::class;
+
+    public function defaultBillingAddress()
+    {
+        return $this->model->where(['is_default' => true])->first();
+    }
 }

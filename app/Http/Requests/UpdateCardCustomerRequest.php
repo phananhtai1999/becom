@@ -6,7 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class UpdateCardStripeRequest extends FormRequest
+class UpdateCardCustomerRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -30,6 +30,7 @@ class UpdateCardStripeRequest extends FormRequest
             "exp_month" => ['required', 'integer'],
             "exp_year" => ['required', 'integer', 'min:' . Carbon::now()->year],
             "cvc" => ['required', 'integer', 'digits:3'],
+            "type" => ['required', Rule::in(['update', 'add'])],
         ];
 
         if ($this->request->get('exp_year') == Carbon::now()->year) {

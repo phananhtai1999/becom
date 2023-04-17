@@ -16,7 +16,20 @@ class BillingAddressResource extends JsonResource
     {
         $expand = request()->get('expand', []);
 
-        $data =  parent::toArray($request);
+        $data =  [
+            'name' => $this->name,
+            'user_uuid' => $this->user_uuid,
+            'email' => $this->email,
+            'address' => $this->address,
+            'phone' => $this->phone,
+            'company' => $this->company,
+            'country' => $this->country,
+            'city' => $this->city,
+            'state' => $this->state,
+            'zipcode' => $this->zipcode,
+            'type' => $this->type,
+            'is_default' => $this->is_default,
+        ];
         if (\in_array('billing_address__user', $expand)) {
             $data['user'] = new UserResource($this->user);
         }

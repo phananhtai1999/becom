@@ -36,9 +36,17 @@ class BillingAddressController extends AbstractRestAPIController
      */
     public function store(BillingAddressRequest $request)
     {
-        $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => auth()->user()->getkey(),
-        ]));
+        $default = $this->service->defaultBillingAddress();
+        if (!$default) {
+            $model = $this->service->create(array_merge($request->all(), [
+                'user_uuid' => auth()->user()->getkey(),
+                'is_default' => true
+            ]));
+        } else {
+            $model = $this->service->create(array_merge($request->all(), [
+                'user_uuid' => auth()->user()->getkey(),
+            ]));
+        }
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -67,11 +75,25 @@ class BillingAddressController extends AbstractRestAPIController
         );
     }
 
-    public function myIndex() {
+    public function myIndex()
+    {
         $models = $this->service->findAllWhere(['user_uuid' => auth()->user()->getKey()]);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+        );
+    }
+
+    public function setDefault($id) {
+        $default = $this->service->defaultBillingAddress();
+        if ($default) {
+            $this->service->update($default, ['is_default' => false]);
+        }
+        $billingAddress = $this->service->findOrFailById($id);
+        $this->service->update($billingAddress, ['is_default' => true]);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $billingAddress)
         );
     }
 }

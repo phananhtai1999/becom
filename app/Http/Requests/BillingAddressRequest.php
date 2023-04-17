@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class BillingAddressRequest extends FormRequest
 {
@@ -33,6 +34,7 @@ class BillingAddressRequest extends FormRequest
             'city' => ['required', 'string'],
             'state' => ['required', 'string'],
             'zipcode' => ['required', 'integer'],
+            'type' => ['required', Rule::in(['home_address', 'company_address'])],
         ];
     }
 }
