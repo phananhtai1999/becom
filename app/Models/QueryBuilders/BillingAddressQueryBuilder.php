@@ -39,6 +39,8 @@ class BillingAddressQueryBuilder extends AbstractQueryBuilder
                 'city',
                 'state',
                 'zipcode',
+                'is_default',
+                'type',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -53,6 +55,8 @@ class BillingAddressQueryBuilder extends AbstractQueryBuilder
                 'city',
                 'state',
                 'zipcode',
+                'is_default',
+                'type',
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -77,6 +81,10 @@ class BillingAddressQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__state', 'state'),
                 'zipcode',
                 AllowedFilter::exact('exact__zipcode', 'zipcode'),
+                'is_default',
+                AllowedFilter::exact('exact__is_default', 'is_default'),
+                'type',
+                AllowedFilter::exact('exact__type', 'type'),
             ]);
 
     }

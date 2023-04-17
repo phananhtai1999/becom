@@ -34,6 +34,8 @@ class BillingAddress extends Model
         'city',
         'state',
         'zipcode',
+        'type',
+        'is_default',
     ];
 
     /**

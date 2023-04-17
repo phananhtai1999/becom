@@ -34,9 +34,6 @@ use Stripe\StripeClient;
 
 class PaymentController extends AbstractRestAPIController
 {
-
-    const UPDATE_CARD_STRIPE = 'update';
-    const ADD_CARD_STRIPE = 'add';
     public function __construct(
         PaypalService               $paypalService,
         StripeService               $stripeService,
@@ -255,40 +252,5 @@ class PaymentController extends AbstractRestAPIController
 
             Event::dispatch(new SubscriptionSuccessEvent($subscriptionHistory->user_uuid, $subscriptionHistoryData, $userPlatformPackage));
         }
-    }
-
-    public function CardStripe(UpdateCardStripeRequest $request)
-    {
-        $subscriptionHistory = $this->subscriptionHistoryService->findOneWhere([
-            'payment_method_uuid' => PaymentMethod::STRIPE,
-            'user_uuid' => auth()->user()->getKey()
-        ]);
-        $stripe = $this->stripeService->getStripeClient();
-        $subscription = $stripe->subscriptions->retrieve($subscriptionHistory->logs['id']);
-        $customer = $stripe->customers->retrieve($subscription->customer);
-        $token = $this->stripeService->createNewToken($request);
-        if ($request->get('type') == self::UPDATE_CARD_STRIPE) {
-            $this->stripeService->updateCustomerCard($customer->id, $token);
-            $message = 'Update Card Successfully';
-        } else {
-            $this->stripeService->addCard($customer->id, $token);
-            $message = 'Add new Card Successfully';
-        }
-
-        return $this->sendOkJsonResponse(['message' => $message]);
-    }
-
-    public function allCardStripe()
-    {
-        $subscriptionHistory = $this->subscriptionHistoryService->findOneWhere([
-            'payment_method_uuid' => PaymentMethod::STRIPE,
-            'user_uuid' => auth()->user()->getKey()
-        ]);
-        $stripe = $this->stripeService->getStripeClient();
-        $subscription = $stripe->subscriptions->retrieve($subscriptionHistory->logs['id']);
-        $customer = $stripe->customers->retrieve($subscription->customer);
-        $allCard = $this->stripeService->allCard($customer->id);
-
-        return $this->sendOkJsonResponse(['message' => $allCard]);
     }
 }

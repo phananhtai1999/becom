@@ -293,4 +293,19 @@ class StripeService extends AbstractService
 
         return $stripe->customers->allSources($customerId);
     }
+
+    public function deleteCard($customerId, $id) {
+        $stripe = $this->getStripeClient();
+
+        return $stripe->customers->deleteSource($customerId, $id);
+    }
+
+    public function updateOneCard($customerId, $request, $id)
+    {
+        $stripe = $this->getStripeClient();
+        $token = $this->createNewToken($request);
+        $this->deleteCard($customerId, $id);
+
+        return $stripe->customers->createSource($customerId, ['source' => $token]);
+    }
 }
