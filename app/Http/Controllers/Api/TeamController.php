@@ -5,14 +5,17 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestEditTrait;
+use App\Http\Controllers\Traits\RestIndexMyTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestStoreTrait;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\InviteUserRequest;
 use App\Http\Requests\JoinTeamRequest;
+use App\Http\Requests\MyUpdateTeamRequest;
 use App\Http\Requests\SetContactListRequest;
 use App\Http\Requests\SetPermissionForTeamRequest;
+use App\Http\Requests\MyTeamRequest;
 use App\Http\Requests\TeamRequest;
 use App\Http\Requests\UpdateTeamRequest;
 use App\Http\Resources\ContactListResource;
@@ -29,6 +32,7 @@ use App\Models\PlatformPackage;
 use App\Models\Team;
 use App\Services\ContactListService;
 use App\Services\InviteService;
+use App\Services\MyTeamService;
 use App\Services\PermissionService;
 use App\Services\SmtpAccountService;
 use App\Services\TeamService;
@@ -41,7 +45,7 @@ use Illuminate\Support\Facades\Hash;
 
 class TeamController extends Controller
 {
-    use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestEditTrait;
+    use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestEditTrait, RestIndexMyTrait, RestStoreTrait;
 
     public function __construct(
         TeamService        $service,
@@ -50,10 +54,12 @@ class TeamController extends Controller
         UserService        $userService,
         InviteService      $inviteService,
         PermissionService $permissionService,
-        ContactListService $contactListService
+        ContactListService $contactListService,
+        MyTeamService $myService
     )
     {
         $this->service = $service;
+        $this->myService = $myService;
         $this->smtpAccountService = $smtpAccountService;
         $this->userTeamService = $userTeamService;
         $this->userService = $userService;
@@ -71,7 +77,7 @@ class TeamController extends Controller
         $this->indexRequest = IndexRequest::class;
     }
 
-    public function store(TeamRequest $request)
+    public function storeMy(MyTeamRequest $request)
     {
         $model = $this->service->create(array_merge($request->all(), [
             'owner_uuid' => auth()->user()->getkey(),
@@ -213,5 +219,28 @@ class TeamController extends Controller
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData($this->contactListresourceCollectionClass, $contactLists)
         );
+    }
+
+    public function editMy(MyUpdateTeamRequest $request, $id) {
+        $model = $this->myService->findOneWhereOrFail([
+            'owner_uuid' => auth()->user()->getKey(),
+            'uuid' => $id
+        ]);
+
+        $this->service->update($model, $request->all());
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+    public function destroyMy(MyUpdateTeamRequest $request, $id) {
+        $model = $this->myService->findOneWhereOrFail([
+            'owner_uuid' => auth()->user()->getKey(),
+            'uuid' => $id
+        ]);
+
+        $this->destroy($model->uuid);
+
+        return $this->sendOkJsonResponse();
     }
 }

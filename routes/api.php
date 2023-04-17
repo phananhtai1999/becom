@@ -97,7 +97,6 @@ Route::group(['as' => 'otp.'], function () {
 });
 
 
-
 //Social API
 Route::get('/auth/url/{driver}', [AuthBySocialNetworkController::class, 'loginUrl'])->name('loginUrl');
 Route::get('/auth/callback/google', [AuthBySocialNetworkController::class, 'loginByGoogleCallback'])->name('loginByGoogleCallback');
@@ -922,36 +921,46 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'footer_template.'], functio
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'country.'], function () {
-        Route::get('/countries', [CountryController::class, 'index'])->name('index');
-        Route::post('/country', [CountryController::class, 'store'])->name('store');
-        Route::get('/country/{id}', [CountryController::class, 'show'])->name('show');
-        Route::put('/country/{id}', [CountryController::class, 'edit'])->name('edit');
-        Route::delete('/country/{id}', [CountryController::class, 'destroy'])->name('destroy');
+    Route::get('/countries', [CountryController::class, 'index'])->name('index');
+    Route::post('/country', [CountryController::class, 'store'])->name('store');
+    Route::get('/country/{id}', [CountryController::class, 'show'])->name('show');
+    Route::put('/country/{id}', [CountryController::class, 'edit'])->name('edit');
+    Route::delete('/country/{id}', [CountryController::class, 'destroy'])->name('destroy');
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'billingAddress.'], function () {
-        Route::get('/billing-addresses', [BillingAddressController::class, 'index'])->name('index');
-        Route::get('my/billing-addresses', [BillingAddressController::class, 'myIndex'])->name('myIndex');
-        Route::post('/billing-address', [BillingAddressController::class, 'store'])->name('store');
-        Route::get('/billing-address/{id}', [BillingAddressController::class, 'show'])->name('show');
-        Route::put('/billing-address/{id}', [BillingAddressController::class, 'edit'])->name('edit');
-        Route::delete('/billing-address/{id}', [BillingAddressController::class, 'destroy'])->name('destroy');
-        Route::get('/set-default/{id}', [BillingAddressController::class, 'setDefault'])->name('setDefault');
+    Route::get('/billing-addresses', [BillingAddressController::class, 'index'])->name('index');
+    Route::get('my/billing-addresses', [BillingAddressController::class, 'myIndex'])->name('myIndex');
+    Route::post('/billing-address', [BillingAddressController::class, 'store'])->name('store');
+    Route::get('/billing-address/{id}', [BillingAddressController::class, 'show'])->name('show');
+    Route::put('/billing-address/{id}', [BillingAddressController::class, 'edit'])->name('edit');
+    Route::delete('/billing-address/{id}', [BillingAddressController::class, 'destroy'])->name('destroy');
+    Route::get('/set-default/{id}', [BillingAddressController::class, 'setDefault'])->name('setDefault');
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'team.'], function () {
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
         Route::get('/teams', [TeamController::class, 'index'])->name('index');
         Route::post('/team', [TeamController::class, 'store'])->name('store');
         Route::get('/team/{id}', [TeamController::class, 'show'])->name('show');
         Route::put('/team/{id}', [TeamController::class, 'edit'])->name('edit');
         Route::delete('/team/{id}', [TeamController::class, 'destroy'])->name('destroy');
-        Route::get('/list-member/{id}', [TeamController::class, 'listMember'])->name('listMember');
-        Route::get('/join-team', [TeamController::class, 'joinTeam'])->name('joinTeam');
-        Route::get('/invite-user', [TeamController::class, 'inviteUser'])->name('inviteUser');
-        Route::post('/team/set-permission', [TeamController::class, 'setPermissionForTeam'])->name('setPermissionForTeam');
-        Route::post('/team/set-contact-list', [TeamController::class, 'setContactList'])->name('setContactList');
-        Route::get('/permission-of-team/{id}', [TeamController::class, 'permissionOfTeams'])->name('permissionOfTeams');
-        Route::get('/contact-list-of-team/{id}', [TeamController::class, 'contactListOfTeams'])->name('contactListOfTeams');
+    });
+
+    Route::get('/list-member/{id}', [TeamController::class, 'listMember'])->name('listMember');
+    Route::get('/join-team', [TeamController::class, 'joinTeam'])->name('joinTeam');
+    Route::get('/invite-user', [TeamController::class, 'inviteUser'])->name('inviteUser');
+    Route::post('/team/set-permission', [TeamController::class, 'setPermissionForTeam'])->name('setPermissionForTeam');
+    Route::post('/team/set-contact-list', [TeamController::class, 'setContactList'])->name('setContactList');
+    Route::get('/permission-of-team/{id}', [TeamController::class, 'permissionOfTeams'])->name('permissionOfTeams');
+    Route::get('/contact-list-of-team/{id}', [TeamController::class, 'contactListOfTeams'])->name('contactListOfTeams');
+
+    Route::group(['as' => 'my.'], function () {
+        Route::get('my/teams', [TeamController::class, 'indexMy'])->name('indexMy');
+        Route::post('/my/team', [TeamController::class, 'storeMy'])->name('storeMy');
+        Route::put('/my/team/{id}', [TeamController::class, 'editMy'])->name('editMy');
+        Route::delete('/my/team/{id}', [TeamController::class, 'destroyMy'])->name('destroyMy');
+    });
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'addOn.'], function () {

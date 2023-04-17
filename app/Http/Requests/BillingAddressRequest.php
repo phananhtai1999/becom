@@ -34,7 +34,7 @@ class BillingAddressRequest extends FormRequest
             'city' => ['required', 'string'],
             'state' => ['required', 'string'],
             'zipcode' => ['required', 'integer'],
-            'type' => ['required', Rule::in(['home_address', 'company_address'])],
+            'type' => ['required'],
         ];
     }
 }
