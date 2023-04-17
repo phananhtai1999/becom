@@ -90,12 +90,12 @@ class TeamController extends Controller
 
     public function inviteUser(InviteUserRequest $request)
     {
+        $invite = $this->inviteService->create([
+            'email' => $request->get('email'),
+            'team_uuid' => $request->get('team_uuid'),
+            'status' => Invite::NEW_STATUS
+        ]);
         if ($request->get('type') == Team::LINK_INVITE) {
-            $invite = $this->inviteService->create([
-                'email' => $request->get('email'),
-                'team_uuid' => $request->get('team_uuid'),
-                'status' => Invite::NEW_STATUS
-            ]);
             $url = env('FRONTEND_URL') . 'auth/register?invite_uuid=' . $invite->uuid;
             $this->smtpAccountService->sendEmailNotificationSystem(null, new SendInviteToTeam($invite, $url), $request->get('email'));
         } elseif ($request->get('type') == Team::ACCOUNT_INVITE) {
@@ -106,13 +106,14 @@ class TeamController extends Controller
                 'can_add_smtp_account' => 0,
                 'password' => Hash::make($password)
             ]);;
+            $user->roles()->attach([config('user.default_role_uuid')]);
             $this->userTeamService->create(array_merge($request->all(), [
                 'user_uuid' => $user->uuid,
             ]));
             $this->smtpAccountService->sendEmailNotificationSystem($user, new SendInviteToTeamByAccount($user, $password));
         }
 
-        return $this->sendCreatedJsonResponse(['url' => env('FRONTEND_URL') . 'api/join-team?team_uuid=' . $request->get('team_uuid')]);
+        return $this->sendCreatedJsonResponse();
     }
 
     public function joinTeam(JoinTeamRequest $request)

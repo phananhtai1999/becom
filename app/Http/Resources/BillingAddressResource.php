@@ -17,6 +17,7 @@ class BillingAddressResource extends JsonResource
         $expand = request()->get('expand', []);
 
         $data =  [
+            'uuid' => $this->uuid,
             'name' => $this->name,
             'user_uuid' => $this->user_uuid,
             'email' => $this->email,

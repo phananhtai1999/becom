@@ -30,6 +30,7 @@ class Invite extends AbstractModel
         'email',
         'status',
         'team_uuid',
+        'is_logged',
     ];
 
     /**
