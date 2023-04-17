@@ -43,6 +43,8 @@ class MyCampaignQueryBuilder extends AbstractQueryBuilder
                 'was_finished',
                 'was_stopped_by_owner',
                 'send_type',
+                'send_from_name',
+                'send_from_email',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -61,6 +63,8 @@ class MyCampaignQueryBuilder extends AbstractQueryBuilder
                 'was_finished',
                 'was_stopped_by_owner',
                 'send_type',
+                'send_from_name',
+                'send_from_email',
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -89,6 +93,10 @@ class MyCampaignQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__reply_to_email', 'reply_to_email'),
                 'reply_name',
                 AllowedFilter::exact('exact__reply_name', 'reply_name'),
+                'send_from_name',
+                AllowedFilter::exact('exact__send_from_name', 'send_from_name'),
+                'send_from_email',
+                AllowedFilter::exact('exact__send_from_email', 'send_from_email'),
                 'was_finished',
                 AllowedFilter::exact('exact__was_finished', 'was_finished'),
                 'was_stopped_by_owner',

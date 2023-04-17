@@ -44,6 +44,8 @@ class Campaign extends AbstractModel
         'was_finished',
         'was_stopped_by_owner',
         'send_type',
+        'send_from_name',
+        'send_from_email',
     ];
 
     /**
