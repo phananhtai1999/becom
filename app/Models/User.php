@@ -310,6 +310,11 @@ class User extends Authenticatable
         return $this->hasOne(PartnerUser::class, 'user_uuid', 'uuid');
     }
 
+    public function invite()
+    {
+        return $this->hasOne(Invite::class, 'user_uuid', 'uuid');
+    }
+
     public function userTeamContactLists() {
         return $this->belongsToMany(ContactList::class, 'user_team_contact_lists', 'user_uuid', 'contact_list_uuid');
     }

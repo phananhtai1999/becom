@@ -122,6 +122,7 @@ class AuthController extends AbstractRestAPIController
             $this->guard()
                 ->attempt($loginRequest->only(['email', 'password']), $loginRequest->filled('remember'))
         ) {
+            $this->checkInvite($user);
             $otpConfig = $this->configService->findOneWhereOrFail(['key' => 'otp_status']);
             if ($otpConfig->value) {
 
@@ -215,7 +216,7 @@ class AuthController extends AbstractRestAPIController
         if ($user) {
             if ($registerRequest->get('invite_uuid')) {
                 $model = $this->inviteService->findOrFailById($registerRequest->get('invite_uuid'));
-                $this->inviteService->update($model, ['status' => Invite::ACTIVE_STATUS]);
+                $this->inviteService->update($model, ['status' => Invite::ACTIVE_STATUS, 'is_logged' => true]);
                 $this->userTeamService->create([
                     'team_uuid' => $model->team_uuid,
                     'user_uuid' => $user->uuid,
@@ -337,7 +338,6 @@ class AuthController extends AbstractRestAPIController
             return $this->sendValidationFailedJsonResponse(['message' => __('auth.active_code_null')]);
         }
         $activeCode = $this->generateRandomString();
-//        $activeCode = 5678;
         $refreshCount = $otp->refresh_count + 1;
         if ($refreshCount > config('otp.refresh_count')) {
 
@@ -426,6 +426,14 @@ class AuthController extends AbstractRestAPIController
             )->withCookie(
                 \cookie('logged', true, config('auth.password_timeout'), null, null, true, false)
             )->withoutCookie('invitePartner');
+    }
+
+    public function checkInvite($user)
+    {
+        $invite = $this->inviteService->findOneWhere(['email' => $user->email]);
+        if ($invite && $invite->is_logged) {
+            $this->inviteService->update($invite, ['status' => Invite::ACTIVE_STATUS, 'is_logged' => true]);
+        }
     }
 }
 
