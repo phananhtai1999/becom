@@ -34,6 +34,8 @@ class CampaignResource extends AbstractJsonResource
             'user_uuid' => $this->user_uuid,
             'reply_to_email' => $this->reply_to_email,
             'reply_name' => $this->reply_name,
+            'send_from_name' => $this->send_from_name,
+            'send_from_email' => $this->send_from_email,
             'was_finished' => $this->was_finished,
             'was_stopped_by_owner' => $this->was_stopped_by_owner,
             'number_credit_needed_to_start_campaign' => $this->number_credit_needed_to_start_campaign,

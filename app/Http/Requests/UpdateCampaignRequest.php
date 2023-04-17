@@ -72,6 +72,8 @@ class UpdateCampaignRequest extends AbstractRequest
             })],
             'reply_to_email' => ['nullable', 'required_if:send_type,email', 'string', 'email:rfc,dns'],
             'reply_name' => ['nullable', 'required_if:send_type,email', 'string'],
+            'send_from_email' => ['nullable', 'string', 'email:rfc,dns'],
+            'send_from_name' => ['nullable', 'string'],
             'was_finished' => ['boolean'],
             'was_stopped_by_owner' => ['boolean'],
             'user_uuid' => ['nullable', 'numeric', 'min:1', 'exists:users,uuid'],
