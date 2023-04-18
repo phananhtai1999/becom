@@ -38,9 +38,22 @@ class Team extends Model
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
     ];
-
+    /**
+     * @var string[]
+     */
+    protected $appends = [
+        'NumOfTeamMember'
+    ];
     public function owner()
     {
         return $this->belongsTo(User::class, 'owner_uuid', 'uuid');
+    }
+
+    public function userTeam() {
+        return $this->hasMany(UserTeam::class, 'team_uuid', 'uuid');
+    }
+    public function getNumOfTeamMemberAttribute()
+    {
+        return count($this->userTeam);
     }
 }

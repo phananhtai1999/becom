@@ -33,11 +33,6 @@ class TeamQueryBuilder extends AbstractQueryBuilder
                 'owner_uuid',
             ])
             ->defaultSort('-created_at')
-            ->allowedSorts([
-                $modelKeyName,
-                'name',
-                'owner_uuid',
-            ])
             ->allowedFilters([
                 $modelKeyName,
                 AllowedFilter::exact('exact__' . $modelKeyName, $modelKeyName),
