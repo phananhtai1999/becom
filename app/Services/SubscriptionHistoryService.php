@@ -38,4 +38,12 @@ class SubscriptionHistoryService extends AbstractService
     {
         return $this->model->where('logs->id', $log)->first();
     }
+
+    /**
+     * @return mixed
+     */
+    public function getSubscriptionHistoryOfCurrentUser()
+    {
+        return $this->model->where('user_uuid',auth()->user()->getkey())->first();
+    }
 }

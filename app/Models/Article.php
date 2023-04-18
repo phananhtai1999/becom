@@ -21,6 +21,11 @@ class Article extends AbstractModel
 
     const PUBLISHED_PUBLISH_STATUS = 1;
     const BLOCKED_PUBLISH_STATUS = 2;
+    const PUBLIC_CONTENT_FOR_USER = 'public';
+    const LOGIN_CONTENT_FOR_USER = 'login';
+    const EDITOR_CONTENT_FOR_USER = 'editor';
+    const PAYMENT_CONTENT_FOR_USER = 'payment';
+    const ADMIN_CONTENT_FOR_USER = 'admin';
 
     /**
      * @var string
@@ -42,7 +47,9 @@ class Article extends AbstractModel
         'article_category_uuid',
         'publish_status',
         'title',
-        'content'
+        'content',
+        'video',
+        'content_for_user',
     ];
 
     public $translatable = ['title', 'content'];

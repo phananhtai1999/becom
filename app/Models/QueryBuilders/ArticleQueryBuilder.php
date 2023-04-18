@@ -36,7 +36,9 @@ class ArticleQueryBuilder extends AbstractQueryBuilder
                 'article_category_uuid',
                 'publish_status',
                 'title',
-                'content'
+                'content',
+                'video',
+                'content_for_user',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -47,7 +49,9 @@ class ArticleQueryBuilder extends AbstractQueryBuilder
                 'article_category_uuid',
                 'publish_status',
                 'title',
-                'content'
+                'content',
+                'video',
+                'content_for_user',
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -64,6 +68,10 @@ class ArticleQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__article_category_uuid', 'article_category_uuid'),
                 'publish_status',
                 AllowedFilter::exact('exact__publish_status', 'publish_status'),
+                'video',
+                AllowedFilter::exact('exact__video', 'video'),
+                'content_for_user',
+                AllowedFilter::exact('exact__content_for_user', 'content_for_user'),
                 'created_at',
                 AllowedFilter::exact('exact__created_at', 'created_at'),
                 'updated_at',
