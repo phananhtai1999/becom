@@ -46,8 +46,8 @@ class BusinessManagementController extends AbstractRestAPIController
     public function __construct(
         BusinessManagementService   $service,
         MyBusinessManagementService $myService,
-        DomainService $domainService,
-        MyDomainService $myDomainService
+        DomainService               $domainService,
+        MyDomainService             $myDomainService
     )
     {
         $this->service = $service;
@@ -75,7 +75,7 @@ class BusinessManagementController extends AbstractRestAPIController
         if ($businessManagement) {
             return $this->sendValidationFailedJsonResponse();
         }
-        $model = $this->service->create(array_merge($request->all(), [
+        $model = $this->service->create(array_merge($request->except('domain_uuid'), [
             'owner_uuid' => $request->get('owner_uuid') ?? auth()->user()->getKey(),
         ]));
 
@@ -108,14 +108,16 @@ class BusinessManagementController extends AbstractRestAPIController
 
             return $this->sendValidationFailedJsonResponse();
         }
-        $this->service->update($model, $request->all());
+        $this->service->update($model, $request->except('domain_uuid'));
         $model->businessCategories()->sync($request->business_categories ?? $model->business_categories);
 
-        //check Domain Business Of User Exists Or Not
-        $domain = $this->domainService->updateOrCreateDomainByBusiness($request->domain, $model);
-        //Set Domain Default for Business
-        if ($domain->verified_at) {
-            $this->service->setDomainDefault($model, $domain->uuid);
+        if ($request->domain) {
+            //check Domain Business Of User Exists Or Not
+            $domain = $this->domainService->updateOrCreateDomainByBusiness($request->domain, $model);
+            //Set Domain Default for Business
+            if ($domain->verified_at) {
+                $this->service->setDomainDefault($model, $domain->uuid);
+            }
         }
 
         return $this->sendOkJsonResponse(
@@ -150,7 +152,7 @@ class BusinessManagementController extends AbstractRestAPIController
             return $this->sendValidationFailedJsonResponse();
         }
 
-        $model = $this->service->create(array_merge($request->all(), [
+        $model = $this->service->create(array_merge($request->except('domain_uuid'), [
             'owner_uuid' => auth()->user()->getkey(),
         ]));
 
@@ -188,16 +190,18 @@ class BusinessManagementController extends AbstractRestAPIController
     {
         $model = $this->myService->showMyBusinessManagement($id);
 
-        $this->service->update($model, array_merge($request->all(), [
+        $this->service->update($model, array_merge($request->except('domain_uuid'), [
             'owner_uuid' => auth()->user()->getkey(),
         ]));
         $model->businessCategories()->sync($request->business_categories ?? $model->business_categories);
 
-        //check Domain Business Of User Exists Or Not
-        $domain = $this->myDomainService->updateOrCreateDomainByBusiness($request->domain, $model);
-        //Set Domain Default for Business
-        if ($domain->verified_at) {
-            $this->service->setDomainDefault($model, $domain->uuid);
+        if ($request->domain) {
+            //check Domain Business Of User Exists Or Not
+            $domain = $this->myDomainService->updateOrCreateDomainByBusiness($request->domain, $model);
+            //Set Domain Default for Business
+            if ($domain->verified_at) {
+                $this->service->setDomainDefault($model, $domain->uuid);
+            }
         }
 
         return $this->sendOkJsonResponse(
