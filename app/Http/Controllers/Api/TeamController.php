@@ -45,7 +45,7 @@ use Illuminate\Support\Facades\Hash;
 
 class TeamController extends Controller
 {
-    use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestEditTrait, RestIndexMyTrait, RestStoreTrait;
+    use RestShowTrait, RestDestroyTrait, RestEditTrait, RestStoreTrait;
 
     public function __construct(
         TeamService        $service,
@@ -75,6 +75,32 @@ class TeamController extends Controller
         $this->storeRequest = TeamRequest::class;
         $this->editRequest = UpdateTeamRequest::class;
         $this->indexRequest = IndexRequest::class;
+    }
+
+    public function index(IndexRequest $request)
+    {
+        if ($request->get('sort') == 'num_of_team_member' || $request->get('sort') == '-num_of_team_member') {
+            $models = $this->service->sortByNumOfTeamMember($request);
+        } else {
+            $models = $this->service->getCollectionWithPagination();
+        }
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+        );
+    }
+
+    public function indexMy(IndexRequest $request)
+    {
+        if ($request->get('sort') == 'num_of_team_member' || $request->get('sort') == '-num_of_team_member') {
+            $models = $this->myService->sortByNumOfTeamMember($request);
+        } else {
+            $models = $this->myService->getCollectionWithPagination();
+        }
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+        );
     }
 
     public function storeMy(MyTeamRequest $request)

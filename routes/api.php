@@ -935,7 +935,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'billingAddress.'], function
     Route::get('/billing-address/{id}', [BillingAddressController::class, 'show'])->name('show');
     Route::put('/billing-address/{id}', [BillingAddressController::class, 'edit'])->name('edit');
     Route::delete('/billing-address/{id}', [BillingAddressController::class, 'destroy'])->name('destroy');
-    Route::get('/set-default/{id}', [BillingAddressController::class, 'setDefault'])->name('setDefault');
+    Route::post('/set-default/{id}', [BillingAddressController::class, 'setDefault'])->name('setDefault');
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'team.'], function () {
