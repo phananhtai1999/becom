@@ -165,4 +165,15 @@ abstract class AbstractService
             'pageName' => 'page',
         ]);
     }
+
+    public function getIndexRequest($request) {
+        return [
+            'per_page' => $request->get('per_page', 15),
+            'page' => $request->get('page', 1),
+            'columns' => $request->get('columns', '*'),
+            'page_name' => $request->get('page_name', 'page'),
+            'search' => $request->get('search', ''),
+            'search_by' => $request->get('search_by', ''),
+        ];
+    }
 }

@@ -53,9 +53,9 @@ class TeamController extends Controller
         SmtpAccountService $smtpAccountService,
         UserService        $userService,
         InviteService      $inviteService,
-        PermissionService $permissionService,
+        PermissionService  $permissionService,
         ContactListService $contactListService,
-        MyTeamService $myService
+        MyTeamService      $myService
     )
     {
         $this->service = $service;
@@ -205,11 +205,13 @@ class TeamController extends Controller
     }
 
     /**
+     * @param IndexRequest $request
      * @param $id
      * @return JsonResponse
      */
-    public function listMember($id){
-        $model = $this->userTeamService->findAllWhere(['team_uuid' => $id]);
+    public function listMember(IndexRequest $request, $id)
+    {
+        $model = $this->userTeamService->listTeamMember($id, $request);
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->userTeamResourceCollectionClass, $model)
@@ -220,7 +222,8 @@ class TeamController extends Controller
      * @param $id
      * @return JsonResponse
      */
-    public function permissionOfTeams($id) {
+    public function permissionOfTeams($id)
+    {
         if (!$this->checkTeamOwner($id)) {
 
             return $this->sendJsonResponse(false, 'You are not owner of team to set permission', [], 403);
@@ -235,7 +238,8 @@ class TeamController extends Controller
      * @param $id
      * @return JsonResponse
      */
-    public function contactListOfTeams($id) {
+    public function contactListOfTeams($id)
+    {
         if (!$this->checkTeamOwner($id)) {
 
             return $this->sendJsonResponse(false, 'You are not owner of team to set permission', [], 403);
@@ -248,7 +252,8 @@ class TeamController extends Controller
         );
     }
 
-    public function editMy(MyUpdateTeamRequest $request, $id) {
+    public function editMy(MyUpdateTeamRequest $request, $id)
+    {
         $model = $this->myService->findOneWhereOrFail([
             'owner_uuid' => auth()->user()->getKey(),
             'uuid' => $id
@@ -260,7 +265,9 @@ class TeamController extends Controller
             $this->service->resourceToData($this->resourceClass, $model)
         );
     }
-    public function destroyMy(MyUpdateTeamRequest $request, $id) {
+
+    public function destroyMy(MyUpdateTeamRequest $request, $id)
+    {
         $model = $this->myService->findOneWhereOrFail([
             'owner_uuid' => auth()->user()->getKey(),
             'uuid' => $id

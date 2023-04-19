@@ -169,7 +169,30 @@ class StripeService extends AbstractService
                 'auto_renew' => true
             ];
             Event::dispatch(new SubscriptionSuccessEvent(Auth::user()->getKey(), $subscriptionHistory, $userPlatformPackage));
-
+//
+//            $checkout_session = $stripe->checkout->sessions->create([
+//                'line_items' => [[
+//                    'price' => $plan,
+//                    'quantity' => 1,
+//                ]],
+//                'mode' => 'subscription',
+//                'success_url' => route('stripe.successPaymentSubscription', [
+//                    'goBackUrl=' . $request['go_back_url'],
+//                    'subscriptionPlanUuid=' . $subscriptionPlan->uuid,
+//                    'subscriptionDate=' . $subscriptionDate,
+//                    'userUuid=' . Auth::user()->getKey(),
+//                    'expirationDate=' . $expirationDate,
+//                    'platformPackageUuid=' . $subscriptionPlan->platform_package_uuid,
+//                    'billingAddressUuid=' . $request['billing_address_uuid'],
+//                ]) . '&session_id={CHECKOUT_SESSION_ID}',
+//                "cancel_url" => route('stripe.cancelPaymentSubscription', ['goBackUrl=' . $request['go_back_url'], 'subscriptionPlanUuid=' . $subscriptionPlan->uuid,]),
+//            ]);
+//            if (isset($checkout_session)) {
+//                return [
+//                    'status' => true,
+//                    'redirect_url' => $checkout_session->url
+//                ];
+//            }
             return [
                 'status' => true,
                 'redirect_url' => env('FRONTEND_URL') . 'my/profile/upgrade/success?go_back_url=' . $request['go_back_url'] . '&plan_id=' . $subscriptionPlan->uuid
@@ -183,7 +206,8 @@ class StripeService extends AbstractService
         }
     }
 
-    public function processSubscriptionAddOn($addOnSubscriptionPlan, $subscriptionDate, $expirationDate, $plan, $request) {
+    public function processSubscriptionAddOn($addOnSubscriptionPlan, $subscriptionDate, $expirationDate, $plan, $request)
+    {
 
         try {
             $subscriptionData = $this->subscription($request, $plan);
@@ -259,7 +283,8 @@ class StripeService extends AbstractService
         return ["id" => $subscription->id];
     }
 
-    public function createNewToken($request) {
+    public function createNewToken($request)
+    {
         $stripe = $this->getStripeClient();
 
         return $stripe->tokens->create([
@@ -273,28 +298,33 @@ class StripeService extends AbstractService
         ]);
     }
 
-    public function updateCustomerCard($customerId, $token) {
+    public function updateCustomerCard($customerId, $token)
+    {
         $stripe = $this->getStripeClient();
 
-        return $stripe->customers->update($customerId,[
+        return $stripe->customers->update($customerId, [
             'source' => $token
         ]);
     }
 
-    public function addCard($customerId, $token) {
+    public function addCard($customerId, $token)
+    {
         $stripe = $this->getStripeClient();
 
-        return $stripe->customers->createSource($customerId,[
+        return $stripe->customers->createSource($customerId, [
             'source' => $token
         ]);
     }
-    public function allCard($customerId) {
+
+    public function allCard($customerId)
+    {
         $stripe = $this->getStripeClient();
 
         return $stripe->customers->allSources($customerId);
     }
 
-    public function deleteCard($customerId, $id) {
+    public function deleteCard($customerId, $id)
+    {
         $stripe = $this->getStripeClient();
 
         return $stripe->customers->deleteSource($customerId, $id);
