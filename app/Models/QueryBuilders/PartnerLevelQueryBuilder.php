@@ -32,7 +32,7 @@ class PartnerLevelQueryBuilder extends AbstractQueryBuilder
             ->allowedFields([
                 $modelKeyName,
                 'title',
-                'number_of_references',
+                'number_of_customers',
                 'commission',
                 'content',
                 'image'
@@ -41,7 +41,7 @@ class PartnerLevelQueryBuilder extends AbstractQueryBuilder
             ->allowedSorts([
                 $modelKeyName,
                 'title',
-                'number_of_references',
+                'number_of_customers',
                 'commission',
                 'content',
                 'image'
@@ -49,8 +49,8 @@ class PartnerLevelQueryBuilder extends AbstractQueryBuilder
             ->allowedFilters([
                 $modelKeyName,
                 AllowedFilter::exact('exact__' . $modelKeyName, $modelKeyName),
-                'number_of_references',
-                AllowedFilter::exact('exact__number_of_references', 'number_of_references'),
+                'number_of_customers',
+                AllowedFilter::exact('exact__number_of_customers', 'number_of_customers'),
                 'commission',
                 AllowedFilter::exact('exact__commission', 'commission'),
                 'content',
