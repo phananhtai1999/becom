@@ -70,10 +70,10 @@ class ArticleService extends AbstractService
      * @param $page
      * @param $search
      * @param $searchBy
-     * @param $arrayContentForUser
+     * @param $arrayListContentForUser
      * @return mixed
      */
-    public function getArticleByPermission($perPage, $columns, $pageName, $page, $search, $searchBy, $arrayContentForUser)
+    public function getArticleByPermission($perPage, $columns, $pageName, $page, $search, $searchBy, $arrayListContentForUser)
     {
         //Get  Article Category Public
         $articleCategoryPublicByUuids = (new ArticleCategoryService())->getListArticleCategoryUuidsPublic();
@@ -84,7 +84,7 @@ class ArticleService extends AbstractService
                 $query->whereIn('article_category_uuid', $articleCategoryPublicByUuids)
                     ->orWhereNull('article_category_uuid');
             })
-            ->whereNotIn('content_for_user', $arrayContentForUser)
+            ->whereIn('content_for_user', config('articlepermission.' . $arrayListContentForUser))
             ->paginate($perPage, $columns, $pageName, $page);
     }
 
@@ -101,7 +101,7 @@ class ArticleService extends AbstractService
     {
         //Check guest
         if (auth()->guest()) {
-            return $this->getArticlePublicWithPagination($perPage, $columns, $pageName, $page, $search, $searchBy);
+            return $this->getArticleByPermission($perPage, $columns, $pageName, $page, $search, $searchBy, Article::PUBLIC_CONTENT_FOR_USER);
         }
 
         //Check auth:api
@@ -111,13 +111,15 @@ class ArticleService extends AbstractService
             return $this->loadAllArticles($perPage, $columns, $pageName, $page, $search, $searchBy);
         } elseif ($this->paidUser()) {
             //Payment
-            return $this->getArticleByPermission($perPage, $columns, $pageName, $page, $search, $searchBy, [Article::ADMIN_CONTENT_FOR_USER]);
+            $contentForUSer = Article::PAYMENT_CONTENT_FOR_USER;
         } elseif (auth()->user()->roles->whereIn('slug', ["editor"])->count()) {
             //Editor
-            return $this->getArticleByPermission($perPage, $columns, $pageName, $page, $search, $searchBy, [Article::ADMIN_CONTENT_FOR_USER, Article::PAYMENT_CONTENT_FOR_USER]);
+            $contentForUSer = Article::EDITOR_CONTENT_FOR_USER;
+        } else {
+            //Login
+            $contentForUSer = Article::LOGIN_CONTENT_FOR_USER;
         }
-        //Login
-        return $this->getArticleByPermission($perPage, $columns, $pageName, $page, $search, $searchBy, [Article::ADMIN_CONTENT_FOR_USER, Article::PAYMENT_CONTENT_FOR_USER, Article::EDITOR_CONTENT_FOR_USER]);
+        return $this->getArticleByPermission($perPage, $columns, $pageName, $page, $search, $searchBy, $contentForUSer);
     }
 
     /**
