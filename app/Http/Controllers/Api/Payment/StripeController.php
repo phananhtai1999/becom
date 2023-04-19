@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Api\Payment;
 
 use App\Abstracts\AbstractRestAPIController;
+use App\Events\SubscriptionSuccessEvent;
 use App\Http\Requests\UpdateCardCustomerRequest;
 use App\Http\Requests\UpdateCardStripeRequest;
 use App\Models\PaymentMethod;
 use App\Services\StripeService;
 use App\Services\SubscriptionHistoryService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Event;
 
 class StripeController extends AbstractRestAPIController
 {
@@ -55,7 +58,8 @@ class StripeController extends AbstractRestAPIController
         return $this->sendOkJsonResponse(['data' => $card]);
     }
 
-    public function getCustomer() {
+    public function getCustomer()
+    {
         $subscriptionHistory = $this->subscriptionHistoryService->findOneWhere([
             'payment_method_uuid' => PaymentMethod::STRIPE,
             'user_uuid' => auth()->user()->getKey()
@@ -67,5 +71,39 @@ class StripeController extends AbstractRestAPIController
         $subscription = $stripe->subscriptions->retrieve($subscriptionHistory->logs['id']);
 
         return $stripe->customers->retrieve($subscription->customer);
+    }
+
+    public function successPaymentSubscription(Request $request)
+    {
+        $stripe = $this->service->getStripeClient();
+        $response = $stripe->checkout->sessions->retrieve($request->session_id);
+        $subscriptionData = ["id" => $response->subscription];
+
+        $subscriptionHistory = [
+            'user_uuid' => $request->userUuid,
+            'subscription_plan_uuid' => $request->subscriptionPlanUuid,
+            'subscription_date' => $request->subscriptionDate,
+            'billing_address_uuid' => $request->billingAddressUuid,
+            'expiration_date' => $request->expirationDate,
+            'payment_method_uuid' => PaymentMethod::STRIPE,
+            'logs' => $subscriptionData,
+            'status' => 'success'
+        ];
+        $userPlatformPackage = [
+            'user_uuid' => $request->userUuid,
+            'platform_package_uuid' => $request->platformPackageUuid,
+            'subscription_plan_uuid' => $request->subscriptionPlanUuid,
+            'expiration_date' => $request->expirationDate,
+            'auto_renew' => true
+        ];
+
+        if (isset($response['status']) && $response['status'] == 'complete') {
+            Event::dispatch(new SubscriptionSuccessEvent($request->userUuid, $subscriptionHistory, $userPlatformPackage));
+
+            return redirect()->to(env('FRONTEND_URL') . 'my/profile/upgrade/success?go_back_url='. $request['goBackUrl'] . '&plan_id=' . $request->subscriptionPlanUuid);
+        } else {
+
+            return redirect()->to(env('FRONTEND_URL') . 'my/profile/upgrade/failed?go_back_url='. $request['goBackUrl'] . '&plan_id=' . $request->subscriptionPlanUuid);
+        }
     }
 }
