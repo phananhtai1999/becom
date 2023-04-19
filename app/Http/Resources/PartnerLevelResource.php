@@ -20,7 +20,7 @@ class PartnerLevelResource extends AbstractJsonResource
             'image' => $this->image,
             'title' => (new UserService())->checkLanguagesPermission() ? $this->getTranslations('title') : $this->title,
             'title_translate' => $this->title_translate,
-            'number_of_references' => $this->number_of_references,
+            'number_of_customers' => $this->number_of_customers,
             'commission' => $this->commission,
             'content' => $this->content,
             'content_translate' => $this->content_translate,

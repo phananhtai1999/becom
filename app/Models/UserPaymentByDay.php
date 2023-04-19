@@ -23,7 +23,7 @@ class UserPaymentByDay extends AbstractModel
      * @var string[]
      */
     protected $fillable = [
-        'user_uuid', 'payment', 'month', 'year', 'total_payment'
+        'user_uuid', 'payment', 'month', 'year', 'total_payment', 'created_at', 'updated_at'
     ];
 
     /**

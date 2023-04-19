@@ -27,7 +27,7 @@ class PartnerLevel extends AbstractModel
      */
     protected $fillable = [
         'title',
-        'number_of_references',
+        'number_of_customers',
         'commission',
         'content',
         'image'
@@ -46,7 +46,7 @@ class PartnerLevel extends AbstractModel
         'content' => 'array',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
-        'number_of_references' => 'integer',
+        'number_of_customers' => 'integer',
         'commission' => 'integer'
     ];
 

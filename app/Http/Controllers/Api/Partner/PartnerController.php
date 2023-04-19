@@ -13,18 +13,28 @@ use App\Http\Requests\ChangeStatusPartnerRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\PartnerReferralsRequest;
 use App\Http\Requests\PartnerRequest;
+use App\Http\Requests\PartnerTop10Request;
 use App\Http\Requests\RegisterPartnerRequest;
 use App\Http\Requests\UpdatePartnerRequest;
 use App\Http\Resources\PartnerResource;
 use App\Http\Resources\PartnerResourceCollection;
 use App\Mail\SendAccountForNewPartner;
+use App\Models\AddOnSubscriptionHistory;
+use App\Models\CreditPackageHistory;
 use App\Models\Partner;
+use App\Models\PartnerLevel;
+use App\Models\PartnerTrackingByYear;
+use App\Models\PartnerUser;
+use App\Models\SubscriptionHistory;
 use App\Models\User;
+use App\Models\UserPaymentByDay;
 use App\Services\PartnerLevelService;
 use App\Services\PartnerService;
+use App\Services\PartnerTrackingByYearService;
 use App\Services\PartnerTrackingService;
 use App\Services\PartnerUserService;
 use App\Services\SmtpAccountService;
+use App\Services\UserPaymentByDayService;
 use App\Services\UserService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -46,13 +56,20 @@ class PartnerController extends AbstractRestAPIController
 
     protected $partnerTrackingService;
 
+    protected $userPaymentByDayService;
+
+    protected $partnerTrackingByYearService;
+
+
     public function __construct(
         PartnerService $service,
         PartnerLevelService $partnerLevelService,
         UserService $userService,
         SmtpAccountService $smtpAccountService,
         PartnerUserService $partnerUserService,
-        PartnerTrackingService $partnerTrackingService
+        PartnerTrackingService $partnerTrackingService,
+        UserPaymentByDayService $userPaymentByDayService,
+        PartnerTrackingByYearService $partnerTrackingByYearService
     )
     {
         $this->service = $service;
@@ -66,6 +83,8 @@ class PartnerController extends AbstractRestAPIController
         $this->smtpAccountService = $smtpAccountService;
         $this->partnerUserService = $partnerUserService;
         $this->partnerTrackingService = $partnerTrackingService;
+        $this->userPaymentByDayService = $userPaymentByDayService;
+        $this->partnerTrackingByYearService = $partnerTrackingByYearService;
     }
 
     public function store()
@@ -161,15 +180,16 @@ class PartnerController extends AbstractRestAPIController
     public function partnerDashboard()
     {
         $partner = $this->service->findOneWhereOrFail(['user_uuid' => auth()->user()->getKey()]);
-        $referrals = $this->partnerUserService->findAllWhere(['registered_from_partner_code' => $partner->code])->count();
-        $clicks = $this->partnerTrackingService->findAllWhere(['partner_uuid' => $partner->uuid])->count();
-        $customers = $this->partnerUserService->customersPartner($partner->code)->count();
+        $referrals = $this->partnerUserService->referralsOfPartnerInMonth($partner->code)->count();
+        $clicks = $this->partnerTrackingService->trackingClicksOfPartnerInMonth($partner->uuid)->count();
+        $customers = $this->partnerUserService->numberCustomerPartnerInMonth($partner->code)->count();
+        $unpaid_earnings = $this->partnerTrackingByYearService->earningsOfPartnerByMonth($partner->uuid);
 
         return $this->sendOkJsonResponse(["data" => [
             "referrals" => $referrals,
             "clicks" => $clicks,
             "customers" => $customers,
-            "unpaid_earnings" => 0, //Tạm thời cho = 0
+            "unpaid_earnings" => $unpaid_earnings
         ]]);
     }
 
@@ -188,5 +208,141 @@ class PartnerController extends AbstractRestAPIController
 
         return $this->sendOkJsonResponse(["data" => $this->partnerUserService->subAffiliatesStatisticsOfPartner($partner->code)]);
 
+    }
+
+    public function partnerTop10(PartnerTop10Request $request)
+    {
+        $result = [];
+        if (!$request->get('type') || $request->get('type') === 'click') {
+            $result = $this->partnerTrackingService->getTop10PartnerClick();
+        }elseif ($request->get('type') === 'signup') {
+            $result = $this->partnerUserService->getTop10PartnerSignUp();
+        }elseif ($request->get('type') === 'customer'){
+            $result = $this->partnerUserService->getTop10PartnerCustomer();
+            dd($result);
+        }
+
+         $newResult = $result->map(function ($item) {
+           return [
+               'name' => $item['full_name'],
+               'email' => substr($item['partner_email'], 0, 5) . str_repeat('*', strlen($item['partner_email']) - 10) . substr($item['partner_email'], -5),
+               'total' => $item['count']
+           ];
+        });
+
+        return $this->sendOkJsonResponse(["data" => $newResult]);
+    }
+
+    public function partnerDetail()
+    {
+//        $partner = $this->service->findOneWhereOrFail(['user_uuid' => auth()->user()->getKey()]);
+//        $startDate = Carbon::today()->subDays(6);
+//        $endDate = Carbon::today();
+//        $format = "%Y-%m-%d";
+//        $clicks = $this->partnerTrackingService->trackingClickByDateFormat($format, $startDate, $endDate, $partner->uuid);
+//        $signups = $this->partnerUserService->trackingSignUpByDateFormat($format, $startDate, $endDate, $partner->code);
+//        $customers = $this->partnerUserService->trackingCustomersByDateFormat($format, $startDate, $endDate, $partner->uuid);
+//        $earnings;
+
+        $fakeData = [
+            [
+                'label' => '2023-04-19',
+                'clicks' => 10,
+                'signups' => 10,
+                'customers' => 10,
+                'earnings' => 10,
+            ],
+            [
+                'label' => '2023-04-18',
+                'clicks' => 10,
+                'signups' => 10,
+                'customers' => 10,
+                'earnings' => 10,
+            ],
+            [
+                'label' => '2023-04-17',
+                'clicks' => 10,
+                'signups' => 10,
+                'customers' => 10,
+                'earnings' => 10,
+            ],
+            [
+                'label' => '2023-04-14',
+                'clicks' => 10,
+                'signups' => 10,
+                'customers' => 10,
+                'earnings' => 10,
+            ],
+        ];
+        return $this->sendOkJsonResponse(["data" => $fakeData]);
+    }
+
+    public function partnerRewards()
+    {
+        //Tao dữ liệu giả
+        $fakeData = [
+            [
+                'status' => 'unpaid',
+                'amount' => 20,
+                'from_customer' => 'Nam',
+                'created' => '2023-04-19',
+            ],
+            [
+                'status' => 'unpaid',
+                'amount' => 120,
+                'from_customer' => 'Nam',
+                'created' => '2023-04-19',
+            ],
+            [
+                'status' => 'unpaid',
+                'amount' => 130,
+                'from_customer' => 'Nam',
+                'created' => '2023-04-19',
+            ],
+            [
+                'status' => 'unpaid',
+                'amount' => 150,
+                'from_customer' => 'Nam',
+                'created' => '2023-04-19',
+            ],
+            [
+                'status' => 'unpaid',
+                'amount' => 200,
+                'from_customer' => 'Nam',
+                'created' => '2023-04-19',
+            ],
+        ];
+        return $this->sendOkJsonResponse(["data" => $fakeData]);
+    }
+
+    public function partnerPayoutTerms()
+    {
+        $fakeData = [
+            [
+                'status' => 'success',
+                'amount' => 200,
+                'created' => '2023-04-19',
+                'paid_at' => '2023-04-19'
+            ],
+            [
+                'status' => 'success',
+                'amount' => 100,
+                'created' => '2023-04-19',
+                'paid_at' => '2023-04-19'
+            ],
+            [
+                'status' => 'success',
+                'amount' => 50,
+                'created' => '2023-04-19',
+                'paid_at' => '2023-04-19'
+            ],
+            [
+                'status' => 'success',
+                'amount' => 250,
+                'created' => '2023-04-19',
+                'paid_at' => '2023-04-19'
+            ]
+        ];
+        return $this->sendOkJsonResponse(["data" => $fakeData]);
     }
 }

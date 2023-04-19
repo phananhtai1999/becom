@@ -14,18 +14,29 @@ class PartnerLevelService extends AbstractService
 
     public function getDefaultPartnerLevel()
     {
-        return $this->model->orderBy('number_of_references', 'ASC')->first();
+        return $this->model->orderBy('number_of_customers', 'ASC')->first();
+    }
+
+    public function getPartnerLevelMax()
+    {
+        return $this->model->orderBy('number_of_customers', 'DESC')->first();
+    }
+
+    public function getPartnerLevelByNumberCustomer($numberCustomers)
+    {
+        $partnerLevelByNumber = $this->model->where('number_of_customers', '>=' , $numberCustomers)
+            ->orderBy('number_of_customers', 'ASC')->first();
+        if (!$partnerLevelByNumber) {
+            return $this->getPartnerLevelMax();
+        }
+        return $partnerLevelByNumber;
     }
 
     public function getPartnerLevelByPartner($partner)
     {
         if ($partner->code) {
-            $numberCustomers = (new PartnerUserService())->customersPartner($partner->code)->count();
-            $partnerLevelByNumber = $this->model->where('number_of_references', '<=' , $numberCustomers)
-                ->orderBy('number_of_references', 'DESC')->first();
-            if ($partnerLevelByNumber) {
-                return $partnerLevelByNumber;
-            }
+            $numberCustomers = (new PartnerUserService())->numberCustomerPartnerInMonth($partner->code)->count();
+            return $this->getPartnerLevelByNumberCustomer($numberCustomers);
         }
         return $this->getDefaultPartnerLevel();
     }
