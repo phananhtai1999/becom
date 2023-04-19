@@ -26,12 +26,14 @@ class UpdateArticleRequest extends AbstractRequest
     {
         return [
             'image' => ['nullable', 'string'],
+            'video' => ['nullable', 'string'],
             'slug' => ['string', "regex:/^[a-z0-9-]+$/", Rule::unique('articles')->ignore($this->id,'uuid')->whereNull('deleted_at')],
             'title' => ['array', 'min:1'],
             'title.*' => ['string'],
             'content' => ['array', 'min:1'],
             'content.*' => ['string'],
             'publish_status' => ['numeric', 'min:1', 'max:3'],
+            'content_for_user' => ['string', 'in:public,login,payment,editor,admin'],
             'article_category_uuid' => ['nullable', 'numeric', Rule::exists('article_categories', 'uuid')->whereNull('deleted_at')]
         ];
     }

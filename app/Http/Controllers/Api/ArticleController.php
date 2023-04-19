@@ -4,21 +4,20 @@ namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
 use App\Http\Controllers\Traits\RestDestroyTrait;
-use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\ArticleRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\UpdateArticleRequest;
 use App\Http\Resources\ArticleResource;
 use App\Http\Resources\ArticleResourceCollection;
-use App\Models\Language;
+use App\Models\Article;
 use App\Services\ArticleService;
 use App\Services\LanguageService;
 use Illuminate\Http\JsonResponse;
 
 class ArticleController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestShowTrait, RestDestroyTrait;
+    use RestShowTrait, RestDestroyTrait;
 
     /**
      * @var LanguageService
@@ -57,7 +56,8 @@ class ArticleController extends AbstractRestAPIController
         }
 
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => auth()->user()->getKey()
+            'user_uuid' => auth()->user()->getKey(),
+            'content_for_user' => $request->content_for_user ?: Article::PUBLIC_CONTENT_FOR_USER
         ]));
 
         return $this->sendCreatedJsonResponse(
@@ -102,6 +102,25 @@ class ArticleController extends AbstractRestAPIController
             $request->get('search_by'),
         );
 
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+        );
+    }
+
+    /**
+     * @param IndexRequest $request
+     * @return JsonResponse
+     */
+    public function indexByPermission(IndexRequest $request)
+    {
+        $models = $this->service->getArticleByPermissionWithPagination(
+            $request->get('per_page', '15'),
+            $request->get('columns', '*'),
+            $request->get('page_name', 'page'),
+            $request->get('page', '1'),
+            $request->get('search'),
+            $request->get('search_by'),
+        );
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
         );

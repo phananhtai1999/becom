@@ -765,12 +765,14 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'article.'], function () {
         Route::post('/article', [ArticleController::class, 'store'])->name('store');
         Route::put('/article/{id}', [ArticleController::class, 'edit'])->name('edit');
         Route::delete('/article/{id}', [ArticleController::class, 'destroy'])->name('destroy');
-        Route::get('/articles', [ArticleController::class, 'index'])->name('article.index');
         Route::get('/article/{id}', [ArticleController::class, 'show'])->name('article.show');
     });
+    //article by permission
+    Route::get('/articles', [ArticleController::class, 'indexByPermission'])->name('article.indexByPermission');
 });
+//article public
 Route::get('public/articles', [ArticleController::class, 'indexPublic'])->name('article-public.index');
-Route::get('public/article/{id}', [ArticleController::class, 'showPublic'])->name('article-public.index');
+Route::get('public/article/{id}', [ArticleController::class, 'showPublic'])->name('article-public.show');
 
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'status.'], function () {

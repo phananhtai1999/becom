@@ -26,6 +26,7 @@ class ArticleRequest extends AbstractRequest
     {
         return [
             'image' => ['nullable', 'string'],
+            'video' => ['nullable', 'string'],
             'slug' => ['required', 'string', "regex:/^[a-z0-9-]+$/", Rule::unique('articles')->whereNull('deleted_at')],
             'title' => ['required', 'array', 'min:1'],
             'title.en' => ['required', 'string'],
@@ -34,6 +35,7 @@ class ArticleRequest extends AbstractRequest
             'content.en' => ['required', 'string'],
             'content.*' => ['required', 'string'],
             'publish_status' => ['required', 'numeric', 'min:1', 'max:3'],
+            'content_for_user' => ['nullable', 'string', 'in:public,login,payment,editor,admin'],
             'article_category_uuid' => ['nullable', 'numeric', Rule::exists('article_categories', 'uuid')->whereNull('deleted_at')]
         ];
     }
