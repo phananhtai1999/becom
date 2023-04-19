@@ -4,7 +4,9 @@ namespace App\Abstracts;
 
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -152,4 +154,15 @@ abstract class AbstractService
         return $this->model->firstOrCreate($where, $data);
     }
 
+    public function collectionPagination($results, $perPage, $page = null)
+    {
+        $page = $page ?: (LengthAwarePaginator::resolveCurrentPage() ?: 1);
+
+        $results = $results instanceof Collection ? $results : Collection::make($results);
+
+        return new LengthAwarePaginator($results->forPage($page, $perPage)->values(), $results->count(), $perPage, $page, [
+            'path' => LengthAwarePaginator::resolveCurrentPath(),
+            'pageName' => 'page',
+        ]);
+    }
 }
