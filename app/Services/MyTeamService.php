@@ -21,14 +21,16 @@ class MyTeamService extends AbstractService
         $search = $request->get('search', '');
         $searchBy = $request->get('search_by', '');
         if ($request->get('sort') == 'num_of_team_member') {
-            return $this->modelQueryBuilderClass::searchQuery($search, $searchBy)
+            $result = MyTeamQueryBuilder::searchQuery($search, $searchBy)
                 ->paginate($perPage, $columns, $pageName, $page)
                 ->sortBy('num_of_team_member');
         } elseif ($request->get('sort') == '-num_of_team_member') {
-            return $this->modelQueryBuilderClass::searchQuery($search, $searchBy)
+            $result = MyTeamQueryBuilder::searchQuery($search, $searchBy)
                 ->paginate($perPage, $columns, $pageName, $page)
                 ->sortByDesc('num_of_team_member');
         }
+
+        return $this->collectionPagination($result, $perPage, $page);
     }
 
 }
