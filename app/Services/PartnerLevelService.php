@@ -32,12 +32,15 @@ class PartnerLevelService extends AbstractService
         return $partnerLevelByNumber;
     }
 
-    public function getPartnerLevelByPartner($partner)
+    public function getPartnerLevelCurrentByPartner($partnerCode)
     {
-        if ($partner->code) {
-            $numberCustomers = (new PartnerUserService())->numberCustomerPartnerInMonth($partner->code)->count();
-            return $this->getPartnerLevelByNumberCustomer($numberCustomers);
-        }
-        return $this->getDefaultPartnerLevel();
+        $numberCustomers = (new PartnerUserService())->numberCustomerPartnerByMonthCurrent($partnerCode)->count();
+        return $this->getPartnerLevelByNumberCustomer($numberCustomers);
+    }
+
+    public function getPartnerLevelOfPartnerByMontYear($partnerCode, $month, $year)
+    {
+        $numberCustomers = (new PartnerUserService())->numberCustomerPartnerByMonthYear($partnerCode, $month, $year)->count();
+        return $this->getPartnerLevelByNumberCustomer($numberCustomers);
     }
 }

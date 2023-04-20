@@ -27,7 +27,7 @@ class PartnerUserService extends AbstractService
             })->get();
     }
 
-    public function numberCustomerPartnerInMonth($partnerCode)
+    public function numberCustomerPartnerByMonthCurrent($partnerCode)
     {
         //Get customer của partner theo tháng và năm
         return $this->model->where('registered_from_partner_code', $partnerCode)
@@ -37,6 +37,19 @@ class PartnerUserService extends AbstractService
                     ->whereColumn('a.user_uuid', 'partner_user.user_uuid')
                     ->where('a.month', Carbon::today()->month)
                     ->where('a.year', Carbon::today()->year);
+            })->get();
+    }
+
+    public function numberCustomerPartnerByMonthYear($partnerCode, $month, $year)
+    {
+        //Get customer của partner theo tháng và năm nhập vào
+        return $this->model->where('registered_from_partner_code', $partnerCode)
+            ->whereIn('partner_user.user_uuid', function ($query) use ($month, $year){
+                $query->select('a.user_uuid')
+                    ->from('user_payment_by_day as a')
+                    ->whereColumn('a.user_uuid', 'partner_user.user_uuid')
+                    ->where('a.month', $month)
+                    ->where('a.year', $year);
             })->get();
     }
 
@@ -131,17 +144,12 @@ class PartnerUserService extends AbstractService
 
     public function trackingSignUpByDateFormat($dateFormat, $startDate, $endDate, $partnerCode)
     {
-        return $this->model->selectRaw("date_format(created_at, '{$dateFormat}') as label, count(uuid) as count")
+        return $this->model->selectRaw("date_format(created_at, '{$dateFormat}') as label, count(uuid) as signups")
             ->whereDate('created_at', '>=', $startDate)
             ->whereDate('created_at', '<=', $endDate)
             ->where('registered_from_partner_code', $partnerCode)
             ->groupBy('label')
             ->orderBy('label', 'ASC')
             ->get();
-    }
-
-    public function trackingCustomersByDateFormat($dateFormat, $startDate, $endDate, $partnerCode)
-    {
-
     }
 }
