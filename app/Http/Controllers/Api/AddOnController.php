@@ -80,7 +80,7 @@ class AddOnController extends AbstractRestAPIController
     {
         $addOn = $this->service->findOrFailById($id);
         $paypalProduct = $this->paypalService->createProduct($addOn);
-        $stripeProduct = $this->stripeService->createProduct($addOn);
+        $stripeProduct = $this->stripeService->createProduct($addOn->name . ' add-on');
         $product = [
             'paypal' => $paypalProduct['id'],
             'stripe' => $stripeProduct['id']

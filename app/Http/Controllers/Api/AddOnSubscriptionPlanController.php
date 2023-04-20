@@ -54,7 +54,7 @@ class AddOnSubscriptionPlanController extends AbstractRestAPIController
         } else {
             $price = $addOn->yearly;
         }
-        $paypalPlan = $this->paypalService->createPlan($addOn->payment_product_id['paypal'], $request, $price);
+        $paypalPlan = $this->paypalService->createPlan($addOn->payment_product_id['paypal'], $request, $price, $addOn->name . ' add-on');
         $stripePlan = $this->stripeService->createPlan($addOn->payment_product_id['stripe'], $request, $price);
         $product = [
             'paypal' => $paypalPlan['plan_id'],

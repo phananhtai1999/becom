@@ -97,13 +97,13 @@ class PaypalService extends AbstractService
      * @return array
      * @throws Throwable
      */
-    public function createPlan($product_id, $request, $price)
+    public function createPlan($product_id, $request, $price, $name)
     {
         $apiContext = new ApiContext();
         $provider = $this->accessServer();
         $plan = $provider->createPlan([
             "product_id" => $product_id,
-            'name' => $request->get('duration_type'),
+            'name' => $name,
             "payment_preferences" => [
                 "auto_bill_outstanding" => true,
                 "setup_fee" => [

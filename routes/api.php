@@ -656,6 +656,8 @@ Route::get('/stripe/success-payment-subscription', [StripeController::class, 'su
 Route::get('/stripe/cancel-payment-subscription', [StripeController::class, 'cancelPaymentSubscription'])->name('stripe.cancelPaymentSubscription');
 Route::get('/stripe/success-payment-subscription-add-on', [StripeController::class, 'successPaymentSubscriptionAddOn'])->name('stripe.successPaymentSubscriptionAddOn');
 Route::get('/stripe/cancel-payment-subscription-add-on', [StripeController::class, 'cancelPaymentSubscriptionAddOn'])->name('stripe.cancelPaymentSubscriptionAddOn');
+Route::get('/stripe/success-payment', [StripeController::class, 'successPayment'])->name('stripe.successPayment');
+Route::get('/stripe/cancel-payment', [StripeController::class, 'cancelPayment'])->name('stripe.cancelPayment');
 
 Route::get('/paypal/success-payment', [PaypalController::class, 'successPayment'])->name('paypal.successPayment');
 Route::get('/paypal/success-payment-subscription', [PaypalController::class, 'successPaymentSubscription'])->name('paypal.successPaymentSubscription');

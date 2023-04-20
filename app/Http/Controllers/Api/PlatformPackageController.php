@@ -78,7 +78,7 @@ class PlatformPackageController extends AbstractRestAPIController
     public function publishPlatformPackage($id) {
         $platformPackage = $this->service->findOrFailById($id);
         $paypalProduct = $this->paypalService->createProduct($platformPackage);
-        $stripeProduct = $this->stripeService->createProduct($platformPackage);
+        $stripeProduct = $this->stripeService->createProduct($platformPackage->uuid . ' platform package');
         $product = [
             'paypal' => $paypalProduct['id'],
             'stripe' => $stripeProduct['id']
