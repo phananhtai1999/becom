@@ -124,79 +124,30 @@ class StripeService extends AbstractService
         $stripe = $this->getStripeClient();
 
         try {
-            $token = $stripe->tokens->create([
-                'card' => [
-                    'name' => Auth::user()->name,
-                    'number' => $request['card_number'],
-                    'exp_month' => $request['exp_month'],
-                    'exp_year' => $request['exp_year'],
-                    'cvc' => $request['cvc'],
-                ]
+            $checkout_session = $stripe->checkout->sessions->create([
+                'line_items' => [[
+                    'price' => $plan,
+                    'quantity' => 1,
+                ]],
+                'mode' => 'subscription',
+                'success_url' => route('stripe.successPaymentSubscription', [
+                        'goBackUrl=' . $request['go_back_url'],
+                        'subscriptionPlanUuid=' . $subscriptionPlan->uuid,
+                        'subscriptionDate=' . $subscriptionDate,
+                        'userUuid=' . Auth::user()->getKey(),
+                        'expirationDate=' . $expirationDate,
+                        'platformPackageUuid=' . $subscriptionPlan->platform_package_uuid,
+                        'billingAddressUuid=' . $request['billing_address_uuid'],
+                    ]) . '&session_id={CHECKOUT_SESSION_ID}',
+                "cancel_url" => route('stripe.cancelPaymentSubscription', ['goBackUrl=' . $request['go_back_url'], 'subscriptionPlanUuid=' . $subscriptionPlan->uuid,]),
             ]);
-
-            $customer = $stripe->customers->create([
-                'email' => auth()->user()->email,
-                'source' => $token
-            ]);
-
-            $subscription = $stripe->subscriptions->create([
-                'customer' => $customer,
-                'items' => [
-                    ['price' => $plan],
-                ]
-            ]);
-
-            $stripe->subscriptionSchedules->create([
-                'from_subscription' => $subscription
-            ]);
-            $subscriptionData = ["id" => $subscription->id];
-
-            $subscriptionHistory = [
-                'user_uuid' => Auth::user()->getKey(),
-                'subscription_plan_uuid' => $subscriptionPlan->uuid,
-                'subscription_date' => $subscriptionDate,
-                'expiration_date' => $expirationDate,
-                'billing_address_uuid' => $request['billing_address_uuid'],
-                'payment_method_uuid' => PaymentMethod::STRIPE,
-                'logs' => $subscriptionData,
-                'status' => 'success'
-            ];
-            $userPlatformPackage = [
-                'user_uuid' => Auth::user()->getKey(),
-                'platform_package_uuid' => $subscriptionPlan->platform_package_uuid,
-                'subscription_plan_uuid' => $subscriptionPlan->uuid,
-                'expiration_date' => $expirationDate,
-                'auto_renew' => true
-            ];
-            Event::dispatch(new SubscriptionSuccessEvent(Auth::user()->getKey(), $subscriptionHistory, $userPlatformPackage));
-//
-//            $checkout_session = $stripe->checkout->sessions->create([
-//                'line_items' => [[
-//                    'price' => $plan,
-//                    'quantity' => 1,
-//                ]],
-//                'mode' => 'subscription',
-//                'success_url' => route('stripe.successPaymentSubscription', [
-//                    'goBackUrl=' . $request['go_back_url'],
-//                    'subscriptionPlanUuid=' . $subscriptionPlan->uuid,
-//                    'subscriptionDate=' . $subscriptionDate,
-//                    'userUuid=' . Auth::user()->getKey(),
-//                    'expirationDate=' . $expirationDate,
-//                    'platformPackageUuid=' . $subscriptionPlan->platform_package_uuid,
-//                    'billingAddressUuid=' . $request['billing_address_uuid'],
-//                ]) . '&session_id={CHECKOUT_SESSION_ID}',
-//                "cancel_url" => route('stripe.cancelPaymentSubscription', ['goBackUrl=' . $request['go_back_url'], 'subscriptionPlanUuid=' . $subscriptionPlan->uuid,]),
-//            ]);
-//            if (isset($checkout_session)) {
-//                return [
-//                    'status' => true,
-//                    'redirect_url' => $checkout_session->url
-//                ];
-//            }
-            return [
-                'status' => true,
-                'redirect_url' => env('FRONTEND_URL') . 'my/profile/upgrade/success?go_back_url=' . $request['go_back_url'] . '&plan_id=' . $subscriptionPlan->uuid
-            ];
+            if (isset($checkout_session)) {
+                
+                return [
+                    'status' => true,
+                    'redirect_url' => $checkout_session->url
+                ];
+            }
         } catch (\Exception $e) {
 
             return [
@@ -208,30 +159,31 @@ class StripeService extends AbstractService
 
     public function processSubscriptionAddOn($addOnSubscriptionPlan, $subscriptionDate, $expirationDate, $plan, $request)
     {
-
+        $stripe = $this->getStripeClient();
         try {
-            $subscriptionData = $this->subscription($request, $plan);
-            $subscriptionHistoryData = [
-                'user_uuid' => Auth::user()->getKey(),
-                'add_on_subscription_plan_uuid' => $addOnSubscriptionPlan->uuid,
-                'subscription_date' => $subscriptionDate,
-                'expiration_date' => $expirationDate,
-                'billing_address_uuid' => $request['billing_address_uuid'],
-                'payment_method_uuid' => PaymentMethod::STRIPE,
-                'logs' => $subscriptionData,
-            ];
-            $userAddOnData = [
-                'user_uuid' => Auth::user()->getKey(),
-                'add_on_subscription_plan_uuid' => $addOnSubscriptionPlan->uuid,
-                'expiration_date' => $expirationDate,
-                'auto_renew' => true
-            ];
-            Event::dispatch(new SubscriptionAddOnSuccessEvent(Auth::user()->getKey(), $subscriptionHistoryData, $userAddOnData));
+            $checkout_session = $stripe->checkout->sessions->create([
+                'line_items' => [[
+                    'price' => $plan,
+                    'quantity' => 1,
+                ]],
+                'mode' => 'subscription',
+                'success_url' => route('stripe.successPaymentSubscriptionAddOn', [
+                        'goBackUrl=' . $request['go_back_url'],
+                        'subscriptionDate=' . $subscriptionDate,
+                        'userUuid=' . Auth::user()->getKey(),
+                        'expirationDate=' . $expirationDate,
+                        'addOnSubscriptionPlanUuid=' . $addOnSubscriptionPlan->uuid,
+                        'billingAddressUuid=' . $request['billing_address_uuid']
+                    ]) . '&session_id={CHECKOUT_SESSION_ID}',
+                "cancel_url" => route('paypal.cancelPaymentSubscriptionAddOn', ['goBackUrl=' . $request['go_back_url'], 'addOnSubscriptionPlanUuid=' . $addOnSubscriptionPlan->uuid,]),
+            ]);
+            if (isset($checkout_session)) {
 
-            return [
-                'status' => true,
-                'redirect_url' => env('FRONTEND_URL') . 'my/profile/upgrade/success?go_back_url=' . $request['go_back_url'] . '&plan_id=' . $request['add_on_subscription_plan_uuid']
-            ];
+                return [
+                    'status' => true,
+                    'redirect_url' => $checkout_session->url
+                ];
+            }
         } catch (\Exception $e) {
 
             return [

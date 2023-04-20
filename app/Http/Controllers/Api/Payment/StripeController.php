@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Payment;
 
 use App\Abstracts\AbstractRestAPIController;
+use App\Events\SubscriptionAddOnSuccessEvent;
 use App\Events\SubscriptionSuccessEvent;
 use App\Http\Requests\UpdateCardCustomerRequest;
 use App\Http\Requests\UpdateCardStripeRequest;
@@ -105,5 +106,47 @@ class StripeController extends AbstractRestAPIController
 
             return redirect()->to(env('FRONTEND_URL') . 'my/profile/upgrade/failed?go_back_url='. $request['goBackUrl'] . '&plan_id=' . $request->subscriptionPlanUuid);
         }
+    }
+
+    public function cancelPaymentSubscription(Request $request)
+    {
+        return redirect()->to(env('FRONTEND_URL') . 'my/profile/upgrade/canceled?go_back_url='. $request['goBackUrl'] . '&plan_id=' . $request->subscriptionPlanUuid);
+    }
+
+    public function successPaymentSubscriptionAddOn(Request $request)
+    {
+        $stripe = $this->service->getStripeClient();
+        $response = $stripe->checkout->sessions->retrieve($request->session_id);
+        $subscriptionData = ["id" => $response->subscription];
+
+        $subscriptionHistoryData = [
+            'user_uuid' => $request->userUuid,
+            'add_on_subscription_plan_uuid' => $request->addOnSubscriptionPlanUuid,
+            'subscription_date' => $request->subscriptionDate,
+            'billing_address_uuid' => $request->billingAddressUuid,
+            'expiration_date' => $request->expirationDate,
+            'payment_method_uuid' => PaymentMethod::PAYPAL,
+            'logs' => $subscriptionData,
+        ];
+        $userAddOnData = [
+            'user_uuid' => $request->userUuid,
+            'add_on_subscription_plan_uuid' => $request->addOnSubscriptionPlanUuid,
+            'expiration_date' => $request->expirationDate,
+            'auto_renew' => true
+        ];
+
+        if (isset($response['status']) && $response['status'] == 'complete') {
+            Event::dispatch(new SubscriptionAddOnSuccessEvent($request->userUuid, $subscriptionHistoryData, $userAddOnData));
+
+            return redirect()->to(env('FRONTEND_URL') . 'my/profile/add-on/success?go_back_url='. $request['goBackUrl'] . '&addOnSubscriptionPlanUuid=' . $request->addOnSubscriptionPlanUuid);
+        } else {
+
+            return redirect()->to(env('FRONTEND_URL') . 'my/profile/add-on/failed?go_back_url='. $request['goBackUrl'] . '&addOnSubscriptionPlanUuid=' . $request->addOnSubscriptionPlanUuid);
+        }
+    }
+
+    public function cancelPaymentSubscriptionAddOn(Request $request)
+    {
+        return redirect()->to(env('FRONTEND_URL') . 'my/profile/add-on/canceled?go_back_url='. $request['goBackUrl'] . '&addOnUuid=' . $request['addOnUuid']);
     }
 }
