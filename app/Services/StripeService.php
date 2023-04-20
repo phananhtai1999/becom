@@ -34,40 +34,32 @@ class StripeService extends AbstractService
         $stripe = $this->getStripeClient();
 
         try {
-//            $checkout_session = $stripe->checkout->sessions->create([
-//                'line_items' => [[
-//                    'price_data' => [
-//                        'currency' => 'usd',
-//                        'product_data' => [
-//                            'name' => 'Credit-Package',
-//                        ],
-//                        'unit_amount' => $creditPackage->price * 100,
-//                    ],
-//                    'quantity' => 1,
-//                ]],
-//                'mode' => 'payment',
-//                'success_url' => env('FRONTEND_URL') . 'my/profile/top-up/success?packageID=' . $creditPackage->uuid,
-//                'cancel_url' => env('FRONTEND_URL') . 'my/profile/top-up/failed?packageID=' . $creditPackage->uuid,
-//            ]);
-
-            $token = $stripe->tokens->create([
-                'card' => [
-                    'name' => $request['card_name'],
-                    'number' => $request['card_number'],
-                    'exp_month' => $request['exp_month'],
-                    'exp_year' => $request['exp_year'],
-                    'cvc' => $request['cvc'],
-                ]
+            $checkout_session = $stripe->checkout->sessions->create([
+                'line_items' => [[
+                    'price_data' => [
+                        'currency' => 'usd',
+                        'product_data' => [
+                            'name' => 'Credit-Package',
+                        ],
+                        'unit_amount' => $creditPackage->price * 100,
+                    ],
+                    'quantity' => 1,
+                ]],
+                'mode' => 'payment',
+                "success_url" => route('stripe.successPayment', [
+                    'goBackUrl=' . $request['go_back_url'],
+                    'userUuid=' . $userUuid,
+                    'creditPackageUuid=' . $creditPackage->uuid
+                ]) . '&session_id={CHECKOUT_SESSION_ID}',
+                "cancel_url" => route('stripe.cancelPayment', ['goBackUrl=' . $request['go_back_url'], 'userUuid=' . $userUuid, 'creditPackageUuid=' . $creditPackage->uuid]),
             ]);
+            if (isset($checkout_session)) {
 
-            $stripe->charges->create([
-                'amount' => $creditPackage->price * 100,
-                'currency' => 'usd',
-                'source' => $token,
-                'description' => empty($request['description']) ? __('Payment incurred at') . ' ' . config('app.name') : $request['description']
-            ]);
-            $paymentData = ["token" => $token->id];
-            Event::dispatch(new PaymentCreditPackageSuccessEvent($creditPackage->uuid, $paymentData, $userUuid, PaymentMethod::STRIPE));
+                return [
+                    'status' => true,
+                    'redirect_url' => $checkout_session->url
+                ];
+            }
 
             return [
                 'status' => true,
@@ -83,12 +75,12 @@ class StripeService extends AbstractService
         }
     }
 
-    public function createProduct($request)
+    public function createProduct($name)
     {
         $stripe = $this->getStripeClient();
 
         return $stripe->products->create([
-            'name' => $request->uuid,
+            'name' => $name,
         ]);
     }
 
@@ -142,7 +134,7 @@ class StripeService extends AbstractService
                 "cancel_url" => route('stripe.cancelPaymentSubscription', ['goBackUrl=' . $request['go_back_url'], 'subscriptionPlanUuid=' . $subscriptionPlan->uuid,]),
             ]);
             if (isset($checkout_session)) {
-                
+
                 return [
                     'status' => true,
                     'redirect_url' => $checkout_session->url

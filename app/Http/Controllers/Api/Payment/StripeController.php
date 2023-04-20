@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Payment;
 
 use App\Abstracts\AbstractRestAPIController;
+use App\Events\PaymentCreditPackageSuccessEvent;
 use App\Events\SubscriptionAddOnSuccessEvent;
 use App\Events\SubscriptionSuccessEvent;
 use App\Http\Requests\UpdateCardCustomerRequest;
@@ -148,5 +149,33 @@ class StripeController extends AbstractRestAPIController
     public function cancelPaymentSubscriptionAddOn(Request $request)
     {
         return redirect()->to(env('FRONTEND_URL') . 'my/profile/add-on/canceled?go_back_url='. $request['goBackUrl'] . '&addOnUuid=' . $request['addOnUuid']);
+    }
+
+    public function cancelPayment(Request $request)
+    {
+
+        return redirect()->to(env('FRONTEND_URL') . 'my/profile/top-up/cancel?packageID=' . $request->creditPackageUuid);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \Stripe\Exception\ApiErrorException
+     */
+    public function successPayment(Request $request)
+    {
+        $stripe = $this->service->getStripeClient();
+        $response = $stripe->checkout->sessions->retrieve($request->session_id);
+        $paymentData = [
+            "token" => $response->payment_intent
+        ];
+        if (isset($response['status']) && $response['status'] == 'complete') {
+            Event::dispatch(new PaymentCreditPackageSuccessEvent($request->creditPackageUuid, $paymentData, $request->userUuid, PaymentMethod::PAYPAL));
+
+            return redirect()->to(env('FRONTEND_URL') . 'my/profile/top-up/success?go_back_url='. $request->goBackUrl .'&package_id=' . $request->creditPackageUuid);
+        } else {
+
+            return redirect()->to(env('FRONTEND_URL') . 'my/profile/top-up/failed?go_back_url='. $request->goBackUrl .'&package_id=' . $request->creditPackageUuid);
+        }
     }
 }

@@ -45,7 +45,7 @@ class SubscriptionPlanController extends AbstractRestAPIController
         } else {
             $price = $platformPackage->yearly;
         }
-        $paypalPlan = $this->paypalService->createPlan($product->paypal, $request, $price);
+        $paypalPlan = $this->paypalService->createPlan($product->paypal, $request, $price, $request->get('platform_package_uuid') . ' platform package');
         $stripePlan = $this->stripeService->createPlan($product->stripe, $request, $price);
         $product = [
             'paypal' => $paypalPlan['plan_id'],

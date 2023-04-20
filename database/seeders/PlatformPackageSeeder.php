@@ -52,7 +52,7 @@ class PlatformPackageSeeder extends Seeder
         foreach ($data as $platformPackage) {
             $request = new Request($platformPackage);
             $paypalProduct = $this->paypalService->createProduct($request);
-            $stripeProduct = $this->stripeService->createProduct($request);
+            $stripeProduct = $this->stripeService->createProduct($request->uuid . ' platform package');
             $product = [
                 'paypal' => $paypalProduct['id'],
                 'stripe' => $stripeProduct['id']
