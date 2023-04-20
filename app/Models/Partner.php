@@ -73,7 +73,7 @@ class Partner extends AbstractModel
 
     public function getPartnerLevelAttribute()
     {
-        return (new PartnerLevelService())->getPartnerLevelByPartner($this);
+        return $this->code ? (new PartnerLevelService())->getPartnerLevelCurrentByPartner($this->code) : null;
     }
 
     /**

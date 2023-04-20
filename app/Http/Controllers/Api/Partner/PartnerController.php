@@ -11,6 +11,7 @@ use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\ChangeStatusPartnerRequest;
 use App\Http\Requests\IndexRequest;
+use App\Http\Requests\PartnerDetailRequest;
 use App\Http\Requests\PartnerReferralsRequest;
 use App\Http\Requests\PartnerRequest;
 use App\Http\Requests\PartnerTop10Request;
@@ -182,7 +183,7 @@ class PartnerController extends AbstractRestAPIController
         $partner = $this->service->findOneWhereOrFail(['user_uuid' => auth()->user()->getKey()]);
         $referrals = $this->partnerUserService->referralsOfPartnerInMonth($partner->code)->count();
         $clicks = $this->partnerTrackingService->trackingClicksOfPartnerInMonth($partner->uuid)->count();
-        $customers = $this->partnerUserService->numberCustomerPartnerInMonth($partner->code)->count();
+        $customers = $this->partnerUserService->numberCustomerPartnerByMonthCurrent($partner->code)->count();
         $unpaid_earnings = $this->partnerTrackingByYearService->earningsOfPartnerByMonth($partner->uuid);
 
         return $this->sendOkJsonResponse(["data" => [
@@ -219,7 +220,6 @@ class PartnerController extends AbstractRestAPIController
             $result = $this->partnerUserService->getTop10PartnerSignUp();
         }elseif ($request->get('type') === 'customer'){
             $result = $this->partnerUserService->getTop10PartnerCustomer();
-            dd($result);
         }
 
          $newResult = $result->map(function ($item) {
@@ -233,48 +233,112 @@ class PartnerController extends AbstractRestAPIController
         return $this->sendOkJsonResponse(["data" => $newResult]);
     }
 
-    public function partnerDetail()
+    public function partnerDetail(PartnerDetailRequest $request)
     {
-//        $partner = $this->service->findOneWhereOrFail(['user_uuid' => auth()->user()->getKey()]);
-//        $startDate = Carbon::today()->subDays(6);
-//        $endDate = Carbon::today();
-//        $format = "%Y-%m-%d";
-//        $clicks = $this->partnerTrackingService->trackingClickByDateFormat($format, $startDate, $endDate, $partner->uuid);
-//        $signups = $this->partnerUserService->trackingSignUpByDateFormat($format, $startDate, $endDate, $partner->code);
-//        $customers = $this->partnerUserService->trackingCustomersByDateFormat($format, $startDate, $endDate, $partner->uuid);
-//        $earnings;
+        $partner = $this->service->findOneWhereOrFail(['user_uuid' => auth()->user()->getKey()]);
 
-        $fakeData = [
-            [
-                'label' => '2023-04-19',
-                'clicks' => 10,
-                'signups' => 10,
-                'customers' => 10,
-                'earnings' => 10,
-            ],
-            [
-                'label' => '2023-04-18',
-                'clicks' => 10,
-                'signups' => 10,
-                'customers' => 10,
-                'earnings' => 10,
-            ],
-            [
-                'label' => '2023-04-17',
-                'clicks' => 10,
-                'signups' => 10,
-                'customers' => 10,
-                'earnings' => 10,
-            ],
-            [
-                'label' => '2023-04-14',
-                'clicks' => 10,
-                'signups' => 10,
-                'customers' => 10,
-                'earnings' => 10,
-            ],
-        ];
-        return $this->sendOkJsonResponse(["data" => $fakeData]);
+        $groupsData = $labels = $lists = [];
+        if (!$request->get('type') || $request->get('type') === 'day'){
+            $startDate = Carbon::today()->subDays(6);
+            $endDate = Carbon::today();
+            $format = "%Y-%m-%d";
+            $clicks = $this->partnerTrackingService->trackingClickByDateFormat($format, $startDate, $endDate, $partner->uuid)->toArray();
+            $signups = $this->partnerUserService->trackingSignUpByDateFormat($format, $startDate, $endDate, $partner->code)->toArray();
+            $customers = $this->userPaymentByDayService->trackingCustomersByDate($startDate, $endDate, $partner->code);
+
+            $lists = [$clicks,$signups,$customers];
+            //Lấy danh sách các label từ start -> endDate theo type day, week, monthj
+            $currentDate = $endDate;
+            while ($currentDate >= $startDate) {
+                $labels[] = $currentDate->format('Y-m-d');
+                $currentDate = $currentDate->subDay();
+            }
+        }
+        if ($request->get('type') === 'month'){
+            $startDate = Carbon::today()->subMonth(5)->startOfMonth();
+            $endDate = Carbon::today();
+            $format = "%Y-%m";
+            $clicks = $this->partnerTrackingService->trackingClickByDateFormat($format, $startDate, $endDate, $partner->uuid)->toArray();
+            $signups = $this->partnerUserService->trackingSignUpByDateFormat($format, $startDate, $endDate, $partner->code)->toArray();
+            $customers = $this->userPaymentByDayService->trackingCustomersByMonth($startDate, $endDate, $partner->code)->toArray();
+            $earnings = $this->partnerTrackingByYearService->trackingEarningsOfPartner($startDate, $endDate, $partner->uuid);
+
+            $lists = [$clicks,$signups,$customers, $earnings];
+            $currentDate = $endDate;
+            while ($currentDate >= $startDate) {
+                $labels[] = $currentDate->format('Y-m');
+                $currentDate = $currentDate->subMonth();
+            }
+        }
+        if ($request->get('type') === 'week') {
+//        $dateString = '2023-14';
+//        $year = substr($dateString, 0, 4); // Lấy 4 ký tự đầu tiên của chuỗi là năm
+//        $week = substr($dateString, -2); // Lấy 2 ký tự cuối của chuỗi là mã lịch tuần
+//        $date = Carbon::now()->setISODate($year, $week)->startOfWeek(0);
+
+            $startDate = Carbon::today()->subWeek(3)->startOfWeek(0);
+            $endDate = Carbon::today();
+            $format = "%Y-%U";
+            $clicks = $this->partnerTrackingService->trackingClickByDateFormat($format, $startDate, $endDate, $partner->uuid)->toArray();
+            $signups = $this->partnerUserService->trackingSignUpByDateFormat($format, $startDate, $endDate, $partner->code)->toArray();
+            $customers = $this->userPaymentByDayService->trackingCustomersByWeek($startDate, $endDate, $partner->code);
+
+            $lists = [$clicks,$signups,$customers];
+            $currentDate = $endDate->startOfWeek(0);
+            while ($currentDate >= $startDate) {
+                $labels[] = $currentDate->format('Y-m-d');
+                $currentDate = $currentDate->subWeek();
+            }
+        }
+
+        //Nhóm danh sách clicks, signups, customers,.. có chung label lại thành 1 mảng
+        foreach ($lists as $list) {
+            foreach ($list as $item) {
+                if ($request->get('type') === 'week'){
+                    $label = Carbon::today()->setISODate(substr($item['label'], 0, 4), substr($item['label'], -2))
+                        ->startOfWeek(0)->format('Y-m-d');
+                    $item['label'] = $label;
+                }else{
+                    $label = $item['label'];
+                }
+                if (!isset($groupsData[$label])) {
+                    $groupsData[$label] = [
+                        'label' => $label,
+                        'clicks' => 0,
+                        'signups' => 0,
+                        'customers' => 0,
+                        'amount' => 0,
+                        'earnings' => 0,
+                    ];
+                }
+                $groupsData[$label] = array_merge($groupsData[$label], $item);
+            }
+        }
+
+        //Gộp danh sách $groupsData vào trong $labels. Nếu có trong labels thì gán qua còn không có thì cho tất cả dữ liệu là 0
+        $results = [];
+        foreach ($labels as $label) {
+            $found = false;
+            foreach ($groupsData as $data) {
+                if ($data['label'] === $label) {
+                    $results[] = $data;
+                    $found = true;
+                    break;
+                }
+            }
+            if (!$found) {
+                $results[] = [
+                    'label' => $label,
+                    'clicks' => 0,
+                    'signups' => 0,
+                    'customers' => 0,
+                    'amount' => 0,
+                    'earnings' => 0,
+                ];
+            }
+        }
+
+        return $this->sendOkJsonResponse(["data" => $results]);
     }
 
     public function partnerRewards()

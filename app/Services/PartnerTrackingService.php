@@ -53,7 +53,7 @@ class PartnerTrackingService extends AbstractService
 
     public function trackingClickByDateFormat($dateFormat, $startDate, $endDate,$partnerUuid)
     {
-        return $this->model->selectRaw("date_format(updated_at, '{$dateFormat}') as label, count(uuid) as count")
+        return $this->model->selectRaw("date_format(updated_at, '{$dateFormat}') as label, count(uuid) as clicks")
             ->whereDate('updated_at', '>=', $startDate)
             ->whereDate('updated_at', '<=', $endDate)
             ->where('partner_uuid', $partnerUuid)
