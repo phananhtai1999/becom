@@ -21,6 +21,7 @@ class UserTeamResource extends JsonResource
             'team_uuid' => $this->team_uuid,
             'user_uuid' => $this->user_uuid,
             'permission_uuids' => $this->permission_uuids,
+            'is_blocked' => $this->is_blocked,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
