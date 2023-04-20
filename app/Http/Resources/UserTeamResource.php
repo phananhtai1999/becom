@@ -21,6 +21,7 @@ class UserTeamResource extends JsonResource
             'team_uuid' => $this->team_uuid,
             'user_uuid' => $this->user_uuid,
             'permission_uuids' => $this->permission_uuids,
+            'is_blocked' => $this->is_blocked,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
@@ -29,6 +30,12 @@ class UserTeamResource extends JsonResource
         }
         if (\in_array('user_team__user', $expand)) {
             $data['user'] = new UserResource($this->user);
+        }
+        if (\in_array('user_team__contact_lists', $expand)) {
+            $data['contact_lists'] = ContactListResource::collection(optional($this->user)->userTeamContactLists);
+        }
+        if (\in_array('user_team__permissions', $expand)) {
+            $data['permissions'] = $this->permissions();
         }
 
         return $data;

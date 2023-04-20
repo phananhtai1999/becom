@@ -961,6 +961,8 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'team.'], function () {
     Route::post('/team/set-contact-list', [TeamController::class, 'setContactList'])->name('setContactList');
     Route::get('/permission-of-team/{id}', [TeamController::class, 'permissionOfTeams'])->name('permissionOfTeams');
     Route::get('/contact-list-of-team/{id}', [TeamController::class, 'contactListOfTeams'])->name('contactListOfTeams');
+    Route::delete('/delete-member/{id}', [TeamController::class, 'deleteMember'])->name('deleteMember');
+    Route::put('/block-member/{id}', [TeamController::class, 'blockMember'])->name('blockMember');
 
     Route::group(['as' => 'my.'], function () {
         Route::get('my/teams', [TeamController::class, 'indexMy'])->name('indexMy');

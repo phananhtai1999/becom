@@ -27,14 +27,15 @@ class UserTeam extends Model
     protected $fillable = [
         'user_uuid',
         'team_uuid',
-        'permission_uuids'
+        'permission_uuids',
+        'is_blocked'
     ];
 
     /**
      * @var string[]
      */
     protected $casts = [
-        'permission_uuids'=> 'array',
+        'permission_uuids' => 'array',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
@@ -48,5 +49,10 @@ class UserTeam extends Model
     public function team()
     {
         return $this->hasOne(Team::class, 'uuid', 'team_uuid');
+    }
+
+    public function permissions()
+    {
+        return Permission::whereIn('uuid', $this->permission_uuids ?? [])->get();
     }
 }

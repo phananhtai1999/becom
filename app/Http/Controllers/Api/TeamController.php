@@ -277,4 +277,30 @@ class TeamController extends Controller
 
         return $this->sendOkJsonResponse();
     }
+
+    public function deleteMember($id)
+    {
+        $model = $this->userTeamService->findOrFailById($id);
+        if (!$this->checkTeamOwner($model->team_uuid)) {
+
+            return $this->sendJsonResponse(false, 'You are not owner of team to set permission', [], 403);
+        }
+        $model->user->userTeamContactLists()->detach();
+        $this->userTeamService->destroy($model->uuid);
+        Cache::forget('team_permission' . $model->user_uuid);
+
+        return $this->sendOkJsonResponse();
+    }
+
+    public function blockMember($id)
+    {
+        $model = $this->userTeamService->findOrFailById($id);
+        if (!$this->checkTeamOwner($model->team_uuid)) {
+
+            return $this->sendJsonResponse(false, 'You are not owner of team to set permission', [], 403);
+        }
+        $this->userTeamService->update($model, ['is_blocked' => true]);
+
+        return $this->sendOkJsonResponse();
+    }
 }
