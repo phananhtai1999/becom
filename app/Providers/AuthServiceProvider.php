@@ -48,7 +48,7 @@ class AuthServiceProvider extends ServiceProvider
                 return false;
             }
             //check team
-            if (isset($user->userTeam->permission_uuids)) {
+            if (isset($user->userTeam->permission_uuids) && !$user->userTeam->is_blocked) {dd(1);
                 $cacheTeams = Cache::rememberForever('team_permission_' . $user->uuid, function () use ($user) {
 
                     return Permission::whereIn('uuid', $user->userTeam->permission_uuids)->get();
