@@ -24,22 +24,11 @@ class PaymentAddOnRequest extends FormRequest
      */
     public function rules()
     {
-        $rule = [
+        return [
             'payment_method_uuid' => ['required', 'exists:payment_methods,uuid'],
             'go_back_url' => ['required'],
             'billing_address_uuid' => ['required', 'exists:billing_addresses,uuid'],
-            'add_on_subscription_plan_uuid' => ['required', 'exists:add_on_subscription_plans,uuid'],
-            "card_number" => ['required_if:payment_method,==,stripe', 'integer', 'digits:16'],
-            "exp_month" => ['required_if:payment_method,==,stripe', 'integer'],
-            "exp_year" => ['required_if:payment_method,==,stripe', 'integer', 'min:' . Carbon::now()->year],
-            "cvc" => ['required_if:payment_method,==,stripe', 'integer', 'digits:3']
+            'add_on_subscription_plan_uuid' => ['required', 'exists:add_on_subscription_plans,uuid']
         ];
-
-        if ($this->request->get('exp_year') == Carbon::now()->year) {
-            $rule['exp_month'] = array_merge($rule['exp_month'], ['min:' . Carbon::now()->month]);
-
-        }
-
-        return $rule;
     }
 }

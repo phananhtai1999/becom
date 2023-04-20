@@ -25,21 +25,11 @@ class UpgradeUserRequest extends AbstractRequest
      */
     public function rules()
     {
-        $rule = [
+        return [
             'payment_method_uuid' => ['required', Rule::in('1', '2')],
             'go_back_url' => ['required'],
             'billing_address_uuid' => ['required', 'exists:billing_addresses,uuid'],
-            "card_number" => ['required_if:payment_method,==,2', 'integer', 'digits:16'],
-            "exp_month" => ['required_if:payment_method,==,2', 'integer'],
-            "exp_year" => ['required_if:payment_method,==,2', 'integer', 'min:' . Carbon::now()->year],
-            "cvc" => ['required_if:payment_method,==,2', 'integer', 'digits:3'],
             "subscription_plan_uuid" => ['required', 'integer', 'exists:subscription_plans,uuid']
         ];
-
-        if ($this->request->get('exp_year') == Carbon::now()->year) {
-            $rule['exp_month'] = array_merge($rule['exp_month'], ['min:' . Carbon::now()->month]);
-        }
-
-        return $rule;
     }
 }
