@@ -78,6 +78,14 @@ class ConfigController extends AbstractRestAPIController
 
         $model = $this->service->findOrFailById($id);
 
+        if (($model->key == 'paypal_method' || $model->key == 'stripe_method') && !$request->get('value')) {
+            if (($model->key == 'paypal_method' && !$this->service->findConfigByKey('stripe_method')->value) ||
+                ($model->key == 'stripe_method' && !$this->service->findConfigByKey('paypal_method')->value)
+            ) {
+
+                return $this->sendValidationFailedJsonResponse(['message' => 'Must have at least one payment method']);
+            }
+        }
         // Cast value to integer
         if ($request->type === 'boolean' || $request->type === 'numeric') {
             if ($request->value == 0) {
