@@ -126,7 +126,7 @@ class StripeController extends AbstractRestAPIController
             'subscription_date' => $request->subscriptionDate,
             'billing_address_uuid' => $request->billingAddressUuid,
             'expiration_date' => $request->expirationDate,
-            'payment_method_uuid' => PaymentMethod::PAYPAL,
+            'payment_method_uuid' => PaymentMethod::STRIPE,
             'logs' => $subscriptionData,
         ];
         $userAddOnData = [

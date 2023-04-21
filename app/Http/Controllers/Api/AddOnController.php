@@ -186,4 +186,29 @@ class AddOnController extends AbstractRestAPIController
         return $this->sendOkJsonResponse(
             $this->addOnSubscriptionHistoryService->resourceCollectionToData($this->addOnSubscriptionHistoryResourceCollectionClass, $subscriptionHistory));
     }
+
+    public function cancelAddOnSubscription($id)
+    {
+        $addOnSubscriptionHistory = $this->addOnSubscriptionHistoryService->findOneWhere([
+            'add_on_subscription_plan_uuid' => $id,
+            'user_uuid' => auth()->user()->getKey(),
+        ]);
+        $userAddOn = $this->userAddOnService->findOneWhere([
+            'add_on_subscription_plan_uuid' => $id,
+            'user_uuid' => auth()->user()->getKey(),
+        ]);
+        try {
+            if ($addOnSubscriptionHistory->payment_method_uuid == PaymentMethod::PAYPAL) {
+                $this->paypalService->cancelSubscription($addOnSubscriptionHistory->logs['id']);
+            } else {
+                $this->stripeService->cancelSubscription($addOnSubscriptionHistory->logs['id']);
+            }
+            $this->userAddOnService->update($userAddOn, ['auto_renew' => false]);
+
+            return $this->sendOkJsonResponse(['message' => 'Successfully']);
+        } catch (\Exception $exception) {
+
+            return $this->sendBadRequestJsonResponse(['message' => $exception->getMessage()]);
+        }
+    }
 }
