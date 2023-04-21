@@ -77,6 +77,9 @@ class UserResource extends AbstractJsonResource
         if (\in_array('user__partner_user', $expand)) {
             $data['partner_user'] = new PartnerUserResource($this->partnerUser);
         }
+        if (\in_array('user__user_tracking', $expand)) {
+            $data['user_tracking'] = new UserTrackingResource($this->userTracking);
+        }
 
         return $data;
     }

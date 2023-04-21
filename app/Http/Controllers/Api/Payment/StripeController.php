@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Api\Payment;
 
 use App\Abstracts\AbstractRestAPIController;
 use App\Events\PaymentCreditPackageSuccessEvent;
+use App\Events\SendNotificationSystemForPaymentEvent;
 use App\Events\SubscriptionAddOnSuccessEvent;
 use App\Events\SubscriptionSuccessEvent;
 use App\Http\Requests\UpdateCardCustomerRequest;
 use App\Http\Requests\UpdateCardStripeRequest;
+use App\Models\Notification;
 use App\Models\PaymentMethod;
 use App\Services\StripeService;
 use App\Services\SubscriptionHistoryService;
@@ -101,7 +103,7 @@ class StripeController extends AbstractRestAPIController
 
         if (isset($response['status']) && $response['status'] == 'complete') {
             Event::dispatch(new SubscriptionSuccessEvent($request->userUuid, $subscriptionHistory, $userPlatformPackage));
-
+            Event::dispatch(new SendNotificationSystemForPaymentEvent($subscriptionHistory, Notification::PACKAGE_TYPE));
             return redirect()->to(env('FRONTEND_URL') . 'my/profile/upgrade/success?go_back_url='. $request['goBackUrl'] . '&plan_id=' . $request->subscriptionPlanUuid);
         } else {
 
@@ -138,7 +140,7 @@ class StripeController extends AbstractRestAPIController
 
         if (isset($response['status']) && $response['status'] == 'complete') {
             Event::dispatch(new SubscriptionAddOnSuccessEvent($request->userUuid, $subscriptionHistoryData, $userAddOnData));
-
+            Event::dispatch(new SendNotificationSystemForPaymentEvent($subscriptionHistoryData, Notification::ADDON_TYPE));
             return redirect()->to(env('FRONTEND_URL') . 'my/profile/add-on/success?go_back_url='. $request['goBackUrl'] . '&addOnSubscriptionPlanUuid=' . $request->addOnSubscriptionPlanUuid);
         } else {
 
@@ -171,7 +173,11 @@ class StripeController extends AbstractRestAPIController
         ];
         if (isset($response['status']) && $response['status'] == 'complete') {
             Event::dispatch(new PaymentCreditPackageSuccessEvent($request->creditPackageUuid, $paymentData, $request->userUuid, PaymentMethod::PAYPAL));
-
+            Event::dispatch(new SendNotificationSystemForPaymentEvent([
+                'credit_package_uuid' => $request->creditPackageUuid,
+                'user_uuid' => $request->userUuid,
+                'payment_method_uuid' => PaymentMethod::STRIPE
+            ], Notification::CREDIT_TYPE));
             return redirect()->to(env('FRONTEND_URL') . 'my/profile/top-up/success?go_back_url='. $request->goBackUrl .'&package_id=' . $request->creditPackageUuid);
         } else {
 

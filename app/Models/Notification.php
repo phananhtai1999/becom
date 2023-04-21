@@ -10,6 +10,9 @@ class Notification extends Model
 {
     use HasFactory, SoftDeletes;
 
+    const PACKAGE_TYPE = "package";
+    const CREDIT_TYPE = 'credit';
+    const ADDON_TYPE = "addon";
     const CAMPAIGN_TYPE = "campaign";
     const SCENARIO_TYPE = "scenario";
     const ACCOUNT_TYPE = "account";

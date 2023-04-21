@@ -13,6 +13,7 @@ use App\Events\SendByCampaignRootScenarioEvent;
 use App\Events\SendByCampaignEvent;
 use App\Events\SendNotificationSystemEvent;
 use App\Events\SendNotificationSystemForLoginEvent;
+use App\Events\SendNotificationSystemForPaymentEvent;
 use App\Events\SendNotOpenByScenarioCampaignEvent;
 use App\Events\SendEmailRecoveryPasswordEvent;
 use App\Events\SendEmailVerifyEmailEvent;
@@ -30,6 +31,7 @@ use App\Listeners\SendByBirthdayCampaignListener;
 use App\Listeners\SendByCampaignRootScenarioListener;
 use App\Listeners\SendByCampaignListener;
 use App\Listeners\SendNotificationSystemForLoginListener;
+use App\Listeners\SendNotificationSystemForPaymentListener;
 use App\Listeners\SendNotificationSystemListener;
 use App\Listeners\SendNotOpenByScenarioCampaignListener;
 use App\Listeners\SendEmailRecoveryPasswordListener;
@@ -122,6 +124,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         SendAccountForNewPartnerEvent::class => [
             SendAccountForNewPartnerListener::class
+        ],
+        SendNotificationSystemForPaymentEvent::class => [
+            SendNotificationSystemForPaymentListener::class
         ]
     ];
 
