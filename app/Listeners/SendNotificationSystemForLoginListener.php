@@ -82,7 +82,7 @@ class SendNotificationSystemForLoginListener implements ShouldQueue
                 ]);
             }
         } catch (\Exception $e) {
-            Log::info($e->getMessage());
+            Log::error($e->getMessage());
         }
 
     }
