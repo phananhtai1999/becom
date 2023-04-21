@@ -31,7 +31,7 @@ class Kernel extends ConsoleKernel
 //        $schedule->command('Send:Email')->everyMinute();
 //        $schedule->command('send:campaign')->dailyAt('8:00');
         $schedule->command('send:birthday-campaign')->dailyAt('8:00');
-        $schedule->command('send:email-not-open')->everyFiveMinutes();
+        $schedule->command('send:not-open-campaign')->everyFiveMinutes();
         $schedule->command('update:recervers')->everyFiveMinutes();
 
 
