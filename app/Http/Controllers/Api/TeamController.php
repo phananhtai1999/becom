@@ -303,4 +303,16 @@ class TeamController extends Controller
 
         return $this->sendOkJsonResponse();
     }
+
+    public function unBlockMember($id)
+    {
+        $model = $this->userTeamService->findOrFailById($id);
+        if (!$this->checkTeamOwner($model->team_uuid)) {
+
+            return $this->sendJsonResponse(false, 'You are not owner of team to set permission', [], 403);
+        }
+        $this->userTeamService->update($model, ['is_blocked' => false]);
+
+        return $this->sendOkJsonResponse();
+    }
 }
