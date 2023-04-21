@@ -21,6 +21,7 @@ class Article extends AbstractModel
 
     const PUBLISHED_PUBLISH_STATUS = 1;
     const BLOCKED_PUBLISH_STATUS = 2;
+    const PENDING_PUBLISH_STATUS = 3;
     const PUBLIC_CONTENT_FOR_USER = 'public';
     const LOGIN_CONTENT_FOR_USER = 'login';
     const EDITOR_CONTENT_FOR_USER = 'editor';
