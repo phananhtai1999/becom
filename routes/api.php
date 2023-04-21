@@ -56,7 +56,7 @@ use App\Http\Controllers\Api\SubscriptionPlanController;
 use App\Http\Controllers\Api\TeamController;
 use App\Http\Controllers\Api\SupportMultipleLanguagesController;
 use App\Http\Controllers\Api\UnsubscribeController;
-use App\Http\Controllers\Api\UploadImgController;
+use App\Http\Controllers\Api\UploadController;
 use App\Http\Controllers\Api\User\UserConfigController;
 use App\Http\Controllers\Api\User\UserController;
 use App\Http\Controllers\Api\User\UserDetailController;
@@ -104,7 +104,8 @@ Route::get('/auth/callback/facebook', [AuthBySocialNetworkController::class, 'lo
 Route::get('/auth/callback/linkedin', [AuthBySocialNetworkController::class, 'loginByLinkedinCallback'])->name('loginByLinkedinCallback');
 Route::get('/auth/callback/github', [AuthBySocialNetworkController::class, 'loginByGithubCallback'])->name('loginByGithubCallback');
 
-Route::post('/upload-img', [UploadImgController::class, 'upload'])->name('upload')->middleware('auth:api');
+Route::post('/upload-img', [UploadController::class, 'uploadImage'])->name('upload-image')->middleware('auth:api');
+Route::post('/upload-video', [UploadController::class, 'uploadVideo'])->name('upload-video')->middleware('auth:api');
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'user.'], function () {
 
