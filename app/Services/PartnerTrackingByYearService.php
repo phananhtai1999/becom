@@ -12,10 +12,11 @@ class PartnerTrackingByYearService extends AbstractService
 
     public function earningsOfPartnerByMonth($partnerUuid)
     {
-        return $this->model->where([
+        $earningInMonth = $this->model->where([
             ['partner_uuid', $partnerUuid],
             ['year', Carbon::today()->year],
-        ])->whereRaw("JSON_EXTRACT(commission, '$.".Carbon::today()->month."') IS NOT NULL")->first()->commission[Carbon::today()->month];
+        ])->whereRaw("JSON_EXTRACT(commission, '$.".Carbon::today()->month."') IS NOT NULL")->first();
+        return $earningInMonth ? $earningInMonth->commission[Carbon::today()->month] : 0;
     }
 
     public function trackingEarningsOfPartner($startDate, $endDate, $partnerUuid)

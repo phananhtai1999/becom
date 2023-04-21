@@ -21,7 +21,7 @@ class PartnerTrackingService extends AbstractService
             $ip = geoip()->getClientIP();
             $country = geoip()->getLocation($ip)->country;
         } catch (\Exception $e) {
-            Log::info($e->getMessage());
+            Log::error($e->getMessage());
             $ip = request()->ip();
         }
 
