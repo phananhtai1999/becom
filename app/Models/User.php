@@ -318,4 +318,9 @@ class User extends Authenticatable
     public function userTeamContactLists() {
         return $this->belongsToMany(ContactList::class, 'user_team_contact_lists', 'user_uuid', 'contact_list_uuid');
     }
+
+    public function userTracking()
+    {
+        return $this->hasOne(UserTracking::class, 'user_uuid', 'uuid');
+    }
 }
