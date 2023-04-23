@@ -682,6 +682,32 @@ class ContactService extends AbstractService
                 AllowedFilter::scope('uuids_not_in'),
                 AllowedFilter::scope('from__dob'),
                 AllowedFilter::scope('to__dob'),
+                //Custom filter full_name Append (LIKE)
+                AllowedFilter::callback("full_name", function (Builder $query, $values) {
+                    if (is_array($values)) {
+                        $query->where(function ($q) use ($values) {
+                            foreach ($values as $value) {
+                                $fullName = ltrim($value, ' ');
+                                $q->orWhereRaw("CONCAT(first_name, ' ', middle_name, ' ', last_name) like '%$fullName%'");
+                            }
+                        });
+                    } else {
+                        $query->whereRaw("CONCAT(first_name, ' ', middle_name, ' ', last_name) like '%$values%'");
+                    }
+                }),
+                //Custom filter full_name Append (EXACT)
+                AllowedFilter::callback("exact__full_name", function (Builder $query, $values) {
+                    if (is_array($values)) {
+                        $query->where(function ($q) use ($values) {
+                            foreach ($values as $value) {
+                                $fullName = ltrim($value, ' ');
+                                $q->orWhereRaw("CONCAT(first_name, ' ', middle_name, ' ', last_name) = '$fullName'");
+                            }
+                        });
+                    } else {
+                        $query->whereRaw("CONCAT(first_name, ' ', middle_name, ' ', last_name) = '$values'");
+                    }
+                }),
                 $this->getDuplicateFiltersByNumeric($modelKeyName),
                 $this->getDuplicateFilters('email'),
                 $this->getDuplicateFilters('first_name'),
