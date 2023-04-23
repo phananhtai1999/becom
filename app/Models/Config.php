@@ -17,6 +17,9 @@ class Config extends AbstractModel
     const CONFIG_EMAIL_PRICE = 'email_price';
     const CONFIG_TELEGRAM_PRICE = 'telegram_price';
     const CONFIG_VIBER_PRICE = 'viber_price';
+    const CONFIG_S3_SYSTEM = 's3_system';
+    const CONFIG_S3_USER = 's3_user';
+    const CONFIG_S3_WEBSITE = 's3_website';
 
     /**
      * @var string

@@ -27,11 +27,16 @@ class ConfigRequest extends AbstractRequest
         $validate = [
             'key' => ['required', 'string', Rule::unique('configs')->whereNull('deleted_at')],
             'value' => ['nullable', 'string'],
-            'type' => ['required', 'in:image,boolean,numeric,string,smtp_account'],
+            'type' => ['required', 'in:image,boolean,numeric,string,smtp_account,s3'],
             'status' => ['required', 'in:public,system,private'],
             'default_value' => ['nullable', 'string'],
             'group_id' => ['required', 'numeric', 'min:1', Rule::exists('groups', 'uuid')->whereNull('deleted_at')],
         ];
+
+        if (in_array($this->request->get('key'), ['s3_system', 's3_user', 's3_website'])) {
+
+            $validate['type'] = ['required', 'in:s3'];
+        }
 
         if ($this->request->get('type') === 'image' || $this->request->get('type') === 'string') {
 
@@ -42,7 +47,7 @@ class ConfigRequest extends AbstractRequest
         } elseif ($this->request->get('type') === 'numeric') {
 
             $validate['value'] = ['nullable', 'numeric'];
-        }elseif ($this->request->get('type') === 'smtp_account') {
+        } elseif ($this->request->get('type') === 'smtp_account') {
 
             $validate['value'] = ['required', 'array'];
             $validate['value.mail_host'] = ['required', 'string'];
@@ -52,6 +57,18 @@ class ConfigRequest extends AbstractRequest
             $validate['value.mail_encryption'] = ['required', 'string'];
             $validate['value.mail_from_address'] = ['required', 'string'];
             $validate['value.mail_from_name'] = ['required', 'string'];
+        } elseif ($this->request->get('type') === 's3') {
+
+            $validate['key'] = ['required', 'string', 'in:s3_system,s3_user,s3_website', Rule::unique('configs')->whereNull('deleted_at')];
+            $validate['value'] = ['required', 'array'];
+            $validate['value.driver'] = ['required', 'string', 'in:s3'];
+            $validate['value.key'] = ['required', 'string'];
+            $validate['value.secret'] = ['required', 'string'];
+            $validate['value.region'] = ['required', 'string'];
+            $validate['value.bucket'] = ['required', 'string'];
+            $validate['value.url'] = ['nullable', 'string'];
+            $validate['value.endpoint'] = ['required', 'string'];
+            $validate['value.use_path_style_endpoint'] = ['nullable', 'boolean'];
         }
 
         return $validate;
