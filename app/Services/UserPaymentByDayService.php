@@ -101,7 +101,7 @@ class UserPaymentByDayService extends AbstractService
         return array_values($results);
     }
 
-    public function getCommissionThisMonthByPartner($partnerCode)
+    public function getRewardsCommissionThisMonthByPartner($partnerCode)
     {
         $today = Carbon::today();
         $payments = $this->model->with('user')->join('partner_user as a', 'a.user_uuid', '=', 'user_payment_by_day.user_uuid')

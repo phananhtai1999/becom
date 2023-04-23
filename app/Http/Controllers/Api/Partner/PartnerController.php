@@ -344,7 +344,7 @@ class PartnerController extends AbstractRestAPIController
     public function partnerRewards()
     {
         $partner = $this->service->findOneWhereOrFail(['user_uuid' => auth()->user()->getKey()]);
-        $data = $this->userPaymentByDayService->getCommissionThisMonthByPartner($partner->code);
+        $data = $this->userPaymentByDayService->getRewardsCommissionThisMonthByPartner($partner->code);
 
         return $this->sendOkJsonResponse(["data" => $data]);
     }
