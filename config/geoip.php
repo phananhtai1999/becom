@@ -124,7 +124,8 @@ return [
     |
     */
 
-    'cache_tags' => ['torann-geoip-location'],
+    'cache_tags' => in_array(config('cache.default'), ['array', 'redis'])
+        ? ['torann-geoip-location'] : [],
 
     /*
     |--------------------------------------------------------------------------

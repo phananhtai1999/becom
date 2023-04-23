@@ -343,40 +343,10 @@ class PartnerController extends AbstractRestAPIController
 
     public function partnerRewards()
     {
-        //Tao dữ liệu giả
-        $fakeData = [
-            [
-                'status' => 'unpaid',
-                'amount' => 20,
-                'from_customer' => 'Nam',
-                'created' => '2023-04-19',
-            ],
-            [
-                'status' => 'unpaid',
-                'amount' => 120,
-                'from_customer' => 'Nam',
-                'created' => '2023-04-19',
-            ],
-            [
-                'status' => 'unpaid',
-                'amount' => 130,
-                'from_customer' => 'Nam',
-                'created' => '2023-04-19',
-            ],
-            [
-                'status' => 'unpaid',
-                'amount' => 150,
-                'from_customer' => 'Nam',
-                'created' => '2023-04-19',
-            ],
-            [
-                'status' => 'unpaid',
-                'amount' => 200,
-                'from_customer' => 'Nam',
-                'created' => '2023-04-19',
-            ],
-        ];
-        return $this->sendOkJsonResponse(["data" => $fakeData]);
+        $partner = $this->service->findOneWhereOrFail(['user_uuid' => auth()->user()->getKey()]);
+        $data = $this->userPaymentByDayService->getCommissionThisMonthByPartner($partner->code);
+
+        return $this->sendOkJsonResponse(["data" => $data]);
     }
 
     public function partnerPayoutTerms()

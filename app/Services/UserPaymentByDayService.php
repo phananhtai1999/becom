@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Abstracts\AbstractService;
 use App\Models\UserPaymentByDay;
+use Carbon\Carbon;
 
 class UserPaymentByDayService extends AbstractService
 {
@@ -29,13 +30,13 @@ class UserPaymentByDayService extends AbstractService
             })->select('user_payment_by_day.*')->get();
 
         //Tính commission dựa vào tháng và năm của start và endDate rồi xem thử partner tháng đó có bnhiu customer -> level -> commission
-        $commissionByMonthOfStartDate = (new PartnerLevelService())->getPartnerLevelOfPartnerByMontYear($partnerCode, $startDate->month, $startDate->year)->commission;
-        $commissionByMonthOfEndDate = (new PartnerLevelService())->getPartnerLevelOfPartnerByMontYear($partnerCode, $endDate->month, $endDate->year)->commission;
+        $commissionByStartDate = (new PartnerLevelService())->getCommissionByTimeOfPartner($startDate, $partnerCode);
+        $commissionByEndDate = (new PartnerLevelService())->getCommissionByTimeOfPartner($endDate, $partnerCode);
 
         // Đếm số lượng user thanh toán theo ngày có số tiền và hoa hồng
         $countByDate = [];
         foreach ($payments as $payment) {
-            $commission = ($payment->month === $startDate->month ? $commissionByMonthOfStartDate : $commissionByMonthOfEndDate);
+            $commission = ($payment->month === $startDate->month ? $commissionByStartDate : $commissionByEndDate);
             foreach ($payment->payment as $day => $amount) {
                 $date = date('Y-m-d', strtotime($payment->year . '-' . $payment->month . '-' . $day));
                 if ($date >= $startDate && $date <= $endDate) {
@@ -98,5 +99,35 @@ class UserPaymentByDayService extends AbstractService
         }
 
         return array_values($results);
+    }
+
+    public function getCommissionThisMonthByPartner($partnerCode)
+    {
+        $today = Carbon::today();
+        $payments = $this->model->with('user')->join('partner_user as a', 'a.user_uuid', '=', 'user_payment_by_day.user_uuid')
+            ->where([
+                ['a.registered_from_partner_code', $partnerCode],
+                ['user_payment_by_day.month', $today->month],
+                ['user_payment_by_day.year', $today->year],
+            ])
+            ->select('user_payment_by_day.*')->get();
+
+        $commission = (new PartnerLevelService())->getCommissionByTimeOfPartner($today, $partnerCode);
+        $result = [];
+        foreach ($payments as $payment) {
+            foreach ($payment->payment as $day => $amount){
+                $date = date('Y-m-d', strtotime($payment->year . '-' . $payment->month . '-' . $day));
+                $email = substr($payment->user->email, 0, 5) . str_repeat('*', strlen($payment->user->email) - 10) . substr($payment->user->email, -5);
+                $result[] = [
+                    'from_customer' => $email,
+                    'amount' => $amount,
+                    'earning' => $amount * $commission / 100,
+                    'created' => $date,
+                    'status' => 'unpaid'
+                ];
+            }
+        }
+
+        return collect($result)->sortByDesc('created')->values();
     }
 }
