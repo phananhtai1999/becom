@@ -16,7 +16,8 @@ class UserTracking extends AbstractModel
 
     protected $fillable = [
         'ip',
-        'country',
+        'last_login_location',
+        'register_location',
         'user_uuid',
         'postal_code',
     ];

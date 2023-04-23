@@ -18,6 +18,7 @@ class SendNotificationSystemForLoginListener implements ShouldQueue
     private $smtpAccountService;
 
     private $notificationService;
+
     /**
      * Create the event listener.
      *
@@ -25,7 +26,7 @@ class SendNotificationSystemForLoginListener implements ShouldQueue
      */
     public function __construct(
         UserTrackingService $service,
-        SmtpAccountService $smtpAccountService,
+        SmtpAccountService  $smtpAccountService,
         NotificationService $notificationService
     )
     {
@@ -37,7 +38,7 @@ class SendNotificationSystemForLoginListener implements ShouldQueue
     /**
      * Handle the event.
      *
-     * @param  SendNotificationSystemForLoginEvent  $event
+     * @param SendNotificationSystemForLoginEvent $event
      * @return void
      */
     public function handle(SendNotificationSystemForLoginEvent $event)
@@ -58,7 +59,8 @@ class SendNotificationSystemForLoginListener implements ShouldQueue
             ]);
 
             if ($userTracking) {
-                if ($userTracking->country != $country) {
+                if (($userTracking->last_login_location && $userTracking->last_login_location != $country) ||
+                    (!$userTracking->last_login_location && $userTracking->register_location != $country) ){
                     $this->smtpAccountService->sendEmailNotificationSystem($user, new SendNotificationSystem($user, $type, $country));
                     $this->notificationService->create([
                         'type' => $type,
@@ -69,15 +71,14 @@ class SendNotificationSystemForLoginListener implements ShouldQueue
                 }
                 $this->service->update($userTracking, [
                     'ip' => $ip,
-                    'country' => $country,
+                    'last_login_location' => $country,
                     'postal_code' => $geoIp->postal_code
                 ]);
-
             }else{
                 $this->service->create([
                     'ip' => $ip,
                     'user_uuid' => $user->uuid,
-                    'country' => $country,
+                    'register_location' => $country,
                     'postal_code' => $geoIp->postal_code
                 ]);
             }
@@ -85,5 +86,5 @@ class SendNotificationSystemForLoginListener implements ShouldQueue
             Log::error($e->getMessage());
         }
 
-    }
+}
 }
