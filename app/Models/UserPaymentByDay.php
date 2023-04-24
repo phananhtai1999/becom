@@ -42,8 +42,8 @@ class UserPaymentByDay extends AbstractModel
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function users()
+    public function user()
     {
-        return $this->belongsTo(User::class, 'user_uuid', 'uuid');
+        return $this->belongsTo(User::class, 'user_uuid', 'uuid')->withTrashed();
     }
 }
