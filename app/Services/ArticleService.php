@@ -71,20 +71,21 @@ class ArticleService extends AbstractService
      * @param $search
      * @param $searchBy
      * @param $arrayListContentForUser
+     * @param $publishStatus
      * @return mixed
      */
-    public function getArticleByPermission($perPage, $columns, $pageName, $page, $search, $searchBy, $arrayListContentForUser)
+    public function getArticleByPermission($perPage, $columns, $pageName, $page, $search, $searchBy, $arrayListContentForUser, $publishStatus)
     {
         //Get  Article Category Public
         $articleCategoryPublicByUuids = (new ArticleCategoryService())->getListArticleCategoryUuidsPublic();
 
         return ArticleQueryBuilder::searchQuery($search, $searchBy)
-            ->where('publish_status', Article::PUBLISHED_PUBLISH_STATUS)
+            ->whereIn('publish_status', $publishStatus)
+            ->whereIn('content_for_user', config('articlepermission.' . $arrayListContentForUser))
             ->where(function ($query) use ($articleCategoryPublicByUuids) {
                 $query->whereIn('article_category_uuid', $articleCategoryPublicByUuids)
                     ->orWhereNull('article_category_uuid');
             })
-            ->whereIn('content_for_user', config('articlepermission.' . $arrayListContentForUser))
             ->paginate($perPage, $columns, $pageName, $page);
     }
 
@@ -110,16 +111,24 @@ class ArticleService extends AbstractService
             //Admin
             return $this->loadAllArticles($perPage, $columns, $pageName, $page, $search, $searchBy);
         } elseif ($this->paidUser()) {
+            //Check current user role
+            $publishStatus = [Article::PUBLISHED_PUBLISH_STATUS];
+            if (auth()->user()->roles->whereIn('slug', ["editor"])->count()) {
+                $publishStatus = [Article::PENDING_PUBLISH_STATUS, Article::PUBLISHED_PUBLISH_STATUS];
+            }
             //Payment
             $contentForUSer = Article::PAYMENT_CONTENT_FOR_USER;
         } elseif (auth()->user()->roles->whereIn('slug', ["editor"])->count()) {
             //Editor
+            $publishStatus = [Article::PENDING_PUBLISH_STATUS, Article::PUBLISHED_PUBLISH_STATUS];
             $contentForUSer = Article::EDITOR_CONTENT_FOR_USER;
         } else {
             //Login
+            $publishStatus = [Article::PUBLISHED_PUBLISH_STATUS];
             $contentForUSer = Article::LOGIN_CONTENT_FOR_USER;
         }
-        return $this->getArticleByPermission($perPage, $columns, $pageName, $page, $search, $searchBy, $contentForUSer);
+
+        return $this->getArticleByPermission($perPage, $columns, $pageName, $page, $search, $searchBy, $contentForUSer, $publishStatus);
     }
 
     /**

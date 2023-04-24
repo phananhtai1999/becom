@@ -9,6 +9,7 @@ use App\Services\SmtpAccountService;
 use App\Services\UserTrackingService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Log;
 
 class SendNotificationSystemForLoginListener implements ShouldQueue
 {
@@ -81,7 +82,7 @@ class SendNotificationSystemForLoginListener implements ShouldQueue
                 ]);
             }
         } catch (\Exception $e) {
-
+            Log::error($e->getMessage());
         }
 
     }

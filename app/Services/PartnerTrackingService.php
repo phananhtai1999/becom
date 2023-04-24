@@ -6,6 +6,7 @@ use App\Abstracts\AbstractService;
 use App\Models\PartnerTracking;
 use App\Models\QueryBuilders\PartnerTrackingQueryBuilder;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class PartnerTrackingService extends AbstractService
 {
@@ -20,6 +21,7 @@ class PartnerTrackingService extends AbstractService
             $ip = geoip()->getClientIP();
             $country = geoip()->getLocation($ip)->country;
         } catch (\Exception $e) {
+            Log::error($e->getMessage());
             $ip = request()->ip();
         }
 

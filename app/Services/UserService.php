@@ -250,7 +250,7 @@ class UserService extends AbstractService
 
     public function getUsersByRole($role)
     {
-        $users = $this->model->whereHas('roles', function ($query) use($role) {
+        $users = $this->model->whereHas('roles', function ($query) use ($role) {
             $query->where('name', $role);
         })->with('roles')->get();
 
@@ -275,5 +275,21 @@ class UserService extends AbstractService
         }
 
         return $min;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCurrentUserRole(): string
+    {
+        if (auth()->user()->roles->whereIn('slug', ['admin'])->count()) {
+            $char = 'a' . auth()->user()->getkey();
+        } elseif (auth()->user()->roles->whereIn('slug', ['editor'])->count()) {
+            $char = 'e' . auth()->user()->getkey();
+        } else {
+            $char = 'u' . auth()->user()->getkey();
+        }
+
+        return $char;
     }
 }

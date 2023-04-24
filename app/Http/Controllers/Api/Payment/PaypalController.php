@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api\Payment;
 
 use App\Abstracts\AbstractRestAPIController;
 use App\Events\PaymentCreditPackageSuccessEvent;
+use App\Events\SendNotificationSystemForPaymentEvent;
 use App\Events\SubscriptionAddOnSuccessEvent;
 use App\Events\SubscriptionSuccessEvent;
+use App\Models\Notification;
 use App\Models\PaymentMethod;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -46,7 +48,11 @@ class PaypalController extends AbstractRestAPIController
         ];
         if (isset($response['status']) && $response['status'] == 'COMPLETED') {
             Event::dispatch(new PaymentCreditPackageSuccessEvent($request->creditPackageUuid, $paymentData, $request->userUuid, PaymentMethod::PAYPAL));
-
+            Event::dispatch(new SendNotificationSystemForPaymentEvent([
+                'credit_package_uuid' => $request->creditPackageUuid,
+                'user_uuid' => $request->userUuid,
+                'payment_method_uuid' => PaymentMethod::PAYPAL
+            ], Notification::CREDIT_TYPE));
             return redirect()->to(env('FRONTEND_URL') . 'my/profile/top-up/success?go_back_url='. $request->goBackUrl .'&package_id=' . $request->creditPackageUuid);
         } else {
 
@@ -84,7 +90,7 @@ class PaypalController extends AbstractRestAPIController
         ];
         if (isset($response['status']) && $response['status'] == 'ACTIVE') {
             Event::dispatch(new SubscriptionSuccessEvent($request->userUuid, $subscriptionHistory, $userPlatformPackage));
-
+            Event::dispatch(new SendNotificationSystemForPaymentEvent($subscriptionHistory, Notification::PACKAGE_TYPE));
             return redirect()->to(env('FRONTEND_URL') . 'my/profile/upgrade/success?go_back_url='. $request['goBackUrl'] . '&plan_id=' . $request->subscriptionPlanUuid);
         } else {
 
@@ -124,7 +130,7 @@ class PaypalController extends AbstractRestAPIController
         ];
         if (isset($response['status']) && $response['status'] == 'ACTIVE') {
             Event::dispatch(new SubscriptionAddOnSuccessEvent($request->userUuid, $subscriptionHistoryData, $userAddOnData));
-
+            Event::dispatch(new SendNotificationSystemForPaymentEvent($subscriptionHistoryData, Notification::ADDON_TYPE));
             return redirect()->to(env('FRONTEND_URL') . 'my/profile/add-on/success?go_back_url='. $request['goBackUrl'] . '&addOnSubscriptionPlanUuid=' . $request->addOnSubscriptionPlanUuid);
         } else {
 
