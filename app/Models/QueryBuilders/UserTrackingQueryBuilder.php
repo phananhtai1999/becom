@@ -33,7 +33,8 @@ class UserTrackingQueryBuilder extends AbstractQueryBuilder
                 $modelKeyName,
                 'ip',
                 'user_uud',
-                'country',
+                'last_login_location',
+                'register_location',
                 'postal_code',
             ])
             ->defaultSort('-created_at')
@@ -41,7 +42,8 @@ class UserTrackingQueryBuilder extends AbstractQueryBuilder
                 $modelKeyName,
                 'ip',
                 'user_uud',
-                'country',
+                'last_login_location',
+                'register_location',
                 'postal_code',
             ])
             ->allowedFilters([
@@ -51,8 +53,10 @@ class UserTrackingQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__ip', 'ip'),
                 'user_uud',
                 AllowedFilter::exact('exact__user_uud', 'user_uud'),
-                'country',
-                AllowedFilter::exact('exact__country', 'country'),
+                'register_location',
+                AllowedFilter::exact('exact__register_location', 'register_location'),
+                'last_login_location',
+                AllowedFilter::exact('exact__last_login_location', 'last_login_location'),
                 'postal_code',
                 AllowedFilter::exact('exact__postal_code', 'postal_code'),
                 'updated_at',
