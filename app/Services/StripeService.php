@@ -263,8 +263,17 @@ class StripeService extends AbstractService
     public function allCard($customerId)
     {
         $stripe = $this->getStripeClient();
+        $defaultSourceId = $stripe->customers->retrieve($customerId)->default_source;
+        $sources = $stripe->customers->allSources($customerId);
+        foreach ($sources as $source) {
+            if ($source->id == $defaultSourceId) {
+                $source->is_default = true;
+                continue;
+            }
+            $source->is_default = false;
+        }
 
-        return $stripe->customers->allSources($customerId);
+        return $sources;
     }
 
     public function deleteCard($customerId, $id)

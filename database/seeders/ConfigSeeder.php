@@ -201,14 +201,14 @@ class ConfigSeeder extends Seeder {
 				'key' => 'paypal_method',
 				'value' => true,
 				'type' => 'boolean',
-				'status' => 'system',
+				'status' => 'private',
 				'group_id' => '1',
 			],
 			[
 				'key' => 'stripe_method',
 				'value' => true,
 				'type' => 'boolean',
-				'status' => 'system',
+				'status' => 'private',
 				'group_id' => '1',
 			]
 
