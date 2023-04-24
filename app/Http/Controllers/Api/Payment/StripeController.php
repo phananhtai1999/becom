@@ -33,17 +33,23 @@ class StripeController extends AbstractRestAPIController
 
     public function cardStripe(UpdateCardCustomerRequest $request)
     {
-        $customer = $this->getCustomer();
-        $token = $this->service->createNewToken($request);
-        if ($request->get('type') == self::UPDATE_CARD_STRIPE) {
-            $this->service->updateCustomerCard($customer->id, $token);
-            $message = 'Update Card Successfully';
-        } else {
-            $this->service->addCard($customer->id, $token);
-            $message = 'Add new Card Successfully';
+        try {
+            $customer = $this->getCustomer();
+            $token = $this->service->createNewToken($request);
+            if ($request->get('type') == self::UPDATE_CARD_STRIPE) {
+                $this->service->updateCustomerCard($customer->id, $token);
+                $message = 'Update Card Successfully';
+            } else {
+                $this->service->addCard($customer->id, $token);
+                $message = 'Add new Card Successfully';
+            }
+            $response = $this->sendOkJsonResponse(['message' => $message]);
+
+        } catch (\Exception $exception) {
+            $response = $this->sendJsonResponse(false, $exception->getMessage(), [], 400);
         }
 
-        return $this->sendOkJsonResponse(['message' => $message]);
+        return $response;
     }
 
     public function allCardStripe()
@@ -56,10 +62,15 @@ class StripeController extends AbstractRestAPIController
 
     public function updateCard(UpdateCardStripeRequest $request, $id)
     {
-        $customer = $this->getCustomer();
-        $card = $this->service->updateOneCard($customer->id, $request, $id);
+        try {
+            $customer = $this->getCustomer();
+            $card = $this->service->updateOneCard($customer->id, $request, $id);
+            $response = $this->sendOkJsonResponse(['data' => $card]);
+        } catch (\Exception $exception) {
+            $response = $this->sendJsonResponse(false, $exception->getMessage(), [], 400);
+        }
 
-        return $this->sendOkJsonResponse(['data' => $card]);
+        return $response;
     }
 
     public function getCustomer()
@@ -104,16 +115,16 @@ class StripeController extends AbstractRestAPIController
         if (isset($response['status']) && $response['status'] == 'complete') {
             Event::dispatch(new SubscriptionSuccessEvent($request->userUuid, $subscriptionHistory, $userPlatformPackage));
             Event::dispatch(new SendNotificationSystemForPaymentEvent($subscriptionHistory, Notification::PACKAGE_TYPE));
-            return redirect()->to(env('FRONTEND_URL') . 'my/profile/upgrade/success?go_back_url='. $request['goBackUrl'] . '&plan_id=' . $request->subscriptionPlanUuid);
+            return redirect()->to(env('FRONTEND_URL') . 'my/profile/upgrade/success?go_back_url=' . $request['goBackUrl'] . '&plan_id=' . $request->subscriptionPlanUuid);
         } else {
 
-            return redirect()->to(env('FRONTEND_URL') . 'my/profile/upgrade/failed?go_back_url='. $request['goBackUrl'] . '&plan_id=' . $request->subscriptionPlanUuid);
+            return redirect()->to(env('FRONTEND_URL') . 'my/profile/upgrade/failed?go_back_url=' . $request['goBackUrl'] . '&plan_id=' . $request->subscriptionPlanUuid);
         }
     }
 
     public function cancelPaymentSubscription(Request $request)
     {
-        return redirect()->to(env('FRONTEND_URL') . 'my/profile/upgrade/canceled?go_back_url='. $request['goBackUrl'] . '&plan_id=' . $request->subscriptionPlanUuid);
+        return redirect()->to(env('FRONTEND_URL') . 'my/profile/upgrade/canceled?go_back_url=' . $request['goBackUrl'] . '&plan_id=' . $request->subscriptionPlanUuid);
     }
 
     public function successPaymentSubscriptionAddOn(Request $request)
@@ -141,16 +152,16 @@ class StripeController extends AbstractRestAPIController
         if (isset($response['status']) && $response['status'] == 'complete') {
             Event::dispatch(new SubscriptionAddOnSuccessEvent($request->userUuid, $subscriptionHistoryData, $userAddOnData));
             Event::dispatch(new SendNotificationSystemForPaymentEvent($subscriptionHistoryData, Notification::ADDON_TYPE));
-            return redirect()->to(env('FRONTEND_URL') . 'my/profile/add-on/success?go_back_url='. $request['goBackUrl'] . '&addOnSubscriptionPlanUuid=' . $request->addOnSubscriptionPlanUuid);
+            return redirect()->to(env('FRONTEND_URL') . 'my/profile/add-on/success?go_back_url=' . $request['goBackUrl'] . '&addOnSubscriptionPlanUuid=' . $request->addOnSubscriptionPlanUuid);
         } else {
 
-            return redirect()->to(env('FRONTEND_URL') . 'my/profile/add-on/failed?go_back_url='. $request['goBackUrl'] . '&addOnSubscriptionPlanUuid=' . $request->addOnSubscriptionPlanUuid);
+            return redirect()->to(env('FRONTEND_URL') . 'my/profile/add-on/failed?go_back_url=' . $request['goBackUrl'] . '&addOnSubscriptionPlanUuid=' . $request->addOnSubscriptionPlanUuid);
         }
     }
 
     public function cancelPaymentSubscriptionAddOn(Request $request)
     {
-        return redirect()->to(env('FRONTEND_URL') . 'my/profile/add-on/canceled?go_back_url='. $request['goBackUrl'] . '&addOnUuid=' . $request['addOnUuid']);
+        return redirect()->to(env('FRONTEND_URL') . 'my/profile/add-on/canceled?go_back_url=' . $request['goBackUrl'] . '&addOnUuid=' . $request['addOnUuid']);
     }
 
     public function cancelPayment(Request $request)
@@ -178,10 +189,10 @@ class StripeController extends AbstractRestAPIController
                 'user_uuid' => $request->userUuid,
                 'payment_method_uuid' => PaymentMethod::STRIPE
             ], Notification::CREDIT_TYPE));
-            return redirect()->to(env('FRONTEND_URL') . 'my/profile/top-up/success?go_back_url='. $request->goBackUrl .'&package_id=' . $request->creditPackageUuid);
+            return redirect()->to(env('FRONTEND_URL') . 'my/profile/top-up/success?go_back_url=' . $request->goBackUrl . '&package_id=' . $request->creditPackageUuid);
         } else {
 
-            return redirect()->to(env('FRONTEND_URL') . 'my/profile/top-up/failed?go_back_url='. $request->goBackUrl .'&package_id=' . $request->creditPackageUuid);
+            return redirect()->to(env('FRONTEND_URL') . 'my/profile/top-up/failed?go_back_url=' . $request->goBackUrl . '&package_id=' . $request->creditPackageUuid);
         }
     }
 }

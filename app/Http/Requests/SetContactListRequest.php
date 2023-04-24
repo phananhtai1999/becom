@@ -26,8 +26,8 @@ class SetContactListRequest extends FormRequest
         return [
             'user_uuid' => ['required', 'integer', 'min:1', 'exists:users,uuid'],
             'team_uuid' => ['required', 'integer', 'min:1', 'exists:teams,uuid'],
-            'contact_list_uuids' => ['required', 'array'],
-            'contact_list_uuids.*' => ['required', 'integer', 'exists:contact_lists,uuid'],
+            'contact_list_uuids' => ['array'],
+            'contact_list_uuids.*' => ['integer', 'exists:contact_lists,uuid'],
         ];
     }
 }

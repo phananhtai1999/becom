@@ -316,7 +316,7 @@ class User extends Authenticatable
     }
 
     public function userTeamContactLists() {
-        return $this->belongsToMany(ContactList::class, 'user_team_contact_lists', 'user_uuid', 'contact_list_uuid');
+        return $this->belongsToMany(ContactList::class, 'user_team_contact_lists', 'user_uuid', 'contact_list_uuid')->withTimestamps();
     }
 
     public function userTracking()
