@@ -27,6 +27,8 @@ class Invite extends AbstractModel
      * @var string[]
      */
     protected $fillable = [
+        'first_name',
+        'last_name',
         'email',
         'status',
         'team_uuid',

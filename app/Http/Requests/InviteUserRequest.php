@@ -28,6 +28,8 @@ class InviteUserRequest extends FormRequest
             'team_uuid' => ['required', 'exists:teams,uuid'],
             'type' => ['required', Rule::in(['link', 'account'])],
             'email' => ['required', 'string', 'email:rfc,dns', 'unique:users,email', 'unique:invites,email'],
+            'first_name' => ['required', 'string'],
+            'last_name' => ['required', 'string'],
         ];
     }
 }

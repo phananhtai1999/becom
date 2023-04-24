@@ -116,11 +116,9 @@ class TeamController extends Controller
 
     public function inviteUser(InviteUserRequest $request)
     {
-        $invite = $this->inviteService->create([
-            'email' => $request->get('email'),
-            'team_uuid' => $request->get('team_uuid'),
+        $invite = $this->inviteService->create(array_merge($request->all(), [
             'status' => Invite::NEW_STATUS
-        ]);
+        ]));
         if ($request->get('type') == Team::LINK_INVITE) {
             $url = env('FRONTEND_URL') . 'auth/register?invite_uuid=' . $invite->uuid;
             $this->smtpAccountService->sendEmailNotificationSystem(null, new SendInviteToTeam($invite, $url), $request->get('email'));
@@ -128,6 +126,8 @@ class TeamController extends Controller
             $password = $this->generateRandomString(6);
             $user = $this->userService->create([
                 'email' => $request->get('email'),
+                'first_name' => $request->get('first_name'),
+                'last_name' => $request->get('last_name'),
                 'username' => $request->get('email'),
                 'can_add_smtp_account' => 0,
                 'password' => Hash::make($password)
@@ -197,7 +197,7 @@ class TeamController extends Controller
 
             return $this->sendBadRequestJsonResponse(['message' => 'This user is not in the team']);
         }
-        $user->userTeamContactLists()->sync($request->get('contact_list_uuids'));
+        $user->userTeamContactLists()->sync($request->get('contact_list_uuids', []));
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->userResourceClass, $user)
