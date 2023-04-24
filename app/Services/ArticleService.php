@@ -74,7 +74,7 @@ class ArticleService extends AbstractService
      * @param $publishStatus
      * @return mixed
      */
-    public function getArticleByPermission($perPage, $columns, $pageName, $page, $search, $searchBy, $arrayListContentForUser, $publishStatus)
+    public function getArticleContentPublic($perPage, $columns, $pageName, $page, $search, $searchBy, $arrayListContentForUser, $publishStatus)
     {
         //Get  Article Category Public
         $articleCategoryPublicByUuids = (new ArticleCategoryService())->getListArticleCategoryUuidsPublic();
@@ -96,39 +96,100 @@ class ArticleService extends AbstractService
      * @param $page
      * @param $search
      * @param $searchBy
+     * @param $arrayListContentForUser
+     * @param $publishStatus
      * @return mixed
      */
-    public function getArticleByPermissionWithPagination($perPage, $columns, $pageName, $page, $search, $searchBy)
+    public function getArticleManager($perPage, $columns, $pageName, $page, $search, $searchBy, $arrayListContentForUser, $publishStatus)
+    {
+        //Get  Article Category Public
+        $articleCategoryPublicByUuids = (new ArticleCategoryService())->getListArticleCategoryUuidsPublic();
+
+        return ArticleQueryBuilder::searchQuery($search, $searchBy)
+            ->whereIn('publish_status', $publishStatus)
+            ->whereIn('content_for_user', config('articlepermission.' . $arrayListContentForUser))
+            ->where(function ($query) use ($articleCategoryPublicByUuids) {
+                $query->whereIn('article_category_uuid', $articleCategoryPublicByUuids)
+                    ->orWhereNull('article_category_uuid');
+            })
+            ->where('user_uuid', auth()->user()->getkey())
+            ->paginate($perPage, $columns, $pageName, $page);
+    }
+
+    /**
+     * @param $perPage
+     * @param $columns
+     * @param $pageName
+     * @param $page
+     * @param $search
+     * @param $searchBy
+     * @return mixed
+     */
+    public function getArticleContentPublicWithPagination($perPage, $columns, $pageName, $page, $search, $searchBy)
     {
         //Check guest
         if (auth()->guest()) {
-            return $this->getArticleByPermission($perPage, $columns, $pageName, $page, $search, $searchBy, Article::PUBLIC_CONTENT_FOR_USER);
+            return $this->getArticleContentPublic($perPage, $columns, $pageName, $page, $search, $searchBy, Article::PUBLIC_CONTENT_FOR_USER, Article::PUBLISHED_PUBLISH_STATUS);
+        }
+        //Check auth:api
+        //get Article Content Public
+        $publishStatus = [Article::PUBLISHED_PUBLISH_STATUS];
+        if (auth()->user()->roles->whereIn('slug', ["admin"])->count()) {
+            //Admin
+            $contentForUSer = Article::ADMIN_CONTENT_FOR_USER;
+        } elseif ($this->paidUser()) {
+            //Payment
+            $contentForUSer = Article::PAYMENT_CONTENT_FOR_USER;
+        } elseif (auth()->user()->roles->whereIn('slug', ["editor"])->count()) {
+            //Editor
+            $contentForUSer = Article::EDITOR_CONTENT_FOR_USER;
+        } else {
+            //Login
+            $contentForUSer = Article::LOGIN_CONTENT_FOR_USER;
+        }
+
+        return $this->getArticleContentPublic($perPage, $columns, $pageName, $page, $search, $searchBy, $contentForUSer, $publishStatus);
+    }
+
+    /**
+     * @param $perPage
+     * @param $columns
+     * @param $pageName
+     * @param $page
+     * @param $search
+     * @param $searchBy
+     * @return mixed
+     */
+    public function getArticleManagerWithPagination($perPage, $columns, $pageName, $page, $search, $searchBy)
+    {
+        //Check guest
+        if (auth()->guest()) {
+            return $this->getArticleManager($perPage, $columns, $pageName, $page, $search, $searchBy, Article::PUBLIC_CONTENT_FOR_USER, Article::PUBLISHED_PUBLISH_STATUS);
         }
 
         //Check auth:api
         //get Article By Permission
+        $publishStatus = [Article::PUBLISHED_PUBLISH_STATUS];
         if (auth()->user()->roles->whereIn('slug', ["admin"])->count()) {
             //Admin
             return $this->loadAllArticles($perPage, $columns, $pageName, $page, $search, $searchBy);
         } elseif ($this->paidUser()) {
             //Check current user role
-            $publishStatus = [Article::PUBLISHED_PUBLISH_STATUS];
             if (auth()->user()->roles->whereIn('slug', ["editor"])->count()) {
-                $publishStatus = [Article::PENDING_PUBLISH_STATUS, Article::PUBLISHED_PUBLISH_STATUS];
+                $publishStatus = [Article::PENDING_PUBLISH_STATUS, Article::PUBLISHED_PUBLISH_STATUS, Article::BLOCKED_PUBLISH_STATUS];
             }
             //Payment
             $contentForUSer = Article::PAYMENT_CONTENT_FOR_USER;
         } elseif (auth()->user()->roles->whereIn('slug', ["editor"])->count()) {
             //Editor
-            $publishStatus = [Article::PENDING_PUBLISH_STATUS, Article::PUBLISHED_PUBLISH_STATUS];
+            $publishStatus = [Article::PENDING_PUBLISH_STATUS, Article::PUBLISHED_PUBLISH_STATUS, Article::BLOCKED_PUBLISH_STATUS];
             $contentForUSer = Article::EDITOR_CONTENT_FOR_USER;
         } else {
             //Login
-            $publishStatus = [Article::PUBLISHED_PUBLISH_STATUS];
             $contentForUSer = Article::LOGIN_CONTENT_FOR_USER;
         }
 
-        return $this->getArticleByPermission($perPage, $columns, $pageName, $page, $search, $searchBy, $contentForUSer, $publishStatus);
+        return $this->getArticleManager($perPage, $columns, $pageName, $page, $search, $searchBy, $contentForUSer, $publishStatus);
     }
 
     /**
