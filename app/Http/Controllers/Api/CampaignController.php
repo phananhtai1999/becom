@@ -795,10 +795,10 @@ class CampaignController extends AbstractRestAPIController
                     if (!empty($campaign->smtpAccount)) {
                         $smtpAccount = $campaign->smtpAccount;
                     } else {
-                        $smtpAccount = $this->smtpAccountService->getRandomSmtpAccountAdmin();
+                        $smtpAccount = $this->smtpAccountService->getRandomSmtpAccountAdmin($campaign->send_type);
                     }
                 } else {
-                    $smtpAccount = $this->smtpAccountService->getRandomSmtpAccountAdmin();
+                    $smtpAccount = $this->smtpAccountService->getRandomSmtpAccountAdmin($campaign->send_type);
                 }
                 $this->smtpAccountService->setSmtpAccountForSendEmail($smtpAccount);
                 $mailTemplate = $this->mailTemplateVariableService->renderBody($campaign->mailTemplate, $user->email, $smtpAccount, $campaign);
@@ -836,10 +836,10 @@ class CampaignController extends AbstractRestAPIController
                     if (!empty($campaign->smtpAccount)) {
                         $smtpAccount = $campaign->smtpAccount;
                     } else {
-                        $smtpAccount = $this->smtpAccountService->getRandomSmtpAccountAdmin();
+                        $smtpAccount = $this->smtpAccountService->getRandomSmtpAccountAdmin($campaign->send_type);
                     }
                 } else {
-                    $smtpAccount = $this->smtpAccountService->getRandomSmtpAccountAdmin();
+                    $smtpAccount = $this->smtpAccountService->getRandomSmtpAccountAdmin($campaign->send_type);
                 }
                 $this->smtpAccountService->setSmtpAccountForSendEmail($smtpAccount);
                 $mailTemplate = $this->mailTemplateVariableService->renderBody($campaign->mailTemplate, $user->email, $smtpAccount, $campaign);
