@@ -773,10 +773,12 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'article.'], function () {
         Route::post('/article', [ArticleController::class, 'store'])->name('store');
         Route::put('/article/{id}', [ArticleController::class, 'edit'])->name('edit');
         Route::delete('/article/{id}', [ArticleController::class, 'destroy'])->name('destroy');
-        Route::get('/article/{id}', [ArticleController::class, 'show'])->name('article.show');
+        Route::get('/article/{id}', [ArticleController::class, 'show'])->name('show');
     });
-    //article by permission
-    Route::get('/articles', [ArticleController::class, 'indexByPermission'])->name('article.indexByPermission');
+    //article content public
+    Route::get('/content/articles', [ArticleController::class, 'indexContent'])->name('article.indexContent');
+    //article manager
+    Route::get('/manager/articles', [ArticleController::class, 'indexManager'])->name('article.indexManager');
 });
 //article public
 Route::get('public/articles', [ArticleController::class, 'indexPublic'])->name('article-public.index');

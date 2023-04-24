@@ -79,8 +79,9 @@ class ArticleController extends AbstractRestAPIController
         }
 
         $model = $this->service->findOrFailById($id);
-
-        $this->service->update($model, $request->except('user_uuid'));
+        //Check current user role
+        $role = auth()->user()->roles->whereIn('slug', ["admin"])->count() ? $request->except('user_uuid') : $request->except(['user_uuid', 'publish_status']);
+        $this->service->update($model, $role);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -111,9 +112,28 @@ class ArticleController extends AbstractRestAPIController
      * @param IndexRequest $request
      * @return JsonResponse
      */
-    public function indexByPermission(IndexRequest $request)
+    public function indexContent(IndexRequest $request)
     {
-        $models = $this->service->getArticleByPermissionWithPagination(
+        $models = $this->service->getArticleContentPublicWithPagination(
+            $request->get('per_page', '15'),
+            $request->get('columns', '*'),
+            $request->get('page_name', 'page'),
+            $request->get('page', '1'),
+            $request->get('search'),
+            $request->get('search_by'),
+        );
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+        );
+    }
+
+    /**
+     * @param IndexRequest $request
+     * @return JsonResponse
+     */
+    public function indexManager(IndexRequest $request)
+    {
+        $models = $this->service->getArticleManagerWithPagination(
             $request->get('per_page', '15'),
             $request->get('columns', '*'),
             $request->get('page_name', 'page'),
