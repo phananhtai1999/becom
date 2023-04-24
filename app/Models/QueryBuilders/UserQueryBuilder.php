@@ -5,6 +5,7 @@ namespace App\Models\QueryBuilders;
 use App\Abstracts\AbstractQueryBuilder;
 use App\Models\SearchQueryBuilders\SearchQueryBuilder;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\Concerns\SortsQuery;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -89,6 +90,32 @@ class UserQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__can_remove_footer_template', 'can_remove_footer_template'),
                 AllowedFilter::scope('from__banned_at'),
                 AllowedFilter::scope('to__banned_at'),
+                //Custom filter full_name Append (LIKE)
+                AllowedFilter::callback("full_name", function (Builder $query, $values) {
+                    if (is_array($values)) {
+                        $query->where(function ($q) use ($values) {
+                            foreach ($values as $value) {
+                                $fullName = ltrim($value, ' ');
+                                $q->orWhereRaw("CONCAT(first_name, ' ', last_name) like '%$fullName%'");
+                            }
+                        });
+                    } else {
+                        $query->whereRaw("CONCAT(first_name, ' ', last_name) like '%$values%'");
+                    }
+                }),
+                //Custom filter full_name Append (EXACT)
+                AllowedFilter::callback("exact__full_name", function (Builder $query, $values) {
+                    if (is_array($values)) {
+                        $query->where(function ($q) use ($values) {
+                            foreach ($values as $value) {
+                                $fullName = ltrim($value, ' ');
+                                $q->orWhereRaw("CONCAT(first_name, ' ', last_name) = '$fullName'");
+                            }
+                        });
+                    } else {
+                        $query->whereRaw("CONCAT(first_name, ' ', last_name) = '$values'");
+                    }
+                })
             ]);
     }
 
