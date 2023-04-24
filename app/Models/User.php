@@ -76,7 +76,16 @@ class User extends Authenticatable
         'cover_img_absolute ',
         'platform_package',
         'team',
+        'full_name',
     ];
+
+    /**
+     * @return string
+     */
+    public function getFullNameAttribute()
+    {
+        return $this->first_name . ' '. $this->last_name;
+    }
 
     /**
      * @return string
