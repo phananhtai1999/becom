@@ -20,7 +20,7 @@ class StripeService extends AbstractService
      */
     public function getStripeClient(): StripeClient
     {
-        return new StripeClient(env('STRIPE_SECRET_KEY'));
+        return new StripeClient(config('payment.stripe.client_secret'));
     }
 
     /**

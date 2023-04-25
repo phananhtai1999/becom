@@ -24,18 +24,16 @@ class PaypalService extends AbstractService
     }
 
     /**
-     * @param $totalPriceCart
-     * @param $order
-     * @return array
+     * @param $creditPackage
+     * @param $userUuid
+     * @param $request
+     * @return array|void
      * @throws Throwable
      */
     public function processTransaction($creditPackage, $userUuid, $request)
     {
         try {
-            $provider = new PayPalClient();
-            $provider->setApiCredentials(config('payment.paypal'));
-            $provider->getAccessToken();
-
+            $provider = $this->accessServer();
             $response = $provider->createOrder([
                 "intent" => "CAPTURE",
                 "application_context" => [
@@ -93,7 +91,10 @@ class PaypalService extends AbstractService
     }
 
     /**
+     * @param $product_id
      * @param $request
+     * @param $price
+     * @param $name
      * @return array
      * @throws Throwable
      */

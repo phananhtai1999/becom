@@ -41,6 +41,7 @@ use App\Services\UserService;
 use App\Services\UserTeamService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class TeamController extends Controller
@@ -197,8 +198,10 @@ class TeamController extends Controller
 
             return $this->sendBadRequestJsonResponse(['message' => 'This user is not in the team']);
         }
-        $user->userTeamContactLists()->sync($request->get('contact_list_uuids', []));
+        DB::enableQueryLog();
 
+        $user->userTeamContactLists()->sync($request->get('contact_list_uuids', []));
+dd(DB::getQueryLog());
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->userResourceClass, $user)
         );
