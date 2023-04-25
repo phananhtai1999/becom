@@ -198,10 +198,9 @@ class TeamController extends Controller
 
             return $this->sendBadRequestJsonResponse(['message' => 'This user is not in the team']);
         }
-        DB::enableQueryLog();
 
         $user->userTeamContactLists()->sync($request->get('contact_list_uuids', []));
-dd(DB::getQueryLog());
+
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->userResourceClass, $user)
         );
