@@ -132,10 +132,10 @@ class AddOnController extends AbstractRestAPIController
 
     public function paymentAddOn(PaymentAddOnRequest $request)
     {
-//        $checkPurchasedAddOn = $this->userAddOnService->checkPurchasedAddOn($request->get('add_on_subscription_plan_uuid'));
-//        if($checkPurchasedAddOn) {
-//            return $this->sendOkJsonResponse(['message' => 'You already have this add-on']);
-//        }
+        $checkPurchasedAddOn = $this->userAddOnService->checkPurchasedAddOn($request->get('add_on_subscription_plan_uuid'));
+        if($checkPurchasedAddOn) {
+            return $this->sendOkJsonResponse(['message' => 'You already have this add-on']);
+        }
         $addOnSubscriptionPlan = $this->addOnSubscriptionPlanService->findOrFailById($request->get('add_on_subscription_plan_uuid'));
         $fromDate = Carbon::now();
         if ($addOnSubscriptionPlan->duration_type == AddOn::ADD_ON_DURATION_YEAR) {
