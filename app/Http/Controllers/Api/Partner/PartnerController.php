@@ -10,6 +10,7 @@ use App\Http\Controllers\Traits\RestEditTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\ChangeStatusPartnerRequest;
+use App\Http\Requests\DashboardPartnerChartRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\PartnerDetailRequest;
 use App\Http\Requests\PartnerReferralsRequest;
@@ -39,6 +40,7 @@ use App\Services\UserPaymentByDayService;
 use App\Services\UserService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -378,5 +380,52 @@ class PartnerController extends AbstractRestAPIController
             ]
         ];
         return $this->sendOkJsonResponse(["data" => $fakeData]);
+    }
+
+    public function UpdateUserPayment()
+    {
+        Artisan::call('db:seed', [
+            '--class' => 'UpdateUserPaymentAndPartnerTrackingSeeder',
+        ]);
+        return $this->sendOkJsonResponse();
+    }
+
+    public function partnersChart(DashboardPartnerChartRequest $request)
+    {
+        $startDate = $request->get('start_date', Carbon::today());
+        $endDate = $request->get('end_date', Carbon::today());
+        $groupBy = $request->get('group_by', 'date');
+
+        $partnersChart = $this->service->getPartnersChartByGroup($startDate, $endDate, $groupBy);
+        $total = $this->service->getTotalPartnersChart($startDate, $endDate);
+
+        return $this->sendOkJsonResponse([
+            'data' => $partnersChart,
+            'total' => $total
+        ]);
+    }
+
+    public function signupChart(DashboardPartnerChartRequest $request)
+    {
+        $startDate = $request->get('start_date', Carbon::today());
+        $endDate = $request->get('end_date', Carbon::today());
+        $groupBy = $request->get('group_by', 'date');
+        $partnerUuid = $request->get('partner_uuid');
+
+
+        if (!$partnerUuid || $partner = $this->service->findOneById($partnerUuid)){
+            $partnerCode = $partnerUuid ? $partner->code : null;
+            $signupChart = $this->partnerUserService->getSigupChartByGroup($startDate, $endDate, $groupBy, $partnerCode);
+            $total =  $this->partnerUserService->getTotalSignUpChart($startDate, $endDate, $partnerCode);
+
+            return $this->sendOkJsonResponse([
+                'data' => $signupChart,
+                'total' => [
+                    'signups' => $total
+                ]
+            ]);
+        }
+
+        return $this->sendValidationFailedJsonResponse(["errors" => ['partner_uuid' => 'The selected partner uuid is invalid.']]);
     }
 }

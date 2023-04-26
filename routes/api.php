@@ -1073,6 +1073,14 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'partner.'], function () {
         Route::put('/partner/{id}', [PartnerController::class, 'edit'])->name('edit');
         Route::delete('/partner/{id}', [PartnerController::class, 'destroy'])->name('destroy');
         Route::post('/change-status-partner', [PartnerController::class, 'changeStatusPartner'])->name('changeStatusPartner');
+
+        Route::group(['as' => 'chart.'], function () {
+            Route::get('dashboard/partners-chart', [PartnerController::class, 'partnersChart'])->name('partnersChart');
+            Route::get('dashboard/clicks-chart', [PartnerTrackingController::class, 'clicksChart'])->name('clicksChart');
+            Route::get('dashboard/signup-chart', [PartnerController::class, 'signupChart'])->name('signupChart');
+            Route::get('dashboard/customers-chart', [PartnerController::class, 'customersChart'])->name('customersChart');
+            Route::get('dashboard/earnings-chart', [PartnerController::class, 'earningsChart'])->name('earningsChart');
+        });
     });
 
     Route::get('partner-dashboard', [PartnerController::class, 'partnerDashboard'])->name('partnerDashboard');
@@ -1082,7 +1090,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'partner.'], function () {
     Route::get('partner-detail', [PartnerController::class, 'partnerDetail'])->name('partnerDetail');
     Route::get('partner-rewards', [PartnerController::class, 'partnerRewards'])->name('partnerRewards');
     Route::get('partner-payout-terms', [PartnerController::class, 'partnerPayoutTerms'])->name('partnerPayoutTerms');
-
+    Route::get('update-user-payment', [PartnerController::class, 'UpdateUserPayment'])->name('UpdateUserPayment');
 });
 Route::post('register-partner', [PartnerController::class, 'registerPartner'])->name('registerPartner');
 

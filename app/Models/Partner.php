@@ -59,9 +59,7 @@ class Partner extends AbstractModel
     /**
      * @var string[]
      */
-    protected $appends = [
-        'full_name',
-    ];
+    protected $appends = [];
 
     /**
      * @return string

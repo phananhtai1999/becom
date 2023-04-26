@@ -8,6 +8,7 @@ use App\Http\Controllers\Traits\RestEditTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestStoreTrait;
+use App\Http\Requests\DashboardPartnerChartRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\PartnerTrackingRequest;
 use App\Http\Requests\UpdatePartnerTrackingRequest;
@@ -15,6 +16,7 @@ use App\Http\Resources\PartnerTrackingResource;
 use App\Http\Resources\PartnerTrackingResourceCollection;
 use App\Services\PartnerService;
 use App\Services\PartnerTrackingService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 
@@ -52,5 +54,28 @@ class PartnerTrackingController extends AbstractRestAPIController
         return $this->sendOkJsonResponse()->withCookie(
             \cookie('invitePartner', $request->get('code'), config('user.invite_partner_timeout') * 24 * 60, null, null, true, true)
         );
+    }
+
+
+    public function clicksChart(DashboardPartnerChartRequest $request)
+    {
+        $startDate = $request->get('start_date', Carbon::today());
+        $endDate = $request->get('end_date', Carbon::today());
+        $groupBy = $request->get('group_by', 'date');
+        $partnerUuid = $request->get('partner_uuid');
+
+        if (!$partnerUuid || $this->partnerService->findOneById($partnerUuid)){
+            $clicksChart = $this->service->getPartnerTrackingChartByGroup($startDate, $endDate, $groupBy, $partnerUuid);
+            $total = $this->service->getTotalPartnerTrackingChart($startDate, $endDate, $partnerUuid);
+
+            return $this->sendOkJsonResponse([
+                'data' => $clicksChart,
+                'total' => [
+                    'clicks' => $total
+                ]
+            ]);
+        }
+
+        return $this->sendValidationFailedJsonResponse(["errors" => ['partner_uuid' => 'The selected partner uuid is invalid.']]);
     }
 }

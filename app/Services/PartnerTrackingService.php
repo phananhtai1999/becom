@@ -6,6 +6,7 @@ use App\Abstracts\AbstractService;
 use App\Models\PartnerTracking;
 use App\Models\QueryBuilders\PartnerTrackingQueryBuilder;
 use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 use Illuminate\Support\Facades\Log;
 
 class PartnerTrackingService extends AbstractService
@@ -53,14 +54,70 @@ class PartnerTrackingService extends AbstractService
             ->skip(0)->take(10)->get();
     }
 
-    public function trackingClickByDateFormat($dateFormat, $startDate, $endDate,$partnerUuid)
+    public function trackingClickByDateFormat($dateFormat, $startDate, $endDate,$partnerUuid = null)
     {
         return $this->model->selectRaw("date_format(updated_at, '{$dateFormat}') as label, count(uuid) as clicks")
             ->whereDate('updated_at', '>=', $startDate)
             ->whereDate('updated_at', '<=', $endDate)
-            ->where('partner_uuid', $partnerUuid)
+            ->when($partnerUuid, function ($query, $partnerUuid) {
+                $query->where('partner_uuid', $partnerUuid);
+            })
             ->groupBy('label')
             ->orderBy('label', 'ASC')
             ->get();
+    }
+
+    public function getPartnerTrackingChartByGroup($startDate, $endDate, $groupBy, $partnerUuid = null)
+    {
+        $startDate = Carbon::parse($startDate);
+        $endDate = Carbon::parse($endDate);
+        $times = [];
+        $result = [];
+        if ($groupBy == "date"){
+            $dateFormat = "%Y-%m-%d";
+            $charts = $this->trackingClickByDateFormat($dateFormat, $startDate, $endDate, $partnerUuid)->keyBy('label');
+            $currentDate = $startDate->copy();
+            while ($currentDate <= $endDate) {
+                $times[] = $currentDate->format('Y-m-d');
+                $currentDate = $currentDate->addDay();
+            }
+        }
+
+        if ($groupBy == "month"){
+            $dateFormat = "%Y-%m";
+            $charts = $this->trackingClickByDateFormat($dateFormat, $startDate, $endDate, $partnerUuid)->keyBy('label');
+
+            $period = CarbonPeriod::create($startDate->format('Y-m'), '1 month', $endDate->format('Y-m'));
+            foreach ($period as $date) {
+                $times[] = $date->format('Y-m');
+            }
+        }
+
+        foreach ($times as $time) {
+            $partnerByTime = $charts->first(function ($item, $key) use ($time){
+                return $key === $time;
+            });
+
+            if ($partnerByTime){
+                $result[] = $partnerByTime->toArray();
+            }else{
+                $result [] = [
+                    'label' => $time,
+                    'clicks'  => 0
+                ];
+            }
+        }
+
+        return $result;
+    }
+
+    public function getTotalPartnerTrackingChart($startDate, $endDate, $partnerUuid = null)
+    {
+        return $this->model
+            ->whereDate('updated_at', '>=', $startDate)
+            ->whereDate('updated_at', '<=', $endDate)
+            ->when($partnerUuid, function ($query, $partnerUuid) {
+                $query->where('partner_uuid', $partnerUuid);
+            })->count();
     }
 }

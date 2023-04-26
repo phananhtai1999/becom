@@ -8,6 +8,7 @@ use App\Models\PartnerUser;
 use App\Models\QueryBuilders\CompanyQueryBuilder;
 use App\Models\UserPaymentByDay;
 use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 use Illuminate\Support\Facades\DB;
 
 class PartnerUserService extends AbstractService
@@ -129,7 +130,7 @@ class PartnerUserService extends AbstractService
         return $this->model->join('partners as a', 'a.code', '=', 'partner_user.registered_from_partner_code')
             ->selectRaw("count(partner_user.registered_from_partner_code) as count, concat(a.first_name, ' ', a.last_name) as full_name, a.partner_email")
             ->orderBy('count', 'DESC')->groupByRaw("full_name, a.partner_email")
-            ->skip(0)->take(10)->dd();
+            ->skip(0)->take(10)->get();
     }
 
     public function getTop10PartnerCustomer()
@@ -142,14 +143,72 @@ class PartnerUserService extends AbstractService
             ->skip(0)->take(10)->get();
     }
 
-    public function trackingSignUpByDateFormat($dateFormat, $startDate, $endDate, $partnerCode)
+    public function trackingSignUpByDateFormat($dateFormat, $startDate, $endDate, $partnerCode = null)
     {
         return $this->model->selectRaw("date_format(created_at, '{$dateFormat}') as label, count(uuid) as signups")
             ->whereDate('created_at', '>=', $startDate)
             ->whereDate('created_at', '<=', $endDate)
-            ->where('registered_from_partner_code', $partnerCode)
+            ->when($partnerCode, function ($query, $partnerCode) {
+                $query->where('registered_from_partner_code', $partnerCode);
+            })
+            ->whereNotNull('registered_from_partner_code')
             ->groupBy('label')
             ->orderBy('label', 'ASC')
             ->get();
+    }
+
+    public function getSigupChartByGroup($startDate, $endDate, $groupBy, $partnerCode = null)
+    {
+        $startDate = Carbon::parse($startDate);
+        $endDate = Carbon::parse($endDate);
+        $times = [];
+        $result = [];
+        if ($groupBy == "date"){
+            $dateFormat = "%Y-%m-%d";
+            $charts = $this->trackingSignUpByDateFormat($dateFormat, $startDate, $endDate, $partnerCode)->keyBy('label');
+            $currentDate = $startDate->copy();
+            while ($currentDate <= $endDate) {
+                $times[] = $currentDate->format('Y-m-d');
+                $currentDate = $currentDate->addDay();
+            }
+        }
+
+        if ($groupBy == "month"){
+            $dateFormat = "%Y-%m";
+            $charts = $this->trackingSignUpByDateFormat($dateFormat, $startDate, $endDate, $partnerCode)->keyBy('label');
+
+            $period = CarbonPeriod::create($startDate->format('Y-m'), '1 month', $endDate->format('Y-m'));
+            foreach ($period as $date) {
+                $times[] = $date->format('Y-m');
+            }
+        }
+
+        foreach ($times as $time) {
+            $partnerByTime = $charts->first(function ($item, $key) use ($time){
+                return $key === $time;
+            });
+
+            if ($partnerByTime){
+                $result[] = $partnerByTime->toArray();
+            }else{
+                $result [] = [
+                    'label' => $time,
+                    'signups'  => 0
+                ];
+            }
+        }
+
+        return $result;
+    }
+
+    public function getTotalSignUpChart($startDate, $endDate, $partnerCode = null)
+    {
+        return $this->model->whereDate('created_at', '>=', $startDate)
+            ->whereDate('created_at', '<=', $endDate)
+            ->when($partnerCode, function ($query, $partnerCode) {
+                $query->where('registered_from_partner_code', $partnerCode);
+            })
+            ->whereNotNull('registered_from_partner_code')
+            ->count();
     }
 }
