@@ -20,6 +20,8 @@ class PlatformPackage extends Model
     const STARTER_INCLUDE = [];
     const PROFESSIONAL_INCLUDE = ['starter'];
     const BUSINESS_INCLUDE = ['professional', 'starter'];
+    const DURATION_MONTH = 'month';
+    const DURATION_YEAR = 'year';
     /**
      * @var string
      */

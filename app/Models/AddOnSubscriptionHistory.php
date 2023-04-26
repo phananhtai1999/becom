@@ -21,6 +21,7 @@ class AddOnSubscriptionHistory extends Model
      */
     protected $fillable = [
         'user_uuid',
+        'invoice_uuid',
         'add_on_subscription_plan_uuid',
         'subscription_date',
         'expiration_date',

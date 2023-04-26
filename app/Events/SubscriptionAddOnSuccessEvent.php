@@ -17,6 +17,7 @@ class SubscriptionAddOnSuccessEvent
     public $subscriptionHistoryData;
     public $userAddOnData;
     public $userUuid;
+    public $invoiceData;
 
     /**
      * Create a new event instance.
@@ -26,12 +27,14 @@ class SubscriptionAddOnSuccessEvent
     public function __construct(
         $userUuid,
         $subscriptionHistoryData,
-        $userAddOnData
+        $userAddOnData,
+        $invoiceData
     )
     {
         $this->userUuid = $userUuid;
         $this->subscriptionHistoryData = $subscriptionHistoryData;
         $this->userAddOnData = $userAddOnData;
+        $this->invoiceData = $invoiceData;
     }
 
     /**

@@ -26,12 +26,14 @@ class SubscriptionSuccessEvent
     public function __construct(
         $userUuid,
         $subscriptionHistory,
-        $userPlatformPackage
+        $userPlatformPackage,
+        $invoiceData
     )
     {
         $this->userUuid = $userUuid;
         $this->subscriptionHistory = $subscriptionHistory;
         $this->userPlatformPackage = $userPlatformPackage;
+        $this->invoiceData = $invoiceData;
     }
 
     /**

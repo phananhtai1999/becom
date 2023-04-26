@@ -49,7 +49,8 @@ class StripeService extends AbstractService
                 "success_url" => route('stripe.successPayment', [
                     'goBackUrl=' . $request['go_back_url'],
                     'userUuid=' . $userUuid,
-                    'creditPackageUuid=' . $creditPackage->uuid
+                    'creditPackageUuid=' . $creditPackage->uuid,
+                    'billingAddressUuid=' . $request['billing_address_uuid'],
                 ]) . '&session_id={CHECKOUT_SESSION_ID}',
                 "cancel_url" => route('stripe.cancelPayment', ['goBackUrl=' . $request['go_back_url'], 'userUuid=' . $userUuid, 'creditPackageUuid=' . $creditPackage->uuid]),
             ]);

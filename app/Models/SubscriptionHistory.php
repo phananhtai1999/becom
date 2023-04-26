@@ -31,7 +31,8 @@ class SubscriptionHistory extends Model
         'user_uuid',
         'subscription_plan_uuid',
         'payment_method_uuid',
-        'billing_address_uuid'
+        'billing_address_uuid',
+        'invoice_uuid'
     ];
 
     /**

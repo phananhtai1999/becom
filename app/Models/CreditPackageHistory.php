@@ -28,7 +28,8 @@ class CreditPackageHistory extends AbstractModel
         'user_uuid',
         'credit_package_uuid',
         'payment_method_uuid',
-        'logs'
+        'logs',
+        'invoice_uuid'
     ];
 
     public function creditPackage() {
