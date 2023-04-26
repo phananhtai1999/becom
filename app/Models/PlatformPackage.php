@@ -16,6 +16,10 @@ class PlatformPackage extends Model
     const PLATFORM_PACKAGE_DRAFT = 'draft';
     const PLATFORM_PACKAGE_PUBLISH = 'publish';
     const PLATFORM_PACKAGE_DISABLE = 'disable';
+
+    const STARTER_INCLUDE = [];
+    const PROFESSIONAL_INCLUDE = ['starter'];
+    const BUSINESS_INCLUDE = ['professional', 'starter'];
     /**
      * @var string
      */

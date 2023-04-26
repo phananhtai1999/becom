@@ -53,7 +53,7 @@ class SubscriptionPlanController extends AbstractRestAPIController
         ];
 
         $model = $this->service->create(array_merge($request->all(), [
-            'payment_plan_id' => json_encode($product),
+            'payment_plan_id' => $product,
             'duration' => $request->get('duration', 1)
         ]));
         return $this->sendCreatedJsonResponse(

@@ -89,8 +89,12 @@ class PaymentController extends AbstractRestAPIController
     public function upgradeUser(UpgradeUserRequest $request)
     {
         $subscriptionPlan = $this->subscriptionPlanService->findOrFailById($request->get('subscription_plan_uuid'));
-        $plan = json_decode($subscriptionPlan->payment_plan_id);
-        $platformPackage = $this->platformPackageService->findOrFailById($subscriptionPlan->platform_package_uuid);
+        $checkPurchasedPlatform = $this->userPlatformPackageService->checkPurchasedPlatform($subscriptionPlan->platform_package_uuid);
+        $checkIncludePlatform = $this->platformPackageService->checkIncludePlatform($subscriptionPlan->platform_package_uuid);
+
+        if($checkPurchasedPlatform || $checkIncludePlatform) {
+            return $this->sendOkJsonResponse(['message' => 'You already have this platform package Or your platform package include this package']);
+        }
         $fromDate = Carbon::now();
         if ($subscriptionPlan->duration_type == 'year') {
             $toDate = Carbon::now()->addYears($subscriptionPlan->duration);
@@ -100,9 +104,9 @@ class PaymentController extends AbstractRestAPIController
 
         $processResult = ['status' => false];
         if ($request->get('payment_method_uuid') == PaymentMethod::STRIPE && $this->configService->findConfigByKey('stripe_method')->value) {
-            $processResult = $this->stripeService->processSubscription($subscriptionPlan, $fromDate, $toDate, $plan->stripe, $request->all());
+            $processResult = $this->stripeService->processSubscription($subscriptionPlan, $fromDate, $toDate, $subscriptionPlan->payment_plan_id['stripe'], $request->all());
         } elseif ($request->get('payment_method_uuid') == PaymentMethod::PAYPAL && $this->configService->findConfigByKey('paypal_method')->value) {
-            $processResult = $this->paypalService->processSubscription($subscriptionPlan, $fromDate, $toDate, $plan->paypal, $request->all());
+            $processResult = $this->paypalService->processSubscription($subscriptionPlan, $fromDate, $toDate, $subscriptionPlan->payment_plan_id['paypal'], $request->all());
         } else {
             $processResult['message'] = 'Your payment method is invalid';
         }
