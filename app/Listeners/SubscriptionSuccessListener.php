@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use App\Models\Invoice;
 use App\Models\SubscriptionHistory;
 use App\Models\UserPlatformPackage;
 use Illuminate\Support\Facades\Cache;
@@ -26,7 +27,8 @@ class SubscriptionSuccessListener
      */
     public function handle($event)
     {
-        SubscriptionHistory::create($event->subscriptionHistory);
+        $invoice = Invoice::create($event->invoiceData);
+        SubscriptionHistory::create(array_merge($event->subscriptionHistory, ['invoice_uuid' => $invoice->uuid]));
         UserPlatformPackage::where('user_uuid', $event->userUuid)->delete();
         UserPlatformPackage::create($event->userPlatformPackage);
         Cache::flush();

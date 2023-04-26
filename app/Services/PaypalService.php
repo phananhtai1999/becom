@@ -37,7 +37,7 @@ class PaypalService extends AbstractService
             $response = $provider->createOrder([
                 "intent" => "CAPTURE",
                 "application_context" => [
-                    "return_url" => route('paypal.successPayment', ['goBackUrl=' . $request['go_back_url'], 'userUuid=' . $userUuid, 'creditPackageUuid=' . $creditPackage->uuid]),
+                    "return_url" => route('paypal.successPayment', ['goBackUrl=' . $request['go_back_url'], 'userUuid=' . $userUuid, 'creditPackageUuid=' . $creditPackage->uuid, 'billingAddressUuid=' . $request['billing_address_uuid']]),
                     "cancel_url" => route('paypal.cancelPayment', ['goBackUrl=' . $request['go_back_url'], 'userUuid=' . $userUuid, 'creditPackageUuid=' . $creditPackage->uuid]),
                 ],
                 "purchase_units" => [

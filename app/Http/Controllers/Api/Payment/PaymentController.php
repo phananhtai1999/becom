@@ -89,12 +89,12 @@ class PaymentController extends AbstractRestAPIController
     public function upgradeUser(UpgradeUserRequest $request)
     {
         $subscriptionPlan = $this->subscriptionPlanService->findOrFailById($request->get('subscription_plan_uuid'));
-        $checkPurchasedPlatform = $this->userPlatformPackageService->checkPurchasedPlatform($subscriptionPlan->platform_package_uuid);
-        $checkIncludePlatform = $this->platformPackageService->checkIncludePlatform($subscriptionPlan->platform_package_uuid);
-
-        if($checkPurchasedPlatform || $checkIncludePlatform) {
-            return $this->sendOkJsonResponse(['message' => 'You already have this platform package Or your platform package include this package']);
-        }
+//        $checkPurchasedPlatform = $this->userPlatformPackageService->checkPurchasedPlatform($subscriptionPlan->platform_package_uuid);
+//        $checkIncludePlatform = $this->platformPackageService->checkIncludePlatform($subscriptionPlan->platform_package_uuid);
+//
+//        if($checkPurchasedPlatform || $checkIncludePlatform) {
+//            return $this->sendOkJsonResponse(['message' => 'You already have this platform package Or your platform package include this package']);
+//        }
         $fromDate = Carbon::now();
         if ($subscriptionPlan->duration_type == 'year') {
             $toDate = Carbon::now()->addYears($subscriptionPlan->duration);
