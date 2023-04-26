@@ -12,4 +12,12 @@ class UserPlatformPackageService extends AbstractService
     protected $modelClass = UserPlatformPackage::class;
 
     protected $modelQueryBuilderClass = ArticleQueryBuilder::class;
+
+    public function checkPurchasedPlatform($platformPackageUuid)
+    {
+        return $this->model->where([
+            'user_uuid' => auth()->user()->getKey(),
+            'platform_package_uuid' => $platformPackageUuid,
+        ])->first();
+    }
 }

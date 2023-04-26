@@ -13,4 +13,17 @@ class PlatformPackageService extends AbstractService
     protected $modelClass = PlatformPackage::class;
     protected $modelQueryBuilderClass = PlatformPackageQueryBuilder::class;
 
+    public function checkIncludePlatform($platformPackageUuid)
+    {
+        if (auth()->user()->platform_package == 'professional' && in_array($platformPackageUuid, PlatformPackage::PROFESSIONAL_INCLUDE)) {
+
+            return true;
+        }elseif (auth()->user()->platform_package == 'business' && in_array($platformPackageUuid, PlatformPackage::BUSINESS_INCLUDE)) {
+
+            return true;
+        }
+
+        return false;
+    }
+
 }

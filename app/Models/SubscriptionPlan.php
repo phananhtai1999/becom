@@ -35,6 +35,7 @@ class SubscriptionPlan extends AbstractModel
      * @var string[]
      */
     protected $casts = [
+        'payment_plan_id' => 'array',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',

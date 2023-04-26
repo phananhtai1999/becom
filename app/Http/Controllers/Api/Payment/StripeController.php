@@ -11,6 +11,7 @@ use App\Http\Requests\UpdateCardCustomerRequest;
 use App\Http\Requests\UpdateCardStripeRequest;
 use App\Models\Notification;
 use App\Models\PaymentMethod;
+use App\Services\PaymentService;
 use App\Services\StripeService;
 use App\Services\SubscriptionHistoryService;
 use Illuminate\Http\Request;
@@ -25,9 +26,11 @@ class StripeController extends AbstractRestAPIController
     public function __construct(
         StripeService              $service,
         SubscriptionHistoryService $subscriptionHistoryService,
+        PaymentService $paymentService
     )
     {
         $this->service = $service;
+        $this->paymentService = $paymentService;
         $this->subscriptionHistoryService = $subscriptionHistoryService;
     }
 
@@ -93,28 +96,13 @@ class StripeController extends AbstractRestAPIController
         $stripe = $this->service->getStripeClient();
         $response = $stripe->checkout->sessions->retrieve($request->session_id);
         $subscriptionData = ["id" => $response->subscription];
-
-        $subscriptionHistory = [
-            'user_uuid' => $request->userUuid,
-            'subscription_plan_uuid' => $request->subscriptionPlanUuid,
-            'subscription_date' => $request->subscriptionDate,
-            'billing_address_uuid' => $request->billingAddressUuid,
-            'expiration_date' => $request->expirationDate,
-            'payment_method_uuid' => PaymentMethod::STRIPE,
-            'logs' => $subscriptionData,
-            'status' => 'success'
-        ];
-        $userPlatformPackage = [
-            'user_uuid' => $request->userUuid,
-            'platform_package_uuid' => $request->platformPackageUuid,
-            'subscription_plan_uuid' => $request->subscriptionPlanUuid,
-            'expiration_date' => $request->expirationDate,
-            'auto_renew' => true
-        ];
+        $subscriptionHistoryData = $this->paymentService->getSubscriptionHistoryData($request, PaymentMethod::STRIPE, $subscriptionData);
+        $userPlatformPackageData = $this->paymentService->getUserPlatformPackageData($request);
 
         if (isset($response['status']) && $response['status'] == 'complete') {
-            Event::dispatch(new SubscriptionSuccessEvent($request->userUuid, $subscriptionHistory, $userPlatformPackage));
-            Event::dispatch(new SendNotificationSystemForPaymentEvent($subscriptionHistory, Notification::PACKAGE_TYPE));
+            Event::dispatch(new SubscriptionSuccessEvent($request->userUuid, $subscriptionHistoryData, $userPlatformPackageData));
+            Event::dispatch(new SendNotificationSystemForPaymentEvent($subscriptionHistoryData, Notification::PACKAGE_TYPE));
+
             return redirect()->to(env('FRONTEND_URL') . 'my/profile/upgrade/success?go_back_url=' . $request['goBackUrl'] . '&plan_id=' . $request->subscriptionPlanUuid);
         } else {
 
@@ -133,25 +121,13 @@ class StripeController extends AbstractRestAPIController
         $response = $stripe->checkout->sessions->retrieve($request->session_id);
         $subscriptionData = ["id" => $response->subscription];
 
-        $subscriptionHistoryData = [
-            'user_uuid' => $request->userUuid,
-            'add_on_subscription_plan_uuid' => $request->addOnSubscriptionPlanUuid,
-            'subscription_date' => $request->subscriptionDate,
-            'billing_address_uuid' => $request->billingAddressUuid,
-            'expiration_date' => $request->expirationDate,
-            'payment_method_uuid' => PaymentMethod::STRIPE,
-            'logs' => $subscriptionData,
-        ];
-        $userAddOnData = [
-            'user_uuid' => $request->userUuid,
-            'add_on_subscription_plan_uuid' => $request->addOnSubscriptionPlanUuid,
-            'expiration_date' => $request->expirationDate,
-            'auto_renew' => true
-        ];
+        $addOnSubscriptionHistoryData = $this->paymentService->getAddOnSubscriptionHistoryData($request, PaymentMethod::STRIPE, $subscriptionData);
+        $userAddOnData = $this->paymentService->getUserAddOnData($request);
 
         if (isset($response['status']) && $response['status'] == 'complete') {
-            Event::dispatch(new SubscriptionAddOnSuccessEvent($request->userUuid, $subscriptionHistoryData, $userAddOnData));
-            Event::dispatch(new SendNotificationSystemForPaymentEvent($subscriptionHistoryData, Notification::ADDON_TYPE));
+            Event::dispatch(new SubscriptionAddOnSuccessEvent($request->userUuid, $addOnSubscriptionHistoryData, $userAddOnData));
+            Event::dispatch(new SendNotificationSystemForPaymentEvent($addOnSubscriptionHistoryData, Notification::ADDON_TYPE));
+
             return redirect()->to(env('FRONTEND_URL') . 'my/profile/add-on/success?go_back_url=' . $request['goBackUrl'] . '&addOnSubscriptionPlanUuid=' . $request->addOnSubscriptionPlanUuid);
         } else {
 
