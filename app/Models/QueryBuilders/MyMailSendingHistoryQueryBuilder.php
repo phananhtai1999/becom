@@ -39,7 +39,7 @@ class MyMailSendingHistoryQueryBuilder extends AbstractQueryBuilder
                 'status',
                 'campaign_scenario_uuid',
             ])
-            ->defaultSort('-created_at')
+            ->defaultSort('-uuid')
             ->allowedSorts([
                 $modelKeyName,
                 'campaign_uuid',

@@ -18,6 +18,7 @@ class Kernel extends ConsoleKernel
         'App\Console\Commands\SendByBirthdayCampaign',
         'App\Console\Commands\SendNotOpenByScenarioCampaign',
         'App\Console\Commands\UpdateStatusOnContact',
+        'App\Console\Commands\UpdateStatisticsOfUserPayment',
     ];
 
     /**
@@ -34,6 +35,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('send:not-open-campaign')->everyFiveMinutes();
         $schedule->command('check:platform-expired')->dailyAt('5:00');
         $schedule->command('update:recervers')->everyFiveMinutes();
+        $schedule->command('update:statistics-user-payment')->everyMinute('23:00');
 
 
 
