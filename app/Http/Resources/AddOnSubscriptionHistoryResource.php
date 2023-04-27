@@ -24,6 +24,7 @@ class AddOnSubscriptionHistoryResource extends JsonResource
             'expiration_date' => $this->expiration_date,
             'status' => $this->status,
             'payment_method_uuid' => $this->payment_method_uuid,
+            'invoice_uuid' => $this->invoice_uuid,
             'logs' => $this->logs,
         ];
         if (\in_array('add_on_subscription_history__add_on_subscription_plan', $expand)) {

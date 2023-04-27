@@ -24,6 +24,7 @@ class SubscriptionHistoryResource extends JsonResource
             'expiration_date' => $this->expiration_date,
             'status' => $this->status,
             'payment_method_uuid' => $this->payment_method_uuid,
+            'invoice_uuid' => $this->invoice_uuid,
             'logs' => $this->logs,
         ];
         if (\in_array('subscription_history__subscription_plan', $expand)) {
