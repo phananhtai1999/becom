@@ -20,4 +20,11 @@ class InvoiceController extends AbstractRestAPIController
         $this->service = $service;
         $this->resourceClass = InvoiceResource::class;
     }
+
+    public function view($id) {
+        $invoice = $this->service->findOrFailById($id);
+        $billingAddress = $invoice->billingAddress;
+        $paymentMethod = $invoice->paymentMethod;
+        return view('invoice.GenerateInvoice', compact('invoice', 'billingAddress', 'paymentMethod'));
+    }
 }

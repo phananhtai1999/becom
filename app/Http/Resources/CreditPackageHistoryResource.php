@@ -23,6 +23,7 @@ class CreditPackageHistoryResource extends JsonResource
             'user_uuid' => $this->user_uuid,
             'payment_method_uuid' => $this->payment_method_uuid,
             'credit_package_uuid' => $this->credit_package_uuid,
+            'invoice_uuid' => $this->invoice_uuid,
             'logs' => $this->logs,
         ];
         if (\in_array('credit_package_history__credit_package', $expand)) {
