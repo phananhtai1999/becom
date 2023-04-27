@@ -5,51 +5,66 @@ namespace App\Services;
 use App\Abstracts\AbstractService;
 use App\Models\UserPaymentByDay;
 use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 
 class UserPaymentByDayService extends AbstractService
 {
     protected $modelClass = UserPaymentByDay::class;
 
-    public function trackingCustomersByDate($startDate, $endDate, $partnerCode)
+    public function createQueryGetCustomersPartnerByDate($startDate, $endDate, $partnerCode)
+    {
+        return $this->model
+            ->join('partner_user as a', 'a.user_uuid', '=', 'user_payment_by_day.user_uuid')
+            ->when($partnerCode, function ($query, $partnerCode) {
+                $query->where('registered_from_partner_code', $partnerCode);
+            })
+            ->whereNotNull('a.registered_from_partner_code')
+            ->whereRaw("CONCAT(user_payment_by_day.year, '-', LPAD(user_payment_by_day.month, 2, '0'), '-01') BETWEEN '{$startDate->copy()->startOfMonth()->toDateString()}' AND '{$endDate->toDateString()}'")
+            ->select('user_payment_by_day.*', 'a.registered_from_partner_code')->get();
+    }
+
+    public function getCustomersPartnerByMonth($startDate, $endDate, $partnerCode)
+    {
+        $payments = $this->createQueryGetCustomersPartnerByDate($startDate, $endDate, $partnerCode);
+        return $payments->groupBy(function ($item) {
+           return date('Y-m', strtotime($item->year.'-'.$item->month));
+        })->map(function ($item, $yearMonth) {
+            $earningsPartnerByMonth = $item->groupBy('registered_from_partner_code')->map(function ($item, $partnerCode) use ($yearMonth) {
+                $time = Carbon::parse($yearMonth);
+                $commissionMonthByPartner = (new PartnerLevelService())->getCommissionByTimeOfPartner($time, $partnerCode);
+                return $item->sum('total_payment') * $commissionMonthByPartner / 100;
+            });
+            return [
+                'label' => $yearMonth,
+                'customers' => $item->count(),
+                'amount' => $item->sum('total_payment'),
+                'earnings' => $earningsPartnerByMonth->sum()
+            ];
+        });
+    }
+
+    public function getCustomersPartnerByDate($startDate, $endDate, $partnerCode)
     {
         //Lấy danh sách user có thanh toán trong start -> endDate
-        $payments = $this->model->join('partner_user as a', 'a.user_uuid', '=', 'user_payment_by_day.user_uuid')
-            ->where('a.registered_from_partner_code', $partnerCode)
-            ->where(function ($query) use ($startDate, $endDate) {
-                $query->where(function ($q) use ($startDate) {
-                    $q->where('user_payment_by_day.month', $startDate->month)
-                        ->where('user_payment_by_day.year', $startDate->year);
-                })->orWhere(function ($query) use ($endDate) {
-                    $query->where('user_payment_by_day.month', $endDate->month)
-                        ->where('user_payment_by_day.year', $endDate->year);
-                });
-            })->where(function ($query) use ($startDate, $endDate) {
-                for ($day = $startDate->day; $day <= $endDate->day; $day++) {
-                    $query->orWhereNotNull("user_payment_by_day.payment->$day");
-                }
-            })->select('user_payment_by_day.*')->get();
+        $payments = $this->createQueryGetCustomersPartnerByDate($startDate, $endDate, $partnerCode);
 
-        //Tính commission dựa vào tháng và năm của start và endDate rồi xem thử partner tháng đó có bnhiu customer -> level -> commission
-        $commissionByStartDate = (new PartnerLevelService())->getCommissionByTimeOfPartner($startDate, $partnerCode);
-        $commissionByEndDate = (new PartnerLevelService())->getCommissionByTimeOfPartner($endDate, $partnerCode);
-
-        // Đếm số lượng user thanh toán theo ngày có số tiền và hoa hồng
         $countByDate = [];
         foreach ($payments as $payment) {
-            $commission = ($payment->month === $startDate->month ? $commissionByStartDate : $commissionByEndDate);
+            $time = Carbon::parse($payment->year . '-' . $payment->month);
+            $commissionMonthByPartner = (new PartnerLevelService())->getCommissionByTimeOfPartner($time, $payment->registered_from_partner_code);
             foreach ($payment->payment as $day => $amount) {
                 $date = date('Y-m-d', strtotime($payment->year . '-' . $payment->month . '-' . $day));
-                if ($date >= $startDate && $date <= $endDate) {
+                if ($date >= $startDate->toDateString() && $date <= $endDate->toDateString()) {
                     if (isset($countByDate[$date])) {
-                        $countByDate[$date]['customers'] ++;
+                        $countByDate[$date]['customers']++;
                         $countByDate[$date]['amount'] += $amount;
-                        $countByDate[$date]['earnings'] = $countByDate[$date]['amount'] * $commission / 100;
+                        $countByDate[$date]['earnings'] += ($amount * $commissionMonthByPartner / 100);
                     } else {
                         $countByDate[$date] = [
                             'label' => $date,
                             'customers' => 1,
                             'amount' => $amount,
-                            'earnings' => $amount * $commission / 100
+                            'earnings' => $amount * $commissionMonthByPartner / 100
                         ];
                     }
                 }
@@ -58,28 +73,10 @@ class UserPaymentByDayService extends AbstractService
         return $countByDate;
     }
 
-    public function trackingCustomersByMonth($startDate, $endDate, $partnerCode)
-    {
-        $payments = $this->model->join('partner_user as a', 'a.user_uuid', '=', 'user_payment_by_day.user_uuid')
-            ->where('a.registered_from_partner_code', $partnerCode)
-            ->whereDate('user_payment_by_day.created_at', '>=', $startDate)
-            ->whereDate('user_payment_by_day.updated_at', '<=', $endDate)
-            ->select('user_payment_by_day.*')->get()->groupBy(function ($item){
-                return date('Y-m', strtotime($item->created_at));
-            })->map(function ($item, $key) {
-                return [
-                    'label' => $key,
-                    'customers' => $item->count(),
-                    'amount' => $item->sum('total_payment'),
-                ];
-            });
-        return $payments->values();
-    }
-
     public function trackingCustomersByWeek($startDate, $endDate, $partnerCode)
     {
         //Đếm số lượng user thanh toán theo ngày (4 week)
-        $countByDay = $this->trackingCustomersByDate($startDate, $endDate, $partnerCode);
+        $countByDay = $this->getCustomersPartnerByDate($startDate, $endDate, $partnerCode);
 
         $results = [];
         foreach ($countByDay as $date => $item) {
@@ -129,5 +126,97 @@ class UserPaymentByDayService extends AbstractService
         }
 
         return collect($result)->sortByDesc('created')->values();
+    }
+
+    public function getCustomersChartByGroup($startDate, $endDate, $groupBy, $partnerCode)
+    {
+        $startDate = Carbon::parse($startDate);
+        $endDate = Carbon::parse($endDate);
+        $times = [];
+        $result = [];
+        if ($groupBy == "date"){
+            $charts = $this->getCustomersPartnerByDate($startDate, $endDate, $partnerCode);
+
+            $currentDate = $startDate->copy();
+            while ($currentDate <= $endDate) {
+                $times[] = $currentDate->format('Y-m-d');
+                $currentDate = $currentDate->addDay();
+            }
+        }
+
+        if ($groupBy == "month"){
+            $charts = $this->getCustomersPartnerByMonth($startDate, $endDate, $partnerCode)->toArray();
+
+            $period = CarbonPeriod::create($startDate->format('Y-m'), '1 month', $endDate->format('Y-m'));
+            foreach ($period as $date) {
+                $times[] = $date->format('Y-m');
+            }
+        }
+
+        foreach ($times as $time) {
+            $chart = array_filter($charts, function ($key) use ($time){
+                return $key === $time;
+            },ARRAY_FILTER_USE_KEY);
+            if ($chart){
+                $result[] = [
+                    'label' => $time,
+                    'customers'  => $chart[$time]['customers'],
+                    'amount'  => $chart[$time]['amount'],
+                ];
+            }else{
+                $result [] = [
+                    'label' => $time,
+                    'customers'  => 0,
+                    'amount'  => 0,
+                ];
+            }
+        }
+
+        return $result;
+    }
+
+    public function getEarningsChartByGroup($startDate, $endDate, $groupBy, $partnerCode)
+    {
+        $startDate = Carbon::parse($startDate);
+        $endDate = Carbon::parse($endDate);
+        $times = [];
+        $result = [];
+        if ($groupBy == "date"){
+            $charts = $this->getCustomersPartnerByDate($startDate, $endDate, $partnerCode);
+
+            $currentDate = $startDate->copy();
+            while ($currentDate <= $endDate) {
+                $times[] = $currentDate->format('Y-m-d');
+                $currentDate = $currentDate->addDay();
+            }
+        }
+
+        if ($groupBy == "month"){
+            $charts = $this->getCustomersPartnerByMonth($startDate, $endDate, $partnerCode)->toArray();
+
+            $period = CarbonPeriod::create($startDate->format('Y-m'), '1 month', $endDate->format('Y-m'));
+            foreach ($period as $date) {
+                $times[] = $date->format('Y-m');
+            }
+        }
+
+        foreach ($times as $time) {
+            $chart = array_filter($charts, function ($key) use ($time){
+                return $key === $time;
+            },ARRAY_FILTER_USE_KEY);
+            if ($chart){
+                $result[] = [
+                    'label' => $time,
+                    'earnings'  => $chart[$time]['earnings'],
+                ];
+            }else{
+                $result [] = [
+                    'label' => $time,
+                    'earnings'  => 0,
+                ];
+            }
+        }
+
+        return $result;
     }
 }
