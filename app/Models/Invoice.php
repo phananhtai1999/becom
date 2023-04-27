@@ -40,4 +40,16 @@ class Invoice extends Model
         'deleted_at' => 'datetime',
     ];
 
+    public function user() {
+        return $this->hasOne(User::class, 'uuid', 'user_uuid');
+    }
+
+    public function paymentMethod() {
+        return $this->hasOne(PaymentMethod::class, 'uuid', 'payment_method_uuid');
+    }
+
+    public function billingAddress() {
+        return $this->hasOne(BillingAddress::class, 'uuid', 'billing_address_uuid');
+    }
+
 }
