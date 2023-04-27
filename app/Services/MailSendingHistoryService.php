@@ -222,8 +222,10 @@ class MailSendingHistoryService extends AbstractService
                 $query->select('m.campaign_scenario_uuid')
                     ->from('mail_sending_history as m')
                     ->whereNotNull('m.campaign_scenario_uuid')
-                    ->where('m.status', "sent")
-                    ->whereRaw("m.email = mail_sending_history.email");
+                    ->whereIn('m.status', ["sent", "opened"])
+                    ->whereNull("m.deleted_at")
+                    ->whereRaw("m.email = mail_sending_history.email")
+                    ->whereRaw('IF(scenarios.last_stopped_at is not null, scenarios.last_stopped_at, scenarios.created_at) < m.created_at');
             })
             ->get();
         /*
