@@ -246,7 +246,7 @@ class PartnerController extends AbstractRestAPIController
             $format = "%Y-%m-%d";
             $clicks = $this->partnerTrackingService->trackingClickByDateFormat($format, $startDate, $endDate, $partner->uuid)->toArray();
             $signups = $this->partnerUserService->trackingSignUpByDateFormat($format, $startDate, $endDate, $partner->code)->toArray();
-            $customers = $this->userPaymentByDayService->trackingCustomersByDate($startDate, $endDate, $partner->code);
+            $customers = $this->userPaymentByDayService->getCustomersPartnerByDate($startDate, $endDate, $partner->code);
 
             $lists = [$clicks,$signups,$customers];
             //Lấy danh sách các label từ start -> endDate theo type day, week, monthj
@@ -262,7 +262,7 @@ class PartnerController extends AbstractRestAPIController
             $format = "%Y-%m";
             $clicks = $this->partnerTrackingService->trackingClickByDateFormat($format, $startDate, $endDate, $partner->uuid)->toArray();
             $signups = $this->partnerUserService->trackingSignUpByDateFormat($format, $startDate, $endDate, $partner->code)->toArray();
-            $customers = $this->userPaymentByDayService->trackingCustomersByMonth($startDate, $endDate, $partner->code)->toArray();
+            $customers = $this->userPaymentByDayService->getCustomersPartnerByMonth($startDate, $endDate, $partner->code)->toArray();
             $earnings = $this->partnerTrackingByYearService->trackingEarningsOfPartner($startDate, $endDate, $partner->uuid);
 
             $lists = [$clicks,$signups,$customers, $earnings];
@@ -422,6 +422,53 @@ class PartnerController extends AbstractRestAPIController
                 'data' => $signupChart,
                 'total' => [
                     'signups' => $total
+                ]
+            ]);
+        }
+
+        return $this->sendValidationFailedJsonResponse(["errors" => ['partner_uuid' => 'The selected partner uuid is invalid.']]);
+    }
+
+    public function customersChart(DashboardPartnerChartRequest $request)
+    {
+        $startDate = $request->get('start_date', Carbon::today());
+        $endDate = $request->get('end_date', Carbon::today());
+        $groupBy = $request->get('group_by', 'date');
+        $partnerUuid = $request->get('partner_uuid');
+
+
+        if (!$partnerUuid || $partner = $this->service->findOneById($partnerUuid)){
+            $partnerCode = $partnerUuid ? $partner->code : null;
+            $signupChart = $this->userPaymentByDayService->getCustomersChartByGroup($startDate, $endDate, $groupBy, $partnerCode);
+
+            return $this->sendOkJsonResponse([
+                'data' => $signupChart,
+                'total' => [
+                    'customers' => collect($signupChart)->sum('customers'),
+                    'amount' => collect($signupChart)->sum('amount'),
+                ]
+            ]);
+        }
+
+        return $this->sendValidationFailedJsonResponse(["errors" => ['partner_uuid' => 'The selected partner uuid is invalid.']]);
+    }
+
+    public function earningsChart(DashboardPartnerChartRequest $request)
+    {
+        $startDate = $request->get('start_date', Carbon::today());
+        $endDate = $request->get('end_date', Carbon::today());
+        $groupBy = $request->get('group_by', 'date');
+        $partnerUuid = $request->get('partner_uuid');
+
+
+        if (!$partnerUuid || $partner = $this->service->findOneById($partnerUuid)){
+            $partnerCode = $partnerUuid ? $partner->code : null;
+            $signupChart = $this->userPaymentByDayService->getEarningsChartByGroup($startDate, $endDate, $groupBy, $partnerCode);
+
+            return $this->sendOkJsonResponse([
+                'data' => $signupChart,
+                'total' => [
+                    'earnings' => collect($signupChart)->sum('earnings'),
                 ]
             ]);
         }

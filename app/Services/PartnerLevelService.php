@@ -45,17 +45,11 @@ class PartnerLevelService extends AbstractService
         return $this->getPartnerLevelByNumberCustomer($numberCustomers);
     }
 
-    public function checkTodayEndOfMonth()
-    {
-        $today = Carbon::today();
-        return $today->copy()->endOfMonth()->startOfDay()->eq($today);
-    }
-
     public function getCommissionByTimeOfPartner($time, $partnerCode)
     {
         $toDay = Carbon::today();
 
-        if (!$this->checkTodayEndOfMonth() && ($time->format('Y-m') === $toDay->format('Y-m'))) {
+        if (!$toDay->isLastOfMonth() && ($time->format('Y-m') === $toDay->format('Y-m'))) {
             $subMonth = $time->copy()->subMonth();
             $commissionByTime = $this->getPartnerLevelOfPartnerByMontYear($partnerCode, $subMonth->month, $subMonth->year)->commission;
         }else{
