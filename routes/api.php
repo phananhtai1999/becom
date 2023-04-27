@@ -26,6 +26,7 @@ use App\Http\Controllers\Api\EmailController;
 use App\Http\Controllers\Api\FooterTemplateController;
 use App\Http\Controllers\Api\FormController;
 use App\Http\Controllers\Api\GroupController;
+use App\Http\Controllers\Api\InvoiceController;
 use App\Http\Controllers\Api\LanguageController;
 use App\Http\Controllers\Api\MailOpenTrackingController;
 use App\Http\Controllers\Api\MailSendingHistoryController;
@@ -1168,4 +1169,9 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'domain-verification.'], fun
     Route::group(['as' => 'my.'], function () {
         Route::get('/my/domain-verifications', [DomainVerificationController::class, 'indexMy'])->name('index');
     });
+});
+
+//invoice
+Route::group(['middleware' => ['auth:api'], 'as' => 'invoice'], function () {
+    Route::get('/invoice/{id}', [InvoiceController::class, 'show'])->name('show');
 });
