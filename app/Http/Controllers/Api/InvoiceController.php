@@ -8,6 +8,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Resources\InvoiceResource;
 use App\Services\InvoiceService;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 
 class InvoiceController extends AbstractRestAPIController
 {
@@ -21,10 +23,17 @@ class InvoiceController extends AbstractRestAPIController
         $this->resourceClass = InvoiceResource::class;
     }
 
-    public function view($id) {
+    public function download($id) {
         $invoice = $this->service->findOrFailById($id);
         $billingAddress = $invoice->billingAddress;
         $paymentMethod = $invoice->paymentMethod;
-        return view('invoice.GenerateInvoice', compact('invoice', 'billingAddress', 'paymentMethod'));
+        $data = [
+            'invoice' => $invoice,
+            'billingAddress' => $billingAddress,
+            'paymentMethod' => $paymentMethod
+            ];
+        $pdf = Pdf::loadView('invoice.GenerateInvoice', $data);
+
+        return $pdf->download('invoice-' . $invoice->uuid . '-' . strtotime(Carbon::now()) .'.pdf');
     }
 }

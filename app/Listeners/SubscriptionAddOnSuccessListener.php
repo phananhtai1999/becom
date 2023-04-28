@@ -27,14 +27,8 @@ class SubscriptionAddOnSuccessListener
      */
     public function handle($event)
     {
-        try {
-            $invoice = Invoice::create($event->invoiceData);
-            AddOnSubscriptionHistory::create(array_merge($event->subscriptionHistoryData, ['invoice_uuid' => $invoice->uuid]));
+            AddOnSubscriptionHistory::create(array_merge($event->subscriptionHistoryData, ['invoice_uuid' => $event->invoice->uuid]));
             UserAddOn::create($event->userAddOnData);
-        } catch (\Exception $exception) {
-            dd($exception->getMessage());
-        }
-
-        Cache::flush();
+            Cache::flush();
     }
 }

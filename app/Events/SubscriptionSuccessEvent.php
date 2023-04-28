@@ -27,13 +27,13 @@ class SubscriptionSuccessEvent
         $userUuid,
         $subscriptionHistory,
         $userPlatformPackage,
-        $invoiceData
+        $invoice
     )
     {
         $this->userUuid = $userUuid;
         $this->subscriptionHistory = $subscriptionHistory;
         $this->userPlatformPackage = $userPlatformPackage;
-        $this->invoiceData = $invoiceData;
+        $this->invoice = $invoice;
     }
 
     /**

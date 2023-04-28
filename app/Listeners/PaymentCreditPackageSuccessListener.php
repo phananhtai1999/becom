@@ -33,13 +33,12 @@ class PaymentCreditPackageSuccessListener
     {
         DB::beginTransaction();
         try {
-            $invoice = Invoice::create($event->invoiceData);
             $creditPackageHistory = CreditPackageHistory::create([
                 'credit_package_uuid' => $event->creditPackageUuid,
                 'user_uuid' => $event->userUuid,
                 'logs' => json_encode($event->paymentData),
                 'payment_method_uuid' => $event->paymentMethodUuid,
-                'invoice_uuid' => $invoice->uuid
+                'invoice_uuid' => $event->invoice->uuid
             ]);
             $model = $this->userCreditHistoryService->create([
                 'user_uuid' => $event->userUuid,

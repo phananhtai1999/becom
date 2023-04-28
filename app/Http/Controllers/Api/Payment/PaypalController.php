@@ -11,6 +11,7 @@ use App\Models\Notification;
 use App\Models\PaymentMethod;
 use App\Services\AddOnSubscriptionPlanService;
 use App\Services\CreditPackageService;
+use App\Services\InvoiceService;
 use App\Services\PaymentService;
 use App\Services\SubscriptionPlanService;
 use Illuminate\Http\RedirectResponse;
@@ -29,12 +30,14 @@ class PaypalController extends AbstractRestAPIController
         PaymentService $paymentService,
         AddOnSubscriptionPlanService $addOnSubscriptionPlanService,
         SubscriptionPlanService $subscriptionPlanService,
-        CreditPackageService $creditPackageService
+        CreditPackageService $creditPackageService,
+        InvoiceService $invoiceService
     ) {
         $this->paymentService = $paymentService;
         $this->addOnSubscriptionPlanService = $addOnSubscriptionPlanService;
         $this->subscriptionPlanService = $subscriptionPlanService;
         $this->creditPackageService = $creditPackageService;
+        $this->invoiceService = $invoiceService;
     }
     /**
      * @param Request $request
@@ -62,16 +65,17 @@ class PaypalController extends AbstractRestAPIController
             "payerId" => $request['PayerID'],
         ];
         $creditPackage = $this->creditPackageService->findOrFailById($request->creditPackageUuid);
-        $invoiceData = $this->paymentService->getInvoiceDataForCreditPackage($request, $creditPackage, PaymentMethod::PAYPAL);
 
         if (isset($response['status']) && $response['status'] == 'COMPLETED') {
-            Event::dispatch(new PaymentCreditPackageSuccessEvent($request->creditPackageUuid, $paymentData, $request->userUuid, PaymentMethod::PAYPAL, $invoiceData));
+            $invoiceData = $this->paymentService->getInvoiceDataForCreditPackage($request, $creditPackage, PaymentMethod::PAYPAL);
+            $invoice = $this->invoiceService->create($invoiceData);
+            Event::dispatch(new PaymentCreditPackageSuccessEvent($request->creditPackageUuid, $paymentData, $request->userUuid, PaymentMethod::PAYPAL, $invoice));
             Event::dispatch(new SendNotificationSystemForPaymentEvent([
                 'credit_package_uuid' => $request->creditPackageUuid,
                 'user_uuid' => $request->userUuid,
                 'payment_method_uuid' => PaymentMethod::PAYPAL
             ], Notification::CREDIT_TYPE));
-            return redirect()->to(env('FRONTEND_URL') . 'my/profile/top-up/success?go_back_url='. $request->goBackUrl .'&package_id=' . $request->creditPackageUuid);
+            return redirect()->to(env('FRONTEND_URL') . 'my/profile/top-up/success?go_back_url='. $request->goBackUrl .'&package_id=' . $request->creditPackageUuid . '&invoice_id=' . $invoice->uuid);
         } else {
 
             return redirect()->to(env('FRONTEND_URL') . 'my/profile/top-up/failed?go_back_url='. $request->goBackUrl .'&package_id=' . $request->creditPackageUuid);
@@ -90,15 +94,17 @@ class PaypalController extends AbstractRestAPIController
         $subscriptionData = ["id" => $response['id']];
 
         $subscriptionHistoryData = $this->paymentService->getSubscriptionHistoryData($request, PaymentMethod::PAYPAL, $subscriptionData);
-        $userPlatformPackageData = $this->paymentService->getUserPlatformPackageData($request);
-        $subscriptionPlan = $this->subscriptionPlanService->findOrFailById($request->subscriptionPlanUuid);
-        $invoiceData = $this->paymentService->getInvoiceDataForPlatformPackage($request, $subscriptionPlan, PaymentMethod::STRIPE);
 
         if (isset($response['status']) && $response['status'] == 'ACTIVE') {
-            Event::dispatch(new SubscriptionSuccessEvent($request->userUuid, $subscriptionHistoryData, $userPlatformPackageData, $invoiceData));
+            $userPlatformPackageData = $this->paymentService->getUserPlatformPackageData($request);
+            $subscriptionPlan = $this->subscriptionPlanService->findOrFailById($request->subscriptionPlanUuid);
+            $invoiceData = $this->paymentService->getInvoiceDataForPlatformPackage($request, $subscriptionPlan, PaymentMethod::STRIPE);
+            $invoice = $this->invoiceService->create($invoiceData);
+
+            Event::dispatch(new SubscriptionSuccessEvent($request->userUuid, $subscriptionHistoryData, $userPlatformPackageData, $invoice));
             Event::dispatch(new SendNotificationSystemForPaymentEvent($subscriptionHistoryData, Notification::PACKAGE_TYPE));
 
-            return redirect()->to(env('FRONTEND_URL') . 'my/profile/upgrade/success?go_back_url='. $request['goBackUrl'] . '&plan_id=' . $request->subscriptionPlanUuid);
+            return redirect()->to(env('FRONTEND_URL') . 'my/profile/upgrade/success?go_back_url='. $request['goBackUrl'] . '&plan_id=' . $request->subscriptionPlanUuid . '&invoice_id=' . $invoice->uuid);
         } else {
 
             return redirect()->to(env('FRONTEND_URL') . 'my/profile/upgrade/failed?go_back_url='. $request['goBackUrl'] . '&plan_id=' . $request->subscriptionPlanUuid);
@@ -120,14 +126,16 @@ class PaypalController extends AbstractRestAPIController
 
         $response = $provider->showSubscriptionDetails($request['subscription_id']);
         $subscriptionData = ["id" => $response['id']];
-        $addOnSubscriptionHistoryData = $this->paymentService->getAddOnSubscriptionHistoryData($request, PaymentMethod::PAYPAL, $subscriptionData);
-        $userAddOnData = $this->paymentService->getUserAddOnData($request);
-        $addOnSubscriptionPlan = $this->addOnSubscriptionPlanService->findOrFailById($request->addOnSubscriptionPlanUuid);
-        $invoiceData = $this->paymentService->getInvoiceDataForAddOn($request, $addOnSubscriptionPlan, PaymentMethod::PAYPAL);
+
         if (isset($response['status']) && $response['status'] == 'ACTIVE') {
-            Event::dispatch(new SubscriptionAddOnSuccessEvent($request->userUuid, $addOnSubscriptionHistoryData, $userAddOnData, $invoiceData));
+            $addOnSubscriptionHistoryData = $this->paymentService->getAddOnSubscriptionHistoryData($request, PaymentMethod::PAYPAL, $subscriptionData);
+            $userAddOnData = $this->paymentService->getUserAddOnData($request);
+            $addOnSubscriptionPlan = $this->addOnSubscriptionPlanService->findOrFailById($request->addOnSubscriptionPlanUuid);
+            $invoiceData = $this->paymentService->getInvoiceDataForAddOn($request, $addOnSubscriptionPlan, PaymentMethod::PAYPAL);
+            $invoice = $this->invoiceService->create($invoiceData);
+            Event::dispatch(new SubscriptionAddOnSuccessEvent($request->userUuid, $addOnSubscriptionHistoryData, $userAddOnData, $invoice));
             Event::dispatch(new SendNotificationSystemForPaymentEvent($addOnSubscriptionHistoryData, Notification::ADDON_TYPE));
-            return redirect()->to(env('FRONTEND_URL') . 'my/profile/add-on/success?go_back_url='. $request['goBackUrl'] . '&addOnSubscriptionPlanUuid=' . $request->addOnSubscriptionPlanUuid);
+            return redirect()->to(env('FRONTEND_URL') . 'my/profile/add-on/success?go_back_url='. $request['goBackUrl'] . '&addOnSubscriptionPlanUuid=' . $request->addOnSubscriptionPlanUuid . '&invoice_id=' . $invoice->uuid);
         } else {
 
             return redirect()->to(env('FRONTEND_URL') . 'my/profile/add-on/failed?go_back_url='. $request['goBackUrl'] . '&addOnSubscriptionPlanUuid=' . $request->addOnSubscriptionPlanUuid);

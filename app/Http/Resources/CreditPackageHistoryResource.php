@@ -35,6 +35,9 @@ class CreditPackageHistoryResource extends JsonResource
         if (\in_array('credit_package_history__user', $expand)) {
             $data['user'] = new UserResource($this->user);
         }
+        if (\in_array('credit_package__invoice', $expand)) {
+            $data['invoice'] = new InvoiceResource($this->invoice);
+        }
 
         return $data;
     }

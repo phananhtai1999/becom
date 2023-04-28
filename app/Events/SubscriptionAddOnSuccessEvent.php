@@ -28,13 +28,13 @@ class SubscriptionAddOnSuccessEvent
         $userUuid,
         $subscriptionHistoryData,
         $userAddOnData,
-        $invoiceData
+        $invoice
     )
     {
         $this->userUuid = $userUuid;
         $this->subscriptionHistoryData = $subscriptionHistoryData;
         $this->userAddOnData = $userAddOnData;
-        $this->invoiceData = $invoiceData;
+        $this->invoice = $invoice;
     }
 
     /**

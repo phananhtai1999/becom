@@ -27,8 +27,7 @@ class SubscriptionSuccessListener
      */
     public function handle($event)
     {
-        $invoice = Invoice::create($event->invoiceData);
-        SubscriptionHistory::create(array_merge($event->subscriptionHistory, ['invoice_uuid' => $invoice->uuid]));
+        SubscriptionHistory::create(array_merge($event->subscriptionHistory, ['invoice_uuid' => $event->invoice->uuid]));
         UserPlatformPackage::where('user_uuid', $event->userUuid)->delete();
         UserPlatformPackage::create($event->userPlatformPackage);
         Cache::flush();
