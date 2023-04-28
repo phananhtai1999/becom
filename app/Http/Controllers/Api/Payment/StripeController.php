@@ -13,6 +13,7 @@ use App\Models\Notification;
 use App\Models\PaymentMethod;
 use App\Services\AddOnSubscriptionPlanService;
 use App\Services\CreditPackageService;
+use App\Services\InvoiceService;
 use App\Services\PaymentService;
 use App\Services\StripeService;
 use App\Services\SubscriptionHistoryService;
@@ -32,7 +33,8 @@ class StripeController extends AbstractRestAPIController
         PaymentService $paymentService,
         AddOnSubscriptionPlanService $addOnSubscriptionPlanService,
         SubscriptionPlanService $subscriptionPlanService,
-        CreditPackageService $creditPackageService
+        CreditPackageService $creditPackageService,
+        InvoiceService $invoiceService
     )
     {
         $this->service = $service;
@@ -41,6 +43,7 @@ class StripeController extends AbstractRestAPIController
         $this->addOnSubscriptionPlanService = $addOnSubscriptionPlanService;
         $this->subscriptionPlanService = $subscriptionPlanService;
         $this->creditPackageService = $creditPackageService;
+        $this->invoiceService = $invoiceService;
     }
 
     public function cardStripe(UpdateCardCustomerRequest $request)
@@ -105,16 +108,18 @@ class StripeController extends AbstractRestAPIController
         $stripe = $this->service->getStripeClient();
         $response = $stripe->checkout->sessions->retrieve($request->session_id);
         $subscriptionData = ["id" => $response->subscription];
-        $subscriptionHistoryData = $this->paymentService->getSubscriptionHistoryData($request, PaymentMethod::STRIPE, $subscriptionData);
-        $userPlatformPackageData = $this->paymentService->getUserPlatformPackageData($request);
-        $subscriptionPlan = $this->subscriptionPlanService->findOrFailById($request->subscriptionPlanUuid);
-        $invoiceData = $this->paymentService->getInvoiceDataForPlatformPackage($request, $subscriptionPlan, PaymentMethod::STRIPE);
 
         if (isset($response['status']) && $response['status'] == 'complete') {
-            Event::dispatch(new SubscriptionSuccessEvent($request->userUuid, $subscriptionHistoryData, $userPlatformPackageData, $invoiceData));
+            $subscriptionHistoryData = $this->paymentService->getSubscriptionHistoryData($request, PaymentMethod::STRIPE, $subscriptionData);
+            $userPlatformPackageData = $this->paymentService->getUserPlatformPackageData($request);
+            $subscriptionPlan = $this->subscriptionPlanService->findOrFailById($request->subscriptionPlanUuid);
+            $invoiceData = $this->paymentService->getInvoiceDataForPlatformPackage($request, $subscriptionPlan, PaymentMethod::STRIPE);
+            $invoice = $this->invoiceService->create($invoiceData);
+
+            Event::dispatch(new SubscriptionSuccessEvent($request->userUuid, $subscriptionHistoryData, $userPlatformPackageData, $invoice));
             Event::dispatch(new SendNotificationSystemForPaymentEvent($subscriptionHistoryData, Notification::PACKAGE_TYPE));
 
-            return redirect()->to(env('FRONTEND_URL') . 'my/profile/upgrade/success?go_back_url=' . $request['goBackUrl'] . '&plan_id=' . $request->subscriptionPlanUuid);
+            return redirect()->to(env('FRONTEND_URL') . 'my/profile/upgrade/success?go_back_url=' . $request['goBackUrl'] . '&plan_id=' . $request->subscriptionPlanUuid . '&invoice_id=' . $invoice->uuid);
         } else {
 
             return redirect()->to(env('FRONTEND_URL') . 'my/profile/upgrade/failed?go_back_url=' . $request['goBackUrl'] . '&plan_id=' . $request->subscriptionPlanUuid);
@@ -133,14 +138,16 @@ class StripeController extends AbstractRestAPIController
         $subscriptionData = ["id" => $response->subscription];
 
         $addOnSubscriptionHistoryData = $this->paymentService->getAddOnSubscriptionHistoryData($request, PaymentMethod::STRIPE, $subscriptionData);
-        $userAddOnData = $this->paymentService->getUserAddOnData($request);
-        $addOnSubscriptionPlan = $this->addOnSubscriptionPlanService->findOrFailById($request->addOnSubscriptionPlanUuid);
-        $invoiceData = $this->paymentService->getInvoiceDataForAddOn($request, $addOnSubscriptionPlan, PaymentMethod::STRIPE);
         if (isset($response['status']) && $response['status'] == 'complete') {
-            Event::dispatch(new SubscriptionAddOnSuccessEvent($request->userUuid, $addOnSubscriptionHistoryData, $userAddOnData, $invoiceData));
+            $userAddOnData = $this->paymentService->getUserAddOnData($request);
+            $addOnSubscriptionPlan = $this->addOnSubscriptionPlanService->findOrFailById($request->addOnSubscriptionPlanUuid);
+            $invoiceData = $this->paymentService->getInvoiceDataForAddOn($request, $addOnSubscriptionPlan, PaymentMethod::STRIPE);
+            $invoice = $this->invoiceService->create($invoiceData);
+
+            Event::dispatch(new SubscriptionAddOnSuccessEvent($request->userUuid, $addOnSubscriptionHistoryData, $userAddOnData, $invoice));
             Event::dispatch(new SendNotificationSystemForPaymentEvent($addOnSubscriptionHistoryData, Notification::ADDON_TYPE));
 
-            return redirect()->to(env('FRONTEND_URL') . 'my/profile/add-on/success?go_back_url=' . $request['goBackUrl'] . '&addOnSubscriptionPlanUuid=' . $request->addOnSubscriptionPlanUuid);
+            return redirect()->to(env('FRONTEND_URL') . 'my/profile/add-on/success?go_back_url=' . $request['goBackUrl'] . '&addOnSubscriptionPlanUuid=' . $request->addOnSubscriptionPlanUuid . '&invoice_id=' . $invoice->uuid);
         } else {
 
             return redirect()->to(env('FRONTEND_URL') . 'my/profile/add-on/failed?go_back_url=' . $request['goBackUrl'] . '&addOnSubscriptionPlanUuid=' . $request->addOnSubscriptionPlanUuid);
@@ -171,16 +178,18 @@ class StripeController extends AbstractRestAPIController
             "token" => $response->payment_intent
         ];
         $creditPackage = $this->creditPackageService->findOrFailById($request->creditPackageUuid);
-        $invoiceData = $this->paymentService->getInvoiceDataForCreditPackage($request, $creditPackage, PaymentMethod::STRIPE);
+
 
         if (isset($response['status']) && $response['status'] == 'complete') {
-            Event::dispatch(new PaymentCreditPackageSuccessEvent($request->creditPackageUuid, $paymentData, $request->userUuid, PaymentMethod::STRIPE, $invoiceData));
+            $invoiceData = $this->paymentService->getInvoiceDataForCreditPackage($request, $creditPackage, PaymentMethod::STRIPE);
+            $invoice = $this->invoiceService->create($invoiceData);
+            Event::dispatch(new PaymentCreditPackageSuccessEvent($request->creditPackageUuid, $paymentData, $request->userUuid, PaymentMethod::STRIPE, $invoice));
             Event::dispatch(new SendNotificationSystemForPaymentEvent([
                 'credit_package_uuid' => $request->creditPackageUuid,
                 'user_uuid' => $request->userUuid,
                 'payment_method_uuid' => PaymentMethod::STRIPE
             ], Notification::CREDIT_TYPE));
-            return redirect()->to(env('FRONTEND_URL') . 'my/profile/top-up/success?go_back_url=' . $request->goBackUrl . '&package_id=' . $request->creditPackageUuid);
+            return redirect()->to(env('FRONTEND_URL') . 'my/profile/top-up/success?go_back_url=' . $request->goBackUrl . '&package_id=' . $request->creditPackageUuid . '&invoice_id=' . $invoice->uuid);
         } else {
 
             return redirect()->to(env('FRONTEND_URL') . 'my/profile/top-up/failed?go_back_url=' . $request->goBackUrl . '&package_id=' . $request->creditPackageUuid);

@@ -30,14 +30,14 @@ class PaymentCreditPackageSuccessEvent
         $paymentData,
         $userUuid,
         $paymentMethodUuid,
-        $invoiceData
+        $invoice
     )
     {
         $this->creditPackageUuid = $creditPackageUuid;
         $this->paymentData = $paymentData;
         $this->userUuid = $userUuid;
         $this->paymentMethodUuid = $paymentMethodUuid;
-        $this->invoiceData = $invoiceData;
+        $this->invoice = $invoice;
     }
 
     /**

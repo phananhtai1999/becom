@@ -37,6 +37,9 @@ class AddOnSubscriptionHistoryResource extends JsonResource
         if (\in_array('add_on_subscription_history__user', $expand)) {
             $data['user'] = new UserResource($this->user);
         }
+        if (\in_array('add_on__invoice', $expand)) {
+            $data['invoice'] = new InvoiceResource($this->invoice);
+        }
 
         return $data;
     }

@@ -1174,5 +1174,5 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'domain-verification.'], fun
 //invoice
 Route::group(['middleware' => ['auth:api'], 'as' => 'invoice'], function () {
     Route::get('/invoice/{id}', [InvoiceController::class, 'show'])->name('show');
-    Route::get('/view-invoice/{id}', [InvoiceController::class, 'view'])->name('view');
+    Route::get('/download-invoice/{id}', [InvoiceController::class, 'download'])->name('download');
 });

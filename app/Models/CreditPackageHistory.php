@@ -41,4 +41,7 @@ class CreditPackageHistory extends AbstractModel
     public function user() {
         return $this->belongsTo(User::class, 'user_uuid', 'uuid');
     }
+    public function invoice() {
+        return $this->hasOne(Invoice::class, 'uuid', 'invoice_uuid');
+    }
 }
