@@ -37,6 +37,7 @@ use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\Partner\PartnerCategoryController;
 use App\Http\Controllers\Api\Partner\PartnerController;
 use App\Http\Controllers\Api\Partner\PartnerLevelController;
+use App\Http\Controllers\Api\Partner\PartnerPayoutController;
 use App\Http\Controllers\Api\Partner\PartnerTrackingController;
 use App\Http\Controllers\Api\Payment\PaymentController;
 use App\Http\Controllers\Api\Payment\PaypalController;
@@ -1175,4 +1176,19 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'domain-verification.'], fun
 Route::group(['middleware' => ['auth:api'], 'as' => 'invoice'], function () {
     Route::get('/invoice/{id}', [InvoiceController::class, 'show'])->name('show');
     Route::get('/download-invoice/{id}', [InvoiceController::class, 'download'])->name('download');
+});
+
+//invoice
+Route::group(['middleware' => ['auth:api'], 'as' => 'partner-payout'], function () {
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/partner-payouts', [PartnerPayoutController::class, 'index'])->name('index');
+        Route::get('/partner-payout/{id}', [PartnerPayoutController::class, 'show'])->name('show');
+        Route::post('partner-payout/confirm-withdrawal', [PartnerPayoutController::class, 'confirmWithdrawal'])->name('confirmWithdrawal');
+    });
+
+    Route::group(['as' => 'my.'], function () {
+        Route::get('my/partner-payouts', [PartnerPayoutController::class, 'indexMy'])->name('index');
+    });
+
+    Route::post('partner-payout/withdrawal', [PartnerPayoutController::class, 'withdrawal'])->name('withdrawal');
 });
