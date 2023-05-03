@@ -115,4 +115,51 @@ class PaymentService extends AbstractService
         ];
     }
 
+    //subscription platform package
+    public function cancelPaymentSubscriptionUrl($request) {
+
+        return redirect()->to(env('FRONTEND_URL') . 'my/profile/upgrade/canceled?go_back_url=' . $request['goBackUrl'] . '&plan_id=' . $request->subscriptionPlanUuid);
+    }
+
+    public function successPaymentSubscriptionUrl($request, $invoice) {
+
+        return redirect()->to(env('FRONTEND_URL') . 'my/profile/upgrade/success?go_back_url=' . $request['goBackUrl'] . '&plan_id=' . $request->subscriptionPlanUuid . '&invoice_id=' . $invoice->uuid);
+    }
+
+    public function failedPaymentSubscriptionUrl($request) {
+
+        return redirect()->to(env('FRONTEND_URL') . 'my/profile/upgrade/failed?go_back_url=' . $request['goBackUrl'] . '&plan_id=' . $request->subscriptionPlanUuid);
+    }
+
+    //subscription add-ons
+    public function cancelPaymentSubscriptionAddOnUrl($request) {
+
+        return redirect()->to(env('FRONTEND_URL') . 'my/profile/add-on/canceled?go_back_url=' . $request['goBackUrl'] . '&addOnUuid=' . $request['addOnUuid']);
+    }
+
+    public function successPaymentSubscriptionAddOnUrl($request, $invoice) {
+
+        return redirect()->to(env('FRONTEND_URL') . 'my/profile/add-on/success?go_back_url=' . $request['goBackUrl'] . '&addOnSubscriptionPlanUuid=' . $request->addOnSubscriptionPlanUuid . '&invoice_id=' . $invoice->uuid);
+    }
+
+    public function failedPaymentSubscriptionAddOnUrl($request) {
+
+        return redirect()->to(env('FRONTEND_URL') . 'my/profile/add-on/failed?go_back_url=' . $request['goBackUrl'] . '&addOnSubscriptionPlanUuid=' . $request->addOnSubscriptionPlanUuid);
+    }
+
+    //payment credit package
+    public function cancelPaymentUrl($request) {
+
+        return redirect()->to(env('FRONTEND_URL') . 'my/profile/top-up/cancel?packageID=' . $request->creditPackageUuid);
+    }
+
+    public function successPaymentUrl($request, $invoice) {
+
+        return redirect()->to(env('FRONTEND_URL') . 'my/profile/top-up/success?go_back_url=' . $request->goBackUrl . '&package_id=' . $request->creditPackageUuid . '&invoice_id=' . $invoice->uuid);
+    }
+
+    public function failedPaymentUrl($request) {
+
+        return redirect()->to(env('FRONTEND_URL') . 'my/profile/top-up/failed?go_back_url=' . $request->goBackUrl . '&package_id=' . $request->creditPackageUuid);
+    }
 }

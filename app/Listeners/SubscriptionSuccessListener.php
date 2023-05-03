@@ -30,6 +30,6 @@ class SubscriptionSuccessListener
         SubscriptionHistory::create(array_merge($event->subscriptionHistory, ['invoice_uuid' => $event->invoice->uuid]));
         UserPlatformPackage::where('user_uuid', $event->userUuid)->delete();
         UserPlatformPackage::create($event->userPlatformPackage);
-        Cache::flush();
+        Cache::forget('platform_permission' . $event->userPlatformPackage['user_uuid']);
     }
 }

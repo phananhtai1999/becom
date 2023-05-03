@@ -20,6 +20,7 @@ use App\Services\AddOnService;
 use App\Services\AddOnSubscriptionHistoryService;
 use App\Services\AddOnSubscriptionPlanService;
 use App\Services\ConfigService;
+use App\Services\PaymentService;
 use App\Services\PaypalService;
 use App\Services\StripeService;
 use App\Services\UserAddOnService;
@@ -41,7 +42,8 @@ class AddOnController extends AbstractRestAPIController
         UserAddOnService $userAddOnService,
         AddOnSubscriptionPlanService $addOnSubscriptionPlanService,
         AddOnSubscriptionHistoryService $addOnSubscriptionHistoryService,
-        ConfigService $configService
+        ConfigService $configService,
+        PaymentService $paymentService
     )
     {
         $this->service = $service;
@@ -49,6 +51,7 @@ class AddOnController extends AbstractRestAPIController
         $this->paypalService = $paypalService;
         $this->userAddOnService = $userAddOnService;
         $this->configService = $configService;
+        $this->paymentService = $paymentService;
         $this->addOnSubscriptionPlanService = $addOnSubscriptionPlanService;
         $this->addOnSubscriptionHistoryService = $addOnSubscriptionHistoryService;
         $this->resourceClass = AddOnResource::class;
@@ -157,7 +160,7 @@ class AddOnController extends AbstractRestAPIController
                 false,
                 $processResult['message'] ?? 'failed',
                 ['data' => [
-                    'redirect_url' => env('FRONTEND_URL') . 'my/profile/upgrade/failed?add_on_id=' . $addOnSubscriptionPlan->uuid
+                    'redirect_url' => $this->paymentService->failedPaymentSubscriptionAddOnUrl($request)
                 ]]
             );
         } else {
