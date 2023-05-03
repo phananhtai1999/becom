@@ -46,7 +46,7 @@ class PaypalController extends AbstractRestAPIController
     public function cancelPayment(Request $request)
     {
 
-        return redirect()->to(env('FRONTEND_URL') . 'my/profile/top-up/cancel?packageID=' . $request->creditPackageUuid);
+        return $this->paymentService->cancelPaymentUrl($request);
     }
 
     /**
@@ -75,10 +75,11 @@ class PaypalController extends AbstractRestAPIController
                 'user_uuid' => $request->userUuid,
                 'payment_method_uuid' => PaymentMethod::PAYPAL
             ], Notification::CREDIT_TYPE));
-            return redirect()->to(env('FRONTEND_URL') . 'my/profile/top-up/success?go_back_url='. $request->goBackUrl .'&package_id=' . $request->creditPackageUuid . '&invoice_id=' . $invoice->uuid);
+
+            return $this->paymentService->successPaymentUrl($request, $invoice);
         } else {
 
-            return redirect()->to(env('FRONTEND_URL') . 'my/profile/top-up/failed?go_back_url='. $request->goBackUrl .'&package_id=' . $request->creditPackageUuid);
+            return $this->paymentService->failedPaymentUrl($request);
         }
     }
 
@@ -104,16 +105,16 @@ class PaypalController extends AbstractRestAPIController
             Event::dispatch(new SubscriptionSuccessEvent($request->userUuid, $subscriptionHistoryData, $userPlatformPackageData, $invoice));
             Event::dispatch(new SendNotificationSystemForPaymentEvent($subscriptionHistoryData, Notification::PACKAGE_TYPE));
 
-            return redirect()->to(env('FRONTEND_URL') . 'my/profile/upgrade/success?go_back_url='. $request['goBackUrl'] . '&plan_id=' . $request->subscriptionPlanUuid . '&invoice_id=' . $invoice->uuid);
+            return $this->paymentService->successPaymentSubscriptionUrl($request, $invoice);
         } else {
 
-            return redirect()->to(env('FRONTEND_URL') . 'my/profile/upgrade/failed?go_back_url='. $request['goBackUrl'] . '&plan_id=' . $request->subscriptionPlanUuid);
+            return $this->paymentService->failedPaymentSubscriptionUrl($request);
         }
     }
 
     public function cancelPaymentSubscription(Request $request)
     {
-        return redirect()->to(env('FRONTEND_URL') . 'my/profile/upgrade/canceled?go_back_url='. $request['goBackUrl'] . '&plan_id=' . $request->subscriptionPlanUuid);
+        return $this->paymentService->cancelPaymentSubscriptionUrl($request);
     }
 
     public function successPaymentSubscriptionAddOn(Request $request)
@@ -135,15 +136,16 @@ class PaypalController extends AbstractRestAPIController
             $invoice = $this->invoiceService->create($invoiceData);
             Event::dispatch(new SubscriptionAddOnSuccessEvent($request->userUuid, $addOnSubscriptionHistoryData, $userAddOnData, $invoice));
             Event::dispatch(new SendNotificationSystemForPaymentEvent($addOnSubscriptionHistoryData, Notification::ADDON_TYPE));
-            return redirect()->to(env('FRONTEND_URL') . 'my/profile/add-on/success?go_back_url='. $request['goBackUrl'] . '&addOnSubscriptionPlanUuid=' . $request->addOnSubscriptionPlanUuid . '&invoice_id=' . $invoice->uuid);
+
+            return $this->paymentService->successPaymentSubscriptionAddOnUrl($request, $invoice);
         } else {
 
-            return redirect()->to(env('FRONTEND_URL') . 'my/profile/add-on/failed?go_back_url='. $request['goBackUrl'] . '&addOnSubscriptionPlanUuid=' . $request->addOnSubscriptionPlanUuid);
+            return $this->paymentService->failedPaymentSubscriptionAddOnUrl($request);
         }
     }
 
     public function cancelPaymentSubscriptionAddOn(Request $request)
     {
-        return redirect()->to(env('FRONTEND_URL') . 'my/profile/add-on/canceled?go_back_url='. $request['goBackUrl'] . '&addOnUuid=' . $request['addOnUuid']);
+        return $this->paymentService->cancelPaymentSubscriptionAddOnUrl($request);
     }
 }

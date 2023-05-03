@@ -15,6 +15,7 @@ use App\Models\PaymentMethod;
 use App\Models\UserCreditHistory;
 use App\Services\ConfigService;
 use App\Services\CreditPackageHistoryService;
+use App\Services\PaymentService;
 use App\Services\SubscriptionHistoryService;
 use App\Services\CreditPackageService;
 use App\Services\PaypalService;
@@ -45,12 +46,14 @@ class PaymentController extends AbstractRestAPIController
         SubscriptionHistoryService  $subscriptionHistoryService,
         UserCreditHistoryService    $userCreditHistoryService,
         UserPlatformPackageService  $userPlatformPackageService,
-        ConfigService               $configService
+        ConfigService               $configService,
+        PaymentService $service
     )
     {
         $this->paypalService = $paypalService;
         $this->stripeService = $stripeService;
         $this->userService = $userService;
+        $this->service = $service;
         $this->subscriptionPlanService = $subscriptionPlanService;
         $this->platformPackageService = $platformPackageService;
         $this->creditPackageService = $creditPackageService;
@@ -116,7 +119,7 @@ class PaymentController extends AbstractRestAPIController
                 false,
                 $processResult['message'] ?? 'failed',
                 ['data' => [
-                    'redirect_url' => env('FRONTEND_URL') . 'my/profile/upgrade/failed?plan_id=' . $subscriptionPlan->uuid
+                    'redirect_url' => $this->service->failedPaymentSubscriptionUrl($request)
                 ]]
             );
         } else {

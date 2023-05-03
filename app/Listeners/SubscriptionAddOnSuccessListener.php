@@ -29,6 +29,6 @@ class SubscriptionAddOnSuccessListener
     {
             AddOnSubscriptionHistory::create(array_merge($event->subscriptionHistoryData, ['invoice_uuid' => $event->invoice->uuid]));
             UserAddOn::create($event->userAddOnData);
-            Cache::flush();
+            Cache::forget('add_on_permission' . $event->userAddOnData['user_uuid']);
     }
 }
