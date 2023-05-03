@@ -43,4 +43,9 @@ class PartnerTrackingByYearService extends AbstractService
         }
         return array_values($countByMonth);
     }
+
+    public function getTotalCommissionsByPartner($partnerUuid)
+    {
+        return $this->model->where('partner_uuid', $partnerUuid)->selectRaw('SUM(total_commission) as total_commissions')->first()->total_commissions;
+    }
 }
