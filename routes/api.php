@@ -1091,7 +1091,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'partner.'], function () {
     Route::get('partner-top-10', [PartnerController::class, 'partnerTop10'])->name('partnerTop10');
     Route::get('partner-detail', [PartnerController::class, 'partnerDetail'])->name('partnerDetail');
     Route::get('partner-rewards', [PartnerController::class, 'partnerRewards'])->name('partnerRewards');
-    Route::get('partner-payout-terms', [PartnerController::class, 'partnerPayoutTerms'])->name('partnerPayoutTerms');
+    Route::get('partner-payout-terms', [PartnerPayoutController::class, 'indexMy'])->name('partnerPayoutTerms');
     Route::get('update-user-payment', [PartnerController::class, 'UpdateUserPayment'])->name('UpdateUserPayment');
 });
 Route::post('register-partner', [PartnerController::class, 'registerPartner'])->name('registerPartner');

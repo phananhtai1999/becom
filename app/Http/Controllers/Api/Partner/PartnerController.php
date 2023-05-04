@@ -31,6 +31,7 @@ use App\Models\SubscriptionHistory;
 use App\Models\User;
 use App\Models\UserPaymentByDay;
 use App\Services\PartnerLevelService;
+use App\Services\PartnerPayoutService;
 use App\Services\PartnerService;
 use App\Services\PartnerTrackingByYearService;
 use App\Services\PartnerTrackingService;
@@ -63,6 +64,7 @@ class PartnerController extends AbstractRestAPIController
 
     protected $partnerTrackingByYearService;
 
+    protected $partnerPayoutService;
 
     public function __construct(
         PartnerService $service,
@@ -72,7 +74,8 @@ class PartnerController extends AbstractRestAPIController
         PartnerUserService $partnerUserService,
         PartnerTrackingService $partnerTrackingService,
         UserPaymentByDayService $userPaymentByDayService,
-        PartnerTrackingByYearService $partnerTrackingByYearService
+        PartnerTrackingByYearService $partnerTrackingByYearService,
+        PartnerPayoutService $partnerPayoutService
     )
     {
         $this->service = $service;
@@ -88,6 +91,7 @@ class PartnerController extends AbstractRestAPIController
         $this->partnerTrackingService = $partnerTrackingService;
         $this->userPaymentByDayService = $userPaymentByDayService;
         $this->partnerTrackingByYearService = $partnerTrackingByYearService;
+        $this->partnerPayoutService = $partnerPayoutService;
     }
 
     public function store()
@@ -186,7 +190,9 @@ class PartnerController extends AbstractRestAPIController
         $referrals = $this->partnerUserService->referralsOfPartnerInMonth($partner->code)->count();
         $clicks = $this->partnerTrackingService->trackingClicksOfPartnerInMonth($partner->uuid)->count();
         $customers = $this->partnerUserService->numberCustomerPartnerByMonthCurrent($partner->code)->count();
-        $unpaid_earnings = $this->partnerTrackingByYearService->earningsOfPartnerByMonth($partner->uuid);
+        $totalCommissions = $this->partnerTrackingByYearService->getTotalCommissionsByPartner($partner->uuid);
+        $totalAmountWithdrawn = $this->partnerPayoutService->getTotalAmountUsedOfPartner($partner->uuid);
+        $unpaid_earnings = $totalCommissions - $totalAmountWithdrawn;
 
         return $this->sendOkJsonResponse(["data" => [
             "referrals" => $referrals,
@@ -349,37 +355,6 @@ class PartnerController extends AbstractRestAPIController
         $data = $this->userPaymentByDayService->getRewardsCommissionThisMonthByPartner($partner->code);
 
         return $this->sendOkJsonResponse(["data" => $data]);
-    }
-
-    public function partnerPayoutTerms()
-    {
-        $fakeData = [
-            [
-                'status' => 'success',
-                'amount' => 200,
-                'created' => '2023-04-19',
-                'paid_at' => '2023-04-19'
-            ],
-            [
-                'status' => 'success',
-                'amount' => 100,
-                'created' => '2023-04-19',
-                'paid_at' => '2023-04-19'
-            ],
-            [
-                'status' => 'success',
-                'amount' => 50,
-                'created' => '2023-04-19',
-                'paid_at' => '2023-04-19'
-            ],
-            [
-                'status' => 'success',
-                'amount' => 250,
-                'created' => '2023-04-19',
-                'paid_at' => '2023-04-19'
-            ]
-        ];
-        return $this->sendOkJsonResponse(["data" => $fakeData]);
     }
 
     public function UpdateUserPayment()
