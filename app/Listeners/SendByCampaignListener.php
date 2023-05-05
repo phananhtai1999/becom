@@ -135,10 +135,9 @@ class SendByCampaignListener implements ShouldQueue {
 		} else {
 			$config = $this->configService->findConfigByKey('send_by_connector');
 			if ($config && $config->value_formatted) {
-		        $emailNotification->sending_by_conecttor($emailNotification->getContacts(), null, null);
+		        $emailNotification->sending_by_conecttor($emailNotification->getContacts(), null, $creditNumberSendByCampaign);
 			} else {
-
-				$emailNotification->send($emailNotification->getContacts(), null, null);
+				$emailNotification->send($emailNotification->getContacts(), null, $creditNumberSendByCampaign);
 			}
 		}
 	}

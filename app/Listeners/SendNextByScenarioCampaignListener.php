@@ -117,19 +117,12 @@ class SendNextByScenarioCampaignListener implements  ShouldQueue
         $campaign = $event->campaign;
 
         $emailNotification = app()->makeWith(BaseNotification::class, ['campaign' => $campaign])->getAdapter();
-        $creditNumberSendByCampaign = $emailNotification->getNotificationPrice();
 
-        if (!$this->userService->checkCredit($creditNumberSendByCampaign, $campaign->user_uuid)) {
-            $this->campaignService->update($campaign, [
-                'was_stopped_by_owner' => true
-            ]);
+        $config = $this->configService->findConfigByKey('send_by_connector');
+        if ($config && $config->value_formatted) {
+            $emailNotification->sending_by_conecttor($contact, $campaignScenario->uuid, null);
         } else {
-            $config = $this->configService->findConfigByKey('send_by_connector');
-            if ($config && $config->value_formatted) {
-                $emailNotification->sending_by_conecttor($contact, $campaignScenario->uuid, $creditNumberSendByCampaign);
-            } else {
-                $emailNotification->send($contact, $campaignScenario->uuid, $creditNumberSendByCampaign);
-            }
+            $emailNotification->send($contact, $campaignScenario->uuid, null);
         }
     }
 }

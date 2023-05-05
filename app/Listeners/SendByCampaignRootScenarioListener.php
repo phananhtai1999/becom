@@ -132,19 +132,12 @@ class SendByCampaignRootScenarioListener implements ShouldQueue
         $creditNumberSendByCampaignScenario = $event->creditNumberSendEmail;
         $emailNotification = app()->makeWith(BaseNotification::class, ['campaign' => $campaign])->getAdapter();
 
-        if (!$this->userService->checkCredit($creditNumberSendByCampaignScenario, $campaign->user_uuid)){
-            $this->campaignService->update($campaign, [
-                'was_stopped_by_owner' => true
-            ]);
-        }else {
-            $config = $this->configService->findConfigByKey('send_by_connector');
-            if ($config && $config->value_formatted) {
-                $emailNotification->sending_by_conecttor($emailNotification->getContacts(), $campaignRootScenario->uuid, null);
-            } else {
+        $config = $this->configService->findConfigByKey('send_by_connector');
+        if ($config && $config->value_formatted) {
+            $emailNotification->sending_by_conecttor($emailNotification->getContacts(), $campaignRootScenario->uuid, $creditNumberSendByCampaignScenario);
+        } else {
 
-                $emailNotification->send($emailNotification->getContacts(), $campaignRootScenario->uuid, null);
-            }
-
+            $emailNotification->send($emailNotification->getContacts(), $campaignRootScenario->uuid, $creditNumberSendByCampaignScenario);
         }
     }
 }
