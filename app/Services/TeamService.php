@@ -15,22 +15,17 @@ class TeamService extends AbstractService
 
     public function sortByNumOfTeamMember($request)
     {
-        $perPage = $request->get('per_page', 15);
-        $page = $request->get('page', 1);
-        $columns = $request->get('columns', '*');
-        $pageName = $request->get('page_name', 'page');
-        $search = $request->get('search', '');
-        $searchBy = $request->get('search_by', '');
+        $indexRequest = $this->getIndexRequest($request);
         if ($request->get('sort') == 'num_of_team_member') {
-            $result = TeamQueryBuilder::searchQuery($search, $searchBy)
-                ->paginate($perPage, $columns, $pageName, $page)
+            $result = TeamQueryBuilder::searchQuery($indexRequest['search'], $indexRequest['search_by'])
+                ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page'])
                 ->sortBy('num_of_team_member');
         } elseif ($request->get('sort') == '-num_of_team_member') {
-            $result = TeamQueryBuilder::searchQuery($search, $searchBy)
-                ->paginate($perPage, $columns, $pageName, $page)
+            $result = TeamQueryBuilder::searchQuery($indexRequest['search'], $indexRequest['search_by'])
+                ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page'])
                 ->sortByDesc('num_of_team_member');
         }
 
-        return $this->collectionPagination($result, $perPage, $page);
+        return $this->collectionPagination($result, $indexRequest['per_page'], $indexRequest['page']);
     }
 }

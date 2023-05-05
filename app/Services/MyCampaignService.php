@@ -317,24 +317,19 @@ class MyCampaignService extends AbstractService
 
     public function myCampaigns($request, $contactLists = [])
     {
-        $perPage = $request->get('per_page', 15);
-        $page = $request->get('page', 1);
-        $columns = $request->get('columns', '*');
-        $pageName = $request->get('page_name', 'page');
-        $search = $request->get('search', '');
-        $searchBy = $request->get('search_by', '');
+        $indexRequest = $this->getIndexRequest($request);
 
         if (empty($contactLists)) {
 
-            return $this->modelQueryBuilderClass::searchQuery($search, $searchBy)
-                ->paginate($perPage, $columns, $pageName, $page);
+            return $this->modelQueryBuilderClass::searchQuery($indexRequest['search'], $indexRequest['search_by'])
+                ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
         }
         $campaignUuids = $this->model->select('campaigns.*')
             ->join('campaign_contact_list', 'campaigns.uuid', '=', 'campaign_contact_list.campaign_uuid')
             ->WhereIn('campaign_contact_list.contact_list_uuid', $contactLists)->get()->pluck('uuid');
 
-        return $this->modelQueryBuilderClass::searchQuery($search, $searchBy)
+        return $this->modelQueryBuilderClass::searchQuery($indexRequest['search'], $indexRequest['search_by'])
             ->OrWhereIn('uuid', $campaignUuids)
-            ->paginate($perPage, $columns, $pageName, $page);
+            ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
     }
 }
