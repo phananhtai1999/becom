@@ -59,4 +59,17 @@ class ScenarioService extends AbstractService
             'sourceType' => $sourceTypes
         ];
     }
+
+    public function sortByNumberCreditOfScenario($request)
+    {
+        $sortCredit = $request->get('sort');
+        $request = $this->getIndexRequest($request);
+        if ($sortCredit === 'number_credit') {
+            $result =  $this->modelQueryBuilderClass::searchQuery($request['search'], $request['search_by'])->get()->sortBy('number_credit');
+        }else{
+            $result = $this->modelQueryBuilderClass::searchQuery($request['search'], $request['search_by'])->get()->sortByDesc('number_credit');
+        }
+
+        return $this->collectionPagination($result, $request['per_page'], $request['page']);
+    }
 }
