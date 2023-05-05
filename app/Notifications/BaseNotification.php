@@ -154,11 +154,7 @@ class BaseNotification
         $campaignContent = $this->mailTemplateVariableService->insertFooterTemplateInBodyMailTemplate($mailTemplate->body, optional($footerTemplateAds)->template, optional($footerTemplateSubscribe)->template);
         $build_body['template'] = $campaignContent;
 
-        if (!empty($creditTotal)) {
-            $creditNumberSendByCampaign = $creditTotal;
-        } else {
-            $creditNumberSendByCampaign = $this->calculatorCredit();
-        }
+        $creditNumberSendByCampaign = $creditTotal;
         $configPrice = $this->getNotificationPrice();
         $smtpAccount = $this->getSendOption($user);
 
@@ -188,22 +184,23 @@ class BaseNotification
             ]);
             return false;
         }
-        try {
-            $this->userService->update($user, [
-                'credit' => $user->credit - $creditNumberSendByCampaign
-            ]);
+        if (!empty($creditTotal)) {
+            try {
+                $this->userService->update($user, [
+                    'credit' => $user->credit - $creditNumberSendByCampaign
+                ]);
 
-            $creditHistory = $this->creditHistoryService->create([
-                'user_uuid' => $this->campaign->user_uuid,
-                'campaign_uuid' => $this->campaign->uuid,
-                'credit' => $creditNumberSendByCampaign,
-                'type' => $this->campaign->send_type
-            ]);
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollback();
+                $creditHistory = $this->creditHistoryService->create([
+                    'user_uuid' => $this->campaign->user_uuid,
+                    'campaign_uuid' => $this->campaign->uuid,
+                    'credit' => $creditNumberSendByCampaign,
+                    'type' => $this->campaign->send_type
+                ]);
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollback();
+            }
         }
-
         return true;
     }
 
@@ -218,11 +215,7 @@ class BaseNotification
 
         $user = $this->campaign->user;
         $mailTemplate = $this->campaign->mailTemplate;
-        if (!empty($creditTotal)) {
-            $creditNumberSendByCampaign = $creditTotal;
-        } else {
-            $creditNumberSendByCampaign = $this->calculatorCredit();
-        }
+        $creditNumberSendByCampaign = $creditTotal;
         $configPrice = $this->getNotificationPrice();
         $smtpAccount = $this->getSendOption($user);
 
@@ -231,22 +224,24 @@ class BaseNotification
             'start_time' => Carbon::now()
         ]);
 
-        DB::beginTransaction();
+        if (!empty($creditTotal)) {
+            DB::beginTransaction();
 
-        try {
-            $this->userService->update($user, [
-                'credit' => $user->credit - $creditNumberSendByCampaign
-            ]);
+            try {
+                $this->userService->update($user, [
+                    'credit' => $user->credit - $creditNumberSendByCampaign
+                ]);
 
-            $creditHistory = $this->creditHistoryService->create([
-                'user_uuid' => $this->campaign->user_uuid,
-                'campaign_uuid' => $this->campaign->uuid,
-                'credit' => $creditNumberSendByCampaign,
-                'type' => $this->campaign->send_type
-            ]);
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollback();
+                $creditHistory = $this->creditHistoryService->create([
+                    'user_uuid' => $this->campaign->user_uuid,
+                    'campaign_uuid' => $this->campaign->uuid,
+                    'credit' => $creditNumberSendByCampaign,
+                    'type' => $this->campaign->send_type
+                ]);
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollback();
+            }
         }
 
         $footerTemplateAds = $this->footerTemplateService->getFooterTemplateAdsForSendCampaignByType($mailTemplate->type, $mailTemplate->user);
@@ -279,7 +274,7 @@ class BaseNotification
             ActivityHistoryOfSendByCampaignEvent::dispatch($mailSendingHistory, $this->campaign->send_type, $contact->uuid);
         }
 
-        if ($this->creditReturn > 0) {
+        if ($this->creditReturn > 0 && !empty($creditTotal) && empty($scenario)) {
             $returnUser = $this->creditReturn;
             $payCreditHistory = $creditNumberSendByCampaign - $this->creditReturn;
             $this->returnCreditUserAndCreditHistory($user, $creditHistory, $returnUser, $payCreditHistory);
