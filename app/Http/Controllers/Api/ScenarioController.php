@@ -15,6 +15,8 @@ use App\Http\Resources\ScenarioResourceCollection;
 use App\Models\Notification;
 use App\Services\CampaignScenarioService;
 use App\Services\CampaignService;
+use App\Services\ConfigService;
+use App\Services\ContactService;
 use App\Services\MailSendingHistoryService;
 use App\Services\MyScenarioService;
 use App\Services\ScenarioService;
@@ -24,7 +26,6 @@ use Illuminate\Http\Request;
 
 class ScenarioController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestIndexMyTrait;
 
     /**
      * @var MyScenarioService
@@ -42,6 +43,10 @@ class ScenarioController extends AbstractRestAPIController
 
     protected $userService;
 
+    protected $configService;
+
+    protected $contactService;
+
     /**
      * @param ScenarioService $service
      * @param MyScenarioService $myService
@@ -53,7 +58,9 @@ class ScenarioController extends AbstractRestAPIController
         CampaignScenarioService $campaignScenarioService,
         MailSendingHistoryService $mailSendingHistoryService,
         CampaignService $campaignService,
-        UserService  $userService
+        UserService  $userService,
+        ConfigService $configService,
+        ContactService $contactService
     )
     {
         $this->service = $service;
@@ -63,6 +70,34 @@ class ScenarioController extends AbstractRestAPIController
         $this->mailSendingHistoryService = $mailSendingHistoryService;
         $this->campaignService = $campaignService;
         $this->userService = $userService;
+        $this->configService = $configService;
+        $this->contactService = $contactService;
+    }
+
+    public function index(IndexRequest $request)
+    {
+        if ($request->get('sort') === 'number_credit' || $request->get('sort') === '-number_credit') {
+            $models = $this->service->sortByNumberCreditOfScenario($request);
+        } else {
+            $models = $this->service->getCollectionWithPagination();
+        }
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+        );
+    }
+
+    public function indexMy(IndexRequest $request)
+    {
+        if ($request->get('sort') === 'number_credit' || $request->get('sort') === '-number_credit') {
+            $models = $this->myService->sortByNumberCreditOfMyScenario($request);
+        } else {
+            $models = $this->myService->getCollectionWithPagination();
+        }
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+        );
     }
 
     /**
@@ -407,9 +442,9 @@ class ScenarioController extends AbstractRestAPIController
     public function checkAndSendScenario($scenario)
     {
         $campaignRootScenario = $this->campaignScenarioService->getCampaignScenarioRootByScenarioUuid($scenario->uuid);
-
         $campaign = $this->campaignService->checkActiveCampaignScenario($campaignRootScenario->campaign_uuid);
-        $creditNumberSendEmail = $campaign->number_credit_needed_to_start_campaign;
+
+        $creditNumberSendEmail = $scenario->number_credit;
         if ($this->userService->checkCredit($creditNumberSendEmail, $campaign->user_uuid)) {
             SendNotificationSystemEvent::dispatch($scenario->user, Notification::SCENARIO_TYPE, Notification::START_ACTION, $scenario);
             SendByCampaignRootScenarioEvent::dispatch($campaign, $creditNumberSendEmail, $campaignRootScenario);

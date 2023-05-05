@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Abstracts\AbstractModel;
+use App\Services\CampaignScenarioService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -41,6 +42,11 @@ class Scenario extends AbstractModel
         'deleted_at' => 'datetime',
         'last_stopped_at' => 'datetime',
     ];
+
+    public function getNumberCreditAttribute()
+    {
+        return (new CampaignScenarioService())->calculateNumberCreditOfScenario($this->uuid);
+    }
 
     /**
      * @return HasMany

@@ -22,6 +22,7 @@ class ScenarioResource extends AbstractJsonResource
             'user_uuid' => $this->user_uuid,
             'status' => $this->status,
             'last_stopped_at' => $this->last_stopped_at,
+            'number_credit' => $this->number_credit,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at

@@ -35,13 +35,6 @@ class MyScenarioQueryBuilder extends AbstractQueryBuilder
                 'last_stopped_at'
             ])
             ->defaultSort('-created_at')
-            ->allowedSorts([
-                $modelKeyName,
-                'name',
-                'user_uuid',
-                'status',
-                'last_stopped_at'
-            ])
             ->allowedFilters([
                 $modelKeyName,
                 AllowedFilter::exact('exact__' . $modelKeyName, $modelKeyName),
