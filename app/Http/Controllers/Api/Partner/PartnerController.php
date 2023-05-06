@@ -48,7 +48,7 @@ use Illuminate\Support\Str;
 
 class PartnerController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestEditTrait;
+    use RestShowTrait, RestDestroyTrait, RestEditTrait;
 
     protected $partnerLevelService;
 
@@ -92,6 +92,24 @@ class PartnerController extends AbstractRestAPIController
         $this->userPaymentByDayService = $userPaymentByDayService;
         $this->partnerTrackingByYearService = $partnerTrackingByYearService;
         $this->partnerPayoutService = $partnerPayoutService;
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function index(IndexRequest $request)
+    {
+        $sort = $request->get('sort');
+        $listSortAttribute = ["clicks", "-clicks", "sign_up", "-sign_up", "customers", "-customers"];
+        if (in_array($sort, $listSortAttribute)) {
+            $models = $this->service->sortByAttributeOfPartner($request);
+        } else {
+            $models = $this->service->getCollectionWithPagination();
+        }
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+        );
     }
 
     public function store()

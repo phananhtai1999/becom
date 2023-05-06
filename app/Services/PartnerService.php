@@ -11,12 +11,27 @@ use App\Models\QueryBuilders\SectionCategoryQueryBuilder;
 use App\Models\SectionCategory;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
+use Illuminate\Support\Str;
 
 class PartnerService extends AbstractService
 {
     protected $modelClass = Partner::class;
 
     protected $modelQueryBuilderClass = PartnerQueryBuilder::class;
+
+    public function sortByAttributeOfPartner($request)
+    {
+        $sort = $request->get('sort');
+        $request = $this->getIndexRequest($request);
+        if (!Str::startsWith($sort, '-')){
+            $result =  $this->modelQueryBuilderClass::searchQuery($request['search'], $request['search_by'])->get()
+                ->sortBy($sort);
+        }else{
+            $result =  $this->modelQueryBuilderClass::searchQuery($request['search'], $request['search_by'])->get()
+                ->sortByDesc(ltrim($sort, '-'));
+        }
+        return $this->collectionPagination($result, $request['per_page'], $request['page']);
+    }
 
     public function getPartnersChartByGroup($startDate, $endDate, $groupBy)
     {

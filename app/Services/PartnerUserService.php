@@ -203,8 +203,11 @@ class PartnerUserService extends AbstractService
 
     public function getTotalSignUpChart($startDate, $endDate, $partnerCode = null)
     {
-        return $this->model->whereDate('created_at', '>=', $startDate)
-            ->whereDate('created_at', '<=', $endDate)
+        return $this->model
+            ->when($startDate && $endDate, function ($query) use ($startDate, $endDate) {
+                $query->whereDate('created_at', '>=', $startDate)
+                    ->whereDate('created_at', '<=', $endDate);
+            })
             ->when($partnerCode, function ($query, $partnerCode) {
                 $query->where('registered_from_partner_code', $partnerCode);
             })

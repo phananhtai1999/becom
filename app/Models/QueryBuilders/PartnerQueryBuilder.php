@@ -45,19 +45,6 @@ class PartnerQueryBuilder extends AbstractQueryBuilder
                 'code'
             ])
             ->defaultSort('-created_at')
-            ->allowedSorts([
-                $modelKeyName,
-                'first_name',
-                'last_name',
-                'company_name',
-                'partner_email',
-                'publish_status',
-                'phone_number',
-                'answer',
-                'partner_category_uuid',
-                'user_uuid',
-                'code'
-            ])
             ->allowedFilters([
                 $modelKeyName,
                 AllowedFilter::exact('exact__' . $modelKeyName, $modelKeyName),
