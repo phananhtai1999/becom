@@ -19,7 +19,9 @@ class UserPaymentByDayService extends AbstractService
                 $query->where('registered_from_partner_code', $partnerCode);
             })
             ->whereNotNull('a.registered_from_partner_code')
-            ->whereRaw("CONCAT(user_payment_by_day.year, '-', LPAD(user_payment_by_day.month, 2, '0'), '-01') BETWEEN '{$startDate->copy()->startOfMonth()->toDateString()}' AND '{$endDate->toDateString()}'")
+            ->when($startDate && $endDate, function ($query) use ($startDate, $endDate) {
+                $query->whereRaw("CONCAT(user_payment_by_day.year, '-', LPAD(user_payment_by_day.month, 2, '0'), '-01') BETWEEN '{$startDate->copy()->startOfMonth()->toDateString()}' AND '{$endDate->toDateString()}'");
+            })
             ->select('user_payment_by_day.*', 'a.registered_from_partner_code')->get();
     }
 

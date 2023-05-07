@@ -5,7 +5,9 @@ namespace App\Models;
 use App\Abstracts\AbstractModel;
 use App\Http\Controllers\Traits\ModelFilterLanguageTrait;
 use App\Services\PartnerLevelService;
+use App\Services\PartnerTrackingService;
 use App\Services\PartnerUserService;
+use App\Services\UserPaymentByDayService;
 use App\Services\UserService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -72,6 +74,34 @@ class Partner extends AbstractModel
     public function getPartnerLevelAttribute()
     {
         return $this->code ? (new PartnerLevelService())->getPartnerLevelCurrentByPartner($this->code) : null;
+    }
+
+    public function getClicksAttribute()
+    {
+        if ($this->code) {
+            return (new PartnerTrackingService())->getTotalPartnerTrackingChart(null, null, $this->uuid);
+        }
+
+        return 0;
+    }
+
+    public function getSignUpAttribute()
+    {
+        if ($this->code) {
+            return (new PartnerUserService())->getTotalSignUpChart(null, null, $this->code);
+        }
+
+        return 0;
+    }
+
+    public function getCustomersAttribute()
+    {
+        if ($this->code) {
+            $totalCustomer = (new UserPaymentByDayService())->createQueryGetCustomersPartnerByDate(null, null, $this->code);
+            return $totalCustomer->isEmpty() ? 0 : $totalCustomer->unique('user_uuid')->count();
+        }
+
+        return 0;
     }
 
     /**

@@ -113,10 +113,12 @@ class PartnerTrackingService extends AbstractService
 
     public function getTotalPartnerTrackingChart($startDate, $endDate, $partnerUuid = null)
     {
-        return $this->model
-            ->whereDate('updated_at', '>=', $startDate)
-            ->whereDate('updated_at', '<=', $endDate)
-            ->when($partnerUuid, function ($query, $partnerUuid) {
+         return $this->model
+             ->when($startDate && $endDate, function ($query) use ($startDate, $endDate) {
+                 $query->whereDate('updated_at', '>=', $startDate)
+                 ->whereDate('updated_at', '<=', $endDate);
+             })
+             ->when($partnerUuid, function ($query, $partnerUuid) {
                 $query->where('partner_uuid', $partnerUuid);
             })->count();
     }
