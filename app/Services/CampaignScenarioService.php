@@ -99,7 +99,7 @@ class CampaignScenarioService extends AbstractService
         })->map(function ($items) use ($sort){
             $max = 0;
             foreach ($items as $item) {
-                $credit = $sort[$item['campaign']['send_type']]['value'];
+                $credit = $item['campaign'] ? $sort[$item['campaign']['send_type']]['value'] : 0;
                 if ($credit > $max) {
                     $max = $credit;
                 }
@@ -113,7 +113,7 @@ class CampaignScenarioService extends AbstractService
         $campaignRootScenario = $this->getCampaignScenarioRootByScenarioUuid($scenarioUuid);
         $listPriceByType = (new ConfigService())->getListPriceByType();
         $listCreditByLevelScenario = $this->getListCreditByLevelScenario($scenarioUuid, $listPriceByType);
-        $numberContact = (new ContactService())->getListsContactsSendSmsByCampaigns($campaignRootScenario->campaign_uuid);
+        $numberContact = (new ContactService())->getListsContactsSendEmailsByCampaigns($campaignRootScenario->campaign_uuid);
         $creditNumberSendEmail = 0;
         foreach ($listCreditByLevelScenario as $item){
             $creditNumberSendEmail = $creditNumberSendEmail + $numberContact * $item;
