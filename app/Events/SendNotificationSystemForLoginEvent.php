@@ -15,18 +15,19 @@ class SendNotificationSystemForLoginEvent
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $user;
-
     public $ip;
+    public $userAgent;
 
     /**
      * @param $user
-     * @param $type
      * @param $ip
+     * @param $userAgent
      */
-    public function __construct($user, $ip)
+    public function __construct($user, $ip, $userAgent)
     {
         $this->user = $user;
         $this->ip = $ip;
+        $this->userAgent = $userAgent;
     }
 
     /**

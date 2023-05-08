@@ -1025,6 +1025,9 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'user-tracking.'], function 
         Route::put('/user-tracking/{id}', [UserTrackingController::class, 'edit'])->name('edit');
         Route::delete('/user-tracking/{id}', [UserTrackingController::class, 'destroy'])->name('destroy');
     });
+    Route::group(['as' => 'my.'], function () {
+        Route::get('my/user-trackings', [UserTrackingController::class, 'indexMy'])->name('indexMy');
+    });
 });
 
 //Article Category

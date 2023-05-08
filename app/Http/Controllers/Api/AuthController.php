@@ -412,7 +412,7 @@ class AuthController extends AbstractRestAPIController
         $userData['data']['token_type'] = 'Bearer';
 
         //Kiểm tra country và gửi email khi khác country
-        SendNotificationSystemForLoginEvent::dispatch($user, \request()->ip());
+        SendNotificationSystemForLoginEvent::dispatch($user, \request()->ip(), \request()->userAgent());
         Cache::forget('platform_permission' . $user->uuid);
         Cache::forget('add_on_permission' . $user->uuid);
         return \response()->json(array_merge([

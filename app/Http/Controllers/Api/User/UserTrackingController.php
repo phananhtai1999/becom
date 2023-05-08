@@ -12,18 +12,21 @@ use App\Http\Requests\IndexRequest;
 use App\Http\Requests\UpdateUserTrackingRequest;
 use App\Http\Resources\UserTrackingResource;
 use App\Http\Resources\UserTrackingResourceCollection;
+use App\Services\MyUserTrackingService;
 use App\Services\UserTrackingService;
-use Illuminate\Http\Request;
 
 class UserTrackingController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestShowTrait, RestEditTrait, RestDestroyTrait;
+    use RestIndexTrait, RestShowTrait, RestEditTrait, RestDestroyTrait, RestIndexMyTrait;
+
+    protected $myService;
 
     /**
      * @param UserTrackingService $service
      */
     public function __construct(
-        UserTrackingService  $service
+        UserTrackingService  $service,
+        MyUserTrackingService $myService
     )
     {
         $this->service = $service;
@@ -31,5 +34,6 @@ class UserTrackingController extends AbstractRestAPIController
         $this->resourceClass = UserTrackingResource::class;
         $this->editRequest = UpdateUserTrackingRequest::class;
         $this->indexRequest = IndexRequest::class;
+        $this->myService = $myService;
     }
 }
