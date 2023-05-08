@@ -26,8 +26,7 @@ class UpdateUserTrackingRequest extends AbstractRequest
     {
         return [
             'ip' => ['string'],
-            'last_login_location' => ['string'],
-            'register_location' => ['string'],
+            'location' => ['string'],
             'user_uuid' => ['numeric', 'exists:users,uuid'],
             'postal_code' => ['string'],
         ];

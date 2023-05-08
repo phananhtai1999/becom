@@ -45,22 +45,21 @@ class SendNotificationSystemForLoginListener implements ShouldQueue
     {
         $user = $event->user;
         $ip = $event->ip;
+        $userAgent = $event->userAgent;
         $type = "account";
 
 //        $ip = geoip()->getClientIP();
 //        // 92.38.148.61, 171.248.187.0
         try {
             $geoIp = geoip()->getLocation($ip);
-
             $country = $geoIp->country;
 
-            $userTracking = $this->service->findOneWhere([
+            $userTracking = $this->service->findAllWhere([
                 'user_uuid' => $user->uuid,
             ]);
-
-            if ($userTracking) {
-                if (($userTracking->last_login_location && $userTracking->last_login_location != $country) ||
-                    (!$userTracking->last_login_location && $userTracking->register_location != $country) ){
+            if (!$userTracking->isEmpty()) {
+                $lastUserTracking = $userTracking->last();
+                if ($lastUserTracking->location != $country){
                     $this->smtpAccountService->sendEmailNotificationSystem($user, new SendNotificationSystem($user, $type, $country));
                     $this->notificationService->create([
                         'type' => $type,
@@ -69,19 +68,15 @@ class SendNotificationSystemForLoginListener implements ShouldQueue
                         'user_uuid' => $user->uuid,
                     ]);
                 }
-                $this->service->update($userTracking, [
-                    'ip' => $ip,
-                    'last_login_location' => $country,
-                    'postal_code' => $geoIp->postal_code
-                ]);
-            }else{
-                $this->service->create([
-                    'ip' => $ip,
-                    'user_uuid' => $user->uuid,
-                    'register_location' => $country,
-                    'postal_code' => $geoIp->postal_code
-                ]);
             }
+            $this->service->create([
+                'ip' => $ip,
+                'user_uuid' => $user->uuid,
+                'location' => $country,
+                'postal_code' => $geoIp->postal_code,
+                'user_agent' => $userAgent
+            ]);
+
         } catch (\Exception $e) {
             Log::error($e->getMessage());
         }

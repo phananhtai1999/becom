@@ -11,14 +11,14 @@ use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\Concerns\SortsQuery;
 use Spatie\QueryBuilder\QueryBuilder;
 
-class UserTrackingQueryBuilder extends AbstractQueryBuilder
+class MyUserTrackingQueryBuilder extends AbstractQueryBuilder
 {
     /**
      * @return string
      */
     public static function baseQuery()
     {
-        return UserTracking::class;
+        return UserTracking::where('user_uuid', auth()->user()->getKey());
     }
 
     /**

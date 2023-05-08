@@ -328,8 +328,8 @@ class User extends Authenticatable
         return $this->belongsToMany(ContactList::class, 'user_team_contact_lists', 'user_uuid', 'contact_list_uuid')->withTimestamps('created_at');
     }
 
-    public function userTracking()
+    public function userTrackings()
     {
-        return $this->hasOne(UserTracking::class, 'user_uuid', 'uuid');
+        return $this->hasMany(UserTracking::class, 'user_uuid', 'uuid');
     }
 }

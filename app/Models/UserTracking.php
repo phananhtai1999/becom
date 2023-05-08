@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Abstracts\AbstractModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Jenssegers\Agent\Agent;
 
 class UserTracking extends AbstractModel
 {
@@ -16,10 +17,10 @@ class UserTracking extends AbstractModel
 
     protected $fillable = [
         'ip',
-        'last_login_location',
-        'register_location',
+        'location',
         'user_uuid',
         'postal_code',
+        'user_agent'
     ];
 
     protected $casts = [
@@ -28,6 +29,52 @@ class UserTracking extends AbstractModel
         'deleted_at' => 'datetime',
         'user_uuid' => 'integer'
     ];
+
+    protected $appends = [
+        'device',
+        'browser',
+        'platform',
+        'is_mobile',
+        'is_tablet',
+        'is_desktop',
+    ];
+
+    public function setUserAgent()
+    {
+        $agent = new Agent();
+        $agent->setUserAgent($this->user_agent);
+        return $agent;
+    }
+
+    public function getDeviceAttribute()
+    {
+        return $this->setUserAgent()->device();
+    }
+
+    public function getBrowserAttribute()
+    {
+        return $this->setUserAgent()->browser();
+    }
+
+    public function getPlatformAttribute()
+    {
+        return $this->setUserAgent()->platform();
+    }
+
+    public function getIsMobileAttribute()
+    {
+        return $this->setUserAgent()->isMobile();
+    }
+
+    public function getIsDesktopAttribute()
+    {
+        return $this->setUserAgent()->isDesktop();
+    }
+
+    public function getIsTabletAttribute()
+    {
+        return $this->setUserAgent()->isTablet();
+    }
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
