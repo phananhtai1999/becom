@@ -735,24 +735,6 @@ class MyContactService extends AbstractService
     }
 
     /**
-     * @param $results
-     * @param $perPage
-     * @param $page
-     * @return LengthAwarePaginator
-     */
-    public function collectionPagination($results, $perPage, $page = null)
-    {
-        $page = $page ?: (LengthAwarePaginator::resolveCurrentPage() ?: 1);
-
-        $results = $results instanceof Collection ? $results : Collection::make($results);
-
-        return new LengthAwarePaginator($results->forPage($page, $perPage)->values(), $results->count(), $perPage, $page, [
-            'path' => LengthAwarePaginator::resolveCurrentPath(),
-            'pageName' => 'page',
-        ]);
-    }
-
-    /**
      * @param $contacts
      * @return mixed
      */
