@@ -31,14 +31,13 @@ class ContactService extends AbstractService
      */
     public function getContactsSendEmail($campaignUuid)
     {
-        $contactsCampaign = $this->model->select('contacts.*')
+        return $this->model->select('contacts.*')
             ->join('contact_contact_list', 'contact_contact_list.contact_uuid', '=', 'contacts.uuid')
             ->join('contact_lists', 'contact_lists.uuid', '=', 'contact_contact_list.contact_list_uuid')
             ->join('campaign_contact_list', 'campaign_contact_list.contact_list_uuid', '=', 'contact_lists.uuid')
             ->join('campaigns', 'campaigns.uuid', '=', 'campaign_contact_list.campaign_uuid')
             ->where('campaigns.uuid', $campaignUuid)->get()->unique('email');
 
-        return $contactsCampaign;
     }
 
     /**
@@ -47,14 +46,12 @@ class ContactService extends AbstractService
      */
     public function getContactsSendSms($campaignUuid)
     {
-        $contactsCampaign = $this->model->select('contacts.*')
+        return $this->model->select('contacts.*')
             ->join('contact_contact_list', 'contact_contact_list.contact_uuid', '=', 'contacts.uuid')
             ->join('contact_lists', 'contact_lists.uuid', '=', 'contact_contact_list.contact_list_uuid')
             ->join('campaign_contact_list', 'campaign_contact_list.contact_list_uuid', '=', 'contact_lists.uuid')
             ->join('campaigns', 'campaigns.uuid', '=', 'campaign_contact_list.campaign_uuid')
             ->where('campaigns.uuid', $campaignUuid)->get()->unique('phone');
-
-        return $contactsCampaign;
     }
 
     /**
@@ -148,26 +145,6 @@ class ContactService extends AbstractService
                 ['campaigns.uuid', $campaignUuid],
                 ['contacts.phone', $email]
             ])->get()->unique('phone');
-    }
-
-    /**
-     * @param $contact
-     * @param $contactListUuid
-     * @return mixed
-     */
-    public function checkAndInsertContactIntoContactList($contact, $contactListUuid)
-    {
-        $model = $this->model->select('contacts.*')
-            ->join('contact_contact_list', 'contact_contact_list.contact_uuid', '=', 'contacts.uuid')
-            ->where('contact_contact_list.contact_list_uuid', $contactListUuid)
-            ->where('contacts.email', $contact->email)
-            ->first();
-
-        if (empty($model)) {
-            $contact->contactLists()->attach($contactListUuid);
-            return $contact;
-        }
-        return $model;
     }
 
     /**
@@ -920,24 +897,6 @@ class ContactService extends AbstractService
         }
 
         return $this->search($search, $searchBy);
-    }
-
-    /**
-     * @param $results
-     * @param $perPage
-     * @param $page
-     * @return LengthAwarePaginator
-     */
-    public function collectionPagination($results, $perPage, $page = null)
-    {
-        $page = $page ?: (LengthAwarePaginator::resolveCurrentPage() ?: 1);
-
-        $results = $results instanceof Collection ? $results : Collection::make($results);
-
-        return new LengthAwarePaginator($results->forPage($page, $perPage)->values(), $results->count(), $perPage, $page, [
-            'path' => LengthAwarePaginator::resolveCurrentPath(),
-            'pageName' => 'page',
-        ]);
     }
 
     /**

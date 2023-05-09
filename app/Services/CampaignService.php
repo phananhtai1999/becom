@@ -111,35 +111,6 @@ class CampaignService extends AbstractService
     }
 
     /**
-     * @param $campaignUuid
-     * @return mixed
-     */
-    public function findCampaignByCreditHistory($campaignUuid)
-    {
-        return $this->findOneById($campaignUuid);
-    }
-
-    /**
-     * @param $model
-     * @return array|void
-     */
-    public function findContactListKeyByCampaign($model)
-    {
-        $contactLists = $model->contactLists()->get();
-
-        if (empty($contactLists)) {
-
-            return [];
-        } else {
-            foreach ($contactLists as $contactList) {
-                $contactListUuid[] = $contactList->uuid;
-
-                return $contactListUuid;
-            }
-        }
-    }
-
-    /**
      * @param $startDate
      * @param $endDate
      * @param $groupBy
@@ -290,33 +261,6 @@ class CampaignService extends AbstractService
     }
 
     /**
-     * @param $campaign
-     * @param $mailSendingHistory
-     * @return bool
-     */
-    public function checkScenarioCampaign($campaign, $mailSendingHistory)
-    {
-        if (!empty($campaign->open_mail_campaign)) {
-            if (empty($campaign->not_open_mail_campaign)) {
-                return true;
-            } else {
-                $result = $this->model->select('campaigns.*')
-                    ->join('mail_sending_history', 'campaigns.uuid', '=', 'mail_sending_history.campaign_uuid')
-                    ->where('mail_sending_history.uuid', $mailSendingHistory->uuid)
-                    ->whereRaw('date(mail_sending_history.updated_at) - date(mail_sending_history.created_at) <= campaigns.open_within')
-                    ->first();
-                if (empty($result)) {
-                    return false;
-                }
-
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * @param $campaignUuid
      * @return mixed
      */
@@ -366,24 +310,6 @@ class CampaignService extends AbstractService
     public function getInfoRelationshipCampaignByUuid($campaignUuid)
     {
         return $this->model->with(['user', 'mailTemplate', 'sendProject', 'smtpAccount'])->find($campaignUuid);
-    }
-
-    /**
-     * @param $results
-     * @param $perPage
-     * @param $page
-     * @return LengthAwarePaginator
-     */
-    public function collectionPagination($results, $perPage, $page = null)
-    {
-        $page = $page ?: (LengthAwarePaginator::resolveCurrentPage() ?: 1);
-
-        $results = $results instanceof Collection ? $results : Collection::make($results);
-
-        return new LengthAwarePaginator($results->forPage($page, $perPage)->values(), $results->count(), $perPage, $page, [
-            'path' => LengthAwarePaginator::resolveCurrentPath(),
-            'pageName' => 'page',
-        ]);
     }
 
     /**

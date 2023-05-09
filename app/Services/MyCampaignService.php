@@ -108,26 +108,6 @@ class MyCampaignService extends AbstractService
     }
 
     /**
-     * @param $model
-     * @return array
-     */
-    public function findContactListKeyByMyCampaign($model)
-    {
-        $contactLists = $model->contactLists()->get();
-
-        if (empty($contactLists)) {
-
-            return [];
-        } else {
-            foreach ($contactLists as $contactList) {
-                $contactListUuid[] = $contactList->uuid;
-
-                return $contactListUuid;
-            }
-        }
-    }
-
-    /**
      * @param $startDate
      * @param $endDate
      * @param $groupBy
@@ -293,26 +273,7 @@ class MyCampaignService extends AbstractService
             }
         }
 
-
         return $this->collectionPagination($sortTotalCredit, $perPage);
-    }
-
-    /**
-     * @param $results
-     * @param $perPage
-     * @param $page
-     * @return LengthAwarePaginator
-     */
-    public function collectionPagination($results, $perPage, $page = null)
-    {
-        $page = $page ?: (LengthAwarePaginator::resolveCurrentPage() ?: 1);
-
-        $results = $results instanceof Collection ? $results : Collection::make($results);
-
-        return new LengthAwarePaginator($results->forPage($page, $perPage)->values(), $results->count(), $perPage, $page, [
-            'path' => LengthAwarePaginator::resolveCurrentPath(),
-            'pageName' => 'page',
-        ]);
     }
 
     public function myCampaigns($request, $contactLists = [])
