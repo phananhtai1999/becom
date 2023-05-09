@@ -54,6 +54,8 @@ class MailSendingHistoryQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__campaign_uuid', 'campaign_uuid'),
                 'campaign_scenario_uuid',
                 AllowedFilter::exact('exact__campaign_scenario_uuid', 'campaign_scenario_uuid'),
+                'campaignScenario.scenario.name',
+                AllowedFilter::exact('exact__campaignScenario.scenario.name', 'campaignScenario.scenario.name'),
                 'email',
                 AllowedFilter::exact('exact__email', 'email'),
                 'time',
