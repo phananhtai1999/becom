@@ -31,6 +31,7 @@ class CreditHistoryQueryBuilder extends AbstractQueryBuilder
                 $modelKeyName,
                 'user_uuid',
                 'campaign_uuid',
+                'scenario_uuid',
                 'credit',
                 'type'
             ])
@@ -39,6 +40,7 @@ class CreditHistoryQueryBuilder extends AbstractQueryBuilder
                 $modelKeyName,
                 'user_uuid',
                 'campaign_uuid',
+                'scenario_uuid',
                 'credit',
                 'type'
             ])
@@ -49,6 +51,10 @@ class CreditHistoryQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
                 'campaign_uuid',
                 AllowedFilter::exact('exact__campaign_uuid', 'campaign_uuid'),
+                'scenario_uuid',
+                AllowedFilter::exact('exact__scenario_uuid', 'scenario_uuid'),
+                'scenario.name',
+                AllowedFilter::exact('exact__scenario.name', 'scenario.name'),
                 'credit',
                 AllowedFilter::exact('exact__credit', 'credit'),
                 'type',
