@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-
-
     <title>Send Email Invoice</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <style type="text/css">
+
         body {
             margin-top: 20px;
             color: #484b51;
@@ -29,29 +29,6 @@
             align-items: center;
         }
 
-        .page-title {
-            padding: 0;
-            margin: 0;
-            font-size: 1.75rem;
-            font-weight: 300;
-        }
-
-        .brc-default-l1 {
-            border-color: #dce9f0 !important;
-        }
-
-        .ml-n1, .mx-n1 {
-            margin-left: -.25rem !important;
-        }
-
-        .mr-n1, .mx-n1 {
-            margin-right: -.25rem !important;
-        }
-
-        .mb-4, .my-4 {
-            margin-bottom: 1.5rem !important;
-        }
-
         hr {
             margin-top: 1rem;
             margin-bottom: 1rem;
@@ -59,40 +36,14 @@
             border-top: 1px solid rgba(0, 0, 0, .1);
         }
 
-        .text-grey-m2 {
-            color: #888a8d !important;
-        }
-
-        .text-success-m2 {
-            color: #86bd68 !important;
-        }
-
-        .font-bolder, .text-600 {
-            font-weight: 600 !important;
-        }
 
         .text-110 {
             font-size: 110% !important;
         }
 
-        .text-blue {
-            color: #0000ee;
-        }
-
-        .pb-25, .py-25 {
-            padding-bottom: .75rem !important;
-        }
-
-        .pt-25, .py-25 {
-            padding-top: .75rem !important;
-        }
-
         .bgc-default-tp1 {
-            background-color: #0000ee;
-        }
-
-        .bgc-default-l4, .bgc-h-default-l4:hover {
-            background-color: #f3f8fa !important;
+            background-color: #888a8d;
+            text-transform: uppercase;
         }
 
         .page-header .page-tools {
@@ -100,30 +51,9 @@
             align-self: flex-end;
         }
 
-        .btn-light {
-            color: #757984;
-            background-color: #f5f6f9;
-            border-color: #dddfe4;
-        }
-
-        .w-2 {
-            width: 1rem;
-        }
-
         .text-120 {
             font-size: 120% !important;
-        }
-
-        .text-primary-m1 {
-            color: #4087d4 !important;
-        }
-
-        .text-danger-m1 {
-            color: #dd4949 !important;
-        }
-
-        .text-blue-m2 {
-            color: #68a3d5 !important;
+            font-weight: bold;
         }
 
         .text-200 {
@@ -135,18 +65,6 @@
             text-align: center;
         }
 
-        .text-60 {
-            font-size: 60% !important;
-        }
-
-        .text-grey-m1 {
-            color: #7b7d81 !important;
-        }
-
-        .align-bottom {
-            vertical-align: bottom !important;
-        }
-
         .text-white {
             color: #fff !important;
         }
@@ -155,118 +73,120 @@
             color: #6c757d !important;
         }
 
-        .info, th, td {
+        .header-table {
+            border-collapse: collapse;
+            text-align: center;
+            width: 100%;
+            padding-bottom: 70px;
+        }
+        .header-table td, .header-table th {
+
+        }
+        .info {
             border-collapse: collapse;
             width: 100%;
         }
 
         .info td, .info th {
-            padding: 15px;
-        }
-
-        .info td div {
-            padding-bottom: 5px;
+            vertical-align: top;
         }
 
         .product-data {
             border-collapse: collapse;
             width: 100%;
+            border: 1px solid #000000;
         }
 
         .product-data td, .product-data th {
             padding: 8px;
-        }
-
-        .badge-success {
-            color: #fff;
-            background-color: #28a745;
-        }
-
-        .badge-pill {
-            padding: 0.2em 0.8em;
-            border-radius: 10rem;
-        }
-
-        .my-2 {
-            text-align: start;
+            border: 1px solid #000000;
         }
 
         .text-right {
             text-align: right !important;
         }
 
+        .text-left {
+            text-align: left !important;
+        }
+
         .vertical-align-top {
             vertical-align: top;
+        }
+        .text-95 {
+            font-size: 95%;
         }
     </style>
 </head>
 <body>
 <div class="page-content container">
     <div class="page-header">
-        <div class="intro">
-            <h3>Hi <strong>{{ $billingAddress->name }}</strong>,</h3>
-            This is the receipt for a payment of <strong> ${{ $invoice->product_data['price'] }} </strong> (USD) for
-            your
-            works
-        </div>
-        <hr/>
-        <div class="text-center">
-            <div class="text-200">
-                <span class="text-default-d3 text-blue">Invoice</span>
-            </div>
-            <div>
-                <span>Invoice ID: #{{ $invoice->uuid }}</span>
-            </div>
-        </div>
-        <hr class="row brc-default-l1 mx-n1"/>
+{{--        <div class="intro">--}}
+{{--            <h3>Hi <strong>{{ $billingAddress->name }}</strong>,</h3>--}}
+{{--            This is the receipt for a payment of <strong> ${{ $invoice->product_data['price'] }} </strong> (USD) for--}}
+{{--            your--}}
+{{--            works--}}
+{{--        </div>--}}
+{{--        <hr/>--}}
+        <table class="header-table">
+            <tr>
+                <td style="width: 30%;"><img width="50%" src="{{ $configLogo->value }}"> <br> www.send.techupzone.com</td>
+                <td style="width: 50%;">
+                    <div class="text-center">
+                        <div class="text-200">
+                            <span class="text-default-d3">Invoice</span>
+                        </div>
+                        <div>
+                            <span>Invoice ID: #{{ $invoice->uuid }}</span>
+                        </div>
+                    </div>
+                </td>
+                <td class="text-left">
+                    <b> Send GPT </b><br>
+                    Company address <br>
+                    contact@website.com
+                </td>
+            </tr>
+        </table>
         <table class="info">
+            <tr class="text-95 text-secondary text-left">
+                <td style="width: 10%">To</td>
+                <td style="width: 40%;">: {{ $billingAddress->name }}</td>
+                <td style="width: 20%"><span class="text-600 text-110 ">Payment Method</span></td>
+                <td><span class="text-600 text-110 ">: {{ ucfirst($paymentMethod->name) }}</span></td>
+            </tr>
             <tr class="text-95 text-secondary">
+                <td><span class=""></span>Phone</td>
+                <td>: {{ $billingAddress->phone }}</td>
+                <td><span class="text-600 text-110">Date</span></td>
+                <td><span class="text-600 text-110">: {{ date('Y-M-D H:m:s', $billingAddress->created_date) }}</span></td>
+            </tr>
+            <tr class="text-95 text-secondary">
+                <td><span class=""></span>Email</td>
+                <td>: {{ $billingAddress->email }}</td>
+                <td><span class="text-600 text-110">Status</span></td>
+                <td><span class="text-600 text-110">: Complete</span></td>
+            </tr>
+            <tr class="text-95 text-secondary">
+                <td><span class=""></span>Address</td>
                 <td>
-
-                    <div class="text-grey-m2">
-                        <div>
-                            <span class="text-grey-m2 align-middle">To:</span>
-                            <span class="text-600 text-110 align-middle">{{ $billingAddress->name }}</span>
-                        </div>
-                        <div>
-                            {{ $billingAddress->address }}, {{ $billingAddress->city }}
-                        </div>
-                        <div>
-                            {{ $billingAddress->state }}, {{ $billingAddress->country }}
-                        </div>
-                        <div>
-                            <span class="text-grey-m2 align-middle">Phone:</span>
-                            <span class="text-grey-m2 align-middle">{{ $billingAddress->phone }}</span>
-
-                        </div>
-                    </div>
+                    : {{ $billingAddress->address }}, {{ $billingAddress->city }} <br>
+                    {{ $billingAddress->state }}, {{ $billingAddress->country }}
                 </td>
-                <td class="vertical-align-top text-grey-m2 my-2" style="text-align: inherit ">
-                    <div>
-                        <div>
-                            <span>Payment Method:</span> {{ ucfirst($paymentMethod->name) }}
-                        </div>
-                        <div>
-                            <span>Invoice Date:</span> {{ date('Y-M-D H:m:s', $billingAddress->created_date) }}
-                        </div>
-                        <div>
-                            <span>Status:</span>
-                            <span class="badge badge-success badge-pill">Complete</span>
-                        </div>
-                    </div>
-                </td>
+                <td><span class="text-600 text-110 align-middle">Final Cost</span></td>
+                <td>: ${{ $invoice->product_data['price'] }}</td>
             </tr>
         </table>
         <div class="mt-4">
             <div>
                 <table class="product-data">
-                    <tr class="text-white bgc-default-tp1 text-600 py-25">
+                    <tr class="text-white bgc-default-tp1">
                         <th>Type</th>
                         <th>Name</th>
                         <th>Qty</th>
                         <th>Duration</th>
                         <th>Unit Price</th>
-                        <th>Amount</th>
+                        <th>Subtotal</th>
                     </tr>
                     <tr style="text-align: center">
                         <td>{{ $invoice->product_data['type'] }}</td>
@@ -277,16 +197,13 @@
                         <td>${{ $invoice->product_data['price'] }}</td>
                     </tr>
                     <tr class="text-95 text-secondary vertical-align-top ">
-                        <td colspan="5">
+                        <td colspan="5" class="text-right text-120">
                             <div>
-                                Extra note such as company or payment information...
+                                <b> Total Amount </b>
                             </div>
                         </td>
-                        <td class="text-right">
-                            <div>
-                                Total Amount
-                            </div>
-                            <div>
+                        <td class="text-center">
+                            <div >
                                 <span class="text-120 text-secondary-d1">${{ $invoice->product_data['price'] }}</span>
                             </div>
                         </td>

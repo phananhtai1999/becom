@@ -13,6 +13,7 @@ use App\Services\AddOnSubscriptionPlanService;
 use App\Services\CreditPackageService;
 use App\Services\InvoiceService;
 use App\Services\PaymentService;
+use App\Services\PaypalService;
 use App\Services\SubscriptionPlanService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -27,12 +28,14 @@ use Throwable;
 class PaypalController extends AbstractRestAPIController
 {
     public function __construct(
+        PaypalService $service,
         PaymentService $paymentService,
         AddOnSubscriptionPlanService $addOnSubscriptionPlanService,
         SubscriptionPlanService $subscriptionPlanService,
         CreditPackageService $creditPackageService,
         InvoiceService $invoiceService
     ) {
+        $this->service = $service;
         $this->paymentService = $paymentService;
         $this->addOnSubscriptionPlanService = $addOnSubscriptionPlanService;
         $this->subscriptionPlanService = $subscriptionPlanService;
@@ -56,9 +59,7 @@ class PaypalController extends AbstractRestAPIController
      */
     public function successPayment(Request $request)
     {
-        $provider = new PayPalClient();
-        $provider->setApiCredentials(config('paypal'));
-        $provider->getAccessToken();
+        $provider = $this->service->accessServer();
         $response = $provider->capturePaymentOrder($request['token']);
         $paymentData = [
             "token" => $request['token'],
@@ -85,10 +86,7 @@ class PaypalController extends AbstractRestAPIController
 
     public function successPaymentSubscription(Request $request)
     {
-        $provider = new PayPalClient();
-        $provider->setApiCredentials(config('paypal'));
-        $provider->getAccessToken();
-
+        $provider = $this->service->accessServer();
         $provider->updateSubscription($request['subscription_id'], ["start_time" => Carbon::now()->addMinute(1)]);
 
         $response = $provider->showSubscriptionDetails($request['subscription_id']);
@@ -119,10 +117,7 @@ class PaypalController extends AbstractRestAPIController
 
     public function successPaymentSubscriptionAddOn(Request $request)
     {
-        $provider = new PayPalClient();
-        $provider->setApiCredentials(config('paypal'));
-        $provider->getAccessToken();
-
+        $provider = $this->service->accessServer();
         $provider->updateSubscription($request['subscription_id'], ["start_time" => Carbon::now()->addMinute(1)]);
 
         $response = $provider->showSubscriptionDetails($request['subscription_id']);

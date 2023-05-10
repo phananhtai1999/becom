@@ -222,10 +222,7 @@ class PaymentController extends AbstractRestAPIController
 
     public function renewByPaypal()
     {
-        $provider = new PayPalClient();
-        $provider->setApiCredentials(config('payment.paypal'));
-        $provider->getAccessToken();
-
+        $provider = $this->paypalService->accessServer();
         $payload = @file_get_contents('php://input');
         $event = \json_decode($payload, true);
 

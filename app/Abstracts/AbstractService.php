@@ -2,11 +2,13 @@
 
 namespace App\Abstracts;
 
+use App\Models\Config;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Cache;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -175,5 +177,22 @@ abstract class AbstractService
             'search' => $request->get('search', ''),
             'search_by' => $request->get('search_by', ''),
         ];
+    }
+
+    public function getConfigInCache() {
+        return Cache::rememberForever('config', function () {
+            return Config::all();
+        });
+    }
+
+    public function getConfigByKeyInCache($key) {
+        $configs = Cache::rememberForever('config', function () {
+            return Config::all();
+        });
+        foreach ($configs as $config) {
+            if ($config->key == $key) {
+                return $config;
+            }
+        }
     }
 }
