@@ -208,15 +208,12 @@ class PartnerController extends AbstractRestAPIController
         $referrals = $this->partnerUserService->referralsOfPartnerInMonth($partner->code)->count();
         $clicks = $this->partnerTrackingService->trackingClicksOfPartnerInMonth($partner->uuid)->count();
         $customers = $this->partnerUserService->numberCustomerPartnerByMonthCurrent($partner->code)->count();
-        $totalCommissions = $this->partnerTrackingByYearService->getTotalCommissionsByPartner($partner->uuid);
-        $totalAmountWithdrawn = $this->partnerPayoutService->getTotalAmountUsedOfPartner($partner->uuid);
-        $unpaid_earnings = $totalCommissions - $totalAmountWithdrawn;
 
         return $this->sendOkJsonResponse(["data" => [
             "referrals" => $referrals,
             "clicks" => $clicks,
             "customers" => $customers,
-            "unpaid_earnings" => $unpaid_earnings
+            "unpaid_earnings" => $partner->unpaid_earnings
         ]]);
     }
 

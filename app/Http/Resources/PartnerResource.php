@@ -30,6 +30,7 @@ class PartnerResource extends AbstractJsonResource
             'clicks' => $this->clicks,
             'sign_up' => $this->sign_up,
             'customers' => $this->customers,
+            'unpaid_earnings' => $this->unpaid_earnings,
             'code' => $this->code,
             'publish_status' => $this->publish_status,
             'answer' => $this->answer,
