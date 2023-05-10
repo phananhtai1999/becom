@@ -48,4 +48,11 @@ class PartnerTrackingByYearService extends AbstractService
     {
         return $this->model->where('partner_uuid', $partnerUuid)->selectRaw('SUM(total_commission) as total_commissions')->first()->total_commissions;
     }
+
+    public function getUnpaidEarningByPartner($partnerUuid)
+    {
+        $totalCommissions = $this->getTotalCommissionsByPartner($partnerUuid);
+        $totalAmountWithdrawn = (new PartnerPayoutService())->getTotalAmountUsedOfPartner($partnerUuid);
+        return $totalCommissions - $totalAmountWithdrawn;
+    }
 }

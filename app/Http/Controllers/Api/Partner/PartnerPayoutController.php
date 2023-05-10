@@ -60,11 +60,10 @@ class PartnerPayoutController extends AbstractRestAPIController
 
     public function withdrawal(MyPartnerPayoutRequest $request)
     {
-        $partner = $this->partnerService->findOneWhereOrFail(['user_uuid' => auth()->user()->getKey()]);
         $amountWantWithdrawn = $request->get('amount');
-        $totalCommissions = $this->partnerTrackingByYearService->getTotalCommissionsByPartner($partner->uuid);
-        $totalAmountWithdrawn = $this->service->getTotalAmountUsedOfPartner($partner->uuid);
-        $amountCanWithdrawn = $totalCommissions - $totalAmountWithdrawn;
+        $partner = $this->partnerService->findOneWhereOrFail(['user_uuid' => auth()->user()->getKey()]);
+        $amountCanWithdrawn = $partner->unpaid_earnings;
+
         if ($amountWantWithdrawn > $amountCanWithdrawn) {
             return $this->sendValidationFailedJsonResponse(['errors' => 'Your balance is not enough']);
         }

@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Abstracts\AbstractModel;
 use App\Http\Controllers\Traits\ModelFilterLanguageTrait;
 use App\Services\PartnerLevelService;
+use App\Services\PartnerTrackingByYearService;
 use App\Services\PartnerTrackingService;
 use App\Services\PartnerUserService;
 use App\Services\UserPaymentByDayService;
@@ -99,6 +100,15 @@ class Partner extends AbstractModel
         if ($this->code) {
             $totalCustomer = (new UserPaymentByDayService())->createQueryGetCustomersPartnerByDate(null, null, $this->code);
             return $totalCustomer->isEmpty() ? 0 : $totalCustomer->unique('user_uuid')->count();
+        }
+
+        return 0;
+    }
+
+    public function getUnpaidEarningsAttribute()
+    {
+        if ($this->code) {
+            return (new PartnerTrackingByYearService())->getUnpaidEarningByPartner($this->uuid);
         }
 
         return 0;
