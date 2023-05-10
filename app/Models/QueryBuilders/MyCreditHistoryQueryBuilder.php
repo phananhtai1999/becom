@@ -32,6 +32,7 @@ class MyCreditHistoryQueryBuilder extends AbstractQueryBuilder
                 'user_uuid',
                 'credit',
                 'campaign_uuid',
+                'scenario_uuid',
                 'type'
             ])
             ->defaultSort('-created_at')
@@ -40,6 +41,7 @@ class MyCreditHistoryQueryBuilder extends AbstractQueryBuilder
                 'user_uuid',
                 'credit',
                 'campaign_uuid',
+                'scenario_uuid',
                 'type'
             ])
             ->allowedFilters([
@@ -51,6 +53,10 @@ class MyCreditHistoryQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__credit', 'credit'),
                 'campaign_uuid',
                 AllowedFilter::exact('exact__campaign_uuid', 'campaign_uuid'),
+                'scenario_uuid',
+                AllowedFilter::exact('exact__scenario_uuid', 'scenario_uuid'),
+                'scenario.name',
+                AllowedFilter::exact('exact__scenario.name', 'scenario.name'),
                 'type',
                 AllowedFilter::exact('exact__type', 'type'),
                 'campaign.send_type',

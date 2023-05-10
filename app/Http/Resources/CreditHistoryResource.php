@@ -19,6 +19,7 @@ class CreditHistoryResource extends AbstractJsonResource
             'uuid' => $this->getKey(),
             'user_uuid' => $this->user_uuid,
             'campaign_uuid' => $this->campaign_uuid,
+            'scenario_uuid' => $this->scenario_uuid,
             'credit' => $this->credit,
             'type' => $this->type,
             'deleted_at' => $this->deleted_at,
@@ -33,6 +34,10 @@ class CreditHistoryResource extends AbstractJsonResource
 
         if (\in_array('credit_history__campaign', $expand)) {
             $data['campaign'] = new CampaignResource($this->campaign);
+        }
+
+        if (\in_array('credit_history__scenario', $expand)) {
+            $data['scenario'] = new ScenarioResource($this->scenario);
         }
 
         return $data;

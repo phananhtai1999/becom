@@ -47,11 +47,13 @@ class CreditTransactionHistoryController extends AbstractRestAPIController
             'user_uuid',
             'credit',
             'campaign_uuid',
+            'scenario_uuid',
             'add_by_uuid',
             '-uuid',
             '-user_uuid',
             '-credit',
             '-campaign_uuid',
+            '-scenario_uuid',
             '-add_by_uuid',
         ];
         $directionDesc = [
@@ -59,6 +61,7 @@ class CreditTransactionHistoryController extends AbstractRestAPIController
             '-user_uuid',
             '-credit',
             '-campaign_uuid',
+            '-scenario_uuid',
             '-add_by_uuid',
             '-created_at'
         ];
@@ -110,11 +113,13 @@ class CreditTransactionHistoryController extends AbstractRestAPIController
             'user_uuid',
             'credit',
             'campaign_uuid',
+            'scenario_uuid',
             'add_by_uuid',
             '-uuid',
             '-user_uuid',
             '-credit',
             '-campaign_uuid',
+            '-scenario_uuid',
             '-add_by_uuid',
         ];
         $directionDesc = [
@@ -122,6 +127,7 @@ class CreditTransactionHistoryController extends AbstractRestAPIController
             '-user_uuid',
             '-credit',
             '-campaign_uuid',
+            '-scenario_uuid',
             '-add_by_uuid',
             '-created_at'
         ];

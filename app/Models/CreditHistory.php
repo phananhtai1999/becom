@@ -26,6 +26,7 @@ class CreditHistory extends AbstractModel
     protected $fillable = [
         'user_uuid',
         'campaign_uuid',
+        'scenario_uuid',
         'credit',
         'type',
     ];
@@ -37,6 +38,9 @@ class CreditHistory extends AbstractModel
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
+        'user_uuid' => 'integer',
+        'scenario_uuid' => 'integer',
+        'campaign_uuid' => 'integer',
     ];
 
     /**
@@ -53,5 +57,10 @@ class CreditHistory extends AbstractModel
     public function campaign()
     {
         return $this->belongsTo(Campaign::class, 'campaign_uuid', 'uuid');
+    }
+
+    public function scenario()
+    {
+        return $this->belongsTo(Scenario::class, 'scenario_uuid', 'uuid');
     }
 }
