@@ -289,7 +289,7 @@ class TeamController extends Controller
         }
         $model->user->userTeamContactLists()->detach();
         $this->userTeamService->destroy($model->uuid);
-        Cache::forget('team_permission' . $model->user_uuid);
+        Cache::forget('team_permission_' . $model->user_uuid);
 
         return $this->sendOkJsonResponse();
     }

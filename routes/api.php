@@ -1191,4 +1191,6 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'partner-payout'], function 
     });
 
     Route::post('partner-payout/withdrawal', [PartnerPayoutController::class, 'withdrawal'])->name('withdrawal');
+    Route::post('/reddit/oauth', [\App\Http\Controllers\Api\RedditController::class, 'oauth'])->name('oauth');
+
 });

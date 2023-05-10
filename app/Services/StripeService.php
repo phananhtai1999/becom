@@ -20,7 +20,7 @@ class StripeService extends AbstractService
      */
     public function getStripeClient(): StripeClient
     {
-        return new StripeClient(config('payment.stripe.client_secret'));
+        return new StripeClient($this->getConfigByKeyInCache('stripe_secret_key')->value);
     }
 
     /**
