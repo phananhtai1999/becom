@@ -265,7 +265,7 @@ class ScenarioController extends AbstractRestAPIController
 
     public function showCampaignScenarioByUuid($scenarioUuid)
     {
-        $campaignsScenario = $this->campaignScenarioService->showCampaignScenarioByScenarioUuid($scenarioUuid);
+        $campaignsScenario = $this->campaignScenarioService->showCampaignScenarioByScenarioUuid($scenarioUuid)->toArray();
         $depth = $this->campaignScenarioService->getMaxDepthOfCampaignScenarioByScenarioUuid($scenarioUuid);
 
         /*

@@ -16,7 +16,7 @@ class CampaignScenarioService extends AbstractService
      */
     public function showCampaignScenarioByScenarioUuid($scenarioUuid)
     {
-        return $this->model->where(['scenario_uuid' => $scenarioUuid])->with('campaign')->get()->toArray();
+        return $this->model->where(['scenario_uuid' => $scenarioUuid])->with('campaign')->get();
     }
 
     /**
@@ -91,10 +91,9 @@ class CampaignScenarioService extends AbstractService
         return $this->model->where('scenario_uuid', $scenarioUuid)->whereNull('parent_uuid')->first();
     }
 
-    public function getListCreditByLevelScenario($scenarioUuid, $sort)
+    public function getListCreditByLevelScenario($campaignsScenario, $sort)
     {
-        $campaignsScenario = $this->showCampaignScenarioByScenarioUuid($scenarioUuid);
-        return collect($campaignsScenario)->groupBy(function ($item) {
+        return $campaignsScenario->groupBy(function ($item) {
             return $item['depth'] + 1;
         })->map(function ($items) use ($sort){
             $max = 0;
@@ -110,13 +109,14 @@ class CampaignScenarioService extends AbstractService
 
     public function calculateNumberCreditOfScenario($scenarioUuid)
     {
-        $campaignRootScenario = $this->getCampaignScenarioRootByScenarioUuid($scenarioUuid);
         $listPriceByType = (new ConfigService())->getListPriceByType();
-        $listCreditByLevelScenario = $this->getListCreditByLevelScenario($scenarioUuid, $listPriceByType);
+        $campaignsScenario = $this->showCampaignScenarioByScenarioUuid($scenarioUuid);
+        $campaignRootScenario = $campaignsScenario->where('parent_uuid', null)->first();
+        $listCreditByLevelScenario = $this->getListCreditByLevelScenario($campaignsScenario, $listPriceByType);
         $numberContact = (new ContactService())->getListsContactsSendEmailsByCampaigns($campaignRootScenario->campaign_uuid);
         $creditNumberSendEmail = 0;
         foreach ($listCreditByLevelScenario as $item){
-            $creditNumberSendEmail = $creditNumberSendEmail + $numberContact * $item;
+            $creditNumberSendEmail += ($numberContact * $item);
         }
         return $creditNumberSendEmail;
     }
