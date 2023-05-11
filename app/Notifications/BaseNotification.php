@@ -132,11 +132,11 @@ class BaseNotification
 
     /**
      * @param $contacts
-     * @param $scenario
+     * @param $campaignScenario
      * @param $creditTotal
      * @return void
      */
-    public function sending_by_conecttor($contacts, $scenario, $creditTotal)
+    public function sending_by_conecttor($contacts, $campaignScenario, $creditTotal)
     {
 
         $user = $this->campaign->user;
@@ -164,7 +164,7 @@ class BaseNotification
         ]);
         $build_body['receivers'] = collect([]);
         foreach ($contacts as $contact) {
-            $mailSendingHistory = $this->saveMailSendingHistory($contact, $scenario);
+            $mailSendingHistory = $this->saveMailSendingHistory($contact, $campaignScenario ? $campaignScenario->uuid : null);
             $footerTemplateAds = $this->footerTemplateService->getFooterTemplateAdsForSendCampaignByType($mailTemplate->type, $mailTemplate->user);
             $footerTemplateSubscribe = $this->footerTemplateService->getFooterTemplateSubscribeForSendCampaignByType($mailTemplate->type);
             $reviever = ['uuid' => $mailSendingHistory->uuid];
@@ -184,7 +184,9 @@ class BaseNotification
             ]);
             return false;
         }
-        if (!empty($creditTotal)) {
+        if ($creditTotal) {
+            DB::beginTransaction();
+
             try {
                 $this->userService->update($user, [
                     'credit' => $user->credit - $creditNumberSendByCampaign
@@ -192,9 +194,10 @@ class BaseNotification
 
                 $creditHistory = $this->creditHistoryService->create([
                     'user_uuid' => $this->campaign->user_uuid,
-                    'campaign_uuid' => $this->campaign->uuid,
+                    'campaign_uuid' => !$campaignScenario ? $this->campaign->uuid : null,
                     'credit' => $creditNumberSendByCampaign,
-                    'type' => $this->campaign->send_type
+                    'type' => !$campaignScenario ? $this->campaign->send_type : null,
+                    'scenario_uuid' => !$campaignScenario ? null : $campaignScenario->scenario_uuid
                 ]);
                 DB::commit();
             } catch (\Exception $e) {
@@ -206,11 +209,11 @@ class BaseNotification
 
     /**
      * @param $contacts
-     * @param $scenario
+     * @param $campaignScenario
      * @param $creditTotal
      * @return void
      */
-    public function send($contacts, $scenario, $creditTotal)
+    public function send($contacts, $campaignScenario, $creditTotal)
     {
 
         $user = $this->campaign->user;
@@ -223,8 +226,7 @@ class BaseNotification
             'campaign_uuid' => $this->campaign->getKey(),
             'start_time' => Carbon::now()
         ]);
-
-        if (!empty($creditTotal)) {
+        if ($creditTotal) {
             DB::beginTransaction();
 
             try {
@@ -234,22 +236,22 @@ class BaseNotification
 
                 $creditHistory = $this->creditHistoryService->create([
                     'user_uuid' => $this->campaign->user_uuid,
-                    'campaign_uuid' => $this->campaign->uuid,
+                    'campaign_uuid' => !$campaignScenario ? $this->campaign->uuid : null,
                     'credit' => $creditNumberSendByCampaign,
-                    'type' => $this->campaign->send_type
+                    'type' => !$campaignScenario ? $this->campaign->send_type : null,
+                    'scenario_uuid' => !$campaignScenario ? null : $campaignScenario->scenario_uuid
                 ]);
                 DB::commit();
             } catch (\Exception $e) {
                 DB::rollback();
             }
         }
-
         $footerTemplateAds = $this->footerTemplateService->getFooterTemplateAdsForSendCampaignByType($mailTemplate->type, $mailTemplate->user);
         $footerTemplateSubscribe = $this->footerTemplateService->getFooterTemplateSubscribeForSendCampaignByType($mailTemplate->type);
         $campaignContent = $this->mailTemplateVariableService->insertFooterTemplateInBodyMailTemplate($mailTemplate->body, optional($footerTemplateAds)->template, optional($footerTemplateSubscribe)->template);
 
         foreach ($contacts as $contact) {
-            $mailSendingHistory = $this->saveMailSendingHistory($contact, $scenario);
+            $mailSendingHistory = $this->saveMailSendingHistory($contact, $campaignScenario ? $campaignScenario->uuid : null);
             $variables = $this->mapVariablelForSendCampaign($contact, $this->campaign, $mailSendingHistory, $footerTemplateSubscribe);
             $emailTracking = $this->getContent($mailTemplate, $campaignContent, $variables);
 
@@ -274,7 +276,7 @@ class BaseNotification
             ActivityHistoryOfSendByCampaignEvent::dispatch($mailSendingHistory, $this->campaign->send_type, $contact->uuid);
         }
 
-        if ($this->creditReturn > 0 && !empty($creditTotal) && empty($scenario)) {
+        if ($this->creditReturn > 0 && $creditTotal && !$campaignScenario) {
             $returnUser = $this->creditReturn;
             $payCreditHistory = $creditNumberSendByCampaign - $this->creditReturn;
             $this->returnCreditUserAndCreditHistory($user, $creditHistory, $returnUser, $payCreditHistory);

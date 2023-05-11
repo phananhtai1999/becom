@@ -121,9 +121,9 @@ class SendNotOpenByScenarioCampaignListener implements ShouldQueue
 
             $config = $this->configService->findConfigByKey('send_by_connector');
             if ($config && $config->value_formatted) {
-                $emailNotification->sending_by_conecttor($contacts, $value['campaignScenario']->uuid, null);
+                $emailNotification->sending_by_conecttor($contacts, $value['campaignScenario'], null);
             } else {
-                $emailNotification->send($contacts, $value['campaignScenario']->uuid, null);
+                $emailNotification->send($contacts, $value['campaignScenario'], null);
             }
         }
     }

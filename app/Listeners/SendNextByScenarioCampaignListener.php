@@ -120,9 +120,9 @@ class SendNextByScenarioCampaignListener implements  ShouldQueue
 
         $config = $this->configService->findConfigByKey('send_by_connector');
         if ($config && $config->value_formatted) {
-            $emailNotification->sending_by_conecttor($contact, $campaignScenario->uuid, null);
+            $emailNotification->sending_by_conecttor($contact, $campaignScenario, null);
         } else {
-            $emailNotification->send($contact, $campaignScenario->uuid, null);
+            $emailNotification->send($contact, $campaignScenario, null);
         }
     }
 }

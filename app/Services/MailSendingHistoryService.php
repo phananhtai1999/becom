@@ -234,4 +234,15 @@ class MailSendingHistoryService extends AbstractService
     {
         return $this->model->where('campaign_scenario_uuid', $campaignScenarioUuid)->whereNotIn('status', ["fail"])->get();
     }
+
+    public function getMailSendingByScenario($scenarioUuid)
+    {
+        return $this->model
+            ->with('campaign')
+            ->whereHas('campaignScenario.scenario', function ($query) use ($scenarioUuid){
+                $query->where('uuid', $scenarioUuid)
+                    ->whereRaw('IF(last_stopped_at is not null, last_stopped_at, created_at)
+                    <= mail_sending_history.created_at');
+        })->get();
+    }
 }

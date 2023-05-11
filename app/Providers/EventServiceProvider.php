@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Events\ActiveStatusEvent;
 use App\Events\ActivityHistoryEvent;
 use App\Events\ActivityHistoryOfSendByCampaignEvent;
+use App\Events\CalculateCreditWhenStopScenarioEvent;
 use App\Events\PaymentCreditPackageSuccessEvent;
 use App\Events\PaymentSuccessfullyEvent;
 use App\Events\SendAccountForNewPartnerEvent;
@@ -24,6 +25,7 @@ use App\Events\UpdateContactByStatusEvent;
 use App\Listeners\ActiveStatusListener;
 use App\Listeners\ActivityHistoryListener;
 use App\Listeners\ActivityHistoryOfSendByCampaignListener;
+use App\Listeners\CalculateCreditWhenStopScenarioListener;
 use App\Listeners\PaymentCreditPackageSuccessListener;
 use App\Listeners\PaymentSuccessfullyListener;
 use App\Listeners\SendAccountForNewPartnerListener;
@@ -127,6 +129,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         SendNotificationSystemForPaymentEvent::class => [
             SendNotificationSystemForPaymentListener::class
+        ],
+        CalculateCreditWhenStopScenarioEvent::class => [
+            CalculateCreditWhenStopScenarioListener::class
         ]
     ];
 

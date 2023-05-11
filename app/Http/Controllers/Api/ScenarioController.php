@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
+use App\Events\CalculateCreditWhenStopScenarioEvent;
 use App\Events\SendByCampaignRootScenarioEvent;
 use App\Events\SendNotificationSystemEvent;
 use App\Http\Controllers\Traits\RestIndexMyTrait;
@@ -264,7 +265,7 @@ class ScenarioController extends AbstractRestAPIController
 
     public function showCampaignScenarioByUuid($scenarioUuid)
     {
-        $campaignsScenario = $this->campaignScenarioService->showCampaignScenarioByScenarioUuid($scenarioUuid);
+        $campaignsScenario = $this->campaignScenarioService->showCampaignScenarioByScenarioUuid($scenarioUuid)->toArray();
         $depth = $this->campaignScenarioService->getMaxDepthOfCampaignScenarioByScenarioUuid($scenarioUuid);
 
         /*
@@ -413,6 +414,8 @@ class ScenarioController extends AbstractRestAPIController
     {
         $scenario = $this->service->findOneById($request->get('scenario_uuid'));
         if ($request->get('status') === 'stopped') {
+            //Hoàn trả credit dư
+            CalculateCreditWhenStopScenarioEvent::dispatch($scenario);
             $this->service->update($scenario, [
                 'status' => $request->get('status'),
                 'last_stopped_at' => Carbon::now(),
