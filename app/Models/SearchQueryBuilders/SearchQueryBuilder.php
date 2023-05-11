@@ -2,7 +2,6 @@
 
 namespace App\Models\SearchQueryBuilders;
 
-use App\Models\User;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class SearchQueryBuilder extends QueryBuilder
@@ -16,20 +15,34 @@ class SearchQueryBuilder extends QueryBuilder
      */
     public static function search($baseQuery, $query, $search, $searchBy)
     {
-        if ($search && !empty($searchBy)) {
-            //Get all fields
-            $getFillAble = app($baseQuery)->getFillable();
-            $getTableName = app($baseQuery)->getTable();
-            $query->where(function ($query) use ($search, $searchBy, $getFillAble, $getTableName) {
-                foreach ($searchBy as $value) {
-                    $query->when(in_array($value, $getFillAble), function ($q) use ($search, $value, $getTableName) {
+        try {
+            if ($search && !empty($searchBy)) {
+                //Get all fields
+                $getFillAble = app($baseQuery)->getFillable();
+                $getTableName = app($baseQuery)->getTable();
+                $query->where(function ($query) use ($search, $searchBy, $getFillAble, $getTableName) {
+                    foreach ($searchBy as $value) {
+                        $query->when(in_array($value, $getFillAble), function ($q) use ($search, $value, $getTableName) {
+                            $q->orWhere($getTableName . '.' . $value, 'like', '%' . $search . '%');
+                        });
+                        //Handle search in relational table
+                        $query->when(!in_array($value, $getFillAble), function ($q) use ($search, $value) {
 
-                        return $q->orWhere($getTableName . '.'  . $value, 'like', '%' . $search . '%');
-                    });
-                }
-            });
+                            $lastDotPosition = strrpos($value, '.');
+                            $relationship = substr($value, 0, $lastDotPosition);
+                            $columnName = substr($value, $lastDotPosition + 1);
+
+                            $q->orWhereHas($relationship, function ($q) use ($search, $columnName) {
+                                $q->where($columnName, 'like', '%' . $search . '%');
+                            });
+                        });
+                    }
+                });
+            }
+
+            return $query;
+        } catch (\BadMethodCallException $exception) {
+            return $query;
         }
-
-        return $query;
     }
 }
