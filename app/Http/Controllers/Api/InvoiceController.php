@@ -35,7 +35,11 @@ class InvoiceController extends AbstractRestAPIController
             'invoice' => $invoice,
             'billingAddress' => $billingAddress,
             'paymentMethod' => $paymentMethod,
-            'configLogo' => $this->configService->findConfigByKey('logo')
+            'logo' => $this->configService->findConfigByKey('logo'),
+            'companyName' => $this->configService->findConfigByKey('company_name'),
+            'companyAddress' => $this->configService->findConfigByKey('company_address'),
+            'supportEmail' => $this->configService->findConfigByKey('support_email'),
+            'companyWebsite' => $this->configService->findConfigByKey('company_website')
         ];
         $pdf = Pdf::loadView('invoice.GenerateInvoice', $data);
 

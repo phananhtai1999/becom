@@ -130,42 +130,48 @@
 {{--        <hr/>--}}
         <table class="header-table">
             <tr>
-                <td style="width: 30%;"><img width="50%" src="{{ $configLogo->value }}"> <br> www.send.techupzone.com</td>
+                <td style="width: 25%;vertical-align: top;"><img width="50%" src="{{ $logo->value }}"> <br> {{ $companyWebsite->value }}</td>
                 <td style="width: 50%;">
                     <div class="text-center">
                         <div class="text-200">
                             <span class="text-default-d3">Invoice</span>
                         </div>
                         <div>
-                            <span>Invoice ID: #{{ $invoice->uuid }}</span>
+                            <span>Invoice ID #{{ $invoice->uuid }}</span>
                         </div>
                     </div>
                 </td>
                 <td class="text-left">
-                    <b> Send GPT </b><br>
-                    Company address <br>
-                    contact@website.com
+                    <b> {{ $companyName->value }} </b><br>
+                    {{ $companyAddress->value }} <br>
+                    {{ $supportEmail->value }}
                 </td>
             </tr>
         </table>
         <table class="info">
             <tr class="text-95 text-secondary text-left">
-                <td style="width: 10%">To</td>
-                <td style="width: 40%;">: {{ $billingAddress->name }}</td>
+                <td><span class="text-600 text-110">Date</span></td>
+                <td><span class="text-600 text-110">: {{ date('Y-M-D H:m:s', $billingAddress->created_date) }}</span></td>
                 <td style="width: 20%"><span class="text-600 text-110 ">Payment Method</span></td>
                 <td><span class="text-600 text-110 ">: {{ ucfirst($paymentMethod->name) }}</span></td>
             </tr>
             <tr class="text-95 text-secondary">
+                <td style="width: 15%">Invoice number</td>
+                <td style="width: 40%;">: {{ $invoice->uuid }}</td>
+                <td><span class=""></span>Initial Charge</td>
+                <td>: ${{ $invoice->product_data['price'] }}</td>
+            </tr>
+            <tr class="text-95 text-secondary">
                 <td><span class=""></span>Phone</td>
                 <td>: {{ $billingAddress->phone }}</td>
-                <td><span class="text-600 text-110">Date</span></td>
-                <td><span class="text-600 text-110">: {{ date('Y-M-D H:m:s', $billingAddress->created_date) }}</span></td>
+                <td><span class="text-600 text-110 align-middle">Final Cost</span></td>
+                <td>: ${{ $invoice->product_data['price'] }}</td>
             </tr>
             <tr class="text-95 text-secondary">
                 <td><span class=""></span>Email</td>
                 <td>: {{ $billingAddress->email }}</td>
-                <td><span class="text-600 text-110">Status</span></td>
-                <td><span class="text-600 text-110">: Complete</span></td>
+                <td></td>
+                <td></td>
             </tr>
             <tr class="text-95 text-secondary">
                 <td><span class=""></span>Address</td>
@@ -173,8 +179,11 @@
                     : {{ $billingAddress->address }}, {{ $billingAddress->city }} <br>
                     {{ $billingAddress->state }}, {{ $billingAddress->country }}
                 </td>
-                <td><span class="text-600 text-110 align-middle">Final Cost</span></td>
-                <td>: ${{ $invoice->product_data['price'] }}</td>
+                <td>
+                    <span class="text-600 text-110 align-middle">Total Refund</span> <br>
+                Refund To
+                </td>
+                <td>: N/A <br>: N/A</td>
             </tr>
         </table>
         <div class="mt-4">
