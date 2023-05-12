@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Config;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Cache;
 
 class ConfigSeeder extends Seeder
 {
@@ -261,8 +262,36 @@ class ConfigSeeder extends Seeder
                 'group_id' => 1,
                 'status' => 'system',
             ],
+            [
+                'key' => 'company_name',
+                'value' => 'Techup Zone',
+                'type' => 'string',
+                'status' => 'system',
+                'group_id' => '1',
+            ],
+            [
+                'key' => 'company_website',
+                'value' => 'www.send.techupzone.com',
+                'type' => 'string',
+                'status' => 'system',
+                'group_id' => '1',
+            ],
+            [
+                'key' => 'support_email',
+                'value' => 'support@send.techupzone.com',
+                'type' => 'string',
+                'status' => 'system',
+                'group_id' => '1',
+            ],
+            [
+                'key' => 'company_address',
+                'value' => '123 Street A - District 12 - HCM',
+                'type' => 'string',
+                'status' => 'system',
+                'group_id' => '1',
+            ],
         ];
-
+        Cache::forget('config');
         foreach ($configs as $config) {
             Config::firstOrCreate(
                 [
