@@ -67,6 +67,17 @@ class ScenarioQueryBuilder extends AbstractQueryBuilder
     public static function searchQuery($search, $searchBy)
     {
         $initialQuery = static::initialQuery();
+        $mutatedAttributes = (new Scenario())->getMutatedAttributes();
+        $sort = ltrim(\request()->get('sort'), '-');
+        if (!in_array($sort, $mutatedAttributes)){
+            $initialQuery = static::initialQuery()->allowedSorts([
+                'uuid',
+                'name',
+                'user_uuid',
+                'status',
+                'last_stopped_at'
+            ]);
+        }
         $baseQuery = static::fillAble();
 
         return SearchQueryBuilder::search($baseQuery, $initialQuery, $search, $searchBy);
