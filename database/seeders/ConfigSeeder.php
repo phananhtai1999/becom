@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Config;
+use App\Models\Group;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Cache;
 
@@ -15,6 +16,11 @@ class ConfigSeeder extends Seeder
      */
     public function run()
     {
+        $companyGroupUuid = Group::where('name', 'company')->first()->uuid;
+        $paymentGroupUuid = Group::where('name', 'payment')->first()->uuid;
+        $otpGroupUuid = Group::where('name', 'otp')->first()->uuid;
+        $s3GroupUuid = Group::where('name', 's3')->first()->uuid;
+        $siteGroupUuid = Group::where('name', 'site')->first()->uuid;
         $configs = [
             [
                 'key' => 'smtp_auto',
@@ -41,7 +47,7 @@ class ConfigSeeder extends Seeder
                 'key' => 'footer_linkedin',
                 'value' => 'https://www.linkedin.com',
                 'type' => 'string',
-                'group_id' => 1,
+                'group_id' => $siteGroupUuid,
                 'status' => 'system',
             ],
             [
@@ -55,35 +61,35 @@ class ConfigSeeder extends Seeder
                 'key' => 'footer_instagram',
                 'value' => 'https://www.instagram.com',
                 'type' => 'string',
-                'group_id' => 1,
+                'group_id' => $siteGroupUuid,
                 'status' => 'system',
             ],
             [
                 'key' => 'footer_facebook',
                 'value' => 'https://www.facebook.com',
                 'type' => 'string',
-                'group_id' => 1,
+                'group_id' => $siteGroupUuid,
                 'status' => 'system',
             ],
             [
                 'key' => 'site_name',
                 'value' => 'Mail',
                 'type' => 'string',
-                'group_id' => 1,
+                'group_id' => $siteGroupUuid,
                 'status' => 'public',
             ],
             [
                 'key' => 'logo',
                 'value' => 'https://file.storage.techupzone.com/linkstar-stg/public/upload/c690285d-4348-4ba4-b982-1e12d2334a5f_1677036055.png',
                 'type' => 'image',
-                'group_id' => 1,
+                'group_id' => $siteGroupUuid,
                 'status' => 'public',
             ],
             [
                 'key' => 'favicon_icon',
                 'value' => 'https://file.storage.techupzone.com/linkstar-stg/public/upload/c690285d-4348-4ba4-b982-1e12d2334a5f_1677036055.png',
                 'type' => 'image',
-                'group_id' => 1,
+                'group_id' => $siteGroupUuid,
                 'status' => 'public',
 
             ],
@@ -105,28 +111,28 @@ class ConfigSeeder extends Seeder
                 'key' => 'paypal_sandbox_client_id',
                 'value' => 'AQfFudqpGq23ZIWGvKobd3a78GX_UdfwOx-w9Ui9TwQnen2l_5X66pu9wG2Yp1fpcLS03GChh-4lm_tw',
                 'type' => 'string',
-                'group_id' => 1,
+                'group_id' => $paymentGroupUuid,
                 'status' => 'system',
             ],
             [
                 'key' => 'paypal_sandbox_client_secret',
                 'value' => 'EOSUPJirjSyoq9mbKYRxFUDCyrjO35J_VpjRfIzWo7dYBc338Div_jBkMEeH2RbnDK5Cs_jo7SctXP2z',
                 'type' => 'string',
-                'group_id' => 1,
+                'group_id' => $paymentGroupUuid,
                 'status' => 'system',
             ],
             [
                 'key' => 'stripe_secret_key',
                 'value' => 'sk_test_51Kd3VBICYCkcIoDDo8WsLk3tSPwU3VATNZJxXPSwHCzW2raGtYIWsUNFPK5cxdgNCxNAEGU51oevF8YwtKKTRlsT00ffEHXQF3',
                 'type' => 'string',
-                'group_id' => 1,
+                'group_id' => $paymentGroupUuid,
                 'status' => 'system',
             ],
             [
                 'key' => 'stripe_endpoint_secret_key',
                 'value' => 'whsec_ffee58f7a216e44bc30f933a1721f2015fdc59cfad949e6dc019bfd14ea4b28b',
                 'type' => 'string',
-                'group_id' => 1,
+                'group_id' => $paymentGroupUuid,
                 'status' => 'system',
             ],
             [
@@ -155,42 +161,42 @@ class ConfigSeeder extends Seeder
                 'key' => 'expired_time',
                 'value' => 5,
                 'type' => 'numeric',
-                'group_id' => 1,
+                'group_id' => $otpGroupUuid,
                 'status' => 'system',
             ],
             [
                 'key' => 'blocked_time',
                 'value' => 1,
                 'type' => 'numeric',
-                'group_id' => 1,
+                'group_id' => $otpGroupUuid,
                 'status' => 'system',
             ],
             [
                 'key' => 'refresh_time',
                 'value' => 90,
                 'type' => 'numeric',
-                'group_id' => 1,
+                'group_id' => $otpGroupUuid,
                 'status' => 'system',
             ],
             [
                 'key' => 'refresh_count',
                 'value' => 3,
                 'type' => 'numeric',
-                'group_id' => 1,
+                'group_id' => $otpGroupUuid,
                 'status' => 'system',
             ],
             [
                 'key' => 'wrong_count',
                 'value' => 5,
                 'type' => 'numeric',
-                'group_id' => 1,
+                'group_id' => $otpGroupUuid,
                 'status' => 'system',
             ],
             [
                 'key' => 'otp_status',
                 'value' => true,
                 'type' => 'boolean',
-                'group_id' => 1,
+                'group_id' => $otpGroupUuid,
                 'status' => 'system',
             ],
             [
@@ -205,14 +211,14 @@ class ConfigSeeder extends Seeder
                 'value' => true,
                 'type' => 'boolean',
                 'status' => 'system',
-                'group_id' => '1',
+                'group_id' => $paymentGroupUuid,
             ],
             [
                 'key' => 'stripe_method',
                 'value' => true,
                 'type' => 'boolean',
                 'status' => 'system',
-                'group_id' => '1',
+                'group_id' => $paymentGroupUuid,
             ],
             [
                 'key' => 's3_system',
@@ -227,7 +233,7 @@ class ConfigSeeder extends Seeder
                     'use_path_style_endpoint' => true,
                 ],
                 'type' => 's3',
-                'group_id' => 1,
+                'group_id' => $s3GroupUuid,
                 'status' => 'system',
             ],
             [
@@ -243,7 +249,7 @@ class ConfigSeeder extends Seeder
                     'use_path_style_endpoint' => true,
                 ],
                 'type' => 's3',
-                'group_id' => 1,
+                'group_id' => $s3GroupUuid,
                 'status' => 'system',
             ],
             [
@@ -259,7 +265,7 @@ class ConfigSeeder extends Seeder
                     'use_path_style_endpoint' => true,
                 ],
                 'type' => 's3',
-                'group_id' => 1,
+                'group_id' => $s3GroupUuid,
                 'status' => 'system',
             ],
             [
@@ -267,28 +273,35 @@ class ConfigSeeder extends Seeder
                 'value' => 'Techup Zone',
                 'type' => 'string',
                 'status' => 'system',
-                'group_id' => '1',
+                'group_id' => $companyGroupUuid,
             ],
             [
                 'key' => 'company_website',
                 'value' => 'www.send.techupzone.com',
                 'type' => 'string',
                 'status' => 'system',
-                'group_id' => '1',
+                'group_id' => $companyGroupUuid,
             ],
             [
                 'key' => 'support_email',
                 'value' => 'support@send.techupzone.com',
                 'type' => 'string',
                 'status' => 'system',
-                'group_id' => '1',
+                'group_id' => $companyGroupUuid,
             ],
             [
                 'key' => 'company_address',
                 'value' => '123 Street A - District 12 - HCM',
                 'type' => 'string',
                 'status' => 'system',
-                'group_id' => '1',
+                'group_id' => $companyGroupUuid,
+            ],
+            [
+                'key' => 'success_url',
+                'value' => 'http://success.com',
+                'type' => 'string',
+                'status' => 'system',
+                'group_id' => $companyGroupUuid,
             ],
         ];
         Cache::forget('config');

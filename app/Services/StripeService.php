@@ -8,7 +8,9 @@ use App\Events\SubscriptionAddOnSuccessEvent;
 use App\Events\SubscriptionSuccessEvent;
 use App\Models\PaymentMethod;
 use Exception;
+use http\Url;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Stripe\Exception\InvalidRequestException;
 use Stripe\StripeClient;
@@ -115,7 +117,6 @@ class StripeService extends AbstractService
     public function processSubscription($subscriptionPlan, $subscriptionDate, $expirationDate, $plan, $request)
     {
         $stripe = $this->getStripeClient();
-
         try {
             $checkout_session = $stripe->checkout->sessions->create([
                 'line_items' => [[
@@ -132,6 +133,15 @@ class StripeService extends AbstractService
                         'platformPackageUuid=' . $subscriptionPlan->platform_package_uuid,
                         'billingAddressUuid=' . $request['billing_address_uuid'],
                     ]) . '&session_id={CHECKOUT_SESSION_ID}',
+//                'success_url' => $this->getConfigByKeyInCache('success_url')->value . '?' . http_build_query([
+//                        'goBackUrl' => $request['go_back_url'],
+//                        'subscriptionPlanUuid' => $subscriptionPlan->uuid,
+//                        'subscriptionDate' => $subscriptionDate,
+//                        'userUuid' => Auth::user()->getKey(),
+//                        'expirationDate' => $expirationDate,
+//                        'platformPackageUuid' => $subscriptionPlan->platform_package_uuid,
+//                        'billingAddressUuid' => $request['billing_address_uuid'],
+//                    ]) . '&session_id={CHECKOUT_SESSION_ID}',
                 "cancel_url" => route('stripe.cancelPaymentSubscription', ['goBackUrl=' . $request['go_back_url'], 'subscriptionPlanUuid=' . $subscriptionPlan->uuid,]),
             ]);
             if (isset($checkout_session)) {

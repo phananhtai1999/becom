@@ -176,6 +176,15 @@ class PaypalService extends AbstractService
                             'platformPackageUuid=' . $subscriptionPlan->platform_package_uuid,
                             'billingAddressUuid=' . $request['billing_address_uuid']
                     ]),
+//                    "return_url" => $this->getConfigByKeyInCache('success_url')->value . '?' . http_build_query([
+//                            'goBackUrl' => $request['go_back_url'],
+//                            'subscriptionPlanUuid' => $subscriptionPlan->uuid,
+//                            'subscriptionDate' => $subscriptionDate,
+//                            'userUuid' => Auth::user()->getKey(),
+//                            'expirationDate' => $expirationDate,
+//                            'platformPackageUuid' => $subscriptionPlan->platform_package_uuid,
+//                            'billingAddressUuid' => $request['billing_address_uuid'],
+//                        ]),
                     "cancel_url" => route('paypal.cancelPaymentSubscription', ['goBackUrl=' . $request['go_back_url'], 'subscriptionPlanUuid=' . $subscriptionPlan->uuid,]),
                 ],
             ]);

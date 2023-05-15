@@ -18,6 +18,21 @@ class GroupSeeder extends Seeder
             [
                 'name' => 'general',
             ],
+            [
+                'name' => 'otp',
+            ],
+            [
+                'name' => 'payment',
+            ],
+            [
+                'name' => 'company',
+            ],
+            [
+                'name' => 's3',
+            ],
+            [
+                'name' => 'site',
+            ],
         ];
 
         foreach ($configs as $config) {
