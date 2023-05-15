@@ -24,6 +24,7 @@ class MailTemplateResource extends AbstractJsonResource
             'subject' => $this->subject,
             'body' => $this->body,
             'send_project_uuid' => $this->send_project_uuid,
+            'business_category_uuid' => $this->business_category_uuid,
             'user_uuid' => $this->user_uuid,
             'design' => $this->design,
             'image' => $this->image,
@@ -41,6 +42,10 @@ class MailTemplateResource extends AbstractJsonResource
 
         if (\in_array('mail_template__user', $expand)) {
             $data['user'] = new UserResource($this->user);
+        }
+
+        if (\in_array('mail_template__business_category', $expand)) {
+            $data['business_category'] = new BusinessCategoryResource($this->businessCategory);
         }
 
         return $data;
