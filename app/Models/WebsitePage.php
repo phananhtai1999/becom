@@ -66,4 +66,9 @@ class WebsitePage extends AbstractModel
     {
         return $this->belongsTo(WebsitePageCategory::class, 'website_page_category_uuid', 'uuid',);
     }
+
+    public function websites()
+    {
+        return $this->belongsToMany(Website::class, 'website_website_page', 'website_page_uuid', 'website_uuid')->withPivot(['is_homepage', 'ordering'])->withTimestamps();
+    }
 }
