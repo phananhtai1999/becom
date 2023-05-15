@@ -31,6 +31,7 @@ class MyMailTemplateRequest extends AbstractRequest
 
                 return $query->where('user_uuid', auth()->user()->getkey())->whereNull('deleted_at');
             })],
+            'business_category_uuid' => ['required', 'numeric', 'min:1', Rule::exists('business_categories', 'uuid')->whereNull('deleted_at')],
             'design' => ['required', 'string'],
             'type' => ['required', 'string', 'in:sms,email,telegram,viber'],
             'image' => ['nullable', 'array'],

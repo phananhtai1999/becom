@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Abstracts\AbstractModel;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -33,6 +34,7 @@ class MailTemplate extends AbstractModel
         'body',
         'send_project_uuid',
         'user_uuid',
+        'business_category_uuid',
         'design',
         'publish_status',
         'type',
@@ -50,6 +52,7 @@ class MailTemplate extends AbstractModel
         'deleted_at' => 'datetime',
         'send_project_uuid' => 'integer',
         'user_uuid' => 'integer',
+        'business_category_uuid' => 'integer',
     ];
 
     /**
@@ -98,5 +101,29 @@ class MailTemplate extends AbstractModel
     public function user()
     {
         return $this->belongsTo(User::class, 'user_uuid', 'uuid');
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function businessCategory()
+    {
+        return $this->belongsTo(BusinessCategory::class, 'business_category_uuid', 'uuid');
+    }
+
+    public function scopeBusinessCategoryTitle(Builder $query, ...$titles)
+    {
+        return $query->where('business_category_uuid', function ($q) use ($titles) {
+            $q->select('a.uuid')
+                ->from('business_categories as a')
+                ->whereColumn('a.uuid', 'mail_templates.business_category_uuid')
+                ->where(function ($i) use ($titles) {
+                    $lang = app()->getLocale();
+                    $langDefault = config('app.fallback_locale');
+                    foreach ($titles as $title) {
+                        $i->orWhereRaw("IFNULL(JSON_UNQUOTE(JSON_EXTRACT(a.title, '$.$lang')),JSON_UNQUOTE(JSON_EXTRACT(a.title, '$.$langDefault'))) = '$title'");
+                    }
+                });
+        });
     }
 }
