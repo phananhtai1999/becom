@@ -77,7 +77,8 @@
             border-collapse: collapse;
             text-align: center;
             width: 100%;
-            padding-bottom: 70px;
+            padding-bottom: 60px;
+            font-weight: bolder;
         }
         .header-table td, .header-table th {
 
@@ -85,6 +86,8 @@
         .info {
             border-collapse: collapse;
             width: 100%;
+            font-weight: bolder;
+            padding-bottom: 20px;
         }
 
         .info td, .info th {
@@ -130,19 +133,20 @@
 {{--        <hr/>--}}
         <table class="header-table">
             <tr>
-                <td style="width: 25%;vertical-align: top;"><img width="50%" src="{{ $logo->value }}"> <br> {{ $companyWebsite->value }}</td>
+                <td style="width: 25%;vertical-align: top;"><img style="padding-bottom: 10px; width: 80%"  src="{{ $logo->value }}"> <br> {{ $companyWebsite->value }}</td>
                 <td style="width: 50%;">
                     <div class="text-center">
                         <div class="text-200">
                             <span class="text-default-d3">Invoice</span>
                         </div>
+                        <br>
                         <div>
                             <span>Invoice ID #{{ $invoice->uuid }}</span>
                         </div>
                     </div>
                 </td>
                 <td class="text-left">
-                    <b> {{ $companyName->value }} </b><br>
+                    {{ $companyName->value }} <br>
                     {{ $companyAddress->value }} <br>
                     {{ $supportEmail->value }}
                 </td>
@@ -156,7 +160,7 @@
                 <td><span class="text-600 text-110 ">: {{ ucfirst($paymentMethod->name) }}</span></td>
             </tr>
             <tr class="text-95 text-secondary">
-                <td style="width: 15%">Invoice number</td>
+                <td style="width: 20%">Invoice number</td>
                 <td style="width: 40%;">: {{ $invoice->uuid }}</td>
                 <td><span class=""></span>Initial Charge</td>
                 <td>: ${{ $invoice->product_data['price'] }}</td>
