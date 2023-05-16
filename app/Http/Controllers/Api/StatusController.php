@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
 use App\Http\Controllers\Traits\RestDestroyTrait;
+use App\Http\Controllers\Traits\RestIndexMyTrait;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyStatusRequest;
 use App\Http\Requests\StatusRequest;
@@ -19,7 +20,7 @@ use App\Services\StatusService;
 
 class StatusController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestShowTrait, RestDestroyTrait;
+    use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestIndexMyTrait;
 
     /**
      * @var MyStatusService
@@ -99,21 +100,6 @@ class StatusController extends AbstractRestAPIController
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
         );
-    }
-
-    /**
-     * @param IndexRequest $request
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
-     */
-    public function indexMyStatus(IndexRequest $request)
-    {
-        return $this->sendOkJsonResponse(
-            $this->service->resourceCollectionToData(
-                $this->resourceCollectionClass,
-                $this->myService->getCollectionWithPagination()
-            ));
     }
 
     /**

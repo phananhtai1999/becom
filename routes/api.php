@@ -798,7 +798,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'status.'], function () {
     });
 
     Route::group(['as' => 'my.'], function () {
-        Route::get('/my/status', [StatusController::class, 'indexMyStatus'])->name('index');
+        Route::get('/my/status', [StatusController::class, 'indexMy'])->name('index');
         Route::post('/my/status', [StatusController::class, 'storeMyStatus'])->name('store');
         Route::get('/my/status/{id}', [StatusController::class, 'showMyStatus'])->name('show');
         Route::put('/my/status/{id}', [StatusController::class, 'editMyStatus'])->name('edit');
@@ -816,7 +816,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'company.'], function () {
     });
 
     Route::group(['as' => 'my.'], function () {
-        Route::get('/my/companies', [CompanyController::class, 'indexMyCompany'])->name('index');
+        Route::get('/my/companies', [CompanyController::class, 'indexMy'])->name('index');
         Route::post('/my/company', [CompanyController::class, 'storeMyCompany'])->name('store');
         Route::get('/my/company/{id}', [CompanyController::class, 'showMyCompany'])->name('show');
         Route::put('/my/company/{id}', [CompanyController::class, 'editMyCompany'])->name('edit');
@@ -834,7 +834,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'position.'], function () {
     });
 
     Route::group(['as' => 'my.'], function () {
-        Route::get('/my/positions', [PositionController::class, 'indexMyPosition'])->name('index');
+        Route::get('/my/positions', [PositionController::class, 'indexMy'])->name('index');
         Route::post('/my/position', [PositionController::class, 'storeMyPosition'])->name('store');
         Route::get('/my/position/{id}', [PositionController::class, 'showMyPosition'])->name('show');
         Route::put('/my/position/{id}', [PositionController::class, 'editMyPosition'])->name('edit');
@@ -852,7 +852,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'note.'], function () {
     });
 
     Route::group(['as' => 'my.'], function () {
-        Route::get('/my/notes', [NoteController::class, 'indexMyNote'])->name('index');
+        Route::get('/my/notes', [NoteController::class, 'indexMy'])->name('index');
         Route::post('/my/note', [NoteController::class, 'storeMyNote'])->name('store');
         Route::get('/my/note/{id}', [NoteController::class, 'showMyNote'])->name('show');
         Route::put('/my/note/{id}', [NoteController::class, 'editMyNote'])->name('edit');
@@ -870,7 +870,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'remind.'], function () {
     });
 
     Route::group(['as' => 'my.'], function () {
-        Route::get('/my/reminds', [RemindController::class, 'indexMyRemind'])->name('index');
+        Route::get('/my/reminds', [RemindController::class, 'indexMy'])->name('index');
         Route::post('/my/remind', [RemindController::class, 'storeMyRemind'])->name('store');
         Route::get('/my/remind/{id}', [RemindController::class, 'showMyRemind'])->name('show');
         Route::put('/my/remind/{id}', [RemindController::class, 'editMyRemind'])->name('edit');
@@ -889,7 +889,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'activity_history.'], functi
     });
 
     Route::group(['as' => 'my.'], function () {
-        Route::get('/my/activity-histories', [ActivityHistoryController::class, 'indexMyActivityHistories'])->name('index');
+        Route::get('/my/activity-histories', [ActivityHistoryController::class, 'indexMy'])->name('index');
         Route::post('/my/render-body-mail-template', [ActivityHistoryController::class, 'renderMyBodyMailTemplate'])->name('renderMyBodyMailtemplate');
     });
 });
@@ -1135,7 +1135,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'business-management.'], fun
     });
 
     Route::group(['as' => 'my.'], function () {
-        Route::get('/my/business-managements', [BusinessManagementController::class, 'indexMyBusinessManagements'])->name('index');
+        Route::get('/my/business-managements', [BusinessManagementController::class, 'indexMy'])->name('index');
         Route::post('/my/business-management', [BusinessManagementController::class, 'storeMyBusinessManagement'])->name('store');
         Route::get('/my/business-management/{id}', [BusinessManagementController::class, 'showMyBusinessManagement'])->name('show');
         Route::put('/my/business-management/{id}', [BusinessManagementController::class, 'editMyBusinessManagement'])->name('edit');

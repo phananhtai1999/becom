@@ -144,19 +144,11 @@ class WebsitePageController extends AbstractRestAPIController
      */
     public function indexUnpublishedWebsitePage(IndexRequest $request)
     {
+        $models = $this->service->getCollectionWithPaginationByCondition($request,
+            ['publish_status' => WebsitePage::PENDING_PUBLISH_STATUS]);
+
         return $this->sendOkJsonResponse(
-            $this->service->resourceCollectionToData(
-                $this->resourceCollectionClass,
-                $this->service->indexWebsitePageByPublishStatus(
-                    WebsitePage::PENDING_PUBLISH_STATUS,
-                    $request->get('per_page', '15'),
-                    $request->get('columns', '*'),
-                    $request->get('page_name', 'page'),
-                    $request->get('page', '1'),
-                    $request->get('search'),
-                    $request->get('search_by'),
-                )
-            )
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
         );
     }
 
@@ -225,16 +217,10 @@ class WebsitePageController extends AbstractRestAPIController
      */
     public function getWebsitePagesDefault(IndexRequest $request)
     {
-        $models = $this->service->getWebsitePageDefaultWithPagination(
-            WebsitePage::PUBLISHED_PUBLISH_STATUS,
-            $request->get('per_page', '15'),
-            $request->get('page', '1'),
-            $request->get('columns', '*'),
-            $request->get('page_name', 'page'),
-            $request->get('search'),
-            $request->get('search_by'),
-        );
-
+        $models = $this->service->getCollectionWithPaginationByCondition($request, [
+            ['publish_status', WebsitePage::PUBLISHED_PUBLISH_STATUS],
+            ['is_default', true],
+        ]);
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
         );

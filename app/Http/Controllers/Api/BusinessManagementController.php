@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
+use App\Http\Controllers\Traits\RestIndexMyTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\BusinessManagementRequest;
 use App\Http\Requests\IndexRequest;
@@ -20,7 +21,7 @@ use App\Services\MyDomainService;
 
 class BusinessManagementController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestDestroyTrait, RestShowTrait;
+    use RestIndexTrait, RestDestroyTrait, RestShowTrait, RestIndexMyTrait;
 
     /**
      * @var MyBusinessManagementService
@@ -123,21 +124,6 @@ class BusinessManagementController extends AbstractRestAPIController
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
         );
-    }
-
-    /**
-     * @param IndexRequest $request
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
-     */
-    public function indexMyBusinessManagements(IndexRequest $request)
-    {
-        return $this->sendOkJsonResponse(
-            $this->service->resourceCollectionToData(
-                $this->resourceCollectionClass,
-                $this->myService->getCollectionWithPagination()
-            ));
     }
 
     /**

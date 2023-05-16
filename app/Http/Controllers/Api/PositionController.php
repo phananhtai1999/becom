@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
 use App\Http\Controllers\Traits\RestDestroyTrait;
+use App\Http\Controllers\Traits\RestIndexMyTrait;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyPositionRequest;
 use App\Http\Requests\PositionRequest;
@@ -20,7 +21,7 @@ use App\Services\PositionService;
 
 class PositionController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestShowTrait, RestDestroyTrait;
+    use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestIndexMyTrait;
 
     /**
      * @var MyStatusService
@@ -100,21 +101,6 @@ class PositionController extends AbstractRestAPIController
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
         );
-    }
-
-    /**
-     * @param IndexRequest $request
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
-     */
-    public function indexMyPosition(IndexRequest $request)
-    {
-        return $this->sendOkJsonResponse(
-            $this->service->resourceCollectionToData(
-                $this->resourceCollectionClass,
-                $this->myService->getCollectionWithPagination()
-            ));
     }
 
     /**

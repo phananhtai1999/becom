@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
 use App\Events\ActivityHistoryEvent;
+use App\Http\Controllers\Traits\RestIndexMyTrait;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyNoteRequest;
 use App\Http\Requests\NoteRequest;
@@ -20,7 +21,7 @@ use App\Services\NoteService;
 
 class NoteController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestShowTrait;
+    use RestIndexTrait, RestShowTrait, RestIndexMyTrait;
 
     /**
      * @var MyStatusService
@@ -105,21 +106,6 @@ class NoteController extends AbstractRestAPIController
         ActivityHistoryEvent::dispatch($getDeletedRecord, Note::NOTE_TYPE, Note::NOTE_DELETED_ACTION);
 
         return $this->sendOkJsonResponse();
-    }
-
-    /**
-     * @param IndexRequest $request
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
-     */
-    public function indexMyNote(IndexRequest $request)
-    {
-        return $this->sendOkJsonResponse(
-            $this->service->resourceCollectionToData(
-                $this->resourceCollectionClass,
-                $this->myService->getCollectionWithPagination()
-            ));
     }
 
     /**

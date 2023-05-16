@@ -192,19 +192,11 @@ class FormController extends AbstractRestAPIController
      */
     public function indexUnpublishedForm(IndexRequest $request)
     {
+        $models = $this->service->getCollectionWithPaginationByCondition($request,
+            ['publish_status' => Form::PENDING_PUBLISH_STATUS]);
+
         return $this->sendOkJsonResponse(
-            $this->service->resourceCollectionToData(
-                $this->resourceCollectionClass,
-                $this->service->indexFormByPublishStatus(
-                    Form::PENDING_PUBLISH_STATUS,
-                    $request->get('per_page', '15'),
-                    $request->get('columns', '*'),
-                    $request->get('page_name', 'page'),
-                    $request->get('page', '1'),
-                    $request->get('search'),
-                    $request->get('search_by'),
-                )
-            )
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
         );
     }
 
@@ -290,15 +282,10 @@ class FormController extends AbstractRestAPIController
      */
     public function getFormsDefault(IndexRequest $request)
     {
-        $models = $this->service->getFormDefaultWithPagination(
-            Form::PUBLISHED_PUBLISH_STATUS,
-            $request->get('per_page', '15'),
-            $request->get('page', '1'),
-            $request->get('columns', '*'),
-            $request->get('page_name', 'page'),
-            $request->get('search'),
-            $request->get('search_by'),
-        );
+        $models = $this->service->getCollectionWithPaginationByCondition($request, [
+            ['publish_status', Form::PUBLISHED_PUBLISH_STATUS],
+            ['contact_list_uuid', null],
+        ]);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
