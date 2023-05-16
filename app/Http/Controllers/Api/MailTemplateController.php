@@ -21,6 +21,7 @@ use App\Services\MailTemplateService;
 use App\Services\MyMailTemplateService;
 use App\Services\SendProjectService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 
 class MailTemplateController extends AbstractRestAPIController
 {
@@ -199,19 +200,11 @@ class MailTemplateController extends AbstractRestAPIController
      */
     public function indexUnpublishedMailTemplate(IndexRequest $request)
     {
+        $models = $this->service->getCollectionWithPaginationByCondition($request,
+            ['publish_status' => MailTemplate::PENDING_PUBLISH_STATUS]);
+
         return $this->sendOkJsonResponse(
-            $this->service->resourceCollectionToData(
-                $this->resourceCollectionClass,
-                $this->service->indexMailtemplateByPublishStatus(
-                    MailTemplate::PENDING_PUBLISH_STATUS,
-                    $request->get('per_page', '15'),
-                    $request->get('columns', '*'),
-                    $request->get('page_name', 'page'),
-                    $request->get('page', '1'),
-                    $request->get('search'),
-                    $request->get('search_by'),
-                )
-            )
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
         );
     }
 
@@ -304,15 +297,10 @@ class MailTemplateController extends AbstractRestAPIController
      */
     public function getMailTemplatesDefault(IndexRequest $request)
     {
-        $models = $this->service->getMailTemplateDefaultWithPagination(
-            MailTemplate::PUBLISHED_PUBLISH_STATUS,
-            $request->get('per_page', '15'),
-            $request->get('page', '1'),
-            $request->get('columns', '*'),
-            $request->get('page_name', 'page'),
-            $request->get('search'),
-            $request->get('search_by'),
-        );
+        $models = $this->service->getCollectionWithPaginationByCondition($request, [
+            ['publish_status', MailTemplate::PUBLISHED_PUBLISH_STATUS],
+            ['send_project_uuid', null],
+        ]);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)

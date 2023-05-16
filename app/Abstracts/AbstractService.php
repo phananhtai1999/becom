@@ -179,6 +179,20 @@ abstract class AbstractService
         ];
     }
 
+    /**
+     * @param $request
+     * @param $where
+     * @return mixed
+     */
+    public function getCollectionWithPaginationByCondition($request, $where = null)
+    {
+        $indexRequest = $this->getIndexRequest($request);
+
+        return $this->modelQueryBuilderClass::searchQuery($indexRequest['search'], $indexRequest['search_by'])
+            ->where($where)
+            ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
+    }
+
     public function getConfigInCache() {
         return Cache::rememberForever('config', function () {
             return Config::all();

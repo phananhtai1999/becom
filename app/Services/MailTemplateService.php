@@ -30,35 +30,6 @@ class MailTemplateService extends AbstractService
     }
 
     /**
-     * @param $perPage
-     * @param $page
-     * @param $columns
-     * @param $pageName
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
-     */
-    public function getMailTemplateDefaultWithPagination($publishedStatus, $perPage, $page, $columns, $pageName, $search, $searchBy)
-    {
-        return MailTemplateQueryBuilder::searchQuery($search, $searchBy)
-            ->where('publish_status', $publishedStatus)
-            ->whereNull('send_project_uuid')
-            ->paginate($perPage, $columns, $pageName, $page);
-    }
-
-    /**
-     * @param $publishStatus
-     * @param $perPage
-     * @param $columns
-     * @param $pageName
-     * @param $page
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
-     */
-    public function indexMailtemplateByPublishStatus($publishStatus, $perPage, $columns, $pageName, $page, $search, $searchBy)
-    {
-        return MailTemplateQueryBuilder::searchQuery($search, $searchBy)->where('publish_status', $publishStatus)
-            ->paginate($perPage, $columns, $pageName, $page);
-    }
-
-    /**
      * @param $publishStatus
      * @param $id
      * @return mixed

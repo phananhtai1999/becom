@@ -144,19 +144,11 @@ class SectionTemplateController extends AbstractRestAPIController
      */
     public function indexUnpublishedSectionTemplate(IndexRequest $request)
     {
+        $models = $this->service->getCollectionWithPaginationByCondition($request,
+            ['publish_status' => SectionTemplate::PENDING_PUBLISH_STATUS]);
+
         return $this->sendOkJsonResponse(
-            $this->service->resourceCollectionToData(
-                $this->resourceCollectionClass,
-                $this->service->indexSectionTemplateByPublishStatus(
-                    SectionTemplate::PENDING_PUBLISH_STATUS,
-                    $request->get('per_page', '15'),
-                    $request->get('columns', '*'),
-                    $request->get('page_name', 'page'),
-                    $request->get('page', '1'),
-                    $request->get('search'),
-                    $request->get('search_by'),
-                )
-            )
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
         );
     }
 
@@ -225,15 +217,10 @@ class SectionTemplateController extends AbstractRestAPIController
      */
     public function getSectionTemplatesDefault(IndexRequest $request)
     {
-        $models = $this->service->getSectionTemplateDefaultWithPagination(
-            SectionTemplate::PUBLISHED_PUBLISH_STATUS,
-            $request->get('per_page', '15'),
-            $request->get('page', '1'),
-            $request->get('columns', '*'),
-            $request->get('page_name', 'page'),
-            $request->get('search'),
-            $request->get('search_by'),
-        );
+        $models = $this->service->getCollectionWithPaginationByCondition($request, [
+            ['publish_status', SectionTemplate::PUBLISHED_PUBLISH_STATUS],
+            ['is_default', true],
+        ]);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)

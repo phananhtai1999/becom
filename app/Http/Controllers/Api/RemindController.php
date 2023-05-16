@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
 use App\Events\ActivityHistoryEvent;
+use App\Http\Controllers\Traits\RestIndexMyTrait;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyRemindRequest;
 use App\Http\Requests\RemindRequest;
@@ -21,7 +22,7 @@ use Illuminate\Support\Facades\Gate;
 
 class RemindController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestShowTrait;
+    use RestIndexTrait, RestShowTrait, RestIndexMyTrait;
 
     /**
      * @var MyStatusService
@@ -110,21 +111,6 @@ class RemindController extends AbstractRestAPIController
         ActivityHistoryEvent::dispatch($getDeletedRecord, Remind::REMIND_TYPE, Remind::REMIND_DELETED_ACTION);
 
         return $this->sendOkJsonResponse();
-    }
-
-    /**
-     * @param IndexRequest $request
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
-     */
-    public function indexMyRemind(IndexRequest $request)
-    {
-        return $this->sendOkJsonResponse(
-            $this->service->resourceCollectionToData(
-                $this->resourceCollectionClass,
-                $this->myService->getCollectionWithPagination()
-            ));
     }
 
     /**
