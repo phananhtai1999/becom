@@ -109,6 +109,7 @@ class PlatformPackageController extends AbstractRestAPIController
             return $this->sendJsonResponse(false, 'Can not edit this platform', [], 403);
         }
         $this->service->update($platformPackage, $request->all());
+        Cache::flush();
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $platformPackage)
