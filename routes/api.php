@@ -46,6 +46,7 @@ use App\Http\Controllers\Api\PaymentMethodController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\PlatformPackageController;
 use App\Http\Controllers\Api\PositionController;
+use App\Http\Controllers\Api\PurposeController;
 use App\Http\Controllers\Api\RemindController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\ScenarioController;
@@ -1043,6 +1044,19 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'business-category.'], funct
 });
 Route::get('public/business-categories', [BusinessCategoryController::class, 'indexPublic'])->name('business-categories-public.index');
 Route::get('public/business-category/{id}', [BusinessCategoryController::class, 'showPublic'])->name('business-categories-public.show');
+
+Route::group(['middleware' => ['auth:api'], 'as' => 'purpose.'], function () {
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::post('/purpose', [PurposeController::class, 'store'])->name('store');
+        Route::put('/purpose/{id}', [PurposeController::class, 'edit'])->name('edit');
+        Route::delete('/purpose/{id}', [PurposeController::class, 'destroy'])->name('destroy');
+        Route::get('/purposes', [PurposeController::class, 'index'])->name('index');
+        Route::get('/purpose/{id}', [PurposeController::class, 'show'])->name('show');
+    });
+
+    Route::get('public/purposes', [PurposeController::class, 'indexPublic'])->name('index');
+
+});
 
 //Contact Unsubscribe
 Route::group(['middleware' => ['auth:api'], 'as' => 'contact-unsubscribe.'], function () {

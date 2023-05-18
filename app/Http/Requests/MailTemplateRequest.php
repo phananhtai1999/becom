@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
+use App\Models\BusinessCategory;
+use App\Models\Purpose;
 use Illuminate\Validation\Rule;
 
 class MailTemplateRequest extends AbstractRequest
@@ -28,7 +30,12 @@ class MailTemplateRequest extends AbstractRequest
             'subject' => ['required', 'string'],
             'body' => ['required', 'string'],
             'send_project_uuid' => ['nullable', 'numeric', 'min:1', 'exists:send_projects,uuid'],
-            'business_category_uuid' => ['required', 'numeric', 'min:1', Rule::exists('business_categories', 'uuid')->whereNull('deleted_at')],
+            'business_category_uuid' => ['required', 'numeric', 'min:1', Rule::exists('business_categories', 'uuid')->where(function ($q) {
+                return $q->where('publish_status', BusinessCategory::PUBLISHED_PUBLISH_STATUS)->whereNull('deleted_at');
+            })],
+            'purpose_uuid' => ['required', 'numeric', 'min:1', Rule::exists('purposes', 'uuid')->where(function ($q) {
+                return $q->where('publish_status', Purpose::PUBLISHED_PUBLISH_STATUS)->whereNull('deleted_at');
+            })],
             'design' => ['required', 'string'],
             'publish_status' => ['required', 'numeric', 'min:1', 'max:2'],
             'type' => ['required', 'string', 'in:sms,email,telegram,viber'],
