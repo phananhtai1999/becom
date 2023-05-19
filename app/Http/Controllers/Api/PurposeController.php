@@ -81,7 +81,7 @@ class PurposeController extends AbstractRestAPIController
         }
         $model = $this->service->findOrFailById($id);
 
-        $this->service->update($model, $request->all());
+        $this->service->update($model, $request->except('publish_status'));
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)

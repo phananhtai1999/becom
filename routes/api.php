@@ -1051,7 +1051,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'purpose.'], function () {
     Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
         Route::post('/purpose', [PurposeController::class, 'store'])->name('store');
         Route::put('/purpose/{id}', [PurposeController::class, 'edit'])->name('edit');
-        Route::delete('/purpose/{id}', [PurposeController::class, 'destroy'])->name('destroy');
+//        Route::delete('/purpose/{id}', [PurposeController::class, 'destroy'])->name('destroy');
         Route::get('/purposes', [PurposeController::class, 'index'])->name('index');
         Route::get('/purpose/{id}', [PurposeController::class, 'show'])->name('show');
         Route::put('/purpose/change-status/{id}', [PurposeController::class, 'changeStatus'])->name('edit');
