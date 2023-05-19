@@ -7,12 +7,15 @@ use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\IndexRequest;
-use App\Http\Requests\PurposeRequest;
-use App\Http\Requests\UpdatePurposeRequest;
+use App\Http\Requests\Purpose\ChangeStatusPurposeRequest;
+use App\Http\Requests\Purpose\DestroyPurposeRequest;
+use App\Http\Requests\Purpose\PurposeRequest;
+use App\Http\Requests\Purpose\UpdatePurposeRequest;
 use App\Http\Resources\PurposeResource;
 use App\Http\Resources\PurposeResourceCollection;
 use App\Models\Purpose;
 use App\Services\LanguageService;
+use App\Services\MailTemplateService;
 use App\Services\PurposeService;
 use Illuminate\Http\JsonResponse;
 
@@ -25,13 +28,16 @@ class PurposeController extends AbstractRestAPIController
      */
     protected $languageService;
 
+    protected $mailTemplateService;
+
     /**
      * @param PurposeService $service
      * @param LanguageService $languageService
      */
     public function __construct(
         PurposeService $service,
-        LanguageService $languageService
+        LanguageService $languageService,
+        MailTemplateService $mailTemplateService
     )
     {
         $this->service = $service;
@@ -41,6 +47,7 @@ class PurposeController extends AbstractRestAPIController
         $this->editRequest = UpdatePurposeRequest::class;
         $this->indexRequest = IndexRequest::class;
         $this->languageService = $languageService;
+        $this->mailTemplateService = $mailTemplateService;
     }
 
     /**
@@ -92,5 +99,34 @@ class PurposeController extends AbstractRestAPIController
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
         );
+    }
+
+    public function changeStatus($id, ChangeStatusPurposeRequest $request)
+    {
+        $purpose = $this->service->findOneById($id);
+        $status = $request->get('publish_status');
+
+        $goPurposeUuid = $request->get('purpose_uuid');
+        if ($status == Purpose::PENDING_PUBLISH_STATUS){
+            $this->mailTemplateService->movePurposeOfMailTemplate($id, $goPurposeUuid);
+        }
+
+        $this->service->update($purpose, [
+            'publish_status' => $status
+        ]);
+        return $this->sendOkJsonResponse();
+    }
+
+    public function destroyPurpose($id, DestroyPurposeRequest $request)
+    {
+        $purpose = $this->service->findOneById($id);
+
+        $goPurposeUuid = $request->get('purpose_uuid');
+
+        $this->mailTemplateService->movePurposeOfMailTemplate($id, $goPurposeUuid);
+
+        $purpose->delete();
+
+        return $this->sendOkJsonResponse();
     }
 }

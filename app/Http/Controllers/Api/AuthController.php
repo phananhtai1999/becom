@@ -422,9 +422,9 @@ class AuthController extends AbstractRestAPIController
             'message' => $message
         ], $userData))
             ->withCookie(
-                \cookie('accessToken', $userData['data']['token'], config('auth.password_timeout'), null, null, true, true)
+                \cookie('accessToken', $userData['data']['token'], config('auth.password_timeout'), null, null, false, true)
             )->withCookie(
-                \cookie('logged', true, config('auth.password_timeout'), null, null, true, false)
+                \cookie('logged', true, config('auth.password_timeout'), null, null, false, false)
             )->withoutCookie('invitePartner');
     }
 
