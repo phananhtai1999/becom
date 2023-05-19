@@ -5,6 +5,9 @@ use App\Http\Controllers\Api\AddOnController;
 use App\Http\Controllers\Api\AddOnSubscriptionPlanController;
 use App\Http\Controllers\Api\ArticleCategoryController;
 use App\Http\Controllers\Api\ArticleController;
+use App\Http\Controllers\Api\AssetController;
+use App\Http\Controllers\Api\AssetGroupController;
+use App\Http\Controllers\Api\AssetSizeController;
 use App\Http\Controllers\Api\AuthBySocialNetworkController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BillingAddressController;
@@ -1225,5 +1228,35 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website'], function () {
         Route::post('my/website', [WebsiteController::class, 'storeMy'])->name('index');
         Route::put('my/website/{id}', [WebsiteController::class, 'editMy'])->name('index');
         Route::delete('my/website/{id}', [WebsiteController::class, 'destroyMy'])->name('index');
+    });
+});
+
+Route::group(['middleware' => ['auth:api'], 'as' => 'asset'], function () {
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/assets', [AssetController::class, 'index']);
+        Route::get('asset/{id}', [AssetController::class, 'show']);
+        Route::post('asset', [AssetController::class, 'store']);
+        Route::put('asset/{id}', [AssetController::class, 'edit']);
+        Route::delete('asset/{id}', [AssetController::class, 'destroy']);
+    });
+});
+
+Route::group(['middleware' => ['auth:api'], 'as' => 'asset-group'], function () {
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/asset-groups', [AssetGroupController::class, 'index']);
+        Route::get('asset-group/{id}', [AssetGroupController::class, 'show']);
+        Route::post('asset-group', [AssetGroupController::class, 'store']);
+        Route::put('asset-group/{id}', [AssetGroupController::class, 'edit']);
+        Route::delete('asset-group/{id}', [AssetGroupController::class, 'destroy']);
+    });
+});
+
+Route::group(['middleware' => ['auth:api'], 'as' => 'asset-size'], function () {
+    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+        Route::get('/asset-sizes', [AssetSizeController::class, 'index']);
+        Route::get('asset-size/{id}', [AssetSizeController::class, 'show']);
+        Route::post('asset-size', [AssetSizeController::class, 'store']);
+        Route::put('asset-size/{id}', [AssetSizeController::class, 'edit']);
+        Route::delete('asset-size/{id}', [AssetSizeController::class, 'destroy']);
     });
 });
