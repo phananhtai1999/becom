@@ -1040,9 +1040,11 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'business-category.'], funct
     Route::group(['middleware' => ['role:admin'], 'as' => 'business-category.'], function () {
         Route::post('/business-category', [BusinessCategoryController::class, 'store'])->name('store');
         Route::put('/business-category/{id}', [BusinessCategoryController::class, 'edit'])->name('edit');
-        Route::delete('/business-category/{id}', [BusinessCategoryController::class, 'destroy'])->name('destroy');
+//        Route::delete('/business-category/{id}', [BusinessCategoryController::class, 'destroy'])->name('destroy');
         Route::get('/business-categories', [BusinessCategoryController::class, 'index'])->name('index');
         Route::get('/business-category/{id}', [BusinessCategoryController::class, 'show'])->name('show');
+        Route::put('business-category/change-status/{id}', [BusinessCategoryController::class, 'changeStatus'])->name('changeStatus');
+        Route::post('/delete-business-category/{id}', [BusinessCategoryController::class, 'destroyBusinessCategory'])->name('destroy');
     });
 });
 Route::get('public/business-categories', [BusinessCategoryController::class, 'indexPublic'])->name('business-categories-public.index');
@@ -1052,12 +1054,15 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'purpose.'], function () {
     Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
         Route::post('/purpose', [PurposeController::class, 'store'])->name('store');
         Route::put('/purpose/{id}', [PurposeController::class, 'edit'])->name('edit');
-        Route::delete('/purpose/{id}', [PurposeController::class, 'destroy'])->name('destroy');
+//        Route::delete('/purpose/{id}', [PurposeController::class, 'destroy'])->name('destroy');
         Route::get('/purposes', [PurposeController::class, 'index'])->name('index');
         Route::get('/purpose/{id}', [PurposeController::class, 'show'])->name('show');
+        Route::put('/purpose/change-status/{id}', [PurposeController::class, 'changeStatus'])->name('edit');
+        Route::post('/delete-purpose/{id}', [PurposeController::class, 'destroyPurpose'])->name('edit');
     });
 
     Route::get('public/purposes', [PurposeController::class, 'indexPublic'])->name('index');
+
 
 });
 

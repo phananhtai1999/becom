@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Business;
 
 use App\Abstracts\AbstractRequest;
 use Illuminate\Validation\Rule;
 
-class PurposeRequest extends AbstractRequest
+class BusinessCategoryRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -28,6 +28,7 @@ class PurposeRequest extends AbstractRequest
             'title' => ['required', 'array', 'min:1'],
             'title.en' => ['required', 'string'],
             'title.*' => ['required', 'string'],
+            'parent_uuid' => ['nullable', 'numeric', Rule::exists('business_categories', 'uuid')->whereNull('deleted_at')]
         ];
     }
 }

@@ -6,13 +6,17 @@ use App\Abstracts\AbstractRestAPIController;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
-use App\Http\Requests\BusinessCategoryRequest;
+use App\Http\Requests\Business\BusinessCategoryRequest;
+use App\Http\Requests\Business\ChangeStatusBusinessCategoryRequest;
+use App\Http\Requests\Business\DestroyBusinessCategoryRequest;
+use App\Http\Requests\Business\UpdateBusinessCategoryRequest;
 use App\Http\Requests\IndexRequest;
-use App\Http\Requests\UpdateBusinessCategoryRequest;
 use App\Http\Resources\BusinessCategoryResource;
 use App\Http\Resources\BusinessCategoryResourceCollection;
+use App\Models\BusinessCategory;
 use App\Services\BusinessCategoryService;
 use App\Services\LanguageService;
+use App\Services\MailTemplateService;
 use Illuminate\Http\JsonResponse;
 
 class BusinessCategoryController extends AbstractRestAPIController
@@ -24,13 +28,16 @@ class BusinessCategoryController extends AbstractRestAPIController
      */
     protected $languageService;
 
+    protected $mailTemplateService;
+
     /**
      * @param BusinessCategoryService $service
      * @param LanguageService $languageService
      */
     public function __construct(
         BusinessCategoryService $service,
-        LanguageService $languageService
+        LanguageService $languageService,
+        MailTemplateService $mailTemplateService
     )
     {
         $this->service = $service;
@@ -40,6 +47,7 @@ class BusinessCategoryController extends AbstractRestAPIController
         $this->editRequest = UpdateBusinessCategoryRequest::class;
         $this->indexRequest = IndexRequest::class;
         $this->languageService = $languageService;
+        $this->mailTemplateService = $mailTemplateService;
     }
 
     /**
@@ -73,7 +81,7 @@ class BusinessCategoryController extends AbstractRestAPIController
         }
         $model = $this->service->findOrFailById($id);
 
-        $this->service->update($model, $request->all());
+        $this->service->update($model, $request->except('publish_status'));
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -113,5 +121,42 @@ class BusinessCategoryController extends AbstractRestAPIController
         }
         return $this->sendValidationFailedJsonResponse();
 
+    }
+
+    public function changeStatus($id, ChangeStatusBusinessCategoryRequest $request)
+    {
+        $businessCategory = $this->service->findOneById($id);
+        $status = $request->get('publish_status');
+
+        if ($status == BusinessCategory::PENDING_PUBLISH_STATUS){
+            //Chuyển Cat Cha -> pending thì Cat con cũng k show => cũng phải move templates của Cat con
+            $catsChildAndSelf = $businessCategory->getDescendantsAndSelf()->pluck('uuid');
+            if (in_array($request->get('business_category_uuid'), $catsChildAndSelf->toArray())) {
+                return $this->sendValidationFailedJsonResponse(["errors" => ["business_category_uuid" => "The selected business category uuid is invalid"]]);
+            }
+            //Lấy tất cả Mail template có Cat con và Chính nó và Update lại Cat
+            $this->mailTemplateService->moveBusinessCategoryOfMailTemplate($catsChildAndSelf, $request->get('business_category_uuid'));
+        }
+
+        $this->service->update($businessCategory, [
+           'publish_status' => $status
+        ]);
+
+        return $this->sendOkJsonResponse();
+    }
+
+    public function destroyBusinessCategory($id, DestroyBusinessCategoryRequest $request)
+    {
+        $businessCategory = $this->service->findOneById($id);
+        $catsChildAndSelf = $businessCategory->getDescendantsAndSelf()->pluck('uuid');
+
+        $goCatUuid = $request->get('business_category_uuid');
+        if (in_array($goCatUuid, $catsChildAndSelf->toArray())) {
+            return $this->sendValidationFailedJsonResponse(["errors" => ["business_category_uuid" => "The selected business category uuid is invalid"]]);
+        }
+        $this->mailTemplateService->moveBusinessCategoryOfMailTemplate($catsChildAndSelf, $goCatUuid);
+        $this->service->destroy($id);
+
+        return $this->sendOkJsonResponse();
     }
 }
