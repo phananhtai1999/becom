@@ -40,8 +40,8 @@ class Asset extends Model
         'deleted_at' => 'datetime',
     ];
 
-    public function addOn()
+    public function assetSize()
     {
-        return $this->belongsTo(AddOn::class, 'add_on_uuid', 'uuid');
+        return $this->hasOne(AssetSize::class, 'uuid', 'asset_size_uuid');
     }
 }
