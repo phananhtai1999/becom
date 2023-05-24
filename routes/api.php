@@ -1241,6 +1241,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'asset'], function () {
         Route::post('generate-js-code/{id}', [AssetController::class, 'generateJsCode']);
     });
 });
+Route::get('generate/', [AssetController::class, 'generate']);
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'asset-group'], function () {
     Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {

@@ -25,7 +25,6 @@ class AssetRequest extends FormRequest
     {
         return [
             'file' => ['required', 'mimes:jpg,png,gif', 'max:153600'],
-            'url' => ['required', 'string'],
             'title' => ['required', 'string'],
             'asset_group_code' => ['required', 'string', 'exists:asset_groups,code'],
             'asset_size_uuid' => ['required', 'integer', 'exists:asset_sizes,uuid'],

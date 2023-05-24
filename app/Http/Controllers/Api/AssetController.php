@@ -15,15 +15,21 @@ use App\Http\Requests\UpdateAssetRequest;
 use App\Http\Resources\AssetResource;
 use App\Http\Resources\AssetResourceCollection;
 use App\Models\Asset;
+use App\Models\User;
 use App\Services\AssetService;
+use App\Services\UploadService;
+use App\Services\UserService;
+use http\Client\Request;
 
 class AssetController extends AbstractRestAPIController
 {
     use RestShowTrait, RestDestroyTrait, RestEditTrait, RestIndexTrait;
 
-    public function __construct(AssetService $service)
+    public function __construct(AssetService $service, UserService $userService, UploadService $uploadService)
     {
         $this->service = $service;
+        $this->userService = $userService;
+        $this->uploadService = $uploadService;
         $this->resourceCollectionClass = AssetResourceCollection::class;
         $this->resourceClass = AssetResource::class;
         $this->storeRequest = AssetRequest::class;
@@ -33,7 +39,8 @@ class AssetController extends AbstractRestAPIController
 
     public function store(AssetRequest $request)
     {
-        $model = $this->service->create($request->all());
+        $uploadUrl = $this->uploadFile($request->file, $this->userService->getCurrentUserRole(), $this->uploadService);
+        $model = $this->service->create(array_merge($request->all(), ['url' => $uploadUrl['absolute_slug']]));
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -46,20 +53,21 @@ class AssetController extends AbstractRestAPIController
             return $this->sendJsonResponse(false, 'You need become partner to use it', [], 400);
         }
         $partner = auth()->user()->partner;
-//        $jsCode = '<script>
-//    function ShowBanners() {
-//        const image = document.createElement("img");
-//        image.setAttribute("src", "' . $asset->url . '?ref=' . $partner->code . '");
-//        image.setAttribute("height", "' . $asset->assetSize->height . '");
-//        image.setAttribute("width", "' . $asset->assetSize->width . '");
-//        const link = document.createElement("a");
-//        link.href = "' . $request->get('url') . '";
-//        link.appendChild(image);
-//        document.getElementById("banner-ads").appendChild(link);
-//    }
-//</script>';
-//        $asset->js_code = $jsCode;
-        $jsCode = '<script type="text/javascript" src="http://localhost:8000/generate.php?pn='. $partner->uuid .'&as='. $id .'&link=' . $request->get('url') . '?ref=' . $partner->code . '"> </script>';
+        $jsCode = '<script type="text/javascript" src="' . env('FRONTEND_URL') . 'api/generate?pn='. $partner->uuid .'&as='. $id .'&link=' . $request->get('url') . '?ref=' . $partner->code . '"> </script>';
         return $this->sendOkJsonResponse(['data' => $jsCode]);
+    }
+
+    public function generate(\Illuminate\Http\Request $request) {
+        $asset = $this->service->findOrFailById($request->get('as'));
+        echo 'function ShowBanners() {
+        const image = document.createElement("img");
+        image.setAttribute("src", "https://www.simplilearn.com/ice9/free_resources_article_thumb/what_is_image_Processing.jpg");
+        image.setAttribute("height", "'. $asset->height .'");
+        image.setAttribute("width", "'. $asset->width .'");
+        const link = document.createElement("a");
+        link.href = "' . $request->get('link') .'";
+        link.appendChild(image);
+        document.getElementById("banner-ads").appendChild(link);
+    }';
     }
 }
