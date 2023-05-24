@@ -61,7 +61,7 @@ class AssetController extends AbstractRestAPIController
         $asset = $this->service->findOrFailById($request->get('as'));
         echo 'function ShowBanners() {
         const image = document.createElement("img");
-        image.setAttribute("src", "https://www.simplilearn.com/ice9/free_resources_article_thumb/what_is_image_Processing.jpg");
+        image.setAttribute("src", "'. $asset->url .'");
         image.setAttribute("height", "'. $asset->height .'");
         image.setAttribute("width", "'. $asset->width .'");
         const link = document.createElement("a");
