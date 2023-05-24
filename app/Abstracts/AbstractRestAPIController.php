@@ -5,6 +5,8 @@ namespace App\Abstracts;
 use App\Models\AddOn;
 use App\Models\Permission;
 use App\Models\PlatformPackage;
+use Aws\Exception\CredentialsException;
+use Aws\S3\Exception\S3Exception;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -16,6 +18,7 @@ use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Str;
 
 class AbstractRestAPIController extends BaseController
 {
@@ -203,5 +206,24 @@ class AbstractRestAPIController extends BaseController
         }
 
         return $str;
+    }
+    public function uploadFile($uploadType, $role, $uploadService)
+    {
+        try {
+            $imageName = $role . '-' . Str::uuid() . '_' . time() . '.' . $uploadType->getClientOriginalExtension();
+            //Bucket S3
+            $configS3 = $uploadService->getStorageServiceByType('s3');
+            //Check storage service exists or not
+            $disk = $uploadService->storageBuild($configS3);
+            //Upload
+            $path = $disk->putFileAs('public/upload', $uploadType, $imageName);
+
+            return [
+                "slug" => $path,
+                "absolute_slug" => $disk->url($path)
+            ];
+        } catch (S3Exception|\InvalidArgumentException|CredentialsException $exception) {
+            return $this->sendValidationFailedJsonResponse();
+        }
     }
 }
