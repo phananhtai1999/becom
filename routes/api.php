@@ -1235,6 +1235,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website'], function () {
         Route::delete('my/website/{id}', [WebsiteController::class, 'destroyMy'])->name('index');
     });
 });
+Route::get('public/website/{id}', [WebsiteController::class, 'show'])->name('website.show');
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'asset'], function () {
     Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
