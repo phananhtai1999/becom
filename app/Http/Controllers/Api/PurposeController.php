@@ -103,12 +103,16 @@ class PurposeController extends AbstractRestAPIController
 
     public function changeStatus($id, ChangeStatusPurposeRequest $request)
     {
-        $purpose = $this->service->findOneById($id);
+        $purpose = $this->service->findOrFailById($id);
         $status = $request->get('publish_status');
 
         $goPurposeUuid = $request->get('purpose_uuid');
         if ($status == Purpose::PENDING_PUBLISH_STATUS){
-            $this->mailTemplateService->movePurposeOfMailTemplate($id, $goPurposeUuid);
+            $mailTemplates = $this->mailTemplateService->findAllWhere(['purpose_uuid' => $id], ['uuid','purpose_uuid']);
+            if ($mailTemplates->count() > 0 && !$goPurposeUuid){
+                return $this->sendValidationFailedJsonResponse(["errors" => ["purpose_uuid" => "The selected purpose uuid is invalid"]]);
+            }
+            $this->mailTemplateService->movePurposeOfMailTemplates($mailTemplates, $goPurposeUuid);
         }
 
         $this->service->update($purpose, [
@@ -119,11 +123,14 @@ class PurposeController extends AbstractRestAPIController
 
     public function destroyPurpose($id, DestroyPurposeRequest $request)
     {
-        $purpose = $this->service->findOneById($id);
-
+        $purpose = $this->service->findOrFailById($id);
         $goPurposeUuid = $request->get('purpose_uuid');
 
-        $this->mailTemplateService->movePurposeOfMailTemplate($id, $goPurposeUuid);
+        $mailTemplates = $this->mailTemplateService->findAllWhere(['purpose_uuid' => $id], ['uuid','purpose_uuid']);
+        if ($mailTemplates->count() > 0 && !$goPurposeUuid){
+            return $this->sendValidationFailedJsonResponse(["errors" => ["purpose_uuid" => "The selected purpose uuid is invalid"]]);
+        }
+        $this->mailTemplateService->movePurposeOfMailTemplates($mailTemplates, $goPurposeUuid);
 
         $purpose->delete();
 
