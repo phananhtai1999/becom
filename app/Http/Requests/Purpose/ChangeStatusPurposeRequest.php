@@ -31,7 +31,7 @@ class ChangeStatusPurposeRequest extends AbstractRequest
                     ->where('uuid', $this->id)
                     ->whereNull('deleted_at');
             })],
-            'purpose_uuid' => ['nullable',"required_if:publish_status,".Purpose::PENDING_PUBLISH_STATUS,Rule::exists('purposes', 'uuid')->where(function ($q) {
+            'purpose_uuid' => ['nullable',Rule::exists('purposes', 'uuid')->where(function ($q) {
                 return $q->where('publish_status', Purpose::PUBLISHED_PUBLISH_STATUS)
                     ->where('uuid', '<>', $this->id)->whereNull('deleted_at');
             })]

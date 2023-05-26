@@ -26,7 +26,7 @@ class DestroyPurposeRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'purpose_uuid' => ['required',Rule::exists('purposes', 'uuid')->where(function ($q) {
+            'purpose_uuid' => ['nullable',Rule::exists('purposes', 'uuid')->where(function ($q) {
                 return $q->where('publish_status', Purpose::PUBLISHED_PUBLISH_STATUS)
                     ->where('uuid', '<>', $this->id)->whereNull('deleted_at');
             })]

@@ -27,7 +27,7 @@ class DestroyBusinessCategoryRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'business_category_uuid' => ['required', Rule::exists('business_categories', 'uuid')->where(function ($q) {
+            'business_category_uuid' => ['nullable', Rule::exists('business_categories', 'uuid')->where(function ($q) {
                 return $q->where('publish_status', BusinessCategory::PUBLISHED_PUBLISH_STATUS)
                     ->where('uuid', '<>', $this->id)->whereNull('deleted_at');
             })]

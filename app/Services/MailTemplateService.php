@@ -43,9 +43,8 @@ class MailTemplateService extends AbstractService
         ]);
     }
 
-    public function moveBusinessCategoryOfMailTemplate($businessCategoriesUuids, $goBusinessCategoryUuid)
+    public function moveBusinessCategoryOfMailTemplates($mailTemplates, $goBusinessCategoryUuid)
     {
-        $mailTemplates = $this->model->select('uuid','business_category_uuid')->whereIn('business_category_uuid', $businessCategoriesUuids)->get();
         foreach ($mailTemplates as $mailTemplate){
             $this->update($mailTemplate, [
                'business_category_uuid' => $goBusinessCategoryUuid
@@ -53,9 +52,8 @@ class MailTemplateService extends AbstractService
         }
     }
 
-    public function movePurposeOfMailTemplate($purposeUuid, $goPurposeUuid)
+    public function movePurposeOfMailTemplates($mailTemplates, $goPurposeUuid)
     {
-        $mailTemplates = $this->model->select('uuid','purpose_uuid')->where('purpose_uuid', $purposeUuid)->get();
         foreach ($mailTemplates as $mailTemplate){
             $this->update($mailTemplate, [
                 'purpose_uuid' => $goPurposeUuid

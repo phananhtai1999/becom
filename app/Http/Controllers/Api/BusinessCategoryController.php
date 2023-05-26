@@ -125,17 +125,21 @@ class BusinessCategoryController extends AbstractRestAPIController
 
     public function changeStatus($id, ChangeStatusBusinessCategoryRequest $request)
     {
-        $businessCategory = $this->service->findOneById($id);
+        $businessCategory = $this->service->findOrFailById($id);
         $status = $request->get('publish_status');
 
         if ($status == BusinessCategory::PENDING_PUBLISH_STATUS){
+            $goCatUuid = $request->get('business_category_uuid');
+
             //Chuyển Cat Cha -> pending thì Cat con cũng k show => cũng phải move templates của Cat con
             $catsChildAndSelf = $businessCategory->getDescendantsAndSelf()->pluck('uuid');
-            if (in_array($request->get('business_category_uuid'), $catsChildAndSelf->toArray())) {
+            $mailTemplates = $this->mailTemplateService->findAllWhereIn('business_category_uuid', $catsChildAndSelf, ['uuid', 'business_category_uuid']);
+            if (($mailTemplates->count() > 0 && !$goCatUuid) || (in_array($goCatUuid, $catsChildAndSelf->toArray()))) {
                 return $this->sendValidationFailedJsonResponse(["errors" => ["business_category_uuid" => "The selected business category uuid is invalid"]]);
             }
+
             //Lấy tất cả Mail template có Cat con và Chính nó và Update lại Cat
-            $this->mailTemplateService->moveBusinessCategoryOfMailTemplate($catsChildAndSelf, $request->get('business_category_uuid'));
+            $this->mailTemplateService->moveBusinessCategoryOfMailTemplates($mailTemplates, $goCatUuid);
         }
 
         $this->service->update($businessCategory, [
@@ -147,14 +151,15 @@ class BusinessCategoryController extends AbstractRestAPIController
 
     public function destroyBusinessCategory($id, DestroyBusinessCategoryRequest $request)
     {
-        $businessCategory = $this->service->findOneById($id);
+        $businessCategory = $this->service->findOrFailById($id);
         $catsChildAndSelf = $businessCategory->getDescendantsAndSelf()->pluck('uuid');
 
         $goCatUuid = $request->get('business_category_uuid');
-        if (in_array($goCatUuid, $catsChildAndSelf->toArray())) {
+        $mailTemplates = $this->mailTemplateService->findAllWhereIn('business_category_uuid', $catsChildAndSelf, ['uuid', 'business_category_uuid']);
+        if (($mailTemplates->count() > 0 && !$goCatUuid) || (in_array($goCatUuid, $catsChildAndSelf->toArray()))) {
             return $this->sendValidationFailedJsonResponse(["errors" => ["business_category_uuid" => "The selected business category uuid is invalid"]]);
         }
-        $this->mailTemplateService->moveBusinessCategoryOfMailTemplate($catsChildAndSelf, $goCatUuid);
+        $this->mailTemplateService->moveBusinessCategoryOfMailTemplates($mailTemplates, $goCatUuid);
         $this->service->destroy($id);
 
         return $this->sendOkJsonResponse();

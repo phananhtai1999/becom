@@ -31,7 +31,7 @@ class ChangeStatusBusinessCategoryRequest extends AbstractRequest
                     ->where('uuid', $this->id)
                     ->whereNull('deleted_at');
             })],
-            'business_category_uuid' => ['nullable',"required_if:publish_status,".BusinessCategory::PENDING_PUBLISH_STATUS,Rule::exists('business_categories', 'uuid')->where(function ($q) {
+            'business_category_uuid' => ['nullable', Rule::exists('business_categories', 'uuid')->where(function ($q) {
                 return $q->where('publish_status', BusinessCategory::PUBLISHED_PUBLISH_STATUS)
                     ->where('uuid', '<>', $this->id)->whereNull('deleted_at');
             })]

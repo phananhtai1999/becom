@@ -145,15 +145,27 @@ abstract class AbstractService
 
     /**
      * @param $where
+     * @param array|null $select
      * @return mixed
      */
-    public function findAllWhere($where = null)
+    public function findAllWhere($where = null, array $select = null)
     {
-        return $this->model->where($where)->get();
+        return $this->model->select($select ?? '*')->where($where)->get();
     }
     public function firstOrCreate($where, $data)
     {
         return $this->model->firstOrCreate($where, $data);
+    }
+
+    /**
+     * @param string|null $whereColumn
+     * @param null $arrayValues
+     * @param array|null $select
+     * @return mixed
+     */
+    public function findAllWhereIn(string $whereColumn = null, $arrayValues = null ,array $select = null)
+    {
+        return $this->model->select($select ?? '*')->whereIn($whereColumn, $arrayValues)->get();
     }
 
     public function collectionPagination($results, $perPage, $page = null)
