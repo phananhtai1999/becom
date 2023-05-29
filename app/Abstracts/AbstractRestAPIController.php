@@ -18,6 +18,7 @@ use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class AbstractRestAPIController extends BaseController
@@ -222,6 +223,18 @@ class AbstractRestAPIController extends BaseController
                 "slug" => $path,
                 "absolute_slug" => $disk->url($path)
             ];
+        } catch (S3Exception|\InvalidArgumentException|CredentialsException $exception) {
+            return $this->sendValidationFailedJsonResponse();
+        }
+    }
+    public function deleteFile($filename, $uploadService)
+    {
+        try {
+            $configS3 = $uploadService->getStorageServiceByType('s3');
+            $disk = $uploadService->storageBuild($configS3);
+            $disk->delete($filename);
+
+            return true;
         } catch (S3Exception|\InvalidArgumentException|CredentialsException $exception) {
             return $this->sendValidationFailedJsonResponse();
         }
