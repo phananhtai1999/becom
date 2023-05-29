@@ -6,16 +6,18 @@ use App\Abstracts\AbstractRestAPIController;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
-use App\Http\Requests\ArticleCategoryRequest;
+use App\Http\Requests\Article\ArticleCategoryRequest;
+use App\Http\Requests\Article\ChangeStatusArticleCategoryRequest;
+use App\Http\Requests\Article\DestroyArticleCategoryRequest;
+use App\Http\Requests\Article\UpdateArticleCategoryRequest;
 use App\Http\Requests\IndexRequest;
-use App\Http\Requests\UpdateArticleCategoryRequest;
 use App\Http\Resources\ArticleCategoryResource;
 use App\Http\Resources\ArticleCategoryResourceCollection;
-use App\Models\Language;
+use App\Models\ArticleCategory;
 use App\Services\ArticleCategoryService;
+use App\Services\ArticleService;
 use App\Services\LanguageService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class ArticleCategoryController extends AbstractRestAPIController
 {
@@ -26,13 +28,16 @@ class ArticleCategoryController extends AbstractRestAPIController
      */
     protected $languageService;
 
+    protected $articleService;
+
     /**
      * @param ArticleCategoryService $service
      * @param LanguageService $languageService
      */
     public function __construct(
         ArticleCategoryService $service,
-        LanguageService $languageService
+        LanguageService $languageService,
+        ArticleService  $articleService
     )
     {
         $this->service = $service;
@@ -42,6 +47,7 @@ class ArticleCategoryController extends AbstractRestAPIController
         $this->editRequest = UpdateArticleCategoryRequest::class;
         $this->indexRequest = IndexRequest::class;
         $this->languageService = $languageService;
+        $this->articleService = $articleService;
     }
 
     /**
@@ -117,5 +123,45 @@ class ArticleCategoryController extends AbstractRestAPIController
         }
         return $this->sendValidationFailedJsonResponse();
 
+    }
+
+    public function changeStatus($id, ChangeStatusArticleCategoryRequest $request)
+    {
+        $articleCategory = $this->service->findOrFailById($id);
+        $status = $request->get('publish_status');
+
+        if ($status == ArticleCategory::PENDING_PUBLISH_STATUS) {
+            $goCatUuid = $request->get('article_category_uuid');
+
+            $catsChildAndSelf = $articleCategory->getDescendantsAndSelf()->pluck('uuid');
+            $articles = $this->articleService->findAllWhereIn('article_category_uuid', $catsChildAndSelf, ['uuid', 'article_category_uuid']);
+            if (($articles->count() > 0 && !$goCatUuid) || (in_array($goCatUuid, $catsChildAndSelf->toArray()))) {
+                return $this->sendValidationFailedJsonResponse(["errors" => ["article_category_uuid" => "The selected article category uuid is invalid"]]);
+            }
+
+            $this->articleService->moveArticlesCategoryOfArticles($articles, $goCatUuid);
+        }
+
+        $this->service->update($articleCategory, [
+            'publish_status' => $status
+        ]);
+
+        return $this->sendOkJsonResponse();
+    }
+
+    public function deleteCategory($id, DestroyArticleCategoryRequest $request)
+    {
+        $articleCategory = $this->service->findOrFailById($id);
+        $catsChildAndSelf = $articleCategory->getDescendantsAndSelf()->pluck('uuid');
+
+        $goCatUuid = $request->get('article_category_uuid');
+        $articles = $this->articleService->findAllWhereIn('article_category_uuid', $catsChildAndSelf, ['uuid', 'article_category_uuid']);
+        if (($articles->count() > 0 && !$goCatUuid) || (in_array($goCatUuid, $catsChildAndSelf->toArray()))) {
+            return $this->sendValidationFailedJsonResponse(["errors" => ["article_category_uuid" => "The selected article category uuid is invalid"]]);
+        }
+        $this->articleService->moveArticlesCategoryOfArticles($articles, $goCatUuid);
+        $this->service->destroy($id);
+
+        return $this->sendOkJsonResponse();
     }
 }

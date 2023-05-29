@@ -757,6 +757,8 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'article-category.'], functi
         Route::delete('/article-category/{id}', [ArticleCategoryController::class, 'destroy'])->name('destroy');
         Route::get('/article-categories', [ArticleCategoryController::class, 'index'])->name('index');
         Route::get('/article-category/{id}', [ArticleCategoryController::class, 'show'])->name('show');
+        Route::put('/article-category/change-status/{id}', [ArticleCategoryController::class, 'changeStatus'])->name('changeStatus');
+        Route::post('/delete-article-category/{id}', [ArticleCategoryController::class, 'deleteCategory']);
     });
 });
 Route::get('public/article-categories', [ArticleCategoryController::class, 'indexPublic'])->name('article-categories-public.index');

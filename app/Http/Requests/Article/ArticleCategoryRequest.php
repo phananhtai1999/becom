@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Article;
 
 use App\Abstracts\AbstractRequest;
 use Illuminate\Validation\Rule;
