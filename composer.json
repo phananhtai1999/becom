@@ -10,6 +10,8 @@
     "require": {
         "php": "^7.3|^8.0",
         "ext-curl": "*",
+        "ext-exif": "*",
+        "ext-gd": "*",
         "ext-json": "*",
         "aws/aws-sdk-php": "^3.216",
         "barryvdh/laravel-dompdf": "*",
