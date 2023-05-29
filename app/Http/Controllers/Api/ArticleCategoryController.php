@@ -21,7 +21,7 @@ use Illuminate\Http\JsonResponse;
 
 class ArticleCategoryController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestShowTrait, RestDestroyTrait;
+    use RestIndexTrait, RestShowTrait;
 
     /**
      * @var LanguageService
@@ -83,7 +83,7 @@ class ArticleCategoryController extends AbstractRestAPIController
         }
         $model = $this->service->findOrFailById($id);
 
-        $this->service->update($model, $request->except('user_uuid'));
+        $this->service->update($model, $request->except(['user_uuid', 'publish_status']));
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
