@@ -208,4 +208,13 @@ class ArticleService extends AbstractService
                 ->orWhereNull('article_category_uuid');
         })->firstOrFail();
     }
+
+    public function moveArticlesCategoryOfArticles($articles, $goCategoryUuid)
+    {
+        foreach ($articles as $article){
+            $this->update($article, [
+                'article_category_uuid' => $goCategoryUuid
+            ]);
+        }
+    }
 }

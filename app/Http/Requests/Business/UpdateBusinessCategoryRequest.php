@@ -27,7 +27,6 @@ class UpdateBusinessCategoryRequest extends AbstractRequest
         return [
             'title' => ['array', 'min:1'],
             'title.*' => ['string'],
-            'publish_status' => ['numeric', 'min:1', 'max:2'],
             'parent_uuid' => ['nullable', 'numeric', Rule::exists('business_categories', 'uuid')->where(function ($query) {
                 return $query->where('uuid',"<>", $this->id)->whereNull('deleted_at');
             })],
