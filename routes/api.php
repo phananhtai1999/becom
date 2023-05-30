@@ -612,9 +612,9 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'creditPackage.'], function 
         Route::put('/credit-package/{id}', [CreditPackageController::class, 'edit']);
         Route::delete('/credit-package/{id}', [CreditPackageController::class, 'destroy']);
     });
-    Route::get('/credit-package/{id}', [CreditPackageController::class, 'show']);
-    Route::get('/credit-packages', [CreditPackageController::class, 'index']);
 });
+Route::get('/credit-package/{id}', [CreditPackageController::class, 'show']);
+Route::get('/credit-packages', [CreditPackageController::class, 'index']);
 Route::group(['middleware' => ['auth:api'], 'as' => 'subscriptionPlan.'], function () {
     Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
         Route::post('/subscription-plan', [SubscriptionPlanController::class, 'store']);
