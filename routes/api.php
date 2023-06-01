@@ -942,12 +942,12 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'footer_template.'], functio
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'country.'], function () {
-    Route::get('/countries', [CountryController::class, 'index'])->name('index');
     Route::post('/country', [CountryController::class, 'store'])->name('store');
-    Route::get('/country/{id}', [CountryController::class, 'show'])->name('show');
     Route::put('/country/{id}', [CountryController::class, 'edit'])->name('edit');
     Route::delete('/country/{id}', [CountryController::class, 'destroy'])->name('destroy');
 });
+Route::get('/country/{id}', [CountryController::class, 'show'])->name('show');
+Route::get('/countries', [CountryController::class, 'index'])->name('index');
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'billingAddress.'], function () {
     Route::get('/billing-addresses', [BillingAddressController::class, 'index'])->name('index');
