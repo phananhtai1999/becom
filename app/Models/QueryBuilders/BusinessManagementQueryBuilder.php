@@ -35,6 +35,8 @@ class BusinessManagementQueryBuilder extends AbstractQueryBuilder
                 'customers',
                 'owner_uuid',
                 'domain_uuid',
+                'avatar',
+                'slogan',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -45,6 +47,8 @@ class BusinessManagementQueryBuilder extends AbstractQueryBuilder
                 'customers',
                 'owner_uuid',
                 'domain_uuid',
+                'avatar',
+                'slogan',
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -57,6 +61,10 @@ class BusinessManagementQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__products_services', 'products_services'),
                 'customers',
                 AllowedFilter::exact('exact__customers', 'customers'),
+                'avatar',
+                AllowedFilter::exact('exact__avatar', 'avatar'),
+                'slogan',
+                AllowedFilter::exact('exact__slogan', 'slogan'),
                 'owner_uuid',
                 AllowedFilter::exact('exact__owner_uuid', 'owner_uuid'),
                 'domain_uuid',

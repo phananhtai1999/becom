@@ -23,6 +23,8 @@ class BusinessManagementResource extends AbstractJsonResource
             'introduce' => $this->introduce,
             'products_services' => $this->products_services,
             'customers' => $this->customers,
+            'avatar' => $this->avatar,
+            'slogan' => $this->slogan,
             'owner_uuid' => $this->owner_uuid,
             'domain_uuid' => $this->domain_uuid,
             'deleted_at' => $this->deleted_at,
