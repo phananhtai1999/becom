@@ -136,12 +136,17 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'user.'], function () {
 
 Route::get('/user/show-by-username/{username}', [UserController::class, 'showByUserName'])->name('user.showByUserName');
 
-Route::group(['middleware' => ['auth:api', 'role:admin'], 'as' => 'role.'], function () {
-    Route::get('/roles', [RoleController::class, 'index'])->name('index');
-    Route::post('/role', [RoleController::class, 'store'])->name('store');
-    Route::get('/role/{id}', [RoleController::class, 'show'])->name('show');
-    Route::put('/role/{id}', [RoleController::class, 'edit'])->name('edit');
-    Route::delete('/role/{id}', [RoleController::class, 'destroy'])->name('destroy');
+Route::group(['middleware' => ['auth:api'], 'as' => 'role.'], function () {
+    Route::group(['middleware' => ['role:root'], 'as' => 'role.'], function () {
+        Route::post('/role', [RoleController::class, 'store'])->name('store');
+        Route::put('/role/{id}', [RoleController::class, 'edit'])->name('edit');
+        Route::delete('/role/{id}', [RoleController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::group(['middleware' => ['role:admin,root'], 'as' => 'role.'], function () {
+        Route::get('/roles', [RoleController::class, 'index'])->name('index');
+        Route::get('/role/{id}', [RoleController::class, 'show'])->name('show');
+    });
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'user-detail.'], function () {
@@ -174,7 +179,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'user-config.'], function ()
     });
 });
 
-Route::group(['middleware' => ['auth:api', 'role:admin'], 'as' => 'config.admin'], function () {
+Route::group(['middleware' => ['auth:api', 'role:root'], 'as' => 'config.root'], function () {
     Route::get('/configs', [ConfigController::class, 'index'])->name('index');
     Route::post('/config', [ConfigController::class, 'store'])->name('store');
     Route::put('/config/upsert', [ConfigController::class, 'upsertConfig'])->name('upsertConfig');
