@@ -699,6 +699,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'section-template'], functio
     });
 
     Route::get('/section-templates-default', [SectionTemplateController::class, 'getSectionTemplatesDefault'])->name('getWebsitePagesDefault');
+    Route::get('/section-template-default/{id}', [SectionTemplateController::class, 'showSectionTemplateDefault'])->name('showSectionTemplateDefault');
 });
 
 //Form
@@ -728,6 +729,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'form.'], function () {
     });
 
     Route::get('/forms-default', [FormController::class, 'getFormsDefault'])->name('getFormsDefault');
+    Route::get('/form-default/{id}', [FormController::class, 'showFormDefault'])->name('showFormDefault');
 });
 
 Route::post('/form/submit-contact', [FormController::class, 'submitContact'])->name('form.submitContact');

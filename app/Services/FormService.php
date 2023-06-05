@@ -24,4 +24,13 @@ class FormService extends AbstractService
             ['uuid', $id]
         ]);
     }
+
+    public function showFormDefaultById($id)
+    {
+        return $this->findOneWhereOrFail([
+            ['publish_status', Form::PUBLISHED_PUBLISH_STATUS],
+            ['contact_list_uuid', null],
+            ['uuid', $id]
+        ]);
+    }
 }

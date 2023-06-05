@@ -24,4 +24,13 @@ class SectionTemplateService extends AbstractService
             ['uuid', $id]
         ]);
     }
+
+    public function showSectionTemplateDefaultById($id)
+    {
+        return $this->findOneWhereOrFail([
+            ['publish_status', SectionTemplate::PUBLISHED_PUBLISH_STATUS],
+            ['is_default', true],
+            ['uuid', $id]
+        ]);
+    }
 }

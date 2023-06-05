@@ -291,4 +291,13 @@ class FormController extends AbstractRestAPIController
             $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
         );
     }
+
+    public function showFormDefault($id)
+    {
+        $model = $this->service->showFormDefaultById($id);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
 }

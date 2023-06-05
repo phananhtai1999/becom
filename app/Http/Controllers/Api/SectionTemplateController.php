@@ -227,4 +227,13 @@ class SectionTemplateController extends AbstractRestAPIController
         );
     }
 
+    public function showSectionTemplateDefault($id)
+    {
+        $model = $this->service->showSectionTemplateDefaultById($id);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
 }
