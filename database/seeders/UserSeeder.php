@@ -27,13 +27,26 @@ class UserSeeder extends Seeder {
                 'password' => '111@222',
                 'role' => 'user',
             ],
+            [
+                'email' => 'root@sendemail.techupcorp',
+                'password' => '111@222',
+                'role' => 'root',
+            ]
         ];
         $role = Role::where('name', 'user')->first();
         $roleadmin = Role::where('name', 'admin')->first();
-        if ($role && $roleadmin) {
+        $roleRoot = Role::where('name', 'root')->first();
+        if ($role && $roleadmin && $roleRoot) {
             foreach ($users as $item) {
+                if($item['role'] == 'admin'){
+                    $current_role = $roleadmin;
+                }elseif ($item['role'] == 'root'){
+                    $current_role = $roleRoot;
+                }else{
+                    $current_role = $role;
+                }
+
                 if ($user = User::where('email', $item['email'])->first()) {
-                    $current_role = $item['role'] === 'admin' ? $roleadmin : $role;
                     $user->roles()->sync([$current_role->uuid]);
                     continue;
                 }
@@ -42,7 +55,6 @@ class UserSeeder extends Seeder {
                     'password' => Hash::make($item['password']),
                     'can_add_smtp_account' => true
                 ]);
-                $current_role = $item['role'] === 'admin' ? $roleadmin : $role;
                 $user->roles()->sync([$current_role->uuid]);
             }
 //            User::factory(10)->create()->each(function ($user) use ($role) {
