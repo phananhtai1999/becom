@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
-use App\Http\Controllers\Traits\RestIndexMyTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Requests\ContactListRequest;
 use App\Http\Requests\IndexRequest;
@@ -23,7 +22,7 @@ use Illuminate\Http\JsonResponse;
 
 class ContactListController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestIndexMyTrait;
+    use RestIndexTrait, RestShowTrait, RestDestroyTrait;
 
     /**
      * @var MyContactListService
@@ -396,5 +395,4 @@ class ContactListController extends AbstractRestAPIController
             $this->service->resourceCollectionToData($this->resourceCollectionClass, $contactLists)
         );
     }
-
 }
