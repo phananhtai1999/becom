@@ -39,16 +39,20 @@ class AssetController extends AbstractRestAPIController
     {
         $uploadUrl = $this->uploadFile($request->file, $this->userService->getCurrentUserRole(), $this->uploadService);
         $filename = $uploadUrl['absolute_slug'];
-        $duration = $this->getGifDuration($filename);
-        $loop = $this->getGifLoopCount($filename);
-        if (empty($loop) || $duration > 30 || $loop * $duration > 30) {
-            $this->deleteFile($uploadUrl['slug'], $this->uploadService);
+        if ($request->get('type') == 'image') {
+            if (getimagesize($filename)['mime'] == 'image/gif') {
+                $duration = $this->getGifDuration($filename);
+                $loop = $this->getGifLoopCount($filename);
+                if (empty($loop) || $duration > 30 || $loop * $duration > 30) {
+                    $this->deleteFile($uploadUrl['slug'], $this->uploadService);
 
-            return $this->sendJsonResponse(false, 'The gif longer than 30s', [], 400);
-        } elseif ($this->getFrames($filename) / $duration > 5) {
-            $this->deleteFile($uploadUrl['slug'], $this->uploadService);
+                    return $this->sendJsonResponse(false, 'The gif longer than 30s', [], 400);
+                } elseif ($this->getFrames($filename) / $duration > 5) {
+                    $this->deleteFile($uploadUrl['slug'], $this->uploadService);
 
-            return $this->sendJsonResponse(false, 'The gif must be smaller than 5FPS', [], 400);
+                    return $this->sendJsonResponse(false, 'The gif must be smaller than 5FPS', [], 400);
+                }
+            }
         }
         $model = $this->service->create(array_merge($request->all(), ['url' => $uploadUrl['absolute_slug']]));
 
@@ -75,7 +79,7 @@ class AssetController extends AbstractRestAPIController
             $totalDuration += $delayTime;
         }
 
-        return $totalDurationSec = $totalDuration / 100.0;
+        return $totalDuration / 100.0;
     }
 
     public function getFrames($filename)
@@ -100,9 +104,6 @@ class AssetController extends AbstractRestAPIController
     {
         $gifData = file_get_contents($filepath);
 
-// Locate the loop count block
-
-// Find the loop count using regular expressions
         preg_match('/\x21\xFF\x0B(?:\x4E\x45\x54\x53\x43\x41\x50\x45\x32\x2E\x30\x03\x01(.{2}))/', $gifData, $matches);
         $loopCount = isset($matches[1]) ? unpack('v', $matches[1])[1] : 0;
 
