@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\AssetGroup;
+use App\Models\AssetSize;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\App;
 
@@ -24,7 +26,9 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
             LanguageSeeder::class,
             PlatformPackageSeeder::class,
-            StatusSeeder::class
+            StatusSeeder::class,
+            AssetGroupSeeder::class,
+            AssetSizeSeeder::class
         ]);
         if (!App::environment('production')) {
             $this->call([

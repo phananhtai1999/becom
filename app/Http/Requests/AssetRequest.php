@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Sabberworm\CSS\Rule\Rule;
 
 class AssetRequest extends FormRequest
 {
@@ -23,12 +24,18 @@ class AssetRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            'file' => ['required', 'mimes:jpg,png,gif', 'max:153600'],
+        $validate = [
+            'file' => ['required'],
             'title' => ['required', 'string'],
             'asset_group_code' => ['required', 'string', 'exists:asset_groups,code'],
             'asset_size_uuid' => ['required', 'integer', 'exists:asset_sizes,uuid'],
-            'type' => ['required', 'string'],
+            'type' => ['required', \Illuminate\Validation\Rule::in(['image', 'video'])],
         ];
+        if($this->request->get('type') == 'video') {
+            $validate['file'] = array_merge($validate['file'], ['mimes:mp4']);
+        } else {
+            $validate['file'] = array_merge($validate['file'], ['mimes:jpg,png,gif', 'max:153600']);
+        }
+        return $validate;
     }
 }

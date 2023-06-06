@@ -1245,7 +1245,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website'], function () {
 Route::get('public/website/{id}', [WebsiteController::class, 'show'])->name('website.show');
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'asset'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:admin,editor'], 'as' => 'admin.'], function () {
         Route::get('/assets', [AssetController::class, 'index']);
         Route::get('asset/{id}', [AssetController::class, 'show']);
         Route::post('asset', [AssetController::class, 'store']);
@@ -1257,7 +1257,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'asset'], function () {
 Route::get('generate/', [AssetController::class, 'generate']);
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'asset-group'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:admin,editor'], 'as' => 'admin.'], function () {
         Route::get('/asset-groups', [AssetGroupController::class, 'index']);
         Route::get('asset-group/{id}', [AssetGroupController::class, 'show']);
         Route::post('asset-group', [AssetGroupController::class, 'store']);
@@ -1267,7 +1267,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'asset-group'], function () 
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'asset-size'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:admin,editor'], 'as' => 'admin.'], function () {
         Route::get('/asset-sizes', [AssetSizeController::class, 'index']);
         Route::get('asset-size/{id}', [AssetSizeController::class, 'show']);
         Route::post('asset-size', [AssetSizeController::class, 'store']);
