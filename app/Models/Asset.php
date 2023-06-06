@@ -28,7 +28,6 @@ class Asset extends Model
     protected $fillable = [
         'type',
         'title',
-        'asset_group_code',
         'asset_size_uuid',
         'url',
     ];

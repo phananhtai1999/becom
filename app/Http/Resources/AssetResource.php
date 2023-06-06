@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Http\Requests\AssetGroupRequest;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class AssetResource extends JsonResource
@@ -14,13 +15,23 @@ class AssetResource extends JsonResource
      */
     public function toArray($request)
     {
-        return [
+        $expand = request()->get('expand', []);
+
+        $data = [
             'uuid' => $this->uuid,
             'type' => $this->type,
             'title' => $this->title,
             'url' => $this->url,
-            'asset_group_code' => $this->asset_group_code,
             'asset_size_uuid' => $this->asset_size_uuid,
         ];
+
+        if (\in_array('asset__asset_size', $expand)) {
+            $data['asset_size'] = new AssetSizeResource($this->assetSize);
+        }
+        if (\in_array('asset__asset_group', $expand)) {
+            $data['asset_group'] = new AssetGroupResource(optional($this->assetSize)->assetGroup);
+        }
+
+        return $data;
     }
 }

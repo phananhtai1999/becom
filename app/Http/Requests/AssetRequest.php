@@ -27,7 +27,6 @@ class AssetRequest extends FormRequest
         $validate = [
             'file' => ['required'],
             'title' => ['required', 'string'],
-            'asset_group_code' => ['required', 'string', 'exists:asset_groups,code'],
             'asset_size_uuid' => ['required', 'integer', 'exists:asset_sizes,uuid'],
             'type' => ['required', \Illuminate\Validation\Rule::in(['image', 'video'])],
         ];

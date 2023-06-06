@@ -39,4 +39,8 @@ class AssetSize extends Model
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
     ];
+
+    public function assetGroup(){
+        return $this->hasOne(AssetGroup::class, 'code', 'asset_group_code');
+    }
 }
