@@ -10,6 +10,8 @@ class Asset extends Model
 {
     use HasFactory, SoftDeletes;
 
+    const TYPE_IMAGE = 'image';
+    const TYPE_VIDEO = 'video';
     /**
      * @var string
      */
