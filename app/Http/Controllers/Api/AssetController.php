@@ -13,6 +13,7 @@ use App\Http\Requests\IndexRequest;
 use App\Http\Requests\UpdateAssetRequest;
 use App\Http\Resources\AssetResource;
 use App\Http\Resources\AssetResourceCollection;
+use App\Models\Asset;
 use App\Services\AssetService;
 use App\Services\UploadService;
 use App\Services\UserService;
@@ -96,7 +97,13 @@ class AssetController extends AbstractRestAPIController
             return $this->sendJsonResponse(false, 'You need become partner to use it', [], 400);
         }
         $partner = auth()->user()->partner;
-        $jsCode = '<script type="text/javascript" src="' . env('FRONTEND_URL') . 'api/generate?pn=' . $partner->uuid . '&as=' . $id . '&link=' . $request->get('url') . '?ref=' . $partner->code . '"> </script>';
+        $asset = $this->service->findOrFailById($id);
+        if($asset->type == Asset::TYPE_IMAGE) {
+            $jsCode = '<script type="text/javascript" src="' . env('FRONTEND_URL') . 'api/generate-image?pn=' . $partner->uuid . '&as=' . $id . '&link=' . $request->get('url') . '?ref=' . $partner->code . '"> </script>';
+        } else {
+            $jsCode = '<script type="text/javascript" src="' . env('FRONTEND_URL') . 'api/generate-video?pn=' . $partner->uuid . '&as=' . $id . '&link=' . $request->get('url') . '?ref=' . $partner->code . '"> </script>';
+        }
+
         return $this->sendOkJsonResponse(['data' => $jsCode]);
     }
 
@@ -111,18 +118,34 @@ class AssetController extends AbstractRestAPIController
     }
 
 
-    public function generate(\Illuminate\Http\Request $request)
+    public function generateForImage(\Illuminate\Http\Request $request)
     {
         $asset = $this->service->findOrFailById($request->get('as'));
-        echo 'function ShowBanners() {
-        const image = document.createElement("img");
+        echo 'const image = document.createElement("img");
         image.setAttribute("src", "' . $asset->url . '");
-        image.setAttribute("height", "' . $asset->height . '");
-        image.setAttribute("width", "' . $asset->width . '");
+        image.setAttribute("height", "' . $asset->assetSize->height . '");
+        image.setAttribute("width", "' . $asset->assetSize->width . '");
         const link = document.createElement("a");
         link.href = "' . $request->get('link') . '";
         link.appendChild(image);
-        document.getElementById("banner-ads").appendChild(link);
-    }';
+        document.getElementById("banner-ads").appendChild(link);';
+    }
+
+    public function generateForVideo(\Illuminate\Http\Request $request)
+    {
+        $asset = $this->service->findOrFailById($request->get('as'));
+        echo 'const video = document.createElement("video");
+        video.src = "' . $asset->url . '";
+        video.autoplay = true;
+        video.controls = true;
+        video.muted = false;
+        video.height = '.$asset->assetSize->height.';
+        video.width = '.$asset->assetSize->width.';
+
+        const box = document.getElementById("banner-ads");
+        const link = document.createElement("a");
+        link.href = "' . $request->get('link') . '";
+        link.appendChild(video);
+        box.appendChild(link);';
     }
 }

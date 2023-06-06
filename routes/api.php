@@ -1256,7 +1256,8 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'asset'], function () {
         Route::post('generate-js-code/{id}', [AssetController::class, 'generateJsCode']);
     });
 });
-Route::get('generate/', [AssetController::class, 'generate']);
+Route::get('generate-video', [AssetController::class, 'generateForVideo']);
+Route::get('generate-image', [AssetController::class, 'generateForImage']);
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'asset-group'], function () {
     Route::group(['middleware' => ['role:admin,editor'], 'as' => 'admin.'], function () {
