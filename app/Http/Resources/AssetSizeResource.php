@@ -14,7 +14,9 @@ class AssetSizeResource extends JsonResource
      */
     public function toArray($request)
     {
-        return [
+        $expand = request()->get('expand', []);
+
+        $data = [
             'uuid' => $this->uuid,
             'name' => $this->name,
             'width' => $this->width,
@@ -24,5 +26,11 @@ class AssetSizeResource extends JsonResource
             'updated_at' => $this->updated_at,
             'deleted_at' => $this->deleted_at,
         ];
+
+        if (\in_array('asset_size__asset_group', $expand)) {
+            $data['asset_group'] = new AssetGroupResource($this->assetGroup);
+        }
+
+        return $data;
     }
 }
