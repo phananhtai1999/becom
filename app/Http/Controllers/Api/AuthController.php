@@ -415,6 +415,7 @@ class AuthController extends AbstractRestAPIController
         SendNotificationSystemForLoginEvent::dispatch($user, \request()->ip(), \request()->userAgent());
         Cache::forget('platform_permission_' . $user->uuid);
         Cache::forget('add_on_permission_' . $user->uuid);
+        Cache::forget('config');
         return \response()->json(array_merge([
             'status' => true,
             "code" => 0,
