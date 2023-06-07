@@ -91,17 +91,22 @@ class AssetController extends AbstractRestAPIController
         return substr_count($gifData, "\x00\x21\xF9\x04", 0, $lastFramePosition + 1);
     }
 
-    public function generateJsCode(GenerateJsCodeAssetRequest $request, $id)
+    public function generateJsCode(GenerateJsCodeAssetRequest $request)
     {
         if (empty(auth()->user()->partner)) {
             return $this->sendJsonResponse(false, 'You need become partner to use it', [], 400);
         }
+        $mainUrl = $this->service->getConfigByKeyInCache('main_url');
+        if (!preg_match('/^'. preg_quote($mainUrl->value, '/').'/', $request->get('url'))) {
+            return $this->sendJsonResponse(false, 'Your url must be start with '. $mainUrl->value, [], 400);
+        }
+
         $partner = auth()->user()->partner;
-        $asset = $this->service->findOrFailById($id);
+        $asset = $this->service->findOrFailById($request->get('asset_uuid'));
         if($asset->type == Asset::TYPE_IMAGE) {
-            $jsCode = '<script type="text/javascript" src="' . env('FRONTEND_URL') . 'api/generate-image?pn=' . $partner->uuid . '&as=' . $id . '&link=' . $request->get('url') . '?ref=' . $partner->code . '"> </script>';
+            $jsCode = '<script type="text/javascript" src="' . env('FRONTEND_URL') . 'api/generate-image?pn=' . $partner->uuid . '&as=' . $asset->uuid . '&link=' . $request->get('url') . '?ref=' . $partner->code . '"> </script>';
         } else {
-            $jsCode = '<script type="text/javascript" src="' . env('FRONTEND_URL') . 'api/generate-video?pn=' . $partner->uuid . '&as=' . $id . '&link=' . $request->get('url') . '?ref=' . $partner->code . '"> </script>';
+            $jsCode = '<script type="text/javascript" src="' . env('FRONTEND_URL') . 'api/generate-video?pn=' . $partner->uuid . '&as=' . $asset->uuid . '&link=' . $request->get('url') . '?ref=' . $partner->code . '"> </script>';
         }
 
         return $this->sendOkJsonResponse(['data' => $jsCode]);

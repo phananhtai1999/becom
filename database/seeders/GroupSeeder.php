@@ -33,6 +33,9 @@ class GroupSeeder extends Seeder
             [
                 'name' => 'site',
             ],
+            [
+                'name' => 'asset',
+            ],
         ];
 
         foreach ($configs as $config) {
