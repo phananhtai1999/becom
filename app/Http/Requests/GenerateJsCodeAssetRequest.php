@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Cache;
 
 class GenerateJsCodeAssetRequest extends FormRequest
 {
@@ -24,7 +25,8 @@ class GenerateJsCodeAssetRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'asset_uuid' => ['required', 'exists:assets,uuid'],
+            'url' => ['required']
         ];
     }
 }
