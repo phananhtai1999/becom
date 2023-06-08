@@ -34,7 +34,7 @@
         "spatie/laravel-translatable": "*",
         "srmklive/paypal": "~3.0",
         "stripe/stripe-php": "^10.0",
-        "techup/connector": "dev-packagenew",
+        "techup/connector": "dev-dev",
         "torann/geoip": "*",
       "ext-mysqli": "*"
     },
