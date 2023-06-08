@@ -192,4 +192,21 @@ class ConfigController extends AbstractRestAPIController
             return $this->sendValidationFailedJsonResponse(["smtp_account" => $e->getMessage()]);
         }
     }
+
+    public function indexAdmin(IndexRequest $request)
+    {
+        $models = $this->service->getAdminConfigsCollectionWithPagination($request);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+        );
+    }
+
+    public function showAdmin($id)
+    {
+        $model = $this->service->showAdminConfig($id);
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
 }

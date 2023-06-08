@@ -46,6 +46,25 @@ class ConfigService extends AbstractService
         }
     }
 
+    public function getAdminConfigsCollectionWithPagination($request)
+    {
+        $indexRequest = $this->getIndexRequest($request);
+
+        return $this->modelQueryBuilderClass::searchQuery($indexRequest['search'], $indexRequest['search_by'])
+            ->whereIn('status', [Config::CONFIG_PRIVATE_STATUS, Config::CONFIG_PUBLIC_STATUS])
+            ->orwhereIn('key', [Config::CONFIG_EMAIL_PRICE, Config::CONFIG_SMS_PRICE, Config::CONFIG_TELEGRAM_PRICE, Config::CONFIG_VIBER_PRICE])
+            ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
+    }
+
+    public function showAdminConfig($id)
+    {
+        return $this->model->where(function ($q) {
+            $q->whereIn('status', [Config::CONFIG_PRIVATE_STATUS, Config::CONFIG_PUBLIC_STATUS])
+                ->orwhereIn('key', [Config::CONFIG_EMAIL_PRICE, Config::CONFIG_SMS_PRICE, Config::CONFIG_TELEGRAM_PRICE, Config::CONFIG_VIBER_PRICE]);
+        })->where('uuid', $id)->firstOrFail();
+    }
+
+
     /**
      * @param $configKey
      * @return mixed
