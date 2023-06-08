@@ -220,5 +220,7 @@ abstract class AbstractService
                 return $config;
             }
         }
+
+        return false;
     }
 }
