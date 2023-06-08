@@ -16,7 +16,7 @@ deploy-staging:
 deploy-production:
   stage: deploy
   only:
-    - production
+    - main
   environment: production
   script:
     - rsync -ravz --delete --exclude .git --exclude .env  --exclude vendor ./ $DEPLOY_USER@$DEPLOY_DOMAIN:/$SOURCE_PATH
