@@ -116,7 +116,7 @@ Route::post('/upload-video', [UploadController::class, 'uploadVideo'])->name('up
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'user.'], function () {
 
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:admin,root'], 'as' => 'admin.'], function () {
         Route::get('/users', [UserController::class, 'index'])->name('index');
         Route::post('/user', [UserController::class, 'store'])->name('store');
         Route::put('/user/ban/{id}', [UserController::class, 'ban'])->name('ban');
@@ -138,9 +138,9 @@ Route::get('/user/show-by-username/{username}', [UserController::class, 'showByU
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'role.'], function () {
     Route::group(['middleware' => ['role:root'], 'as' => 'role.'], function () {
-        Route::post('/role', [RoleController::class, 'store'])->name('store');
-        Route::put('/role/{id}', [RoleController::class, 'edit'])->name('edit');
-        Route::delete('/role/{id}', [RoleController::class, 'destroy'])->name('destroy');
+        Route::post('/root/role', [RoleController::class, 'store'])->name('store');
+        Route::put('/root/role/{id}', [RoleController::class, 'edit'])->name('edit');
+        Route::delete('/root/role/{id}', [RoleController::class, 'destroy'])->name('destroy');
     });
 
     Route::group(['middleware' => ['role:admin,root'], 'as' => 'role.'], function () {
@@ -180,16 +180,20 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'user-config.'], function ()
 });
 
 Route::group(['middleware' => ['auth:api', 'role:root'], 'as' => 'config.root'], function () {
-    Route::get('/configs', [ConfigController::class, 'index'])->name('index');
-    Route::post('/config', [ConfigController::class, 'store'])->name('store');
-    Route::put('/config/upsert', [ConfigController::class, 'upsertConfig'])->name('upsertConfig');
-    Route::get('/config/{id}', [ConfigController::class, 'show'])->name('show');
-    Route::put('/config/{id}', [ConfigController::class, 'edit'])->name('edit');
+    Route::get('/root/configs', [ConfigController::class, 'index'])->name('index');
+    Route::post('/root/config', [ConfigController::class, 'store'])->name('store');
+    Route::put('/root/config/upsert', [ConfigController::class, 'upsertConfig'])->name('upsertConfig');
+    Route::get('/root/config/{id}', [ConfigController::class, 'show'])->name('show');
+    Route::put('/root/config/{id}', [ConfigController::class, 'edit'])->name('edit');
     Route::post('test-smtp-account-config/{id}', [ConfigController::class, 'testSmtpAccount'])->name('testSmtpAccount');
 });
 
 //Load permission config
 Route::group(['middleware' => ['auth:api'], 'as' => 'config.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'config.root'], function () {
+        Route::get('configs', [ConfigController::class, 'indexAdmin'])->name('indexAdmin');
+        Route::get('/config/{id}', [ConfigController::class, 'showAdmin'])->name('showAdmin');
+    });
     Route::get('/configs/permission', [ConfigController::class, 'loadConfigPermission'])->name('config.loadConfigPermission');
 });
 //Load public config
