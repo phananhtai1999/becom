@@ -6,6 +6,7 @@ use App\Abstracts\AbstractService;
 use App\Models\QueryBuilders\UserQueryBuilder;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
 class UserService extends AbstractService
@@ -291,5 +292,20 @@ class UserService extends AbstractService
         }
 
         return $char;
+    }
+
+    public function getUsersOfAdmin($request)
+    {
+        $indexRequest = $this->getIndexRequest($request);
+
+        return $this->modelQueryBuilderClass::searchQuery($indexRequest['search'], $indexRequest['search_by'])
+            ->whereHas('roles', function (Builder $query){
+                $query->where('name', '<>', 'root');
+            })->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
+    }
+
+    public function getListUsersByRole($request)
+    {
+        $roleUser = auth()->user()->roles;
     }
 }

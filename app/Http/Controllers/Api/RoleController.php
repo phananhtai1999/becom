@@ -13,6 +13,8 @@ use App\Http\Controllers\Traits\RestEditTrait;
 use App\Http\Controllers\Traits\RestStoreTrait;
 use App\Http\Requests\UpdateRoleRequest;
 use App\Http\Resources\RoleResourceCollection;
+use App\Models\Config;
+use App\Models\Role;
 use App\Services\RoleService;
 
 class RoleController extends AbstractRestAPIController
@@ -27,5 +29,25 @@ class RoleController extends AbstractRestAPIController
         $this->storeRequest = RoleRequest::class;
         $this->editRequest = UpdateRoleRequest::class;
         $this->indexRequest = IndexRequest::class;
+    }
+
+    public function indexAdmin(IndexRequest $request)
+    {
+        $models = $this->service->getCollectionWithPaginationByCondition($request, [
+            ['name', '<>', Role::ROLE_ROOT]
+        ]);
+
+        return $this->sendOkJsonResponse($this->service->resourceCollectionToData(
+            $this->resourceCollectionClass, $models
+        ));
+    }
+
+    public function showAdmin($id)
+    {
+        $model = $this->service->showRoleOfAdminById($id);
+
+        return $this->sendOkJsonResponse($this->service->resourceToData(
+            $this->resourceClass, $model
+        ));
     }
 }

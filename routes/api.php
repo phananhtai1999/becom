@@ -115,12 +115,20 @@ Route::post('/upload-img', [UploadController::class, 'uploadImage'])->name('uplo
 Route::post('/upload-video', [UploadController::class, 'uploadVideo'])->name('upload-video')->middleware('auth:api');
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'user.'], function () {
+    Route::group(['middleware' => ['role:root'], 'as' => 'root.'], function () {
+        Route::get('root/users', [UserController::class, 'index'])->name('index');
+        Route::get('root/user/{id}', [UserController::class, 'show'])->name('show');
+        Route::post('root/user', [UserController::class, 'store'])->name('store');
+        Route::put('root/user/ban/{id}', [UserController::class, 'ban'])->name('ban');
+        Route::put('root/user/{id}', [UserController::class, 'edit'])->name('edit');
+        Route::delete('root/user/{id}', [UserController::class, 'destroy'])->name('destroy');
+    });
 
-    Route::group(['middleware' => ['role:admin,root'], 'as' => 'admin.'], function () {
-        Route::get('/users', [UserController::class, 'index'])->name('index');
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
+        Route::get('/users', [UserController::class, 'indexAdmin'])->name('indexAdmin');
         Route::post('/user', [UserController::class, 'store'])->name('store');
-        Route::put('/user/ban/{id}', [UserController::class, 'ban'])->name('ban');
-        Route::get('/user/{id}', [UserController::class, 'show'])->name('show');
+        Route::put('/user/ban/{id}', [UserController::class, 'banAdmin'])->name('banAdmin');
+        Route::get('/user/{id}', [UserController::class, 'showAdmin'])->name('showAdmin');
         Route::put('/user/{id}', [UserController::class, 'edit'])->name('edit');
         Route::delete('/user/{id}', [UserController::class, 'destroy'])->name('destroy');
     });
@@ -141,11 +149,13 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'role.'], function () {
         Route::post('/root/role', [RoleController::class, 'store'])->name('store');
         Route::put('/root/role/{id}', [RoleController::class, 'edit'])->name('edit');
         Route::delete('/root/role/{id}', [RoleController::class, 'destroy'])->name('destroy');
+        Route::get('/root/roles', [RoleController::class, 'index'])->name('index');
+        Route::get('/root/role/{id}', [RoleController::class, 'show'])->name('show');
     });
 
     Route::group(['middleware' => ['role:admin,root'], 'as' => 'role.'], function () {
-        Route::get('/roles', [RoleController::class, 'index'])->name('index');
-        Route::get('/role/{id}', [RoleController::class, 'show'])->name('show');
+        Route::get('/roles', [RoleController::class, 'indexAdmin'])->name('indexAdmin');
+        Route::get('/role/{id}', [RoleController::class, 'showAdmin'])->name('showAdmin');
     });
 });
 
@@ -202,7 +212,7 @@ Route::get('/configs/public', [ConfigController::class, 'loadPublicConfig'])->na
 //Website
 Route::group(['middleware' => ['auth:api'], 'as' => 'website.'], function () {
 
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('/send-projects', [SendProjectController::class, 'index'])->name('index');
         Route::post('/send-project', [SendProjectController::class, 'store'])->name('store');
         Route::get('/send-project/{id}', [SendProjectController::class, 'show'])->name('show');
@@ -228,7 +238,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website.'], function () {
 //SmtpAccount
 Route::group(['middleware' => ['auth:api'], 'as' => 'smtp-account.'], function () {
 
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('/smtp-accounts', [SmtpAccountController::class, 'index'])->name('index');
         Route::post('/smtp-account', [SmtpAccountController::class, 'store'])->name('store');
         Route::get('/smtp-account/{id}', [SmtpAccountController::class, 'show'])->name('show');
@@ -256,7 +266,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'smtp-account.'], function (
 //MailTemplate
 Route::group(['middleware' => ['auth:api'], 'as' => 'mail-template.'], function () {
 
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('/mail-templates', [MailTemplateController::class, 'index'])->name('index');
         Route::get('/mail-template/{id}', [MailTemplateController::class, 'show'])->name('show');
         Route::post('/mail-template', [MailTemplateController::class, 'store'])->name('store');
@@ -265,7 +275,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'mail-template.'], function 
         Route::post('/accept-publish', [MailTemplateController::class, 'acceptPublishMailtemplate'])->name('accept-publish');
     });
 
-    Route::group(['middleware' => ['role:admin,editor']], function () {
+    Route::group(['middleware' => ['role:root,admin,editor']], function () {
         Route::get('/unpublished-mail-templates', [MailTemplateController::class, 'indexUnpublishedMailTemplate'])->name('index-unpublished');
         Route::get('/unpublished-mail-template/{id}', [MailTemplateController::class, 'showUnpublishedMailTemplate'])->name('show-unpublished');
         Route::post('/unpublished-mail-template', [MailTemplateController::class, 'storeUnpublishedMailTemplate'])->name('store-unpublished');
@@ -286,7 +296,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'mail-template.'], function 
 //Campaign
 Route::group(['middleware' => ['auth:api'], 'as' => 'campaign.'], function () {
 
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('/campaigns', [CampaignController::class, 'index'])->name('index');
         Route::post('/campaign', [CampaignController::class, 'store'])->name('store');
         Route::get('/campaign/{id}', [CampaignController::class, 'show'])->name('show');
@@ -320,7 +330,7 @@ Route::get('/campaign-tracking/increment/total-open', [CampaignController::class
 //Email
 Route::group(['middleware' => ['auth:api'], 'as' => 'email.'], function () {
 
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('/emails', [EmailController::class, 'index'])->name('index');
         Route::post('/email', [EmailController::class, 'store'])->name('store');
         Route::get('/email/{id}', [EmailController::class, 'show'])->name('show');
@@ -340,7 +350,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'email.'], function () {
 //MailSendingHistory
 Route::group(['middleware' => ['auth:api'], 'as' => 'mail-sending-history.'], function () {
 
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('/mail-sending-histories', [MailSendingHistoryController::class, 'index'])->name('index');
         Route::post('/mail-sending-history', [MailSendingHistoryController::class, 'store'])->name('store');
         Route::get('/mail-sending-history/{id}', [MailSendingHistoryController::class, 'show'])->name('show');
@@ -375,7 +385,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website-verification.'], fu
 //Contact
 Route::group(['middleware' => ['auth:api'], 'as' => 'contact.'], function () {
 
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('/contacts', [ContactController::class, 'index'])->name('index');
         Route::post('/contact', [ContactController::class, 'store'])->name('store');
         Route::get('/contact/{id}', [ContactController::class, 'show'])->name('show');
@@ -402,7 +412,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'contact.'], function () {
 //Contact List
 Route::group(['middleware' => ['auth:api'], 'as' => 'contact-list.'], function () {
 
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('/contact-lists', [ContactListController::class, 'index'])->name('index');
         Route::post('/contact-list', [ContactListController::class, 'storeAndImportFile'])->name('store-and-importFile');
         Route::get('/contact-list/{id}', [ContactListController::class, 'show'])->name('show');
@@ -424,7 +434,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'contact-list.'], function (
 
 //Credit History
 Route::group(['middleware' => ['auth:api'], 'as' => 'user-use-credit-history.'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('/credit-histories', [CreditHistoryController::class, 'index'])->name('index');
         Route::post('/credit-history', [CreditHistoryController::class, 'store'])->name('store');
         Route::get('/credit-history/{id}', [CreditHistoryController::class, 'show'])->name('show');
@@ -438,7 +448,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'user-use-credit-history.'],
 
 //Transaciton CreditHistory View
 Route::group(['middleware' => ['auth:api'], 'as' => 'credit-transaction-histories.'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('/credit-transaction-histories', [CreditTransactionHistoryController::class, 'index'])->name('credit-transaction-history-view');
     });
 
@@ -449,7 +459,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'credit-transaction-historie
 
 //User Credit History
 Route::group(['middleware' => ['auth:api'], 'as' => 'user-credit-history.'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('/user-credit-histories', [UserCreditHistoryController::class, 'index'])->name('index');
         Route::post('/user-credit-history', [UserCreditHistoryController::class, 'store'])->name('store');
         Route::get('/user-credit-history/{id}', [UserCreditHistoryController::class, 'show'])->name('show');
@@ -481,7 +491,7 @@ Route::get('/support-multiple-languages', [SupportMultipleLanguagesController::c
 Route::get('/mail-open-tracking/{id}', [MailSendingHistoryController::class, 'mailOpenTracking'])->name('mail-open-tracking');
 //Chart
 Route::group(['middleware' => ['auth:api'], 'as' => 'chart.'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('/user-chart', [UserController::class, 'userChart'])->name('user-chart');
         Route::get('/email-chart', [MailSendingHistoryController::class, 'emailChart'])->name('email-chart');
         Route::get('/campaign-chart', [CampaignController::class, 'campaignChart'])->name('campaign-chart');
@@ -499,7 +509,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'chart.'], function () {
     });
 });
 
-Route::group(['middleware' => ['auth:api', 'role:admin'], 'as' => 'payment-method.'], function () {
+Route::group(['middleware' => ['auth:api', 'role:root,admin'], 'as' => 'payment-method.'], function () {
     Route::post('/payment-method', [PaymentMethodController::class, 'store'])->name('store');
     Route::put('/payment-method/{id}', [PaymentMethodController::class, 'edit'])->name('edit');
     Route::delete('/payment-method/{id}', [PaymentMethodController::class, 'destroy'])->name('destroy');
@@ -509,7 +519,7 @@ Route::get('/payment-methods', [PaymentMethodController::class, 'index'])->name(
 Route::get('/payment-method/{id}', [PaymentMethodController::class, 'show'])->name('payment-method.show');
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'order.'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('/orders', [OrderController::class, 'index'])->name('index');
         Route::get('/order/{id}', [OrderController::class, 'show'])->name('show');
         Route::post('/order', [OrderController::class, 'store'])->name('store');
@@ -528,7 +538,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'order.'], function () {
 
 //Scenario
 Route::group(['middleware' => ['auth:api'], 'as' => 'scenario.'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('scenarios', [ScenarioController::class, 'index'])->name('index');
         Route::post('scenario', [ScenarioController::class, 'storeScenario'])->name('storeScenario');
         Route::get('scenario/{id}', [ScenarioController::class, 'show'])->name('showMyScenario');
@@ -547,7 +557,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'scenario.'], function () {
 //Website_page_categories
 Route::group(['middleware' => ['auth:api'], 'as' => 'website_page_category.'], function () {
 
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::post('/website-page-category', [WebsitePageCategoryController::class, 'store'])->name('store');
         Route::put('/website-page-category/{id}', [WebsitePageCategoryController::class, 'edit'])->name('edit');
         Route::delete('/website-page-category/{id}', [WebsitePageCategoryController::class, 'destroy'])->name('destroy');
@@ -562,7 +572,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website_page_category.'], f
 
 //Website_pages
 Route::group(['middleware' => ['auth:api'], 'as' => 'website_page'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('website-pages', [WebsitePageController::class, 'index'])->name('index');
         Route::post('website-page', [WebsitePageController::class, 'store'])->name('store');
         Route::get('website-page/{id}', [WebsitePageController::class, 'show'])->name('show');
@@ -571,7 +581,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website_page'], function ()
         Route::post('website-page/accept-publish', [WebsitePageController::class, 'acceptPublishWebsitePage'])->name('acceptPublishWebsitePage');
     });
 
-    Route::group(['middleware' => ['role:admin,editor']], function () {
+    Route::group(['middleware' => ['role:root,admin,editor']], function () {
         Route::get('/unpublished-website-pages', [WebsitePageController::class, 'indexUnpublishedWebsitePage'])->name('index-unpublished');
         Route::get('/unpublished-website-page/{id}', [WebsitePageController::class, 'showUnpublishedWebsitePage'])->name('show-unpublished');
         Route::post('/unpublished-website-page', [WebsitePageController::class, 'storeUnpublishedWebsitePage'])->name('store-unpublished');
@@ -607,7 +617,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'platformPackage.'], functio
 
 //Cache config
 Route::group(['middleware' => ['auth:api'], 'as' => 'cacheConfig.'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::put('/cache-platform-config/{membership_package_uuid}', [ConfigController::class, 'editCachePlatformConfig']);
         Route::get('/cache-platform-config/{membership_package_uuid}', [ConfigController::class, 'getCachePlatformConfig']);
     });
@@ -616,7 +626,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'cacheConfig.'], function ()
 
 //Credit Package
 Route::group(['middleware' => ['auth:api'], 'as' => 'creditPackage.'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::post('/credit-package', [CreditPackageController::class, 'store']);
         Route::put('/credit-package/{id}', [CreditPackageController::class, 'edit']);
         Route::delete('/credit-package/{id}', [CreditPackageController::class, 'destroy']);
@@ -625,7 +635,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'creditPackage.'], function 
 Route::get('/credit-package/{id}', [CreditPackageController::class, 'show']);
 Route::get('/credit-packages', [CreditPackageController::class, 'index']);
 Route::group(['middleware' => ['auth:api'], 'as' => 'subscriptionPlan.'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::post('/subscription-plan', [SubscriptionPlanController::class, 'store']);
         Route::delete('/subscription-plan/{id}', [SubscriptionPlanController::class, 'destroy']);
     });
@@ -635,7 +645,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'subscriptionPlan.'], functi
 
 //add-on subscription plan
 Route::group(['middleware' => ['auth:api'], 'as' => 'addOnSubscriptionPlan.'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::post('/add-on-subscription-plan', [AddOnSubscriptionPlanController::class, 'store']);
         Route::delete('/add-on-subscription-plan/{id}', [AddOnSubscriptionPlanController::class, 'destroy']);
     });
@@ -644,7 +654,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'addOnSubscriptionPlan.'], f
 Route::get('/add-on-subscription-plans', [AddOnSubscriptionPlanController::class, 'index']);
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'permission.'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::post('/permission', [PermissionController::class, 'store']);
         Route::get('/permission/{id}', [PermissionController::class, 'show']);
         Route::put('/permission/{id}', [PermissionController::class, 'edit']);
@@ -683,7 +693,7 @@ Route::get('/paypal/cancel-payment-subscription', [PaypalController::class, 'can
 
 //Section Template
 Route::group(['middleware' => ['auth:api'], 'as' => 'section-template'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('section-templates', [SectionTemplateController::class, 'index'])->name('index');
         Route::post('section-template', [SectionTemplateController::class, 'store'])->name('store');
         Route::get('section-template/{id}', [SectionTemplateController::class, 'show'])->name('show');
@@ -692,7 +702,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'section-template'], functio
         Route::post('section-template/accept-publish', [SectionTemplateController::class, 'acceptPublishSectionTemplate'])->name('acceptPublishSectionTemplate');
     });
 
-    Route::group(['middleware' => ['role:admin,editor']], function () {
+    Route::group(['middleware' => ['role:root,admin,editor']], function () {
         Route::get('/unpublished-section-templates', [SectionTemplateController::class, 'indexUnpublishedSectionTemplate'])->name('index-unpublished');
         Route::get('/unpublished-section-template/{id}', [SectionTemplateController::class, 'showUnpublishedSectionTemplate'])->name('show-unpublished');
         Route::post('/unpublished-section-template', [SectionTemplateController::class, 'storeUnpublishedSectionTemplate'])->name('store-unpublished');
@@ -713,7 +723,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'section-template'], functio
 
 //Form
 Route::group(['middleware' => ['auth:api'], 'as' => 'form.'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('/forms', [FormController::class, 'index'])->name('index');
         Route::post('/form', [FormController::class, 'store'])->name('store');
         Route::get('/form/{id}', [FormController::class, 'show'])->name('show');
@@ -722,7 +732,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'form.'], function () {
         Route::post('form/accept-publish', [FormController::class, 'acceptPublishForm'])->name('acceptPublishForm');
     });
 
-    Route::group(['middleware' => ['role:admin,editor']], function () {
+    Route::group(['middleware' => ['role:root,admin,editor']], function () {
         Route::get('/unpublished-forms', [FormController::class, 'indexUnpublishedForm'])->name('index-unpublished');
         Route::get('/unpublished-form/{id}', [FormController::class, 'showUnpublishedForm'])->name('show-unpublished');
         Route::post('/unpublished-form', [FormController::class, 'storeUnpublishedForm'])->name('store-unpublished');
@@ -747,7 +757,7 @@ Route::post('/form/submit-contact', [FormController::class, 'submitContact'])->n
 //Language
 Route::group(['middleware' => ['auth:api'], 'as' => 'language.'], function () {
 
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::post('/language', [LanguageController::class, 'store'])->name('store');
         Route::put('/language/{id}', [LanguageController::class, 'edit'])->name('edit');
         Route::delete('/language/{id}', [LanguageController::class, 'destroy'])->name('destroy');
@@ -762,7 +772,7 @@ Route::get('/language/{id}', [LanguageController::class, 'show'])->name('languag
 
 //Article Category
 Route::group(['middleware' => ['auth:api'], 'as' => 'article-category.'], function () {
-    Route::group(['middleware' => ['role:admin,editor'], 'as' => 'author.'], function () {
+    Route::group(['middleware' => ['role:root,admin,editor'], 'as' => 'author.'], function () {
         Route::post('/article-category', [ArticleCategoryController::class, 'store'])->name('store');
         Route::put('/article-category/{id}', [ArticleCategoryController::class, 'edit'])->name('edit');
 //        Route::delete('/article-category/{id}', [ArticleCategoryController::class, 'destroy'])->name('destroy');
@@ -777,7 +787,7 @@ Route::get('public/article-category/{id}', [ArticleCategoryController::class, 's
 
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'group.'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('/groups', [GroupController::class, 'index'])->name('index');
         Route::post('/group', [GroupController::class, 'store'])->name('store');
         Route::get('/group/{id}', [GroupController::class, 'show'])->name('show');
@@ -789,7 +799,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'group.'], function () {
 //Article
 Route::group(['middleware' => ['auth:api'], 'as' => 'article.'], function () {
 
-    Route::group(['middleware' => ['role:admin,editor'], 'as' => 'author.'], function () {
+    Route::group(['middleware' => ['role:root,admin,editor'], 'as' => 'author.'], function () {
         Route::post('/article', [ArticleController::class, 'store'])->name('store');
         Route::put('/article/{id}', [ArticleController::class, 'edit'])->name('edit');
         Route::delete('/article/{id}', [ArticleController::class, 'destroy'])->name('destroy');
@@ -806,7 +816,7 @@ Route::get('public/article/{id}', [ArticleController::class, 'showPublic'])->nam
 
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'status.'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('/status', [StatusController::class, 'index'])->name('index');
         Route::post('/status', [StatusController::class, 'store'])->name('store');
         Route::get('/status/{id}', [StatusController::class, 'show'])->name('show');
@@ -824,7 +834,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'status.'], function () {
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'company.'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('/companies', [CompanyController::class, 'index'])->name('index');
         Route::post('/company', [CompanyController::class, 'store'])->name('store');
         Route::get('/company/{id}', [CompanyController::class, 'show'])->name('show');
@@ -842,7 +852,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'company.'], function () {
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'position.'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('/positions', [PositionController::class, 'index'])->name('index');
         Route::post('/position', [PositionController::class, 'store'])->name('store');
         Route::get('/position/{id}', [PositionController::class, 'show'])->name('show');
@@ -860,7 +870,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'position.'], function () {
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'note.'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('/notes', [NoteController::class, 'index'])->name('index');
         Route::post('/note', [NoteController::class, 'store'])->name('store');
         Route::get('/note/{id}', [NoteController::class, 'show'])->name('show');
@@ -878,7 +888,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'note.'], function () {
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'remind.'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('/reminds', [RemindController::class, 'index'])->name('index');
         Route::post('/remind', [RemindController::class, 'store'])->name('store');
         Route::get('/remind/{id}', [RemindController::class, 'show'])->name('show');
@@ -896,7 +906,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'remind.'], function () {
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'activity_history.'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('/activity-histories', [ActivityHistoryController::class, 'index'])->name('index');
         Route::post('/activity-history', [ActivityHistoryController::class, 'store'])->name('store');
         Route::get('/activity-history/{id}', [ActivityHistoryController::class, 'show'])->name('show');
@@ -914,7 +924,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'activity_history.'], functi
 //Website_page_categories
 Route::group(['middleware' => ['auth:api'], 'as' => 'section_category.'], function () {
 
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::post('/section-category', [SectionCategoryController::class, 'store'])->name('store');
         Route::put('/section-category/{id}', [SectionCategoryController::class, 'edit'])->name('edit');
         Route::delete('/section-category/{id}', [SectionCategoryController::class, 'destroy'])->name('destroy');
@@ -933,7 +943,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'api.'], function () {
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'footer_template.'], function () {
 
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('/footer-templates', [FooterTemplateController::class, 'index'])->name('index');
         Route::post('/footer-template', [FooterTemplateController::class, 'store'])->name('store');
         Route::get('/footer-template/{id}', [FooterTemplateController::class, 'show'])->name('show');
@@ -971,7 +981,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'billingAddress.'], function
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'team.'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('/teams', [TeamController::class, 'index'])->name('index');
         Route::post('/team', [TeamController::class, 'store'])->name('store');
         Route::get('/team/{id}', [TeamController::class, 'show'])->name('show');
@@ -999,7 +1009,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'team.'], function () {
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'addOn.'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::post('/add-on', [AddOnController::class, 'store'])->name('store');
         Route::get('/publish-add-on/{id}', [AddOnController::class, 'publishAddOn'])->name('publish');
         Route::put('/add-on/{id}', [AddOnController::class, 'edit'])->name('edit');
@@ -1022,7 +1032,7 @@ Route::post('/platform-packages/renew-by-stripe', [PaymentController::class, 're
 Route::post('/platform-packages/renew-by-paypal', [PaymentController::class, 'renewByPaypal'])->name('renewByPaypal');
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'notification.'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('/notifications', [NotificationController::class, 'index'])->name('index');
         Route::delete('/notification/{id}', [NotificationController::class, 'destroy'])->name('destroy');
     });
@@ -1037,7 +1047,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'notification.'], function (
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'user-tracking.'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('/user-trackings', [UserTrackingController::class, 'index'])->name('index');
         Route::get('/user-tracking/{id}', [UserTrackingController::class, 'show'])->name('show');
         Route::put('/user-tracking/{id}', [UserTrackingController::class, 'edit'])->name('edit');
@@ -1050,7 +1060,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'user-tracking.'], function 
 
 //Article Category
 Route::group(['middleware' => ['auth:api'], 'as' => 'business-category.'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'business-category.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'business-category.'], function () {
         Route::post('/business-category', [BusinessCategoryController::class, 'store'])->name('store');
         Route::put('/business-category/{id}', [BusinessCategoryController::class, 'edit'])->name('edit');
 //        Route::delete('/business-category/{id}', [BusinessCategoryController::class, 'destroy'])->name('destroy');
@@ -1064,7 +1074,7 @@ Route::get('public/business-categories', [BusinessCategoryController::class, 'in
 Route::get('public/business-category/{id}', [BusinessCategoryController::class, 'showPublic'])->name('business-categories-public.show');
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'purpose.'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::post('/purpose', [PurposeController::class, 'store'])->name('store');
         Route::put('/purpose/{id}', [PurposeController::class, 'edit'])->name('edit');
 //        Route::delete('/purpose/{id}', [PurposeController::class, 'destroy'])->name('destroy');
@@ -1081,7 +1091,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'purpose.'], function () {
 
 //Contact Unsubscribe
 Route::group(['middleware' => ['auth:api'], 'as' => 'contact-unsubscribe.'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('/contact-unsubscribes', [ContactUnsubscribeController::class, 'index'])->name('index');
     });
 
@@ -1095,7 +1105,7 @@ Route::post('unsubscribe', [UnsubscribeController::class, 'storeUnsubscribe'])->
 //Partner_categories
 Route::group(['middleware' => ['auth:api'], 'as' => 'partner_category.'], function () {
 
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('/partner-categories', [PartnerCategoryController::class, 'index'])->name('index');
         Route::get('/partner-category/{id}', [PartnerCategoryController::class, 'show'])->name('show');
         Route::post('/partner-category', [PartnerCategoryController::class, 'store'])->name('store');
@@ -1107,7 +1117,7 @@ Route::get('public/partner-categories', [PartnerCategoryController::class, 'inde
 
 //Partners
 Route::group(['middleware' => ['auth:api'], 'as' => 'partner.'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('/partners', [PartnerController::class, 'index'])->name('index');
         Route::get('/partner/{id}', [PartnerController::class, 'show'])->name('show');
         Route::post('/partner', [PartnerController::class, 'store'])->name('store');
@@ -1138,7 +1148,7 @@ Route::post('register-partner', [PartnerController::class, 'registerPartner'])->
 //Partner Level
 Route::group(['middleware' => ['auth:api'], 'as' => 'partner_level.'], function () {
 
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('/partner-levels', [PartnerLevelController::class, 'index'])->name('index');
         Route::get('/partner-level/{id}', [PartnerLevelController::class, 'show'])->name('show');
         Route::post('/partner-level', [PartnerLevelController::class, 'store'])->name('store');
@@ -1150,7 +1160,7 @@ Route::get('public/partner-levels', [PartnerLevelController::class, 'index'])->n
 
 //Partner Tracking
 Route::group(['middleware' => ['auth:api'], 'as' => 'partner-tracking.'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('/partner-trackings', [PartnerTrackingController::class, 'index'])->name('index');
         Route::post('/partner-tracking', [PartnerTrackingController::class, 'store'])->name('store');
         Route::get('/partner-tracking/{id}', [PartnerTrackingController::class, 'show'])->name('show');
@@ -1161,7 +1171,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'partner-tracking.'], functi
 Route::get('tracking-invite-partner', [PartnerTrackingController::class, 'trackingInvitePartner']);
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'business-management.'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('/business-managements', [BusinessManagementController::class, 'index'])->name('index');
         Route::post('/business-management', [BusinessManagementController::class, 'store'])->name('store');
         Route::get('/business-management/{id}', [BusinessManagementController::class, 'show'])->name('show');
@@ -1179,7 +1189,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'business-management.'], fun
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'domain.'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('/domains', [DomainController::class, 'index'])->name('index');
         Route::post('/domain', [DomainController::class, 'store'])->name('store');
         Route::get('/domain/{id}', [DomainController::class, 'show'])->name('show');
@@ -1200,7 +1210,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'domain.'], function () {
 
 //DomainVerification
 Route::group(['middleware' => ['auth:api'], 'as' => 'domain-verification.'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('/domain-verifications', [DomainVerificationController::class, 'index'])->name('index');
         Route::get('/domain-verification/{id}', [DomainVerificationController::class, 'show'])->name('show');
         Route::delete('/domain-verification/{id}', [DomainVerificationController::class, 'destroy'])->name('destroy');
@@ -1219,7 +1229,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'invoice'], function () {
 
 //invoice
 Route::group(['middleware' => ['auth:api'], 'as' => 'partner-payout'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('/partner-payouts', [PartnerPayoutController::class, 'index'])->name('index');
         Route::get('/partner-payout/{id}', [PartnerPayoutController::class, 'show'])->name('show');
         Route::post('partner-payout/confirm-withdrawal', [PartnerPayoutController::class, 'confirmWithdrawal'])->name('confirmWithdrawal');
@@ -1234,7 +1244,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'partner-payout'], function 
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'website'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('/websites', [WebsiteController::class, 'index'])->name('index');
         Route::get('website/{id}', [WebsiteController::class, 'show'])->name('index');
         Route::delete('website/{id}', [WebsiteController::class, 'destroy'])->name('index');
@@ -1251,7 +1261,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website'], function () {
 Route::get('public/website/{id}', [WebsiteController::class, 'show'])->name('website.show');
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'asset'], function () {
-    Route::group(['middleware' => ['role:admin,editor'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin,editor'], 'as' => 'admin.'], function () {
         Route::get('/assets', [AssetController::class, 'index']);
         Route::get('asset/{id}', [AssetController::class, 'show']);
         Route::post('asset', [AssetController::class, 'store']);
@@ -1264,7 +1274,7 @@ Route::get('generate-video', [AssetController::class, 'generateForVideo']);
 Route::get('generate-image', [AssetController::class, 'generateForImage']);
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'asset-group'], function () {
-    Route::group(['middleware' => ['role:admin,editor'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin,editor'], 'as' => 'admin.'], function () {
         Route::get('/asset-groups', [AssetGroupController::class, 'index']);
         Route::get('asset-group/{id}', [AssetGroupController::class, 'show']);
         Route::post('asset-group', [AssetGroupController::class, 'store']);
@@ -1274,7 +1284,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'asset-group'], function () 
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'asset-size'], function () {
-    Route::group(['middleware' => ['role:admin,editor'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin,editor'], 'as' => 'admin.'], function () {
         Route::get('/asset-sizes', [AssetSizeController::class, 'index']);
         Route::get('asset-size/{id}', [AssetSizeController::class, 'show']);
         Route::post('asset-size', [AssetSizeController::class, 'store']);

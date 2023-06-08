@@ -43,6 +43,14 @@ class UserController extends AbstractRestAPIController
         $this->indexRequest = IndexRequest::class;
     }
 
+    public function indexAdmin(IndexRequest $request)
+    {
+        $models = $this->service->getUsersOfAdmin($request);
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+        );
+    }
+
     /**
      * @param $username
      * @return JsonResponse
