@@ -126,11 +126,11 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'user.'], function () {
 
     Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('/users', [UserController::class, 'indexAdmin'])->name('indexAdmin');
-        Route::post('/user', [UserController::class, 'store'])->name('store');
+        Route::post('/user', [UserController::class, 'storeAdmin'])->name('storeAdmin');
         Route::put('/user/ban/{id}', [UserController::class, 'banAdmin'])->name('banAdmin');
         Route::get('/user/{id}', [UserController::class, 'showAdmin'])->name('showAdmin');
-        Route::put('/user/{id}', [UserController::class, 'edit'])->name('edit');
-        Route::delete('/user/{id}', [UserController::class, 'destroy'])->name('destroy');
+        Route::put('/user/{id}', [UserController::class, 'editAdmin'])->name('editAdmin');
+        Route::delete('/user/{id}', [UserController::class, 'destroyAdmin'])->name('destroyAdmin');
     });
 
     Route::group(['as' => 'my.'], function () {
@@ -161,7 +161,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'role.'], function () {
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'user-detail.'], function () {
 
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('/user-details', [UserDetailController::class, 'index'])->name('index');
         Route::post('/user-detail', [UserDetailController::class, 'store'])->name('store');
         Route::get('/user-detail/{id}', [UserDetailController::class, 'show'])->name('show');
@@ -175,7 +175,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'user-detail.'], function ()
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'user-config.'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('/user-configs', [UserConfigController::class, 'index'])->name('index');
         Route::post('/user-config', [UserConfigController::class, 'store'])->name('store');
         Route::get('/user-config/{id}', [UserConfigController::class, 'show'])->name('show');

@@ -7,9 +7,11 @@ use App\Events\SendEmailVerifyEmailEvent;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
+use App\Http\Requests\AdminUserRequest;
 use App\Http\Requests\ChangePasswordRequest;
 use App\Http\Requests\ChartRequest;
 use App\Http\Requests\IndexRequest;
+use App\Http\Requests\UpdateAdminUserRequest;
 use App\Http\Requests\UpdateMyProfileRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Requests\UserRequest;
@@ -43,14 +45,6 @@ class UserController extends AbstractRestAPIController
         $this->indexRequest = IndexRequest::class;
     }
 
-    public function indexAdmin(IndexRequest $request)
-    {
-        $models = $this->service->getUsersOfAdmin($request);
-        return $this->sendOkJsonResponse(
-            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
-        );
-    }
-
     /**
      * @param $username
      * @return JsonResponse
@@ -64,27 +58,12 @@ class UserController extends AbstractRestAPIController
 
     /**
      * @return JsonResponse
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
      */
     public function store()
     {
         $request = app($this->storeRequest);
 
-        if (empty($request->can_add_smtp_account)) {
-            $model = $this->service->create(array_merge($request->all(), [
-                'password' => Hash::make($request->get('password')),
-                'can_add_smtp_account' => '0'
-            ]));
-        } else {
-            $model = $this->service->create(array_merge($request->all(), [
-                'password' => Hash::make($request->get('password')),
-            ]));
-        }
-
-        $model->roles()->sync(
-            array_merge($request->get('roles', []), [config('user.default_role_uuid')])
-        );
+        $model = $this->service->createUserByRequest($request);
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -234,5 +213,68 @@ class UserController extends AbstractRestAPIController
             return $this->sendOkJsonResponse(["messages" => __('messages.change_password_success')]);
         }
         return $this->sendValidationFailedJsonResponse(["errors" => ["old_password" => __('messages.old_password_invalid')]]);
+    }
+
+    public function indexAdmin(IndexRequest $request)
+    {
+        $models = $this->service->getUsersOfAdmin($request);
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+        );
+    }
+
+    public function showAdmin($id)
+    {
+        $model = $this->service->showUserOfAdminById($id);
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    public function banAdmin($id)
+    {
+        $model = $this->service->showUserOfAdminById($id);
+        $this->service->update($model, ['banned_at' => Carbon::now()]);
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    public function storeAdmin(AdminUserRequest $request)
+    {
+        $model = $this->service->createUserByRequest($request);
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    public function editAdmin($id, UpdateAdminUserRequest $request)
+    {
+        $model = $this->service->showUserOfAdminById($id);
+        $data = $request->except('credit');
+
+        if ($request->has('password')) {
+            $data = array_merge($data, [
+                'password' => Hash::make($request->get('password'))
+            ]);
+        }
+
+        $this->service->update($model, $data);
+
+        $model->roles()->sync($request->roles ?? $model->roles);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    public function destroyAdmin($id)
+    {
+        $this->service->deleteUserOfAdminById($id);
+
+        return $this->sendOkJsonResponse();
     }
 }
