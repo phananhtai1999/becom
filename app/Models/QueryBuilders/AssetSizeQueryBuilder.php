@@ -41,7 +41,7 @@ class AssetSizeQueryBuilder extends AbstractQueryBuilder
                 'name',
                 'width',
                 'height',
-                'asset_group_code',
+                'asset_group_uuid',
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -52,10 +52,11 @@ class AssetSizeQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__name', 'name'),
                 'height',
                 AllowedFilter::exact('exact__height', 'height'),
-                'asset_group_code',
-                AllowedFilter::exact('exact__asset_group_code', 'asset_group_code'),
+                'asset_group_uuid',
+                AllowedFilter::exact('exact__asset_group_uuid', 'asset_group_uuid'),
+                'assetGroup.name',
+                AllowedFilter::exact('exact__asset_group.name', 'assetGroup.name'),
             ]);
-
     }
 
     /**
