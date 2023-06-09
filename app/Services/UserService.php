@@ -6,7 +6,9 @@ use App\Abstracts\AbstractService;
 use App\Models\QueryBuilders\UserQueryBuilder;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class UserService extends AbstractService
 {
@@ -291,5 +293,49 @@ class UserService extends AbstractService
         }
 
         return $char;
+    }
+
+    public function getUsersOfAdmin($request)
+    {
+        $indexRequest = $this->getIndexRequest($request);
+
+        return $this->modelQueryBuilderClass::searchQuery($indexRequest['search'], $indexRequest['search_by'])
+            ->whereDoesntHave('roles', function (Builder $query){
+                $query->where('name', 'root');
+            })->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
+    }
+
+    public function showUserOfAdminById($id)
+    {
+        return $this->model->whereDoesntHave('roles', function (Builder $query){
+            $query->where('name', 'root');
+        })->where('uuid', $id)->firstOrFail();
+    }
+
+    public function createUserByRequest($request)
+    {
+        if (empty($request->can_add_smtp_account)) {
+            $model = $this->create(array_merge($request->all(), [
+                'password' => Hash::make($request->get('password')),
+                'can_add_smtp_account' => '0'
+            ]));
+        } else {
+            $model = $this->create(array_merge($request->all(), [
+                'password' => Hash::make($request->get('password')),
+            ]));
+        }
+
+        $model->roles()->sync(
+            array_merge($request->get('roles', []), [config('user.default_role_uuid')])
+        );
+
+        return $model;
+    }
+
+    public function deleteUserOfAdminById($id)
+    {
+        $user = $this->showUserOfAdminById($id);
+
+        return $user->delete();
     }
 }

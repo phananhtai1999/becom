@@ -13,6 +13,8 @@ class Role extends AbstractModel
 {
     use HasFactory, SoftDeletes, HasSlug;
 
+    const ROLE_ROOT = 'root';
+
     /**
      * @var string
      */
