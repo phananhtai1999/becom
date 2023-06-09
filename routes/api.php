@@ -787,7 +787,7 @@ Route::get('public/article-category/{id}', [ArticleCategoryController::class, 's
 
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'group.'], function () {
-    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root'], 'as' => 'root.'], function () {
         Route::get('/groups', [GroupController::class, 'index'])->name('index');
         Route::post('/group', [GroupController::class, 'store'])->name('store');
         Route::get('/group/{id}', [GroupController::class, 'show'])->name('show');
