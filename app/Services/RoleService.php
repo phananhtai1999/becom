@@ -11,4 +11,12 @@ class RoleService extends AbstractService
     protected $modelClass = Role::class;
 
     protected $modelQueryBuilderClass = RoleQueryBuilder::class;
+
+    public function showRoleOfAdminById($id)
+    {
+        return $this->findOneWhereOrFail([
+            ['name', '<>', Role::ROLE_ROOT],
+            ['uuid', $id]
+        ]);
+    }
 }

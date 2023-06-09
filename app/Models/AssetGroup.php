@@ -21,14 +21,13 @@ class AssetGroup extends Model
     /**
      * @var string
      */
-    protected $primaryKey = 'code';
-    protected $keyType = 'string';
-    public $incrementing = false;
+    protected $primaryKey = 'uuid';
     /**
      * @var string[]
      */
     protected $fillable = [
         'name',
+        'code'
     ];
 
     /**

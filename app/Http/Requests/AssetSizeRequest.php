@@ -27,7 +27,7 @@ class AssetSizeRequest extends FormRequest
             'name' => ['required', 'string'],
             'width' => ['required', 'integer', 'min:1'],
             'height' => ['required', 'integer', 'min:1'],
-            'asset_group_code' => ['required', 'string', 'exists:asset_groups,code']
+            'asset_group_uuid' => ['required', 'integer', 'exists:asset_groups,uuid']
         ];
     }
 }

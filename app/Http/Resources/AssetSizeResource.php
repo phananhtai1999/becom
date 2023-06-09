@@ -21,7 +21,7 @@ class AssetSizeResource extends JsonResource
             'name' => $this->name,
             'width' => $this->width,
             'height' => $this->height,
-            'asset_group_code' => $this->asset_group_code,
+            'asset_group_uuid' => $this->asset_group_uuid,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'deleted_at' => $this->deleted_at,

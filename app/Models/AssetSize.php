@@ -28,7 +28,7 @@ class AssetSize extends Model
         'name',
         'width',
         'height',
-        'asset_group_code',
+        'asset_group_uuid',
     ];
 
     /**
@@ -41,6 +41,6 @@ class AssetSize extends Model
     ];
 
     public function assetGroup(){
-        return $this->hasOne(AssetGroup::class, 'code', 'asset_group_code');
+        return $this->hasOne(AssetGroup::class, 'uuid', 'asset_group_uuid');
     }
 }
