@@ -1,3 +1,7 @@
+stages:
+  - build
+  - deploy
+  - seed
 before_script:
   - apt-get update && apt-get install -y -qq rsync openssh-client zip unzip
   - mkdir -p ~/.ssh && chmod 700 ~/.ssh
@@ -12,6 +16,15 @@ deploy-staging:
   script:
     - rsync -ravz --delete --exclude .git --exclude .env  --exclude vendor ./ $DEPLOY_USER@$DEPLOY_DOMAIN:/$SOURCE_PATH
     - ssh $DEPLOY_USER@$DEPLOY_DOMAIN "bash -c 'cd $SOURCE_PATH && rm -f composer.lock && composer install && php artisan migrate'"
+
+seeder-staging:
+  stage: seed
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "staging"'
+      when: manual
+  environment: staging
+  script:
+    - ssh $DEPLOY_USER@$DEPLOY_DOMAIN "bash -c 'cd $SOURCE_PATH && php artisan db:seed'"
 
 deploy-production:
   stage: deploy
