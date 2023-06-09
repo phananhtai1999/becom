@@ -5,8 +5,11 @@ namespace App\Models\QueryBuilders;
 use App\Abstracts\AbstractQueryBuilder;
 use App\Models\Asset;
 use App\Models\SearchQueryBuilders\SearchQueryBuilder;
+use App\Sorts\SortHeightAssetSize;
+use App\Sorts\SortWidthAssetSize;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\AllowedSort;
 use Spatie\QueryBuilder\Concerns\SortsQuery;
 
 class AssetQueryBuilder extends AbstractQueryBuilder
@@ -32,7 +35,6 @@ class AssetQueryBuilder extends AbstractQueryBuilder
                 'type',
                 'title',
                 'asset_size_uuid',
-                'asset_group_code',
                 'url',
             ])
             ->defaultSort('-created_at')
@@ -41,8 +43,9 @@ class AssetQueryBuilder extends AbstractQueryBuilder
                 'type',
                 'title',
                 'asset_size_uuid',
-                'asset_group_code',
                 'url',
+                AllowedSort::custom('assetSize.width', new SortWidthAssetSize()),
+                AllowedSort::custom('assetSize.height', new SortHeightAssetSize())
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -55,8 +58,8 @@ class AssetQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__asset_size_uuid', 'asset_size_uuid'),
                 'updated_at',
                 AllowedFilter::exact('exact__updated_at', 'updated_at'),
-                'asset_group_code',
-                AllowedFilter::exact('exact__asset_group_code', 'asset_group_code'),
+                'assetSize.name',
+                AllowedFilter::exact('exact__asset_size.name', 'assetSize.name'),
                 'url',
                 AllowedFilter::exact('exact__url', 'url'),
             ]);
