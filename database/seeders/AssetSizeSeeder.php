@@ -15,10 +15,10 @@ class AssetSizeSeeder extends Seeder
      */
     public function run()
     {
-        $squareGroupId = AssetGroup::where('code', 'square_and_rectangle')->first()->uuid();
-        $skyscraperGroupId = AssetGroup::where('code', 'skyscraper')->first()->uuid();
-        $leaderboardGroupId = AssetGroup::where('code', 'leaderboard')->first()->uuid();
-        $mobileGroupId = AssetGroup::where('code', 'mobile')->first()->uuid();
+        $squareGroupId = AssetGroup::where('code', 'square_and_rectangle')->first()->uuid;
+        $skyscraperGroupId = AssetGroup::where('code', 'skyscraper')->first()->uuid;
+        $leaderboardGroupId = AssetGroup::where('code', 'leaderboard')->first()->uuid;
+        $mobileGroupId = AssetGroup::where('code', 'mobile')->first()->uuid;
         $assetSizes = [
             [
                 'name' => 'Small square',
