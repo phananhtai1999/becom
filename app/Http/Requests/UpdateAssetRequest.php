@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateAssetRequest extends FormRequest
 {
@@ -23,12 +24,18 @@ class UpdateAssetRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            'url' => ['string'],
+        $validate = [
             'title' => ['string'],
-            'asset_group_code' => ['string', 'exists:asset_groups,code'],
             'asset_size_uuid' => ['integer', 'exists:asset_sizes,uuid'],
-            'type' => ['string'],
+            'type' => [Rule::in(['image', 'video']), 'required_if:file,*'],
         ];
+        if ($this->request->get('type')) {
+            if($this->request->get('type') == 'video') {
+                $validate['file'] = ['required', 'mimes:mp4'];
+            } else {
+                $validate['file'] = ['required', 'mimes:jpg,png,gif', 'max:153600'];
+            }
+        }
+        return $validate;
     }
 }
