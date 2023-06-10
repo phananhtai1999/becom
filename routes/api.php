@@ -604,7 +604,7 @@ Route::get('public/website-page/{id}', [WebsitePageController::class, 'show'])->
 //Platform Package
 Route::get('/platform-packages', [PlatformPackageController::class, 'index']);
 Route::group(['middleware' => ['auth:api'], 'as' => 'platformPackage.'], function () {
-    Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root'], 'as' => 'root.'], function () {
         Route::post('/platform-package', [PlatformPackageController::class, 'store']);
         Route::delete('/platform-package/{id}', [PlatformPackageController::class, 'destroy']);
     });
@@ -617,7 +617,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'platformPackage.'], functio
 
 //Cache config
 Route::group(['middleware' => ['auth:api'], 'as' => 'cacheConfig.'], function () {
-    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root'], 'as' => 'root.'], function () {
         Route::put('/cache-platform-config/{membership_package_uuid}', [ConfigController::class, 'editCachePlatformConfig']);
         Route::get('/cache-platform-config/{membership_package_uuid}', [ConfigController::class, 'getCachePlatformConfig']);
     });
@@ -626,7 +626,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'cacheConfig.'], function ()
 
 //Credit Package
 Route::group(['middleware' => ['auth:api'], 'as' => 'creditPackage.'], function () {
-    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root'], 'as' => 'root.'], function () {
         Route::post('/credit-package', [CreditPackageController::class, 'store']);
         Route::put('/credit-package/{id}', [CreditPackageController::class, 'edit']);
         Route::delete('/credit-package/{id}', [CreditPackageController::class, 'destroy']);
@@ -635,7 +635,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'creditPackage.'], function 
 Route::get('/credit-package/{id}', [CreditPackageController::class, 'show']);
 Route::get('/credit-packages', [CreditPackageController::class, 'index']);
 Route::group(['middleware' => ['auth:api'], 'as' => 'subscriptionPlan.'], function () {
-    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root'], 'as' => 'root.'], function () {
         Route::post('/subscription-plan', [SubscriptionPlanController::class, 'store']);
         Route::delete('/subscription-plan/{id}', [SubscriptionPlanController::class, 'destroy']);
     });
@@ -645,7 +645,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'subscriptionPlan.'], functi
 
 //add-on subscription plan
 Route::group(['middleware' => ['auth:api'], 'as' => 'addOnSubscriptionPlan.'], function () {
-    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root'], 'as' => 'root.'], function () {
         Route::post('/add-on-subscription-plan', [AddOnSubscriptionPlanController::class, 'store']);
         Route::delete('/add-on-subscription-plan/{id}', [AddOnSubscriptionPlanController::class, 'destroy']);
     });
@@ -654,7 +654,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'addOnSubscriptionPlan.'], f
 Route::get('/add-on-subscription-plans', [AddOnSubscriptionPlanController::class, 'index']);
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'permission.'], function () {
-    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root'], 'as' => 'root.'], function () {
         Route::post('/permission', [PermissionController::class, 'store']);
         Route::get('/permission/{id}', [PermissionController::class, 'show']);
         Route::put('/permission/{id}', [PermissionController::class, 'edit']);
