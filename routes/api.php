@@ -1265,7 +1265,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'asset'], function () {
         Route::get('/assets', [AssetController::class, 'index']);
         Route::get('asset/{id}', [AssetController::class, 'show']);
         Route::post('asset', [AssetController::class, 'store']);
-        Route::put('asset/{id}', [AssetController::class, 'edit']);
+        Route::post('asset/{id}', [AssetController::class, 'edit']);
         Route::delete('asset/{id}', [AssetController::class, 'destroy']);
         Route::post('generate-js-code', [AssetController::class, 'generateJsCode']);
     });
