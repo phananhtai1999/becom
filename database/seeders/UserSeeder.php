@@ -31,6 +31,11 @@ class UserSeeder extends Seeder {
                 'email' => 'root@sendemail.techupcorp',
                 'password' => '111@222',
                 'role' => 'root',
+            ],
+            [
+                'email' => 'ronn@techupzone.com',
+                'password' => '111@222',
+                'role' => 'root',
             ]
         ];
         $role = Role::where('name', 'user')->first();
