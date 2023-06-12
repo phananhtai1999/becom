@@ -23,6 +23,7 @@ class AssetResource extends JsonResource
             'title' => $this->title,
             'url' => $this->url,
             'asset_size_uuid' => $this->asset_size_uuid,
+            'status' => $this->status,
             'js_code' => $this->js_code
         ];
 
