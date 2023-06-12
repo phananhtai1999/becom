@@ -12,6 +12,8 @@ class Asset extends Model
 
     const TYPE_IMAGE = 'image';
     const TYPE_VIDEO = 'video';
+    const PENDING_STATUS = 'pending';
+    const PUBLISH_STATUS = 'publish';
     /**
      * @var string
      */
@@ -30,6 +32,7 @@ class Asset extends Model
         'title',
         'asset_size_uuid',
         'url',
+        'status'
     ];
 
     /**
