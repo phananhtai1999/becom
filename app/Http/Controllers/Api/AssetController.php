@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
 use App\Http\Controllers\Traits\RestDestroyTrait;
-use App\Http\Controllers\Traits\RestEditTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\AssetRequest;
@@ -17,12 +16,10 @@ use App\Models\Asset;
 use App\Services\AssetService;
 use App\Services\UploadService;
 use App\Services\UserService;
-use Exception;
-use Imagick;
 
 class AssetController extends AbstractRestAPIController
 {
-    use RestShowTrait, RestDestroyTrait, RestEditTrait, RestIndexTrait;
+    use RestShowTrait, RestDestroyTrait, RestIndexTrait;
 
     public function __construct(AssetService $service, UserService $userService, UploadService $uploadService)
     {
@@ -59,6 +56,57 @@ class AssetController extends AbstractRestAPIController
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+    public function edit(UpdateAssetRequest $request, $id)
+    {
+        $model = $this->service->findOrFailById($id);
+        if($request->file) {
+            $uploadUrl = $this->uploadFile($request->file, $this->userService->getCurrentUserRole(), $this->uploadService);
+            $filename = $uploadUrl['absolute_slug'];
+            if ($request->get('type') == 'image') {
+                if (getimagesize($filename)['mime'] == 'image/gif') {
+                    $duration = $this->getGifDuration($filename);
+                    $loop = $this->getGifLoopCount($filename);
+                    if (empty($loop) || $duration > 30 || $loop * $duration > 30) {
+                        $this->deleteFile($uploadUrl['slug'], $this->uploadService);
+
+                        return $this->sendJsonResponse(false, 'The gif longer than 30s', [], 400);
+                    } elseif ($this->getFrames($filename) / $duration > 5) {
+                        $this->deleteFile($uploadUrl['slug'], $this->uploadService);
+
+                        return $this->sendJsonResponse(false, 'The gif must be smaller than 5FPS', [], 400);
+                    }
+                }
+            }
+            $this->service->update($model, array_merge($request->all(), ['url' => $uploadUrl['absolute_slug']]));
+        } else {
+            $this->service->update($model, $request->all());
+        }
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    public function index()
+    {
+        if (empty(auth()->user()->partner)) {
+            return $this->sendJsonResponse(false, 'You need become partner to use it', [], 400);
+        }
+        $models = $this->service->getCollectionWithPagination();
+        $mainUrl = $this->service->getConfigByKeyInCache('main_url');
+        foreach ($models as $model) {
+            if($model->type == Asset::TYPE_IMAGE) {
+                $jsCode = '<script type="text/javascript" src="' . env('FRONTEND_URL') . 'api/generate-image?pn=' . $model->uuid . '&as=' . $model->uuid . '&link=' . $mainUrl->value . '?ref=' . auth()->user()->partner->code . '"> </script>';
+            } else {
+                $jsCode = '<script type="text/javascript" src="' . env('FRONTEND_URL') . 'api/generate-video?pn=' . $model->uuid . '&as=' . $model->uuid . '&link=' . $mainUrl->value . '?ref=' . auth()->user()->partner->code . '"> </script>';
+            }
+            $model->js_code = $jsCode;
+        }
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
         );
     }
 

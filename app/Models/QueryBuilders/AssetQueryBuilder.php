@@ -44,8 +44,8 @@ class AssetQueryBuilder extends AbstractQueryBuilder
                 'title',
                 'asset_size_uuid',
                 'url',
-                AllowedSort::custom('assetSize.width', new SortWidthAssetSize()),
-                AllowedSort::custom('assetSize.height', new SortHeightAssetSize())
+                AllowedSort::custom('asset_size_width', new SortWidthAssetSize()),
+                AllowedSort::custom('asset_size_height', new SortHeightAssetSize())
             ])
             ->allowedFilters([
                 $modelKeyName,
