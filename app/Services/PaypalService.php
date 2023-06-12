@@ -101,12 +101,11 @@ class PaypalService extends AbstractService
     public function createProduct($request)
     {
         $provider = $this->accessServer();
-        $apiContext = new ApiContext();
 
         return $provider->createProduct([
             'name' => $request->uuid,
             'type' => 'SERVICE',
-        ], $apiContext->getRequestId());
+        ], 'create-product-'.time());
     }
 
     /**
