@@ -1261,14 +1261,23 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website'], function () {
 Route::get('public/website/{id}', [WebsiteController::class, 'show'])->name('website.show');
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'asset'], function () {
-    Route::group(['middleware' => ['role:root,admin,editor'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('/assets', [AssetController::class, 'index']);
-        Route::get('asset/{id}', [AssetController::class, 'show']);
-        Route::post('asset', [AssetController::class, 'store']);
         Route::post('asset/{id}', [AssetController::class, 'edit']);
         Route::delete('asset/{id}', [AssetController::class, 'destroy']);
-        Route::post('generate-js-code', [AssetController::class, 'generateJsCode']);
+        Route::post('publish-asset/{id}', [AssetController::class, 'publishAsset']);
+        Route::post('asset', [AssetController::class, 'store']);
     });
+
+    Route::group(['middleware' => ['role:root,admin,editor'], 'as' => 'admin.'], function () {
+        Route::get('unpublished-assets', [AssetController::class, 'pendingAssets']);
+        Route::post('unpublished-asset/{id}', [AssetController::class, 'editPendingAsset']);
+        Route::get('unpublished-asset/{id}', [AssetController::class, 'showPendingAsset']);
+        Route::post('unpublished-asset', [AssetController::class, 'storePendingAsset']);
+    });
+    Route::get('/publish-assets', [AssetController::class, 'indexPublishAssets']);
+    Route::post('generate-js-code', [AssetController::class, 'generateJsCode']);
+    Route::get('asset/{id}', [AssetController::class, 'show']);
 });
 Route::get('generate-video', [AssetController::class, 'generateForVideo']);
 Route::get('generate-image', [AssetController::class, 'generateForImage']);

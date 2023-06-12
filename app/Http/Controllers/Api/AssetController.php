@@ -52,16 +52,17 @@ class AssetController extends AbstractRestAPIController
                 }
             }
         }
-        $model = $this->service->create(array_merge($request->all(), ['url' => $uploadUrl['absolute_slug']]));
+        $model = $this->service->create(array_merge($request->except('status'), ['url' => $uploadUrl['absolute_slug'], 'status' => Asset::PUBLISH_STATUS]));
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
         );
     }
+
     public function edit(UpdateAssetRequest $request, $id)
     {
         $model = $this->service->findOrFailById($id);
-        if($request->file) {
+        if ($request->file) {
             $uploadUrl = $this->uploadFile($request->file, $this->userService->getCurrentUserRole(), $this->uploadService);
             $filename = $uploadUrl['absolute_slug'];
             if ($request->get('type') == 'image') {
@@ -97,7 +98,7 @@ class AssetController extends AbstractRestAPIController
         $models = $this->service->getCollectionWithPagination();
         $mainUrl = $this->service->getConfigByKeyInCache('main_url');
         foreach ($models as $model) {
-            if($model->type == Asset::TYPE_IMAGE) {
+            if ($model->type == Asset::TYPE_IMAGE) {
                 $jsCode = '<script type="text/javascript" src="' . env('FRONTEND_URL') . 'api/generate-image?pn=' . $model->uuid . '&as=' . $model->uuid . '&link=' . $mainUrl->value . '?ref=' . auth()->user()->partner->code . '"> </script>';
             } else {
                 $jsCode = '<script type="text/javascript" src="' . env('FRONTEND_URL') . 'api/generate-video?pn=' . $model->uuid . '&as=' . $model->uuid . '&link=' . $mainUrl->value . '?ref=' . auth()->user()->partner->code . '"> </script>';
@@ -145,13 +146,13 @@ class AssetController extends AbstractRestAPIController
             return $this->sendJsonResponse(false, 'You need become partner to use it', [], 400);
         }
         $mainUrl = $this->service->getConfigByKeyInCache('main_url');
-        if (!preg_match('/^'. preg_quote($mainUrl->value, '/').'/', $request->get('url'))) {
-            return $this->sendJsonResponse(false, 'Your url must be start with '. $mainUrl->value, [], 400);
+        if (!preg_match('/^' . preg_quote($mainUrl->value, '/') . '/', $request->get('url'))) {
+            return $this->sendJsonResponse(false, 'Your url must be start with ' . $mainUrl->value, [], 400);
         }
 
         $partner = auth()->user()->partner;
         $asset = $this->service->findOrFailById($request->get('asset_uuid'));
-        if($asset->type == Asset::TYPE_IMAGE) {
+        if ($asset->type == Asset::TYPE_IMAGE) {
             $jsCode = '<script type="text/javascript" src="' . env('FRONTEND_URL') . 'api/generate-image?pn=' . $partner->uuid . '&as=' . $asset->uuid . '&link=' . $request->get('url') . '?ref=' . $partner->code . '"> </script>';
         } else {
             $jsCode = '<script type="text/javascript" src="' . env('FRONTEND_URL') . 'api/generate-video?pn=' . $partner->uuid . '&as=' . $asset->uuid . '&link=' . $request->get('url') . '?ref=' . $partner->code . '"> </script>';
@@ -192,13 +193,112 @@ class AssetController extends AbstractRestAPIController
         video.autoplay = true;
         video.controls = true;
         video.muted = false;
-        video.height = '.$asset->assetSize->height.';
-        video.width = '.$asset->assetSize->width.';
+        video.height = ' . $asset->assetSize->height . ';
+        video.width = ' . $asset->assetSize->width . ';
 
         const box = document.getElementById("banner-ads");
         const link = document.createElement("a");
         link.href = "' . $request->get('link') . '";
         link.appendChild(video);
         box.appendChild(link);';
+    }
+
+    public function publishAsset($id)
+    {
+        $model = $this->service->findOrFailById($id);
+        $model->update(['status' => Asset::PUBLISH_STATUS]);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    public function storePendingAsset(AssetRequest $request)
+    {
+        $uploadUrl = $this->uploadFile($request->file, $this->userService->getCurrentUserRole(), $this->uploadService);
+        $filename = $uploadUrl['absolute_slug'];
+        if ($request->get('type') == 'image') {
+            if (getimagesize($filename)['mime'] == 'image/gif') {
+                $duration = $this->getGifDuration($filename);
+                $loop = $this->getGifLoopCount($filename);
+                if (empty($loop) || $duration > 30 || $loop * $duration > 30) {
+                    $this->deleteFile($uploadUrl['slug'], $this->uploadService);
+
+                    return $this->sendJsonResponse(false, 'The gif longer than 30s', [], 400);
+                } elseif ($this->getFrames($filename) / $duration > 5) {
+                    $this->deleteFile($uploadUrl['slug'], $this->uploadService);
+
+                    return $this->sendJsonResponse(false, 'The gif must be smaller than 5FPS', [], 400);
+                }
+            }
+        }
+        $model = $this->service->create(array_merge($request->except('status'), ['url' => $uploadUrl['absolute_slug']]));
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+    public function pendingAssets(IndexRequest $request)
+    {
+        $models = $this->service->getCollectionWithPaginationByCondition($request,
+            ['status' => Asset::PENDING_STATUS]);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+        );
+    }
+
+    public function indexPublishAssets(IndexRequest $request)
+    {
+        $models = $this->service->getCollectionWithPaginationByCondition($request,
+            ['status' => Asset::PUBLISH_STATUS]);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+        );
+    }
+
+    /**
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function showPendingAsset($id)
+    {
+        $model = $this->service->findOneWhereOrFail(['status' => Asset::PENDING_STATUS, 'uuid' => $id]);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    public function editPendingAsset(UpdateAssetRequest $request, $id)
+    {
+        $model = $this->service->findOneWhere(['status' => Asset::PENDING_STATUS, 'uuid' => $id]);
+        if ($request->file) {
+            $uploadUrl = $this->uploadFile($request->file, $this->userService->getCurrentUserRole(), $this->uploadService);
+            $filename = $uploadUrl['absolute_slug'];
+            if ($request->get('type') == 'image') {
+                if (getimagesize($filename)['mime'] == 'image/gif') {
+                    $duration = $this->getGifDuration($filename);
+                    $loop = $this->getGifLoopCount($filename);
+                    if (empty($loop) || $duration > 30 || $loop * $duration > 30) {
+                        $this->deleteFile($uploadUrl['slug'], $this->uploadService);
+
+                        return $this->sendJsonResponse(false, 'The gif longer than 30s', [], 400);
+                    } elseif ($this->getFrames($filename) / $duration > 5) {
+                        $this->deleteFile($uploadUrl['slug'], $this->uploadService);
+
+                        return $this->sendJsonResponse(false, 'The gif must be smaller than 5FPS', [], 400);
+                    }
+                }
+            }
+            $this->service->update($model, array_merge($request->except('status'), ['url' => $uploadUrl['absolute_slug']]));
+        } else {
+            $this->service->update($model, $request->all());
+        }
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
     }
 }
