@@ -607,10 +607,11 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'platformPackage.'], functio
     Route::group(['middleware' => ['role:root'], 'as' => 'root.'], function () {
         Route::post('/platform-package', [PlatformPackageController::class, 'store']);
         Route::delete('/platform-package/{id}', [PlatformPackageController::class, 'destroy']);
+        Route::put('/publish-platform-package/{id}', [PlatformPackageController::class, 'publishPlatformPackage']);
+        Route::put('/platform-package/{id}', [PlatformPackageController::class, 'edit']);
+        Route::put('/disable-platform-package/{id}', [PlatformPackageController::class, 'disablePlatformPackage']);
     });
-    Route::put('/publish-platform-package/{id}', [PlatformPackageController::class, 'publishPlatformPackage']);
-    Route::put('/platform-package/{id}', [PlatformPackageController::class, 'edit']);
-    Route::put('/disable-platform-package/{id}', [PlatformPackageController::class, 'disablePlatformPackage']);
+
     Route::get('/platform-package/{id}', [PlatformPackageController::class, 'show']);
     Route::get('/my-platform-package', [PlatformPackageController::class, 'myPlatformPackage']);
 });
@@ -1009,13 +1010,12 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'team.'], function () {
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'addOn.'], function () {
-    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
+    Route::group(['middleware' => ['role:root'], 'as' => 'root.'], function () {
         Route::post('/add-on', [AddOnController::class, 'store'])->name('store');
         Route::get('/publish-add-on/{id}', [AddOnController::class, 'publishAddOn'])->name('publish');
         Route::put('/add-on/{id}', [AddOnController::class, 'edit'])->name('edit');
         Route::get('/disable-add-on/{id}', [AddOnController::class, 'disableAddOn'])->name('disableAddOn');
         Route::delete('add-on/{id}', [AddOnController::class, 'destroy'])->name('destroy');
-
     });
     Route::get('/add-on/{id}', [AddOnController::class, 'show'])->name('show');
     Route::get('/add-on-subscription-histories', [AddOnController::class, 'addOnSubscriptionHistory'])->name('addOnSubscriptionHistory');
