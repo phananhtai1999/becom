@@ -39,18 +39,10 @@ class AssetController extends AbstractRestAPIController
         $filename = $uploadUrl['absolute_slug'];
         if ($request->get('type') == 'image') {
             if (getimagesize($filename)['mime'] == 'image/gif') {
-                $duration = $this->getGifDuration($filename);
-                $loop = $this->getGifLoopCount($filename);
-                if (empty($loop) || $duration > 30 || $loop * $duration > 30) {
-                    $this->deleteFile($uploadUrl['slug'], $this->uploadService);
-
-                    return $this->sendJsonResponse(false, 'The gif longer than 30s', [], 400);
-                } elseif ($this->getFrames($filename) / $duration > 5) {
-                    $this->deleteFile($uploadUrl['slug'], $this->uploadService);
-
-                    return $this->sendJsonResponse(false, 'The gif must be smaller than 5FPS', [], 400);
-                }
-            }
+                $gif = $this->validateGif($filename, $uploadUrl);
+                if($gif['is_failed']) {
+                    return $this->sendJsonResponse(false, $gif['message'], [], 400);
+                }            }
         }
         $model = $this->service->create(array_merge($request->except('status'), ['url' => $uploadUrl['absolute_slug'], 'status' => Asset::PUBLISH_STATUS]));
 
@@ -67,18 +59,10 @@ class AssetController extends AbstractRestAPIController
             $filename = $uploadUrl['absolute_slug'];
             if ($request->get('type') == 'image') {
                 if (getimagesize($filename)['mime'] == 'image/gif') {
-                    $duration = $this->getGifDuration($filename);
-                    $loop = $this->getGifLoopCount($filename);
-                    if (empty($loop) || $duration > 30 || $loop * $duration > 30) {
-                        $this->deleteFile($uploadUrl['slug'], $this->uploadService);
-
-                        return $this->sendJsonResponse(false, 'The gif longer than 30s', [], 400);
-                    } elseif ($this->getFrames($filename) / $duration > 5) {
-                        $this->deleteFile($uploadUrl['slug'], $this->uploadService);
-
-                        return $this->sendJsonResponse(false, 'The gif must be smaller than 5FPS', [], 400);
-                    }
-                }
+                    $gif = $this->validateGif($filename, $uploadUrl);
+                    if($gif['is_failed']) {
+                        return $this->sendJsonResponse(false, $gif['message'], [], 400);
+                    }                }
             }
             $this->service->update($model, array_merge($request->all(), ['url' => $uploadUrl['absolute_slug']]));
         } else {
@@ -219,18 +203,10 @@ class AssetController extends AbstractRestAPIController
         $filename = $uploadUrl['absolute_slug'];
         if ($request->get('type') == 'image') {
             if (getimagesize($filename)['mime'] == 'image/gif') {
-                $duration = $this->getGifDuration($filename);
-                $loop = $this->getGifLoopCount($filename);
-                if (empty($loop) || $duration > 30 || $loop * $duration > 30) {
-                    $this->deleteFile($uploadUrl['slug'], $this->uploadService);
-
-                    return $this->sendJsonResponse(false, 'The gif longer than 30s', [], 400);
-                } elseif ($this->getFrames($filename) / $duration > 5) {
-                    $this->deleteFile($uploadUrl['slug'], $this->uploadService);
-
-                    return $this->sendJsonResponse(false, 'The gif must be smaller than 5FPS', [], 400);
-                }
-            }
+                $gif = $this->validateGif($filename, $uploadUrl);
+                if($gif['is_failed']) {
+                    return $this->sendJsonResponse(false, $gif['message'], [], 400);
+                }            }
         }
         $model = $this->service->create(array_merge($request->except('status'), ['url' => $uploadUrl['absolute_slug']]));
 
@@ -279,16 +255,9 @@ class AssetController extends AbstractRestAPIController
             $filename = $uploadUrl['absolute_slug'];
             if ($request->get('type') == 'image') {
                 if (getimagesize($filename)['mime'] == 'image/gif') {
-                    $duration = $this->getGifDuration($filename);
-                    $loop = $this->getGifLoopCount($filename);
-                    if (empty($loop) || $duration > 30 || $loop * $duration > 30) {
-                        $this->deleteFile($uploadUrl['slug'], $this->uploadService);
-
-                        return $this->sendJsonResponse(false, 'The gif longer than 30s', [], 400);
-                    } elseif ($this->getFrames($filename) / $duration > 5) {
-                        $this->deleteFile($uploadUrl['slug'], $this->uploadService);
-
-                        return $this->sendJsonResponse(false, 'The gif must be smaller than 5FPS', [], 400);
+                    $gif = $this->validateGif($filename, $uploadUrl);
+                    if($gif['is_failed']) {
+                        return $this->sendJsonResponse(false, $gif['message'], [], 400);
                     }
                 }
             }
@@ -300,5 +269,21 @@ class AssetController extends AbstractRestAPIController
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
         );
+    }
+
+    public function validateGif($filename, $uploadUrl) {
+        $duration = $this->getGifDuration($filename);
+        $loop = $this->getGifLoopCount($filename);
+        if (empty($loop) || $duration > 30 || $loop * $duration > 30) {
+            $this->deleteFile($uploadUrl['slug'], $this->uploadService);
+
+            return ['is_failed' => true, 'message' => 'The gif longer than 30s'];
+        } elseif ($this->getFrames($filename) / $duration > 5) {
+            $this->deleteFile($uploadUrl['slug'], $this->uploadService);
+
+            return ['is_failed' => true, 'message' => 'The gif must be smaller than 5FPS'];
+        }
+
+        return ['is_failed' => false];
     }
 }
