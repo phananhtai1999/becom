@@ -17,16 +17,16 @@ class PaypalService extends AbstractService
     public function accessServer()
     {
         $paypalConfig = [
-            'mode' => 'sandbox', // Can only be 'sandbox' Or 'live'. If empty or invalid, 'live' will be used.
+            'mode' => $this->getConfigByKeyInCache('payment_mode')->value, // Can only be 'sandbox' Or 'live'. If empty or invalid, 'live' will be used.
             'sandbox' => [
-                'client_id' => $this->getConfigByKeyInCache('paypal_sandbox_client_id')->value,
-                'client_secret' => $this->getConfigByKeyInCache('paypal_sandbox_client_secret')->value,
-                'app_id' => 'APP-80W284485P519543T',
+                'client_id' => $this->getConfigByKeyInCache('paypal_client_id')->value,
+                'client_secret' => $this->getConfigByKeyInCache('paypal_client_secret')->value,
+                'app_id' => $this->getConfigByKeyInCache('paypal_app_id')->value,
             ],
             'live' => [
-                'client_id' => env('PAYPAL_LIVE_CLIENT_ID', ''),
-                'client_secret' => env('PAYPAL_LIVE_CLIENT_SECRET', ''),
-                'app_id' => env('PAYPAL_LIVE_APP_ID', ''),
+                'client_id' => $this->getConfigByKeyInCache('paypal_client_id')->value,
+                'client_secret' => $this->getConfigByKeyInCache('paypal_client_secret')->value,
+                'app_id' => $this->getConfigByKeyInCache('paypal_app_id')->value,
             ],
 
             'payment_action' => env('PAYPAL_PAYMENT_ACTION', 'Sale'), // Can only be 'Sale', 'Authorization' or 'Order'
