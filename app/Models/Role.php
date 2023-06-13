@@ -14,6 +14,7 @@ class Role extends AbstractModel
     use HasFactory, SoftDeletes, HasSlug;
 
     const ROLE_ROOT = 'root';
+    const ADMIN_ROOT = 'admin';
 
     /**
      * @var string
