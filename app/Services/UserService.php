@@ -246,7 +246,7 @@ class UserService extends AbstractService
             return false;
         }
 
-        return auth()->user()->roles->whereIn('slug', ["admin", "editor"])->count();
+        return auth()->user()->roles->whereIn('slug', ["admin", "editor", "root"])->count();
 
     }
 

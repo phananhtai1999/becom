@@ -11,6 +11,8 @@ use App\Services\ConfigService;
 use App\Services\InvoiceService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use DateTime;
+use DateTimeZone;
 
 class InvoiceController extends AbstractRestAPIController
 {
@@ -31,6 +33,11 @@ class InvoiceController extends AbstractRestAPIController
         $billingAddress = $invoice->billingAddress;
         $billingAddress->name = $this->checkVietnamese($billingAddress->name);
         $paymentMethod = $invoice->paymentMethod;
+        $date = new DateTime(date('Y-m-d H:i:s', $billingAddress->created_date));
+        $timezone = new DateTimeZone('Asia/Ho_Chi_Minh');
+        $date->setTimezone($timezone);
+        $billingAddress->created_date = $date->format('d/m/Y H:i:s');
+
         $data = [
             'invoice' => $invoice,
             'billingAddress' => $billingAddress,
