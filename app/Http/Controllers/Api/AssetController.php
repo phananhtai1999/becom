@@ -13,6 +13,7 @@ use App\Http\Requests\UpdateAssetRequest;
 use App\Http\Resources\AssetResource;
 use App\Http\Resources\AssetResourceCollection;
 use App\Models\Asset;
+use App\Models\Role;
 use App\Services\AssetService;
 use App\Services\UploadService;
 use App\Services\UserService;
@@ -39,10 +40,12 @@ class AssetController extends AbstractRestAPIController
         $filename = $uploadUrl['absolute_slug'];
         if ($request->get('type') == 'image') {
             if (getimagesize($filename)['mime'] == 'image/gif') {
-                $gif = $this->validateGif($filename, $uploadUrl);
-                if($gif['is_failed']) {
+                $gif = $this->service->validateGif($filename, $uploadUrl);
+                if ($gif['is_failed']) {
+                    $this->deleteFile($uploadUrl['slug'], $this->uploadService);
                     return $this->sendJsonResponse(false, $gif['message'], [], 400);
-                }            }
+                }
+            }
         }
         $model = $this->service->create(array_merge($request->except('status'), ['url' => $uploadUrl['absolute_slug'], 'status' => Asset::PUBLISH_STATUS]));
 
@@ -59,10 +62,12 @@ class AssetController extends AbstractRestAPIController
             $filename = $uploadUrl['absolute_slug'];
             if ($request->get('type') == 'image') {
                 if (getimagesize($filename)['mime'] == 'image/gif') {
-                    $gif = $this->validateGif($filename, $uploadUrl);
-                    if($gif['is_failed']) {
+                    $gif = $this->service->validateGif($filename, $uploadUrl);
+                    if ($gif['is_failed']) {
+                        $this->deleteFile($uploadUrl['slug'], $this->uploadService);
                         return $this->sendJsonResponse(false, $gif['message'], [], 400);
-                    }                }
+                    }
+                }
             }
             $this->service->update($model, array_merge($request->all(), ['url' => $uploadUrl['absolute_slug']]));
         } else {
@@ -74,60 +79,10 @@ class AssetController extends AbstractRestAPIController
         );
     }
 
-    public function index()
-    {
-        if (empty(auth()->user()->partner)) {
-            return $this->sendJsonResponse(false, 'You need become partner to use it', [], 400);
-        }
-        $models = $this->service->getCollectionWithPagination();
-        $mainUrl = $this->service->getConfigByKeyInCache('main_url');
-        foreach ($models as $model) {
-            if ($model->type == Asset::TYPE_IMAGE) {
-                $jsCode = '<script type="text/javascript" src="' . env('FRONTEND_URL') . 'api/generate-image?pn=' . $model->uuid . '&as=' . $model->uuid . '&link=' . $mainUrl->value . '?ref=' . auth()->user()->partner->code . '"> </script>';
-            } else {
-                $jsCode = '<script type="text/javascript" src="' . env('FRONTEND_URL') . 'api/generate-video?pn=' . $model->uuid . '&as=' . $model->uuid . '&link=' . $mainUrl->value . '?ref=' . auth()->user()->partner->code . '"> </script>';
-            }
-            $model->js_code = $jsCode;
-        }
-
-        return $this->sendOkJsonResponse(
-            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
-        );
-    }
-
-    public function getGifDuration($filename)
-    {
-        $gifData = file_get_contents($filename);
-
-        $delayPositions = [];
-        $offset = 0;
-        while (($position = strpos($gifData, "\x21\xF9\x04", $offset)) !== false) {
-            $delayPositions[] = $position + 4;
-            $offset = $position + 1;
-        }
-
-        $totalDuration = 0;
-        foreach ($delayPositions as $position) {
-            $delayBytes = substr($gifData, $position, 2);
-            $delayTime = unpack('v', $delayBytes)[1];
-            $totalDuration += $delayTime;
-        }
-
-        return $totalDuration / 100.0;
-    }
-
-    public function getFrames($filename)
-    {
-        $gifData = file_get_contents($filename);
-        $lastFramePosition = strrpos($gifData, "\x00\x2C");
-
-        return substr_count($gifData, "\x00\x21\xF9\x04", 0, $lastFramePosition + 1);
-    }
-
     public function generateJsCode(GenerateJsCodeAssetRequest $request)
     {
-        if (empty(auth()->user()->partner)) {
-            return $this->sendJsonResponse(false, 'You need become partner to use it', [], 400);
+        if (empty(auth()->user()->partner) && auth()->user()->role != Role::ADMIN_ROOT) {
+            return $this->sendJsonResponse(false, 'You need become partner to use it', [], 403);
         }
         $mainUrl = $this->service->getConfigByKeyInCache('main_url');
         if (!preg_match('/^' . preg_quote($mainUrl->value, '/') . '/', $request->get('url'))) {
@@ -144,17 +99,6 @@ class AssetController extends AbstractRestAPIController
 
         return $this->sendOkJsonResponse(['data' => $jsCode]);
     }
-
-    function getGifLoopCount($filepath)
-    {
-        $gifData = file_get_contents($filepath);
-
-        preg_match('/\x21\xFF\x0B(?:\x4E\x45\x54\x53\x43\x41\x50\x45\x32\x2E\x30\x03\x01(.{2}))/', $gifData, $matches);
-        $loopCount = isset($matches[1]) ? unpack('v', $matches[1])[1] : 0;
-
-        return $loopCount;
-    }
-
 
     public function generateForImage(\Illuminate\Http\Request $request)
     {
@@ -203,10 +147,12 @@ class AssetController extends AbstractRestAPIController
         $filename = $uploadUrl['absolute_slug'];
         if ($request->get('type') == 'image') {
             if (getimagesize($filename)['mime'] == 'image/gif') {
-                $gif = $this->validateGif($filename, $uploadUrl);
-                if($gif['is_failed']) {
+                $gif = $this->service->validateGif($filename, $uploadUrl);
+                if ($gif['is_failed']) {
+                    $this->deleteFile($uploadUrl['slug'], $this->uploadService);
                     return $this->sendJsonResponse(false, $gif['message'], [], 400);
-                }            }
+                }
+            }
         }
         $model = $this->service->create(array_merge($request->except('status'), ['url' => $uploadUrl['absolute_slug']]));
 
@@ -214,6 +160,7 @@ class AssetController extends AbstractRestAPIController
             $this->service->resourceToData($this->resourceClass, $model)
         );
     }
+
     public function pendingAssets(IndexRequest $request)
     {
         $models = $this->service->getCollectionWithPaginationByCondition($request,
@@ -226,8 +173,12 @@ class AssetController extends AbstractRestAPIController
 
     public function indexPublishAssets(IndexRequest $request)
     {
+        if (empty(auth()->user()->partner) && !auth()->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ADMIN_ROOT])) {
+            return $this->sendJsonResponse(false, 'You need to become partner to use it', [], 403);
+        }
         $models = $this->service->getCollectionWithPaginationByCondition($request,
             ['status' => Asset::PUBLISH_STATUS]);
+        $this->service->addJsCodeToIndex($models);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
@@ -249,14 +200,15 @@ class AssetController extends AbstractRestAPIController
 
     public function editPendingAsset(UpdateAssetRequest $request, $id)
     {
-        $model = $this->service->findOneWhere(['status' => Asset::PENDING_STATUS, 'uuid' => $id]);
+        $model = $this->service->findOneWhereOrFail(['status' => Asset::PENDING_STATUS, 'uuid' => $id]);
         if ($request->file) {
             $uploadUrl = $this->uploadFile($request->file, $this->userService->getCurrentUserRole(), $this->uploadService);
             $filename = $uploadUrl['absolute_slug'];
             if ($request->get('type') == 'image') {
                 if (getimagesize($filename)['mime'] == 'image/gif') {
-                    $gif = $this->validateGif($filename, $uploadUrl);
-                    if($gif['is_failed']) {
+                    $gif = $this->service->validateGif($filename, $uploadUrl);
+                    if ($gif['is_failed']) {
+                        $this->deleteFile($uploadUrl['slug'], $this->uploadService);
                         return $this->sendJsonResponse(false, $gif['message'], [], 400);
                     }
                 }
@@ -271,19 +223,4 @@ class AssetController extends AbstractRestAPIController
         );
     }
 
-    public function validateGif($filename, $uploadUrl) {
-        $duration = $this->getGifDuration($filename);
-        $loop = $this->getGifLoopCount($filename);
-        if (empty($loop) || $duration > 30 || $loop * $duration > 30) {
-            $this->deleteFile($uploadUrl['slug'], $this->uploadService);
-
-            return ['is_failed' => true, 'message' => 'The gif longer than 30s'];
-        } elseif ($this->getFrames($filename) / $duration > 5) {
-            $this->deleteFile($uploadUrl['slug'], $this->uploadService);
-
-            return ['is_failed' => true, 'message' => 'The gif must be smaller than 5FPS'];
-        }
-
-        return ['is_failed' => false];
-    }
 }
