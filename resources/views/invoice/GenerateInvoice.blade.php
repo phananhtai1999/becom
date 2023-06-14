@@ -155,7 +155,7 @@
         <table class="info">
             <tr class="text-95 text-secondary text-left">
                 <td><span class="text-600 text-110">Date</span></td>
-                <td><span class="text-600 text-110">: {{ $billingAddress->created_date }}</span></td>
+                <td><span class="text-600 text-110">: {{ $invoice->created_date }}</span></td>
                 <td style="width: 20%"><span class="text-600 text-110 ">Payment Method</span></td>
                 <td><span class="text-600 text-110 ">: {{ ucfirst($paymentMethod->name) }}</span></td>
             </tr>
