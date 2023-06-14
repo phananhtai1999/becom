@@ -7,6 +7,7 @@ use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\AssetRequest;
+use App\Http\Requests\ChangeStatusAssetRequest;
 use App\Http\Requests\GenerateJsCodeAssetRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\UpdateAssetRequest;
@@ -131,10 +132,10 @@ class AssetController extends AbstractRestAPIController
         box.appendChild(link);';
     }
 
-    public function publishAsset($id)
+    public function changeStatusAsset($id, ChangeStatusAssetRequest $request)
     {
         $model = $this->service->findOrFailById($id);
-        $model->update(['status' => Asset::PUBLISH_STATUS]);
+        $model->update(['status' => $request->get('status')]);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -191,7 +192,7 @@ class AssetController extends AbstractRestAPIController
      */
     public function showPendingAsset($id)
     {
-        $model = $this->service->findOneWhereOrFail(['status' => Asset::PENDING_STATUS, 'uuid' => $id]);
+        $model = $this->service->showAssetForEditorById($id);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -200,7 +201,7 @@ class AssetController extends AbstractRestAPIController
 
     public function editPendingAsset(UpdateAssetRequest $request, $id)
     {
-        $model = $this->service->findOneWhereOrFail(['status' => Asset::PENDING_STATUS, 'uuid' => $id]);
+        $model = $this->service->showAssetForEditorById($id);
         if ($request->file) {
             $uploadUrl = $this->uploadFile($request->file, $this->userService->getCurrentUserRole(), $this->uploadService);
             $filename = $uploadUrl['absolute_slug'];
@@ -213,9 +214,14 @@ class AssetController extends AbstractRestAPIController
                     }
                 }
             }
-            $this->service->update($model, array_merge($request->except('status'), ['url' => $uploadUrl['absolute_slug']]));
+            $this->service->update($model, array_merge($request->all(), [
+                'url' => $uploadUrl['absolute_slug'],
+                'status' => Asset::PENDING_STATUS
+            ]));
         } else {
-            $this->service->update($model, $request->all());
+            $this->service->update($model, array_merge($request->all(), [
+                'status' => Asset::PENDING_STATUS
+            ]));
         }
 
         return $this->sendOkJsonResponse(

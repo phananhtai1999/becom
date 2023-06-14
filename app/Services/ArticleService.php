@@ -134,7 +134,7 @@ class ArticleService extends AbstractService
         //Check auth:api
         //get Article Content Public
         $publishStatus = [Article::PUBLISHED_PUBLISH_STATUS];
-        if (auth()->user()->roles->whereIn('slug', ["admin"])->count()) {
+        if (auth()->user()->roles->whereIn('slug', ["admin","root"])->count()) {
             //Admin
             $contentForUSer = Article::ADMIN_CONTENT_FOR_USER;
         } elseif ($this->paidUser()) {
@@ -170,19 +170,19 @@ class ArticleService extends AbstractService
         //Check auth:api
         //get Article By Permission
         $publishStatus = [Article::PUBLISHED_PUBLISH_STATUS];
-        if (auth()->user()->roles->whereIn('slug', ["admin"])->count()) {
+        if (auth()->user()->roles->whereIn('slug', ["admin","root"])->count()) {
             //Admin
             return $this->loadAllArticles($perPage, $columns, $pageName, $page, $search, $searchBy);
         } elseif ($this->paidUser()) {
             //Check current user role
             if (auth()->user()->roles->whereIn('slug', ["editor"])->count()) {
-                $publishStatus = [Article::PENDING_PUBLISH_STATUS, Article::PUBLISHED_PUBLISH_STATUS, Article::BLOCKED_PUBLISH_STATUS];
+                $publishStatus = [Article::PENDING_PUBLISH_STATUS, Article::PUBLISHED_PUBLISH_STATUS, Article::BLOCKED_PUBLISH_STATUS, Article::REJECT_PUBLISH_STATUS];
             }
             //Payment
             $contentForUSer = Article::PAYMENT_CONTENT_FOR_USER;
         } elseif (auth()->user()->roles->whereIn('slug', ["editor"])->count()) {
             //Editor
-            $publishStatus = [Article::PENDING_PUBLISH_STATUS, Article::PUBLISHED_PUBLISH_STATUS, Article::BLOCKED_PUBLISH_STATUS];
+            $publishStatus = [Article::PENDING_PUBLISH_STATUS, Article::PUBLISHED_PUBLISH_STATUS, Article::BLOCKED_PUBLISH_STATUS, Article::REJECT_PUBLISH_STATUS];
             $contentForUSer = Article::EDITOR_CONTENT_FOR_USER;
         } else {
             //Login
@@ -216,5 +216,11 @@ class ArticleService extends AbstractService
                 'article_category_uuid' => $goCategoryUuid
             ]);
         }
+    }
+
+    public function showArticleForEditorById($id)
+    {
+        return $this->model->whereIn('publish_status', [Article::PENDING_PUBLISH_STATUS, Article::REJECT_PUBLISH_STATUS])
+            ->where('uuid', $id)->firstOrFail();
     }
 }

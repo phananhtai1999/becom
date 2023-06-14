@@ -31,6 +31,7 @@ class AcceptPublishMailTemplateRequest extends AbstractRequest
 
                 return $query->where('publish_status', MailTemplate::PENDING_PUBLISH_STATUS)->whereNull('deleted_at');
             })],
+            'publish_status' => ['required', 'numeric', Rule::in(MailTemplate::PUBLISHED_PUBLISH_STATUS, MailTemplate::REJECT_PUBLISH_STATUS)]
         ];
     }
 }

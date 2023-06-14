@@ -158,7 +158,7 @@ class SectionTemplateController extends AbstractRestAPIController
      */
     public function showUnpublishedSectionTemplate($id)
     {
-        $model = $this->service->findSectionTemplateByKeyAndPublishStatus(SectionTemplate::PENDING_PUBLISH_STATUS, $id);
+        $model = $this->service->showSectionTemplateForEditorById($id);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -187,8 +187,10 @@ class SectionTemplateController extends AbstractRestAPIController
      */
     public function editUnpublishedSectionTemplate(UpdateUnpublishedSectionTemplateRequest $request, $id)
     {
-        $model = $this->service->findSectionTemplateByKeyAndPublishStatus(SectionTemplate::PENDING_PUBLISH_STATUS, $id);
-        $this->service->update($model, $request->except(['user_uuid', 'publish_status']));
+        $model = $this->service->showSectionTemplateForEditorById($id);
+        $this->service->update($model, array_merge($request->except(['user_uuid']), [
+            'publish_status' => SectionTemplate::PENDING_PUBLISH_STATUS,
+        ]));
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -199,13 +201,13 @@ class SectionTemplateController extends AbstractRestAPIController
      * @param AcceptPublishSectionTemplateRequest $request
      * @return JsonResponse
      */
-    public function acceptPublishSectionTemplate(AcceptPublishSectionTemplateRequest $request)
+    public function changeStatusSectionTemplate(AcceptPublishSectionTemplateRequest $request)
     {
         $sectionTemplateUuids = $request->section_templates;
         foreach ($sectionTemplateUuids as $sectionTemplateUuid)
         {
             $model = $this->service->findOneById($sectionTemplateUuid);
-            $this->service->update($model, ['publish_status' => SectionTemplate::PUBLISHED_PUBLISH_STATUS]);
+            $this->service->update($model, ['publish_status' => $request->get('publish_status')]);
         }
 
         return $this->sendOkJsonResponse();

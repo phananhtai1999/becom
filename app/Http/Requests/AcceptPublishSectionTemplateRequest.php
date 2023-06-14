@@ -31,6 +31,8 @@ class AcceptPublishSectionTemplateRequest extends AbstractRequest
             'section_templates.*' => ['numeric', 'min:1', Rule::exists('section_templates', 'uuid')->where(function ($query) {
                 return $query->where('publish_status', SectionTemplate::PENDING_PUBLISH_STATUS)->whereNull('deleted_at');
             })],
+            'publish_status' => ['required', 'numeric', Rule::in(SectionTemplate::PUBLISHED_PUBLISH_STATUS, SectionTemplate::REJECT_PUBLISH_STATUS)]
+
         ];
     }
 }

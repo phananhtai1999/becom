@@ -30,6 +30,8 @@ class AcceptPublishWebsitePageRequest extends AbstractRequest
             'website_pages.*' => ['numeric', 'min:1', Rule::exists('website_pages', 'uuid')->where(function ($query) {
                 return $query->where('publish_status', WebsitePage::PENDING_PUBLISH_STATUS)->whereNull('deleted_at');
             })],
+            'publish_status' => ['required', 'numeric', Rule::in(WebsitePage::PUBLISHED_PUBLISH_STATUS, WebsitePage::REJECT_PUBLISH_STATUS)]
+
         ];
     }
 }
