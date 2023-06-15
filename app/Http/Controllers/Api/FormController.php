@@ -206,7 +206,7 @@ class FormController extends AbstractRestAPIController
      */
     public function showUnpublishedForm($id)
     {
-        $model = $this->service->findFormByKeyAndPublishStatus(Form::PENDING_PUBLISH_STATUS, $id);
+        $model = $this->service->showFormForEditorById($id);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -242,14 +242,17 @@ class FormController extends AbstractRestAPIController
      */
     public function editUnpublishedForm(UpdateUnpublishedFormRequest $request, $id)
     {
-        $model = $this->service->findFormByKeyAndPublishStatus(Form::PENDING_PUBLISH_STATUS, $id);
+        $model = $this->service->showFormForEditorById($id);
 
-        $data = $request->except(['user_uuid', 'publish_status']);
+        $data = array_merge($request->except('user_uuid'), [
+            'publish_status' => Form::PENDING_PUBLISH_STATUS,
+        ]);
 
         if ($request->get('contact_list_uuid') && $request->get('contact_list_uuid') != $model->contact_list_uuid) {
             $contactList = $this->contactListService->findOneById($request->get('contact_list_uuid'));
             $data = array_merge($request->all(), [
                 'user_uuid' => $contactList->user_uuid,
+                'publish_status' => Form::PENDING_PUBLISH_STATUS,
             ]);
         }
 
@@ -264,13 +267,13 @@ class FormController extends AbstractRestAPIController
      * @param AcceptPublishFormRequest $request
      * @return JsonResponse
      */
-    public function acceptPublishForm(AcceptPublishFormRequest $request)
+    public function changeStatusForm(AcceptPublishFormRequest $request)
     {
         $FormUuids = $request->forms;
         foreach ($FormUuids as $FormUuid)
         {
             $model = $this->service->findOneById($FormUuid);
-            $this->service->update($model, ['publish_status' => Form::PUBLISHED_PUBLISH_STATUS]);
+            $this->service->update($model, ['publish_status' => $request->get('publish_status')]);
         }
 
         return $this->sendOkJsonResponse();

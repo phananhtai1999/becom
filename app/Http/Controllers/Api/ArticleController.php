@@ -4,7 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
 use App\Http\Controllers\Traits\RestDestroyTrait;
+use App\Http\Controllers\Traits\RestIndexMyTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
+use App\Http\Requests\Article\ChangeStatusArticleRequest;
+use App\Http\Requests\Article\UnpublishedArticleRequest;
+use App\Http\Requests\Article\UpdateUnpublishedArticleRequest;
 use App\Http\Requests\ArticleRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\UpdateArticleRequest;
@@ -157,5 +161,82 @@ class ArticleController extends AbstractRestAPIController
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
         );
+    }
+
+    public function indexMy(IndexRequest $request)
+    {
+        $models = $this->service->getCollectionWithPaginationByCondition($request,
+            ['user_uuid' => auth()->user()->getKey()]);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+        );
+    }
+
+    public function indexUnpublishedArticle(IndexRequest $request)
+    {
+        $models = $this->service->getCollectionWithPaginationByCondition($request,
+            ['publish_status' => Article::PENDING_PUBLISH_STATUS]);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+        );
+    }
+
+    public function showUnpublishedArticle($id)
+    {
+        $model = $this->service->showArticleForEditorById($id);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    /**
+     * @param UnpublishedArticleRequest $request
+     * @return JsonResponse
+     */
+    public function storeUnpublishedArticle(UnpublishedArticleRequest $request)
+    {
+        $model = $this->service->create(array_merge($request->all(), [
+            'publish_status' => Article::PENDING_PUBLISH_STATUS,
+            'user_uuid' => auth()->user()->getKey(),
+        ]));
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    /**
+     * @param UpdateUnpublishedArticleRequest $request
+     * @return JsonResponse
+     */
+    public function editUnpublishedArticle(UpdateUnpublishedArticleRequest $request, $id)
+    {
+        $model = $this->service->showArticleForEditorById($id);
+        $this->service->update($model, array_merge($request->except(['user_uuid']), [
+            'publish_status' => Article::PENDING_PUBLISH_STATUS,
+        ]));
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    /**
+     * @param ChangeStatusArticleRequest $request
+     * @return JsonResponse
+     */
+    public function changeStatusArticle(ChangeStatusArticleRequest $request)
+    {
+        $articleUuids = $request->articles;
+        foreach ($articleUuids as $articleUuid)
+        {
+            $model = $this->service->findOneById($articleUuid);
+            $this->service->update($model, ['publish_status' => $request->get('publish_status')]);
+        }
+
+        return $this->sendOkJsonResponse();
     }
 }

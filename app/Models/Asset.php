@@ -14,6 +14,8 @@ class Asset extends Model
     const TYPE_VIDEO = 'video';
     const PENDING_STATUS = 'pending';
     const PUBLISH_STATUS = 'publish';
+
+    const REJECT_STATUS = 'reject';
     /**
      * @var string
      */

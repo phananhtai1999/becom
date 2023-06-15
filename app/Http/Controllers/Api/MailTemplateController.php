@@ -237,7 +237,7 @@ class MailTemplateController extends AbstractRestAPIController
      */
     public function showUnpublishedMailTemplate($id)
     {
-        $model = $this->service->findMailTemplateByKeyAndPublishStatus(MailTemplate::PENDING_PUBLISH_STATUS, $id);
+        $model = $this->service->showMailTemplateForEditorById($id);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -251,7 +251,7 @@ class MailTemplateController extends AbstractRestAPIController
      */
     public function editUnpublishedMailTemplate(UpdateUnpublishedMailTemplateRequest $request, $id)
     {
-        $model = $this->service->findMailTemplateByKeyAndPublishStatus(MailTemplate::PENDING_PUBLISH_STATUS, $id);
+        $model = $this->service->showMailTemplateForEditorById($id);
 
         if (empty($request->get('send_project_uuid')) || $model->send_project_uuid == $request->get('send_project_uuid')) {
             $data = $request->except('user_uuid');
@@ -279,13 +279,13 @@ class MailTemplateController extends AbstractRestAPIController
      * @param AcceptPublishMailTemplateRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function acceptPublishMailtemplate(AcceptPublishMailTemplateRequest $request)
+    public function changeStatusMailtemplate(AcceptPublishMailTemplateRequest $request)
     {
         $mailTemplateUuids = $request->mail_templates;
         foreach ($mailTemplateUuids as $mailTemplateUuid)
         {
             $model = $this->service->findOneById($mailTemplateUuid);
-            $this->service->update($model, ['publish_status' => MailTemplate::PUBLISHED_PUBLISH_STATUS]);
+            $this->service->update($model, ['publish_status' => $request->get('publish_status')]);
         }
 
         return $this->sendOkJsonResponse();

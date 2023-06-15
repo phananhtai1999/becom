@@ -158,7 +158,7 @@ class WebsitePageController extends AbstractRestAPIController
      */
     public function showUnpublishedWebsitePage($id)
     {
-        $model = $this->service->findWebsitePageByKeyAndPublishStatus(WebsitePage::PENDING_PUBLISH_STATUS, $id);
+        $model = $this->service->showWebsitePageForEditorById($id);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -187,8 +187,10 @@ class WebsitePageController extends AbstractRestAPIController
      */
     public function editUnpublishedWebsitePage(UpdateUnpublishedWebsitePageRequest $request, $id)
     {
-        $model = $this->service->findWebsitePageByKeyAndPublishStatus(WebsitePage::PENDING_PUBLISH_STATUS, $id);
-        $this->service->update($model, $request->except(['user_uuid', 'publish_status']));
+        $model = $this->service->showWebsitePageForEditorById($id);
+        $this->service->update($model, array_merge($request->except(['user_uuid']), [
+            'publish_status' => WebsitePage::PENDING_PUBLISH_STATUS,
+        ]));
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -199,13 +201,13 @@ class WebsitePageController extends AbstractRestAPIController
      * @param AcceptPublishWebsitePageRequest $request
      * @return JsonResponse
      */
-    public function acceptPublishWebsitePage(AcceptPublishWebsitePageRequest $request)
+    public function changeStatusWebsitePage(AcceptPublishWebsitePageRequest $request)
     {
         $websitePageUuids = $request->website_pages;
         foreach ($websitePageUuids as $websitePageUuid)
         {
             $model = $this->service->findOneById($websitePageUuid);
-            $this->service->update($model, ['publish_status' => WebsitePage::PUBLISHED_PUBLISH_STATUS]);
+            $this->service->update($model, ['publish_status' => $request->get('publish_status')]);
         }
 
         return $this->sendOkJsonResponse();
