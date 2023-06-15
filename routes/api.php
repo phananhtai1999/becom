@@ -272,7 +272,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'mail-template.'], function 
         Route::post('/mail-template', [MailTemplateController::class, 'store'])->name('store');
         Route::put('/mail-template/{id}', [MailTemplateController::class, 'edit'])->name('edit');
         Route::delete('/mail-template/{id}', [MailTemplateController::class, 'destroy'])->name('destroy');
-        Route::post('/accept-publish', [MailTemplateController::class, 'acceptPublishMailtemplate'])->name('accept-publish');
+        Route::post('/change-status', [MailTemplateController::class, 'changeStatusMailtemplate'])->name('accept-publish');
     });
 
     Route::group(['middleware' => ['role:root,admin,editor']], function () {
@@ -404,7 +404,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'contact.'], function () {
         Route::get('/my/select-all-contact', [ContactController::class, 'selectAllMyContact'])->name('select-all-contact');
     });
 
-    Route::group(['middleware' => ['role:editor'], 'as' => 'editor.'], function () {
+    Route::group(['middleware' => ['role:root,admin,editor'], 'as' => 'editor.'], function () {
         Route::get('/dynamic-content-contact', [ContactController::class, 'dynamicContentContact'])->name('dynamic-content-contact');
     });
 });
@@ -578,7 +578,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website_page'], function ()
         Route::get('website-page/{id}', [WebsitePageController::class, 'show'])->name('show');
         Route::put('website-page/{id}', [WebsitePageController::class, 'edit'])->name('edit');
         Route::delete('/website-page/{id}', [WebsitePageController::class, 'destroy'])->name('destroy');
-        Route::post('website-page/accept-publish', [WebsitePageController::class, 'acceptPublishWebsitePage'])->name('acceptPublishWebsitePage');
+        Route::post('website-page/change-status', [WebsitePageController::class, 'changeStatusWebsitePage'])->name('changeStatusWebsitePage');
     });
 
     Route::group(['middleware' => ['role:root,admin,editor']], function () {
@@ -700,7 +700,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'section-template'], functio
         Route::get('section-template/{id}', [SectionTemplateController::class, 'show'])->name('show');
         Route::put('section-template/{id}', [SectionTemplateController::class, 'edit'])->name('edit');
         Route::delete('/section-template/{id}', [SectionTemplateController::class, 'destroy'])->name('destroy');
-        Route::post('section-template/accept-publish', [SectionTemplateController::class, 'acceptPublishSectionTemplate'])->name('acceptPublishSectionTemplate');
+        Route::post('section-template/change-status', [SectionTemplateController::class, 'changeStatusSectionTemplate'])->name('acceptPublishSectionTemplate');
     });
 
     Route::group(['middleware' => ['role:root,admin,editor']], function () {
@@ -730,7 +730,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'form.'], function () {
         Route::get('/form/{id}', [FormController::class, 'show'])->name('show');
         Route::put('/form/{id}', [FormController::class, 'edit'])->name('edit');
         Route::delete('/form/{id}', [FormController::class, 'destroy'])->name('destroy');
-        Route::post('form/accept-publish', [FormController::class, 'acceptPublishForm'])->name('acceptPublishForm');
+        Route::post('form/change-status', [FormController::class, 'changeStatusForm'])->name('acceptPublishForm');
     });
 
     Route::group(['middleware' => ['role:root,admin,editor']], function () {
@@ -800,12 +800,24 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'group.'], function () {
 //Article
 Route::group(['middleware' => ['auth:api'], 'as' => 'article.'], function () {
 
-    Route::group(['middleware' => ['role:root,admin,editor'], 'as' => 'author.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'author.'], function () {
         Route::post('/article', [ArticleController::class, 'store'])->name('store');
         Route::put('/article/{id}', [ArticleController::class, 'edit'])->name('edit');
         Route::delete('/article/{id}', [ArticleController::class, 'destroy'])->name('destroy');
         Route::get('/article/{id}', [ArticleController::class, 'show'])->name('show');
+        Route::post('article/change-status', [ArticleController::class, 'changeStatusArticle'])->name('changeStatusArticle');
     });
+
+    Route::group(['middleware' => ['role:root,admin,editor']], function () {
+        Route::get('/unpublished-articles', [ArticleController::class, 'indexUnpublishedArticle'])->name('index-unpublished');
+        Route::get('/unpublished-article/{id}', [ArticleController::class, 'showUnpublishedArticle'])->name('show-unpublished');
+        Route::post('/unpublished-article', [ArticleController::class, 'storeUnpublishedArticle'])->name('store-unpublished');
+        Route::put('/unpublished-article/{id}', [ArticleController::class, 'editUnpublishedArticle'])->name('edit-unpublished');
+    });
+
+    Route::get('my/articles', [ArticleController::class, 'indexMy'])->name('indexMy');
+
+
     //article content public
     Route::get('/content/articles', [ArticleController::class, 'indexContent'])->name('article.indexContent');
     //article manager
@@ -1265,7 +1277,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'asset'], function () {
         Route::get('/assets', [AssetController::class, 'index']);
         Route::post('asset/{id}', [AssetController::class, 'edit']);
         Route::delete('asset/{id}', [AssetController::class, 'destroy']);
-        Route::post('publish-asset/{id}', [AssetController::class, 'publishAsset']);
+        Route::post('asset/change-status/{id}', [AssetController::class, 'changeStatusAsset']);
         Route::post('asset', [AssetController::class, 'store']);
     });
 
@@ -1275,6 +1287,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'asset'], function () {
         Route::get('unpublished-asset/{id}', [AssetController::class, 'showPendingAsset']);
         Route::post('unpublished-asset', [AssetController::class, 'storePendingAsset']);
     });
+    Route::get('my/assets', [AssetController::class, 'indexMy']);
     Route::get('/publish-assets', [AssetController::class, 'indexPublishAssets']);
     Route::post('generate-js-code', [AssetController::class, 'generateJsCode']);
     Route::get('asset/{id}', [AssetController::class, 'show']);

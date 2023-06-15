@@ -43,6 +43,12 @@ class MailTemplateService extends AbstractService
         ]);
     }
 
+    public function showMailTemplateForEditorById($id)
+    {
+        return $this->model->whereIn('publish_status', [MailTemplate::PENDING_PUBLISH_STATUS, MailTemplate::REJECT_PUBLISH_STATUS])
+            ->where('uuid', $id)->firstOrFail();
+    }
+
     public function moveBusinessCategoryOfMailTemplates($mailTemplates, $goBusinessCategoryUuid)
     {
         foreach ($mailTemplates as $mailTemplate){

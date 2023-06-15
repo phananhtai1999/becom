@@ -32,6 +32,7 @@ class AcceptPublishFormRequest extends AbstractRequest
 
                 return $query->where('publish_status', Form::PENDING_PUBLISH_STATUS)->whereNull('deleted_at');
             })],
+            'publish_status' => ['required', 'numeric', Rule::in(Form::PUBLISHED_PUBLISH_STATUS, Form::REJECT_PUBLISH_STATUS)]
         ];
     }
 }

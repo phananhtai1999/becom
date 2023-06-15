@@ -78,4 +78,10 @@ class AssetService extends AbstractService
             $model->js_code = $jsCode;
         }
     }
+
+    public function showAssetForEditorById($id)
+    {
+        return $this->model->whereIn('status', [Asset::PENDING_STATUS, Asset::REJECT_STATUS])
+            ->where('uuid', $id)->firstOrFail();
+    }
 }
