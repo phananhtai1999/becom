@@ -48,7 +48,13 @@ class AssetController extends AbstractRestAPIController
                 }
             }
         }
-        $model = $this->service->create(array_merge($request->except('status'), ['url' => $uploadUrl['absolute_slug'], 'status' => Asset::PUBLISH_STATUS]));
+        $model = $this->service->create(array_merge(
+            $request->except('status'),
+            [
+                'url' => $uploadUrl['absolute_slug'],
+                'status' => Asset::PUBLISH_STATUS,
+                'user_uuid' => auth()->user()->uuid
+            ]));
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -70,13 +76,23 @@ class AssetController extends AbstractRestAPIController
                     }
                 }
             }
-            $this->service->update($model, array_merge($request->all(), ['url' => $uploadUrl['absolute_slug']]));
+            $this->service->update($model, array_merge($request->except('status'), ['url' => $uploadUrl['absolute_slug']]));
         } else {
-            $this->service->update($model, $request->all());
+            $this->service->update($model, $request->except('status'));
         }
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    public function indexMy(IndexRequest $request)
+    {
+        $models = $this->service->getCollectionWithPaginationByCondition($request,
+            ['user_uuid' => auth()->user()->getKey()]);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
         );
     }
 
@@ -155,7 +171,12 @@ class AssetController extends AbstractRestAPIController
                 }
             }
         }
-        $model = $this->service->create(array_merge($request->except('status'), ['url' => $uploadUrl['absolute_slug']]));
+        $model = $this->service->create(array_merge(
+            $request->except('status'),
+            [
+                'url' => $uploadUrl['absolute_slug'],
+                'user_uuid' => auth()->user()->uuid
+            ]));
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)

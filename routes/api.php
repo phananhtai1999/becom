@@ -1287,6 +1287,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'asset'], function () {
         Route::get('unpublished-asset/{id}', [AssetController::class, 'showPendingAsset']);
         Route::post('unpublished-asset', [AssetController::class, 'storePendingAsset']);
     });
+    Route::get('my/assets', [AssetController::class, 'indexMy']);
     Route::get('/publish-assets', [AssetController::class, 'indexPublishAssets']);
     Route::post('generate-js-code', [AssetController::class, 'generateJsCode']);
     Route::get('asset/{id}', [AssetController::class, 'show']);
