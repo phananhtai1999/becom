@@ -66,6 +66,10 @@ class AssetQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__asset_size.name', 'assetSize.name'),
                 'url',
                 AllowedFilter::exact('exact__url', 'url'),
+                'user_uuid',
+                AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
+                'status',
+                AllowedFilter::exact('exact__status', 'status'),
             ]);
 
     }
