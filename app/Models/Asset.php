@@ -51,4 +51,9 @@ class Asset extends Model
     {
         return $this->hasOne(AssetSize::class, 'uuid', 'asset_size_uuid');
     }
+
+    public function user()
+    {
+        return $this->hasOne(User::class, 'uuid', 'user_uuid');
+    }
 }

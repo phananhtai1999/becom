@@ -36,6 +36,8 @@ class AssetQueryBuilder extends AbstractQueryBuilder
                 'title',
                 'asset_size_uuid',
                 'url',
+                'user_uuid',
+                'status'
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -44,6 +46,8 @@ class AssetQueryBuilder extends AbstractQueryBuilder
                 'title',
                 'asset_size_uuid',
                 'url',
+                'user_uuid',
+                'status',
                 AllowedSort::custom('asset_size_width', new SortWidthAssetSize()),
                 AllowedSort::custom('asset_size_height', new SortHeightAssetSize())
             ])
