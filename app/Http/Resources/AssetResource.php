@@ -34,6 +34,9 @@ class AssetResource extends JsonResource
         if (\in_array('asset__asset_group', $expand)) {
             $data['asset_group'] = new AssetGroupResource(optional($this->assetSize)->assetGroup);
         }
+        if (\in_array('asset__user', $expand)) {
+            $data['user'] = new UserResource($this->user);
+        }
 
         return $data;
     }
