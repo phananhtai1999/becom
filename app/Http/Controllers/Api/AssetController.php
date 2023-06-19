@@ -96,6 +96,17 @@ class AssetController extends AbstractRestAPIController
         );
     }
 
+    public function destroyMy($id)
+    {
+        $asset = $this->service->findOrFailById($id);
+        if ($asset->status == Asset::PUBLISH_STATUS) {
+            return $this->sendJsonResponse(false, 'Can not delete the asset is publish', [], 400);
+        }
+        $this->service->destroyMyAsset($id);
+
+        return $this->sendJsonResponse(true, 'Delete successfully', [], 200);
+    }
+
     public function generateJsCode(GenerateJsCodeAssetRequest $request)
     {
         if (empty(auth()->user()->partner) && auth()->user()->role != Role::ADMIN_ROOT) {
@@ -109,9 +120,9 @@ class AssetController extends AbstractRestAPIController
         $partner = auth()->user()->partner;
         $asset = $this->service->findOrFailById($request->get('asset_uuid'));
         if ($asset->type == Asset::TYPE_IMAGE) {
-            $jsCode = '<script type="text/javascript" src="' . env('FRONTEND_URL') . 'api/generate-image?pn=' . $partner->uuid . '&as=' . $asset->uuid . '&link=' . $request->get('url') . '?ref=' . $partner->code . '"> </script>';
+            $jsCode = '<script type="text/javascript" src="' . asset("/") . 'api/generate-image?pn=' . $partner->uuid . '&as=' . $asset->uuid . '&link=' . $request->get('url') . '?ref=' . $partner->code . '"> </script>';
         } else {
-            $jsCode = '<script type="text/javascript" src="' . env('FRONTEND_URL') . 'api/generate-video?pn=' . $partner->uuid . '&as=' . $asset->uuid . '&link=' . $request->get('url') . '?ref=' . $partner->code . '"> </script>';
+            $jsCode = '<script type="text/javascript" src="' . asset("/") . 'api/generate-video?pn=' . $partner->uuid . '&as=' . $asset->uuid . '&link=' . $request->get('url') . '?ref=' . $partner->code . '"> </script>';
         }
 
         return $this->sendOkJsonResponse(['data' => $jsCode]);
