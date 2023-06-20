@@ -96,22 +96,34 @@ class AssetController extends AbstractRestAPIController
         );
     }
 
+    public function destroyMy($id)
+    {
+        $asset = $this->service->findOrFailById($id);
+        if ($asset->status == Asset::PUBLISH_STATUS) {
+
+            return $this->sendJsonResponse(false, __('asset.deleteMy.failed_publish'), [], 400);
+        }
+        $this->service->destroyMyAsset($id);
+
+        return $this->sendJsonResponse(true, __('asset.delete.success'), [], 200);
+    }
+
     public function generateJsCode(GenerateJsCodeAssetRequest $request)
     {
         if (empty(auth()->user()->partner) && auth()->user()->role != Role::ADMIN_ROOT) {
-            return $this->sendJsonResponse(false, 'You need become partner to use it', [], 403);
+            return $this->sendJsonResponse(false,  __('asset.failed_partner'), [], 403);
         }
         $mainUrl = $this->service->getConfigByKeyInCache('main_url');
         if (!preg_match('/^' . preg_quote($mainUrl->value, '/') . '/', $request->get('url'))) {
-            return $this->sendJsonResponse(false, 'Your url must be start with ' . $mainUrl->value, [], 400);
+            return $this->sendJsonResponse(false, __('asset.failed_main_url', ['main_url' => $mainUrl->value]) , [], 400);
         }
 
         $partner = auth()->user()->partner;
         $asset = $this->service->findOrFailById($request->get('asset_uuid'));
         if ($asset->type == Asset::TYPE_IMAGE) {
-            $jsCode = '<script type="text/javascript" src="' . env('FRONTEND_URL') . 'api/generate-image?pn=' . $partner->uuid . '&as=' . $asset->uuid . '&link=' . $request->get('url') . '?ref=' . $partner->code . '"> </script>';
+            $jsCode = '<script type="text/javascript" src="' . asset("/") . 'api/generate-image?pn=' . $partner->uuid . '&as=' . $asset->uuid . '&link=' . $request->get('url') . '?ref=' . $partner->code . '"> </script>';
         } else {
-            $jsCode = '<script type="text/javascript" src="' . env('FRONTEND_URL') . 'api/generate-video?pn=' . $partner->uuid . '&as=' . $asset->uuid . '&link=' . $request->get('url') . '?ref=' . $partner->code . '"> </script>';
+            $jsCode = '<script type="text/javascript" src="' . asset("/") . 'api/generate-video?pn=' . $partner->uuid . '&as=' . $asset->uuid . '&link=' . $request->get('url') . '?ref=' . $partner->code . '"> </script>';
         }
 
         return $this->sendOkJsonResponse(['data' => $jsCode]);
@@ -196,7 +208,7 @@ class AssetController extends AbstractRestAPIController
     public function indexPublishAssets(IndexRequest $request)
     {
         if (empty(auth()->user()->partner) && !auth()->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ADMIN_ROOT])) {
-            return $this->sendJsonResponse(false, 'You need to become partner to use it', [], 403);
+            return $this->sendJsonResponse(false, __('asset.failed_partner'), [], 403);
         }
         $models = $this->service->getCollectionWithPaginationByCondition($request,
             ['status' => Asset::PUBLISH_STATUS]);

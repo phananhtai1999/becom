@@ -84,4 +84,10 @@ class AssetService extends AbstractService
         return $this->model->whereIn('status', [Asset::PENDING_STATUS, Asset::REJECT_STATUS])
             ->where('uuid', $id)->firstOrFail();
     }
+
+    public function destroyMyAsset($id)
+    {
+        $model = $this->findOneWhereOrFail(['uuid' => $id, 'user_uuid' => auth()->user()->getKey()]);
+        $model->delete();
+    }
 }
