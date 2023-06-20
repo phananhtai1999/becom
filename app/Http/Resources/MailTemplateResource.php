@@ -31,6 +31,7 @@ class MailTemplateResource extends AbstractJsonResource
             'image' => $this->image,
             'type' => $this->type,
             'publish_status' => $this->publish_status,
+            'reject_reason' => $this->reject_reason,
             'rendered_body' => $this->rendered_body,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,

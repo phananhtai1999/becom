@@ -25,8 +25,13 @@ class ChangeStatusAssetRequest extends AbstractRequest
      */
     public function rules()
     {
-        return [
-          'status' => ['required', Rule::in(Asset::REJECT_STATUS, Asset::PUBLISH_STATUS)]
+        $validate = [
+          'status' => ['required', Rule::in(Asset::REJECT_STATUS, Asset::PUBLISH_STATUS, Asset::PENDING_STATUS)]
         ];
+
+        if ($this->request->get('status') == Asset::REJECT_STATUS){
+            $validate['reject_reason'] = ['required', 'string'];
+        }
+        return $validate;
     }
 }

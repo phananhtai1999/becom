@@ -35,7 +35,8 @@ class Asset extends Model
         'asset_size_uuid',
         'url',
         'status',
-        'user_uuid'
+        'user_uuid',
+        'reject_reason'
     ];
 
     /**

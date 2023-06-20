@@ -36,6 +36,7 @@ class MyFormQueryBuilder extends AbstractQueryBuilder
                 'template_json',
                 'publish_status',
                 'display_type',
+                'reject_reason'
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -47,6 +48,7 @@ class MyFormQueryBuilder extends AbstractQueryBuilder
                 'template_json',
                 'publish_status',
                 'display_type',
+                'reject_reason'
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -69,6 +71,8 @@ class MyFormQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__contactList.name', 'contactList.name'),
                 'publish_status',
                 AllowedFilter::exact('exact__publish_status', 'publish_status'),
+                'reject_reason',
+                AllowedFilter::exact('exact__reject_reason', 'reject_reason'),
                 'display_type',
                 AllowedFilter::exact('exact__display_type', 'display_type'),
             ]);

@@ -25,13 +25,19 @@ class AcceptPublishWebsitePageRequest extends AbstractRequest
      */
     public function rules()
     {
-        return [
+        $validate = [
             'website_pages' => ['required', 'array', 'min:1'],
             'website_pages.*' => ['numeric', 'min:1', Rule::exists('website_pages', 'uuid')->where(function ($query) {
-                return $query->where('publish_status', WebsitePage::PENDING_PUBLISH_STATUS)->whereNull('deleted_at');
+                return $query->where('publish_status', '<>', $this->request->get('publish_status'))->whereNull('deleted_at');
             })],
             'publish_status' => ['required', 'numeric', Rule::in(WebsitePage::PUBLISHED_PUBLISH_STATUS, WebsitePage::REJECT_PUBLISH_STATUS)]
 
         ];
+
+        if ($this->request->get('publish_status') == WebsitePage::REJECT_PUBLISH_STATUS){
+            $validate['reject_reason'] = ['required', 'string'];
+        }
+
+        return $validate;
     }
 }
