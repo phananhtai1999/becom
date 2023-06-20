@@ -100,21 +100,22 @@ class AssetController extends AbstractRestAPIController
     {
         $asset = $this->service->findOrFailById($id);
         if ($asset->status == Asset::PUBLISH_STATUS) {
-            return $this->sendJsonResponse(false, 'Can not delete the asset is publish', [], 400);
+
+            return $this->sendJsonResponse(false, __('asset.deleteMy.failed_publish'), [], 400);
         }
         $this->service->destroyMyAsset($id);
 
-        return $this->sendJsonResponse(true, 'Delete successfully', [], 200);
+        return $this->sendJsonResponse(true, __('asset.delete.success'), [], 200);
     }
 
     public function generateJsCode(GenerateJsCodeAssetRequest $request)
     {
         if (empty(auth()->user()->partner) && auth()->user()->role != Role::ADMIN_ROOT) {
-            return $this->sendJsonResponse(false, 'You need become partner to use it', [], 403);
+            return $this->sendJsonResponse(false,  __('asset.failed_partner'), [], 403);
         }
         $mainUrl = $this->service->getConfigByKeyInCache('main_url');
         if (!preg_match('/^' . preg_quote($mainUrl->value, '/') . '/', $request->get('url'))) {
-            return $this->sendJsonResponse(false, 'Your url must be start with ' . $mainUrl->value, [], 400);
+            return $this->sendJsonResponse(false, __('asset.failed_main_url', ['main_url' => $mainUrl->value]) , [], 400);
         }
 
         $partner = auth()->user()->partner;
@@ -207,7 +208,7 @@ class AssetController extends AbstractRestAPIController
     public function indexPublishAssets(IndexRequest $request)
     {
         if (empty(auth()->user()->partner) && !auth()->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ADMIN_ROOT])) {
-            return $this->sendJsonResponse(false, 'You need to become partner to use it', [], 403);
+            return $this->sendJsonResponse(false, __('asset.failed_partner'), [], 403);
         }
         $models = $this->service->getCollectionWithPaginationByCondition($request,
             ['status' => Asset::PUBLISH_STATUS]);
