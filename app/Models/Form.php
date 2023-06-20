@@ -35,7 +35,8 @@ class Form extends AbstractModel
         'contact_list_uuid',
         'user_uuid',
         'publish_status',
-        'display_type'
+        'display_type',
+        'reject_reason'
     ];
 
     /**

@@ -207,7 +207,11 @@ class SectionTemplateController extends AbstractRestAPIController
         foreach ($sectionTemplateUuids as $sectionTemplateUuid)
         {
             $model = $this->service->findOneById($sectionTemplateUuid);
-            $this->service->update($model, ['publish_status' => $request->get('publish_status')]);
+            $this->service->update($model, [
+                'publish_status' => $request->get('publish_status'),
+                'reject_reason' => $request->get('publish_status') == SectionTemplate::REJECT_PUBLISH_STATUS ? $request->get('reject_reason') : $model->reject_reason
+
+            ]);
         }
 
         return $this->sendOkJsonResponse();

@@ -35,7 +35,8 @@ class SectionTemplate extends AbstractModel
         'user_uuid',
         'publish_status',
         'is_default',
-        'section_category_uuid'
+        'section_category_uuid',
+        'reject_reason'
     ];
 
     /**

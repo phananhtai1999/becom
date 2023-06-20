@@ -37,6 +37,7 @@ class MyMailTemplateQueryBuilder extends AbstractQueryBuilder
                 'user_uuid',
                 'design',
                 'publish_status',
+                'reject_reason',
                 'type',
                 'image'
             ])
@@ -51,6 +52,7 @@ class MyMailTemplateQueryBuilder extends AbstractQueryBuilder
                 'user_uuid',
                 'design',
                 'publish_status',
+                'reject_reason',
                 'type',
                 'image'
             ])
@@ -81,6 +83,8 @@ class MyMailTemplateQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__type', 'type'),
                 'publish_status',
                 AllowedFilter::exact('exact__publish_status', 'publish_status'),
+                'reject_reason',
+                AllowedFilter::exact('exact__reject_reason', 'reject_reason'),
                 'sendProject.domain',
                 AllowedFilter::exact('exact__sendProject.domain', 'sendProject.domain'),
                 'sendProject.name',

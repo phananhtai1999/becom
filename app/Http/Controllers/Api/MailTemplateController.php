@@ -285,7 +285,11 @@ class MailTemplateController extends AbstractRestAPIController
         foreach ($mailTemplateUuids as $mailTemplateUuid)
         {
             $model = $this->service->findOneById($mailTemplateUuid);
-            $this->service->update($model, ['publish_status' => $request->get('publish_status')]);
+            $this->service->update($model, [
+                'publish_status' => $request->get('publish_status'),
+                'reject_reason' => $request->get('publish_status') == MailTemplate::REJECT_PUBLISH_STATUS ? $request->get('reject_reason') : $model->reject_reason
+
+            ]);
         }
 
         return $this->sendOkJsonResponse();

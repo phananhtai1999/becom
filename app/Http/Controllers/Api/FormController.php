@@ -273,7 +273,10 @@ class FormController extends AbstractRestAPIController
         foreach ($FormUuids as $FormUuid)
         {
             $model = $this->service->findOneById($FormUuid);
-            $this->service->update($model, ['publish_status' => $request->get('publish_status')]);
+            $this->service->update($model, [
+                'publish_status' => $request->get('publish_status'),
+                'reject_reason' => $request->get('publish_status') == Form::REJECT_PUBLISH_STATUS ? $request->get('reject_reason') : $model->reject_reason
+            ]);
         }
 
         return $this->sendOkJsonResponse();

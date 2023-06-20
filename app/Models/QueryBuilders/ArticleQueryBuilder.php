@@ -39,6 +39,7 @@ class ArticleQueryBuilder extends AbstractQueryBuilder
                 'content',
                 'video',
                 'content_for_user',
+                'reject_reason'
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -52,6 +53,7 @@ class ArticleQueryBuilder extends AbstractQueryBuilder
                 'content',
                 'video',
                 'content_for_user',
+                'reject_reason'
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -74,6 +76,8 @@ class ArticleQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__content_for_user', 'content_for_user'),
                 'created_at',
                 AllowedFilter::exact('exact__created_at', 'created_at'),
+                'reject_reason',
+                AllowedFilter::exact('exact__reject_reason', 'reject_reason'),
                 'updated_at',
                 AllowedFilter::exact('exact__updated_at', 'updated_at'),
                 'user.username',

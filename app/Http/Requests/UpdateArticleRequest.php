@@ -32,7 +32,7 @@ class UpdateArticleRequest extends AbstractRequest
             'title.*' => ['string'],
             'content' => ['array', 'min:1'],
             'content.*' => ['string'],
-            'publish_status' => ['numeric', 'min:1', 'max:3'],
+            'publish_status' => ['numeric', 'min:1', 'max:4'],
             'content_for_user' => ['string', 'in:public,login,payment,editor,admin'],
             'article_category_uuid' => ['nullable', 'numeric', Rule::exists('article_categories', 'uuid')->whereNull('deleted_at')]
         ];

@@ -816,6 +816,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'article.'], function () {
     });
 
     Route::get('my/articles', [ArticleController::class, 'indexMy'])->name('indexMy');
+    Route::delete('my/article/{id}', [ArticleController::class, 'deleteMy'])->name('indexMy');
 
 
     //article content public

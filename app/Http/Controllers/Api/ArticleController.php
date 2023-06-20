@@ -59,7 +59,7 @@ class ArticleController extends AbstractRestAPIController
             return $this->sendValidationFailedJsonResponse();
         }
 
-        $model = $this->service->create(array_merge($request->all(), [
+        $model = $this->service->create(array_merge($request->except(['reject_reason']), [
             'user_uuid' => auth()->user()->getKey(),
             'content_for_user' => $request->content_for_user ?: Article::PUBLIC_CONTENT_FOR_USER
         ]));
@@ -84,7 +84,7 @@ class ArticleController extends AbstractRestAPIController
 
         $model = $this->service->findOrFailById($id);
         //Check current user role
-        $role = auth()->user()->roles->whereIn('slug', ["admin"])->count() ? $request->except('user_uuid') : $request->except(['user_uuid', 'publish_status']);
+        $role = auth()->user()->roles->whereIn('slug', ["admin", "root"])->count() ? $request->except('user_uuid') : $request->except(['user_uuid', 'publish_status']);
         $this->service->update($model, $role);
 
         return $this->sendOkJsonResponse(
@@ -198,7 +198,7 @@ class ArticleController extends AbstractRestAPIController
      */
     public function storeUnpublishedArticle(UnpublishedArticleRequest $request)
     {
-        $model = $this->service->create(array_merge($request->all(), [
+        $model = $this->service->create(array_merge($request->except(['reject_reason']), [
             'publish_status' => Article::PENDING_PUBLISH_STATUS,
             'user_uuid' => auth()->user()->getKey(),
         ]));
@@ -234,8 +234,23 @@ class ArticleController extends AbstractRestAPIController
         foreach ($articleUuids as $articleUuid)
         {
             $model = $this->service->findOneById($articleUuid);
-            $this->service->update($model, ['publish_status' => $request->get('publish_status')]);
+            $this->service->update($model, [
+                'publish_status' => $request->get('publish_status'),
+                'reject_reason' => $request->get('publish_status') == Article::REJECT_PUBLISH_STATUS ? $request->get('reject_reason') : $model->reject_reason
+            ]);
         }
+
+        return $this->sendOkJsonResponse();
+    }
+
+    public function deleteMy($id)
+    {
+        $model = $this->service->findOneWhereOrFail([
+            ['user_uuid', auth()->user()->getKey()],
+            ['uuid', $id]
+        ]);
+
+        $model->delete();
 
         return $this->sendOkJsonResponse();
     }

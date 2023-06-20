@@ -163,7 +163,10 @@ class AssetController extends AbstractRestAPIController
     public function changeStatusAsset($id, ChangeStatusAssetRequest $request)
     {
         $model = $this->service->findOrFailById($id);
-        $model->update(['status' => $request->get('status')]);
+        $model->update([
+            'status' => $request->get('status'),
+            'reject_reason' => $request->get('status') == Asset::REJECT_STATUS ? $request->get('reject_reason') : $model->reject_reason
+        ]);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
