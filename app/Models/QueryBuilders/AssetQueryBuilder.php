@@ -37,7 +37,8 @@ class AssetQueryBuilder extends AbstractQueryBuilder
                 'asset_size_uuid',
                 'url',
                 'user_uuid',
-                'status'
+                'status',
+                'reject_reason'
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -48,6 +49,7 @@ class AssetQueryBuilder extends AbstractQueryBuilder
                 'url',
                 'user_uuid',
                 'status',
+                'reject_reason',
                 AllowedSort::custom('asset_size_width', new SortWidthAssetSize()),
                 AllowedSort::custom('asset_size_height', new SortHeightAssetSize())
             ])
@@ -68,6 +70,8 @@ class AssetQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__url', 'url'),
                 'user_uuid',
                 AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
+                'reject_reason',
+                AllowedFilter::exact('exact__reject_reason', 'reject_reason'),
                 'status',
                 AllowedFilter::exact('exact__status', 'status'),
             ]);

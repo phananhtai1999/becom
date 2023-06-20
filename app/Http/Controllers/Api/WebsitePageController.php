@@ -207,7 +207,10 @@ class WebsitePageController extends AbstractRestAPIController
         foreach ($websitePageUuids as $websitePageUuid)
         {
             $model = $this->service->findOneById($websitePageUuid);
-            $this->service->update($model, ['publish_status' => $request->get('publish_status')]);
+            $this->service->update($model, [
+                'publish_status' => $request->get('publish_status'),
+                'reject_reason' => $request->get('publish_status') == WebsitePage::REJECT_PUBLISH_STATUS ? $request->get('reject_reason') : $model->reject_reason
+            ]);
         }
 
         return $this->sendOkJsonResponse();

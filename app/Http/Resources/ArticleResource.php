@@ -25,6 +25,7 @@ class ArticleResource extends AbstractJsonResource
             'image' => $this->image,
             'video' => $this->video,
             'publish_status' => $this->publish_status,
+            'reject_reason' => $this->reject_reason,
             'content_for_user' => $this->content_for_user,
             'title' => $this->title,
             'title_translate' => $this->title_translate,

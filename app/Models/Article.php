@@ -52,6 +52,7 @@ class Article extends AbstractModel
         'content',
         'video',
         'content_for_user',
+        'reject_reason'
     ];
 
     public $translatable = ['title', 'content'];

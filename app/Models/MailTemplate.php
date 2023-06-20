@@ -39,6 +39,7 @@ class MailTemplate extends AbstractModel
         'purpose_uuid',
         'design',
         'publish_status',
+        'reject_reason',
         'type',
         'image'
     ];

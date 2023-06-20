@@ -25,13 +25,19 @@ class AcceptPublishMailTemplateRequest extends AbstractRequest
      */
     public function rules()
     {
-        return [
+        $validate = [
             'mail_templates' => ['required', 'array', 'min:1'],
             'mail_templates.*' => ['numeric', 'min:1', Rule::exists('mail_templates', 'uuid')->where(function ($query) {
 
-                return $query->where('publish_status', MailTemplate::PENDING_PUBLISH_STATUS)->whereNull('deleted_at');
+                return $query->where('publish_status', '<>', $this->request->get('publish_status'))->whereNull('deleted_at');
             })],
-            'publish_status' => ['required', 'numeric', Rule::in(MailTemplate::PUBLISHED_PUBLISH_STATUS, MailTemplate::REJECT_PUBLISH_STATUS)]
+            'publish_status' => ['required', 'numeric', Rule::in(MailTemplate::PUBLISHED_PUBLISH_STATUS, MailTemplate::REJECT_PUBLISH_STATUS, MailTemplate::PENDING_PUBLISH_STATUS)]
         ];
+
+        if ($this->request->get('publish_status') == MailTemplate::REJECT_PUBLISH_STATUS){
+            $validate['reject_reason'] = ['required', 'string'];
+        }
+
+        return $validate;
     }
 }

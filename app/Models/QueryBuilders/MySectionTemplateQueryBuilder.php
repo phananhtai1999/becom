@@ -35,6 +35,7 @@ class MySectionTemplateQueryBuilder extends AbstractQueryBuilder
                 'user_uuid',
                 'section_category_uuid',
                 'publish_status',
+                'reject_reason',
                 'is_default',
             ])
             ->defaultSort('-created_at')
@@ -46,6 +47,7 @@ class MySectionTemplateQueryBuilder extends AbstractQueryBuilder
                 'user_uuid',
                 'section_category_uuid',
                 'publish_status',
+                'reject_reason',
                 'is_default',
             ])
             ->allowedFilters([
@@ -67,6 +69,8 @@ class MySectionTemplateQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__publish_status', 'publish_status'),
                 'is_default',
                 AllowedFilter::exact('exact__is_default', 'is_default'),
+                'reject_reason',
+                AllowedFilter::exact('exact__reject_reason', 'reject_reason'),
                 'user.username',
                 AllowedFilter::exact('exact__user.username', 'user.username'),
                 'user.email',

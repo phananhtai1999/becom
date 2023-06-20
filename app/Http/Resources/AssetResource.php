@@ -25,6 +25,7 @@ class AssetResource extends JsonResource
             'user_uuid' => $this->user_uuid,
             'asset_size_uuid' => $this->asset_size_uuid,
             'status' => $this->status,
+            'reject_reason' => $this->reject_reason,
             'js_code' => $this->js_code
         ];
 
