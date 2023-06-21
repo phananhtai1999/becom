@@ -50,6 +50,7 @@ class SectionTemplate extends AbstractModel
         'user_uuid' =>  'integer',
         'section_category_uuid' => 'integer',
         'is_default' => 'boolean',
+        'reject_reason' => 'array',
     ];
 
     /**

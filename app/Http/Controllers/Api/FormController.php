@@ -24,6 +24,7 @@ use App\Services\ContactListService;
 use App\Services\ContactService;
 use App\Services\FormService;
 use App\Services\MyFormService;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -273,9 +274,16 @@ class FormController extends AbstractRestAPIController
         foreach ($FormUuids as $FormUuid)
         {
             $model = $this->service->findOneById($FormUuid);
+            $list_reason = $model->reject_reason;
+            if ($request->get('publish_status') == Form::REJECT_PUBLISH_STATUS){
+                $list_reason[] = [
+                    'content' => $request->get('reject_reason'),
+                    'created_at' => Carbon::now()
+                ];
+            }
             $this->service->update($model, [
                 'publish_status' => $request->get('publish_status'),
-                'reject_reason' => $request->get('publish_status') == Form::REJECT_PUBLISH_STATUS ? $request->get('reject_reason') : $model->reject_reason
+                'reject_reason' => $list_reason
             ]);
         }
 

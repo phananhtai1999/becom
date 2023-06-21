@@ -68,6 +68,7 @@ class Article extends AbstractModel
         'content' => 'array',
         'user_uuid' => 'integer',
         'article_category_uuid' => 'integer',
+        'reject_reason' => 'array',
     ];
 
     protected $appends = [
