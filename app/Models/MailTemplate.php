@@ -64,7 +64,7 @@ class MailTemplate extends AbstractModel
      * @var string[]
      */
     protected $appends = [
-        'rendered_body'
+//        'rendered_body'
     ];
 
     /**

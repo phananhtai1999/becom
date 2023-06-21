@@ -6,6 +6,7 @@ use App\Abstracts\AbstractService;
 use App\Models\Asset;
 use App\Models\QueryBuilders\AssetQueryBuilder;
 use App\Models\Role;
+use Carbon\Carbon;
 
 class AssetService extends AbstractService
 {
@@ -89,5 +90,83 @@ class AssetService extends AbstractService
     {
         $model = $this->findOneWhereOrFail(['uuid' => $id, 'user_uuid' => auth()->user()->getKey()]);
         $model->delete();
+    }
+
+    public function totalEditorAssetChart($startDate, $endDate){
+        return $this->model->selectRaw("COUNT(IF( status = 'publish', 1, NULL ) ) as approve,
+        COUNT(IF( status = 'pending', 1, NULL ) ) as pending,
+        COUNT(IF( status = 'reject', 1, NULL ) ) as reject")
+            ->whereDate('updated_at', '>=', $startDate)
+            ->whereDate('updated_at', '<=', $endDate)
+            ->first()->toArray();
+    }
+
+    public function getAssetsChartByDateFormat($dateFormat, $startDate, $endDate)
+    {
+        return $this->model->selectRaw("date_format(updated_at, '{$dateFormat}') as label,
+        COUNT(IF( status = 'publish', 1, NULL ) ) as approve,
+        COUNT(IF( status = 'pending', 1, NULL ) ) as pending,
+        COUNT(IF( status = 'reject', 1, NULL ) ) as reject")
+            ->whereDate('updated_at', '>=', $startDate)
+            ->whereDate('updated_at', '<=', $endDate)
+            ->groupBy('label')
+            ->orderBy('label', 'ASC')
+            ->get();
+    }
+
+    public function editorAssetChart($groupBy, $startDate, $endDate)
+    {
+        $startDate = Carbon::parse($startDate);
+        $endDate = Carbon::parse($endDate);
+        $currentDate = $startDate->copy();
+        $times = [];
+        $result = [];
+
+        if ($groupBy == "hour"){
+            $dateFormat = "%Y-%m-%d %H:00:00";
+
+            $endDate = $endDate->endOfDay();
+            while ($currentDate <= $endDate) {
+                $times[] = $currentDate->format('Y-m-d H:00:00');
+                $currentDate = $currentDate->addHour();
+            }
+        }
+
+        if ($groupBy == "date"){
+            $dateFormat = "%Y-%m-%d";
+            while ($currentDate <= $endDate) {
+                $times[] = $currentDate->format('Y-m-d');
+                $currentDate = $currentDate->addDay();
+            }
+        }
+
+        if ($groupBy == "month"){
+            $dateFormat = "%Y-%m";
+            while ($currentDate <= $endDate) {
+                $times[] = $currentDate->format('Y-m');
+                $currentDate = $currentDate->addMonth();
+            }
+        }
+
+        $charts = $this->getAssetsChartByDateFormat($dateFormat, $startDate, $endDate)->keyBy('label');
+
+        foreach ($times as $time){
+            $mailByTime = $charts->first(function($item, $key) use ($time){
+                return $key == $time;
+            });
+
+            if($mailByTime){
+                $result[] = $mailByTime->toArray();
+            }else{
+                $result [] = [
+                    'label' => $time,
+                    'approve'  => 0,
+                    'pending'  => 0,
+                    'reject'  => 0,
+                ];
+            }
+        }
+
+        return $result;
     }
 }

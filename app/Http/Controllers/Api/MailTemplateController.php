@@ -7,6 +7,7 @@ use App\Http\Controllers\Traits\RestIndexMyTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\AcceptPublishMailTemplateRequest;
+use App\Http\Requests\EditorMailTemplateChartRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MailTemplateRequest;
 use App\Http\Requests\MyMailTemplateRequest;
@@ -316,5 +317,21 @@ class MailTemplateController extends AbstractRestAPIController
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
         );
+    }
+
+    public function editorMailTemplateChart(EditorMailTemplateChartRequest $request)
+    {
+        $startDate = $request->get('start_date', Carbon::today());
+        $endDate = $request->get('end_date', Carbon::today());
+        $groupBy = $request->get('group_by', 'hour');
+        $type = $request->get('type');
+
+        $data = $this->service->editorMailTemplateChart($groupBy, $startDate, $endDate, $type);
+        $total = $this->service->totalEditorMailTemplateChart($startDate, $endDate, $type);
+
+        return $this->sendOkJsonResponse([
+            'data' => $data,
+            'total' => $total
+        ]);
     }
 }
