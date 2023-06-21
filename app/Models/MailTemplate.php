@@ -57,6 +57,7 @@ class MailTemplate extends AbstractModel
         'user_uuid' => 'integer',
         'business_category_uuid' => 'integer',
         'purpose_uuid' => 'integer',
+        'reject_reason' => 'array',
     ];
 
     /**

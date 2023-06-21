@@ -20,6 +20,7 @@ use App\Http\Resources\SectionTemplateResourceCollection;
 use App\Models\SectionTemplate;
 use App\Services\MySectionTemplateService;
 use App\Services\SectionTemplateService;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -207,10 +208,16 @@ class SectionTemplateController extends AbstractRestAPIController
         foreach ($sectionTemplateUuids as $sectionTemplateUuid)
         {
             $model = $this->service->findOneById($sectionTemplateUuid);
+            $list_reason = $model->reject_reason;
+            if ($request->get('publish_status') == SectionTemplate::REJECT_PUBLISH_STATUS){
+                $list_reason[] = [
+                    'content' => $request->get('reject_reason'),
+                    'created_at' => Carbon::now()
+                ];
+            }
             $this->service->update($model, [
                 'publish_status' => $request->get('publish_status'),
-                'reject_reason' => $request->get('publish_status') == SectionTemplate::REJECT_PUBLISH_STATUS ? $request->get('reject_reason') : $model->reject_reason
-
+                'reject_reason' => $list_reason
             ]);
         }
 

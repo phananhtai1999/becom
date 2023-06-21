@@ -17,6 +17,7 @@ use App\Http\Resources\ArticleResourceCollection;
 use App\Models\Article;
 use App\Services\ArticleService;
 use App\Services\LanguageService;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 
 class ArticleController extends AbstractRestAPIController
@@ -234,9 +235,16 @@ class ArticleController extends AbstractRestAPIController
         foreach ($articleUuids as $articleUuid)
         {
             $model = $this->service->findOneById($articleUuid);
+            $list_reason = $model->reject_reason;
+            if ($request->get('publish_status') == Article::REJECT_PUBLISH_STATUS){
+                $list_reason[] = [
+                    'content' => $request->get('reject_reason'),
+                    'created_at' => Carbon::now()
+                ];
+            }
             $this->service->update($model, [
                 'publish_status' => $request->get('publish_status'),
-                'reject_reason' => $request->get('publish_status') == Article::REJECT_PUBLISH_STATUS ? $request->get('reject_reason') : $model->reject_reason
+                'reject_reason' => $list_reason
             ]);
         }
 

@@ -21,6 +21,7 @@ use App\Http\Resources\WebsitePageResourceCollection;
 use App\Models\WebsitePage;
 use App\Services\MyWebsitePageService;
 use App\Services\WebsitePageService;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -207,9 +208,16 @@ class WebsitePageController extends AbstractRestAPIController
         foreach ($websitePageUuids as $websitePageUuid)
         {
             $model = $this->service->findOneById($websitePageUuid);
+            $list_reason = $model->reject_reason;
+            if ($request->get('publish_status') == WebsitePage::REJECT_PUBLISH_STATUS){
+                $list_reason[] = [
+                    'content' => $request->get('reject_reason'),
+                    'created_at' => Carbon::now()
+                ];
+            }
             $this->service->update($model, [
                 'publish_status' => $request->get('publish_status'),
-                'reject_reason' => $request->get('publish_status') == WebsitePage::REJECT_PUBLISH_STATUS ? $request->get('reject_reason') : $model->reject_reason
+                'reject_reason' => $list_reason
             ]);
         }
 
