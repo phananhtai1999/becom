@@ -51,6 +51,7 @@ class WebsitePage extends AbstractModel
         'user_uuid' =>  'integer',
         'website_page_category_uuid' => 'integer',
         'is_default' => 'boolean',
+        'reject_reason' => 'array',
     ];
 
     /**

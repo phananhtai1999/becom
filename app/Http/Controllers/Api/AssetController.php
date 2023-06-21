@@ -18,6 +18,7 @@ use App\Models\Role;
 use App\Services\AssetService;
 use App\Services\UploadService;
 use App\Services\UserService;
+use Carbon\Carbon;
 
 class AssetController extends AbstractRestAPIController
 {
@@ -163,9 +164,16 @@ class AssetController extends AbstractRestAPIController
     public function changeStatusAsset($id, ChangeStatusAssetRequest $request)
     {
         $model = $this->service->findOrFailById($id);
+        $list_reason = $model->reject_reason;
+        if ($request->get('status') == Asset::REJECT_STATUS){
+            $list_reason[] = [
+                'content' => $request->get('reject_reason'),
+                'created_at' => Carbon::now()
+            ];
+        }
         $model->update([
             'status' => $request->get('status'),
-            'reject_reason' => $request->get('status') == Asset::REJECT_STATUS ? $request->get('reject_reason') : $model->reject_reason
+            'reject_reason' => $list_reason
         ]);
 
         return $this->sendOkJsonResponse(

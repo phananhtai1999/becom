@@ -20,6 +20,7 @@ use App\Models\MailTemplate;
 use App\Services\MailTemplateService;
 use App\Services\MyMailTemplateService;
 use App\Services\SendProjectService;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
@@ -285,10 +286,16 @@ class MailTemplateController extends AbstractRestAPIController
         foreach ($mailTemplateUuids as $mailTemplateUuid)
         {
             $model = $this->service->findOneById($mailTemplateUuid);
+            $list_reason = $model->reject_reason;
+            if ($request->get('publish_status') == MailTemplate::REJECT_PUBLISH_STATUS){
+                $list_reason[] = [
+                    'content' => $request->get('reject_reason'),
+                    'created_at' => Carbon::now()
+                ];
+            }
             $this->service->update($model, [
                 'publish_status' => $request->get('publish_status'),
-                'reject_reason' => $request->get('publish_status') == MailTemplate::REJECT_PUBLISH_STATUS ? $request->get('reject_reason') : $model->reject_reason
-
+                'reject_reason' => $list_reason
             ]);
         }
 

@@ -46,6 +46,7 @@ class Asset extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
+        'reject_reason' => 'array',
     ];
 
     public function assetSize()
