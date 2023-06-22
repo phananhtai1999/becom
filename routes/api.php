@@ -47,6 +47,7 @@ use App\Http\Controllers\Api\Payment\PaymentController;
 use App\Http\Controllers\Api\Payment\PaypalController;
 use App\Http\Controllers\Api\Payment\StripeController;
 use App\Http\Controllers\Api\PaymentMethodController;
+use App\Http\Controllers\Api\PayoutInformationController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\PlatformPackageController;
 use App\Http\Controllers\Api\PositionController;
@@ -1326,9 +1327,23 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'asset-size'], function () {
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'bank-information'], function () {
-    Route::get('/bank-informations', [BankInformationController::class, 'index']);
-    Route::get('bank-information/{id}', [BankInformationController::class, 'show']);
-    Route::post('bank-information', [BankInformationController::class, 'store']);
-    Route::put('bank-information/{id}', [BankInformationController::class, 'edit']);
-    Route::delete('bank-information/{id}', [BankInformationController::class, 'destroy']);
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
+        Route::get('/bank-informations', [BankInformationController::class, 'index']);
+        Route::get('bank-information/{id}', [BankInformationController::class, 'show']);
+        Route::post('bank-information', [BankInformationController::class, 'store']);
+        Route::put('bank-information/{id}', [BankInformationController::class, 'edit']);
+        Route::delete('bank-information/{id}', [BankInformationController::class, 'destroy']);
+    });
+});
+
+Route::group(['middleware' => ['auth:api'], 'as' => 'payout-information'], function () {
+    Route::get('/payout-informations', [PayoutInformationController::class, 'index']);
+    Route::get('payout-information/{id}', [PayoutInformationController::class, 'show']);
+    Route::post('payout-information', [PayoutInformationController::class, 'store']);
+    Route::put('payout-information/{id}', [PayoutInformationController::class, 'edit']);
+    Route::delete('payout-information/{id}', [PayoutInformationController::class, 'destroy']);
+
+    Route::get('my/payout-informations', [PayoutInformationController::class, 'myIndex']);
+    Route::post('payout-information/set-default/{id}', [PayoutInformationController::class, 'setDefault']);
+
 });
