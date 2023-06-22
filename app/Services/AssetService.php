@@ -96,6 +96,7 @@ class AssetService extends AbstractService
         return $this->model->selectRaw("COUNT(IF( status = 'publish', 1, NULL ) ) as approve,
         COUNT(IF( status = 'pending', 1, NULL ) ) as pending,
         COUNT(IF( status = 'reject', 1, NULL ) ) as reject")
+            ->where('user_uuid', auth()->user()->getKey())
             ->whereDate('updated_at', '>=', $startDate)
             ->whereDate('updated_at', '<=', $endDate)
             ->first()->toArray();
@@ -107,6 +108,7 @@ class AssetService extends AbstractService
         COUNT(IF( status = 'publish', 1, NULL ) ) as approve,
         COUNT(IF( status = 'pending', 1, NULL ) ) as pending,
         COUNT(IF( status = 'reject', 1, NULL ) ) as reject")
+            ->where('user_uuid', auth()->user()->getKey())
             ->whereDate('updated_at', '>=', $startDate)
             ->whereDate('updated_at', '<=', $endDate)
             ->groupBy('label')

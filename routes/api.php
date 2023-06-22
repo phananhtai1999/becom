@@ -504,6 +504,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'chart.'], function () {
     Route::group(['middleware' => ['role:root,admin,editor'], 'as' => 'editor.'], function () {
         Route::get('editor/mail-template-chart', [MailTemplateController::class, 'editorMailTemplateChart'])->name('editorMailTemplateChart');
         Route::get('editor/asset-chart', [AssetController::class, 'editorAssetChart'])->name('editorAssetChart');
+        Route::get('editor/article-chart', [ArticleController::class, 'editorArticleChart'])->name('editorArticleChart');
     });
 
 

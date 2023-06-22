@@ -10,6 +10,7 @@ use App\Http\Requests\Article\ChangeStatusArticleRequest;
 use App\Http\Requests\Article\UnpublishedArticleRequest;
 use App\Http\Requests\Article\UpdateUnpublishedArticleRequest;
 use App\Http\Requests\ArticleRequest;
+use App\Http\Requests\ChartRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\UpdateArticleRequest;
 use App\Http\Resources\ArticleResource;
@@ -261,5 +262,20 @@ class ArticleController extends AbstractRestAPIController
         $model->delete();
 
         return $this->sendOkJsonResponse();
+    }
+
+    public function editorArticleChart(ChartRequest $request)
+    {
+        $startDate = $request->get('start_date', Carbon::today());
+        $endDate = $request->get('end_date', Carbon::today());
+        $groupBy = $request->get('group_by', 'hour');
+
+        $data = $this->service->editorArticleChart($groupBy, $startDate, $endDate);
+        $total = $this->service->totalEditorArticleChart($startDate, $endDate);
+
+        return $this->sendOkJsonResponse([
+            'data' => $data,
+            'total' => $total
+        ]);
     }
 }
