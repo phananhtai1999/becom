@@ -228,8 +228,8 @@ class ArticleService extends AbstractService
     public function totalEditorArticleChart($startDate, $endDate)
     {
         return $this->model->selectRaw("COUNT(IF( publish_status = 1, 1, NULL ) ) as approve,
-        COUNT(IF( publish_status = 2, 1, NULL ) ) as pending,
-        COUNT(IF( publish_status = 3, 1, NULL ) ) as reject")
+        COUNT(IF( publish_status = 3, 1, NULL ) ) as pending,
+        COUNT(IF( publish_status = 4, 1, NULL ) ) as reject")
             ->where('user_uuid', auth()->user()->getKey())
             ->whereDate('updated_at', '>=', $startDate)
             ->whereDate('updated_at', '<=', $endDate)
@@ -240,8 +240,8 @@ class ArticleService extends AbstractService
     {
         return $this->model->selectRaw("date_format(updated_at, '{$dateFormat}') as label,
         COUNT(IF( publish_status = 1, 1, NULL ) ) as approve,
-        COUNT(IF( publish_status = 2, 1, NULL ) ) as pending,
-        COUNT(IF( publish_status = 3, 1, NULL ) ) as reject")
+        COUNT(IF( publish_status = 3, 1, NULL ) ) as pending,
+        COUNT(IF( publish_status = 4, 1, NULL ) ) as reject")
             ->where('user_uuid', auth()->user()->getKey())
             ->whereDate('updated_at', '>=', $startDate)
             ->whereDate('updated_at', '<=', $endDate)
