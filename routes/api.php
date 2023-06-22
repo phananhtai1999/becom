@@ -26,6 +26,7 @@ use App\Http\Controllers\Api\CreditPackageController;
 use App\Http\Controllers\Api\CreditTransactionHistoryController;
 use App\Http\Controllers\Api\DomainController;
 use App\Http\Controllers\Api\DomainVerificationController;
+use App\Http\Controllers\Api\EditorChartController;
 use App\Http\Controllers\Api\EmailController;
 use App\Http\Controllers\Api\FooterTemplateController;
 use App\Http\Controllers\Api\FormController;
@@ -506,6 +507,8 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'chart.'], function () {
         Route::get('editor/mail-template-chart', [MailTemplateController::class, 'editorMailTemplateChart'])->name('editorMailTemplateChart');
         Route::get('editor/asset-chart', [AssetController::class, 'editorAssetChart'])->name('editorAssetChart');
         Route::get('editor/article-chart', [ArticleController::class, 'editorArticleChart'])->name('editorArticleChart');
+        Route::get('editor/website-chart', [EditorChartController::class, 'editorWebsiteChart'])->name('editorWebsiteChart');
+        Route::get('editor/all-chart', [EditorChartController::class, 'editorAllChart'])->name('editorAllChart');
     });
 
 
