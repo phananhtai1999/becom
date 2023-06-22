@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\AssetGroupController;
 use App\Http\Controllers\Api\AssetSizeController;
 use App\Http\Controllers\Api\AuthBySocialNetworkController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\BankInformationController;
 use App\Http\Controllers\Api\BillingAddressController;
 use App\Http\Controllers\Api\BusinessCategoryController;
 use App\Http\Controllers\Api\BusinessManagementController;
@@ -499,6 +500,12 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'chart.'], function () {
         Route::get('/smtp-account-chart', [SmtpAccountController::class, 'smtpAccountChart'])->name('smtpAccountChart');
         Route::get('/point-contact-chart', [ContactController::class, 'pointsContactChart'])->name('pointsContactChart');
     });
+
+    Route::group(['middleware' => ['role:root,admin,editor'], 'as' => 'editor.'], function () {
+        Route::get('editor/mail-template-chart', [MailTemplateController::class, 'editorMailTemplateChart'])->name('editorMailTemplateChart');
+        Route::get('editor/asset-chart', [AssetController::class, 'editorAssetChart'])->name('editorAssetChart');
+    });
+
 
     Route::group(['as' => 'my.'], function () {
         Route::get('/my/credit-chart', [CreditHistoryController::class, 'myCreditChart'])->name('myCreditChart');
@@ -1315,4 +1322,12 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'asset-size'], function () {
         Route::put('asset-size/{id}', [AssetSizeController::class, 'edit']);
         Route::delete('asset-size/{id}', [AssetSizeController::class, 'destroy']);
     });
+});
+
+Route::group(['middleware' => ['auth:api'], 'as' => 'bank-information'], function () {
+    Route::get('/bank-informations', [BankInformationController::class, 'index']);
+    Route::get('bank-information/{id}', [BankInformationController::class, 'show']);
+    Route::post('bank-information', [BankInformationController::class, 'store']);
+    Route::put('bank-information/{id}', [BankInformationController::class, 'edit']);
+    Route::delete('bank-information/{id}', [BankInformationController::class, 'destroy']);
 });
