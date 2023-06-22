@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\AssetGroupController;
 use App\Http\Controllers\Api\AssetSizeController;
 use App\Http\Controllers\Api\AuthBySocialNetworkController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\BankInformationController;
 use App\Http\Controllers\Api\BillingAddressController;
 use App\Http\Controllers\Api\BusinessCategoryController;
 use App\Http\Controllers\Api\BusinessManagementController;
@@ -1321,4 +1322,12 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'asset-size'], function () {
         Route::put('asset-size/{id}', [AssetSizeController::class, 'edit']);
         Route::delete('asset-size/{id}', [AssetSizeController::class, 'destroy']);
     });
+});
+
+Route::group(['middleware' => ['auth:api'], 'as' => 'bank-information'], function () {
+    Route::get('/bank-informations', [BankInformationController::class, 'index']);
+    Route::get('bank-information/{id}', [BankInformationController::class, 'show']);
+    Route::post('bank-information', [BankInformationController::class, 'store']);
+    Route::put('bank-information/{id}', [BankInformationController::class, 'edit']);
+    Route::delete('bank-information/{id}', [BankInformationController::class, 'destroy']);
 });
