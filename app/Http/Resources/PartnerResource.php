@@ -55,6 +55,10 @@ class PartnerResource extends AbstractJsonResource
             $data['partner_trackings'] = PartnerTrackingResource::collection($this->partnerTrackings);
         }
 
+        if (\in_array('partner__roles', $expand)) {
+            $data['roles'] = RoleResource::collection(optional(optional($this->user)->roles));
+        }
+
         return $data;
     }
 }

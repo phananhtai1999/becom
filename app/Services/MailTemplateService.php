@@ -75,6 +75,7 @@ class MailTemplateService extends AbstractService
         COUNT(IF( publish_status = 3, 1, NULL ) ) as reject")
             ->whereDate('updated_at', '>=', $startDate)
             ->whereDate('updated_at', '<=', $endDate)
+            ->where('user_uuid', auth()->user()->getKey())
             ->when($type, function ($q, $type) {
               $q->where('type', $type);
             })
@@ -89,6 +90,7 @@ class MailTemplateService extends AbstractService
         COUNT(IF( publish_status = 3, 1, NULL ) ) as reject")
             ->whereDate('updated_at', '>=', $startDate)
             ->whereDate('updated_at', '<=', $endDate)
+            ->where('user_uuid', auth()->user()->getKey())
             ->when($type, function ($q, $type) {
                 $q->where('type', $type);
             })

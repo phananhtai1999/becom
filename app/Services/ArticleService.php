@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Abstracts\AbstractService;
 use App\Models\Article;
 use App\Models\QueryBuilders\ArticleQueryBuilder;
+use Carbon\Carbon;
 
 class ArticleService extends AbstractService
 {
@@ -222,5 +223,90 @@ class ArticleService extends AbstractService
     {
         return $this->model->whereIn('publish_status', [Article::PENDING_PUBLISH_STATUS, Article::REJECT_PUBLISH_STATUS])
             ->where('uuid', $id)->firstOrFail();
+    }
+
+    public function totalEditorArticleChart($startDate, $endDate)
+    {
+        return $this->model->selectRaw("COUNT(IF( publish_status = 1, 1, NULL ) ) as approve,
+        COUNT(IF( publish_status = 2, 1, NULL ) ) as pending,
+        COUNT(IF( publish_status = 3, 1, NULL ) ) as reject")
+            ->where('user_uuid', auth()->user()->getKey())
+            ->whereDate('updated_at', '>=', $startDate)
+            ->whereDate('updated_at', '<=', $endDate)
+            ->first()->setAppends([])->toArray();
+    }
+
+    public function getArticlesChartByDateFormat($dateFormat, $startDate, $endDate)
+    {
+        return $this->model->selectRaw("date_format(updated_at, '{$dateFormat}') as label,
+        COUNT(IF( publish_status = 1, 1, NULL ) ) as approve,
+        COUNT(IF( publish_status = 2, 1, NULL ) ) as pending,
+        COUNT(IF( publish_status = 3, 1, NULL ) ) as reject")
+            ->where('user_uuid', auth()->user()->getKey())
+            ->whereDate('updated_at', '>=', $startDate)
+            ->whereDate('updated_at', '<=', $endDate)
+            ->groupBy('label')
+            ->orderBy('label', 'ASC')
+            ->get();
+    }
+
+    public function editorArticleChart($groupBy, $startDate, $endDate)
+    {
+        $startDate = Carbon::parse($startDate);
+        $endDate = Carbon::parse($endDate);
+        $currentDate = $startDate->copy();
+        $times = [];
+        $result = [];
+
+        if ($groupBy == "hour"){
+            $dateFormat = "%Y-%m-%d %H:00:00";
+
+            $endDate = $endDate->endOfDay();
+            while ($currentDate <= $endDate) {
+                $times[] = $currentDate->format('Y-m-d H:00:00');
+                $currentDate = $currentDate->addHour();
+            }
+        }
+
+        if ($groupBy == "date"){
+            $dateFormat = "%Y-%m-%d";
+            while ($currentDate <= $endDate) {
+                $times[] = $currentDate->format('Y-m-d');
+                $currentDate = $currentDate->addDay();
+            }
+        }
+
+        if ($groupBy == "month"){
+            $dateFormat = "%Y-%m";
+            while ($currentDate <= $endDate) {
+                $times[] = $currentDate->format('Y-m');
+                $currentDate = $currentDate->addMonth();
+            }
+        }
+
+        $charts = $this->getArticlesChartByDateFormat($dateFormat, $startDate, $endDate)->keyBy('label');
+        foreach ($times as $time){
+            $mailByTime = $charts->first(function($item, $key) use ($time){
+                return $key == $time;
+            });
+
+            if($mailByTime){
+                $result[] = [
+                    'label' => $time,
+                    'approve'  => $mailByTime->approve,
+                    'pending'  => $mailByTime->pending,
+                    'reject'  => $mailByTime->reject
+                ];
+            }else{
+                $result [] = [
+                    'label' => $time,
+                    'approve'  => 0,
+                    'pending'  => 0,
+                    'reject'  => 0,
+                ];
+            }
+        }
+
+        return $result;
     }
 }
