@@ -23,6 +23,7 @@ class ConfigSeeder extends Seeder
         $siteGroupUuid = Group::where('name', 'site')->first()->uuid;
         $assetGroupUuid = Group::where('name', 'asset')->first()->uuid;
         $payoutGroupUuid = Group::where('name', 'payout')->first()->uuid;
+        $generalGroupUuid = Group::where('name', 'general')->first()->uuid;
         $configs = [
             [
                 'key' => 'smtp_auto',
@@ -339,6 +340,20 @@ class ConfigSeeder extends Seeder
                 'type' => 'string',
                 'status' => 'system',
                 'group_id' => 1,
+            ],
+            [
+                'key' => 'SITE_URL',
+                'value' => 'https://site.techupzone.com',
+                'type' => 'string',
+                'status' => 'public',
+                'group_id' => $generalGroupUuid,
+            ],
+            [
+                'key' => 'BUILDER_URL',
+                'value' => 'https://builder.techupzone.com',
+                'type' => 'string',
+                'status' => 'public',
+                'group_id' => $generalGroupUuid,
             ],
         ];
         Cache::forget('config');
