@@ -333,6 +333,13 @@ class ConfigSeeder extends Seeder
                 'status' => 'system',
                 'group_id' => $payoutGroupUuid,
             ],
+            [
+                'key' => 'timezone',
+                'value' => 'Asia/Ho_Chi_Minh',
+                'type' => 'string',
+                'status' => 'system',
+                'group_id' => 1,
+            ],
         ];
         Cache::forget('config');
         foreach ($configs as $config) {

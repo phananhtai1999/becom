@@ -324,7 +324,8 @@ class BaseNotification
      */
     public function mapVariablelForSendCampaign($contact, $campaign, $mailSendingHistory, $footerTemplateSubscribe)
     {
-        $current = Carbon::now('Asia/Ho_Chi_Minh');
+        $timezone = $this->configService->getConfigByKeyInCache('timezone')->value;
+        $current = Carbon::now($timezone);
         return [
             'to_email' => $contact->email,
             'contact_first_name' => $contact->first_name,
@@ -335,9 +336,9 @@ class BaseNotification
             'contact_dob' => optional($contact->dob)->toDateString(),
             'contact_country' => $contact->country,
             'contact_city' => $contact->city,
-            'website_name' => optional($campaign->website)->name,
-            'website_domain' => optional($campaign->website)->domain,
-            'website_description' => optional($campaign->website)->description,
+            'website_name' => optional($campaign->sendProject)->name,
+            'website_domain' => optional($campaign->sendProject)->domain,
+            'website_description' => optional($campaign->sendProject)->description,
             'campaign_from_date' => $campaign->from_date,
             'campaign_to_date' => $campaign->to_date,
             'campaign_tracking_key' => $campaign->tracking_key,

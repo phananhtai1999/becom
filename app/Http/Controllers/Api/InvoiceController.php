@@ -34,7 +34,8 @@ class InvoiceController extends AbstractRestAPIController
         $billingAddress->name = $this->checkVietnamese($billingAddress->name);
         $paymentMethod = $invoice->paymentMethod;
         $date = new DateTime($invoice->created_at);
-        $timezone = new DateTimeZone('Asia/Ho_Chi_Minh');
+        $time = $this->service->getConfigByKeyInCache('timezone')->value;
+        $timezone = new DateTimeZone($time->value);
         $date->setTimezone($timezone);
         $invoice->created_date = $date->format('d/m/Y H:i:s');
 
