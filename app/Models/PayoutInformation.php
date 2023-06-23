@@ -52,6 +52,18 @@ class PayoutInformation extends Model
         'deleted_at' => 'datetime',
     ];
 
+    protected $appends = [
+        'last_4',
+    ];
+
+    /**
+     * @return string
+     */
+    public function getLast4Attribute()
+    {
+        return substr($this->account_number, -4);
+    }
+
     public function user() {
         return $this->belongsTo(User::class, 'user_uuid', 'uuid');
     }

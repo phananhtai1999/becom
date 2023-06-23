@@ -22,6 +22,7 @@ class ConfigSeeder extends Seeder
         $s3GroupUuid = Group::where('name', 's3')->first()->uuid;
         $siteGroupUuid = Group::where('name', 'site')->first()->uuid;
         $assetGroupUuid = Group::where('name', 'asset')->first()->uuid;
+        $payoutGroupUuid = Group::where('name', 'payout')->first()->uuid;
         $configs = [
             [
                 'key' => 'smtp_auto',
@@ -324,6 +325,13 @@ class ConfigSeeder extends Seeder
                 'type' => 'string',
                 'status' => 'system',
                 'group_id' => $assetGroupUuid,
+            ],
+            [
+                'key' => 'payout_fee',
+                'value' => 1,
+                'type' => 'numeric',
+                'status' => 'system',
+                'group_id' => $payoutGroupUuid,
             ],
         ];
         Cache::forget('config');
