@@ -19,10 +19,11 @@ class MailTemplateVariableService extends AbstractService
      */
     public function renderBody($mailTemplate, $contact, $smtpAccount, $campaign = null)
     {
+        $timezone = $this->getConfigByKeyInCache('timezone')->value;
         $fromEmail = $smtpAccount ? $smtpAccount->mail_from_address : '';
-        $websiteName = !empty($campaign) ? $campaign->website->name : '';
-        $websiteDomain = !empty($campaign) ? $campaign->website->domain : '';
-        $websiteDescription = !empty($campaign) ? $campaign->website->description : '';
+        $websiteName = !empty($campaign) ? optional($campaign->sendProject)->name : '';
+        $websiteDomain = !empty($campaign) ? optional($campaign->sendProject)->domain : '';
+        $websiteDescription = !empty($campaign) ? optional($campaign->sendProject)->description : '';
         $toEmail = $contact->email ?? $contact;
         $contactFirstName = $contact->first_name ?? '';
         $contactMiddleName = $contact->middle_name ?? '';
@@ -32,7 +33,7 @@ class MailTemplateVariableService extends AbstractService
         $contactDob = $contact->dob ?? '';
         $contactCountry = $contact->country ?? '';
         $contactCity = $contact->city ?? '';
-        $current = Carbon::now('Asia/Ho_Chi_Minh');
+        $current = Carbon::now($timezone);
         $currentDay = $current->toDateString();
         $currentTime = $current->toTimeString();
         $search = [
