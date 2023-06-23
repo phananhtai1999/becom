@@ -102,6 +102,7 @@ class SortTotalCreditOfMyCampaignQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::scope('to__from_date'),
                 AllowedFilter::scope('from__to_date'),
                 AllowedFilter::scope('to__to_date'),
+                AllowedFilter::scope('is_expired', 'campaignIsExpired')
             ]);
     }
 

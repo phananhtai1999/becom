@@ -134,6 +134,7 @@ class TeamController extends Controller
                 'password' => Hash::make($password)
             ]);;
             $user->roles()->attach([config('user.default_role_uuid')]);
+            $user->userPlatformPackage()->create(['platform_package_uuid' => PlatformPackage::DEFAULT_PLATFORM_PACKAGE_1]);
             $this->userTeamService->create(array_merge($request->all(), [
                 'user_uuid' => $user->uuid,
             ]));

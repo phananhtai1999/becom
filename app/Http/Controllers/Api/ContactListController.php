@@ -224,7 +224,7 @@ class ContactListController extends AbstractRestAPIController
                     ]));
                     if ($userUuid != auth()->user()->getKey()) {
                         $user = $this->userService->findOrFailById(auth()->user()->getKey());
-                        $user->userTeamContactLists()->sync($model->uuid);
+                        $user->userTeamContactLists()->attach($model->uuid);
                     }
                     $model->contacts()->attach(array_merge($request->get('contact', []), $import['data']));
                     if ($import['have_error_data'] === true) {
@@ -256,7 +256,7 @@ class ContactListController extends AbstractRestAPIController
         $model->contacts()->attach($request->get('contact', []));
         if ($userUuid != auth()->user()->getKey()) {
             $user = $this->userService->findOrFailById(auth()->user()->getKey());
-            $user->userTeamContactLists()->sync($model->uuid);
+            $user->userTeamContactLists()->attach($model->uuid);
         }
 
         return $this->sendCreatedJsonResponse(

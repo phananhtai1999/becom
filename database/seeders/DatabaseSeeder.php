@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\AssetGroup;
 use App\Models\AssetSize;
+use App\Models\BankInformation;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\App;
 
@@ -28,7 +29,8 @@ class DatabaseSeeder extends Seeder
             PlatformPackageSeeder::class,
             StatusSeeder::class,
             AssetGroupSeeder::class,
-            AssetSizeSeeder::class
+            AssetSizeSeeder::class,
+            BankInformationSeeder::class
         ]);
         if (!App::environment('production')) {
             $this->call([

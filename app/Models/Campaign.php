@@ -161,6 +161,15 @@ class Campaign extends AbstractModel
         return $this->to_date->toDateTimeString() < Carbon::now('Asia/Ho_Chi_Minh')->toDateTimeString();
     }
 
+    public function scopeCampaignIsExpired(Builder $query, $check)
+    {
+        if ($check){
+            return $query->where('to_date', '<',  Carbon::now('Asia/Ho_Chi_Minh'));
+        }else{
+            return $query->where('to_date', '>=',  Carbon::now('Asia/Ho_Chi_Minh'));
+        }
+    }
+
     /**
      * @param Builder $query
      * @param $fromDate
