@@ -26,6 +26,7 @@ use App\Http\Controllers\Api\CreditPackageController;
 use App\Http\Controllers\Api\CreditTransactionHistoryController;
 use App\Http\Controllers\Api\DomainController;
 use App\Http\Controllers\Api\DomainVerificationController;
+use App\Http\Controllers\Api\EditorChartController;
 use App\Http\Controllers\Api\EmailController;
 use App\Http\Controllers\Api\FooterTemplateController;
 use App\Http\Controllers\Api\FormController;
@@ -47,6 +48,7 @@ use App\Http\Controllers\Api\Payment\PaymentController;
 use App\Http\Controllers\Api\Payment\PaypalController;
 use App\Http\Controllers\Api\Payment\StripeController;
 use App\Http\Controllers\Api\PaymentMethodController;
+use App\Http\Controllers\Api\PayoutInformationController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\PlatformPackageController;
 use App\Http\Controllers\Api\PositionController;
@@ -505,6 +507,8 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'chart.'], function () {
         Route::get('editor/mail-template-chart', [MailTemplateController::class, 'editorMailTemplateChart'])->name('editorMailTemplateChart');
         Route::get('editor/asset-chart', [AssetController::class, 'editorAssetChart'])->name('editorAssetChart');
         Route::get('editor/article-chart', [ArticleController::class, 'editorArticleChart'])->name('editorArticleChart');
+        Route::get('editor/website-chart', [EditorChartController::class, 'editorWebsiteChart'])->name('editorWebsiteChart');
+        Route::get('editor/all-chart', [EditorChartController::class, 'editorAllChart'])->name('editorAllChart');
     });
 
 
@@ -1326,9 +1330,23 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'asset-size'], function () {
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'bank-information'], function () {
-    Route::get('/bank-informations', [BankInformationController::class, 'index']);
-    Route::get('bank-information/{id}', [BankInformationController::class, 'show']);
-    Route::post('bank-information', [BankInformationController::class, 'store']);
-    Route::put('bank-information/{id}', [BankInformationController::class, 'edit']);
-    Route::delete('bank-information/{id}', [BankInformationController::class, 'destroy']);
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
+        Route::get('/bank-informations', [BankInformationController::class, 'index']);
+        Route::get('bank-information/{id}', [BankInformationController::class, 'show']);
+        Route::post('bank-information', [BankInformationController::class, 'store']);
+        Route::put('bank-information/{id}', [BankInformationController::class, 'edit']);
+        Route::delete('bank-information/{id}', [BankInformationController::class, 'destroy']);
+    });
+});
+
+Route::group(['middleware' => ['auth:api'], 'as' => 'payout-information'], function () {
+    Route::get('/payout-informations', [PayoutInformationController::class, 'index']);
+    Route::get('payout-information/{id}', [PayoutInformationController::class, 'show']);
+    Route::post('payout-information', [PayoutInformationController::class, 'store']);
+    Route::put('payout-information/{id}', [PayoutInformationController::class, 'edit']);
+    Route::delete('payout-information/{id}', [PayoutInformationController::class, 'destroy']);
+
+    Route::get('my/payout-informations', [PayoutInformationController::class, 'myIndex']);
+    Route::post('payout-information/set-default/{id}', [PayoutInformationController::class, 'setDefault']);
+
 });

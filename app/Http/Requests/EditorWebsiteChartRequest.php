@@ -2,10 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\Abstracts\AbstractRequest;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class BankInformationRequest extends FormRequest
+class EditorWebsiteChartRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -14,7 +15,7 @@ class BankInformationRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return True;
     }
 
     /**
@@ -25,10 +26,10 @@ class BankInformationRequest extends FormRequest
     public function rules()
     {
         return [
-            'swift_code' => ['required', 'string', Rule::unique('bank_informations', 'swift_code')->whereNull('deleted_at')],
-            'bank_name' => ['required', 'string'],
-            'bank_address' => ['required', 'string'],
-            'currency' => ['required', 'string']
+            'start_date' => ['nullable', 'before_or_equal:end_date'],
+            'end_date' => ['nullable', 'after_or_equal:start_date'],
+            'group_by' => ['nullable', 'in:hour,date,month'],
+            'type' => ['nullable', 'in:website_page,section_template,form']
         ];
     }
 }
