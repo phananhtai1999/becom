@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Abstracts\AbstractModel;
+use App\Abstracts\AbstractService;
 use App\Services\CampaignService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -158,15 +159,17 @@ class Campaign extends AbstractModel
      */
     public function getIsExpiredAttribute()
     {
-        return $this->to_date->toDateTimeString() < Carbon::now('Asia/Ho_Chi_Minh')->toDateTimeString();
+        $timezone = (new CampaignService())->getConfigByKeyInCache('timezone')->value;
+        return $this->to_date->toDateTimeString() < Carbon::now($timezone)->toDateTimeString();
     }
 
     public function scopeCampaignIsExpired(Builder $query, $check)
     {
+        $timezone = (new CampaignService())->getConfigByKeyInCache('timezone')->value;
         if ($check){
-            return $query->where('to_date', '<',  Carbon::now('Asia/Ho_Chi_Minh'));
+            return $query->where('to_date', '<',  Carbon::now($timezone));
         }else{
-            return $query->where('to_date', '>=',  Carbon::now('Asia/Ho_Chi_Minh'));
+            return $query->where('to_date', '>=',  Carbon::now($timezone));
         }
     }
 

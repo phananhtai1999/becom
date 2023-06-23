@@ -43,6 +43,7 @@ class CampaignService extends AbstractService
      */
     public function getListActiveBirthdayCampaign()
     {
+        $timezone = $this->getConfigByKeyInCache('timezone')->value;
         return $this->model->selectRaw('DISTINCT campaigns.*')->with(['mailTemplate', 'sendProject', 'smtpAccount'])
             ->join('campaign_contact_list', 'campaigns.uuid', '=', 'campaign_contact_list.campaign_uuid')
             ->join('contact_lists', 'campaign_contact_list.contact_list_uuid', '=', 'contact_lists.uuid')
@@ -50,8 +51,8 @@ class CampaignService extends AbstractService
             ->join('contacts', 'contact_contact_list.contact_uuid', '=', 'contacts.uuid')
             ->where([
                 ['campaigns.type', 'birthday'],
-                ['campaigns.from_date', '<=', Carbon::now('Asia/Ho_Chi_Minh')],
-                ['campaigns.to_date', '>=', Carbon::now('Asia/Ho_Chi_Minh')],
+                ['campaigns.from_date', '<=', Carbon::now($timezone)],
+                ['campaigns.to_date', '>=', Carbon::now($timezone)],
                 ['campaigns.was_finished', false],
                 ['campaigns.was_stopped_by_owner', false],
                 ['campaigns.status', "active"],
@@ -67,6 +68,7 @@ class CampaignService extends AbstractService
      */
     public function checkActiveCampainByColumn($column, $id)
     {
+        $timezone = $this->getConfigByKeyInCache('timezone')->value;
         if ($column === "type") {
             $activeCampaign = $this->model->where([
                 ['uuid', $id]
@@ -80,10 +82,10 @@ class CampaignService extends AbstractService
                 $query = [$column, false];
             }
             if ($column === "from_date") {
-                $query = [$column, '<=', Carbon::now('Asia/Ho_Chi_Minh')];
+                $query = [$column, '<=', Carbon::now($timezone)];
             }
             if ($column === "to_date") {
-                $query = [$column, '>=', Carbon::now('Asia/Ho_Chi_Minh')];
+                $query = [$column, '>=', Carbon::now($timezone)];
             }
             if ($column === "status") {
                 $query = [$column, "active"];

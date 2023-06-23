@@ -47,6 +47,7 @@ class MyCampaignService extends AbstractService
      */
     public function checkActiveMyCampainByColumn($column, $id)
     {
+        $timezone = $this->getConfigByKeyInCache('timezone')->value;
         if ($column === "type"){
             $activeCampaign = $this->model->where([
                 ['uuid', $id],
@@ -61,10 +62,10 @@ class MyCampaignService extends AbstractService
                 $query = [$column, false];
             }
             if ($column === "from_date") {
-                $query = [$column, '<=', Carbon::now('Asia/Ho_Chi_Minh')];
+                $query = [$column, '<=', Carbon::now($timezone)];
             }
             if ($column === "to_date") {
-                $query = [$column, '>=', Carbon::now('Asia/Ho_Chi_Minh')];
+                $query = [$column, '>=', Carbon::now($timezone)];
             }
             if ($column === "status") {
                 $query = [$column, "active"];
@@ -90,13 +91,14 @@ class MyCampaignService extends AbstractService
      */
     public function CheckMyCampaign($campaignUuid)
     {
+        $timezone = $this->getConfigByKeyInCache('timezone')->value;
         $myCampaign = $this->model->select('campaigns.*')
             ->join('send_projects', 'send_projects.uuid', '=', 'campaigns.send_project_uuid')
             ->where([
                 ['campaigns.uuid', $campaignUuid],
                 ['send_projects.user_uuid', auth()->user()->getKey()],
-                ['campaigns.from_date', '<=', Carbon::now('Asia/Ho_Chi_Minh')],
-                ['campaigns.to_date', '>=', Carbon::now('Asia/Ho_Chi_Minh')],
+                ['campaigns.from_date', '<=', Carbon::now($timezone)],
+                ['campaigns.to_date', '>=', Carbon::now($timezone)],
                 ['campaigns.was_finished', false],
                 ['campaigns.was_stopped_by_owner', false],
             ])->first();
