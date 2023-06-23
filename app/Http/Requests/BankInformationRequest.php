@@ -28,6 +28,7 @@ class BankInformationRequest extends FormRequest
             'swift_code' => ['required', 'string', Rule::unique('bank_informations', 'swift_code')->whereNull('deleted_at')],
             'bank_name' => ['required', 'string'],
             'bank_address' => ['required', 'string'],
+            'is_verified' => ['boolean'],
             'currency' => ['required', 'string']
         ];
     }

@@ -33,7 +33,8 @@ class PayoutInformationResource extends JsonResource
             'swift_code' => $this->swift_code,
             'bank_name' => $this->bank_name,
             'bank_address' => $this->bank_address,
-            'currency' => $this->currency
+            'currency' => $this->currency,
+            'last_4' => $this->last_4
         ];
         if (\in_array('payout_information__user', $expand)) {
             $data['user'] = new UserResource($this->user);

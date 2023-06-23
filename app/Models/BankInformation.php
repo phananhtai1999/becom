@@ -27,6 +27,7 @@ class BankInformation extends Model
         'swift_code',
         'bank_name',
         'bank_address',
+        'is_verified',
         'currency'
     ];
 
@@ -38,4 +39,20 @@ class BankInformation extends Model
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
     ];
+
+    /**
+     * @var string[]
+     */
+    protected $appends = [
+        'payout_fee',
+    ];
+
+    /**
+     * @return string
+     */
+    public function getPayoutFeeAttribute()
+    {
+        return Config::where('key', 'payout_fee')->first()->value;
+    }
+
 }

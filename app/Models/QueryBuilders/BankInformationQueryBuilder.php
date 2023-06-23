@@ -32,6 +32,7 @@ class BankInformationQueryBuilder extends AbstractQueryBuilder
                 'swift_code',
                 'bank_name',
                 'bank_address',
+                'is_verified',
                 'currency'
             ])
             ->defaultSort('-created_at')
@@ -40,6 +41,7 @@ class BankInformationQueryBuilder extends AbstractQueryBuilder
                 'swift_code',
                 'bank_name',
                 'bank_address',
+                'is_verified',
                 'currency'
             ])
             ->allowedFilters([
@@ -53,6 +55,8 @@ class BankInformationQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__bank_address', 'bank_address'),
                 'currency',
                 AllowedFilter::exact('exact__currency', 'currency'),
+                'is_verified',
+                AllowedFilter::exact('exact__is_verified', 'is_verified'),
             ]);
 
     }

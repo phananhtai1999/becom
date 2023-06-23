@@ -20,6 +20,8 @@ class BankInformationResource extends JsonResource
             'bank_name' => $this->bank_name,
             'bank_address' => $this->bank_address,
             'currency' => $this->currency,
+            'payout_fee' => $this->payout_fee,
+            'is_verified' => $this->is_verified,
             'updated_at' => $this->updated_at,
             'created_at' => $this->created_at
         ];

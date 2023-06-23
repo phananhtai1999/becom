@@ -1328,12 +1328,12 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'asset-size'], function () {
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'bank-information'], function () {
     Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
-        Route::get('/bank-informations', [BankInformationController::class, 'index']);
-        Route::get('bank-information/{id}', [BankInformationController::class, 'show']);
         Route::post('bank-information', [BankInformationController::class, 'store']);
         Route::put('bank-information/{id}', [BankInformationController::class, 'edit']);
         Route::delete('bank-information/{id}', [BankInformationController::class, 'destroy']);
     });
+    Route::get('/bank-informations', [BankInformationController::class, 'index']);
+    Route::get('bank-information/{id}', [BankInformationController::class, 'show']);
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'payout-information'], function () {

@@ -29,6 +29,7 @@ class UpdateBankInformationRequest extends FormRequest
                 return $q->where('uuid','!=', $this->id)
                     ->whereNull('deleted_at');
             })],
+            'is_verified' => ['boolean'],
             'bank_name' => ['string'],
             'bank_address' => ['string'],
             'currency' => ['string']

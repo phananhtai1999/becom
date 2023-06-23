@@ -27,9 +27,10 @@ class UpdatePayoutInformationRequest extends FormRequest
         return [
             'type' => ['required', Rule::in(['bank_account', 'paypal'])],
             'email' => ['required_if:type,===,paypal', 'string'],
-            'account_number' => ['required_if:type,===,bank_account', 'integer'],
+            'account_number' => ['required_if:type,===,bank_account', 'string', 'digits:16'],
             'payout_fee' => ['required_if:type,===,bank_account', 'integer'],
-            'name' => ['required_if:type,===,bank_account', 'string'],
+            'first_name' => ['required_if:type,===,bank_account', 'string'],
+            'last_name' => ['required_if:type,===,bank_account', 'string'],
             'address' => ['required_if:type,===,bank_account', 'string'],
             'city' => ['required_if:type,===,bank_account', 'string'],
             'country' => ['required_if:type,===,bank_account', 'string'],
