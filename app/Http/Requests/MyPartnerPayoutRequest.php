@@ -24,7 +24,8 @@ class MyPartnerPayoutRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'amount' => ['required', 'numeric', 'min:0']
+            'amount' => ['required', 'numeric', 'min:0'],
+            'payout_information_uuid' => ['required', 'exists:payout_informations,uuid']
         ];
     }
 }

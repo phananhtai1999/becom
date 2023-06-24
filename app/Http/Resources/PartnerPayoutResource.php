@@ -22,6 +22,7 @@ class PartnerPayoutResource extends AbstractJsonResource
             'status' => $this->status,
             'time' => $this->time,
             'by_user_uuid' => $this->by_user_uuid,
+            'payout_information_uuid' => $this->payout_information_uuid,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
         ];
@@ -32,6 +33,9 @@ class PartnerPayoutResource extends AbstractJsonResource
 
         if (\in_array('partner_payout__partner', $expand)) {
             $data['partner'] = new PartnerResource($this->partner);
+        }
+        if (\in_array('partner_payout__payout_information', $expand)) {
+            $data['partner'] = new PayoutInformationResource($this->payoutInformation);
         }
         return $data;
     }

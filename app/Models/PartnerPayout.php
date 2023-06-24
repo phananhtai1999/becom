@@ -29,7 +29,8 @@ class PartnerPayout extends AbstractModel
         'partner_uuid',
         'amount',
         'time',
-        'status'
+        'status',
+        'payout_information_uuid'
     ];
 
     /**
@@ -55,5 +56,10 @@ class PartnerPayout extends AbstractModel
     public function partner()
     {
         return $this->belongsTo(Partner::class, 'partner_uuid', 'uuid');
+    }
+
+    public function payoutInformation()
+    {
+        return $this->belongsTo(PayoutInformation::class, 'payout_information_uuid', 'uuid');
     }
 }
