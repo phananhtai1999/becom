@@ -30,7 +30,7 @@ class PartnerPayout extends AbstractModel
         'amount',
         'time',
         'status',
-        'payout_information_uuid'
+        'payout_method_uuid'
     ];
 
     /**
@@ -58,8 +58,8 @@ class PartnerPayout extends AbstractModel
         return $this->belongsTo(Partner::class, 'partner_uuid', 'uuid');
     }
 
-    public function payoutInformation()
+    public function payoutMethod()
     {
-        return $this->belongsTo(PayoutInformation::class, 'payout_information_uuid', 'uuid');
+        return $this->belongsTo(PayoutMethod::class, 'payout_method_uuid', 'uuid');
     }
 }

@@ -64,13 +64,13 @@ class PartnerPayoutController extends AbstractRestAPIController
         $partner = $this->partnerService->findOneWhereOrFail(['user_uuid' => auth()->user()->getKey()]);
         $amountCanWithdrawn = $partner->unpaid_earnings;
 
-        if ($amountWantWithdrawn > $amountCanWithdrawn) {
-            return $this->sendValidationFailedJsonResponse(['errors' => 'Your balance is not enough']);
-        }
+//        if ($amountWantWithdrawn > $amountCanWithdrawn) {
+//            return $this->sendValidationFailedJsonResponse(['errors' => 'Your balance is not enough']);
+//        }
         $this->service->create([
             'partner_uuid' => $partner->uuid,
             'amount'=> $amountWantWithdrawn,
-            'payout_information_uuid'=> $request->get('payout_information_uuid'),
+            'payout_method_uuid'=> $request->get('payout_method_uuid'),
         ]);
         return $this->sendOkJsonResponse();
     }
