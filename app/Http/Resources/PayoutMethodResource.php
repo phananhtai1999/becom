@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class PayoutInformationResource extends JsonResource
+class PayoutMethodResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -36,7 +36,7 @@ class PayoutInformationResource extends JsonResource
             'currency' => $this->currency,
             'last_4' => $this->last_4
         ];
-        if (\in_array('payout_information__user', $expand)) {
+        if (\in_array('payout_method__user', $expand)) {
             $data['user'] = new UserResource($this->user);
         }
 

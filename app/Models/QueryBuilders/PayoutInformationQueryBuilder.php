@@ -3,7 +3,7 @@
 namespace App\Models\QueryBuilders;
 
 use App\Abstracts\AbstractQueryBuilder;
-use App\Models\PayoutInformation;
+use App\Models\PayoutMethod;
 use App\Models\SearchQueryBuilders\SearchQueryBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -16,7 +16,7 @@ class PayoutInformationQueryBuilder extends AbstractQueryBuilder
      */
     public static function baseQuery()
     {
-        return PayoutInformation::class;
+        return PayoutMethod::class;
     }
 
     /**
@@ -24,7 +24,7 @@ class PayoutInformationQueryBuilder extends AbstractQueryBuilder
      */
     public static function initialQuery()
     {
-        $modelKeyName = (new PayoutInformation())->getKeyName();
+        $modelKeyName = (new PayoutMethod())->getKeyName();
 
         return static::for(static::baseQuery())
             ->allowedFields([
@@ -114,7 +114,7 @@ class PayoutInformationQueryBuilder extends AbstractQueryBuilder
      */
     public static function fillAble()
     {
-        return PayoutInformation::class;
+        return PayoutMethod::class;
     }
 
     /**

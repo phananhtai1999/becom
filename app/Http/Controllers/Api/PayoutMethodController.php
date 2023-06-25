@@ -11,20 +11,20 @@ use App\Http\Controllers\Traits\RestStoreTrait;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\PayoutInformationRequest;
 use App\Http\Requests\UpdatePayoutInformationRequest;
-use App\Http\Resources\PayoutInformationResource;
-use App\Http\Resources\PayoutInformationResourceCollection;
+use App\Http\Resources\PayoutMethodResource;
+use App\Http\Resources\PayoutMethodResourceCollection;
 use App\Services\PayoutInformationService;
 use Illuminate\Http\Request;
 
-class PayoutInformationController extends Controller
+class PayoutMethodController extends Controller
 {
     use RestShowTrait, RestDestroyTrait, RestEditTrait, RestIndexTrait, RestStoreTrait;
 
     public function __construct(PayoutInformationService $service)
     {
         $this->service = $service;
-        $this->resourceCollectionClass = PayoutInformationResourceCollection::class;
-        $this->resourceClass = PayoutInformationResource::class;
+        $this->resourceCollectionClass = PayoutMethodResourceCollection::class;
+        $this->resourceClass = PayoutMethodResource::class;
         $this->storeRequest = PayoutInformationRequest::class;
         $this->editRequest = UpdatePayoutInformationRequest::class;
         $this->indexRequest = IndexRequest::class;

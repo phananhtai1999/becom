@@ -70,7 +70,7 @@ class PartnerPayoutController extends AbstractRestAPIController
         $this->service->create([
             'partner_uuid' => $partner->uuid,
             'amount'=> $amountWantWithdrawn,
-            'payout_information_uuid'=> $request->get('payout_information_uuid'),
+            'payout_method_uuid'=> $request->get('payout_method_uuid'),
         ]);
         return $this->sendOkJsonResponse();
     }

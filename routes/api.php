@@ -48,7 +48,7 @@ use App\Http\Controllers\Api\Payment\PaymentController;
 use App\Http\Controllers\Api\Payment\PaypalController;
 use App\Http\Controllers\Api\Payment\StripeController;
 use App\Http\Controllers\Api\PaymentMethodController;
-use App\Http\Controllers\Api\PayoutInformationController;
+use App\Http\Controllers\Api\PayoutMethodController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\PlatformPackageController;
 use App\Http\Controllers\Api\PositionController;
@@ -1339,14 +1339,14 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'bank-information'], functio
     Route::get('bank-information/{id}', [BankInformationController::class, 'show']);
 });
 
-Route::group(['middleware' => ['auth:api'], 'as' => 'payout-information'], function () {
-    Route::get('/payout-informations', [PayoutInformationController::class, 'index']);
-    Route::get('payout-information/{id}', [PayoutInformationController::class, 'show']);
-    Route::post('payout-information', [PayoutInformationController::class, 'store']);
-    Route::put('payout-information/{id}', [PayoutInformationController::class, 'edit']);
-    Route::delete('payout-information/{id}', [PayoutInformationController::class, 'destroy']);
+Route::group(['middleware' => ['auth:api'], 'as' => 'payout-method'], function () {
+    Route::get('/payout-methods', [PayoutMethodController::class, 'index']);
+    Route::get('payout-method/{id}', [PayoutMethodController::class, 'show']);
+    Route::post('payout-method', [PayoutMethodController::class, 'store']);
+    Route::put('payout-method/{id}', [PayoutMethodController::class, 'edit']);
+    Route::delete('payout-method/{id}', [PayoutMethodController::class, 'destroy']);
 
-    Route::get('my/payout-informations', [PayoutInformationController::class, 'myIndex']);
-    Route::post('payout-information/set-default/{id}', [PayoutInformationController::class, 'setDefault']);
+    Route::get('my/payout-methods', [PayoutMethodController::class, 'myIndex']);
+    Route::post('payout-method/set-default/{id}', [PayoutMethodController::class, 'setDefault']);
 
 });

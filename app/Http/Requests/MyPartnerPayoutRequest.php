@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
+use Illuminate\Validation\Rule;
 
 class MyPartnerPayoutRequest extends AbstractRequest
 {
@@ -25,7 +26,7 @@ class MyPartnerPayoutRequest extends AbstractRequest
     {
         return [
             'amount' => ['required', 'numeric', 'min:0'],
-            'payout_information_uuid' => ['required', 'exists:payout_informations,uuid']
+            'payout_method_uuid' => ['required', Rule::exists('payout_methods', 'uuid')->whereNull('deleted_at')]
         ];
     }
 }

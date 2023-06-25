@@ -3,12 +3,12 @@
 namespace App\Services;
 
 use App\Abstracts\AbstractService;
-use App\Models\PayoutInformation;
+use App\Models\PayoutMethod;
 use App\Models\QueryBuilders\PayoutInformationQueryBuilder;
 
 class PayoutInformationService extends AbstractService
 {
-    protected $modelClass = PayoutInformation::class;
+    protected $modelClass = PayoutMethod::class;
 
     protected $modelQueryBuilderClass = PayoutInformationQueryBuilder::class;
 
