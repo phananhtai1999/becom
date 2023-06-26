@@ -36,7 +36,8 @@ class MyPartnerPayoutQueryBuilder extends AbstractQueryBuilder
                 'partner_uuid',
                 'amount',
                 'time',
-                'status'
+                'status',
+                'payout_method_uuid'
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -45,7 +46,8 @@ class MyPartnerPayoutQueryBuilder extends AbstractQueryBuilder
                 'partner_uuid',
                 'amount',
                 'time',
-                'status'
+                'status',
+                'payout_method_uuid'
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -64,6 +66,8 @@ class MyPartnerPayoutQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__status', 'status'),
                 'created_at',
                 AllowedFilter::exact('exact__created_at', 'created_at'),
+                'payoutMethod.type',
+                AllowedFilter::exact('exact__payout_method.type', 'payoutMethod.type'),
             ]);
     }
 
