@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
+use App\Abstracts\AbstractModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Team extends Model
+class Team extends AbstractModel
 {
     use HasFactory, SoftDeletes;
 
