@@ -609,6 +609,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website_page'], function ()
     });
 
     Route::get('/website-pages-default', [WebsitePageController::class, 'getWebsitePagesDefault'])->name('getWebsitePagesDefault');
+    Route::get('/website-page-default/{id}', [WebsitePageController::class, 'showWebsitePagesDefault'])->name('showWebsitePagesDefault');
 });
 
 Route::get('public/website-page/{id}', [WebsitePageController::class, 'show'])->name('website_page_public.show');
