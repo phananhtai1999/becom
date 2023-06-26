@@ -239,4 +239,17 @@ class WebsitePageController extends AbstractRestAPIController
         );
     }
 
+    public function showWebsitePagesDefault($id)
+    {
+        $model = $this->service->findOneWhereOrFail([
+            ['publish_status', WebsitePage::PUBLISHED_PUBLISH_STATUS],
+            ['is_default', true],
+            ['uuid', $id]
+        ]);
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
 }
