@@ -52,6 +52,10 @@ class ScenarioQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__created_at', 'created_at'),
                 AllowedFilter::scope('from__created_at'),
                 AllowedFilter::scope('to__created_at'),
+                'updated_at',
+                AllowedFilter::exact('exact__updated_at', 'updated_at'),
+                AllowedFilter::scope('from__updated_at'),
+                AllowedFilter::scope('to__updated_at'),
             ]);
     }
 

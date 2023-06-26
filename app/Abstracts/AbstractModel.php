@@ -24,4 +24,24 @@ abstract class AbstractModel extends Model
     {
         return $query->whereDate('created_at', '<=', $date);
     }
+
+    /**
+     * @param Builder $query
+     * @param $date
+     * @return Builder
+     */
+    public function scopeFromUpdatedAt(Builder $query, $date): Builder
+    {
+        return $query->whereDate('updated_at', '>=', $date);
+    }
+
+    /**
+     * @param Builder $query
+     * @param $date
+     * @return Builder
+     */
+    public function scopeToUpdatedAt(Builder $query, $date): Builder
+    {
+        return $query->whereDate('updated_at', '<=', $date);
+    }
 }
