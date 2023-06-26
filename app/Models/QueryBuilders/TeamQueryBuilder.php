@@ -40,6 +40,12 @@ class TeamQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__name', 'name'),
                 'owner_uuid',
                 AllowedFilter::exact('exact__owner_uuid', 'owner_uuid'),
+                'owner.email',
+                AllowedFilter::exact('exact__owner.email', 'owner.email'),
+                'created_at',
+                AllowedFilter::exact('exact__created_at', 'created_at'),
+                AllowedFilter::scope('from__created_at'),
+                AllowedFilter::scope('to__created_at'),
             ]);
     }
 
