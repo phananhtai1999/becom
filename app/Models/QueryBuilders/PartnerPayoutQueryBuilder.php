@@ -64,6 +64,8 @@ class PartnerPayoutQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__status', 'status'),
                 'payout_method_uuid',
                 AllowedFilter::exact('exact__payout_method_uuid', 'payout_method_uuid'),
+                'payoutMethod.type',
+                AllowedFilter::exact('exact__payout_method.type', 'payoutMethod.type'),
                 'created_at',
                 AllowedFilter::exact('exact__created_at', 'created_at'),
             ]);
