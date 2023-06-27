@@ -55,7 +55,7 @@ class CompanyController extends AbstractRestAPIController
         $request = app($this->storeRequest);
 
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => $request->get('user_uuid') ?? null
+            'user_uuid' => $request->get('user_uuid') ?? auth()->user()->getkey()
         ]));
 
         return $this->sendCreatedJsonResponse(
@@ -76,7 +76,7 @@ class CompanyController extends AbstractRestAPIController
         $model = $this->service->findOrFailById($id);
 
         $this->service->update($model, array_merge($request->all(), [
-            'user_uuid' => $request->get('user_uuid') ?? null
+            'user_uuid' => $request->get('user_uuid') ?? auth()->user()->getkey()
         ]));
 
         return $this->sendOkJsonResponse(

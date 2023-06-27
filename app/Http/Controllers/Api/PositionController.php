@@ -69,7 +69,7 @@ class PositionController extends AbstractRestAPIController
         }
 
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => $request->get('user_uuid') ?? null
+            'user_uuid' => $request->get('user_uuid') ?? auth()->user()->getkey()
         ]));
 
         return $this->sendCreatedJsonResponse(
@@ -95,7 +95,7 @@ class PositionController extends AbstractRestAPIController
         }
 
         $this->service->update($model, array_merge($request->all(), [
-            'user_uuid' => $request->get('user_uuid', $model->user_uuid)
+            'user_uuid' => $request->get('user_uuid') ?? auth()->user()->getkey()
         ]));
 
         return $this->sendOkJsonResponse(
