@@ -29,6 +29,10 @@ class CompanyResource extends AbstractJsonResource
             $data['user'] = new UserResource($this->user);
         }
 
+        if (\in_array('company__user_role', $expand)) {
+            $data['user_role'] = RoleResource::collection(optional(optional($this->user)->roles));
+        }
+
         return $data;
     }
 }

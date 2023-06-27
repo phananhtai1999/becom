@@ -44,6 +44,10 @@ class CompanyQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__' . $modelKeyName, $modelKeyName),
                 'name',
                 AllowedFilter::exact('exact__name', 'name'),
+                'user.email',
+                AllowedFilter::exact('exact__user.email', 'user.email'),
+                'user.roles.name',
+                AllowedFilter::exact('exact__user.roles.name', 'user.roles.name'),
                 AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
                 AllowedFilter::callback("user_uuid", function (Builder $query, $value) {
                     if ($value === 'null') {

@@ -53,6 +53,10 @@ class MyStatusQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::scope('name'),
                 'points',
                 AllowedFilter::exact('exact__points', 'points'),
+                'user.email',
+                AllowedFilter::exact('exact__user.email', 'user.email'),
+                'user.roles.name',
+                AllowedFilter::exact('exact__user.roles.name', 'user.roles.name'),
                 AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
                 AllowedFilter::callback("user_uuid", function (Builder $query, $value) {
                     if ($value === 'null') {
