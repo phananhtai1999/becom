@@ -152,6 +152,7 @@ abstract class AbstractService
     {
         return $this->model->select($select ?? '*')->where($where)->get();
     }
+
     public function firstOrCreate($where, $data)
     {
         return $this->model->firstOrCreate($where, $data);
@@ -163,7 +164,7 @@ abstract class AbstractService
      * @param array|null $select
      * @return mixed
      */
-    public function findAllWhereIn(string $whereColumn = null, $arrayValues = null ,array $select = null)
+    public function findAllWhereIn(string $whereColumn = null, $arrayValues = null, array $select = null)
     {
         return $this->model->select($select ?? '*')->whereIn($whereColumn, $arrayValues)->get();
     }
@@ -180,7 +181,8 @@ abstract class AbstractService
         ]);
     }
 
-    public function getIndexRequest($request) {
+    public function getIndexRequest($request)
+    {
         return [
             'per_page' => $request->get('per_page', 15),
             'page' => $request->get('page', 1),
@@ -205,13 +207,29 @@ abstract class AbstractService
             ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
     }
 
-    public function getConfigInCache() {
+    /**
+     * @param $request
+     * @param $select
+     * @return mixed
+     */
+    public function getPluckModel($request, $select = [])
+    {
+        $indexRequest = $this->getIndexRequest($request);
+
+        return $this->modelQueryBuilderClass::searchQuery($indexRequest['search'], $indexRequest['search_by'])
+            ->select($select)
+            ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
+    }
+
+    public function getConfigInCache()
+    {
         return Cache::rememberForever('config', function () {
             return Config::all();
         });
     }
 
-    public function getConfigByKeyInCache($key) {
+    public function getConfigByKeyInCache($key)
+    {
         $configs = Cache::rememberForever('config', function () {
             return Config::all();
         });
