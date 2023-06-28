@@ -160,6 +160,8 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'role.'], function () {
         Route::get('/roles', [RoleController::class, 'indexAdmin'])->name('indexAdmin');
         Route::get('/role/{id}', [RoleController::class, 'showAdmin'])->name('showAdmin');
     });
+    //Login role
+    Route::get('/public/roles', [RoleController::class, 'publicRoles'])->name('public-roles');
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'user-detail.'], function () {
