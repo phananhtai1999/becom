@@ -21,6 +21,9 @@ class RoleController extends AbstractRestAPIController
 {
     use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestEditTrait, RestStoreTrait;
 
+    /**
+     * @param RoleService $service
+     */
     public function __construct(RoleService $service)
     {
         $this->service = $service;
@@ -31,6 +34,10 @@ class RoleController extends AbstractRestAPIController
         $this->indexRequest = IndexRequest::class;
     }
 
+    /**
+     * @param IndexRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function indexAdmin(IndexRequest $request)
     {
         $models = $this->service->getCollectionWithPaginationByCondition($request, [
@@ -42,6 +49,23 @@ class RoleController extends AbstractRestAPIController
         ));
     }
 
+    /**
+     * @param IndexRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function publicRoles(IndexRequest $request)
+    {
+        $models = $this->service->getPluckModel($request, ['uuid', 'name', 'slug']);
+
+        return $this->sendOkJsonResponse($this->service->resourceCollectionToData(
+            $this->resourceCollectionClass, $models
+        ));
+    }
+
+    /**
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function showAdmin($id)
     {
         $model = $this->service->showRoleOfAdminById($id);
