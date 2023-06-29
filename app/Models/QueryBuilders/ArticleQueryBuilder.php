@@ -39,7 +39,10 @@ class ArticleQueryBuilder extends AbstractQueryBuilder
                 'content',
                 'video',
                 'content_for_user',
-                'reject_reason'
+                'reject_reason',
+                'content_type',
+                'single_purpose_uuid',
+                'paragraph_type_uuid'
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -53,7 +56,10 @@ class ArticleQueryBuilder extends AbstractQueryBuilder
                 'content',
                 'video',
                 'content_for_user',
-                'reject_reason'
+                'reject_reason',
+                'content_type',
+                'single_purpose_uuid',
+                'paragraph_type_uuid'
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -66,6 +72,12 @@ class ArticleQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__slug', 'slug'),
                 'user_uuid',
                 AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
+                'content_type',
+                AllowedFilter::exact('exact__content_type', 'content_type'),
+                'single_purpose_uuid',
+                AllowedFilter::exact('exact__single_purpose_uuid', 'single_purpose_uuid'),
+                'paragraph_type_uuid',
+                AllowedFilter::exact('exact__paragraph_type_uuid', 'paragraph_type_uuid'),
                 'article_category_uuid',
                 AllowedFilter::exact('exact__article_category_uuid', 'article_category_uuid'),
                 'publish_status',
