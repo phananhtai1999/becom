@@ -3,15 +3,14 @@
 namespace App\Http\Resources;
 
 use App\Abstracts\AbstractJsonResource;
-use App\Services\UserService;
 
 class ArticleResource extends AbstractJsonResource
 {
     /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
+     * @param $request
+     * @return array
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function toArray($request)
     {
@@ -22,6 +21,9 @@ class ArticleResource extends AbstractJsonResource
             'slug' => $this->slug,
             'article_category_uuid' => $this->article_category_uuid,
             'user_uuid' => $this->user_uuid,
+            'content_type' => $this->content_type,
+            'single_purpose_uuid' => $this->single_purpose_uuid,
+            'paragraph_type_uuid' => $this->paragraph_type_uuid,
             'image' => $this->image,
             'video' => $this->video,
             'publish_status' => $this->publish_status,
@@ -43,6 +45,14 @@ class ArticleResource extends AbstractJsonResource
 
         if (\in_array('article__article_category', $expand)) {
             $data['article_category'] = new ArticleCategoryResource($this->articleCategory);
+        }
+
+        if (\in_array('article__single_purpose', $expand)) {
+            $data['single_purpose'] = new SinglePurposeResource($this->singlePurpose);
+        }
+
+        if (\in_array('article__paragraph_type', $expand)) {
+            $data['paragraph_type'] = new ParagraphTypeResource($this->paragraphType);
         }
 
         return $data;

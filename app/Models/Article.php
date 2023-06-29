@@ -52,7 +52,10 @@ class Article extends AbstractModel
         'content',
         'video',
         'content_for_user',
-        'reject_reason'
+        'reject_reason',
+        'content_type',
+        'single_purpose_uuid',
+        'paragraph_type_uuid'
     ];
 
     public $translatable = ['title', 'content'];
@@ -68,6 +71,8 @@ class Article extends AbstractModel
         'content' => 'array',
         'user_uuid' => 'integer',
         'article_category_uuid' => 'integer',
+        'single_purpose_uuid' => 'integer',
+        'paragraph_type_uuid' => 'integer',
         'reject_reason' => 'array',
     ];
 
@@ -96,6 +101,22 @@ class Article extends AbstractModel
     public function articleCategory()
     {
         return $this->belongsTo(ArticleCategory::class, 'article_category_uuid', 'uuid');
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function singlePurpose()
+    {
+        return $this->belongsTo(SinglePurpose::class, 'single_purpose_uuid', 'uuid');
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function paragraphType()
+    {
+        return $this->belongsTo(ParagraphType::class, 'paragraph_type_uuid', 'uuid');
     }
 
     /**
