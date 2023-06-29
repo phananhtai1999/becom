@@ -8,7 +8,7 @@ trait ModelFilterLanguageTrait
 {
     /**
      * @param Builder $query
-     * @param $title
+     * @param ...$titles
      * @return Builder
      */
     public function scopeTitle(Builder $query, ...$titles)

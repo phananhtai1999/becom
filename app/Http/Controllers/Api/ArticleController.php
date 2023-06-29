@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
 use App\Http\Controllers\Traits\RestDestroyTrait;
-use App\Http\Controllers\Traits\RestIndexMyTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\Article\ChangeStatusArticleRequest;
 use App\Http\Requests\Article\UnpublishedArticleRequest;
@@ -212,6 +211,7 @@ class ArticleController extends AbstractRestAPIController
 
     /**
      * @param UpdateUnpublishedArticleRequest $request
+     * @param $id
      * @return JsonResponse
      */
     public function editUnpublishedArticle(UpdateUnpublishedArticleRequest $request, $id)
