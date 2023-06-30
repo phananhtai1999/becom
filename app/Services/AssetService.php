@@ -72,9 +72,9 @@ class AssetService extends AbstractService
         $code = auth()->user()->partner->code ?? Role::ADMIN_ROOT;
         foreach ($models as $model) {
             if ($model->type == Asset::TYPE_IMAGE) {
-                $jsCode = '<script type="text/javascript" src="' . env('FRONTEND_URL') . 'api/generate-image?pn=' . $model->uuid . '&as=' . $model->uuid . '&link=' . $mainUrl->value . '?ref=' . $code . '"> </script>';
+                $jsCode = '<script type="text/javascript" src="' . asset("/") . 'api/generate-image?pn=' . $model->uuid . '&as=' . $model->uuid . '&link=' . $mainUrl->value . '?ref=' . $code . '"> </script>';
             } else {
-                $jsCode = '<script type="text/javascript" src="' . env('FRONTEND_URL') . 'api/generate-video?pn=' . $model->uuid . '&as=' . $model->uuid . '&link=' . $mainUrl->value . '?ref=' . $code . '"> </script>';
+                $jsCode = '<script type="text/javascript" src="' . asset("/") . 'api/generate-video?pn=' . $model->uuid . '&as=' . $model->uuid . '&link=' . $mainUrl->value . '?ref=' . $code . '"> </script>';
             }
             $model->js_code = $jsCode;
         }
