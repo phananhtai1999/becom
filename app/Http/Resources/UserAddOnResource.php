@@ -27,9 +27,11 @@ class UserAddOnResource extends JsonResource
             'updated_at' => $this->updated_at,
         ];
         if (\in_array('user_add_on__add_on_subscription_plan', $expand)) {
-            $data['add_on_subscription_plan'] = new AddOnSubscriptionPlanResource(optional($this->addOnSubscriptionPlan));
-            $data['add_on'] = new AddOnResource(optional($this->addOnSubscriptionPlan)->addOn);
-            $data['permissions'] = PermissionResource::collection(optional(optional($this->addOnSubscriptionPlan)->addOn)->permissions);
+            $data['add_on_subscription_plan'] = optional(new AddOnSubscriptionPlanResource($this->addOnSubscriptionPlan));
+            if (!empty($data['add_on_subscription_plan']['resource'])) {
+                $data['add_on'] = new AddOnResource(optional($this->addOnSubscriptionPlan)->addOn);
+                $data['permissions'] = PermissionResource::collection(optional(optional($this->addOnSubscriptionPlan)->addOn)->permissions);
+            }
         }
         if (\in_array('user_add_on__user', $expand)) {
             $data['user'] = new UserResource($this->user);
