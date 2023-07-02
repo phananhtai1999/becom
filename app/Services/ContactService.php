@@ -665,11 +665,11 @@ class ContactService extends AbstractService
                         $query->where(function ($q) use ($values) {
                             foreach ($values as $value) {
                                 $fullName = ltrim($value, ' ');
-                                $q->orWhereRaw("IFNULL(CONCAT(first_name, ' ', middle_name, ' ', last_name),CONCAT(first_name, ' ', last_name)) like '%$fullName%'");
+                                $q->orWhereRaw("CONCAT(first_name, ' ', last_name) like '%$fullName%'");
                             }
                         });
                     } else {
-                        $query->whereRaw("IFNULL(CONCAT(first_name, ' ', middle_name, ' ', last_name),CONCAT(first_name, ' ', last_name)) like '%$values%'");
+                        $query->whereRaw("CONCAT(first_name, ' ', last_name) like '%$values%'");
                     }
                 }),
                 //Custom filter full_name Append (EXACT)
@@ -678,11 +678,11 @@ class ContactService extends AbstractService
                         $query->where(function ($q) use ($values) {
                             foreach ($values as $value) {
                                 $fullName = ltrim($value, ' ');
-                                $q->orWhereRaw("IFNULL(CONCAT(first_name, ' ', middle_name, ' ', last_name),CONCAT(first_name, ' ', last_name)) = '$fullName'");
+                                $q->orWhereRaw("CONCAT(first_name, ' ', last_name) = '$fullName'");
                             }
                         });
                     } else {
-                        $query->whereRaw("IFNULL(CONCAT(first_name, ' ', middle_name, ' ', last_name),CONCAT(first_name, ' ', last_name)) = '$values'");
+                        $query->whereRaw("CONCAT(first_name, ' ', last_name) = '$values'");
                     }
                 }),
                 $this->getDuplicateFiltersByNumeric($modelKeyName),

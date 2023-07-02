@@ -45,6 +45,7 @@ class StatusQueryBuilder extends AbstractQueryBuilder
                 $modelKeyName,
                 AllowedFilter::exact('exact__' . $modelKeyName, $modelKeyName),
                 AllowedFilter::scope('name'),
+                AllowedFilter::scope('exact__name','exactName'),
                 'points',
                 AllowedFilter::exact('exact__points', 'points'),
                 'user.email',

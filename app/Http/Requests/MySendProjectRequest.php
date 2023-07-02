@@ -25,9 +25,7 @@ class MySendProjectRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'domain' => ['nullable', 'string', Rule::unique('send_projects')->where(function ($query) {
-                return $query->where('user_uuid', auth()->user()->getKey())->whereNull('deleted_at');
-            })],
+            'domain' => ['nullable', 'string', 'regex:/^(?:[-A-Za-z0-9]+\.)+[A-Za-z]{2,6}$/', Rule::unique('send_projects')],
             'name' => ['required', 'string'],
             'description' => ['required', 'string'],
             'logo' => ['required', 'string'],
