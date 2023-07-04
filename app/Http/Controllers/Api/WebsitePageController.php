@@ -247,7 +247,7 @@ class WebsitePageController extends AbstractRestAPIController
             ['uuid', $id]
         ]);
 
-        return $this->sendCreatedJsonResponse(
+        return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
         );
     }

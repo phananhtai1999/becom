@@ -9,6 +9,8 @@ use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestMyDestroyTrait;
 use App\Http\Controllers\Traits\RestMyShowTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
+use App\Http\Requests\ChangeStatusMyWebsite;
+use App\Http\Requests\ChangeStatusWebsite;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyWebsiteRequest;
 use App\Http\Requests\UpdateMyWebsiteRequest;
@@ -72,5 +74,29 @@ class WebsiteController extends AbstractRestAPIController
                     'ordering' => $webpage['ordering'],
                 ];
             });
+    }
+
+    public function changeStatus(ChangeStatusWebsite $request)
+    {
+        $this->changeStatusWebsiteByRequest($request);
+        return $this->sendOkJsonResponse();
+    }
+
+    public function changeStatusMyWebsite(ChangeStatusMyWebsite $request)
+    {
+        $this->changeStatusWebsiteByRequest($request);
+        return $this->sendOkJsonResponse();
+    }
+
+    public function changeStatusWebsiteByRequest($request)
+    {
+        $websiteUuids = $request->websites;
+        foreach ($websiteUuids as $websiteUuid)
+        {
+            $website = $this->service->findOneById($websiteUuid);
+            $this->service->update($website, [
+                'publish_status' => $request->get('publish_status')
+            ]);
+        }
     }
 }
