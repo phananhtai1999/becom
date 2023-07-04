@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
+use App\Rules\ArticleContentRule;
 use Illuminate\Validation\Rule;
 
 class UpdateArticleRequest extends AbstractRequest
@@ -44,6 +45,7 @@ class UpdateArticleRequest extends AbstractRequest
             $validate['paragraph_type_uuid'] = ['nullable', 'in:NULL'];
         } elseif ($this->request->get('content_type') === 'paragraph') {
             $validate['single_purpose_uuid'] = ['nullable', 'in:NULL'];
+            $validate['content'] = ['array', 'min:1', new ArticleContentRule($this->request->get('paragraph_type_uuid'))];
         }
 
         return $validate;

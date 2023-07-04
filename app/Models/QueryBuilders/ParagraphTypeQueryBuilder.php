@@ -32,7 +32,8 @@ class ParagraphTypeQueryBuilder extends AbstractQueryBuilder
                 'slug',
                 'parent_uuid',
                 'user_uuid',
-                'title'
+                'title',
+                'sort',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -40,7 +41,8 @@ class ParagraphTypeQueryBuilder extends AbstractQueryBuilder
                 'slug',
                 'parent_uuid',
                 'user_uuid',
-                'title'
+                'title',
+                'sort',
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -51,6 +53,8 @@ class ParagraphTypeQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
                 'parent_uuid',
                 AllowedFilter::exact('exact__parent_uuid', 'parent_uuid'),
+                'sort',
+                AllowedFilter::exact('exact__sort', 'sort'),
                 'user.username',
                 AllowedFilter::exact('exact__user.username', 'user.username'),
                 'user.email',

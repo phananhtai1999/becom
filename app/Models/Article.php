@@ -28,6 +28,8 @@ class Article extends AbstractModel
     const EDITOR_CONTENT_FOR_USER = 'editor';
     const PAYMENT_CONTENT_FOR_USER = 'payment';
     const ADMIN_CONTENT_FOR_USER = 'admin';
+    const PARAGRAPH_CONTENT_TYPE = 'paragraph';
+    const SINGLE_CONTENT_TYPE = 'single';
 
     /**
      * @var string
@@ -84,6 +86,18 @@ class Article extends AbstractModel
 
     public function getShortContentAttribute()
     {
+        if($this->content_type === Article::PARAGRAPH_CONTENT_TYPE)
+        {
+            $result = '';
+            $contents = json_decode($this->content, true);
+            foreach ($contents as $content)
+            {
+                $result .= $content['content'] . ' ';
+            }
+            $result = trim($result);
+
+            return Str::limit(strip_tags($result), 500);
+        }
         return Str::limit(strip_tags($this->content), 500);
     }
 
