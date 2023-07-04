@@ -25,7 +25,7 @@ class ArticleContentRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        $childrenParagraphType = (new ParagraphTypeService())->findByUuid($this->paragraphTypeUuid)->childrenParagraphType->count();
+        $childrenParagraphType = optional(optional((new ParagraphTypeService())->findByUuid($this->paragraphTypeUuid))->childrenParagraphType)->count();
         foreach ($value as $item) {
             $jsonString = stripslashes($item);
             $results = json_decode($jsonString, true);
