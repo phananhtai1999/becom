@@ -29,7 +29,7 @@ class ChangeStatusWebsite extends AbstractRequest
         return [
             'websites' => ['required', 'array', 'min:1'],
             'websites.*' => ['numeric', 'min:1', Rule::exists('websites', 'uuid')->where(function ($query) {
-                return $query->where('publish_status', '<>', $this->request->get('publish_status'))->whereNull('deleted_at');
+                return $query->where('publish_status', '<>', $this->request->get('publish_status'));
             })],
             'publish_status' => ['required', 'numeric', Rule::in(Website::PUBLISHED_PUBLISH_STATUS, Website::PENDING_PUBLISH_STATUS)]
         ];
