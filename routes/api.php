@@ -835,7 +835,6 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'article.'], function () {
     Route::get('my/articles', [ArticleController::class, 'indexMy'])->name('indexMy');
     Route::delete('my/article/{id}', [ArticleController::class, 'deleteMy'])->name('indexMy');
 
-
     //article content public
     Route::get('/content/articles', [ArticleController::class, 'indexContent'])->name('article.indexContent');
     //article manager
@@ -844,7 +843,6 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'article.'], function () {
 //article public
 Route::get('public/articles', [ArticleController::class, 'indexPublic'])->name('article-public.index');
 Route::get('public/article/{id}', [ArticleController::class, 'showPublic'])->name('article-public.show');
-
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'status.'], function () {
     Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {

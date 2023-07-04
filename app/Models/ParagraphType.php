@@ -67,7 +67,8 @@ class ParagraphType extends AbstractModel
         'slug',
         'parent_uuid',
         'user_uuid',
-        'title'
+        'title',
+        'sort',
     ];
 
     /**
@@ -78,6 +79,7 @@ class ParagraphType extends AbstractModel
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
         'user_uuid' => 'integer',
+        'sort' => 'integer',
         'parent_uuid' => 'integer',
         'title' => 'array'
     ];
@@ -130,7 +132,15 @@ class ParagraphType extends AbstractModel
      */
     public function childrenParagraphType()
     {
-        return $this->hasMany(__CLASS__, 'parent_uuid');
+        return $this->hasMany(__CLASS__, 'parent_uuid')->orderBy('sort');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function sortDescChildrenParagraphType()
+    {
+        return $this->hasMany(__CLASS__, 'parent_uuid')->orderByDesc('sort');
     }
 
     /**
