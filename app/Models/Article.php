@@ -84,20 +84,24 @@ class Article extends AbstractModel
         'content_translate',
     ];
 
+    /**
+     * @return string
+     */
     public function getShortContentAttribute()
     {
-        if($this->content_type === Article::PARAGRAPH_CONTENT_TYPE)
-        {
+        if ($this->content_type === Article::PARAGRAPH_CONTENT_TYPE) {
             $result = '';
             $contents = json_decode($this->content, true);
-            foreach ($contents as $content)
-            {
-                $result .= $content['content'] . ' ';
-            }
-            $result = trim($result);
+            if ($contents && is_array($contents)) {
+                foreach ($contents as $content) {
+                    $result .= $content['content'] . ' ';
+                }
+                $result = trim($result);
 
-            return Str::limit(strip_tags($result), 500);
+                return Str::limit(strip_tags($result), 500);
+            }
         }
+
         return Str::limit(strip_tags($this->content), 500);
     }
 
