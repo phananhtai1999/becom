@@ -31,6 +31,7 @@ class UpdateParagraphTypeRequest extends AbstractRequest
             'parent_uuid' => ['nullable', 'numeric', 'min:1', Rule::exists('paragraph_types', 'uuid')->where(function ($query) {
                 return $query->where('uuid',"<>", $this->id)->whereNull('deleted_at');
             })],
+            'sort' => ['numeric']
         ];
     }
 }

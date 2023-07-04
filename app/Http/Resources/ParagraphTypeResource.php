@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Abstracts\AbstractJsonResource;
+use App\Services\ParagraphTypeService;
 use App\Services\UserService;
 
 class ParagraphTypeResource extends AbstractJsonResource
@@ -24,6 +25,7 @@ class ParagraphTypeResource extends AbstractJsonResource
             'title_translate' => $this->title_translate,
             'parent_uuid' => $this->parent_uuid,
             'user_uuid' => $this->user_uuid,
+            'sort' => $this->sort,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
@@ -38,7 +40,9 @@ class ParagraphTypeResource extends AbstractJsonResource
         }
 
         if (\in_array('paragraph_type__children_category', $expand)) {
-            $data['children_category'] = self::collection($this->childrenParagraphType);
+            $sortChildren = (new ParagraphTypeService())->sortChildren();
+            $childrenParagraphType = $sortChildren ? $this->sortDescChildrenParagraphType : $this->childrenParagraphType;
+            $data['children_category'] = self::collection($childrenParagraphType);
         }
 
         if (\in_array('paragraph_type__articles', $expand)) {

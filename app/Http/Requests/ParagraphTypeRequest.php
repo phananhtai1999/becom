@@ -30,6 +30,7 @@ class ParagraphTypeRequest extends AbstractRequest
             'title.en' => ['required', 'string'],
             'title.*' => ['required', 'string'],
             'parent_uuid' => ['nullable', 'numeric', 'min:1', Rule::exists('paragraph_types', 'uuid')->whereNull('deleted_at')],
+            'sort' => ['required', 'numeric']
         ];
     }
 }
