@@ -1276,6 +1276,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website'], function () {
         Route::get('/websites', [WebsiteController::class, 'index'])->name('index');
         Route::get('website/{id}', [WebsiteController::class, 'show'])->name('index');
         Route::delete('website/{id}', [WebsiteController::class, 'destroy'])->name('index');
+        Route::post('websites/change-status', [WebsiteController::class, 'changeStatus'])->name('changeStatus');
     });
 
     Route::group(['as' => 'my.'], function () {
@@ -1284,6 +1285,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website'], function () {
         Route::post('my/website', [WebsiteController::class, 'storeMy'])->name('index');
         Route::put('my/website/{id}', [WebsiteController::class, 'editMy'])->name('index');
         Route::delete('my/website/{id}', [WebsiteController::class, 'destroyMy'])->name('index');
+        Route::post('my/websites/change-status', [WebsiteController::class, 'changeStatusMyWebsite'])->name('changeStatusMyWebsite');
     });
 });
 Route::get('public/website/{id}', [WebsiteController::class, 'show'])->name('website.show');

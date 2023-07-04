@@ -29,13 +29,17 @@ class MyWebsiteRequest extends AbstractRequest
         return [
             'title' => ['required', 'string'],
             'header_section_uuid' => ['required', 'numeric', Rule::exists('section_templates', 'uuid')->where(function ($query) {
-                return $query->where('user_uuid', auth()->user()->getKey())
-                    ->where('publish_status', SectionTemplate::PUBLISHED_PUBLISH_STATUS)
+                return $query->where(function ($q) {
+                        $q->where('user_uuid', auth()->user()->getKey())
+                            ->orWhere('is_default', true);
+                    })->where('publish_status', SectionTemplate::PUBLISHED_PUBLISH_STATUS)
                     ->whereNull('deleted_at');
             })],
             'footer_section_uuid' => ['required', 'numeric', Rule::exists('section_templates', 'uuid')->where(function ($query) {
-                return $query->where('user_uuid', auth()->user()->getKey())
-                    ->where('publish_status', SectionTemplate::PUBLISHED_PUBLISH_STATUS)
+                return $query->where(function ($q) {
+                        $q->where('user_uuid', auth()->user()->getKey())
+                            ->orWhere('is_default', true);
+                    })->where('publish_status', SectionTemplate::PUBLISHED_PUBLISH_STATUS)
                     ->whereNull('deleted_at');
             })],
             'description' => ['nullable', 'string'],
@@ -45,8 +49,11 @@ class MyWebsiteRequest extends AbstractRequest
                     ->whereNull('deleted_at');
             })],
             'website_pages' => ['nullable','array', 'distinct', CheckWebsitePagesRule::singleHomepage(), CheckWebsitePagesRule::uniqueWebpageIds()],
-            'website_pages.*.uuid' =>  ['required','numeric', Rule::exists('website_pages', 'uuid')->where(function ($q) {
-                return $q->where('user_uuid', auth()->user()->getkey());
+            'website_pages.*.uuid' =>  ['required','numeric', Rule::exists('website_pages', 'uuid')->where(function ($query) {
+                return $query->where(function ($q) {
+                        $q->where('user_uuid', auth()->user()->getKey())
+                            ->orWhere('is_default', true);
+                    })->whereNull('deleted_at');
             })],
             'website_pages.*.is_homepage' =>  ['nullable','boolean'],
             'website_pages.*.ordering' =>  ['nullable','numeric', 'min:1'],
