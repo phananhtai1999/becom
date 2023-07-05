@@ -343,7 +343,8 @@ class ArticleService extends AbstractService
         if ($contentType == Article::PARAGRAPH_CONTENT_TYPE) {
             $array = [];
             foreach ($content as $key => $jsonString) {
-                $originalArray = json_decode($jsonString, true);
+                $parseJsonString = stripslashes($jsonString);
+                $originalArray = json_decode($parseJsonString, true);
 
                 $typeUuids = array_column($originalArray, 'type_uuid');
 
