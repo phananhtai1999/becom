@@ -207,7 +207,7 @@ class ArticleController extends AbstractRestAPIController
     public function storeUnpublishedArticle(UnpublishedArticleRequest $request)
     {
         //Map type_label to content
-        $content = $this->service->mapTypeLabelToContent($request->content, $request->content_type);
+        $content = $this->service->mapTypeLabelToContent($request->get('content'), $request->content_type);
 
         $model = $this->service->create(array_merge($request->except(['reject_reason']), [
             'publish_status' => Article::PENDING_PUBLISH_STATUS,
@@ -229,7 +229,7 @@ class ArticleController extends AbstractRestAPIController
     {
         $model = $this->service->showArticleForEditorById($id);
         //Map type_label to content
-        $content = $this->service->mapTypeLabelToContent($request->content, $request->content_type);
+        $content = $this->service->mapTypeLabelToContent($request->get('content'), $request->content_type);
 
         $this->service->update($model, array_merge($request->except(['user_uuid']), [
             'publish_status' => Article::PENDING_PUBLISH_STATUS,

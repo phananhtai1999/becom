@@ -76,6 +76,9 @@ class ParagraphTypeController extends AbstractRestAPIController
 
         $this->service->update($model, $request->except(['user_uuid']));
 
+        //Update sort field by UUID
+        $this->service->updateSortFieldByUuid($request->children_uuid);
+
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
         );

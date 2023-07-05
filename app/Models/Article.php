@@ -98,7 +98,7 @@ class Article extends AbstractModel
                 }
                 $result = trim($result);
 
-                return Str::limit(strip_tags($result), 500);
+                return Str::limit(html_entity_decode(htmlspecialchars_decode(strip_tags($result))), 500);
             }
         }
 
