@@ -135,7 +135,7 @@ class ArticleService extends AbstractService
         //Check auth:api
         //get Article Content Public
         $publishStatus = [Article::PUBLISHED_PUBLISH_STATUS];
-        if (auth()->user()->roles->whereIn('slug', ["admin","root"])->count()) {
+        if (auth()->user()->roles->whereIn('slug', ["admin", "root"])->count()) {
             //Admin
             $contentForUSer = Article::ADMIN_CONTENT_FOR_USER;
         } elseif ($this->paidUser()) {
@@ -171,7 +171,7 @@ class ArticleService extends AbstractService
         //Check auth:api
         //get Article By Permission
         $publishStatus = [Article::PUBLISHED_PUBLISH_STATUS];
-        if (auth()->user()->roles->whereIn('slug', ["admin","root"])->count()) {
+        if (auth()->user()->roles->whereIn('slug', ["admin", "root"])->count()) {
             //Admin
             return $this->loadAllArticles($perPage, $columns, $pageName, $page, $search, $searchBy);
         } elseif ($this->paidUser()) {
@@ -212,7 +212,7 @@ class ArticleService extends AbstractService
 
     public function moveArticlesCategoryOfArticles($articles, $goCategoryUuid)
     {
-        foreach ($articles as $article){
+        foreach ($articles as $article) {
             $this->update($article, [
                 'article_category_uuid' => $goCategoryUuid
             ]);
@@ -258,7 +258,7 @@ class ArticleService extends AbstractService
         $times = [];
         $result = [];
 
-        if ($groupBy == "hour"){
+        if ($groupBy == "hour") {
             $dateFormat = "%Y-%m-%d %H:00:00";
 
             $endDate = $endDate->endOfDay();
@@ -268,7 +268,7 @@ class ArticleService extends AbstractService
             }
         }
 
-        if ($groupBy == "date"){
+        if ($groupBy == "date") {
             $dateFormat = "%Y-%m-%d";
             while ($currentDate <= $endDate) {
                 $times[] = $currentDate->format('Y-m-d');
@@ -276,7 +276,7 @@ class ArticleService extends AbstractService
             }
         }
 
-        if ($groupBy == "month"){
+        if ($groupBy == "month") {
             $dateFormat = "%Y-%m";
             while ($currentDate <= $endDate) {
                 $times[] = $currentDate->format('Y-m');
@@ -285,28 +285,51 @@ class ArticleService extends AbstractService
         }
 
         $charts = $this->getArticlesChartByDateFormat($dateFormat, $startDate, $endDate)->keyBy('label');
-        foreach ($times as $time){
-            $mailByTime = $charts->first(function($item, $key) use ($time){
+        foreach ($times as $time) {
+            $mailByTime = $charts->first(function ($item, $key) use ($time) {
                 return $key == $time;
             });
 
-            if($mailByTime){
+            if ($mailByTime) {
                 $result[] = [
                     'label' => $time,
-                    'approve'  => $mailByTime->approve,
-                    'pending'  => $mailByTime->pending,
-                    'reject'  => $mailByTime->reject
+                    'approve' => $mailByTime->approve,
+                    'pending' => $mailByTime->pending,
+                    'reject' => $mailByTime->reject
                 ];
-            }else{
+            } else {
                 $result [] = [
                     'label' => $time,
-                    'approve'  => 0,
-                    'pending'  => 0,
-                    'reject'  => 0,
+                    'approve' => 0,
+                    'pending' => 0,
+                    'reject' => 0,
                 ];
             }
         }
 
         return $result;
+    }
+
+    /**
+     * @param $contentType
+     * @param $content
+     * @param $contentTranslate
+     * @return array
+     */
+    public function formatContent($contentType, $content, $contentTranslate)
+    {
+        $formatContent = [];
+        if ($contentType == Article::PARAGRAPH_CONTENT_TYPE) {
+            $formatContent['content'] = json_decode($content) ?? $content;
+            $formatContent['content_translate'] = array_map(function ($value) {
+                $arrayContent = json_decode($value, true);
+                return $arrayContent ?? $value;
+            }, $contentTranslate);
+        } else {
+            $formatContent['content'] = $content;
+            $formatContent['content_translate'] = $contentTranslate;
+        }
+
+        return $formatContent;
     }
 }
