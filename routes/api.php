@@ -1357,20 +1357,26 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'payout-method'], function (
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'single-purpose'], function () {
     Route::group(['middleware' => ['role:root,admin'], 'as' => 'author.'], function () {
-        Route::get('single-purposes', [SinglePurposeController::class, 'index']);
-        Route::get('single-purpose/{id}', [SinglePurposeController::class, 'show']);
         Route::post('single-purpose', [SinglePurposeController::class, 'store']);
         Route::put('single-purpose/{id}', [SinglePurposeController::class, 'edit']);
         Route::delete('single-purpose/{id}', [SinglePurposeController::class, 'destroy']);
+    });
+
+    Route::group(['middleware' => ['role:root,admin,editor'], 'as' => 'author.'], function () {
+        Route::get('single-purposes', [SinglePurposeController::class, 'index']);
+        Route::get('single-purpose/{id}', [SinglePurposeController::class, 'show']);
     });
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'paragraph-type'], function () {
     Route::group(['middleware' => ['role:root,admin'], 'as' => 'author.'], function () {
-        Route::get('paragraph-types', [ParagraphTypeController::class, 'index']);
-        Route::get('paragraph-type/{id}', [ParagraphTypeController::class, 'show']);
         Route::post('paragraph-type', [ParagraphTypeController::class, 'store']);
         Route::put('paragraph-type/{id}', [ParagraphTypeController::class, 'edit']);
         Route::delete('paragraph-type/{id}', [ParagraphTypeController::class, 'destroy']);
+    });
+
+    Route::group(['middleware' => ['role:root,admin,editor'], 'as' => 'author.'], function () {
+        Route::get('paragraph-types', [ParagraphTypeController::class, 'index']);
+        Route::get('paragraph-type/{id}', [ParagraphTypeController::class, 'show']);
     });
 });
