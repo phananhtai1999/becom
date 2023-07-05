@@ -32,9 +32,9 @@ class UpdateUnpublishedArticleRequest extends AbstractRequest
             'title' => ['array', 'min:1'],
             'title.en' => ['string'],
             'title.*' => ['string'],
-            'content' => ['array', 'min:1'],
-            'content.en' => ['string'],
-            'content.*' => ['string'],
+            'content' => ['required', 'array', 'min:1'],
+            'content.en' => ['required', 'string'],
+            'content.*' => ['required', 'string'],
             'content_for_user' => ['nullable', 'string', 'in:public,login,payment,editor,admin'],
             'article_category_uuid' => ['nullable', 'numeric', Rule::exists('article_categories', 'uuid')->whereNull('deleted_at')],
             'content_type' => ['required', 'string', 'in:single,paragraph'],
@@ -46,7 +46,7 @@ class UpdateUnpublishedArticleRequest extends AbstractRequest
             $validate['paragraph_type_uuid'] = ['nullable', 'in:NULL'];
         } elseif ($this->request->get('content_type') === 'paragraph') {
             $validate['single_purpose_uuid'] = ['nullable', 'in:NULL'];
-            $validate['content'] = ['array', 'min:1', new ArticleContentRule($this->request->get('paragraph_type_uuid'))];
+            $validate['content'] = ['required', 'array', 'min:1', new ArticleContentRule($this->request->get('paragraph_type_uuid'))];
         }
 
         return $validate;
