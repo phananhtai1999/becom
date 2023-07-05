@@ -332,4 +332,34 @@ class ArticleService extends AbstractService
 
         return $formatContent;
     }
+
+    /**
+     * @param $content
+     * @param $contentType
+     * @return array|false[]|string[]
+     */
+    public function mapTypeLabelToContent($content, $contentType)
+    {
+        if ($contentType == Article::PARAGRAPH_CONTENT_TYPE) {
+            $array = [];
+            foreach ($content as $key => $jsonString) {
+                $originalArray = json_decode($jsonString, true);
+
+                $typeUuids = array_column($originalArray, 'type_uuid');
+
+                $articles = (new ParagraphTypeService())->pluckField($typeUuids);
+
+                $array[$key] = array_map(function ($item) use ($articles) {
+                    $typeLabel = $articles[$item['type_uuid']] ?? null;
+                    return array_merge($item, ['type_label' => $typeLabel]);
+                }, $originalArray);
+            }
+
+            return array_map(function ($item) {
+                return json_encode($item);
+            }, $array);
+        }
+
+        return $content;
+    }
 }

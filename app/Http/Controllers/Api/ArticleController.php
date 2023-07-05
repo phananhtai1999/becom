@@ -60,9 +60,13 @@ class ArticleController extends AbstractRestAPIController
             return $this->sendValidationFailedJsonResponse();
         }
 
+        //Map type_label to content
+        $content = $this->service->mapTypeLabelToContent($request->content, $request->content_type);
+
         $model = $this->service->create(array_merge($request->except(['reject_reason']), [
             'user_uuid' => auth()->user()->getKey(),
-            'content_for_user' => $request->content_for_user ?: Article::PUBLIC_CONTENT_FOR_USER
+            'content_for_user' => $request->content_for_user ?: Article::PUBLIC_CONTENT_FOR_USER,
+            'content' => $content
         ]));
 
         return $this->sendCreatedJsonResponse(
@@ -86,7 +90,10 @@ class ArticleController extends AbstractRestAPIController
         $model = $this->service->findOrFailById($id);
         //Check current user role
         $role = auth()->user()->roles->whereIn('slug', ["admin", "root"])->count() ? $request->except('user_uuid') : $request->except(['user_uuid', 'publish_status']);
-        $this->service->update($model, $role);
+        //Map type_label to content
+        $content = $this->service->mapTypeLabelToContent($request->content, $request->content_type);
+
+        $this->service->update($model, array_merge($role, ['content' => $content]));
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -199,9 +206,13 @@ class ArticleController extends AbstractRestAPIController
      */
     public function storeUnpublishedArticle(UnpublishedArticleRequest $request)
     {
+        //Map type_label to content
+        $content = $this->service->mapTypeLabelToContent($request->content, $request->content_type);
+
         $model = $this->service->create(array_merge($request->except(['reject_reason']), [
             'publish_status' => Article::PENDING_PUBLISH_STATUS,
             'user_uuid' => auth()->user()->getKey(),
+            'content' => $content
         ]));
 
         return $this->sendCreatedJsonResponse(
@@ -217,8 +228,12 @@ class ArticleController extends AbstractRestAPIController
     public function editUnpublishedArticle(UpdateUnpublishedArticleRequest $request, $id)
     {
         $model = $this->service->showArticleForEditorById($id);
+        //Map type_label to content
+        $content = $this->service->mapTypeLabelToContent($request->content, $request->content_type);
+
         $this->service->update($model, array_merge($request->except(['user_uuid']), [
             'publish_status' => Article::PENDING_PUBLISH_STATUS,
+            'content' => $content
         ]));
 
         return $this->sendCreatedJsonResponse(

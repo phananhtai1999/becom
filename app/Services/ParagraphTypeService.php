@@ -35,4 +35,13 @@ class ParagraphTypeService extends AbstractService
 
         return false;
     }
+
+    /**
+     * @param $uuid
+     * @return mixed
+     */
+    public function pluckField($uuid)
+    {
+        return $this->model->whereIn('uuid', $uuid)->pluck('title', 'uuid');
+    }
 }
