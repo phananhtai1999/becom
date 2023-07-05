@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Abstracts\AbstractJsonResource;
+use App\Services\ArticleService;
 
 class ArticleResource extends AbstractJsonResource
 {
@@ -15,6 +16,8 @@ class ArticleResource extends AbstractJsonResource
     public function toArray($request)
     {
         $expand = request()->get('expand', []);
+
+        $formatContent = (new ArticleService())->formatContent($this->content_type, $this->content, $this->content_translate);
 
         $data = [
             'uuid' => $this->uuid,
@@ -31,8 +34,8 @@ class ArticleResource extends AbstractJsonResource
             'content_for_user' => $this->content_for_user,
             'title' => $this->title,
             'title_translate' => $this->title_translate,
-            'content' => $this->content,
-            'content_translate' => $this->content_translate,
+            'content' => $formatContent['content'],
+            'content_translate' => $formatContent['content_translate'],
             'short_content' => $this->short_content,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
