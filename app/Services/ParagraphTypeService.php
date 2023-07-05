@@ -44,4 +44,20 @@ class ParagraphTypeService extends AbstractService
     {
         return $this->model->whereIn('uuid', $uuid)->pluck('title', 'uuid');
     }
+
+    /**
+     * @param $arrayUuids
+     * @return void
+     */
+    public function updateSortFieldByUuid($arrayUuids)
+    {
+        if($arrayUuids)
+        {
+            $point = 1;
+            foreach ($arrayUuids as $uuid) {
+                $this->model->where('uuid', $uuid)->update(['sort' => $point]);
+                $point++;
+            }
+        }
+    }
 }

@@ -25,13 +25,18 @@ class UpdateParagraphTypeRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'slug' => ['string', "regex:/^[a-z0-9-]+$/", Rule::unique('paragraph_types')->ignore($this->id,'uuid')->whereNull('deleted_at')],
+            'slug' => ['string', "regex:/^[a-z0-9-]+$/", Rule::unique('paragraph_types')->ignore($this->id, 'uuid')->whereNull('deleted_at')],
             'title' => ['array', 'min:1'],
             'title.*' => ['string'],
             'parent_uuid' => ['nullable', 'numeric', 'min:1', Rule::exists('paragraph_types', 'uuid')->where(function ($query) {
-                return $query->where('uuid',"<>", $this->id)->whereNull('deleted_at');
+                return $query->where('uuid', "<>", $this->id)->whereNull('deleted_at');
             })],
-            'sort' => ['numeric']
+            'sort' => ['numeric'],
+            'children_uuid' => ['nullable', 'array', 'min:1'],
+            'children_uuid.*' => ['numeric', 'min:1', Rule::exists('paragraph_types', 'uuid')->where(function ($q) {
+                return $q->where('parent_uuid', $this->id)
+                    ->whereNull('deleted_at');
+            })],
         ];
     }
 }
