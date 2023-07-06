@@ -30,8 +30,8 @@ class ChangeStatusArticleRequest extends AbstractRequest
             'articles.*' => ['numeric', 'min:1', Rule::exists('articles', 'uuid')->where(function ($query) {
                 return $query->where('publish_status', '<>', $this->request->get('publish_status'))->whereNull('deleted_at');
             })],
-            'publish_status' => ['required', 'numeric', Rule::in(Article::PUBLISHED_PUBLISH_STATUS, Article::REJECT_PUBLISH_STATUS, Article::BLOCKED_PUBLISH_STATUS, Article::PENDING_PUBLISH_STATUS)]
-
+            'publish_status' => ['required', 'numeric', Rule::in(Article::PUBLISHED_PUBLISH_STATUS, Article::REJECT_PUBLISH_STATUS, Article::BLOCKED_PUBLISH_STATUS, Article::PENDING_PUBLISH_STATUS)],
+            'content_for_user' => ['nullable', 'string', 'in:public,login,payment,editor,admin'],
         ];
 
         if ($this->request->get('publish_status') == Article::REJECT_PUBLISH_STATUS){
