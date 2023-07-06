@@ -2,7 +2,6 @@
 
 namespace App\Rules;
 
-use App\Models\ParagraphType;
 use App\Services\ParagraphTypeService;
 use Illuminate\Contracts\Validation\Rule;
 
@@ -27,8 +26,7 @@ class ArticleContentRule implements Rule
     {
         $childrenParagraphType = optional(optional((new ParagraphTypeService())->findByUuid($this->paragraphTypeUuid))->childrenParagraphType)->count();
         foreach ($value as $item) {
-            $jsonString = stripslashes($item);
-            $results = json_decode($jsonString, true);
+            $results = json_decode($item, true);
             //Check value is array or not
             if (!is_array($results) || empty($results) || count($results) != $childrenParagraphType) {
                 return false;
