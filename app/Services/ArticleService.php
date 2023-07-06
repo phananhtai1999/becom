@@ -321,10 +321,17 @@ class ArticleService extends AbstractService
         $formatContent = [];
         if ($contentType == Article::PARAGRAPH_CONTENT_TYPE) {
             $formatContent['content'] = json_decode($content) ?? $content;
-            $formatContent['content_translate'] = array_map(function ($value) {
-                $arrayContent = json_decode($value, true);
-                return $arrayContent ?? $value;
-            }, $contentTranslate);
+            //Check content_translate by login, user role
+            if (is_array($contentTranslate))
+            {
+                //Login and user role is admin, editor, root
+                $formatContent['content_translate'] = array_map(function ($value) {
+                    $arrayContent = json_decode($value, true);
+                    return $arrayContent ?? $value;
+                }, $contentTranslate);
+            } else {
+                $formatContent['content_translate'] = json_decode($content) ?? $content;
+            }
         } else {
             $formatContent['content'] = $content;
             $formatContent['content_translate'] = $contentTranslate;
