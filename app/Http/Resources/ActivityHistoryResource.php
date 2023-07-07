@@ -16,13 +16,14 @@ class ActivityHistoryResource extends AbstractJsonResource
     {
         $expand = request()->get('expand', []);
 
+        $statusType = !empty($this->content['status_type']) ? $this->content['status_type'] : null;
         $data = [
             'uuid' => $this->getKey(),
             'type' => $this->type,
             'type_id' => $this->type_id,
             'contact_uuid' => $this->contact_uuid,
             'date' => $this->date,
-            'content' => __('activity.'. $this->content['langkey'], $this->content),
+            'content' => ['content' => __('activity.'. $this->content['langkey'], $this->content), 'status_type' => $statusType],
             'render_body_mail_template' => $this->render_body_mail_template,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
