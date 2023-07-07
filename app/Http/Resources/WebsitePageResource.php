@@ -41,6 +41,10 @@ class WebsitePageResource extends AbstractJsonResource
             $data['website_page_category'] = new WebsitePageCategoryResource($this->websitePageCategory);
         }
 
+        if (\in_array('website_page__website', $expand)) {
+            $data['website'] = new WebsiteResource($this->websites());
+        }
+
         return $data;
     }
 }
