@@ -260,7 +260,8 @@ class ArticleController extends AbstractRestAPIController
             }
             $this->service->update($model, [
                 'publish_status' => $request->get('publish_status'),
-                'reject_reason' => $list_reason
+                'reject_reason' => $list_reason,
+                'content_for_user' => $request->get('content_for_user') ?? $model->content_for_user,
             ]);
         }
 
