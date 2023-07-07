@@ -72,6 +72,6 @@ class WebsitePage extends AbstractModel
 
     public function websites()
     {
-        return $this->belongsToMany(Website::class, 'website_website_page', 'website_page_uuid', 'website_uuid')->withPivot(['is_homepage', 'ordering'])->withTimestamps();
+        return $this->belongsToMany(Website::class, 'website_website_page', 'website_page_uuid', 'website_uuid')->orderBy('created_at')->withPivot(['is_homepage', 'ordering'])->withTimestamps()->first();
     }
 }
