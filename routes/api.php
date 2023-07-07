@@ -1274,17 +1274,17 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'partner-payout'], function 
 Route::group(['middleware' => ['auth:api'], 'as' => 'website'], function () {
     Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
         Route::get('/websites', [WebsiteController::class, 'index'])->name('index');
-        Route::get('website/{id}', [WebsiteController::class, 'show'])->name('index');
-        Route::delete('website/{id}', [WebsiteController::class, 'destroy'])->name('index');
+        Route::get('website/{id}', [WebsiteController::class, 'show'])->name('show');
+        Route::delete('website/{id}', [WebsiteController::class, 'destroy'])->name('destroy');
         Route::post('websites/change-status', [WebsiteController::class, 'changeStatus'])->name('changeStatus');
     });
 
     Route::group(['as' => 'my.'], function () {
         Route::get('my/websites', [WebsiteController::class, 'indexMy'])->name('index');
-        Route::get('my/website/{id}', [WebsiteController::class, 'showMy'])->name('index');
-        Route::post('my/website', [WebsiteController::class, 'storeMy'])->name('index');
-        Route::put('my/website/{id}', [WebsiteController::class, 'editMy'])->name('index');
-        Route::delete('my/website/{id}', [WebsiteController::class, 'destroyMy'])->name('index');
+        Route::get('my/website/{id}', [WebsiteController::class, 'showMy'])->name('show');
+        Route::post('my/website', [WebsiteController::class, 'storeMy'])->name('store');
+        Route::put('my/website/{id}', [WebsiteController::class, 'editMy'])->name('edit');
+        Route::delete('my/website/{id}', [WebsiteController::class, 'destroyMy'])->name('destroy');
         Route::post('my/websites/change-status', [WebsiteController::class, 'changeStatusMyWebsite'])->name('changeStatusMyWebsite');
     });
 });
