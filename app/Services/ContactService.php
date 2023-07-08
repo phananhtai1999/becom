@@ -554,13 +554,18 @@ class ContactService extends AbstractService
      */
     public function getBirthdayContactsSendEmailsByCampaigns($campaignUuid, $fromDate, $toDate)
     {
+        $fromDateFormatted = Carbon::parse($fromDate)->format('m-d');
+        $toDateFormatted = Carbon::parse($toDate)->format('m-d');
+
         return $this->model->select('contacts.*')
             ->join('contact_contact_list', 'contact_contact_list.contact_uuid', '=', 'contacts.uuid')
             ->join('contact_lists', 'contact_lists.uuid', '=', 'contact_contact_list.contact_list_uuid')
             ->join('campaign_contact_list', 'campaign_contact_list.contact_list_uuid', '=', 'contact_lists.uuid')
             ->join('campaigns', 'campaigns.uuid', '=', 'campaign_contact_list.campaign_uuid')
-            ->whereDate('contacts.dob', '>=', $fromDate)
-            ->whereDate('contacts.dob', '<=', $toDate)
+            ->where(function ($query) use ($fromDateFormatted, $toDateFormatted) {
+                $query->whereRaw("DATE_FORMAT(contacts.dob, '%m-%d') >= '{$fromDateFormatted}'")
+                    ->whereRaw("DATE_FORMAT(contacts.dob, '%m-%d') <= '{$toDateFormatted}'");
+            })
             ->where('campaigns.uuid', $campaignUuid)->get()->unique('email')->count();
     }
 
@@ -572,13 +577,18 @@ class ContactService extends AbstractService
      */
     public function getBirthdayContactsSendSmsByCampaigns($campaignUuid, $fromDate, $toDate)
     {
+        $fromDateFormatted = Carbon::parse($fromDate)->format('m-d');
+        $toDateFormatted = Carbon::parse($toDate)->format('m-d');
+
         return $this->model->select('contacts.*')
             ->join('contact_contact_list', 'contact_contact_list.contact_uuid', '=', 'contacts.uuid')
             ->join('contact_lists', 'contact_lists.uuid', '=', 'contact_contact_list.contact_list_uuid')
             ->join('campaign_contact_list', 'campaign_contact_list.contact_list_uuid', '=', 'contact_lists.uuid')
             ->join('campaigns', 'campaigns.uuid', '=', 'campaign_contact_list.campaign_uuid')
-            ->whereDate('contacts.dob', '>=', $fromDate)
-            ->whereDate('contacts.dob', '<=', $toDate)
+            ->where(function ($query) use ($fromDateFormatted, $toDateFormatted) {
+                $query->whereRaw("DATE_FORMAT(contacts.dob, '%m-%d') >= '{$fromDateFormatted}'")
+                    ->whereRaw("DATE_FORMAT(contacts.dob, '%m-%d') <= '{$toDateFormatted}'");
+            })
             ->where('campaigns.uuid', $campaignUuid)->get()->unique('phone')->count();
     }
 
