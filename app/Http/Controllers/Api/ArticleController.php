@@ -181,6 +181,10 @@ class ArticleController extends AbstractRestAPIController
         );
     }
 
+    /**
+     * @param IndexRequest $request
+     * @return JsonResponse
+     */
     public function indexUnpublishedArticle(IndexRequest $request)
     {
         $models = $this->service->getCollectionWithPaginationByCondition($request,
@@ -210,7 +214,6 @@ class ArticleController extends AbstractRestAPIController
         $content = $this->service->mapTypeLabelToContent($request->get('content'), $request->content_type);
 
         $model = $this->service->create(array_merge($request->except(['reject_reason']), [
-            'publish_status' => Article::PENDING_PUBLISH_STATUS,
             'user_uuid' => auth()->user()->getKey(),
             'content' => $content
         ]));
@@ -232,7 +235,6 @@ class ArticleController extends AbstractRestAPIController
         $content = $this->service->mapTypeLabelToContent($request->get('content'), $request->content_type);
 
         $this->service->update($model, array_merge($request->except(['user_uuid']), [
-            'publish_status' => Article::PENDING_PUBLISH_STATUS,
             'content' => $content
         ]));
 

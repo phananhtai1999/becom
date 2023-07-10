@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Article;
 
 use App\Abstracts\AbstractRequest;
+use App\Models\Article;
 use App\Rules\ArticleContentRule;
 use Illuminate\Validation\Rule;
 
@@ -35,6 +36,7 @@ class UnpublishedArticleRequest extends AbstractRequest
             'content' => ['required', 'array', 'min:1'],
             'content.en' => ['required', 'string'],
             'content.*' => ['required', 'string'],
+            'publish_status' => ['required', 'numeric', Rule::in(Article::PENDING_PUBLISH_STATUS, Article::DRAFT_PUBLISH_STATUS)],
             'content_for_user' => ['nullable', 'string', 'in:public,login,payment,editor,admin'],
             'article_category_uuid' => ['nullable', 'numeric', Rule::exists('article_categories', 'uuid')->whereNull('deleted_at')],
             'content_type' => ['required', 'string', 'in:single,paragraph'],
