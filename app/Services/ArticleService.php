@@ -221,7 +221,7 @@ class ArticleService extends AbstractService
 
     public function showArticleForEditorById($id)
     {
-        return $this->model->whereIn('publish_status', [Article::PENDING_PUBLISH_STATUS, Article::REJECT_PUBLISH_STATUS])
+        return $this->model->whereIn('publish_status', [Article::PENDING_PUBLISH_STATUS, Article::REJECT_PUBLISH_STATUS, Article::DRAFT_PUBLISH_STATUS])
             ->where('uuid', $id)->firstOrFail();
     }
 
