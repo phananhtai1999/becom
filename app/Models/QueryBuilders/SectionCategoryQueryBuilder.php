@@ -42,6 +42,9 @@ class SectionCategoryQueryBuilder extends AbstractQueryBuilder
                 $modelKeyName,
                 AllowedFilter::exact('exact__' . $modelKeyName, $modelKeyName),
                 AllowedFilter::scope('title'),
+                AllowedFilter::scope('title_category'),
+                AllowedFilter::scope('exact__title_category', 'exactTitleCategory'),
+
             ]);
     }
 

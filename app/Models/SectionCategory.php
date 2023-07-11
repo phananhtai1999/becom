@@ -3,7 +3,9 @@
 namespace App\Models;
 
 use App\Abstracts\AbstractModel;
+use App\Http\Controllers\Traits\ModelFilterExactTitleCategoryLanguageTrait;
 use App\Http\Controllers\Traits\ModelFilterLanguageTrait;
+use App\Http\Controllers\Traits\ModelFilterTitleCategoryLanguageTrait;
 use App\Services\UserService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -14,7 +16,8 @@ use Spatie\Translatable\HasTranslations;
 class SectionCategory extends AbstractModel
 {
     use HasFactory, SoftDeletes,
-        HasTranslations, ModelFilterLanguageTrait;
+        HasTranslations, ModelFilterLanguageTrait, ModelFilterTitleCategoryLanguageTrait,
+        ModelFilterExactTitleCategoryLanguageTrait;
 
     /**
      * @var string
