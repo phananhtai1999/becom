@@ -30,7 +30,7 @@ class UnpublishedAssetRequest extends FormRequest
             'title' => ['required', 'string'],
             'asset_size_uuid' => ['required', 'integer', 'exists:asset_sizes,uuid'],
             'type' => ['required', Rule::in(['image', 'video'])],
-            'status' => ['required', 'numeric', Rule::in(Asset::PENDING_STATUS, Asset::DRAFT_STATUS)],
+            'status' => ['required', 'string', Rule::in(Asset::PENDING_STATUS, Asset::DRAFT_STATUS)],
         ];
         if ($this->request->get('type') == 'video') {
             $validate['file'] = array_merge($validate['file'], ['mimes:mp4']);
