@@ -115,11 +115,11 @@ class AssetController extends AbstractRestAPIController
     public function generateJsCode(GenerateJsCodeAssetRequest $request)
     {
         if (empty(auth()->user()->partner) && auth()->user()->role != Role::ADMIN_ROOT) {
-            return $this->sendJsonResponse(false,  __('asset.failed_partner'), [], 403);
+            return $this->sendJsonResponse(false, __('asset.failed_partner'), [], 403);
         }
         $mainUrl = $this->service->getConfigByKeyInCache('main_url');
         if (!preg_match('/^' . preg_quote($mainUrl->value, '/') . '/', $request->get('url'))) {
-            return $this->sendJsonResponse(false, __('asset.failed_main_url', ['main_url' => $mainUrl->value]) , [], 400);
+            return $this->sendJsonResponse(false, __('asset.failed_main_url', ['main_url' => $mainUrl->value]), [], 400);
         }
 
         $partner = auth()->user()->partner;
@@ -168,7 +168,7 @@ class AssetController extends AbstractRestAPIController
     {
         $model = $this->service->findOrFailById($id);
         $list_reason = $model->reject_reason;
-        if ($request->get('status') == Asset::REJECT_STATUS){
+        if ($request->get('status') == Asset::REJECT_STATUS) {
             $list_reason[] = [
                 'content' => $request->get('reject_reason'),
                 'created_at' => Carbon::now()
@@ -197,11 +197,12 @@ class AssetController extends AbstractRestAPIController
                 }
             }
         }
-        $model = $this->service->create(
+        $model = $this->service->create(array_merge(
+            $request->all(),
             [
                 'url' => $uploadUrl['absolute_slug'],
                 'user_uuid' => auth()->user()->uuid
-            ]);
+            ]));
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
