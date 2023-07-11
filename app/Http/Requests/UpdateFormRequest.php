@@ -29,7 +29,7 @@ class UpdateFormRequest extends AbstractRequest
             'template' => ['string'],
             'template_json' => ['string'],
             'contact_list_uuid' => ['nullable', 'numeric', Rule::exists('contact_lists','uuid')->whereNull('deleted_at')],
-            'publish_status' => ['numeric', 'min:1', 'max:2'],
+            'publish_status' => ['numeric', 'min:1', 'max:4'],
             'display_type' => ['string', 'in:modal,in_page']
         ];
     }

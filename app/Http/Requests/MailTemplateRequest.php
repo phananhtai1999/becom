@@ -29,7 +29,7 @@ class MailTemplateRequest extends AbstractRequest
         return [
             'subject' => ['required', 'string'],
             'body' => ['required', 'string'],
-            'send_project_uuid' => ['nullable', 'numeric', 'min:1', 'exists:send_projects,uuid'],
+            'send_project_uuid' => ['nullable', 'numeric', 'min:1', Rule::exists('send_projects', 'uuid')->whereNull('deleted_at')],
             'business_category_uuid' => ['required', 'numeric', 'min:1', Rule::exists('business_categories', 'uuid')->where(function ($q) {
                 return $q->where('publish_status', BusinessCategory::PUBLISHED_PUBLISH_STATUS)->whereNull('deleted_at');
             })],
@@ -37,7 +37,7 @@ class MailTemplateRequest extends AbstractRequest
                 return $q->where('publish_status', Purpose::PUBLISHED_PUBLISH_STATUS)->whereNull('deleted_at');
             })],
             'design' => ['required', 'string'],
-            'publish_status' => ['required', 'numeric', 'min:1', 'max:2'],
+            'publish_status' => ['required', 'numeric', 'min:1', 'max:4'],
             'type' => ['required', 'string', 'in:sms,email,telegram,viber'],
             'image' => ['nullable', 'array'],
             'image.*' => ['string'],

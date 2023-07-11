@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
+use App\Models\Form;
 use Illuminate\Validation\Rule;
 
 class UnpublishedFormRequest extends AbstractRequest
@@ -29,7 +30,8 @@ class UnpublishedFormRequest extends AbstractRequest
             'template' => ['required', 'string'],
             'template_json' => ['required', 'string'],
             'contact_list_uuid' => ['nullable', 'numeric', Rule::exists('contact_lists','uuid')->whereNull('deleted_at')],
-            'display_type' => ['required', 'string', 'in:modal,in_page']
+            'display_type' => ['required', 'string', 'in:modal,in_page'],
+            'publish_status' => ['required', 'numeric', Rule::in(Form::PENDING_PUBLISH_STATUS, Form::DRAFT_PUBLISH_STATUS)],
         ];
     }
 }

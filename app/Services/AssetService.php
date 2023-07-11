@@ -82,7 +82,7 @@ class AssetService extends AbstractService
 
     public function showAssetForEditorById($id)
     {
-        return $this->model->whereIn('status', [Asset::PENDING_STATUS, Asset::REJECT_STATUS])
+        return $this->model->whereIn('status', [Asset::PENDING_STATUS, Asset::REJECT_STATUS, Asset::DRAFT_STATUS])
             ->where('uuid', $id)->firstOrFail();
     }
 

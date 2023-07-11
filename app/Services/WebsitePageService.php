@@ -29,7 +29,7 @@ class WebsitePageService extends AbstractService
 
     public function showWebsitePageForEditorById($id)
     {
-        return $this->model->whereIn('publish_status', [WebsitePage::PENDING_PUBLISH_STATUS, WebsitePage::REJECT_PUBLISH_STATUS])
+        return $this->model->whereIn('publish_status', [WebsitePage::PENDING_PUBLISH_STATUS, WebsitePage::REJECT_PUBLISH_STATUS, WebsitePage::DRAFT_PUBLISH_STATUS])
             ->where('uuid', $id)->firstOrFail();
     }
 

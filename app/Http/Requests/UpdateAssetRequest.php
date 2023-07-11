@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Asset;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -28,7 +29,8 @@ class UpdateAssetRequest extends FormRequest
             'title' => ['string'],
             'asset_size_uuid' => ['integer', 'exists:asset_sizes,uuid'],
             'type' => [Rule::in(['image', 'video']), 'required_if:file,*'],
-        ];
+            'status' => ['numeric', Rule::in(Asset::PENDING_STATUS, Asset::DRAFT_STATUS, Asset::REJECT_STATUS, Asset::PUBLISH_STATUS)]
+            ];
         if ($this->request->get('type')) {
             if($this->request->get('type') == 'video') {
                 $validate['file'] = ['required', 'mimes:mp4'];

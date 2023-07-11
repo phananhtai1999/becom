@@ -16,6 +16,7 @@ class Asset extends Model
     const PUBLISH_STATUS = 'publish';
 
     const REJECT_STATUS = 'reject';
+    const DRAFT_STATUS = 'draft';
     /**
      * @var string
      */

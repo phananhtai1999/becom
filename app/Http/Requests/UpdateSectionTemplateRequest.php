@@ -29,7 +29,7 @@ class UpdateSectionTemplateRequest extends AbstractRequest
             'template' => ['string'],
             'template_json' => ['string'],
             'section_category_uuid' => ['numeric', Rule::exists('section_categories','uuid')->whereNull('deleted_at')],
-            'publish_status' => ['numeric', 'min:1', 'max:2'],
+            'publish_status' => ['numeric', 'min:1', 'max:4'],
             'is_default' => ['boolean']
         ];
     }

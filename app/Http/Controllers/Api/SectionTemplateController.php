@@ -173,7 +173,6 @@ class SectionTemplateController extends AbstractRestAPIController
     public function storeUnpublishedSectionTemplate(UnpublishedSectionTemplateRequest $request)
     {
         $model = $this->service->create(array_merge($request->all(), [
-            'publish_status' => SectionTemplate::PENDING_PUBLISH_STATUS,
             'user_uuid' => auth()->user()->getKey(),
         ]));
 
@@ -184,14 +183,13 @@ class SectionTemplateController extends AbstractRestAPIController
 
     /**
      * @param UpdateUnpublishedSectionTemplateRequest $request
+     * @param $id
      * @return JsonResponse
      */
     public function editUnpublishedSectionTemplate(UpdateUnpublishedSectionTemplateRequest $request, $id)
     {
         $model = $this->service->showSectionTemplateForEditorById($id);
-        $this->service->update($model, array_merge($request->except(['user_uuid']), [
-            'publish_status' => SectionTemplate::PENDING_PUBLISH_STATUS,
-        ]));
+        $this->service->update($model, $request->except(['user_uuid']));
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)

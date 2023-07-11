@@ -28,7 +28,7 @@ class SectionTemplateService extends AbstractService
 
     public function showSectionTemplateForEditorById($id)
     {
-        return $this->model->whereIn('publish_status', [SectionTemplate::PENDING_PUBLISH_STATUS, SectionTemplate::REJECT_PUBLISH_STATUS])
+        return $this->model->whereIn('publish_status', [SectionTemplate::PENDING_PUBLISH_STATUS, SectionTemplate::REJECT_PUBLISH_STATUS, SectionTemplate::DRAFT_PUBLISH_STATUS])
             ->where('uuid', $id)->firstOrFail();
     }
 

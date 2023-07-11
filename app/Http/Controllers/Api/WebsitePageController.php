@@ -173,7 +173,6 @@ class WebsitePageController extends AbstractRestAPIController
     public function storeUnpublishedWebsitePage(UnpublishedWebsitePageRequest $request)
     {
         $model = $this->service->create(array_merge($request->all(), [
-            'publish_status' => WebsitePage::PENDING_PUBLISH_STATUS,
             'user_uuid' => auth()->user()->getKey()
         ]));
 
@@ -184,14 +183,13 @@ class WebsitePageController extends AbstractRestAPIController
 
     /**
      * @param UpdateUnpublishedWebsitePageRequest $request
+     * @param $id
      * @return JsonResponse
      */
     public function editUnpublishedWebsitePage(UpdateUnpublishedWebsitePageRequest $request, $id)
     {
         $model = $this->service->showWebsitePageForEditorById($id);
-        $this->service->update($model, array_merge($request->except(['user_uuid']), [
-            'publish_status' => WebsitePage::PENDING_PUBLISH_STATUS,
-        ]));
+        $this->service->update($model, $request->except(['user_uuid']));
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)

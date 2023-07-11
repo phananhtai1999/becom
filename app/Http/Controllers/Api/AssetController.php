@@ -11,7 +11,9 @@ use App\Http\Requests\ChangeStatusAssetRequest;
 use App\Http\Requests\ChartRequest;
 use App\Http\Requests\GenerateJsCodeAssetRequest;
 use App\Http\Requests\IndexRequest;
+use App\Http\Requests\UnpublishedAssetRequest;
 use App\Http\Requests\UpdateAssetRequest;
+use App\Http\Requests\UpdateUnpublishedAssetRequest;
 use App\Http\Resources\AssetResource;
 use App\Http\Resources\AssetResourceCollection;
 use App\Models\Asset;
@@ -80,7 +82,7 @@ class AssetController extends AbstractRestAPIController
             }
             $this->service->update($model, array_merge($request->except('status'), ['url' => $uploadUrl['absolute_slug']]));
         } else {
-            $this->service->update($model, $request->except('status'));
+            $this->service->update($model, $request->all());
         }
 
         return $this->sendOkJsonResponse(
@@ -182,7 +184,7 @@ class AssetController extends AbstractRestAPIController
         );
     }
 
-    public function storePendingAsset(AssetRequest $request)
+    public function storePendingAsset(UnpublishedAssetRequest $request)
     {
         $uploadUrl = $this->uploadFile($request->file, $this->userService->getCurrentUserRole(), $this->uploadService);
         $filename = $uploadUrl['absolute_slug'];
@@ -195,12 +197,11 @@ class AssetController extends AbstractRestAPIController
                 }
             }
         }
-        $model = $this->service->create(array_merge(
-            $request->except('status'),
+        $model = $this->service->create(
             [
                 'url' => $uploadUrl['absolute_slug'],
                 'user_uuid' => auth()->user()->uuid
-            ]));
+            ]);
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -244,7 +245,7 @@ class AssetController extends AbstractRestAPIController
         );
     }
 
-    public function editPendingAsset(UpdateAssetRequest $request, $id)
+    public function editPendingAsset(UpdateUnpublishedAssetRequest $request, $id)
     {
         $model = $this->service->showAssetForEditorById($id);
         if ($request->file) {
@@ -260,13 +261,10 @@ class AssetController extends AbstractRestAPIController
                 }
             }
             $this->service->update($model, array_merge($request->all(), [
-                'url' => $uploadUrl['absolute_slug'],
-                'status' => Asset::PENDING_STATUS
+                'url' => $uploadUrl['absolute_slug']
             ]));
         } else {
-            $this->service->update($model, array_merge($request->all(), [
-                'status' => Asset::PENDING_STATUS
-            ]));
+            $this->service->update($model, $request->all());
         }
 
         return $this->sendOkJsonResponse(
