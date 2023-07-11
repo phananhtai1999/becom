@@ -85,7 +85,7 @@ class SmtpAccountController extends AbstractRestAPIController
     /**
      * @return JsonResponse
      */
-    public function index(IndexRequest $request)
+    public function indexWithoutDefault(IndexRequest $request)
     {
         $models = $this->service->getAllSmtpAccountWithoutDefault(
             $request->get('per_page', '15'),

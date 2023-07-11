@@ -246,12 +246,13 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website.'], function () {
 Route::group(['middleware' => ['auth:api'], 'as' => 'smtp-account.'], function () {
 
     Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
-        Route::get('/smtp-accounts', [SmtpAccountController::class, 'index'])->name('index');
+        Route::get('/all/smtp-accounts', [SmtpAccountController::class, 'index'])->name('index');
         Route::post('/smtp-account', [SmtpAccountController::class, 'store'])->name('store');
         Route::get('/smtp-account/{id}', [SmtpAccountController::class, 'show'])->name('show');
         Route::put('/smtp-account/{id}', [SmtpAccountController::class, 'edit'])->name('edit');
         Route::delete('/smtp-account/{id}', [SmtpAccountController::class, 'destroy'])->name('destroy');
         Route::get('/get-mail-mailer-type/smtp-account', [SmtpAccountController::class, 'getMailMailerSmtpAccount'])->name('get-mail-mailer-smtp-account');
+        Route::get('/smtp-accounts', [SmtpAccountController::class, 'indexWithoutDefault'])->name('index-without-default');
         Route::get('/smtp-accounts-default', [SmtpAccountController::class, 'getDefault'])->name('getDefault');
     });
 
