@@ -3,7 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
-use Illuminate\Foundation\Http\FormRequest;
+use App\Models\SectionTemplate;
 use Illuminate\Validation\Rule;
 
 class UnpublishedSectionTemplateRequest extends AbstractRequest
@@ -30,7 +30,8 @@ class UnpublishedSectionTemplateRequest extends AbstractRequest
             'template' => ['required', 'string'],
             'template_json' => ['required', 'string'],
             'section_category_uuid' => ['required', 'numeric', Rule::exists('section_categories','uuid')->whereNull('deleted_at')],
-            'is_default' => ['required', 'boolean']
+            'is_default' => ['required', 'boolean'],
+            'publish_status' => ['required', 'numeric', Rule::in(SectionTemplate::PENDING_PUBLISH_STATUS, SectionTemplate::DRAFT_PUBLISH_STATUS)],
         ];
     }
 }

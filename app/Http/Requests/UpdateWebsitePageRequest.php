@@ -29,7 +29,7 @@ class UpdateWebsitePageRequest extends AbstractRequest
             'template' => ['string'],
             'template_json' => ['string'],
             'website_page_category_uuid' => ['numeric', Rule::exists('website_page_categories','uuid')->whereNull('deleted_at')],
-            'publish_status' => ['numeric', 'min:1', 'max:2'],
+            'publish_status' => ['numeric', 'min:1', 'max:4'],
             'is_default' => ['boolean'],
             'display_type' => ['string', 'in:page,in_page']
         ];
