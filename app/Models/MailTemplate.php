@@ -16,6 +16,7 @@ class MailTemplate extends AbstractModel
     const PUBLISHED_PUBLISH_STATUS = 1;
     const PENDING_PUBLISH_STATUS = 2;
     const REJECT_PUBLISH_STATUS = 3;
+    const DRAFT_PUBLISH_STATUS = 4;
 
     /**
      * @var string[]

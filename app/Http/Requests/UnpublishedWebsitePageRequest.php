@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
+use App\Models\WebsitePage;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -31,7 +32,8 @@ class UnpublishedWebsitePageRequest extends AbstractRequest
             'template_json' => ['required', 'string'],
             'website_page_category_uuid' => ['required', 'numeric', Rule::exists('website_page_categories','uuid')->whereNull('deleted_at')],
             'is_default' => ['required', 'boolean'],
-            'display_type' => ['required', 'string', 'in:page,in_page']
+            'display_type' => ['required', 'string', 'in:page,in_page'],
+            'publish_status' => ['required', 'numeric', Rule::in(WebsitePage::PENDING_PUBLISH_STATUS, WebsitePage::DRAFT_PUBLISH_STATUS)]
         ];
     }
 }

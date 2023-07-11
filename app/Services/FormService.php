@@ -28,7 +28,7 @@ class FormService extends AbstractService
 
     public function showFormForEditorById($id)
     {
-        return $this->model->whereIn('publish_status', [Form::PENDING_PUBLISH_STATUS, Form::REJECT_PUBLISH_STATUS])
+        return $this->model->whereIn('publish_status', [Form::PENDING_PUBLISH_STATUS, Form::REJECT_PUBLISH_STATUS, Form::DRAFT_PUBLISH_STATUS])
             ->where('uuid', $id)->firstOrFail();
     }
 

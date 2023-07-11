@@ -224,7 +224,6 @@ class MailTemplateController extends AbstractRestAPIController
         }
 
         $model = $this->service->create(array_merge($request->all(), [
-            'publish_status' => MailTemplate::PENDING_PUBLISH_STATUS,
             'user_uuid' => $userUuid
         ]));
 

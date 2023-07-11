@@ -65,6 +65,8 @@ class FormController extends AbstractRestAPIController
 
     /**
      * @return JsonResponse
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function store()
     {
@@ -228,7 +230,6 @@ class FormController extends AbstractRestAPIController
         }
 
         $model = $this->service->create(array_merge($request->all(), [
-            'publish_status' => Form::PENDING_PUBLISH_STATUS,
             'user_uuid' => $userUuid
         ]));
 
@@ -239,21 +240,19 @@ class FormController extends AbstractRestAPIController
 
     /**
      * @param UpdateUnpublishedFormRequest $request
+     * @param $id
      * @return JsonResponse
      */
     public function editUnpublishedForm(UpdateUnpublishedFormRequest $request, $id)
     {
         $model = $this->service->showFormForEditorById($id);
 
-        $data = array_merge($request->except('user_uuid'), [
-            'publish_status' => Form::PENDING_PUBLISH_STATUS,
-        ]);
+        $data = $request->except('user_uuid');
 
         if ($request->get('contact_list_uuid') && $request->get('contact_list_uuid') != $model->contact_list_uuid) {
             $contactList = $this->contactListService->findOneById($request->get('contact_list_uuid'));
             $data = array_merge($request->all(), [
                 'user_uuid' => $contactList->user_uuid,
-                'publish_status' => Form::PENDING_PUBLISH_STATUS,
             ]);
         }
 

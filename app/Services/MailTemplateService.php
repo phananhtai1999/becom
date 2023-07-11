@@ -46,7 +46,7 @@ class MailTemplateService extends AbstractService
 
     public function showMailTemplateForEditorById($id)
     {
-        return $this->model->whereIn('publish_status', [MailTemplate::PENDING_PUBLISH_STATUS, MailTemplate::REJECT_PUBLISH_STATUS])
+        return $this->model->whereIn('publish_status', [MailTemplate::PENDING_PUBLISH_STATUS, MailTemplate::REJECT_PUBLISH_STATUS, MailTemplate::DRAFT_PUBLISH_STATUS])
             ->where('uuid', $id)->firstOrFail();
     }
 

@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
+use App\Models\SectionTemplate;
 use Illuminate\Validation\Rule;
 
 class UpdateUnpublishedSectionTemplateRequest extends AbstractRequest
@@ -29,7 +30,8 @@ class UpdateUnpublishedSectionTemplateRequest extends AbstractRequest
             'template' => ['string'],
             'template_json' => ['string'],
             'section_category_uuid' => ['numeric', Rule::exists('section_categories','uuid')->whereNull('deleted_at')],
-            'is_default' => ['boolean']
+            'is_default' => ['boolean'],
+            'publish_status' => ['numeric', Rule::in(SectionTemplate::PENDING_PUBLISH_STATUS, SectionTemplate::DRAFT_PUBLISH_STATUS)],
         ];
     }
 }
