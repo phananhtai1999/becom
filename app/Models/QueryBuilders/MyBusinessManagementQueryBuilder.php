@@ -71,6 +71,10 @@ class MyBusinessManagementQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__domain_uuid', 'domain_uuid'),
                 'user.email',
                 AllowedFilter::exact('exact__user.email', 'user.email'),
+                AllowedFilter::scope('from__created_at'),
+                AllowedFilter::scope('to__created_at'),
+                AllowedFilter::scope('from__updated_at'),
+                AllowedFilter::scope('to__updated_at'),
             ]);
     }
 
