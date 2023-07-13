@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Abstracts\AbstractModel;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -68,5 +69,26 @@ class SectionTemplate extends AbstractModel
     public function sectionCategory()
     {
         return $this->belongsTo(SectionCategory::class, 'section_category_uuid', 'uuid',);
+    }
+
+    /**
+     * @param Builder $query
+     * @param ...$titles
+     * @return Builder
+     */
+    public function scopeSectionCategoryTitle(Builder $query, ...$titles)
+    {
+        return $query->where('section_category_uuid', function ($q) use ($titles) {
+            $q->select('a.uuid')
+                ->from('section_categories as a')
+                ->whereColumn('a.uuid', 'section_templates.section_category_uuid')
+                ->where(function ($i) use ($titles) {
+                    $lang = app()->getLocale();
+                    $langDefault = config('app.fallback_locale');
+                    foreach ($titles as $title) {
+                        $i->orWhereRaw("IFNULL(JSON_UNQUOTE(JSON_EXTRACT(a.title, '$.$lang')),JSON_UNQUOTE(JSON_EXTRACT(a.title, '$.$langDefault'))) = '$title'");
+                    }
+                });
+        });
     }
 }
