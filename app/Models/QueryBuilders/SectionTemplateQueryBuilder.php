@@ -64,7 +64,7 @@ class SectionTemplateQueryBuilder extends AbstractQueryBuilder
                 'section_category_uuid',
                 AllowedFilter::exact('exact__section_category_uuid', 'section_category_uuid'),
                 'sectionCategory.title',
-                AllowedFilter::exact('exact__sectionCategory.title', 'sectionCategory.title'),
+                AllowedFilter::scope('exact__sectionCategory.title', 'sectionCategoryTitle'),
                 'publish_status',
                 AllowedFilter::exact('exact__publish_status', 'publish_status'),
                 'is_default',
