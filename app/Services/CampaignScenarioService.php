@@ -113,7 +113,7 @@ class CampaignScenarioService extends AbstractService
         $campaignsScenario = $this->showCampaignScenarioByScenarioUuid($scenarioUuid);
         $campaignRootScenario = $campaignsScenario->where('parent_uuid', null)->first();
         $listCreditByLevelScenario = $this->getListCreditByLevelScenario($campaignsScenario, $listPriceByType);
-        $numberContact = (new ContactService())->getListsContactsSendEmailsByCampaigns($campaignRootScenario->campaign_uuid);
+        $numberContact = (new ContactService())->getListsContactsSendEmailsByCampaigns(optional($campaignRootScenario)->campaign_uuid);
         $creditNumberSendEmail = 0;
         foreach ($listCreditByLevelScenario as $item){
             $creditNumberSendEmail += ($numberContact * $item);
