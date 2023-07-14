@@ -28,7 +28,7 @@ class UserAddOnResource extends JsonResource
         ];
         if (\in_array('user_add_on__add_on_subscription_plan', $expand)) {
             $data['add_on_subscription_plan'] = new AddOnSubscriptionPlanResource($this->addOnSubscriptionPlan);
-            if (!empty($data['add_on_subscription_plan']['resource'])) {
+            if (!empty($data['add_on_subscription_plan'])) {
                 $data['add_on'] = new AddOnResource(optional($this->addOnSubscriptionPlan)->addOn);
                 $data['permissions'] = PermissionResource::collection(optional(optional($this->addOnSubscriptionPlan)->addOn)->permissions);
             }
