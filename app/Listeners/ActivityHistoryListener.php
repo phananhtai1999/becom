@@ -4,6 +4,7 @@ namespace App\Listeners;
 
 use App\Events\ActivityHistoryEvent;
 use App\Services\ActivityHistoryService;
+use Carbon\Carbon;
 
 class ActivityHistoryListener
 {
@@ -37,7 +38,8 @@ class ActivityHistoryListener
         } elseif ($action === 'deleted') {
             $date = $model->deleted_at;
         }
-
+        $timezone = optional($this->activityHistoryService->getConfigByKeyInCache('timezone'))->value;
+        $date = $timezone ? Carbon::parse($date)->setTimezone($timezone) : $date;
         if ($type === 'note') {
             $this->activityHistories($type, $model->uuid, $action, $model->contact->email, $date, $model->contact_uuid);
         } elseif ($type === 'remind') {
