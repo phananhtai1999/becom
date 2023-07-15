@@ -42,10 +42,11 @@ class SendNotificationSystemListener implements ShouldQueue
 
         $mail = new SendNotificationSystem($user, $type, $action, $model);
         $this->smtpAccountService->sendEmailNotificationSystem($user, $mail);
+        $timezone = optional($this->smtpAccountService->getConfigByKeyInCache('timezone'))->value;
         if ($type === 'campaign') {
-            $content = ['langkey' => $type.'_'.$action, 'type' => $type , 'name' => $model->tracking_key  , 'date' => Carbon::now()->toDateTimeString()];
+            $content = ['langkey' => $type.'_'.$action, 'type' => $type , 'name' => $model->tracking_key  , 'date' => Carbon::now($timezone)->toDateTimeString()];
         } else {
-            $content = ['langkey' => $type.'_'.$action, 'type' => $type , 'name' => $model->name, 'date' => Carbon::now()->toDateTimeString()];
+            $content = ['langkey' => $type.'_'.$action, 'type' => $type , 'name' => $model->name, 'date' => Carbon::now($timezone)->toDateTimeString()];
         }
 
         $this->notificationService->create([
