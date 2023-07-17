@@ -8,5 +8,5 @@ return array(
     'account_login' => 'Bạn đã đăng nhập từ một quốc gia khác. Bạn đã đăng nhập từ :country',
     'addon_payment' => 'Bạn vừa sử :type_payment để thanh toán :name AddOn với giá $:price',
     'package_payment' => 'Bạn vừa sử :type_payment để thanh toán :name Package với giá $:price',
-    'credit_payment' => 'Bạn vừa sử :type_payment để nạp :name credits với giá $:price'
+    'credit_payment' => 'Bạn vừa sử :type_payment để nạp :credit credits với giá $:price'
 );

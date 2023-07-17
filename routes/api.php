@@ -80,6 +80,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\SinglePurposeController;
 use App\Http\Controllers\Api\ParagraphTypeController;
+use App\Http\Controllers\Api\ArticleSeriesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -1382,5 +1383,18 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'paragraph-type'], function 
     Route::group(['middleware' => ['role:root,admin,editor'], 'as' => 'author.'], function () {
         Route::get('paragraph-types', [ParagraphTypeController::class, 'index']);
         Route::get('paragraph-type/{id}', [ParagraphTypeController::class, 'show']);
+    });
+});
+
+Route::group(['middleware' => ['auth:api'], 'as' => 'article-series'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'author.'], function () {
+        Route::post('article-serie', [ArticleSeriesController::class, 'store']);
+        Route::put('article-serie/{id}', [ArticleSeriesController::class, 'edit']);
+        Route::delete('article-serie/{id}', [ArticleSeriesController::class, 'destroy']);
+    });
+
+    Route::group(['middleware' => ['role:root,admin,editor'], 'as' => 'author.'], function () {
+        Route::get('article-series', [ArticleSeriesController::class, 'index']);
+        Route::get('article-serie/{id}', [ArticleSeriesController::class, 'show']);
     });
 });
