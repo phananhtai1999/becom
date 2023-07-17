@@ -51,7 +51,7 @@ class SendProjectController extends AbstractRestAPIController
         SendProjectService         $service,
         WebsiteVerificationService $websiteVerificationService,
         FileVerificationService    $fileVerificationService,
-        MySendProjectService $myService
+        MySendProjectService       $myService
     )
     {
         $this->service = $service;
@@ -74,14 +74,9 @@ class SendProjectController extends AbstractRestAPIController
     {
         $request = app($this->storeRequest);
 
-        if(empty($request->get('user_uuid'))){
-            $data = array_merge($request->all(), [
-                'user_uuid' => auth()->user()->getkey(),
-            ]);
-        }else{
-            $data = $request->all();
-        }
-        $model = $this->service->create($data);
+        $model = $this->service->create(array_merge($request->all(), [
+            'user_uuid' => $request->get('user_uuid') ?? auth()->user()->getkey(),
+        ]));
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)

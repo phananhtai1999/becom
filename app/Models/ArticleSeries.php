@@ -79,7 +79,8 @@ class ArticleSeries extends AbstractModel
         'deleted_at' => 'datetime',
         'parent_uuid' => 'integer',
         'article_category_uuid' => 'integer',
-        'title' => 'array'
+        'title' => 'array',
+        'list_keywords' => 'array',
     ];
 
     /**

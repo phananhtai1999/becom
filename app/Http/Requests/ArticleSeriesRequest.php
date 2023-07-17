@@ -34,7 +34,8 @@ class ArticleSeriesRequest extends AbstractRequest
         ];
 
         if ($this->request->get('parent_uuid')) {
-            $validate['list_keywords'] = ['required', 'string'];
+            $validate['list_keywords'] = ['required', 'array', 'min:1'];
+            $validate['list_keywords.*'] = ['string'];
         } else {
             $validate['list_keywords'] = ['nullable', 'in:NULL'];
         }
