@@ -25,7 +25,10 @@ class UpdateMySendProjectRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'domain' => ['nullable', 'string', 'regex:/^(?:[-A-Za-z0-9]+\.)+[A-Za-z]{2,6}$/', Rule::unique('send_projects')->ignore($this->id, 'uuid')],
+            'domain' => ['nullable', 'string', 'regex:/^(?:[-A-Za-z0-9]+\.)+[A-Za-z]{2,6}$/', Rule::unique('send_projects')->where(function ($query) {
+                return $query->where('user_uuid', auth()->user()->getKey())
+                    ->whereNull('deleted_at');
+            })->ignore($this->id, 'uuid')],
             'name' => ['string'],
             'description' => ['string'],
             'logo' => ['string'],

@@ -46,7 +46,8 @@ class PermissionQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__' . $modelKeyName, $modelKeyName),
                 'code',
                 AllowedFilter::exact('exact__code', 'code'),
-                AllowedFilter::scope('name')
+                AllowedFilter::scope('name'),
+                AllowedFilter::scope('exact__name', 'exactName'),
             ]);
     }
 

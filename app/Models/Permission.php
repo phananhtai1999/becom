@@ -3,15 +3,16 @@
 namespace App\Models;
 
 use App\Abstracts\AbstractModel;
+use App\Http\Controllers\Traits\ModelFilterExactNameLanguageTrait;
+use App\Http\Controllers\Traits\ModelFilterNameLanguageTrait;
 use App\Services\UserService;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Translatable\HasTranslations;
 
 class Permission extends AbstractModel
 {
-    use HasFactory, SoftDeletes, HasTranslations;
+    use HasFactory, SoftDeletes, HasTranslations, ModelFilterExactNameLanguageTrait, ModelFilterNameLanguageTrait;
 
     /**
      * @var string
@@ -45,22 +46,6 @@ class Permission extends AbstractModel
     protected $appends = [
         'name_translate',
     ];
-
-    /**
-     * @param Builder $query
-     * @param $name
-     * @return Builder
-     */
-    public function scopeName(Builder $query, ...$names)
-    {
-        return $query->where(function ($q) use($names){
-            $lang = app()->getLocale();
-            $langDefault = config('app.fallback_locale');
-            foreach ($names as $name){
-                $q->orWhereRaw("IFNULL(JSON_UNQUOTE(JSON_EXTRACT(name, '$.$lang')),JSON_UNQUOTE(JSON_EXTRACT(name, '$.$langDefault'))) like '%$name%'");
-            }
-        });
-    }
 
     public function platformPackages() {
         return $this->belongsToMany(PlatformPackage::class, 'platform_package_permission', 'permission_uuid', 'platform_package_uuid');
