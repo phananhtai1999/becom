@@ -28,6 +28,7 @@ use App\Http\Resources\CampaignLinkTrackingResource;
 use App\Http\Resources\CampaignResource;
 use App\Http\Resources\CampaignTrackingResource;
 use App\Mail\SendCampaign;
+use App\Models\Campaign;
 use App\Models\Notification;
 use App\Services\CampaignDailyTrackingService;
 use App\Services\CampaignLinkDailyTrackingService;
@@ -313,7 +314,7 @@ class CampaignController extends AbstractRestAPIController
     {
         $sortTotalCredit = explode(',', $request->sort);
 
-        if(isset($this->user()->userTeamContactLists) && !empty($this->user()->userTeamContactLists)) {
+        if (isset($this->user()->userTeamContactLists) && !empty($this->user()->userTeamContactLists)) {
             if ($sortTotalCredit[0] == 'number_credit_needed_to_start_campaign' || $sortTotalCredit[0] == '-number_credit_needed_to_start_campaign') {
                 $models = $this->myService->sortMyTotalCredit($request->get('per_page', '15'), $sortTotalCredit[0], $request->search, $request->search_by, $this->user()->userTeamContactLists()->pluck('contact_list_uuid'));
             } else {
@@ -659,16 +660,20 @@ class CampaignController extends AbstractRestAPIController
             'was_stopped_by_owner' => $request->get('was_stopped_by_owner')
         ]);
 
-        $result = $this->checkAndSendCampaign($request->get('campaign_uuid'));
-        if (!$result['status']) {
-            $this->service->update($campaign, [
-                'was_stopped_by_owner' => !$request->get('was_stopped_by_owner')
-            ]);
-            return $this->sendValidationFailedJsonResponse(['errors' => $result['messages']]);
+        if ($campaign->type != Campaign::CAMPAIGN_BIRTHDAY_TYPE) {
+            $result = $this->checkAndSendCampaign($request->get('campaign_uuid'));
+            if (!$result['status']) {
+                $this->service->update($campaign, [
+                    'was_stopped_by_owner' => !$request->get('was_stopped_by_owner')
+                ]);
+
+                return $this->sendValidationFailedJsonResponse(['errors' => $result['messages']]);
+            }
+
+            return $this->sendOkJsonResponse(["message" => $result['messages']]);
         }
 
-        return $this->sendOkJsonResponse(["message" => $result['messages']]);
-
+        return $this->sendOkJsonResponse();
     }
 
     /**
@@ -690,15 +695,20 @@ class CampaignController extends AbstractRestAPIController
             'was_stopped_by_owner' => $request->get('was_stopped_by_owner')
         ]);
 
-        $result = $this->checkAndSendCampaign($request->get('campaign_uuid'));
-        if (!$result['status']) {
-            $this->service->update($campaign, [
-                'was_stopped_by_owner' => !$request->get('was_stopped_by_owner')
-            ]);
-            return $this->sendValidationFailedJsonResponse(['errors' => $result['messages']]);
+        if ($campaign->type != Campaign::CAMPAIGN_BIRTHDAY_TYPE) {
+            $result = $this->checkAndSendCampaign($request->get('campaign_uuid'));
+            if (!$result['status']) {
+                $this->service->update($campaign, [
+                    'was_stopped_by_owner' => !$request->get('was_stopped_by_owner')
+                ]);
+
+                return $this->sendValidationFailedJsonResponse(['errors' => $result['messages']]);
+            }
+
+            return $this->sendOkJsonResponse(["message" => $result['messages']]);
         }
 
-        return $this->sendOkJsonResponse(["message" => $result['messages']]);
+        return $this->sendOkJsonResponse();
     }
 
     /**

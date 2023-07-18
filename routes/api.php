@@ -827,6 +827,9 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'article.'], function () {
         Route::put('/article/{id}', [ArticleController::class, 'edit'])->name('edit');
         Route::delete('/article/{id}', [ArticleController::class, 'destroy'])->name('destroy');
         Route::get('/article/{id}', [ArticleController::class, 'show'])->name('show');
+    });
+    //Check role editor for change status
+    Route::group(['middleware' => ['role:root,admin,editor'], 'as' => 'author.'], function () {
         Route::post('article/change-status', [ArticleController::class, 'changeStatusArticle'])->name('changeStatusArticle');
     });
 
