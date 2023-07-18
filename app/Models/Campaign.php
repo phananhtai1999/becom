@@ -17,6 +17,10 @@ class Campaign extends AbstractModel
 {
     use HasFactory, SoftDeletes;
 
+    CONST CAMPAIGN_BIRTHDAY_TYPE = 'birthday';
+    CONST CAMPAIGN_SIMPLE_TYPE = 'simple';
+    CONST CAMPAIGN_SCENARIO_TYPE = 'scenario';
+
     /**
      * @var string
      */
