@@ -44,6 +44,8 @@ class CampaignService extends AbstractService
     public function getListActiveBirthdayCampaign()
     {
         $timezone = $this->getConfigByKeyInCache('timezone')->value;
+        $currentTime = Carbon::parse(Carbon::now($timezone))->format('m-d');
+
         return $this->model->selectRaw('DISTINCT campaigns.*')->with(['mailTemplate', 'sendProject', 'smtpAccount'])
             ->join('campaign_contact_list', 'campaigns.uuid', '=', 'campaign_contact_list.campaign_uuid')
             ->join('contact_lists', 'campaign_contact_list.contact_list_uuid', '=', 'contact_lists.uuid')
@@ -57,7 +59,9 @@ class CampaignService extends AbstractService
                 ['campaigns.was_stopped_by_owner', false],
                 ['campaigns.status', "active"],
             ])
-            ->whereDate('contacts.dob', Carbon::now())
+            ->where(function ($query) use ($currentTime) {
+                $query->whereRaw("DATE_FORMAT(contacts.dob, '%m-%d') = '{$currentTime}'");
+            })
             ->whereNull('contacts.deleted_at')->get();
     }
 
@@ -72,7 +76,7 @@ class CampaignService extends AbstractService
         if ($column === "type") {
             $activeCampaign = $this->model->where([
                 ['uuid', $id]
-            ])->whereIn('type', ['simple', 'scenario'])->first();
+            ])->whereIn('type', [Campaign::CAMPAIGN_SCENARIO_TYPE, Campaign::CAMPAIGN_SIMPLE_TYPE])->first();
         } else {
             $query = [];
             if ($column === "was_finished") {
