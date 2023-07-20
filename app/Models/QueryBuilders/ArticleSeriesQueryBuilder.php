@@ -33,6 +33,7 @@ class ArticleSeriesQueryBuilder extends AbstractQueryBuilder
                 'parent_uuid',
                 'title',
                 'article_category_uuid',
+                'assigned_ids',
                 'list_keywords',
             ])
             ->defaultSort('-created_at')
@@ -42,6 +43,7 @@ class ArticleSeriesQueryBuilder extends AbstractQueryBuilder
                 'parent_uuid',
                 'title',
                 'article_category_uuid',
+                'assigned_ids',
                 'list_keywords',
             ])
             ->allowedFilters([
@@ -53,6 +55,8 @@ class ArticleSeriesQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__parent_uuid', 'parent_uuid'),
                 'article_category_uuid',
                 AllowedFilter::exact('exact__article_category_uuid', 'article_category_uuid'),
+                'assigned_ids',
+                AllowedFilter::exact('exact__assigned_ids', 'assigned_ids'),
                 'list_keywords',
                 AllowedFilter::exact('exact__list_keywords', 'list_keywords'),
                 'created_at',

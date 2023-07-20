@@ -1398,5 +1398,6 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'article-series'], function 
     Route::group(['middleware' => ['role:root,admin,editor'], 'as' => 'author.'], function () {
         Route::get('article-series', [ArticleSeriesController::class, 'index']);
         Route::get('article-serie/{id}', [ArticleSeriesController::class, 'show']);
+        Route::get('assigned/article-series', [ArticleSeriesController::class, 'indexMyAssigned']);
     });
 });

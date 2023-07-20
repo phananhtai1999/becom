@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
+use App\Rules\ArticleSeriesRule;
 use Illuminate\Validation\Rule;
 
 class ArticleSeriesRequest extends AbstractRequest
@@ -29,15 +30,17 @@ class ArticleSeriesRequest extends AbstractRequest
             'title' => ['required', 'array', 'min:1'],
             'title.en' => ['required', 'string'],
             'title.*' => ['required', 'string'],
+            'list_keywords' => ['nullable', 'in:NULL'],
             'article_category_uuid' => ['nullable', 'numeric', 'min:1', Rule::exists('article_categories', 'uuid')->whereNull('deleted_at')],
-            'parent_uuid' => ['nullable', 'numeric', Rule::exists('article_series', 'uuid')->whereNull('deleted_at')]
+            'parent_uuid' => ['nullable', 'numeric', Rule::exists('article_series', 'uuid')->whereNull('deleted_at')],
+            'assigned_ids' => ['nullable', 'numeric', new ArticleSeriesRule($this->request->get('assigned_ids'))],
         ];
 
         if ($this->request->get('parent_uuid')) {
+            $validate['article_category_uuid'] = ['nullable', 'in:NULL'];
+            $validate['assigned_ids'] = ['nullable', 'in:NULL'];
             $validate['list_keywords'] = ['required', 'array', 'min:1'];
             $validate['list_keywords.*'] = ['string'];
-        } else {
-            $validate['list_keywords'] = ['nullable', 'in:NULL'];
         }
 
         return $validate;
