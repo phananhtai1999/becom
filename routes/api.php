@@ -828,16 +828,14 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'article.'], function () {
         Route::delete('/article/{id}', [ArticleController::class, 'destroy'])->name('destroy');
         Route::get('/article/{id}', [ArticleController::class, 'show'])->name('show');
     });
-    //Check role editor for change status
-    Route::group(['middleware' => ['role:root,admin,editor'], 'as' => 'author.'], function () {
-        Route::post('article/change-status', [ArticleController::class, 'changeStatusArticle'])->name('changeStatusArticle');
-    });
 
     Route::group(['middleware' => ['role:root,admin,editor']], function () {
         Route::get('/unpublished-articles', [ArticleController::class, 'indexUnpublishedArticle'])->name('index-unpublished');
         Route::get('/unpublished-article/{id}', [ArticleController::class, 'showUnpublishedArticle'])->name('show-unpublished');
         Route::post('/unpublished-article', [ArticleController::class, 'storeUnpublishedArticle'])->name('store-unpublished');
         Route::put('/unpublished-article/{id}', [ArticleController::class, 'editUnpublishedArticle'])->name('edit-unpublished');
+        //Check role editor for change status
+        Route::post('article/change-status', [ArticleController::class, 'changeStatusArticle'])->name('changeStatusArticle');
     });
 
     Route::get('my/articles', [ArticleController::class, 'indexMy'])->name('indexMy');
@@ -1303,7 +1301,6 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'asset'], function () {
         Route::get('/assets', [AssetController::class, 'index']);
         Route::post('asset/{id}', [AssetController::class, 'edit']);
         Route::delete('asset/{id}', [AssetController::class, 'destroy']);
-        Route::post('asset/change-status/{id}', [AssetController::class, 'changeStatusAsset']);
         Route::post('asset', [AssetController::class, 'store']);
     });
 
@@ -1313,6 +1310,8 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'asset'], function () {
         Route::get('unpublished-asset/{id}', [AssetController::class, 'showPendingAsset']);
         Route::post('unpublished-asset', [AssetController::class, 'storePendingAsset']);
         Route::delete('my/asset/{id}', [AssetController::class, 'destroyMy']);
+        //Check role editor for change status
+        Route::post('asset/change-status/{id}', [AssetController::class, 'changeStatusAsset']);
     });
     Route::get('my/assets', [AssetController::class, 'indexMy']);
     Route::get('/publish-assets', [AssetController::class, 'indexPublishAssets']);
