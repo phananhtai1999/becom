@@ -78,4 +78,18 @@ class ArticleSeriesController extends AbstractRestAPIController
             $this->service->resourceToData($this->resourceClass, $model)
         );
     }
+
+    /**
+     * @param IndexRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function indexMyAssigned(IndexRequest $request)
+    {
+        $models = $this->service->getCollectionWithPaginationByCondition($request,
+            ['assigned_ids' => auth()->user()->getKey()]);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+        );
+    }
 }

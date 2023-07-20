@@ -332,4 +332,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(UserTracking::class, 'user_uuid', 'uuid');
     }
+
+    /**
+     * @return HasMany
+     */
+    public function articleSeries()
+    {
+        return $this->hasMany(ArticleSeries::class, 'assigned_ids', 'uuid');
+    }
 }

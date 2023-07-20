@@ -21,6 +21,7 @@ class ArticleSeriesResource extends AbstractJsonResource
             'uuid' => $this->uuid,
             'slug' => $this->slug,
             'article_category_uuid' => $this->article_category_uuid,
+            'assigned_ids' => $this->assigned_ids,
             'parent_uuid' => $this->parent_uuid,
             'list_keywords' => $this->list_keywords,
             'title' => app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('title') : $this->title,
@@ -40,6 +41,10 @@ class ArticleSeriesResource extends AbstractJsonResource
 
         if (\in_array('article_series__children_category', $expand)) {
             $data['children_category'] = self::collection($this->childrenArticleSeries);
+        }
+
+        if (\in_array('article_series__user', $expand)) {
+            $data['user'] = new UserResource($this->user);
         }
 
         return $data;

@@ -67,6 +67,7 @@ class ArticleSeries extends AbstractModel
         'parent_uuid',
         'title',
         'article_category_uuid',
+        'assigned_ids',
         'list_keywords',
     ];
 
@@ -79,6 +80,7 @@ class ArticleSeries extends AbstractModel
         'deleted_at' => 'datetime',
         'parent_uuid' => 'integer',
         'article_category_uuid' => 'integer',
+        'assigned_ids' => 'integer',
         'title' => 'array',
         'list_keywords' => 'array',
     ];
@@ -214,5 +216,13 @@ class ArticleSeries extends AbstractModel
                     }
                 });
         });
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'assigned_ids', 'uuid');
     }
 }
