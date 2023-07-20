@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
 use App\Models\Asset;
+use App\Models\Role;
 use Illuminate\Validation\Rule;
 
 class ChangeStatusAssetRequest extends AbstractRequest
@@ -28,6 +29,12 @@ class ChangeStatusAssetRequest extends AbstractRequest
         $validate = [
           'status' => ['required', Rule::in(Asset::REJECT_STATUS, Asset::PUBLISH_STATUS, Asset::PENDING_STATUS, Asset::DRAFT_STATUS)]
         ];
+
+        //Check role editor
+        if (!auth()->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ADMIN_ROOT])->count())
+        {
+            $validate['status'] = ['required', Rule::in(Asset::PENDING_STATUS, Asset::DRAFT_STATUS)];
+        }
 
         if ($this->request->get('status') == Asset::REJECT_STATUS){
             $validate['reject_reason'] = ['required', 'string'];
