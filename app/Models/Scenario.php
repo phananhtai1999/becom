@@ -13,6 +13,9 @@ class Scenario extends AbstractModel
 {
     use HasFactory, SoftDeletes;
 
+    CONST STATUS_RUNNING = 'running';
+    CONST STATUS_STOPPED = 'stopped';
+
     /**
      * @var string
      */
