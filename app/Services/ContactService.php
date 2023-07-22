@@ -60,13 +60,18 @@ class ContactService extends AbstractService
      */
     public function getBirthdayContactsSendEmail($campaignUuid)
     {
+        $timezone = $this->getConfigByKeyInCache('timezone')->value;
+        $currentTime = Carbon::parse(Carbon::now($timezone))->format('m-d');
+
         return $this->model->select('contacts.*')
             ->join('contact_contact_list', 'contact_contact_list.contact_uuid', '=', 'contacts.uuid')
             ->join('contact_lists', 'contact_lists.uuid', '=', 'contact_contact_list.contact_list_uuid')
             ->join('campaign_contact_list', 'campaign_contact_list.contact_list_uuid', '=', 'contact_lists.uuid')
             ->join('campaigns', 'campaigns.uuid', '=', 'campaign_contact_list.campaign_uuid')
             ->where('campaigns.uuid', $campaignUuid)
-            ->whereDate('contacts.dob', Carbon::now())->get()->unique('email');
+            ->where(function ($query) use ($currentTime) {
+                $query->whereRaw("DATE_FORMAT(contacts.dob, '%m-%d') = '{$currentTime}'");
+            })->get()->unique('email');
     }
 
     /**
@@ -75,13 +80,18 @@ class ContactService extends AbstractService
      */
     public function getBirthdayContactsSendSms($campaignUuid)
     {
+        $timezone = $this->getConfigByKeyInCache('timezone')->value;
+        $currentTime = Carbon::parse(Carbon::now($timezone))->format('m-d');
+
         return $this->model->select('contacts.*')
             ->join('contact_contact_list', 'contact_contact_list.contact_uuid', '=', 'contacts.uuid')
             ->join('contact_lists', 'contact_lists.uuid', '=', 'contact_contact_list.contact_list_uuid')
             ->join('campaign_contact_list', 'campaign_contact_list.contact_list_uuid', '=', 'contact_lists.uuid')
             ->join('campaigns', 'campaigns.uuid', '=', 'campaign_contact_list.campaign_uuid')
             ->where('campaigns.uuid', $campaignUuid)
-            ->whereDate('contacts.dob', Carbon::now())->get()->unique('phone');
+            ->where(function ($query) use ($currentTime) {
+                $query->whereRaw("DATE_FORMAT(contacts.dob, '%m-%d') = '{$currentTime}'");
+            })->get()->unique('phone');
     }
 
     /**

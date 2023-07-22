@@ -51,11 +51,11 @@ class ActivityHistoryOfSendByCampaignListener
         $timezone = optional($this->activityHistoryService->getConfigByKeyInCache('timezone'))->value;
         if ($mailSendingHistories->status === 'sent' || $mailSendingHistories->status === 'fail') {
             $contactUuid = $event->contact;
-            $date = $timezone ? Carbon::parse($mailSendingHistories->created_at)->setTimezone($timezone) : $mailSendingHistories->created_at;
+            $date = $timezone ? Carbon::parse($mailSendingHistories->created_at)->setTimezone($timezone)->toDateTimeString() : $mailSendingHistories->created_at;
             $content = ['status_type' => $mailSendingHistories->status, 'langkey' => $mailSendingHistories->status === 'sent' ? 'sent.success' : 'sent.failed', 'send_type' => $sendType, 'email' => $mailSendingHistories->email, 'status' => $mailSendingHistories->status === 'sent' ? 'success' : 'failed', 'date' => $date];
         } elseif ($mailSendingHistories->status === 'opened') {
             $contactUuid = $this->contactService->getContactByCampaignTypeEmail($mailSendingHistories->campaign->uuid, $mailSendingHistories->email)->toArray()[0]['uuid'];
-            $date =  $timezone ? Carbon::parse($mailSendingHistories->updated_at)->setTimezone($timezone) : $mailSendingHistories->updated_at;
+            $date =  $timezone ? Carbon::parse($mailSendingHistories->updated_at)->setTimezone($timezone)->toDateTimeString() : $mailSendingHistories->updated_at;
             $content = ['status_type' => $mailSendingHistories->status, 'langkey' => 'opened', 'email' => $mailSendingHistories->email, 'date' => $date];
         }
         if($content){
