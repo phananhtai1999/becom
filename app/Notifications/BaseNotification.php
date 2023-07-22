@@ -14,7 +14,6 @@ use App\Services\SmtpAccountService;
 use App\Services\UserService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Techup\Connector\Facades\Connector;
 use App\Models\MailSendingHistory;
 
