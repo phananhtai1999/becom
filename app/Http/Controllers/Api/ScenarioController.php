@@ -14,6 +14,7 @@ use App\Http\Requests\ScenarioRequest;
 use App\Http\Requests\StatusMyScenarioRequest;
 use App\Http\Resources\ScenarioResourceCollection;
 use App\Models\Notification;
+use App\Models\Scenario;
 use App\Services\CampaignScenarioService;
 use App\Services\CampaignService;
 use App\Services\ConfigService;
@@ -400,8 +401,10 @@ class ScenarioController extends AbstractRestAPIController
     {
         $myScenario = $this->myService->findMyScenarioByUuid($id);
         $campaignScenarioRoot = $this->campaignScenarioService->getCampaignScenarioRootByScenarioUuid($myScenario->uuid);
-        if ($campaignScenarioRoot && count($this->mailSendingHistoryService->showMailSendingByCampaignScenarioUuid($campaignScenarioRoot->uuid))) {
-            return $this->sendValidationFailedJsonResponse(["errors" => ["scenario_uuid" => __('messages.scenario_running')]]);
+        if ($myScenario->status == Scenario::STATUS_RUNNING){
+            if ($campaignScenarioRoot && count($this->mailSendingHistoryService->showMailSendingByCampaignScenarioUuid($campaignScenarioRoot->uuid))) {
+                return $this->sendValidationFailedJsonResponse(["errors" => ["scenario_uuid" => __('messages.scenario_running')]]);
+            }
         }
         if ($campaignScenarioRoot){
             $this->campaignScenarioService->destroy($campaignScenarioRoot->uuid);
