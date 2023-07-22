@@ -1,0 +1,41 @@
+{
+    "name": "techup/mailbox",
+    "description": ":package_description",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Author Name",
+            "email": "author@email.com",
+            "homepage": "http://author.com"
+        }
+    ],
+    "homepage": "https://github.com/techup/mailbox",
+    "keywords": ["Laravel", "Mailbox"],
+    "require": {
+        "illuminate/support": "~8"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~8.0",
+        "orchestra/testbench": "~7"
+    },
+    "autoload": {
+        "psr-4": {
+            "Techup\\Mailbox\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Techup\\Mailbox\\Tests\\": "tests"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Techup\\Mailbox\\MailboxServiceProvider"
+            ],
+            "aliases": {
+                "Mailbox": "Techup\\Mailbox\\Facades\\Mailbox"
+            }
+        }
+    }
+}
