@@ -35,6 +35,7 @@
         "srmklive/paypal": "~3.0",
         "stripe/stripe-php": "^10.0",
         "techup/connector": "dev-main",
+        "techup/mailbox": "dev-dev",
         "torann/geoip": "*",
       "ext-mysqli": "*"
     },
@@ -90,6 +91,13 @@
         "techup/connector": {
             "type": "path",
             "url": "packages/techup/connector",
+            "options": {
+                "symlink": true
+            }
+        },
+        "techup/mailbox": {
+            "type": "path",
+            "url": "packages/techup/mailbox",
             "options": {
                 "symlink": true
             }

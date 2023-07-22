@@ -39,7 +39,7 @@ class ActivityHistoryListener
             $date = $model->deleted_at;
         }
         $timezone = optional($this->activityHistoryService->getConfigByKeyInCache('timezone'))->value;
-        $date = $timezone ? Carbon::parse($date)->setTimezone($timezone) : $date;
+        $date = $timezone ? Carbon::parse($date)->setTimezone($timezone)->toDateTimeString() : $date;
         if ($type === 'note') {
             $this->activityHistories($type, $model->uuid, $action, $model->contact->email, $date, $model->contact_uuid);
         } elseif ($type === 'remind') {

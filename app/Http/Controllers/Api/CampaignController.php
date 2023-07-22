@@ -314,7 +314,7 @@ class CampaignController extends AbstractRestAPIController
     {
         $sortTotalCredit = explode(',', $request->sort);
 
-        if (isset($this->user()->userTeamContactLists) && !empty($this->user()->userTeamContactLists)) {
+        if (isset($this->user()->userTeamContactLists) && !empty($this->user()->userTeamContactLists)  && !$this->user()->userTeam['is_blocked']) {
             if ($sortTotalCredit[0] == 'number_credit_needed_to_start_campaign' || $sortTotalCredit[0] == '-number_credit_needed_to_start_campaign') {
                 $models = $this->myService->sortMyTotalCredit($request->get('per_page', '15'), $sortTotalCredit[0], $request->search, $request->search_by, $this->user()->userTeamContactLists()->pluck('contact_list_uuid'));
             } else {
