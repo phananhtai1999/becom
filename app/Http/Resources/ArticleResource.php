@@ -33,7 +33,7 @@ class ArticleResource extends AbstractJsonResource
             'reject_reason' => $this->reject_reason,
             'content_for_user' => $this->content_for_user,
             'title' => $this->title,
-            'title_translate' => $this->title_translate,
+            'titles' => $this->titles,
             'content' => $formatContent['content'],
             'content_translate' => $formatContent['content_translate'],
             'short_content' => $this->short_content,

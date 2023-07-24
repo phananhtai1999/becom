@@ -49,7 +49,7 @@ class WebsitePageCategory extends AbstractModel
      * @var string[]
      */
     protected $appends = [
-        'title_translate',
+        'titles',
     ];
 
     /**
@@ -63,7 +63,7 @@ class WebsitePageCategory extends AbstractModel
     /**
      * @return array|mixed
      */
-    public function getTitleTranslateAttribute()
+    public function getTitlesAttribute()
     {
         return app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('title') : $this->title;
     }

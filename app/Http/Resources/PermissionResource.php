@@ -20,7 +20,7 @@ class PermissionResource extends AbstractJsonResource
             'code' => $this->code,
             'api_methods' => $this->api_methods,
             'name' => $this->name,
-            'name_translate' => $this->name_translate,
+            'names' => $this->names,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
