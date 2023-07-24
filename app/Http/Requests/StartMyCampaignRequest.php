@@ -27,7 +27,7 @@ class StartMyCampaignRequest extends AbstractRequest
     public function rules()
     {
         $campaignUuid = [];
-        if (isset(auth()->user()->userTeamContactLists) && !empty(auth()->user()->userTeamContactLists)  && !auth()->user()->userTeam['is_blocked']) {
+        if(($this->user()->userTeam && !$this->user()->userTeam['is_blocked']) && !empty($this->user()->userTeamContactLists)) {
             $campaignUuid = app(Campaign::class)->select('campaigns.*')
                 ->join('campaign_contact_list', 'campaigns.uuid', '=', 'campaign_contact_list.campaign_uuid')
                 ->WhereIn('campaign_contact_list.contact_list_uuid', auth()->user()->userTeamContactLists()->pluck('contact_list_uuid'))->get()->pluck('uuid');
