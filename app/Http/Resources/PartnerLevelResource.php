@@ -23,7 +23,7 @@ class PartnerLevelResource extends AbstractJsonResource
             'number_of_customers' => $this->number_of_customers,
             'commission' => $this->commission,
             'content' => $this->content,
-            'content_translate' => $this->content_translate,
+            'contents' => $this->contents,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
         ];
