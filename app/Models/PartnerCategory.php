@@ -53,7 +53,7 @@ class PartnerCategory extends AbstractModel
      */
     protected $appends = [
         'titles',
-        'content_translate'
+        'contents'
     ];
 
     /**
@@ -75,7 +75,7 @@ class PartnerCategory extends AbstractModel
     /**
      * @return array|mixed
      */
-    public function getContentTranslateAttribute()
+    public function getContentsAttribute()
     {
         return app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('content') : $this->content;
     }

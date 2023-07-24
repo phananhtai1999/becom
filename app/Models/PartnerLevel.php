@@ -56,7 +56,7 @@ class PartnerLevel extends AbstractModel
      */
     protected $appends = [
         'titles',
-        'content_translate'
+        'contents'
     ];
 
     /**
@@ -70,7 +70,7 @@ class PartnerLevel extends AbstractModel
     /**
      * @return mixed
      */
-    public function getContentTranslateAttribute()
+    public function getContentsAttribute()
     {
         $language = app()->getLocale();
         $langDefault = config('app.fallback_locale');

@@ -23,7 +23,7 @@ class PartnerCategoryResource extends AbstractJsonResource
             'title' => $this->title,
             'titles' => $this->titles,
             'content' => $this->content,
-            'content_translate' => $this->content_translate,
+            'contents' => $this->contents,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
