@@ -18,7 +18,7 @@ class PartnerLevelResource extends AbstractJsonResource
         $data = [
             'uuid' => $this->getKey(),
             'image' => $this->image,
-            'title' => (new UserService())->checkLanguagesPermission() ? $this->getTranslations('title') : $this->title,
+            'title' => $this->title,
             'titles' => $this->titles,
             'number_of_customers' => $this->number_of_customers,
             'commission' => $this->commission,
