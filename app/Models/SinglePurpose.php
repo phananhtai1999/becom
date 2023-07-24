@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Abstracts\AbstractModel;
 use App\Http\Controllers\Traits\ModelFilterExactTitleCategoryLanguageTrait;
 use App\Http\Controllers\Traits\ModelFilterLanguageTrait;
+use App\Services\UserService;
 use Baum\NestedSet\Node as WorksAsNestedSet;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -87,7 +88,7 @@ class SinglePurpose extends AbstractModel
      * @var string[]
      */
     protected $appends = [
-        'title_translate',
+        'titles',
     ];
 
     /**
@@ -113,9 +114,9 @@ class SinglePurpose extends AbstractModel
     /**
      * @return mixed
      */
-    public function getTitleTranSlateAttribute()
+    public function getTitlesAttribute()
     {
-        return $this->title;
+        return app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('title') : $this->title;
     }
 
     /**

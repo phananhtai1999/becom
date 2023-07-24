@@ -5,11 +5,7 @@ namespace App\Models;
 use App\Abstracts\AbstractModel;
 use App\Http\Controllers\Traits\ModelFilterLanguageTrait;
 use App\Services\UserService;
-use Baum\NestedSet\Node as WorksAsNestedSet;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Translatable\HasTranslations;
 
@@ -57,7 +53,7 @@ class Purpose extends AbstractModel
      * @var string[]
      */
     protected $appends = [
-        'title_translate',
+        'titles',
     ];
 
     public function mailTemplates()
@@ -68,8 +64,8 @@ class Purpose extends AbstractModel
     /**
      * @return array|mixed
      */
-    public function getTitleTranslateAttribute()
+    public function getTitlesAttribute()
     {
-        return $this->title;
+        return app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('title') : $this->title;
     }
 }

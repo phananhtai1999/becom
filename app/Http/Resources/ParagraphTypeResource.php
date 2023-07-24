@@ -22,7 +22,7 @@ class ParagraphTypeResource extends AbstractJsonResource
             'uuid' => $this->uuid,
             'slug' => $this->slug,
             'title' => app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('title') : $this->title,
-            'title_translate' => $this->title_translate,
+            'titles' => $this->titles,
             'parent_uuid' => $this->parent_uuid,
             'user_uuid' => $this->user_uuid,
             'sort' => $this->sort,
