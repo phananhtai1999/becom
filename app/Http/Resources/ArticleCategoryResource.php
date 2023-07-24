@@ -21,7 +21,7 @@ class ArticleCategoryResource extends AbstractJsonResource
             'uuid' => $this->uuid,
             'slug' => $this->slug,
             'title' => $this->title,
-            'title_translate' => $this->title_translate,
+            'titles' => $this->titles,
             'image' => $this->image,
             'parent_uuid' => $this->parent_uuid,
             'user_uuid' => $this->user_uuid,

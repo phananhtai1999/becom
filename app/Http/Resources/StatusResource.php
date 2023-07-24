@@ -18,8 +18,8 @@ class StatusResource extends AbstractJsonResource
 
         $data = [
             'uuid' => $this->getKey(),
-            'name' => auth()->user()->roles->where('slug', 'admin')->isEmpty() ? $this->name : $this->getTranslations('name'),
-            'name_translate' => $this->name_translate,
+            'name' => $this->name,
+            'names' => $this->names,
             'points' => $this->points,
             'user_uuid' => $this->user_uuid,
             'deleted_at' => $this->deleted_at,

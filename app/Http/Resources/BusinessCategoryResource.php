@@ -20,7 +20,7 @@ class BusinessCategoryResource extends AbstractJsonResource
         $data = [
             'uuid' => $this->uuid,
             'title' => $this->title,
-            'title_translate' => $this->title_translate,
+            'titles' => $this->titles,
             'parent_uuid' => $this->parent_uuid,
             'publish_status' => $this->publish_status,
             'deleted_at' => $this->deleted_at,

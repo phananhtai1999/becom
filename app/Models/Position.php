@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Abstracts\AbstractModel;
 use App\Http\Controllers\Traits\ModelFilterExactNameLanguageTrait;
 use App\Http\Controllers\Traits\ModelFilterNameLanguageTrait;
+use App\Services\UserService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Translatable\HasTranslations;
@@ -50,7 +51,7 @@ class Position extends AbstractModel
      * @var string[]
      */
     protected $appends = [
-        'name_translate',
+        'names',
     ];
 
     /**
@@ -72,8 +73,8 @@ class Position extends AbstractModel
     /**
      * @return array|mixed
      */
-    public function getNameTranSlateAttribute()
+    public function getNamesAttribute()
     {
-        return auth()->user()->roles->where('slug', 'admin')->isEmpty() ? $this->name : $this->getTranslations('name');
+        return app(UserService::class)->checkLanguagesPermissionWithAdminAndRootRole() ? $this->getTranslations('name') : $this->name;
     }
 }

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Abstracts\AbstractService;
 use App\Models\QueryBuilders\UserQueryBuilder;
+use App\Models\Role;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -246,8 +247,19 @@ class UserService extends AbstractService
             return false;
         }
 
-        return auth()->user()->roles->whereIn('slug', ["admin", "editor", "root"])->count();
+        return auth()->user()->roles->whereIn('slug', [Role::ADMIN_ROOT, Role::ROLE_ROOT, Role::ROLE_EDITOR])->count();
+    }
 
+    /**
+     * @return false
+     */
+    public function checkLanguagesPermissionWithAdminAndRootRole()
+    {
+        if (auth()->guest()) {
+            return false;
+        }
+
+        return auth()->user()->roles->whereIn('slug', [Role::ADMIN_ROOT, Role::ROLE_ROOT])->count();
     }
 
     public function getUsersByRole($role)

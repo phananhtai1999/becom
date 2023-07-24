@@ -44,7 +44,7 @@ class Permission extends AbstractModel
      * @var string[]
      */
     protected $appends = [
-        'name_translate',
+        'names',
     ];
 
     public function platformPackages() {
@@ -54,7 +54,7 @@ class Permission extends AbstractModel
     /**
      * @return array|mixed
      */
-    public function getNameTranslateAttribute()
+    public function getNamesAttribute()
     {
         return app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('name') : $this->name;
     }

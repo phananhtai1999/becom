@@ -20,7 +20,7 @@ class PurposeResource extends AbstractJsonResource
         $data = [
             'uuid' => $this->uuid,
             'title' => app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('title') : $this->title,
-            'title_translate' => $this->title_translate,
+            'titles' => $this->titles,
             'publish_status' => $this->publish_status,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,

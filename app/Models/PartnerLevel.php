@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Abstracts\AbstractModel;
 use App\Http\Controllers\Traits\ModelFilterLanguageTrait;
+use App\Services\UserService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Translatable\HasTranslations;
@@ -54,16 +55,16 @@ class PartnerLevel extends AbstractModel
      * @var string[]
      */
     protected $appends = [
-        'title_translate',
+        'titles',
         'content_translate'
     ];
 
     /**
      * @return mixed
      */
-    public function getTitleTranslateAttribute()
+    public function getTitlesAttribute()
     {
-        return $this->title;
+        return app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('title') : $this->title;
     }
 
     /**
