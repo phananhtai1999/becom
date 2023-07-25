@@ -82,7 +82,7 @@ class Article extends AbstractModel
     protected $appends = [
         'short_content',
         'titles',
-        'content_translate',
+        'contents',
     ];
 
     /**
@@ -181,7 +181,7 @@ class Article extends AbstractModel
     /**
      * @return array|mixed
      */
-    public function getContentTranslateAttribute()
+    public function getContentsAttribute()
     {
         return app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('content') : $this->content;
     }

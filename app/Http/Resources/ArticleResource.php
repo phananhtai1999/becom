@@ -17,7 +17,7 @@ class ArticleResource extends AbstractJsonResource
     {
         $expand = request()->get('expand', []);
 
-        $formatContent = (new ArticleService())->formatContent($this->content_type, $this->content, $this->content_translate);
+        $formatContent = (new ArticleService())->formatContent($this->content_type, $this->content, $this->contents);
 
         $data = [
             'uuid' => $this->uuid,
@@ -35,7 +35,7 @@ class ArticleResource extends AbstractJsonResource
             'title' => $this->title,
             'titles' => $this->titles,
             'content' => $formatContent['content'],
-            'content_translate' => $formatContent['content_translate'],
+            'contents' => $formatContent['contents'],
             'short_content' => $this->short_content,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
