@@ -159,7 +159,7 @@ class AuthController extends AbstractRestAPIController
     public function me(): JsonResponse
     {
         /** @var User $user */
-        $user = $this->userService->currentUser();
+        $user = auth()->user();
         if ($user) {
             return $this->sendOkJsonResponse(
                 app(UserResource::class, ['resource' => $user])
