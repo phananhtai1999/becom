@@ -175,7 +175,7 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-
+        Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
     ],
 
     /*
@@ -233,6 +233,8 @@ return [
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
         'GeoIP' => \Torann\GeoIP\Facades\GeoIP::class,
         'Agent' => Jenssegers\Agent\Facades\Agent::class,
+        'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class,
+        'JWTFactory' => Tymon\JWTAuth\Facades\JWTFactory::class,
     ],
 
 ];

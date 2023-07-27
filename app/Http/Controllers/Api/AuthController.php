@@ -7,6 +7,7 @@ use App\Events\SendEmailRecoveryPasswordEvent;
 use App\Events\SendNotificationSystemForLoginEvent;
 use App\Http\Requests\RecoveryPasswordRequest;
 use App\Http\Requests\RefreshOtpRequest;
+use App\Http\Requests\RefreshTokenRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\SendResetPasswordEmailRequest;
 use App\Http\Requests\VerifyActiveCodeRequest;
@@ -36,8 +37,8 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Redis;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends AbstractRestAPIController
 {
@@ -84,12 +85,12 @@ class AuthController extends AbstractRestAPIController
         RoleService            $roleService,
         UserAccessTokenService $userAccessTokenService,
         OtpService             $otpService,
-        ConfigService $configService,
-        SmtpAccountService $smtpAccountService,
-        InviteService $inviteService,
-        UserTeamService $userTeamService,
-        PartnerService $partnerService,
-        PartnerUserService $partnerUserService
+        ConfigService          $configService,
+        SmtpAccountService     $smtpAccountService,
+        InviteService          $inviteService,
+        UserTeamService        $userTeamService,
+        PartnerService         $partnerService,
+        PartnerUserService     $partnerUserService
     )
     {
         $this->userService = $userService;
@@ -137,7 +138,6 @@ class AuthController extends AbstractRestAPIController
 
     /**
      * @return JsonResponse
-     * @throws \Throwable
      */
     public function logout(): JsonResponse
     {
@@ -307,7 +307,7 @@ class AuthController extends AbstractRestAPIController
                     'email' => $user->email
                 ]]);
             }
-            $this->otpService->update($otp,[
+            $this->otpService->update($otp, [
                 'active_code' => $activeCode,
                 'expired_time' => Carbon::now()->addMinutes(config('otp.expired_time')),
                 'refresh_time' => Carbon::now()->addSeconds(config('otp.refresh_time')),
@@ -332,7 +332,7 @@ class AuthController extends AbstractRestAPIController
         $otp = $this->otpService->findOrFailById($user->uuid);
         if ($otp->refresh_time > Carbon::now()) {
 
-            return $this->sendValidationFailedJsonResponse(['message'=> 'Please wait ' . config('otp.refresh_time') . ' second to refresh!']);
+            return $this->sendValidationFailedJsonResponse(['message' => 'Please wait ' . config('otp.refresh_time') . ' second to refresh!']);
         } elseif (empty($otp->active_code)) {
 
             return $this->sendValidationFailedJsonResponse(['message' => __('auth.active_code_null')]);
@@ -358,7 +358,8 @@ class AuthController extends AbstractRestAPIController
      * @param VerifyActiveCodeRequest $request
      * @return JsonResponse|void
      */
-    public function verifyActiveCode(VerifyActiveCodeRequest $request) {
+    public function verifyActiveCode(VerifyActiveCodeRequest $request)
+    {
         $user = $this->userService->findByEmail($request->get('email'));
         $otp = $this->otpService->findOrFailById($user->uuid);
         if ($otp->expired_time < Carbon::now()) {
@@ -369,14 +370,14 @@ class AuthController extends AbstractRestAPIController
             return $this->sendValidationFailedJsonResponse(['message' => __('auth.account_blocked')]);
         } elseif ($otp->active_code != $request->get('active_code')) {
             $wrongCount = $otp->wrong_count + 1;
-            if ($wrongCount == config('otp.wrong_count')){
+            if ($wrongCount == config('otp.wrong_count')) {
                 $this->otpService->update($otp, [
                     'wrong_count' => 0,
                     'refresh_count' => 0,
                     'blocked_time' => Carbon::now()->addMinutes(config('otp.blocked_time')),
                 ]);
 
-                return $this->sendValidationFailedJsonResponse(['message' => 'Your code is wrong ' .config('otp.wrong_count') .' times. Please check it again']);
+                return $this->sendValidationFailedJsonResponse(['message' => 'Your code is wrong ' . config('otp.wrong_count') . ' times. Please check it again']);
             } else {
                 $this->otpService->update($otp, ['wrong_count' => $wrongCount]);
 
@@ -408,8 +409,12 @@ class AuthController extends AbstractRestAPIController
             ->toResponse(app('Request'))
             ->getData(true);
 
-        $userData['data']['token'] = $this->userAccessTokenService->storeNewForUser($user)->getKey();
+        $userData['data']['token'] = JWTAuth::fromUser($user);
+        if (!$userData['data']['token']) {
+            return $this->sendUnAuthorizedJsonResponse();
+        }
         $userData['data']['token_type'] = 'Bearer';
+        $userData['data']['expires_in'] = config('jwt.ttl');
 
         //Kiểm tra country và gửi email khi khác country
         SendNotificationSystemForLoginEvent::dispatch($user, \request()->ip(), \request()->userAgent());
@@ -422,11 +427,25 @@ class AuthController extends AbstractRestAPIController
             "locale" => app()->getLocale(),
             'message' => $message
         ], $userData))
-            ->withCookie(
-                \cookie('accessToken', $userData['data']['token'], config('auth.password_timeout'), null, null, true, true)
-            )->withCookie(
-                \cookie('logged', true, config('auth.password_timeout'), null, null, true, false)
-            )->withoutCookie('invitePartner');
+            ->withoutCookie('invitePartner');
+    }
+
+    /**
+     * @param RefreshTokenRequest $request
+     * @return JsonResponse
+     */
+    public function refreshToken(RefreshTokenRequest $request)
+    {
+        try {
+            return $this->sendOkJsonResponse([
+                'data' => [
+                    'token' => auth()->refresh($request->token),
+                    'expires_in' => config('jwt.refresh_ttl')
+                ]
+            ]);
+        } catch (JWTException $exception) {
+            return $this->sendUnAuthorizedJsonResponse();
+        }
     }
 
     public function checkInvite($user)

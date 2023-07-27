@@ -13,6 +13,7 @@
         "ext-exif": "*",
         "ext-gd": "*",
         "ext-json": "*",
+        "ext-mysqli": "*",
         "aws/aws-sdk-php": "^3.216",
         "barryvdh/laravel-dompdf": "*",
         "baum/baum": "*",
@@ -37,7 +38,7 @@
         "techup/connector": "dev-main",
         "techup/mailbox": "dev-dev",
         "torann/geoip": "*",
-      "ext-mysqli": "*"
+        "tymon/jwt-auth": "^1.0@dev"
     },
     "require-dev": {
         "facade/ignition": "^2.5",
