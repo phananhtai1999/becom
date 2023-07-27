@@ -101,6 +101,7 @@ Route::group(['as' => 'auth.'], function () {
     Route::post('/forget-password', [AuthController::class, 'forgetPassword'])->name('forget-password');
     Route::post('/recovery-password', [AuthController::class, 'recoveryPassword'])->name('recovery-password');
     Route::get('/check-token', [AuthController::class, 'checkToken'])->name('check-token');
+    Route::post('/refresh-token', [AuthController::class, 'refreshToken'])->name('refresh-token');
 });
 
 Route::group(['as' => 'otp.'], function () {
