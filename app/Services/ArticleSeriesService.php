@@ -23,4 +23,13 @@ class ArticleSeriesService extends AbstractService
             return $this->findOneById($articleSeriesUuid)->update(['article_uuid' => $articleUuid]);
         }
     }
+
+    /**
+     * @param $articleUuid
+     * @return mixed
+     */
+    public function updateArticleSeriesWhenDeleteArticle($articleUuid)
+    {
+        return $this->model->where('article_uuid', $articleUuid)->update(['article_uuid' => null]);
+    }
 }
