@@ -35,6 +35,7 @@ class ArticleSeriesQueryBuilder extends AbstractQueryBuilder
                 'article_category_uuid',
                 'assigned_ids',
                 'list_keywords',
+                'article_uuid',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -45,6 +46,7 @@ class ArticleSeriesQueryBuilder extends AbstractQueryBuilder
                 'article_category_uuid',
                 'assigned_ids',
                 'list_keywords',
+                'article_uuid',
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -57,6 +59,8 @@ class ArticleSeriesQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__article_category_uuid', 'article_category_uuid'),
                 'assigned_ids',
                 AllowedFilter::exact('exact__assigned_ids', 'assigned_ids'),
+                'article_uuid',
+                AllowedFilter::exact('exact__article_uuid', 'article_uuid'),
                 'list_keywords',
                 AllowedFilter::exact('exact__list_keywords', 'list_keywords'),
                 'created_at',
@@ -74,6 +78,8 @@ class ArticleSeriesQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::scope('to__created_at'),
                 AllowedFilter::scope('from__updated_at'),
                 AllowedFilter::scope('to__updated_at'),
+                'article.publish_status',
+                AllowedFilter::exact('exact__article.publish_status', 'article.publish_status'),
             ]);
     }
 
