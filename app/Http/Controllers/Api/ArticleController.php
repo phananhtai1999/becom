@@ -230,6 +230,9 @@ class ArticleController extends AbstractRestAPIController
             'content' => $content
         ]));
 
+        // Update Article Series By Article Uuid
+        $this->articleSeriesService->updateArticleSeriesByArticleUuid($request->article_series_uuid, $model->uuid);
+
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
         );

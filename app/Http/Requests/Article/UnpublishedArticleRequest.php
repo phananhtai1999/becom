@@ -41,7 +41,10 @@ class UnpublishedArticleRequest extends AbstractRequest
             'article_category_uuid' => ['nullable', 'numeric', Rule::exists('article_categories', 'uuid')->whereNull('deleted_at')],
             'content_type' => ['required', 'string', 'in:single,paragraph'],
             'single_purpose_uuid' => ['nullable', 'required_if:content_type,single', 'numeric', 'min:1', Rule::exists('single_purposes', 'uuid')->whereNull('deleted_at')],
-            'paragraph_type_uuid' => ['nullable', 'required_if:content_type,paragraph', 'numeric', 'min:1', Rule::exists('paragraph_types', 'uuid')->whereNull('deleted_at')]
+            'paragraph_type_uuid' => ['nullable', 'required_if:content_type,paragraph', 'numeric', 'min:1', Rule::exists('paragraph_types', 'uuid')->whereNull('deleted_at')],
+            'article_series_uuid' => ['nullable', 'numeric', 'min:1', Rule::exists('article_series', 'uuid')->where(function ($query) {
+                return $query->whereNull('article_uuid')->whereNotNull('parent_uuid')->whereNull('deleted_at');
+            })],
         ];
 
         if ($this->request->get('content_type') === 'single') {
