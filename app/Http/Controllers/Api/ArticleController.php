@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
-use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\Article\ChangeStatusArticleRequest;
 use App\Http\Requests\Article\UnpublishedArticleRequest;
@@ -23,7 +22,7 @@ use Illuminate\Http\JsonResponse;
 
 class ArticleController extends AbstractRestAPIController
 {
-    use RestShowTrait, RestDestroyTrait;
+    use RestShowTrait;
 
     /**
      * @var LanguageService
@@ -110,6 +109,20 @@ class ArticleController extends AbstractRestAPIController
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
         );
+    }
+
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
+    public function destroy($id)
+    {
+        $this->service->destroy($id);
+
+        // Update Article Series By Article Uuid
+        $this->articleSeriesService->updateArticleSeriesWhenDeleteArticle($id);
+
+        return $this->sendOkJsonResponse();
     }
 
     /**
