@@ -70,6 +70,7 @@ class ArticleSeries extends AbstractModel
         'article_category_uuid',
         'assigned_ids',
         'list_keywords',
+        'article_uuid',
     ];
 
     /**
@@ -82,6 +83,7 @@ class ArticleSeries extends AbstractModel
         'parent_uuid' => 'integer',
         'article_category_uuid' => 'integer',
         'assigned_ids' => 'integer',
+        'article_uuid' => 'integer',
         'title' => 'array',
         'list_keywords' => 'array',
     ];
@@ -225,5 +227,13 @@ class ArticleSeries extends AbstractModel
     public function user()
     {
         return $this->belongsTo(User::class, 'assigned_ids', 'uuid');
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function article()
+    {
+        return $this->belongsTo(Article::class, 'article_uuid', 'uuid');
     }
 }

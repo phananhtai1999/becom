@@ -15,6 +15,7 @@ use App\Http\Requests\UpdateArticleRequest;
 use App\Http\Resources\ArticleResource;
 use App\Http\Resources\ArticleResourceCollection;
 use App\Models\Article;
+use App\Services\ArticleSeriesService;
 use App\Services\ArticleService;
 use App\Services\LanguageService;
 use Carbon\Carbon;
@@ -30,15 +31,23 @@ class ArticleController extends AbstractRestAPIController
     protected $languageService;
 
     /**
+     * @var ArticleSeriesService
+     */
+    protected $articleSeriesService;
+
+    /**
      * @param ArticleService $service
      * @param LanguageService $languageService
+     * @param ArticleSeriesService $articleSeriesService
      */
     public function __construct(
         ArticleService $service,
-        LanguageService $languageService
+        LanguageService $languageService,
+        ArticleSeriesService $articleSeriesService
     )
     {
         $this->service = $service;
+        $this->articleSeriesService = $articleSeriesService;
         $this->resourceCollectionClass = ArticleResourceCollection::class;
         $this->resourceClass = ArticleResource::class;
         $this->storeRequest = ArticleRequest::class;
@@ -68,6 +77,9 @@ class ArticleController extends AbstractRestAPIController
             'content_for_user' => $request->content_for_user ?: Article::PUBLIC_CONTENT_FOR_USER,
             'content' => $content
         ]));
+
+        // Update Article Series By Article Uuid
+        $this->articleSeriesService->updateArticleSeriesByArticleUuid($request->article_series_uuid, $model->uuid);
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
