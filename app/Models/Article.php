@@ -221,4 +221,12 @@ class Article extends AbstractModel
         return $query->whereIn('article_category_uuid', $articleCategoryUuids)
             ->whereRaw("IFNULL(JSON_UNQUOTE(JSON_EXTRACT(title, '$.$lang')),JSON_UNQUOTE(JSON_EXTRACT(title, '$.$langDefault'))) like '%$title%'");
     }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function articleSerie()
+    {
+        return $this->hasOne(ArticleSeries::class, 'article_uuid', 'uuid');
+    }
 }

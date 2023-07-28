@@ -21,6 +21,7 @@ class ArticleSeriesResource extends AbstractJsonResource
             'uuid' => $this->uuid,
             'slug' => $this->slug,
             'article_category_uuid' => $this->article_category_uuid,
+            'article_uuid' => $this->article_uuid,
             'assigned_ids' => $this->assigned_ids,
             'parent_uuid' => $this->parent_uuid,
             'list_keywords' => $this->list_keywords,
@@ -45,6 +46,10 @@ class ArticleSeriesResource extends AbstractJsonResource
 
         if (\in_array('article_series__user', $expand)) {
             $data['user'] = new UserResource($this->user);
+        }
+
+        if (\in_array('article_series__article', $expand)) {
+            $data['article'] = new ArticleResource($this->article);
         }
 
         return $data;
