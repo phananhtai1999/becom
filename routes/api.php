@@ -127,6 +127,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'user.'], function () {
         Route::get('root/user/{id}', [UserController::class, 'show'])->name('show');
         Route::post('root/user', [UserController::class, 'store'])->name('store');
         Route::put('root/user/ban/{id}', [UserController::class, 'ban'])->name('ban');
+        Route::put('root/user/unban/{id}', [UserController::class, 'unBan'])->name('unban');
         Route::put('root/user/{id}', [UserController::class, 'edit'])->name('edit');
         Route::delete('root/user/{id}', [UserController::class, 'destroy'])->name('destroy');
     });
@@ -135,6 +136,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'user.'], function () {
         Route::get('/users', [UserController::class, 'indexAdmin'])->name('indexAdmin');
         Route::post('/user', [UserController::class, 'storeAdmin'])->name('storeAdmin');
         Route::put('/user/ban/{id}', [UserController::class, 'banAdmin'])->name('banAdmin');
+        Route::put('/user/unban/{id}', [UserController::class, 'unBanAdmin'])->name('unban-admin');
         Route::get('/user/{id}', [UserController::class, 'showAdmin'])->name('showAdmin');
         Route::put('/user/{id}', [UserController::class, 'editAdmin'])->name('editAdmin');
         Route::delete('/user/{id}', [UserController::class, 'destroyAdmin'])->name('destroyAdmin');
