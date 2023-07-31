@@ -12,14 +12,16 @@ class AuthenticationService
      */
     public function doesUserCanLogin(User $user)
     {
-        if($user->banned_at){
-            return [
-                'errors' => __('messages.account_banned')
-            ];
-        }
         if ($user->deleted_at) {
             return [
+                'code' => 1,
                 'errors' => __('messages.account_deleted')
+            ];
+        }
+        if ($user->banned_at) {
+            return [
+                'code' => 2,
+                'errors' => __('messages.account_banned')
             ];
         }
         return true;
