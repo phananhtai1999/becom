@@ -173,7 +173,23 @@ class UserController extends AbstractRestAPIController
     public function ban($id)
     {
         $model = $this->service->findOrFailById($id);
-        $this->service->update($model, ['banned_at' => Carbon::now()]);
+        $timezone = optional($this->service->getConfigByKeyInCache('timezone'))->value;
+
+        $this->service->update($model, ['banned_at' => Carbon::now($timezone)]);
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
+    public function unBan($id)
+    {
+        $model = $this->service->findOrFailById($id);
+        $this->service->update($model, ['banned_at' => null]);
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -235,7 +251,23 @@ class UserController extends AbstractRestAPIController
     public function banAdmin($id)
     {
         $model = $this->service->showUserOfAdminById($id);
-        $this->service->update($model, ['banned_at' => Carbon::now()]);
+        $timezone = optional($this->service->getConfigByKeyInCache('timezone'))->value;
+
+        $this->service->update($model, ['banned_at' => Carbon::now($timezone)]);
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
+    public function unBanAdmin($id)
+    {
+        $model = $this->service->showUserOfAdminById($id);
+        $this->service->update($model, ['banned_at' => null]);
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)

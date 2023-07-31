@@ -98,7 +98,7 @@ class ConfigController extends AbstractRestAPIController
             $castValue = $request->value;
         }
 
-        $this->service->update($model, array_merge($request->all(), [
+        $this->service->update($model, array_merge($request->except(['key']), [
             'value' => $castValue
         ]));
 
