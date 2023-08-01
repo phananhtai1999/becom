@@ -29,7 +29,7 @@ class UpdateUnpublishedArticleRequest extends AbstractRequest
         $validate = [
             'image' => ['nullable', 'string'],
             'video' => ['nullable', 'string'],
-            'slug' => ['string', "regex:/^[a-z0-9-]+$/", Rule::unique('articles')->whereNull('deleted_at')],
+            'slug' => ['string', "regex:/^[a-z0-9-]+$/", Rule::unique('articles')->ignore($this->id, 'uuid')->whereNull('deleted_at')],
             'title' => ['array', 'min:1'],
             'title.en' => ['string'],
             'title.*' => ['string'],

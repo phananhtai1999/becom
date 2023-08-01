@@ -33,7 +33,7 @@ class ContactResource extends AbstractJsonResource
             'avatar' => $this->avatar,
             'status_uuid' => $this->status_uuid,
             'status_active' => new StatusResource($this->status_active),
-            'status_list' => $this->admin_status_list && $this->status_list->isNotEmpty() ? StatusResource::collection($this->status_list) : null,
+            'status_list' => $this->status_list && $this->status_list->isNotEmpty() ? StatusResource::collection($this->status_list) : null,
             'admin_status_active' => new StatusResource($this->admin_status_active),
             'admin_status_list' => $this->admin_status_list && $this->admin_status_list->isNotEmpty() ? StatusResource::collection($this->admin_status_list) : null,
             'user_uuid' => $this->user_uuid,
