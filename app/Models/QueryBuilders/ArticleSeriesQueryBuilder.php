@@ -73,13 +73,17 @@ class ArticleSeriesQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__parentArticleSeries.slug', 'parentArticleSeries.slug'),
                 AllowedFilter::scope('category_root'),
                 AllowedFilter::scope('title'),
-                AllowedFilter::scope('exact__title','exactTitleCategory'),
+                AllowedFilter::scope('exact__title', 'exactTitleCategory'),
                 AllowedFilter::scope('from__created_at'),
                 AllowedFilter::scope('to__created_at'),
                 AllowedFilter::scope('from__updated_at'),
                 AllowedFilter::scope('to__updated_at'),
                 'article.publish_status',
                 AllowedFilter::exact('exact__article.publish_status', 'article.publish_status'),
+                'user.email',
+                AllowedFilter::exact('exact__user.email', 'user.email'),
+                'user.username',
+                AllowedFilter::exact('exact__user.username', 'user.username'),
             ]);
     }
 
