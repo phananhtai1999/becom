@@ -26,7 +26,7 @@ class UpdateArticleSeriesRequest extends AbstractRequest
     public function rules()
     {
         $validate = [
-            'slug' => ['string', "regex:/^[a-z0-9-]+$/", Rule::unique('article_series')->whereNull('deleted_at')],
+            'slug' => ['string', "regex:/^[a-z0-9-]+$/", Rule::unique('article_series')->ignore($this->id, 'uuid')->whereNull('deleted_at')],
             'title' => ['array', 'min:1'],
             'title.*' => ['string'],
             'list_keywords' => ['nullable', 'in:NULL'],
