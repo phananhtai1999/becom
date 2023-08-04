@@ -12,81 +12,32 @@ class Mailbox {
     public function getRequestUrl($route){
     	return $this->baseUrl . '/' . ltrim($route, '/');
     }
-	public function send_request($route, $data = [], $type = 'post') {
-		if ($type === 'post') {
-			return Http::accept('application/json')->post($this->getRequestUrl($route), $data);
-		} elseif ($type === 'get') {
-			$data['client_id'] = config('mailbox.client_id');
-			return Http::accept('application/json')->get(rtrim(config('mailbox.sending_url'), '/') . '/' . ltrim($route, '/'), $data);
-		}
 
-	}
 
-	public function getEmail($user_uuid) {
-		$data = [];
-		return Http::accept('application/json')->withHeaders([
-            'x-user-id' => $user_uuid,
-            'Authorization' => 'Bearer ' . config('mailbox.access_token')
-        ])->get($this->getRequestUrl('email'), $data);
-	}  
-
-	public function postEmailaddToStar($user_uuid, $email_id) {
+	public function postConfig($user_uuid, $default_value, $key, $value) {
 		$data = [
-			'email_id' => $email_id,
+			'default_value' => $default_value,
+			'key' => $key,
+			'value' => $value,
 		];
 		return Http::accept('application/json')->withHeaders([
             'x-user-id' => $user_uuid,
             'Authorization' => 'Bearer ' . config('mailbox.access_token')
-        ])->post($this->getRequestUrl('email/add-to-star'), $data);
+        ])->post($this->getRequestUrl('config'), $data);
 	}   
 
-	public function postEmailremoveStar($user_uuid, $email_id) {
-		$data = [
-			'email_id' => $email_id,
-		];
-		return Http::accept('application/json')->withHeaders([
-            'x-user-id' => $user_uuid,
-            'Authorization' => 'Bearer ' . config('mailbox.access_token')
-        ])->post($this->getRequestUrl('email/remove-star'), $data);
-	}   
-
-	public function getSents($user_uuid) {
+	public function getConfigs($user_uuid) {
 		$data = [];
 		return Http::accept('application/json')->withHeaders([
             'x-user-id' => $user_uuid,
             'Authorization' => 'Bearer ' . config('mailbox.access_token')
-        ])->get($this->getRequestUrl('sents'), $data);
+        ])->get($this->getRequestUrl('configs'), $data);
 	}  
 
-	public function postSendEmail($user_uuid, $subject, $body, $status, $email_address, $type, $files) {
-		$data = [
-			'subject' => $subject,
-			'body' => $body,
-			'status' => $status,
-			'email_address' => $email_address,
-			'type' => $type,
-			'files' => $files,
-		];
-		return Http::accept('application/json')->withHeaders([
-            'x-user-id' => $user_uuid,
-            'Authorization' => 'Bearer ' . config('mailbox.access_token')
-        ])->post($this->getRequestUrl('send-email'), $data);
-	}   
-
-	public function getMailBox($user_uuid) {
-		$data = [];
-		return Http::accept('application/json')->withHeaders([
-            'x-user-id' => $user_uuid,
-            'Authorization' => 'Bearer ' . config('mailbox.access_token')
-        ])->get($this->getRequestUrl('mail-box'), $data);
-	}  
-
-	public function postEmailAccountcreate($user_uuid, $email_address, $password, $user_id, $app_id) {
+	public function postEmailAccountcreate($user_uuid, $email_address, $password) {
 		$data = [
 			'email_address' => $email_address,
 			'password' => $password,
-			'user_id' => $user_id,
-			'app_id' => $app_id,
 		];
 		return Http::accept('application/json')->withHeaders([
             'x-user-id' => $user_uuid,
@@ -94,16 +45,127 @@ class Mailbox {
         ])->post($this->getRequestUrl('email_account/create'), $data);
 	}   
 
-	public function postConfigcreate($user_uuid, $expiration_date, $api_key) {
+	public function getEmails($user_uuid) {
+		$data = [];
+		return Http::accept('application/json')->withHeaders([
+            'x-user-id' => $user_uuid,
+            'Authorization' => 'Bearer ' . config('mailbox.access_token')
+        ])->get($this->getRequestUrl('emails'), $data);
+	}  
+
+	public function postFolder($user_uuid, $title) {
 		$data = [
-			'expiration_date' => $expiration_date,
-			'api_key' => $api_key,
+			'title' => $title,
 		];
 		return Http::accept('application/json')->withHeaders([
             'x-user-id' => $user_uuid,
             'Authorization' => 'Bearer ' . config('mailbox.access_token')
-        ])->post($this->getRequestUrl('config/create'), $data);
+        ])->post($this->getRequestUrl('folder'), $data);
 	}   
+
+	public function getFolders($user_uuid) {
+		$data = [];
+		return Http::accept('application/json')->withHeaders([
+            'x-user-id' => $user_uuid,
+            'Authorization' => 'Bearer ' . config('mailbox.access_token')
+        ])->get($this->getRequestUrl('folders'), $data);
+	}  
+
+	public function getMailBox($user_uuid) {
+		$data = [];
+		return Http::accept('application/json')->withHeaders([
+            'x-user-id' => $user_uuid,
+            'Authorization' => 'Bearer ' . config('mailbox.access_token')
+        ])->get($this->getRequestUrl('mail-box/'), $data);
+	}  
+
+	public function postSendEmail($user_uuid, $body, $email_address, $files, $status, $subject, $type) {
+		$data = [
+			'body' => $body,
+			'email_address' => $email_address,
+			'files' => $files,
+			'status' => $status,
+			'subject' => $subject,
+			'type' => $type,
+		];
+		return Http::accept('application/json')->withHeaders([
+            'x-user-id' => $user_uuid,
+            'Authorization' => 'Bearer ' . config('mailbox.access_token')
+        ])->post($this->getRequestUrl('send-email/'), $data);
+	}   
+
+	public function getSents($user_uuid) {
+		$data = [];
+		return Http::accept('application/json')->withHeaders([
+            'x-user-id' => $user_uuid,
+            'Authorization' => 'Bearer ' . config('mailbox.access_token')
+        ])->get($this->getRequestUrl('sents/'), $data);
+	}  
+
+	public function deleteAttachmentsdeleteid($user_uuid, $id) {
+		return Http::accept('application/json')->withHeaders([
+            'x-user-id' => $user_uuid,
+            'Authorization' => 'Bearer ' . config('mailbox.access_token')
+        ])->delete($this->getRequestUrl("attachments/delete/{$id}"));
+	} 
+
+	public function getAttachmentsgetByEmailid($user_uuid, $id) {
+		$data = [];
+		return Http::accept('application/json')->withHeaders([
+            'x-user-id' => $user_uuid,
+            'Authorization' => 'Bearer ' . config('mailbox.access_token')
+        ])->get($this->getRequestUrl("attachments/get-by-email/{$id}"), $data);
+	}  
+
+	public function getAttachmentsgetBySentid($user_uuid, $id) {
+		$data = [];
+		return Http::accept('application/json')->withHeaders([
+            'x-user-id' => $user_uuid,
+            'Authorization' => 'Bearer ' . config('mailbox.access_token')
+        ])->get($this->getRequestUrl("attachments/get-by-sent/{$id}"), $data);
+	}  
+
+	public function deleteConfigid($user_uuid, $id) {
+		return Http::accept('application/json')->withHeaders([
+            'x-user-id' => $user_uuid,
+            'Authorization' => 'Bearer ' . config('mailbox.access_token')
+        ])->delete($this->getRequestUrl("config/{$id}"));
+	} 
+
+	public function getConfigid($user_uuid, $id) {
+		$data = [];
+		return Http::accept('application/json')->withHeaders([
+            'x-user-id' => $user_uuid,
+            'Authorization' => 'Bearer ' . config('mailbox.access_token')
+        ])->get($this->getRequestUrl("config/{$id}"), $data);
+	}  
+
+	public function putConfigid($user_uuid, $default_value, $key, $value, $id) {	
+		$data = [
+			'default_value' => $default_value,
+			'key' => $key,
+			'value' => $value,
+		];
+		return Http::accept('application/json')->withHeaders([
+            'x-user-id' => $user_uuid,
+            'Authorization' => 'Bearer ' . config('mailbox.access_token')
+        ])->put($this->getRequestUrl("config/{$id}"), $data);
+	}    
+
+	public function deleteConversationdeleteid($user_uuid, $id) {
+		return Http::accept('application/json')->withHeaders([
+            'x-user-id' => $user_uuid,
+            'Authorization' => 'Bearer ' . config('mailbox.access_token')
+        ])->delete($this->getRequestUrl("conversation/delete/{$id}"));
+	} 
+
+	public function getConversationid($user_uuid, $id) {
+		$data = [];
+		return Http::accept('application/json')->withHeaders([
+            'x-user-id' => $user_uuid,
+            'Authorization' => 'Bearer ' . config('mailbox.access_token')
+        ])->get($this->getRequestUrl("conversation/{$id}"), $data);
+	}  
 
 	public function getEmailgetEmailConversationid($user_uuid, $id, $Page, $PerPage) {
 		$data = [
@@ -116,42 +178,55 @@ class Mailbox {
         ])->get($this->getRequestUrl("email/get-email-conversation/{$id}"), $data);
 	}  
 
-	public function deleteEmaildeleteid($user_uuid, $id) {
+	public function deleteEmailid($user_uuid, $id) {
 		return Http::accept('application/json')->withHeaders([
             'x-user-id' => $user_uuid,
             'Authorization' => 'Bearer ' . config('mailbox.access_token')
-        ])->delete($this->getRequestUrl("email/delete/{$id}"));
+        ])->delete($this->getRequestUrl("email/{$id}"));
 	} 
 
-	public function getConversationemailId($user_uuid, $email_id) {
+	public function getEmailid($user_uuid, $id) {
 		$data = [];
 		return Http::accept('application/json')->withHeaders([
             'x-user-id' => $user_uuid,
             'Authorization' => 'Bearer ' . config('mailbox.access_token')
-        ])->get($this->getRequestUrl("conversation/{$email_id}"), $data);
+        ])->get($this->getRequestUrl("email/{$id}"), $data);
 	}  
 
-	public function deleteConversationdeleteid($user_uuid, $id) {
+	public function putEmailid($user_uuid, $star, $id) {	
+		$data = [
+			'star' => $star,
+		];
 		return Http::accept('application/json')->withHeaders([
             'x-user-id' => $user_uuid,
             'Authorization' => 'Bearer ' . config('mailbox.access_token')
-        ])->delete($this->getRequestUrl("conversation/delete/{$id}"));
-	} 
+        ])->put($this->getRequestUrl("email/{$id}"), $data);
+	}    
 
-	public function deleteSentsdeleteid($user_uuid, $id) {
+	public function deleteFolderid($user_uuid, $id) {
 		return Http::accept('application/json')->withHeaders([
             'x-user-id' => $user_uuid,
             'Authorization' => 'Bearer ' . config('mailbox.access_token')
-        ])->delete($this->getRequestUrl("sents/delete/{$id}"));
+        ])->delete($this->getRequestUrl("folder/{$id}"));
 	} 
 
-	public function getSendEmailAddressemailId($user_uuid, $email_id) {
+	public function getFolderid($user_uuid, $id) {
 		$data = [];
 		return Http::accept('application/json')->withHeaders([
             'x-user-id' => $user_uuid,
             'Authorization' => 'Bearer ' . config('mailbox.access_token')
-        ])->get($this->getRequestUrl("send-email-address/{$email_id}"), $data);
+        ])->get($this->getRequestUrl("folder/{$id}"), $data);
 	}  
+
+	public function putFolderid($user_uuid, $title, $id) {	
+		$data = [
+			'title' => $title,
+		];
+		return Http::accept('application/json')->withHeaders([
+            'x-user-id' => $user_uuid,
+            'Authorization' => 'Bearer ' . config('mailbox.access_token')
+        ])->put($this->getRequestUrl("folder/{$id}"), $data);
+	}    
 
 	public function deleteSendEmailAddressdeleteid($user_uuid, $id) {
 		return Http::accept('application/json')->withHeaders([
@@ -160,27 +235,19 @@ class Mailbox {
         ])->delete($this->getRequestUrl("send-email-address/delete/{$id}"));
 	} 
 
-	public function getAttachmentsgetByEmailemailId($user_uuid, $email_id) {
+	public function getSendEmailAddressid($user_uuid, $id) {
 		$data = [];
 		return Http::accept('application/json')->withHeaders([
             'x-user-id' => $user_uuid,
             'Authorization' => 'Bearer ' . config('mailbox.access_token')
-        ])->get($this->getRequestUrl("attachments/get-by-email/{$email_id}"), $data);
+        ])->get($this->getRequestUrl("send-email-address/{$id}"), $data);
 	}  
 
-	public function getAttachmentsgetBySentsentId($user_uuid, $sent_id) {
-		$data = [];
+	public function deleteSentsdeleteid($user_uuid, $id) {
 		return Http::accept('application/json')->withHeaders([
             'x-user-id' => $user_uuid,
             'Authorization' => 'Bearer ' . config('mailbox.access_token')
-        ])->get($this->getRequestUrl("attachments/get-by-sent/{$sent_id}"), $data);
-	}  
-
-	public function deleteAttachmentsdeleteid($user_uuid, $id) {
-		return Http::accept('application/json')->withHeaders([
-            'x-user-id' => $user_uuid,
-            'Authorization' => 'Bearer ' . config('mailbox.access_token')
-        ])->delete($this->getRequestUrl("attachments/delete/{$id}"));
+        ])->delete($this->getRequestUrl("sents/delete/{$id}"));
 	} 
 
 }
