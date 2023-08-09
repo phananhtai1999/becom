@@ -24,10 +24,11 @@ class ConfigRequest extends AbstractRequest
      */
     public function rules()
     {
+        $configMailbox = config('mailbox.mailbox_mx_domain');
         $validate = [
             'key' => ['required', 'string', Rule::unique('configs')->whereNull('deleted_at')],
             'value' => ['nullable', 'string'],
-            'type' => ['required', 'in:image,boolean,numeric,string,smtp_account,s3'],
+            'type' => ['required', 'in:image,boolean,numeric,string,smtp_account,s3,mailbox'],
             'status' => ['required', 'in:public,system,private'],
             'default_value' => ['nullable', 'string'],
             'group_id' => ['required', 'numeric', 'min:1', Rule::exists('groups', 'uuid')->whereNull('deleted_at')],
@@ -36,6 +37,18 @@ class ConfigRequest extends AbstractRequest
         if (in_array($this->request->get('key'), ['s3_system', 's3_user', 's3_website'])) {
 
             $validate['type'] = ['required', 'in:s3'];
+        }
+
+        if (in_array($this->request->get('key'), ['mailbox_mx_domain', 'mailbox_dmarc_domain', 'mailbox_dkim_domain'])) {
+            $validate['value'] = ['required', 'array'];
+            $validate['value.record'] = ['required', 'string'];
+            $validate['value.type'] = ['nullable', 'string', 'in:TXT'];
+            $validate['value.value'] = ['required', 'string'];
+            $validate['type'] = ['required', 'in:mailbox'];
+            if ($this->request->get('key') === 'mailbox_mx_domain') {
+                $validate['value.record'] = ['required', 'string', "in:$configMailbox"];
+                $validate['value.type'] = ['nullable', 'string', 'in:MX'];
+            }
         }
 
         if ($this->request->get('type') === 'image' || $this->request->get('type') === 'string') {
@@ -69,6 +82,9 @@ class ConfigRequest extends AbstractRequest
             $validate['value.url'] = ['nullable', 'string'];
             $validate['value.endpoint'] = ['required', 'string'];
             $validate['value.use_path_style_endpoint'] = ['nullable', 'boolean'];
+        } elseif ($this->request->get('type') === 'mailbox') {
+
+            $validate['key'] = ['required', 'string', 'in:mailbox_mx_domain,mailbox_dmarc_domain,mailbox_dkim_domain', Rule::unique('configs')->whereNull('deleted_at')];
         }
 
         return $validate;
