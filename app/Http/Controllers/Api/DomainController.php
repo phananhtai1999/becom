@@ -16,6 +16,7 @@ use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Resources\DomainVerificationResource;
+use App\Services\ConfigService;
 use App\Services\DomainService;
 use App\Services\DomainVerificationService;
 use App\Services\MyDomainService;
@@ -35,18 +36,26 @@ class DomainController extends AbstractRestAPIController
     protected $myService;
 
     /**
+     * @var ConfigService
+     */
+    protected $configService;
+
+    /**
      * @param DomainService $service
      * @param MyDomainService $myService
      * @param DomainVerificationService $domainVerificationService
+     * @param ConfigService $configService
      */
     public function __construct(
         DomainService             $service,
         MyDomainService           $myService,
-        DomainVerificationService $domainVerificationService
+        DomainVerificationService $domainVerificationService,
+        ConfigService             $configService
 
     )
     {
         $this->service = $service;
+        $this->configService = $configService;
         $this->myService = $myService;
         $this->domainVerificationService = $domainVerificationService;
         $this->resourceCollectionClass = DomainResourceCollection::class;
@@ -65,7 +74,7 @@ class DomainController extends AbstractRestAPIController
     {
         $request = app($this->storeRequest);
 
-        $model = $this->service->create(array_merge($request->all(), [
+        $model = $this->service->create(array_merge($request->except(['active_mailbox', 'active_mailbox_status']), [
             'owner_uuid' => $request->get('owner_uuid') ?? auth()->user()->getKey(),
         ]));
 
@@ -86,7 +95,7 @@ class DomainController extends AbstractRestAPIController
 
         $model = $this->service->findOrFailById($id);
 
-        $this->service->update($model, array_merge($request->all(), [
+        $this->service->update($model, array_merge($request->except(['active_mailbox', 'active_mailbox_status']), [
             'owner_uuid' => $request->get('owner_uuid') ?? auth()->user()->getKey(),
             'business_uuid' => $request->get('business_uuid') ?? null
         ]));
@@ -102,7 +111,7 @@ class DomainController extends AbstractRestAPIController
      */
     public function storeMyDomain(MyDomainRequest $request)
     {
-        $model = $this->service->create(array_merge($request->all(), [
+        $model = $this->service->create(array_merge($request->except(['active_mailbox', 'active_mailbox_status']), [
             'owner_uuid' => auth()->user()->getkey(),
         ]));
 
@@ -133,7 +142,7 @@ class DomainController extends AbstractRestAPIController
     {
         $model = $this->myService->showMyDomain($id);
 
-        $this->service->update($model, array_merge($request->all(), [
+        $this->service->update($model, array_merge($request->except(['active_mailbox', 'active_mailbox_status']), [
             'owner_uuid' => auth()->user()->getkey(),
         ]));
 
@@ -176,5 +185,52 @@ class DomainController extends AbstractRestAPIController
         } catch (\Exception $exception) {
             return $this->sendValidationFailedJsonResponse();
         }
+    }
+
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function checkMailboxDomain()
+    {
+        $configMailboxMx = $this->configService->findConfigByKey('mailbox_mx_domain');
+        $configMailboxDmarc = $this->configService->findConfigByKey('mailbox_dmarc_domain');
+        $configMailboxDkim = $this->configService->findConfigByKey('mailbox_dkim_domain');
+        //update active mailbox status and active mailbox
+        $this->service->updateActiveMailboxStatusDomain($configMailboxMx, $configMailboxDmarc, $configMailboxDkim);
+
+        return $this->sendOkJsonResponse();
+    }
+
+    /**
+     * @param IndexRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function domainVerifiedAndActiveMailbox(IndexRequest $request)
+    {
+        $models = $this->service->getCollectionWithPaginationByCondition($request, [
+            ['verified_at', '<>', null],
+            ['active_mailbox', true]
+        ]);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+        );
+    }
+
+    /**
+     * @param IndexRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function myDomainVerifiedAndActiveMailbox(IndexRequest $request)
+    {
+        $models = $this->service->getCollectionWithPaginationByCondition($request, [
+            ['owner_uuid', auth()->user()->getKey()],
+            ['verified_at', '<>', null],
+            ['active_mailbox', true]
+        ]);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+        );
     }
 }

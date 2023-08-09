@@ -33,6 +33,8 @@ class MyDomainQueryBuilder extends AbstractQueryBuilder
                 'verified_at',
                 'business_uuid',
                 'owner_uuid',
+                'active_mailbox',
+                'active_mailbox_status',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -41,6 +43,8 @@ class MyDomainQueryBuilder extends AbstractQueryBuilder
                 'verified_at',
                 'business_uuid',
                 'owner_uuid',
+                'active_mailbox',
+                'active_mailbox_status',
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -52,7 +56,11 @@ class MyDomainQueryBuilder extends AbstractQueryBuilder
                 'business_uuid',
                 AllowedFilter::exact('exact__business_uuid', 'business_uuid'),
                 'owner_uuid',
-                AllowedFilter::exact('exact__owner_uuid', 'owner_uuid')
+                AllowedFilter::exact('exact__owner_uuid', 'owner_uuid'),
+                'active_mailbox',
+                AllowedFilter::exact('exact__active_mailbox', 'active_mailbox'),
+                'active_mailbox_status',
+                AllowedFilter::exact('exact__active_mailbox_status', 'active_mailbox_status')
             ]);
     }
 
