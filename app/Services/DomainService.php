@@ -96,4 +96,39 @@ class DomainService extends AbstractService
     {
         return $this->findOneById($domainUuid);
     }
+
+    /**
+     * @param $configMailboxMx
+     * @param $configMailboxDmarc
+     * @param $configMailboxDkim
+     * @return mixed
+     */
+    public function updateActiveMailboxStatusDomain($configMailboxMx, $configMailboxDmarc, $configMailboxDkim)
+    {
+        $activeMailbox = !empty($configMailboxMx->value['value']) &&
+            !empty($configMailboxDmarc->value['value']) &&
+            !empty($configMailboxDkim->value['value']) &&
+            config('mailbox.mailbox_mx_domain') == !empty($configMailboxMx->value['record']);
+        $activeMailboxMxStatus = !empty($configMailboxMx->value['value']) &&
+            config('mailbox.mailbox_mx_domain') == !empty($configMailboxMx->value['record']);
+        $activeMailboxDmarcStatus = !empty($configMailboxDmarc->value['value']);
+        $activeMailboxDkimStatus = !empty($configMailboxDkim->value['value']);
+
+        $domains = $this->model->all();
+
+        return $domains->each(function ($item) use (
+            $activeMailbox, $configMailboxMx,
+            $configMailboxDmarc, $configMailboxDkim, $activeMailboxMxStatus,
+            $activeMailboxDmarcStatus, $activeMailboxDkimStatus
+        ) {
+            $item->update([
+                'active_mailbox' => $activeMailbox,
+                'active_mailbox_status' => [
+                    array_merge($activeMailboxMxStatus ? $configMailboxMx->value : [], ['status' => $activeMailboxMxStatus]),
+                    array_merge($activeMailboxDmarcStatus ? $configMailboxDmarc->value : [], ['status' => $activeMailboxDmarcStatus]),
+                    array_merge($activeMailboxDkimStatus ? $configMailboxDkim->value : [], ['status' => $activeMailboxDkimStatus]),
+                ]
+            ]);
+        });
+    }
 }

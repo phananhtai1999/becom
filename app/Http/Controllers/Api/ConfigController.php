@@ -23,8 +23,10 @@ class ConfigController extends AbstractRestAPIController
     use RestIndexTrait, RestShowTrait;
 
     protected $smtpAccountService;
+
     /**
      * @param ConfigService $service
+     * @param SmtpAccountService $smtpAccountService
      */
     public function __construct(
         ConfigService $service,
@@ -71,6 +73,8 @@ class ConfigController extends AbstractRestAPIController
     /**
      * @param $id
      * @return JsonResponse
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function edit($id)
     {
@@ -142,10 +146,10 @@ class ConfigController extends AbstractRestAPIController
         if (empty($model)) {
             $request = app($this->storeRequest);
 
-            $model = $this->service->create($request->all());
+            $model = $this->service->create($request->except(['key']));
         } else {
 
-            $this->service->update($model, $request->all());
+            $this->service->update($model, $request->except(['key']));
         }
 
         return $this->sendCreatedJsonResponse(
@@ -165,7 +169,7 @@ class ConfigController extends AbstractRestAPIController
     public function editCachePlatformConfig($platformPackageUuid, UpdateCachePlatformConfig $request)
     {
         $model = $this->service->findOneWhere(['key' => $platformPackageUuid . '_cache']);
-        $this->service->update($model, $request->all());
+        $this->service->update($model, $request->except(['key']));
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)

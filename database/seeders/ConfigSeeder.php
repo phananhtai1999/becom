@@ -24,6 +24,7 @@ class ConfigSeeder extends Seeder
         $assetGroupUuid = Group::where('name', 'asset')->first()->uuid;
         $payoutGroupUuid = Group::where('name', 'payout')->first()->uuid;
         $generalGroupUuid = Group::where('name', 'general')->first()->uuid;
+        $mailboxGroupUuid = Group::where('name', 'mailbox')->first()->uuid;
         $configs = [
             [
                 'key' => 'smtp_auto',
@@ -354,6 +355,39 @@ class ConfigSeeder extends Seeder
                 'type' => 'string',
                 'status' => 'public',
                 'group_id' => $generalGroupUuid,
+            ],
+            [
+                'key' => 'mailbox_mx_domain',
+                'value' => [
+                    'record' => 'box.mail.au1.sendgpt.ai',
+                    'type' => 'MX',
+                    'value' => 'MX 10 box.mail.au1.sendgpt.ai',
+                ],
+                'type' => 'mailbox',
+                'group_id' => $mailboxGroupUuid,
+                'status' => 'system',
+            ],
+            [
+                'key' => 'mailbox_dmarc_domain',
+                'value' => [
+                    'record' => '@',
+                    'type' => 'TXT',
+                    'value' => 'TXT v=DMARC1; p=quarantine',
+                ],
+                'type' => 'mailbox',
+                'group_id' => $mailboxGroupUuid,
+                'status' => 'system',
+            ],
+            [
+                'key' => 'mailbox_dkim_domain',
+                'value' => [
+                    'record' => '@',
+                    'type' => 'TXT',
+                    'value' => 'TXT v=spf1 mx -all',
+                ],
+                'type' => 'mailbox',
+                'group_id' => $mailboxGroupUuid,
+                'status' => 'system',
             ],
         ];
         Cache::forget('config');

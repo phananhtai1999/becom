@@ -1232,6 +1232,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'domain.'], function () {
         Route::get('/domain/{id}', [DomainController::class, 'show'])->name('show');
         Route::put('/domain/{id}', [DomainController::class, 'edit'])->name('edit');
         Route::delete('/domain/{id}', [DomainController::class, 'destroy'])->name('destroy');
+        Route::get('/domains/verified/active-mailbox', [DomainController::class, 'domainVerifiedAndActiveMailbox'])->name('domain-verified-and-active-mailbox');
     });
 
     Route::group(['as' => 'my.'], function () {
@@ -1240,8 +1241,10 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'domain.'], function () {
         Route::get('/my/domain/{id}', [DomainController::class, 'showMyDomain'])->name('show');
         Route::put('/my/domain/{id}', [DomainController::class, 'editMyDomain'])->name('edit');
         Route::delete('/my/domain/{id}', [DomainController::class, 'destroyMyDomain'])->name('destroy');
+        Route::get('/my/domains/verified/active-mailbox', [DomainController::class, 'myDomainVerifiedAndActiveMailbox'])->name('my-domain-verified-and-active-mailbox');
     });
 
+    Route::get('/check-mailbox', [DomainController::class, 'checkMailboxDomain'])->name('check-mailbox');
     Route::post('/domain-verification/dns-record', [DomainController::class, 'verifyByDnsRecord'])->name('verifyByDnsRecord');
 });
 

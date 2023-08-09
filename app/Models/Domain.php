@@ -28,12 +28,16 @@ class Domain extends AbstractModel
         'verified_at',
         'business_uuid',
         'owner_uuid',
+        'active_mailbox',
+        'active_mailbox_status',
     ];
 
     /**
      * @var string[]
      */
     protected $casts = [
+        'active_mailbox' => 'boolean',
+        'active_mailbox_status' => 'array',
         'verified_at' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',

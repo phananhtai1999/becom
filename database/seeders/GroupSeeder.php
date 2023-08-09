@@ -38,6 +38,9 @@ class GroupSeeder extends Seeder
             ],
             [
                 'name' => 'payout',
+            ],
+            [
+                'name' => 'mailbox',
             ]
         ];
 
