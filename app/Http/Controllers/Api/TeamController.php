@@ -5,10 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestEditTrait;
-use App\Http\Controllers\Traits\RestIndexMyTrait;
-use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestStoreTrait;
+use App\Http\Requests\AddTeamMemberRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\InviteUserRequest;
 use App\Http\Requests\JoinTeamRequest;
@@ -18,7 +17,6 @@ use App\Http\Requests\SetPermissionForTeamRequest;
 use App\Http\Requests\MyTeamRequest;
 use App\Http\Requests\TeamRequest;
 use App\Http\Requests\UpdateTeamRequest;
-use App\Http\Resources\ContactListResource;
 use App\Http\Resources\ContactListResourceCollection;
 use App\Http\Resources\TeamResource;
 use App\Http\Resources\TeamResourceCollection;
@@ -36,13 +34,12 @@ use App\Services\MyTeamService;
 use App\Services\PermissionService;
 use App\Services\SmtpAccountService;
 use App\Services\TeamService;
-use App\Services\UserContactListService;
 use App\Services\UserService;
 use App\Services\UserTeamService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Techup\Mailbox\Facades\Mailbox;
 
 class TeamController extends Controller
 {
@@ -124,7 +121,7 @@ class TeamController extends Controller
             $url = env('FRONTEND_URL') . 'auth/register?invite_uuid=' . $invite->uuid;
             $this->smtpAccountService->sendEmailNotificationSystem(null, new SendInviteToTeam($invite, $url), $request->get('email'));
         } elseif ($request->get('type') == Team::ACCOUNT_INVITE) {
-            $password = $this->generateRandomString(6);
+            $password = $this->generateRandomString(10);
             $user = $this->userService->create([
                 'email' => $request->get('email'),
                 'first_name' => $request->get('first_name'),
@@ -132,7 +129,7 @@ class TeamController extends Controller
                 'username' => $request->get('email'),
                 'can_add_smtp_account' => 0,
                 'password' => Hash::make($password)
-            ]);;
+            ]);
             $user->roles()->attach([config('user.default_role_uuid')]);
             $user->userPlatformPackage()->create(['platform_package_uuid' => PlatformPackage::DEFAULT_PLATFORM_PACKAGE_1]);
             $this->userTeamService->create(array_merge($request->all(), [
@@ -143,6 +140,32 @@ class TeamController extends Controller
 
         return $this->sendCreatedJsonResponse();
     }
+
+    public function addTeamMember(AddTeamMemberRequest $request)
+    {
+        if ($request->get('type') == Team::ACCOUNT_INVITE) {
+            $passwordRandom = $this->generateRandomString(10);
+            $user = $this->userService->create([
+                'email' => $request->get('username') . '@' . $request->get('domain'),
+                'first_name' => $request->get('first_name'),
+                'last_name' => $request->get('last_name'),
+                'username' => $request->get('username'),
+                'can_add_smtp_account' => 0,
+                'password' => Hash::make($request->get('password'))
+            ]);
+            $user->roles()->attach([config('user.default_role_uuid')]);
+            $user->userPlatformPackage()->create(['platform_package_uuid' => PlatformPackage::DEFAULT_PLATFORM_PACKAGE_1]);
+            $this->userTeamService->create(array_merge($request->all(), [
+                'user_uuid' => $user->uuid,
+            ]));
+            Mailbox::postEmailAccountcreate($user->uuid, $request->get('username'), $passwordRandom);
+
+            return $this->sendCreatedJsonResponse();
+        }
+
+        return $this->sendValidationFailedJsonResponse();
+    }
+
 
     public function joinTeam(JoinTeamRequest $request)
     {

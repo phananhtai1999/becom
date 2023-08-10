@@ -1030,6 +1030,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'team.'], function () {
     Route::get('/list-member/{id}', [TeamController::class, 'listMember'])->name('listMember');
     Route::get('/join-team', [TeamController::class, 'joinTeam'])->name('joinTeam');
     Route::get('/invite-user', [TeamController::class, 'inviteUser'])->name('inviteUser');
+    Route::post('/add-team-member', [TeamController::class, 'addTeamMember'])->name('add-team-member');
     Route::post('/team/set-permission', [TeamController::class, 'setPermissionForTeam'])->name('setPermissionForTeam');
     Route::post('/team/set-contact-list', [TeamController::class, 'setContactList'])->name('setContactList');
     Route::get('/permission-of-team/{id}', [TeamController::class, 'permissionOfTeams'])->name('permissionOfTeams');
