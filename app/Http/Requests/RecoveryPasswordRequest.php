@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
+use Illuminate\Validation\Rules\Password;
 
 class RecoveryPasswordRequest extends AbstractRequest
 {
@@ -25,7 +26,13 @@ class RecoveryPasswordRequest extends AbstractRequest
     {
         return [
             'token' => ['required', 'max:255'],
-            'password' => ['required', 'min:1' , 'max:255', 'confirmed']
+            'password' => ['required', 'string', 'confirmed', Password::min(8)
+                ->letters()
+                ->mixedCase()
+                ->numbers()
+                ->symbols(),
+                'max:255'
+            ]
         ];
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 
 class RegisterRequest extends AbstractRequest
 {
@@ -29,7 +30,13 @@ class RegisterRequest extends AbstractRequest
             'first_name' => ['required', 'string',"regex:/^[^(\|\]~`!@#$%^&*+=\-_{}\\\;:\"'?><,.\/’)\[]*$/"],
             'last_name' => ['required', 'string',"regex:/^[^(\|\]~`!@#$%^&*+=\-_{}\\\;:\"'?><,.\/’)\[]*$/"],
             'email' => ['required', 'string', 'email:rfc,dns', Rule::unique('users')->whereNull('deleted_at')],
-            'password' => ['required', 'string', 'confirmed'],
+            'password' => ['required', 'string', 'confirmed', Password::min(8)
+                ->letters()
+                ->mixedCase()
+                ->numbers()
+                ->symbols(),
+                'max:255'
+            ]
         ];
     }
 }

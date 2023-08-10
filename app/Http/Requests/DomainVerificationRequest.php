@@ -25,7 +25,7 @@ class DomainVerificationRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'domain' => ['required', 'string', 'regex:/^(?:[-A-Za-z0-9]+\.)+[A-Za-z]{2,6}$/', Rule::exists('domains', 'name')->whereNull('deleted_at')]
+            'domain' => ['required', 'string', 'regex:/^(?!(www|http|https)\.)\w+(\.\w+)+$/', Rule::exists('domains', 'name')->whereNull('deleted_at')]
         ];
     }
 }

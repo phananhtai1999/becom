@@ -39,7 +39,7 @@ class UpdateMyBusinessManagementRequest extends AbstractRequest
             'domain_uuid' => ['nullable', 'numeric', 'min:1', Rule::exists('domains', 'uuid')->where(function ($query) {
                 return $query->where('owner_uuid', auth()->user()->getKey());
             })->whereNull('deleted_at')],
-            'domain' => ['nullable', 'string', 'regex:/^(?:[-A-Za-z0-9]+\.)+[A-Za-z]{2,6}$/'],
+            'domain' => ['nullable', 'string', 'regex:/^(?!(www|http|https)\.)\w+(\.\w+)+$/'],
             'avatar' => ['string'],
             'slogan' => ['string'],
         ];
