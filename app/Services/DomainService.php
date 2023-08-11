@@ -98,37 +98,89 @@ class DomainService extends AbstractService
     }
 
     /**
+     * @param $businessUuid
      * @param $configMailboxMx
      * @param $configMailboxDmarc
      * @param $configMailboxDkim
      * @return mixed
      */
-    public function updateActiveMailboxStatusDomain($configMailboxMx, $configMailboxDmarc, $configMailboxDkim)
+    public function updateActiveMailboxStatusDomain($businessUuid, $configMailboxMx, $configMailboxDmarc, $configMailboxDkim)
     {
-        $activeMailbox = !empty($configMailboxMx->value['value']) &&
-            !empty($configMailboxDmarc->value['value']) &&
-            !empty($configMailboxDkim->value['value']) &&
-            config('mailbox.mailbox_mx_domain') == !empty($configMailboxMx->value['record']);
-        $activeMailboxMxStatus = !empty($configMailboxMx->value['value']) &&
-            config('mailbox.mailbox_mx_domain') == !empty($configMailboxMx->value['record']);
-        $activeMailboxDmarcStatus = !empty($configMailboxDmarc->value['value']);
-        $activeMailboxDkimStatus = !empty($configMailboxDkim->value['value']);
+        //Get all where domains
+        $domains = $this->findAllWhere([
+            ['business_uuid', $businessUuid],
+            ['active_mailbox', false]
+        ]);
 
-        $domains = $this->model->all();
+        $activeMailboxMxStatus = !empty($configMailboxMx->value);
+        $activeMailboxDmarcStatus = !empty($configMailboxDmarc->value);
+        $activeMailboxDkimStatus = !empty($configMailboxDkim->value);
 
         return $domains->each(function ($item) use (
-            $activeMailbox, $configMailboxMx,
-            $configMailboxDmarc, $configMailboxDkim, $activeMailboxMxStatus,
-            $activeMailboxDmarcStatus, $activeMailboxDkimStatus
+            $configMailboxMx, $configMailboxDmarc, $configMailboxDkim,
+            $activeMailboxMxStatus, $activeMailboxDmarcStatus, $activeMailboxDkimStatus
         ) {
+            //Check record domain
+            $checkRecordsDomainExistOrNot = $this->checkRecordsDomainExistOrNot($item, $configMailboxMx, $configMailboxDmarc, $configMailboxDkim);
             $item->update([
-                'active_mailbox' => $activeMailbox,
+                'active_mailbox' => $checkRecordsDomainExistOrNot['status'],
                 'active_mailbox_status' => [
-                    array_merge($activeMailboxMxStatus ? $configMailboxMx->value : [], ['status' => $activeMailboxMxStatus]),
-                    array_merge($activeMailboxDmarcStatus ? $configMailboxDmarc->value : [], ['status' => $activeMailboxDmarcStatus]),
-                    array_merge($activeMailboxDkimStatus ? $configMailboxDkim->value : [], ['status' => $activeMailboxDkimStatus]),
+                    array_merge($activeMailboxMxStatus ? $configMailboxMx->value : [], ['status' => $checkRecordsDomainExistOrNot['mx_status']]),
+                    array_merge($activeMailboxDmarcStatus ? $configMailboxDmarc->value : [], ['status' => $checkRecordsDomainExistOrNot['dmarc_status']]),
+                    array_merge($activeMailboxDkimStatus ? $configMailboxDkim->value : [], ['status' => $checkRecordsDomainExistOrNot['dkim_status']]),
                 ]
             ]);
         });
+    }
+
+    /**
+     * @param $domain
+     * @param $configMailboxMx
+     * @param $configMailboxDmarc
+     * @param $configMailboxDkim
+     * @return array
+     */
+    public function checkRecordsDomainExistOrNot($domain, $configMailboxMx, $configMailboxDmarc, $configMailboxDkim)
+    {
+        $dnsMxRecords = dns_get_record($domain->name, DNS_MX);
+        $dnsTxtRecords = dns_get_record($domain->name, DNS_TXT);
+        $mxStatus = false;
+        $dmarcStatus = false;
+        $dkimStatus = false;
+
+        //TXT record
+        foreach ($dnsTxtRecords as $record) {
+            if (!empty($configMailboxDmarc->value['value']) &&
+                $record['txt'] === $configMailboxDmarc->value['value']) {
+                $dmarcStatus = true;
+            } elseif (!empty($configMailboxDkim->value['value']) &&
+                $record['txt'] === $configMailboxDkim->value['value']) {
+                $dkimStatus = true;
+            }
+        }
+
+        //MX record
+        foreach ($dnsMxRecords as $record) {
+            if (!empty($configMailboxMx->value['value']) &&
+                $record['target'] === $configMailboxMx->value['value']) {
+                $mxStatus = true;
+            }
+        }
+
+        if ($mxStatus && $dkimStatus && $dmarcStatus) {
+            return [
+                'status' => true,
+                'mx_status' => $mxStatus,
+                'dmarc_status' => $dmarcStatus,
+                'dkim_status' => $dkimStatus,
+            ];
+        } else {
+            return [
+                'status' => false,
+                'mx_status' => $mxStatus,
+                'dmarc_status' => $dmarcStatus,
+                'dkim_status' => $dkimStatus,
+            ];
+        }
     }
 }
