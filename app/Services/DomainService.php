@@ -167,20 +167,11 @@ class DomainService extends AbstractService
             }
         }
 
-        if ($mxStatus && $dkimStatus && $dmarcStatus) {
-            return [
-                'status' => true,
-                'mx_status' => $mxStatus,
-                'dmarc_status' => $dmarcStatus,
-                'dkim_status' => $dkimStatus,
-            ];
-        } else {
-            return [
-                'status' => false,
-                'mx_status' => $mxStatus,
-                'dmarc_status' => $dmarcStatus,
-                'dkim_status' => $dkimStatus,
-            ];
-        }
+        return [
+            'status' => $mxStatus && $dkimStatus && $dmarcStatus,
+            'mx_status' => $mxStatus,
+            'dmarc_status' => $dmarcStatus,
+            'dkim_status' => $dkimStatus,
+        ];
     }
 }
