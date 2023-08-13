@@ -24,7 +24,6 @@ class UpdateConfigRequest extends AbstractRequest
      */
     public function rules()
     {
-        $configMailbox = config('mailbox.mailbox_mx_domain');
         $validate = [
             'key' => ['string', 'unique:configs,key,' . $this->id . ',uuid,deleted_at,NULL'],
             'value' => ['nullable', 'string'],
@@ -46,7 +45,6 @@ class UpdateConfigRequest extends AbstractRequest
             $validate['value.value'] = ['required', 'string'];
             $validate['type'] = ['required', 'in:mailbox'];
             if ($this->request->get('key') === 'mailbox_mx_domain') {
-                $validate['value.record'] = ['required', 'string', "in:$configMailbox"];
                 $validate['value.type'] = ['nullable', 'string', 'in:MX'];
             }
         }
