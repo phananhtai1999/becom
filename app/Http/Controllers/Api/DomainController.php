@@ -82,8 +82,9 @@ class DomainController extends AbstractRestAPIController
     {
         $request = app($this->storeRequest);
 
-        $model = $this->service->create(array_merge($request->except(['active_mailbox', 'active_mailbox_status']), [
+        $model = $this->service->create(array_merge($request->except(['active_mailbox_status']), [
             'owner_uuid' => $request->get('owner_uuid') ?? auth()->user()->getKey(),
+            'active_mailbox' => false,
         ]));
 
         return $this->sendCreatedJsonResponse(
@@ -104,7 +105,7 @@ class DomainController extends AbstractRestAPIController
         $model = $this->service->findOrFailById($id);
 
         $this->service->update($model, array_merge($request->except(['active_mailbox', 'active_mailbox_status']), [
-            'owner_uuid' => $request->get('owner_uuid') ?? auth()->user()->getKey(),
+            'owner_uuid' => $request->get('owner_uuid') ?? $model->owner_uuid,
             'business_uuid' => $request->get('business_uuid') ?? null
         ]));
 
@@ -119,8 +120,9 @@ class DomainController extends AbstractRestAPIController
      */
     public function storeMyDomain(MyDomainRequest $request)
     {
-        $model = $this->service->create(array_merge($request->except(['active_mailbox', 'active_mailbox_status']), [
+        $model = $this->service->create(array_merge($request->except(['active_mailbox_status']), [
             'owner_uuid' => auth()->user()->getkey(),
+            'active_mailbox' => false,
         ]));
 
         return $this->sendCreatedJsonResponse(
@@ -196,18 +198,19 @@ class DomainController extends AbstractRestAPIController
     }
 
     /**
+     * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function checkMailboxDomain()
+    public function checkActiveMailBox($id)
     {
-        //Check business of User Exist Or not
-        $business = $this->businessManagementService->findOneWhere([['owner_uuid', auth()->user()->getkey()]]);
-        if ($business) {
+        //Check Domain Valid Or not
+        $domainUuidValidOrNot = $this->service->checkDomainValidOrNot($id);
+        if ($domainUuidValidOrNot) {
             $configMailboxMx = $this->configService->findConfigByKey('mailbox_mx_domain');
             $configMailboxDmarc = $this->configService->findConfigByKey('mailbox_dmarc_domain');
             $configMailboxDkim = $this->configService->findConfigByKey('mailbox_dkim_domain');
             //update active mailbox status and active mailbox
-            $this->service->updateActiveMailboxStatusDomain($business->uuid, $configMailboxMx, $configMailboxDmarc, $configMailboxDkim);
+            $this->service->updateActiveMailboxStatusDomain($id, $configMailboxMx, $configMailboxDmarc, $configMailboxDkim);
 
             return $this->sendOkJsonResponse();
         }

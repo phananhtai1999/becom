@@ -20,6 +20,9 @@ class Config extends AbstractModel
     const CONFIG_S3_SYSTEM = 's3_system';
     const CONFIG_S3_USER = 's3_user';
     const CONFIG_S3_WEBSITE = 's3_website';
+    const CONFIG_MAILBOX_MX = 'mailbox_mx_domain';
+    const CONFIG_MAILBOX_DMARC = 'mailbox_dmarc_domain';
+    const CONFIG_MAILBOX_DKIM = 'mailbox_dkim_domain';
 
     /**
      * @var string
