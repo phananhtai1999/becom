@@ -359,9 +359,10 @@ class ConfigSeeder extends Seeder
             [
                 'key' => 'mailbox_mx_domain',
                 'value' => [
-                    'record' => 'box.mail.au1.sendgpt.ai',
+                    'name' => '@',
                     'type' => 'MX',
-                    'value' => 'MX 10 box.mail.au1.sendgpt.ai',
+                    'priority' => '10',
+                    'value' => 'box.mail.au1.sendgpt.ai',
                 ],
                 'type' => 'mailbox',
                 'group_id' => $mailboxGroupUuid,
@@ -370,9 +371,10 @@ class ConfigSeeder extends Seeder
             [
                 'key' => 'mailbox_dmarc_domain',
                 'value' => [
-                    'record' => '@',
+                    'name' => '@',
                     'type' => 'TXT',
-                    'value' => 'TXT v=DMARC1; p=quarantine',
+                    'priority' => null,
+                    'value' => 'v=DMARC1; p=quarantine',
                 ],
                 'type' => 'mailbox',
                 'group_id' => $mailboxGroupUuid,
@@ -381,9 +383,10 @@ class ConfigSeeder extends Seeder
             [
                 'key' => 'mailbox_dkim_domain',
                 'value' => [
-                    'record' => '@',
+                    'name' => '@',
                     'type' => 'TXT',
-                    'value' => 'TXT v=spf1 mx -all',
+                    'priority' => null,
+                    'value' => 'v=spf1 mx -all',
                 ],
                 'type' => 'mailbox',
                 'group_id' => $mailboxGroupUuid,
