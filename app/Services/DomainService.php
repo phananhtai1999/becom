@@ -99,6 +99,26 @@ class DomainService extends AbstractService
 
     /**
      * @param $domainUuid
+     * @return bool
+     */
+    public function checkDomainValidOrNot($domainUuid)
+    {
+        $business = (new BusinessManagementService())->findOneWhere([['owner_uuid', auth()->user()->getkey()]]);
+        $domain = $this->findOneWhere([
+            ['uuid', $domainUuid],
+            ['business_uuid', optional($business)->uuid],
+            ['verified_at', '<>', null]
+        ]);
+
+        if ($business && $domain) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param $domainUuid
      * @param $configMailboxMx
      * @param $configMailboxDmarc
      * @param $configMailboxDkim
@@ -141,6 +161,7 @@ class DomainService extends AbstractService
         $dmarcStatus = false;
         $dkimStatus = false;
 
+//        dd($dnsTxtRecords);
         //TXT record
         foreach ($dnsTxtRecords as $record) {
             if (!empty($configMailboxDmarc->value['value']) &&

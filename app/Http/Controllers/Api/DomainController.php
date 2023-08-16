@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
 use App\Http\Controllers\Traits\RestIndexMyTrait;
-use App\Http\Requests\CheckActiveMailboxRequest;
 use App\Http\Requests\DomainRequest;
 use App\Http\Requests\DomainVerificationRequest;
 use App\Http\Requests\IndexRequest;
@@ -199,19 +198,24 @@ class DomainController extends AbstractRestAPIController
     }
 
     /**
-     * @param CheckActiveMailboxRequest $request
+     * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function checkActiveMailBox(CheckActiveMailboxRequest $request)
+    public function checkActiveMailBox($id)
     {
-        //Check business of User Exist Or not
-        $configMailboxMx = $this->configService->findConfigByKey('mailbox_mx_domain');
-        $configMailboxDmarc = $this->configService->findConfigByKey('mailbox_dmarc_domain');
-        $configMailboxDkim = $this->configService->findConfigByKey('mailbox_dkim_domain');
-        //update active mailbox status and active mailbox
-        $this->service->updateActiveMailboxStatusDomain($request->domain_uuid, $configMailboxMx, $configMailboxDmarc, $configMailboxDkim);
+        //Check Domain Valid Or not
+        $domainUuidValidOrNot = $this->service->checkDomainValidOrNot($id);
+        if ($domainUuidValidOrNot) {
+            $configMailboxMx = $this->configService->findConfigByKey('mailbox_mx_domain');
+            $configMailboxDmarc = $this->configService->findConfigByKey('mailbox_dmarc_domain');
+            $configMailboxDkim = $this->configService->findConfigByKey('mailbox_dkim_domain');
+            //update active mailbox status and active mailbox
+            $this->service->updateActiveMailboxStatusDomain($id, $configMailboxMx, $configMailboxDmarc, $configMailboxDkim);
 
-        return $this->sendOkJsonResponse();
+            return $this->sendOkJsonResponse();
+        }
+
+        return $this->sendValidationFailedJsonResponse();
     }
 
     /**
