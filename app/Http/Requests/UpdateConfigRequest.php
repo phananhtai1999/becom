@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
+use App\Models\Config;
 use Illuminate\Validation\Rule;
 
 class UpdateConfigRequest extends AbstractRequest
@@ -38,14 +39,16 @@ class UpdateConfigRequest extends AbstractRequest
             $validate['type'] = ['required', 'in:s3'];
         }
 
-        if (in_array($this->request->get('key'), ['mailbox_mx_domain', 'mailbox_dmarc_domain', 'mailbox_dkim_domain'])) {
+        if (in_array($this->request->get('key'), [Config::CONFIG_MAILBOX_MX, Config::CONFIG_MAILBOX_DKIM, Config::CONFIG_MAILBOX_DMARC])) {
             $validate['value'] = ['required', 'array'];
-            $validate['value.record'] = ['required', 'string'];
-            $validate['value.type'] = ['nullable', 'string', 'in:TXT'];
+            $validate['value.name'] = ['required', 'string'];
+            $validate['value.type'] = ['required', 'string', 'in:TXT'];
             $validate['value.value'] = ['required', 'string'];
+            $validate['value.priority'] = ['nullable', 'in:NULL'];
             $validate['type'] = ['required', 'in:mailbox'];
-            if ($this->request->get('key') === 'mailbox_mx_domain') {
-                $validate['value.type'] = ['nullable', 'string', 'in:MX'];
+            if ($this->request->get('key') === Config::CONFIG_MAILBOX_MX) {
+                $validate['value.type'] = ['required', 'string', 'in:MX'];
+                $validate['value.priority'] = ['required', 'numeric'];
             }
         }
 
@@ -82,7 +85,7 @@ class UpdateConfigRequest extends AbstractRequest
             $validate['value.use_path_style_endpoint'] = ['nullable', 'boolean'];
         }  elseif ($this->request->get('type') === 'mailbox') {
 
-            $validate['key'] = ['required', 'string', 'in:mailbox_mx_domain,mailbox_dmarc_domain,mailbox_dkim_domain', Rule::unique('configs')->whereNull('deleted_at')];
+            $validate['key'] = ['required', 'string', Rule::in(Config::CONFIG_MAILBOX_MX, Config::CONFIG_MAILBOX_DKIM, Config::CONFIG_MAILBOX_DMARC), Rule::unique('configs')->ignore($this->id,'uuid')->whereNull('deleted_at')];
         }
 
         return $validate;
