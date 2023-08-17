@@ -161,7 +161,6 @@ class DomainService extends AbstractService
         $dmarcStatus = false;
         $dkimStatus = false;
 
-//        dd($dnsTxtRecords);
         //TXT record
         foreach ($dnsTxtRecords as $record) {
             if (!empty($configMailboxDmarc->value['value']) &&

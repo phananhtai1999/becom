@@ -3,10 +3,11 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
+use App\Rules\ResetPasswordTeamMemberRule;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
-class RegisterRequest extends AbstractRequest
+class ResetPasswordEmailTeamMemberRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,10 +27,7 @@ class RegisterRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'username' => ['nullable', 'string', "regex:/^(?!.*\.\.)[a-zA-Z0-9]*(?:\.[a-zA-Z0-9]+)*$/", Rule::unique('users')->whereNull('deleted_at')],
-            'first_name' => ['required', 'string', "regex:/^[^(\|\]~`!@#$%^&*+=\-_{}\\\;:\"'?><,.\/’)\[]*$/"],
-            'last_name' => ['required', 'string', "regex:/^[^(\|\]~`!@#$%^&*+=\-_{}\\\;:\"'?><,.\/’)\[]*$/"],
-            'email' => ['required', 'string', 'email:rfc,dns', Rule::unique('users')->whereNull('deleted_at')],
+            'user_uuid' => ['required', 'numeric', 'min:1', Rule::exists('users', 'uuid')->whereNull('deleted_at'), Rule::exists('user_teams', 'user_uuid')->whereNull('deleted_at'), new ResetPasswordTeamMemberRule($this->request->get('user_uuid'))],
             'password' => ['required', 'string', 'regex:/^\S*$/',
                 Password::min(8)
                     ->letters()

@@ -26,13 +26,15 @@ class RecoveryPasswordRequest extends AbstractRequest
     {
         return [
             'token' => ['required', 'max:255'],
-            'password' => ['required', 'string', 'confirmed', Password::min(8)
-                ->letters()
-                ->mixedCase()
-                ->numbers()
-                ->symbols(),
+            'password' => ['required', 'string', 'regex:/^\S*$/',
+                Password::min(8)
+                    ->letters()
+                    ->mixedCase()
+                    ->numbers()
+                    ->symbols(),
                 'max:255'
-            ]
+            ],
+            'password_confirmation' => ['required', 'string', 'same:password']
         ];
     }
 }
