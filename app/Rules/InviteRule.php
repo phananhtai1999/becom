@@ -44,6 +44,6 @@ class InviteRule implements Rule
      */
     public function message()
     {
-        return 'The email has already been taken.';
+        return 'The :attribute has already been taken.';
     }
 }

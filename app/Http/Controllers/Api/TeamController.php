@@ -12,6 +12,7 @@ use App\Http\Requests\IndexRequest;
 use App\Http\Requests\InviteUserRequest;
 use App\Http\Requests\JoinTeamRequest;
 use App\Http\Requests\MyUpdateTeamRequest;
+use App\Http\Requests\ResetPasswordEmailTeamMemberRequest;
 use App\Http\Requests\SetContactListRequest;
 use App\Http\Requests\SetPermissionForTeamRequest;
 use App\Http\Requests\MyTeamRequest;
@@ -36,8 +37,10 @@ use App\Services\SmtpAccountService;
 use App\Services\TeamService;
 use App\Services\UserService;
 use App\Services\UserTeamService;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Techup\Mailbox\Facades\Mailbox;
 
@@ -141,29 +144,40 @@ class TeamController extends Controller
         return $this->sendCreatedJsonResponse();
     }
 
+    /**
+     * @param AddTeamMemberRequest $request
+     * @return JsonResponse
+     */
     public function addTeamMember(AddTeamMemberRequest $request)
     {
-        if ($request->get('type') == Team::ACCOUNT_INVITE) {
-            $passwordRandom = $this->generateRandomString(10);
-            $user = $this->userService->create([
-                'email' => $request->get('username') . '@' . $request->get('domain'),
-                'first_name' => $request->get('first_name'),
-                'last_name' => $request->get('last_name'),
-                'username' => $request->get('username'),
-                'can_add_smtp_account' => 0,
-                'password' => Hash::make($request->get('password'))
-            ]);
-            $user->roles()->attach([config('user.default_role_uuid')]);
-            $user->userPlatformPackage()->create(['platform_package_uuid' => PlatformPackage::DEFAULT_PLATFORM_PACKAGE_1]);
-            $this->userTeamService->create(array_merge($request->all(), [
-                'user_uuid' => $user->uuid,
-            ]));
-            Mailbox::postEmailAccountcreate($user->uuid, $request->get('username'), $passwordRandom);
+        DB::beginTransaction();
+        try {
+            if ($request->get('type') == Team::ACCOUNT_INVITE) {
+                $passwordRandom = $this->generateRandomString(10);
+                $user = $this->userService->create([
+                    'email' => $request->get('username') . '@' . $request->get('domain'),
+                    'first_name' => $request->get('first_name'),
+                    'last_name' => $request->get('last_name'),
+                    'username' => $request->get('username'),
+                    'can_add_smtp_account' => 0,
+                    'password' => Hash::make($request->get('password'))
+                ]);
+                $user->roles()->attach([config('user.default_role_uuid')]);
+                $user->userPlatformPackage()->create(['platform_package_uuid' => PlatformPackage::DEFAULT_PLATFORM_PACKAGE_1]);
+                $this->userTeamService->create(array_merge($request->all(), [
+                    'user_uuid' => $user->uuid,
+                ]));
+                Mailbox::postEmailAccountcreate($user->uuid, $request->get('username'), $passwordRandom);
+                DB::commit();
 
-            return $this->sendCreatedJsonResponse();
+                return $this->sendCreatedJsonResponse();
+            }
+
+            return $this->sendValidationFailedJsonResponse();
+        } catch (ConnectionException $exception) {
+            DB::rollback();
+            return $this->sendInternalServerErrorJsonResponse();
         }
-
-        return $this->sendValidationFailedJsonResponse();
     }
 
 
@@ -340,5 +354,25 @@ class TeamController extends Controller
         $this->userTeamService->update($model, ['is_blocked' => false]);
 
         return $this->sendOkJsonResponse();
+    }
+
+    /**
+     * @param ResetPasswordEmailTeamMemberRequest $request
+     * @return JsonResponse
+     */
+    public function resetPassword(ResetPasswordEmailTeamMemberRequest $request)
+    {
+        $user = $this->userService
+            ->findOneWhere(['uuid' => $request->user_uuid]);
+
+        if ($user) {
+            $user->update([
+                'password' => Hash::make($request->get('password'))
+            ]);
+
+            return $this->sendOkJsonResponse(['message' => __('messages.change_password_success')]);
+        }
+
+        return $this->sendValidationFailedJsonResponse();
     }
 }

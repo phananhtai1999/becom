@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 
 class UpdateAdminUserRequest extends AbstractRequest
 {
@@ -25,9 +26,17 @@ class UpdateAdminUserRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'username' => ['nullable', 'string',"regex:/^[^(\|\]~`!@#$%^&*+=\-_{}\\\;:\"'?><,.\/’)\[]*$/", 'unique:users,username,'.$this->id.',uuid,deleted_at,NULL'],
+            'username' => ['nullable', 'string',"regex:/^(?!.*\.\.)[a-zA-Z0-9]*(?:\.[a-zA-Z0-9]+)*$/", 'unique:users,username,'.$this->id.',uuid,deleted_at,NULL'],
             'email' => ['string', 'email:rfc,dns', 'unique:users,email,'.$this->id.',uuid,deleted_at,NULL'],
-            'password' => ['string', 'confirmed'],
+            'password' => ['string', 'regex:/^\S*$/',
+                Password::min(8)
+                    ->letters()
+                    ->mixedCase()
+                    ->numbers()
+                    ->symbols(),
+                'max:255'
+            ],
+            'password_confirmation' => ['required', 'string', 'same:password'],
             'first_name' => ['nullable', 'string', "regex:/^[^(\|\]~`!@#$%^&*+=\-_{}\\\;:\"'?><,.\/’)\[]*$/"],
             'last_name' => ['nullable', 'string', "regex:/^[^(\|\]~`!@#$%^&*+=\-_{}\\\;:\"'?><,.\/’)\[]*$/"],
             'avatar_img' => ['nullable', 'string'],

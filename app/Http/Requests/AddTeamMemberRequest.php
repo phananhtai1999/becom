@@ -29,7 +29,7 @@ class AddTeamMemberRequest extends FormRequest
         return [
             'team_uuid' => ['required', Rule::exists('teams', 'uuid')->whereNull('deleted_at')],
             'type' => ['required', Rule::in(['link', 'account'])],
-            'username' => ['required', 'string', "regex:/^[^(\|\]~`!@#$%^&*+=\-_{}\\\;:\"'?><,.\/’)\[]*$/", Rule::unique('users', 'username')->whereNull('deleted_at'), new InviteRule($this->request->get('domain'))],
+            'username' => ['required', 'string', "regex:/^(?!.*\.\.)[a-zA-Z0-9]*(?:\.[a-zA-Z0-9]+)*$/", Rule::unique('users', 'username')->whereNull('deleted_at'), new InviteRule($this->request->get('domain'))],
             'first_name' => ['required', 'string', "regex:/^[^(\|\]~`!@#$%^&*+=\-_{}\\\;:\"'?><,.\/’)\[]*$/"],
             'last_name' => ['required', 'string', "regex:/^[^(\|\]~`!@#$%^&*+=\-_{}\\\;:\"'?><,.\/’)\[]*$/"],
             'domain' => ['required', 'string', 'regex:/^(?!(www|http|https)\.)\w+(\.\w+)+$/', Rule::exists('domains', 'name')->where(function ($query) {
@@ -38,13 +38,15 @@ class AddTeamMemberRequest extends FormRequest
                     ['active_mailbox', true]
                 ])->whereNull('deleted_at');
             })],
-            'password' => ['required', 'string', 'confirmed', Password::min(8)
-                ->letters()
-                ->mixedCase()
-                ->numbers()
-                ->symbols(),
+            'password' => ['required', 'string', 'regex:/^\S*$/',
+                Password::min(8)
+                    ->letters()
+                    ->mixedCase()
+                    ->numbers()
+                    ->symbols(),
                 'max:255'
-            ]
+            ],
+            'password_confirmation' => ['required', 'string', 'same:password']
         ];
     }
 }
