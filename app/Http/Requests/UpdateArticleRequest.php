@@ -31,9 +31,8 @@ class UpdateArticleRequest extends AbstractRequest
             'slug' => ['string', "regex:/^[a-z0-9-]+$/", Rule::unique('articles')->ignore($this->id, 'uuid')->whereNull('deleted_at')],
             'title' => ['array', 'min:1'],
             'title.*' => ['string'],
-            'content' => ['required', 'array', 'min:1'],
-            'content.en' => ['required', 'string'],
-            'content.*' => ['required', 'string'],
+            'content' => ['array', 'min:1'],
+            'content.*' => ['string'],
             'publish_status' => ['numeric', 'min:1', 'max:5'],
             'content_for_user' => ['string', 'in:public,login,payment,editor,admin'],
             'article_category_uuid' => ['nullable', 'numeric', Rule::exists('article_categories', 'uuid')->whereNull('deleted_at')],
@@ -46,7 +45,7 @@ class UpdateArticleRequest extends AbstractRequest
             $validate['paragraph_type_uuid'] = ['nullable', 'in:NULL'];
         } elseif ($this->request->get('content_type') === 'paragraph') {
             $validate['single_purpose_uuid'] = ['nullable', 'in:NULL'];
-            $validate['content'] = ['required', 'array', 'min:1', new ArticleContentRule($this->request->get('paragraph_type_uuid'))];
+            $validate['content'] = ['array', 'min:1', new ArticleContentRule($this->request->get('paragraph_type_uuid'))];
         }
 
         return $validate;

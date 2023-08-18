@@ -98,39 +98,52 @@ class DomainService extends AbstractService
     }
 
     /**
-     * @param $businessUuid
+     * @param $domainUuid
+     * @return bool
+     */
+    public function checkDomainValidOrNot($domainUuid)
+    {
+        $business = (new BusinessManagementService())->findOneWhere([['owner_uuid', auth()->user()->getkey()]]);
+        $domain = $this->findOneWhere([
+            ['uuid', $domainUuid],
+            ['business_uuid', optional($business)->uuid],
+            ['verified_at', '<>', null]
+        ]);
+
+        if ($business && $domain) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param $domainUuid
      * @param $configMailboxMx
      * @param $configMailboxDmarc
      * @param $configMailboxDkim
-     * @return mixed
+     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|object|null
      */
-    public function updateActiveMailboxStatusDomain($businessUuid, $configMailboxMx, $configMailboxDmarc, $configMailboxDkim)
+    public function updateActiveMailboxStatusDomain($domainUuid, $configMailboxMx, $configMailboxDmarc, $configMailboxDkim)
     {
-        //Get all where domains
-        $domains = $this->findAllWhere([
-            ['business_uuid', $businessUuid],
-            ['active_mailbox', false]
-        ]);
+        $domain = $this->findOneWhere([
+            ['uuid', $domainUuid]]);
 
         $activeMailboxMxStatus = !empty($configMailboxMx->value);
         $activeMailboxDmarcStatus = !empty($configMailboxDmarc->value);
         $activeMailboxDkimStatus = !empty($configMailboxDkim->value);
+        $checkRecordsDomainExistOrNot = $this->checkRecordsDomainExistOrNot($domain, $configMailboxMx, $configMailboxDmarc, $configMailboxDkim);
 
-        return $domains->each(function ($item) use (
-            $configMailboxMx, $configMailboxDmarc, $configMailboxDkim,
-            $activeMailboxMxStatus, $activeMailboxDmarcStatus, $activeMailboxDkimStatus
-        ) {
-            //Check record domain
-            $checkRecordsDomainExistOrNot = $this->checkRecordsDomainExistOrNot($item, $configMailboxMx, $configMailboxDmarc, $configMailboxDkim);
-            $item->update([
-                'active_mailbox' => $checkRecordsDomainExistOrNot['status'],
-                'active_mailbox_status' => [
-                    array_merge($activeMailboxMxStatus ? $configMailboxMx->value : [], ['status' => $checkRecordsDomainExistOrNot['mx_status']]),
-                    array_merge($activeMailboxDmarcStatus ? $configMailboxDmarc->value : [], ['status' => $checkRecordsDomainExistOrNot['dmarc_status']]),
-                    array_merge($activeMailboxDkimStatus ? $configMailboxDkim->value : [], ['status' => $checkRecordsDomainExistOrNot['dkim_status']]),
-                ]
-            ]);
-        });
+        $domain->update([
+            'active_mailbox' => $checkRecordsDomainExistOrNot['status'],
+            'active_mailbox_status' => [
+                array_merge($activeMailboxMxStatus ? $configMailboxMx->value : [], ['status' => $checkRecordsDomainExistOrNot['mx_status']]),
+                array_merge($activeMailboxDmarcStatus ? $configMailboxDmarc->value : [], ['status' => $checkRecordsDomainExistOrNot['dmarc_status']]),
+                array_merge($activeMailboxDkimStatus ? $configMailboxDkim->value : [], ['status' => $checkRecordsDomainExistOrNot['dkim_status']]),
+            ]
+        ]);
+
+        return $domain;
     }
 
     /**

@@ -216,6 +216,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'config.'], function () {
         Route::get('/config/{id}', [ConfigController::class, 'showAdmin'])->name('showAdmin');
     });
     Route::get('/configs/permission', [ConfigController::class, 'loadConfigPermission'])->name('config.loadConfigPermission');
+    Route::get('/configs/mailbox', [ConfigController::class, 'loadConfigMailbox'])->name('config.mailbox');
 });
 //Load public config
 Route::get('/configs/public', [ConfigController::class, 'loadPublicConfig'])->name('config.loadPublicConfig');
@@ -1038,6 +1039,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'team.'], function () {
     Route::delete('/delete-member/{id}', [TeamController::class, 'deleteMember'])->name('deleteMember');
     Route::put('/block-member/{id}', [TeamController::class, 'blockMember'])->name('blockMember');
     Route::put('/unblock-member/{id}', [TeamController::class, 'unBlockMember'])->name('unBlockMember');
+    Route::post('/reset-password', [TeamController::class, 'resetPassword'])->name('reset-password');
 
     Route::group(['as' => 'my.'], function () {
         Route::get('my/teams', [TeamController::class, 'indexMy'])->name('indexMy');
@@ -1245,7 +1247,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'domain.'], function () {
         Route::get('/my/domains/verified/active-mailbox', [DomainController::class, 'myDomainVerifiedAndActiveMailbox'])->name('my-domain-verified-and-active-mailbox');
     });
 
-    Route::get('/check-mailbox', [DomainController::class, 'checkMailboxDomain'])->name('check-mailbox');
+    Route::get('/check-mailbox/{domain_uuid}', [DomainController::class, 'checkActiveMailBox'])->name('check-active-mailbox');
     Route::post('/domain-verification/dns-record', [DomainController::class, 'verifyByDnsRecord'])->name('verifyByDnsRecord');
 });
 

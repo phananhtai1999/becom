@@ -13,6 +13,7 @@ use App\Http\Resources\ConfigResource;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Mail\SendEmails;
+use App\Models\Config;
 use App\Services\ConfigService;
 use App\Services\SmtpAccountService;
 use Illuminate\Http\JsonResponse;
@@ -129,6 +130,19 @@ class ConfigController extends AbstractRestAPIController
     public function loadConfigPermission(): JsonResponse
     {
         $models = $this->service->loadConfigPermission();
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+        );
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function loadConfigMailbox(): JsonResponse
+    {
+        $configMailbox = [Config::CONFIG_MAILBOX_MX, Config::CONFIG_MAILBOX_DMARC, Config::CONFIG_MAILBOX_DKIM];
+        $models = $this->service->findAllWhereIn('key', $configMailbox);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)

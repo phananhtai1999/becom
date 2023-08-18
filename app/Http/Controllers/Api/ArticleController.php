@@ -40,8 +40,8 @@ class ArticleController extends AbstractRestAPIController
      * @param ArticleSeriesService $articleSeriesService
      */
     public function __construct(
-        ArticleService $service,
-        LanguageService $languageService,
+        ArticleService       $service,
+        LanguageService      $languageService,
         ArticleSeriesService $articleSeriesService
     )
     {
@@ -99,10 +99,17 @@ class ArticleController extends AbstractRestAPIController
         }
 
         $model = $this->service->findOrFailById($id);
+
+        //Not allow change content_type
+        if ($model->content_type != $request->content_type) {
+            return $this->sendValidationFailedJsonResponse();
+        }
         //Check current user role
         $role = auth()->user()->roles->whereIn('slug', ["admin", "root"])->count() ? $request->except('user_uuid') : $request->except(['user_uuid', 'publish_status']);
         //Map type_label to content
-        $content = $this->service->mapTypeLabelToContent($request->content, $request->content_type);
+        //Check content exist or not
+        $checkContent = $request->content ? array_merge($model->getTranslations('content'), $request->content) : $model->getTranslations('content');
+        $content = $this->service->mapTypeLabelToContent($checkContent, $model->content_type);
 
         $this->service->update($model, array_merge($role, ['content' => $content]));
 
@@ -259,8 +266,15 @@ class ArticleController extends AbstractRestAPIController
     public function editUnpublishedArticle(UpdateUnpublishedArticleRequest $request, $id)
     {
         $model = $this->service->showArticleForEditorById($id);
+        //Not allow change content_type
+        if ($model->content_type != $request->content_type) {
+            return $this->sendValidationFailedJsonResponse();
+        }
+
         //Map type_label to content
-        $content = $this->service->mapTypeLabelToContent($request->get('content'), $request->content_type);
+        //Check content exist or not
+        $checkContent = $request->get('content') ? array_merge($model->getTranslations('content'), $request->get('content')) : $model->getTranslations('content');
+        $content = $this->service->mapTypeLabelToContent($checkContent, $model->content_type);
 
         $this->service->update($model, array_merge($request->except(['user_uuid']), [
             'content' => $content
@@ -278,11 +292,10 @@ class ArticleController extends AbstractRestAPIController
     public function changeStatusArticle(ChangeStatusArticleRequest $request)
     {
         $articleUuids = $request->articles;
-        foreach ($articleUuids as $articleUuid)
-        {
+        foreach ($articleUuids as $articleUuid) {
             $model = $this->service->findOneById($articleUuid);
             $list_reason = $model->reject_reason;
-            if ($request->get('publish_status') == Article::REJECT_PUBLISH_STATUS){
+            if ($request->get('publish_status') == Article::REJECT_PUBLISH_STATUS) {
                 $list_reason[] = [
                     'content' => $request->get('reject_reason'),
                     'created_at' => Carbon::now()
