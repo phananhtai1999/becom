@@ -322,8 +322,7 @@ class ArticleService extends AbstractService
         if ($contentType == Article::PARAGRAPH_CONTENT_TYPE) {
             $formatContent['content'] = json_decode($content) ?? $content;
             //Check contents by login, user role
-            if (is_array($contentTranslate))
-            {
+            if (is_array($contentTranslate)) {
                 //Login and user role is admin, editor, root
                 $formatContent['contents'] = array_map(function ($value) {
                     $arrayContent = json_decode($value, true);
