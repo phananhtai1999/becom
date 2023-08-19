@@ -20,6 +20,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RoleSeeder::class,
             UserSeeder::class,
+            DomainForUserSeeder::class,
+            BusinessForUserSeeder::class,
             SmtpAccountEncryptionSeeder::class,
             MailTemplateDefaultSeeder::class,
             GroupSeeder::class,
