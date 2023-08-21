@@ -14,8 +14,10 @@ use App\Http\Requests\UpdateArticleRequest;
 use App\Http\Resources\ArticleResource;
 use App\Http\Resources\ArticleResourceCollection;
 use App\Models\Article;
+use App\Models\Role;
 use App\Services\ArticleSeriesService;
 use App\Services\ArticleService;
+use App\Services\ConfigService;
 use App\Services\LanguageService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -35,17 +37,25 @@ class ArticleController extends AbstractRestAPIController
     protected $articleSeriesService;
 
     /**
+     * @var ConfigService
+     */
+    protected $configService;
+
+    /**
      * @param ArticleService $service
      * @param LanguageService $languageService
      * @param ArticleSeriesService $articleSeriesService
+     * @param ConfigService $configService
      */
     public function __construct(
         ArticleService       $service,
         LanguageService      $languageService,
-        ArticleSeriesService $articleSeriesService
+        ArticleSeriesService $articleSeriesService,
+        ConfigService        $configService
     )
     {
         $this->service = $service;
+        $this->configService = $configService;
         $this->articleSeriesService = $articleSeriesService;
         $this->resourceCollectionClass = ArticleResourceCollection::class;
         $this->resourceClass = ArticleResource::class;
@@ -205,8 +215,18 @@ class ArticleController extends AbstractRestAPIController
 
     public function indexMy(IndexRequest $request)
     {
-        $models = $this->service->getCollectionWithPaginationByCondition($request,
-            ['user_uuid' => auth()->user()->getKey()]);
+        $role = auth()->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ADMIN_ROOT])->count();
+        $config = $this->configService->findConfigByKey('time_allowed_view_articles_of_editor');
+        //Role editor limit by config days
+        if (!$role && $config) {
+            $models = $this->service->getCollectionWithPaginationByCondition($request, [
+                ['user_uuid' => auth()->user()->getKey()],
+                ['updated_at', '>=', Carbon::now()->subDays($config->value)]
+            ]);
+        } else {
+            $models = $this->service->getCollectionWithPaginationByCondition($request,
+                ['user_uuid' => auth()->user()->getKey()]);
+        }
 
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
@@ -219,8 +239,18 @@ class ArticleController extends AbstractRestAPIController
      */
     public function indexUnpublishedArticle(IndexRequest $request)
     {
-        $models = $this->service->getCollectionWithPaginationByCondition($request,
-            ['publish_status' => Article::PENDING_PUBLISH_STATUS]);
+        $role = auth()->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ADMIN_ROOT])->count();
+        $config = $this->configService->findConfigByKey('time_allowed_view_articles_of_editor');
+        //Role editor limit by config days
+        if (!$role && $config) {
+            $models = $this->service->getCollectionWithPaginationByCondition($request, [
+                ['publish_status', Article::PENDING_PUBLISH_STATUS],
+                ['updated_at', '>=', Carbon::now()->subDays($config->value)]
+            ]);
+        } else {
+            $models = $this->service->getCollectionWithPaginationByCondition($request,
+                ['publish_status' => Article::PENDING_PUBLISH_STATUS]);
+        }
 
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
