@@ -19,6 +19,7 @@ class Kernel extends ConsoleKernel
         'App\Console\Commands\SendNotOpenByScenarioCampaign',
         'App\Console\Commands\UpdateStatusOnContact',
         'App\Console\Commands\UpdateStatisticsOfUserPayment',
+        'App\Console\Commands\AutoDeleteDraftArticleOfEditor',
     ];
 
     /**
@@ -36,6 +37,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('check:platform-expired')->dailyAt('5:00');
         $schedule->command('update:recervers')->everyFiveMinutes();
         $schedule->command('update:statistics-user-payment')->dailyAt('23:00');
+        $schedule->command('delete:draft-articles')->everyFiveMinutes();
     }
 
     /**

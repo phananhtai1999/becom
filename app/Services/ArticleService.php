@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Abstracts\AbstractService;
 use App\Models\Article;
 use App\Models\QueryBuilders\ArticleQueryBuilder;
+use App\Models\Role;
 use Carbon\Carbon;
 
 class ArticleService extends AbstractService
@@ -25,16 +26,34 @@ class ArticleService extends AbstractService
     public function getArticlePublicWithPagination($perPage, $page, $columns, $pageName, $search, $searchBy)
     {
         $articleCategoryPublicByUuids = (new ArticleCategoryService())->getListArticleCategoryUuidsPublic();
-        return ArticleQueryBuilder::searchQuery($search, $searchBy)
-            ->where([
-                ['publish_status', Article::PUBLISHED_PUBLISH_STATUS],
-                ['content_for_user', Article::PUBLIC_CONTENT_FOR_USER]
-            ])
-            ->where(function ($query) use ($articleCategoryPublicByUuids) {
-                $query->whereIn('article_category_uuid', $articleCategoryPublicByUuids)
-                    ->orWhereNull('article_category_uuid');
-            })
-            ->paginate($perPage, $columns, $pageName, $page);
+        $config = (new ConfigService())->findConfigByKey('time_allowed_view_articles_of_editor');
+        $roleRootAndAdmin = auth()->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ADMIN_ROOT])->count();
+        $roleEditor = auth()->user()->roles->whereIn('slug', [Role::ROLE_EDITOR])->count();
+
+        if (!$roleRootAndAdmin && $roleEditor && $config) {
+            return ArticleQueryBuilder::searchQuery($search, $searchBy)
+                ->where([
+                    ['publish_status', Article::PUBLISHED_PUBLISH_STATUS],
+                    ['content_for_user', Article::PUBLIC_CONTENT_FOR_USER],
+                    ['updated_at', '>=', Carbon::now()->subDays($config->value)]
+                ])
+                ->where(function ($query) use ($articleCategoryPublicByUuids) {
+                    $query->whereIn('article_category_uuid', $articleCategoryPublicByUuids)
+                        ->orWhereNull('article_category_uuid');
+                })
+                ->paginate($perPage, $columns, $pageName, $page);
+        } else {
+            return ArticleQueryBuilder::searchQuery($search, $searchBy)
+                ->where([
+                    ['publish_status', Article::PUBLISHED_PUBLISH_STATUS],
+                    ['content_for_user', Article::PUBLIC_CONTENT_FOR_USER]
+                ])
+                ->where(function ($query) use ($articleCategoryPublicByUuids) {
+                    $query->whereIn('article_category_uuid', $articleCategoryPublicByUuids)
+                        ->orWhereNull('article_category_uuid');
+                })
+                ->paginate($perPage, $columns, $pageName, $page);
+        }
     }
 
     /**
@@ -79,15 +98,27 @@ class ArticleService extends AbstractService
     {
         //Get  Article Category Public
         $articleCategoryPublicByUuids = (new ArticleCategoryService())->getListArticleCategoryUuidsPublic();
-
-        return ArticleQueryBuilder::searchQuery($search, $searchBy)
-            ->whereIn('publish_status', $publishStatus)
-            ->whereIn('content_for_user', config('articlepermission.' . $arrayListContentForUser))
-            ->where(function ($query) use ($articleCategoryPublicByUuids) {
-                $query->whereIn('article_category_uuid', $articleCategoryPublicByUuids)
-                    ->orWhereNull('article_category_uuid');
-            })
-            ->paginate($perPage, $columns, $pageName, $page);
+        $config = (new ConfigService())->findConfigByKey('time_allowed_view_articles_of_editor');
+        if ($arrayListContentForUser === Article::EDITOR_CONTENT_FOR_USER && $config) {
+            return ArticleQueryBuilder::searchQuery($search, $searchBy)
+                ->whereIn('publish_status', $publishStatus)
+                ->whereIn('content_for_user', config('articlepermission.' . $arrayListContentForUser))
+                ->where(function ($query) use ($articleCategoryPublicByUuids) {
+                    $query->whereIn('article_category_uuid', $articleCategoryPublicByUuids)
+                        ->orWhereNull('article_category_uuid');
+                })
+                ->where('updated_at', '>=', Carbon::now()->subDays($config->value))
+                ->paginate($perPage, $columns, $pageName, $page);
+        } else {
+            return ArticleQueryBuilder::searchQuery($search, $searchBy)
+                ->whereIn('publish_status', $publishStatus)
+                ->whereIn('content_for_user', config('articlepermission.' . $arrayListContentForUser))
+                ->where(function ($query) use ($articleCategoryPublicByUuids) {
+                    $query->whereIn('article_category_uuid', $articleCategoryPublicByUuids)
+                        ->orWhereNull('article_category_uuid');
+                })
+                ->paginate($perPage, $columns, $pageName, $page);
+        }
     }
 
     /**
@@ -105,16 +136,29 @@ class ArticleService extends AbstractService
     {
         //Get  Article Category Public
         $articleCategoryPublicByUuids = (new ArticleCategoryService())->getListArticleCategoryUuidsPublic();
-
-        return ArticleQueryBuilder::searchQuery($search, $searchBy)
-            ->whereIn('publish_status', $publishStatus)
-            ->whereIn('content_for_user', config('articlepermission.' . $arrayListContentForUser))
-            ->where(function ($query) use ($articleCategoryPublicByUuids) {
-                $query->whereIn('article_category_uuid', $articleCategoryPublicByUuids)
-                    ->orWhereNull('article_category_uuid');
-            })
-            ->where('user_uuid', auth()->user()->getkey())
-            ->paginate($perPage, $columns, $pageName, $page);
+        $config = (new ConfigService())->findConfigByKey('time_allowed_view_articles_of_editor');
+        if ($arrayListContentForUser === Article::EDITOR_CONTENT_FOR_USER && $config) {
+            return ArticleQueryBuilder::searchQuery($search, $searchBy)
+                ->whereIn('publish_status', $publishStatus)
+                ->whereIn('content_for_user', config('articlepermission.' . $arrayListContentForUser))
+                ->where(function ($query) use ($articleCategoryPublicByUuids) {
+                    $query->whereIn('article_category_uuid', $articleCategoryPublicByUuids)
+                        ->orWhereNull('article_category_uuid');
+                })
+                ->where('user_uuid', auth()->user()->getkey())
+                ->where('updated_at', '>=', Carbon::now()->subDays($config->value))
+                ->paginate($perPage, $columns, $pageName, $page);
+        } else {
+            return ArticleQueryBuilder::searchQuery($search, $searchBy)
+                ->whereIn('publish_status', $publishStatus)
+                ->whereIn('content_for_user', config('articlepermission.' . $arrayListContentForUser))
+                ->where(function ($query) use ($articleCategoryPublicByUuids) {
+                    $query->whereIn('article_category_uuid', $articleCategoryPublicByUuids)
+                        ->orWhereNull('article_category_uuid');
+                })
+                ->where('user_uuid', auth()->user()->getkey())
+                ->paginate($perPage, $columns, $pageName, $page);
+        }
     }
 
     /**
