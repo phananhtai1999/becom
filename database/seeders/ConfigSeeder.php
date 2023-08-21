@@ -392,6 +392,13 @@ class ConfigSeeder extends Seeder
                 'group_id' => $mailboxGroupUuid,
                 'status' => 'system',
             ],
+            [
+                'key' => 'time_allowed_view_articles_of_editor',
+                'value' => 10,
+                'type' => 'numeric',
+                'group_id' => $generalGroupUuid,
+                'status' => 'system',
+            ],
         ];
         Cache::forget('config');
         foreach ($configs as $config) {
