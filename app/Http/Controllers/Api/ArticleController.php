@@ -272,6 +272,11 @@ class ArticleController extends AbstractRestAPIController
      */
     public function storeUnpublishedArticle(UnpublishedArticleRequest $request)
     {
+        if (!$this->languageService->checkLanguages($request->title)
+            || !$this->languageService->checkLanguages($request->get('content'))) {
+
+            return $this->sendValidationFailedJsonResponse();
+        }
         //Map type_label to content
         $content = $this->service->mapTypeLabelToContent($request->get('content'), $request->content_type);
 
@@ -296,6 +301,12 @@ class ArticleController extends AbstractRestAPIController
     public function editUnpublishedArticle(UpdateUnpublishedArticleRequest $request, $id)
     {
         $model = $this->service->showArticleForEditorById($id);
+        if (($request->title && !$this->languageService->checkLanguages($request->title))
+            || ($request->get('content') && !$this->languageService->checkLanguages($request->get('content')))) {
+
+            return $this->sendValidationFailedJsonResponse();
+        }
+
         //Not allow change content_type
         if ($model->content_type != $request->content_type) {
             return $this->sendValidationFailedJsonResponse();
