@@ -37,6 +37,7 @@ class MySectionTemplateQueryBuilder extends AbstractQueryBuilder
                 'publish_status',
                 'reject_reason',
                 'is_default',
+                'type',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -49,6 +50,7 @@ class MySectionTemplateQueryBuilder extends AbstractQueryBuilder
                 'publish_status',
                 'reject_reason',
                 'is_default',
+                'type',
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -75,6 +77,8 @@ class MySectionTemplateQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__user.username', 'user.username'),
                 'user.email',
                 AllowedFilter::exact('exact__user.email', 'user.email'),
+                'type',
+                AllowedFilter::exact('exact__type', 'type'),
             ]);
     }
 

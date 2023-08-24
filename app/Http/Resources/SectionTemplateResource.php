@@ -22,6 +22,7 @@ class SectionTemplateResource extends AbstractJsonResource
             'user_uuid' => $this->user_uuid,
             'section_category_uuid' => $this->section_category_uuid,
             'publish_status' => $this->publish_status,
+            'type' => $this->type,
             'reject_reason' => $this->reject_reason,
             'is_default' => $this->is_default,
             'template' => $this->template,
