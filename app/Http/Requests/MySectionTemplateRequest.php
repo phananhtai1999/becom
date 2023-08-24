@@ -28,7 +28,8 @@ class MySectionTemplateRequest extends AbstractRequest
             'title' => ['required', 'string'],
             'template' => ['required', 'string'],
             'template_json' => ['required', 'string'],
-            'section_category_uuid' => ['required', 'numeric', Rule::exists('section_categories','uuid')->whereNull('deleted_at')],
+            'section_category_uuid' => ['required', 'numeric', Rule::exists('section_categories', 'uuid')->whereNull('deleted_at')],
+            'type' => ['required', 'string', 'in:modal,in_page']
         ];
     }
 }
