@@ -29,6 +29,7 @@ class UpdateMySectionTemplateRequest extends AbstractRequest
             'template' => ['string'],
             'template_json' => ['string'],
             'section_category_uuid' => ['numeric', Rule::exists('section_categories','uuid')->whereNull('deleted_at')],
+            'type' => ['string', 'in:modal,in_page']
         ];
     }
 }

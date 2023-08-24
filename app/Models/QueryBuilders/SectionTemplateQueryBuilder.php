@@ -36,7 +36,8 @@ class SectionTemplateQueryBuilder extends AbstractQueryBuilder
                 'section_category_uuid',
                 'publish_status',
                 'is_default',
-                'reject_reason'
+                'reject_reason',
+                'type',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -48,7 +49,8 @@ class SectionTemplateQueryBuilder extends AbstractQueryBuilder
                 'section_category_uuid',
                 'publish_status',
                 'is_default',
-                'reject_reason'
+                'reject_reason',
+                'type',
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -75,6 +77,8 @@ class SectionTemplateQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__user.username', 'user.username'),
                 'user.email',
                 AllowedFilter::exact('exact__user.email', 'user.email'),
+                'type',
+                AllowedFilter::exact('exact__type', 'type'),
             ]);
     }
 
