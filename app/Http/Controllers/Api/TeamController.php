@@ -154,8 +154,9 @@ class TeamController extends Controller
         try {
             if ($request->get('type') == Team::ACCOUNT_INVITE) {
                 $passwordRandom = $this->generateRandomString(10);
+                $email = $request->get('username') . '@' . $request->get('domain');
                 $user = $this->userService->create([
-                    'email' => $request->get('username') . '@' . $request->get('domain'),
+                    'email' => $email,
                     'first_name' => $request->get('first_name'),
                     'last_name' => $request->get('last_name'),
                     'username' => $request->get('username'),
@@ -167,7 +168,7 @@ class TeamController extends Controller
                 $this->userTeamService->create(array_merge($request->all(), [
                     'user_uuid' => $user->uuid,
                 ]));
-                Mailbox::postEmailAccountcreate($user->uuid, $request->get('username'), $passwordRandom);
+                Mailbox::postEmailAccountcreate($user->uuid, $email, $passwordRandom);
                 DB::commit();
 
                 return $this->sendCreatedJsonResponse();
