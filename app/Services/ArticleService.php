@@ -26,34 +26,17 @@ class ArticleService extends AbstractService
     public function getArticlePublicWithPagination($perPage, $page, $columns, $pageName, $search, $searchBy)
     {
         $articleCategoryPublicByUuids = (new ArticleCategoryService())->getListArticleCategoryUuidsPublic();
-        $config = (new ConfigService())->findConfigByKey('time_allowed_view_articles_of_editor');
-        $roleRootAndAdmin = auth()->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ADMIN_ROOT])->count();
-        $roleEditor = auth()->user()->roles->whereIn('slug', [Role::ROLE_EDITOR])->count();
 
-        if (!$roleRootAndAdmin && $roleEditor && $config) {
-            return ArticleQueryBuilder::searchQuery($search, $searchBy)
-                ->where([
-                    ['publish_status', Article::PUBLISHED_PUBLISH_STATUS],
-                    ['content_for_user', Article::PUBLIC_CONTENT_FOR_USER],
-                    ['updated_at', '>=', Carbon::now()->subDays($config->value)]
-                ])
-                ->where(function ($query) use ($articleCategoryPublicByUuids) {
-                    $query->whereIn('article_category_uuid', $articleCategoryPublicByUuids)
-                        ->orWhereNull('article_category_uuid');
-                })
-                ->paginate($perPage, $columns, $pageName, $page);
-        } else {
-            return ArticleQueryBuilder::searchQuery($search, $searchBy)
-                ->where([
-                    ['publish_status', Article::PUBLISHED_PUBLISH_STATUS],
-                    ['content_for_user', Article::PUBLIC_CONTENT_FOR_USER]
-                ])
-                ->where(function ($query) use ($articleCategoryPublicByUuids) {
-                    $query->whereIn('article_category_uuid', $articleCategoryPublicByUuids)
-                        ->orWhereNull('article_category_uuid');
-                })
-                ->paginate($perPage, $columns, $pageName, $page);
-        }
+        return ArticleQueryBuilder::searchQuery($search, $searchBy)
+            ->where([
+                ['publish_status', Article::PUBLISHED_PUBLISH_STATUS],
+                ['content_for_user', Article::PUBLIC_CONTENT_FOR_USER]
+            ])
+            ->where(function ($query) use ($articleCategoryPublicByUuids) {
+                $query->whereIn('article_category_uuid', $articleCategoryPublicByUuids)
+                    ->orWhereNull('article_category_uuid');
+            })
+            ->paginate($perPage, $columns, $pageName, $page);
     }
 
     /**
