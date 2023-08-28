@@ -75,10 +75,9 @@ class MailboxController  extends Controller
 		$body = $request->get('body');
 		$email_address = $request->get('email_address');
 		$files = $request->get('files');
-		$status = $request->get('status');
 		$subject = $request->get('subject');
 		$type = $request->get('type');
-	    $data = Mailbox::postSendEmail($user_uuid, $body, $email_address, $files, $status, $subject, $type);
+	    $data = Mailbox::postSendEmail($user_uuid, $body, $email_address, $files, $subject, $type);
 	    return response()->json($data->json(), $data->status());
 
 	}   
