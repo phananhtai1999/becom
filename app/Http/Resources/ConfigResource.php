@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Abstracts\AbstractJsonResource;
+use App\Services\ConfigService;
 
 class ConfigResource extends AbstractJsonResource
 {
@@ -15,11 +16,13 @@ class ConfigResource extends AbstractJsonResource
     public function toArray($request)
     {
         $expand = request()->get('expand', []);
+        //Multi lang for value with meta_tag type
+        $value = (new ConfigService())->multiLangForValueWithMetaTagType($this->type, $this->value);
 
         $data = [
             'uuid' => $this->getKey(),
             'key' => $this->key,
-            'value' => $this->value,
+            'value' => $value,
             'type' => $this->type,
             'status' => $this->status,
             'group_id' => $this->group_id,

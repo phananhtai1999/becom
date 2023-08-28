@@ -83,4 +83,19 @@ class ConfigService extends AbstractService
                 return str_replace("_price", "", $item->key);
             })->toArray();
     }
+
+    public function multiLangForValueWithMetaTagType($type, $value)
+    {
+        if ($type === Config::CONFIG_META_TAG_TYPE) {
+            $currentLanguage = request()->cookie('lang') ?? app()->getLocale();
+
+            $value['title'] = !empty($value['titles'][$currentLanguage]) ? $value['titles'][$currentLanguage] : $value['titles'][config('app.fallback_locale')];
+            $value['description'] = !empty($value['descriptions'][$currentLanguage]) ? $value['descriptions'][$currentLanguage] : $value['descriptions'][config('app.fallback_locale')];
+            $value['keyword'] = !empty($value['keywords'][$currentLanguage]) ? $value['keywords'][$currentLanguage] : $value['keywords'][config('app.fallback_locale')];
+
+            return $value;
+        }
+
+        return $value;
+    }
 }

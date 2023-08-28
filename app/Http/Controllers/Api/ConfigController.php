@@ -15,6 +15,7 @@ use App\Http\Controllers\Traits\RestShowTrait;
 use App\Mail\SendEmails;
 use App\Models\Config;
 use App\Services\ConfigService;
+use App\Services\LanguageService;
 use App\Services\SmtpAccountService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Mail;
@@ -24,17 +25,21 @@ class ConfigController extends AbstractRestAPIController
     use RestIndexTrait, RestShowTrait;
 
     protected $smtpAccountService;
+    protected $languageService;
 
     /**
      * @param ConfigService $service
      * @param SmtpAccountService $smtpAccountService
+     * @param LanguageService $languageService
      */
     public function __construct(
-        ConfigService $service,
-        SmtpAccountService $smtpAccountService
+        ConfigService      $service,
+        SmtpAccountService $smtpAccountService,
+        LanguageService    $languageService
     )
     {
         $this->service = $service;
+        $this->languageService = $languageService;
         $this->resourceCollectionClass = ConfigResourceCollection::class;
         $this->resourceClass = ConfigResource::class;
         $this->storeRequest = ConfigRequest::class;
@@ -50,6 +55,15 @@ class ConfigController extends AbstractRestAPIController
     {
         $request = app($this->storeRequest);
 
+        //Check type is meta_tag with multi lang for title,des,keyword
+        if ($request->type === Config::CONFIG_META_TAG_TYPE) {
+            if (!$this->languageService->checkLanguages($request->value['titles']) ||
+                !$this->languageService->checkLanguages($request->value['descriptions']) ||
+                !$this->languageService->checkLanguages($request->value['keywords'])
+            ) {
+                return $this->sendValidationFailedJsonResponse();
+            }
+        }
         // Cast value to integer
         if ($request->type === 'boolean' || $request->type === 'numeric') {
             if ($request->value == 0) {
@@ -82,6 +96,15 @@ class ConfigController extends AbstractRestAPIController
         $request = app($this->editRequest);
 
         $model = $this->service->findOrFailById($id);
+        //Check type is meta_tag with multi lang for title,des,keyword
+        if ($request->type === Config::CONFIG_META_TAG_TYPE && $request->value) {
+            if (!empty($request->value['titles']) && !$this->languageService->checkLanguages($request->value['titles']) ||
+                !empty($request->value['descriptions']) && !$this->languageService->checkLanguages($request->value['descriptions']) ||
+                !empty($request->value['keywords']) && !$this->languageService->checkLanguages($request->value['keywords'])
+            ) {
+                return $this->sendValidationFailedJsonResponse();
+            }
+        }
 
         if (($model->key == 'paypal_method' || $model->key == 'stripe_method') && !$request->get('value')) {
             if (($model->key == 'paypal_method' && !$this->service->findConfigByKey('stripe_method')->value) ||
@@ -102,9 +125,12 @@ class ConfigController extends AbstractRestAPIController
         } else {
             $castValue = $request->value;
         }
-
+        //Check value by meta tag type
+        $valueMetaTagType = $request->type === Config::CONFIG_META_TAG_TYPE ?
+            array_replace_recursive($model->value, $castValue ?? $model->value) :
+            $castValue;
         $this->service->update($model, array_merge($request->except(['key']), [
-            'value' => $castValue
+            'value' => $valueMetaTagType
         ]));
 
         return $this->sendOkJsonResponse(
@@ -206,7 +232,7 @@ class ConfigController extends AbstractRestAPIController
             Mail::to(config('user.email_test'))->send(new SendEmails($subject, $body));
 
             return $this->sendOkJsonResponse(['message' => __('messages.sent_mail_success')]);
-        }catch (\Exception $e){
+        } catch (\Exception $e) {
             return $this->sendValidationFailedJsonResponse(["smtp_account" => $e->getMessage()]);
         }
     }
