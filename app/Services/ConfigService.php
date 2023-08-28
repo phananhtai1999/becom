@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Abstracts\AbstractService;
 use App\Models\Config;
 use App\Models\QueryBuilders\ConfigQueryBuilder;
+use App\Models\Role;
 
 class ConfigService extends AbstractService
 {
@@ -86,12 +87,22 @@ class ConfigService extends AbstractService
 
     public function multiLangForValueWithMetaTagType($type, $value)
     {
+        //Check auth:api
+        $check = false;
+        if (auth()->guest() || !optional(optional(optional(auth()->user())->roles)->whereIn('slug', [Role::ROLE_ROOT, Role::ADMIN_ROOT]))->count()) {
+            $check = true;
+        }
+
         if ($type === Config::CONFIG_META_TAG_TYPE) {
             $currentLanguage = request()->cookie('lang') ?? app()->getLocale();
 
             $value['title'] = !empty($value['titles'][$currentLanguage]) ? $value['titles'][$currentLanguage] : $value['titles'][config('app.fallback_locale')];
             $value['description'] = !empty($value['descriptions'][$currentLanguage]) ? $value['descriptions'][$currentLanguage] : $value['descriptions'][config('app.fallback_locale')];
             $value['keyword'] = !empty($value['keywords'][$currentLanguage]) ? $value['keywords'][$currentLanguage] : $value['keywords'][config('app.fallback_locale')];
+
+            $value['titles'] = $check ? $value['title'] : $value['titles'];
+            $value['descriptions'] = $check ? $value['description'] : $value['descriptions'];
+            $value['keywords'] = $check ? $value['keyword'] : $value['keywords'];
 
             return $value;
         }

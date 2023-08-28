@@ -415,7 +415,7 @@ class ConfigSeeder extends Seeder
                 ],
                 'type' => 'meta_tag',
                 'group_id' => $generalGroupUuid,
-                'status' => 'system',
+                'status' => 'public',
             ],
         ];
         Cache::forget('config');
