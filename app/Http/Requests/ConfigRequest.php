@@ -28,7 +28,7 @@ class ConfigRequest extends AbstractRequest
         $validate = [
             'key' => ['required', 'string', Rule::unique('configs')->whereNull('deleted_at')],
             'value' => ['nullable', 'string'],
-            'type' => ['required', 'in:image,boolean,numeric,string,smtp_account,s3,mailbox'],
+            'type' => ['required', 'in:image,boolean,numeric,string,smtp_account,s3,mailbox,meta_tag'],
             'status' => ['required', 'in:public,system,private'],
             'default_value' => ['nullable', 'string'],
             'group_id' => ['required', 'numeric', 'min:1', Rule::exists('groups', 'uuid')->whereNull('deleted_at')],
@@ -86,6 +86,19 @@ class ConfigRequest extends AbstractRequest
         } elseif ($this->request->get('type') === 'mailbox') {
 
             $validate['key'] = ['required', 'string', Rule::in(Config::CONFIG_MAILBOX_MX, Config::CONFIG_MAILBOX_DKIM, Config::CONFIG_MAILBOX_DMARC), Rule::unique('configs')->whereNull('deleted_at')];
+        } elseif ($this->request->get('type') === Config::CONFIG_META_TAG_TYPE) {
+
+            $validate['value'] = ['required', 'array'];
+            $validate['value.titles'] = ['required', 'array'];
+            $validate['value.titles.en'] = ['required', 'string'];
+            $validate['value.titles.*'] = ['string'];
+            $validate['value.descriptions'] = ['required', 'array'];
+            $validate['value.descriptions.en'] = ['required', 'string'];
+            $validate['value.descriptions.*'] = ['string'];
+            $validate['value.keywords'] = ['required', 'array'];
+            $validate['value.keywords.en'] = ['required', 'string'];
+            $validate['value.keywords.*'] = ['string'];
+            $validate['value.image'] = ['nullable', 'string'];
         }
 
         return $validate;
