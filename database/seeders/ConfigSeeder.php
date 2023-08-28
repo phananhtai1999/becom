@@ -399,6 +399,24 @@ class ConfigSeeder extends Seeder
                 'group_id' => $generalGroupUuid,
                 'status' => 'system',
             ],
+            [
+                'key' => 'meta_tags',
+                'value' => [
+                    'titles' => [
+                        'en' => 'TechupZone Email Marketing'
+                    ],
+                    'descriptions' => [
+                        'en' => 'TechupZone Email Marketing'
+                    ],
+                    'keywords' => [
+                        'en' => 'TechupZone Email Marketing'
+                    ],
+                    'image' => '',
+                ],
+                'type' => 'meta_tag',
+                'group_id' => $generalGroupUuid,
+                'status' => 'system',
+            ],
         ];
         Cache::forget('config');
         foreach ($configs as $config) {
