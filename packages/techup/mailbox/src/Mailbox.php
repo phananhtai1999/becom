@@ -79,12 +79,11 @@ class Mailbox {
         ])->get($this->getRequestUrl('mail-box/'), $data);
 	}  
 
-	public function postSendEmail($user_uuid, $body, $email_address, $files, $status, $subject, $type) {
+	public function postSendEmail($user_uuid, $body, $email_address, $files, $subject, $type) {
 		$data = [
 			'body' => $body,
 			'email_address' => $email_address,
 			'files' => $files,
-			'status' => $status,
 			'subject' => $subject,
 			'type' => $type,
 		];
