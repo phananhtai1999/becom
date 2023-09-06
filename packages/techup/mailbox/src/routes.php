@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use Techup\Mailbox\MailboxController;
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -12,8 +11,8 @@ use Techup\Mailbox\MailboxController;
 | routes are loaded by the RouteServiceProvider within a group which
 | contains the "web" middleware group. Now create something great!
 |
- */
-Route::group(['middleware' => ['auth:api'], 'prefix' => 'mailbox', 'as' => 'mailbox.'], function () {
+*/
+Route::group(['middleware' => ['auth:api'], 'prefix'=>'mailbox', 'as' => 'mailbox.'], function () {
 	Route::post('config', [MailboxController::class, 'postConfig'])->name('postConfig');
 
 	Route::get('configs', [MailboxController::class, 'getConfigs'])->name('getConfigs');
@@ -22,11 +21,15 @@ Route::group(['middleware' => ['auth:api'], 'prefix' => 'mailbox', 'as' => 'mail
 
 	Route::post('email/delete-emails', [MailboxController::class, 'postEmaildeleteEmails'])->name('postEmaildeleteEmails');
 
+	Route::post('email/restore-emails', [MailboxController::class, 'postEmailrestoreEmails'])->name('postEmailrestoreEmails');
+
 	Route::post('email/update-read', [MailboxController::class, 'postEmailupdateRead'])->name('postEmailupdateRead');
 
 	Route::post('email_account/create', [MailboxController::class, 'postEmailAccountcreate'])->name('postEmailAccountcreate');
 
 	Route::get('emails', [MailboxController::class, 'getEmails'])->name('getEmails');
+
+	Route::get('emails/trash', [MailboxController::class, 'getEmailstrash'])->name('getEmailstrash');
 
 	Route::post('folder', [MailboxController::class, 'postFolder'])->name('postFolder');
 
@@ -41,6 +44,8 @@ Route::group(['middleware' => ['auth:api'], 'prefix' => 'mailbox', 'as' => 'mail
 	Route::get('sent-email-address', [MailboxController::class, 'getSentEmailAddress'])->name('getSentEmailAddress');
 
 	Route::post('sent-email-address', [MailboxController::class, 'postSentEmailAddress'])->name('postSentEmailAddress');
+
+	Route::post('sent/delete-sents', [MailboxController::class, 'postSentdeleteSents'])->name('postSentdeleteSents');
 
 	Route::get('sents', [MailboxController::class, 'getSents'])->name('getSents');
 
