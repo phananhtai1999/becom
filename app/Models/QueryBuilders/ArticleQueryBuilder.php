@@ -42,7 +42,9 @@ class ArticleQueryBuilder extends AbstractQueryBuilder
                 'reject_reason',
                 'content_type',
                 'single_purpose_uuid',
-                'paragraph_type_uuid'
+                'paragraph_type_uuid',
+                'keyword',
+                'description',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -59,7 +61,9 @@ class ArticleQueryBuilder extends AbstractQueryBuilder
                 'reject_reason',
                 'content_type',
                 'single_purpose_uuid',
-                'paragraph_type_uuid'
+                'paragraph_type_uuid',
+                'keyword',
+                'description',
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -105,7 +109,9 @@ class ArticleQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::scope('to__created_at'),
                 AllowedFilter::scope('from__updated_at'),
                 AllowedFilter::scope('to__updated_at'),
-                AllowedFilter::scope('title_by_root', 'titleByRoot')
+                AllowedFilter::scope('title_by_root', 'titleByRoot'),
+                AllowedFilter::scope('keyword'),
+                AllowedFilter::scope('description'),
             ]);
 
     }
