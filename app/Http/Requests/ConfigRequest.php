@@ -87,17 +87,14 @@ class ConfigRequest extends AbstractRequest
 
             $validate['key'] = ['required', 'string', Rule::in(Config::CONFIG_MAILBOX_MX, Config::CONFIG_MAILBOX_DKIM, Config::CONFIG_MAILBOX_DMARC), Rule::unique('configs')->whereNull('deleted_at')];
         } elseif ($this->request->get('type') === Config::CONFIG_META_TAG_TYPE) {
-
+            $structuredFields = ['titles', 'descriptions', 'keywords', 'copyrights', 'authors', 'resource-types', 'distributions', 'revisit-afters', 'GENERATORS'];
+            foreach ($structuredFields as $field) {
+                $validate["value.$field"] = ['required', 'array'];
+                $validate["value.$field.en"] = ['required', 'string'];
+                $validate["value.$field.*"] = ['string'];
+            }
+            $validate["value.fb:pages"] = ['required', 'string'];
             $validate['value'] = ['required', 'array'];
-            $validate['value.titles'] = ['required', 'array'];
-            $validate['value.titles.en'] = ['required', 'string'];
-            $validate['value.titles.*'] = ['string'];
-            $validate['value.descriptions'] = ['required', 'array'];
-            $validate['value.descriptions.en'] = ['required', 'string'];
-            $validate['value.descriptions.*'] = ['string'];
-            $validate['value.keywords'] = ['required', 'array'];
-            $validate['value.keywords.en'] = ['required', 'string'];
-            $validate['value.keywords.*'] = ['string'];
             $validate['value.image'] = ['nullable', 'string'];
         }
 

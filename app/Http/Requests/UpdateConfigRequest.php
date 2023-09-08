@@ -83,18 +83,17 @@ class UpdateConfigRequest extends AbstractRequest
             $validate['value.url'] = ['nullable', 'string'];
             $validate['value.endpoint'] = ['required', 'string'];
             $validate['value.use_path_style_endpoint'] = ['nullable', 'boolean'];
-        }  elseif ($this->request->get('type') === 'mailbox') {
+        } elseif ($this->request->get('type') === 'mailbox') {
 
-            $validate['key'] = ['required', 'string', Rule::in(Config::CONFIG_MAILBOX_MX, Config::CONFIG_MAILBOX_DKIM, Config::CONFIG_MAILBOX_DMARC), Rule::unique('configs')->ignore($this->id,'uuid')->whereNull('deleted_at')];
+            $validate['key'] = ['required', 'string', Rule::in(Config::CONFIG_MAILBOX_MX, Config::CONFIG_MAILBOX_DKIM, Config::CONFIG_MAILBOX_DMARC), Rule::unique('configs')->ignore($this->id, 'uuid')->whereNull('deleted_at')];
         } elseif ($this->request->get('type') === Config::CONFIG_META_TAG_TYPE) {
-
+            $structuredFields = ['titles', 'descriptions', 'keywords', 'copyrights', 'authors', 'resource-types', 'distributions', 'revisit-afters', 'GENERATORS'];
+            foreach ($structuredFields as $field) {
+                $validate["value.$field"] = ['array'];
+                $validate["value.$field.*"] = ['string'];
+            }
+            $validate["value.fb:pages"] = ['string'];
             $validate['value'] = ['array'];
-            $validate['value.titles'] = ['array'];
-            $validate['value.titles.*'] = ['string'];
-            $validate['value.descriptions'] = ['array'];
-            $validate['value.descriptions.*'] = ['string'];
-            $validate['value.keywords'] = ['array'];
-            $validate['value.keywords.*'] = ['string'];
             $validate['value.image'] = ['string'];
         }
 
