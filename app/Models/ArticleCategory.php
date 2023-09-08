@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Abstracts\AbstractModel;
+use App\Http\Controllers\Traits\ModelFilterDescriptionLanguageTrait;
+use App\Http\Controllers\Traits\ModelFilterKeywordLanguageTrait;
 use App\Http\Controllers\Traits\ModelFilterLanguageTrait;
 use App\Services\UserService;
 use Baum\NestedSet\Node as WorksAsNestedSet;
@@ -17,7 +19,8 @@ class ArticleCategory extends AbstractModel
 {
     use HasFactory, WorksAsNestedSet,
         SoftDeletes, HasTranslations,
-        ModelFilterLanguageTrait;
+        ModelFilterLanguageTrait,
+        ModelFilterKeywordLanguageTrait, ModelFilterDescriptionLanguageTrait;
 
     const PUBLISHED_PUBLISH_STATUS = 1;
     const PENDING_PUBLISH_STATUS = 2;
@@ -61,7 +64,7 @@ class ArticleCategory extends AbstractModel
      */
     protected $depthColumnName = 'depth';
 
-    public $translatable = ['title'];
+    public $translatable = ['title', 'keyword', 'description'];
 
     /**
      * @var string[]
@@ -72,7 +75,10 @@ class ArticleCategory extends AbstractModel
         'parent_uuid',
         'user_uuid',
         'publish_status',
-        'title'
+        'title',
+        'keyword',
+        'description',
+        'feature_image',
     ];
 
     /**
@@ -84,7 +90,9 @@ class ArticleCategory extends AbstractModel
         'deleted_at' => 'datetime',
         'user_uuid' => 'integer',
         'parent_uuid' => 'integer',
-        'title' => 'array'
+        'title' => 'array',
+        'keyword' => 'array',
+        'description' => 'array',
     ];
 
     /**
@@ -92,6 +100,8 @@ class ArticleCategory extends AbstractModel
      */
     protected $appends = [
         'titles',
+        'keywords',
+        'descriptions',
     ];
 
     /**
@@ -184,6 +194,16 @@ class ArticleCategory extends AbstractModel
     public function getTitlesAttribute()
     {
         return app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('title') : $this->title;
+    }
+
+    public function getKeywordsAttribute()
+    {
+        return app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('keyword') : $this->keyword;
+    }
+
+    public function getDescriptionsAttribute()
+    {
+        return app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('description') : $this->description;
     }
 
     /**
