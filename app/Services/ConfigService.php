@@ -95,16 +95,12 @@ class ConfigService extends AbstractService
 
         if ($type === Config::CONFIG_META_TAG_TYPE) {
             $currentLanguage = request()->cookie('lang') ?? app()->getLocale();
-
-            $value['title'] = !empty($value['titles'][$currentLanguage]) ? $value['titles'][$currentLanguage] : $value['titles'][config('app.fallback_locale')];
-            $value['description'] = !empty($value['descriptions'][$currentLanguage]) ? $value['descriptions'][$currentLanguage] : $value['descriptions'][config('app.fallback_locale')];
-            $value['keyword'] = !empty($value['keywords'][$currentLanguage]) ? $value['keywords'][$currentLanguage] : $value['keywords'][config('app.fallback_locale')];
-
-            $value['titles'] = $check ? $value['title'] : $value['titles'];
-            $value['descriptions'] = $check ? $value['description'] : $value['descriptions'];
-            $value['keywords'] = $check ? $value['keyword'] : $value['keywords'];
-
-            return $value;
+            $structuredFields = ['titles', 'descriptions', 'keywords', 'copyrights', 'authors', 'resource-types', 'distributions', 'revisit-afters', 'GENERATORS'];
+            foreach ($structuredFields as $fields) {
+                $field = substr($fields, 0, -1);
+                $value[$field] = !empty($value[$fields][$currentLanguage]) ? $value[$fields][$currentLanguage] : $value[$fields][config('app.fallback_locale')];
+                $value[$fields] = $check ? $value[$field] : $value[$fields];
+            }
         }
 
         return $value;
