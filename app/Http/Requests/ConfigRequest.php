@@ -93,7 +93,7 @@ class ConfigRequest extends AbstractRequest
                 $validate["value.$field.en"] = ['required', 'string'];
                 $validate["value.$field.*"] = ['string'];
             }
-            $validate["value.fb:pages"] = ['required', 'string'];
+            $validate["value.fb:pages"] = ['nullable', 'string'];
             $validate['value'] = ['required', 'array'];
             $validate['value.image'] = ['nullable', 'string'];
         }

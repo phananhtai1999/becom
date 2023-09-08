@@ -22,18 +22,18 @@ class UpdateMetaTagTypeConfigSeeder extends Seeder
                 'en' => 'TechupZone Email Marketing'
             ],
             'resource-types' => [
-                'en' => 'TechupZone Email Marketing'
+                'en' => 'Document'
             ],
             'distributions' => [
-                'en' => 'TechupZone Email Marketing'
+                'en' => 'Global'
             ],
             'revisit-afters' => [
-                'en' => 'TechupZone Email Marketing'
+                'en' => '1 days'
             ],
             'GENERATORS' => [
                 'en' => 'TechupZone Email Marketing'
             ],
-            'fb:pages' => 'TechupZone Email Marketing'
+            'fb:pages' => ''
         ];
         $config = Config::where('type', Config::CONFIG_META_TAG_TYPE)->first();
         if ($config) {

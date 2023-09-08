@@ -92,7 +92,7 @@ class UpdateConfigRequest extends AbstractRequest
                 $validate["value.$field"] = ['array'];
                 $validate["value.$field.*"] = ['string'];
             }
-            $validate["value.fb:pages"] = ['string'];
+            $validate["value.fb:pages"] = ['nullable', 'string'];
             $validate['value'] = ['array'];
             $validate['value.image'] = ['string'];
         }
