@@ -45,6 +45,12 @@ class UnpublishedArticleRequest extends AbstractRequest
             'article_series_uuid' => ['nullable', 'numeric', 'min:1', Rule::exists('article_series', 'uuid')->where(function ($query) {
                 return $query->whereNull('article_uuid')->whereNotNull('parent_uuid')->whereNull('deleted_at');
             })],
+            'keyword' => ['nullable', 'array'],
+            'keyword.en' => ['required_with:keyword', 'string', 'not_in:0'],
+            'keyword.*' => ['required_with:keyword', 'string'],
+            'description' => ['nullable', 'array'],
+            'description.en' => ['required_with:description', 'string', 'not_in:0'],
+            'description.*' => ['required_with:description', 'string'],
         ];
 
         if ($this->request->get('content_type') === 'single') {

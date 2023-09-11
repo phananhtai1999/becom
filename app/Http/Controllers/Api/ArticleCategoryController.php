@@ -58,7 +58,7 @@ class ArticleCategoryController extends AbstractRestAPIController
         $request = app($this->storeRequest);
 
         if (!$this->languageService->checkLanguages($request->title)
-            || !$this->languageService->checkLanguages($request->keyword)
+            || ($request->keyword && !$this->languageService->checkLanguages($request->keyword))
             || ($request->description && !$this->languageService->checkLanguages($request->description))) {
 
             return $this->sendValidationFailedJsonResponse();
@@ -66,7 +66,7 @@ class ArticleCategoryController extends AbstractRestAPIController
 
         $model = $this->service->create(array_merge($request->all(), [
             'user_uuid' => auth()->user()->getKey(),
-            'description' => array_merge($request->keyword, $request->description ?? $request->keyword)
+            'description' => $request->keyword ? array_merge($request->keyword, $request->description ?? $request->keyword) : $request->description
         ]));
 
         return $this->sendCreatedJsonResponse(
@@ -90,8 +90,8 @@ class ArticleCategoryController extends AbstractRestAPIController
         }
         $model = $this->service->findOrFailById($id);
 
-        //Generate description by keyword and lang key description != null
-        $description = array_merge($request->get('keyword', []), $model->descriptions, array_filter($request->get('description', []), function ($value) {
+        //Generate description by keyword and value lang != null
+        $description = array_merge(\request('keyword', []), !empty($model->descriptions) ? $model->descriptions : [], array_filter(\request('description', []), function ($value) {
             return $value !== null;
         }));
 

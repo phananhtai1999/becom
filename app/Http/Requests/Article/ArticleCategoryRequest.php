@@ -31,11 +31,12 @@ class ArticleCategoryRequest extends AbstractRequest
             'title' => ['required', 'array', 'min:1'],
             'title.en' => ['required', 'string'],
             'title.*' => ['required', 'string'],
-            'keyword' => ['required', 'array', 'min:1'],
-            'keyword.en' => ['required', 'string'],
-            'keyword.*' => ['required', 'string'],
-            'description' => ['nullable', 'array', 'min:1'],
-            'description.*' => ['nullable', 'string'],
+            'keyword' => ['nullable', 'array'],
+            'keyword.en' => ['required_with:keyword', 'string', 'not_in:0'],
+            'keyword.*' => ['required_with:keyword', 'string'],
+            'description' => ['nullable', 'array'],
+            'description.en' => ['required_with:description', 'string', 'not_in:0'],
+            'description.*' => ['required_with:description', 'string'],
             'publish_status' => ['required', 'numeric', 'min:1', 'max:2'],
             'parent_uuid' => ['nullable', 'numeric', Rule::exists('article_categories', 'uuid')->whereNull('deleted_at')]
         ];

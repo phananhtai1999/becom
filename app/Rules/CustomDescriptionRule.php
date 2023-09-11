@@ -2,6 +2,8 @@
 
 namespace App\Rules;
 
+use App\Services\ArticleCategoryService;
+use App\Services\ArticleService;
 use App\Services\WebsitePageService;
 use Illuminate\Contracts\Validation\Rule;
 
@@ -35,7 +37,12 @@ class CustomDescriptionRule implements Rule
     {
         if ($this->type == 'website_page') {
             $model = (new WebsitePageService())->findOneById($this->uuid);
+        } elseif ($this->type == 'articles') {
+            $model = (new ArticleService())->findOneById($this->uuid);
+        } else {
+            $model = (new ArticleCategoryService())->findOneById($this->uuid);
         }
+
         if (($model && !empty($model->descriptions['en'])) || ($model && empty($model->descriptions['en']) && !empty($this->description['en'])) ||
             ($model && empty($model->descriptions['en']) && !empty($this->keyword['en']))) {
 
