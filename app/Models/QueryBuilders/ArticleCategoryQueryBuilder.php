@@ -34,7 +34,10 @@ class ArticleCategoryQueryBuilder extends AbstractQueryBuilder
                 'parent_uuid',
                 'user_uuid',
                 'publish_status',
-                'title'
+                'title',
+                'keyword',
+                'description',
+                'feature_image',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -44,13 +47,18 @@ class ArticleCategoryQueryBuilder extends AbstractQueryBuilder
                 'parent_uuid',
                 'user_uuid',
                 'publish_status',
-                'title'
+                'title',
+                'keyword',
+                'description',
+                'feature_image',
             ])
             ->allowedFilters([
                 $modelKeyName,
                 AllowedFilter::exact('exact__' . $modelKeyName, $modelKeyName),
                 'image',
                 AllowedFilter::exact('exact__image', 'image'),
+                'feature_image',
+                AllowedFilter::exact('exact__feature_image', 'feature_image'),
                 'slug',
                 AllowedFilter::exact('exact__slug', 'slug'),
                 'user_uuid',
@@ -77,6 +85,8 @@ class ArticleCategoryQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::scope('to__created_at'),
                 AllowedFilter::scope('from__updated_at'),
                 AllowedFilter::scope('to__updated_at'),
+                AllowedFilter::scope('keyword'),
+                AllowedFilter::scope('description'),
             ]);
     }
 
