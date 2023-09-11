@@ -36,7 +36,7 @@ class UpdateMyWebsitePageRequest extends AbstractRequest
             'feature_image' => ['nullable', 'string'],
             'keyword' => ['nullable', 'array', new CustomKeywordRule($this->id, $this->request->get('keyword'), 'website_page')],
             'keyword.*' => ['nullable', 'string', 'not_in:0'],
-            'description' => ['nullable', 'array', new CustomDescriptionRule($this->id, $this->request->get('keyword'), $this->request->get('description'))],
+            'description' => ['nullable', 'array', new CustomDescriptionRule($this->id, $this->request->get('keyword'), $this->request->get('description'), 'website_page')],
             'description.*' => ['nullable', 'string', 'not_in:0'],
         ];
     }

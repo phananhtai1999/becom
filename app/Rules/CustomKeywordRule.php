@@ -7,18 +7,18 @@ use Illuminate\Contracts\Validation\Rule;
 
 class CustomKeywordRule implements Rule
 {
-    private $websitePageUuid;
+    private $uuid;
     private $keyword;
     private $type;
 
     /**
-     * @param $websitePageUuid
+     * @param $uuid
      * @param $keyword
      * @param $type
      */
-    public function __construct($websitePageUuid, $keyword, $type)
+    public function __construct($uuid, $keyword, $type)
     {
-        $this->websitePageUuid = $websitePageUuid;
+        $this->uuid = $uuid;
         $this->keyword = $keyword;
         $this->type = $type;
     }
@@ -31,9 +31,9 @@ class CustomKeywordRule implements Rule
     public function passes($attribute, $value)
     {
         if ($this->type == 'website_page') {
-            $websitePage = (new WebsitePageService())->findOneById($this->websitePageUuid);
+            $model = (new WebsitePageService())->findOneById($this->uuid);
         }
-        if (($websitePage && !empty($websitePage->keywords['en'])) || ($websitePage && empty($websitePage->keywords['en']) && !empty($this->keyword['en']))) {
+        if (($model && !empty($model->keywords['en'])) || ($model && empty($model->keywords['en']) && !empty($this->keyword['en']))) {
 
             return true;
         }

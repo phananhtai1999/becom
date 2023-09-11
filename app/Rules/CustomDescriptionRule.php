@@ -7,20 +7,23 @@ use Illuminate\Contracts\Validation\Rule;
 
 class CustomDescriptionRule implements Rule
 {
-    private $websitePageUuid;
+    private $uuid;
     private $description;
     private $keyword;
+    private $type;
 
     /**
-     * @param $websitePageUuid
+     * @param $uuid
      * @param $keyword
      * @param $description
+     * @param $type
      */
-    public function __construct($websitePageUuid, $keyword, $description)
+    public function __construct($uuid, $keyword, $description, $type)
     {
-        $this->websitePageUuid = $websitePageUuid;
+        $this->uuid = $uuid;
         $this->keyword = $keyword;
         $this->description = $description;
+        $this->type = $type;
     }
 
     /**
@@ -30,9 +33,11 @@ class CustomDescriptionRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        $websitePage = (new WebsitePageService())->findOneById($this->websitePageUuid);
-        if (($websitePage && !empty($websitePage->descriptions['en'])) || ($websitePage && empty($websitePage->descriptions['en']) && !empty($this->description['en'])) ||
-            ($websitePage && empty($websitePage->descriptions['en']) && !empty($this->keyword['en']))) {
+        if ($this->type == 'website_page') {
+            $model = (new WebsitePageService())->findOneById($this->uuid);
+        }
+        if (($model && !empty($model->descriptions['en'])) || ($model && empty($model->descriptions['en']) && !empty($this->description['en'])) ||
+            ($model && empty($model->descriptions['en']) && !empty($this->keyword['en']))) {
 
             return true;
         }
