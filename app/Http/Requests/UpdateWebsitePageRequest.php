@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
+use App\Rules\CustomDescriptionRule;
+use App\Rules\CustomKeywordRule;
 use Illuminate\Validation\Rule;
 
 class UpdateWebsitePageRequest extends AbstractRequest
@@ -31,7 +33,12 @@ class UpdateWebsitePageRequest extends AbstractRequest
             'website_page_category_uuid' => ['numeric', Rule::exists('website_page_categories','uuid')->whereNull('deleted_at')],
             'publish_status' => ['numeric', 'min:1', 'max:4'],
             'is_default' => ['boolean'],
-            'display_type' => ['string', 'in:page,in_page']
+            'display_type' => ['string', 'in:page,in_page'],
+            'feature_image' => ['nullable', 'string'],
+            'keyword' => ['nullable', 'array', new CustomKeywordRule($this->id, $this->request->get('keyword'), 'website_page')],
+            'keyword.*' => ['nullable', 'string', 'not_in:0'],
+            'description' => ['nullable', 'array', new CustomDescriptionRule($this->id, $this->request->get('keyword'), $this->request->get('description'))],
+            'description.*' => ['nullable', 'string', 'not_in:0'],
         ];
     }
 }
