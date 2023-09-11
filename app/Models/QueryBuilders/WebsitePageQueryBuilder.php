@@ -37,7 +37,10 @@ class WebsitePageQueryBuilder extends AbstractQueryBuilder
                 'publish_status',
                 'is_default',
                 'display_type',
-                'reject_reason'
+                'reject_reason',
+                'keyword',
+                'description',
+                'feature_image',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -50,7 +53,10 @@ class WebsitePageQueryBuilder extends AbstractQueryBuilder
                 'publish_status',
                 'is_default',
                 'display_type',
-                'reject_reason'
+                'reject_reason',
+                'keyword',
+                'description',
+                'feature_image',
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -79,6 +85,10 @@ class WebsitePageQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__reject_reason', 'reject_reason'),
                 'display_type',
                 AllowedFilter::exact('exact__display_type', 'display_type'),
+                AllowedFilter::scope('keyword'),
+                AllowedFilter::scope('description'),
+                'feature_image',
+                AllowedFilter::exact('exact__feature_image', 'feature_image'),
             ]);
     }
 
