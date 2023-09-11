@@ -2,6 +2,8 @@
 
 namespace App\Rules;
 
+use App\Services\ArticleCategoryService;
+use App\Services\ArticleService;
 use App\Services\WebsitePageService;
 use Illuminate\Contracts\Validation\Rule;
 
@@ -32,7 +34,12 @@ class CustomKeywordRule implements Rule
     {
         if ($this->type == 'website_page') {
             $model = (new WebsitePageService())->findOneById($this->uuid);
+        } elseif ($this->type == 'articles') {
+            $model = (new ArticleService())->findOneById($this->uuid);
+        } else {
+            $model = (new ArticleCategoryService())->findOneById($this->uuid);
         }
+
         if (($model && !empty($model->keywords['en'])) || ($model && empty($model->keywords['en']) && !empty($this->keyword['en']))) {
 
             return true;

@@ -74,7 +74,7 @@ class ArticleController extends AbstractRestAPIController
 
         if (!$this->languageService->checkLanguages($request->title)
             || !$this->languageService->checkLanguages($request->content)
-            || !$this->languageService->checkLanguages($request->keyword)
+            || ($request->keyword && !$this->languageService->checkLanguages($request->keyword))
             || ($request->description && !$this->languageService->checkLanguages($request->description))) {
 
             return $this->sendValidationFailedJsonResponse();
@@ -87,7 +87,7 @@ class ArticleController extends AbstractRestAPIController
             'user_uuid' => auth()->user()->getKey(),
             'content_for_user' => $request->content_for_user ?: Article::PUBLIC_CONTENT_FOR_USER,
             'content' => $content,
-            'description' => array_merge($request->keyword, $request->description ?? $request->keyword)
+            'description' => $request->keyword ? array_merge($request->keyword, $request->description ?? $request->keyword) : $request->description
         ]));
 
         // Update Article Series By Article Uuid
@@ -127,8 +127,8 @@ class ArticleController extends AbstractRestAPIController
         //Check content exist or not
         $checkContent = $request->content ? array_merge($model->getTranslations('content'), $request->content) : $model->getTranslations('content');
         $content = $this->service->mapTypeLabelToContent($checkContent, $model->content_type);
-        //Generate description by keyword and lang key description != null
-        $description = array_merge($request->get('keyword', []), $model->descriptions, array_filter($request->get('description', []), function ($value) {
+        //Generate description by keyword and value lang != null
+        $description = array_merge(\request('keyword', []), !empty($model->descriptions) ? $model->descriptions : [], array_filter(\request('description', []), function ($value) {
             return $value !== null;
         }));
 
@@ -288,7 +288,7 @@ class ArticleController extends AbstractRestAPIController
     {
         if (!$this->languageService->checkLanguages($request->title)
             || !$this->languageService->checkLanguages($request->get('content'))
-            || !$this->languageService->checkLanguages($request->keyword)
+            || ($request->keyword && !$this->languageService->checkLanguages($request->keyword))
             || ($request->description && !$this->languageService->checkLanguages($request->description))) {
 
             return $this->sendValidationFailedJsonResponse();
@@ -299,7 +299,7 @@ class ArticleController extends AbstractRestAPIController
         $model = $this->service->create(array_merge($request->except(['reject_reason']), [
             'user_uuid' => auth()->user()->getKey(),
             'content' => $content,
-            'description' => array_merge($request->keyword, $request->description ?? $request->keyword)
+            'description' => $request->keyword ? array_merge($request->keyword, $request->description ?? $request->keyword) : $request->description
         ]));
 
         // Update Article Series By Article Uuid
@@ -335,8 +335,8 @@ class ArticleController extends AbstractRestAPIController
         //Check content exist or not
         $checkContent = $request->get('content') ? array_merge($model->getTranslations('content'), $request->get('content')) : $model->getTranslations('content');
         $content = $this->service->mapTypeLabelToContent($checkContent, $model->content_type);
-        //Generate description by keyword and lang key description != null
-        $description = array_merge($request->get('keyword', []), $model->descriptions, array_filter($request->get('description', []), function ($value) {
+        //Generate description by keyword and value lang != null
+        $description = array_merge(\request('keyword', []), !empty($model->descriptions) ? $model->descriptions : [], array_filter(\request('description', []), function ($value) {
             return $value !== null;
         }));
 
