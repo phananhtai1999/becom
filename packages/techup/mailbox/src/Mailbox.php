@@ -14,7 +14,7 @@ class Mailbox {
     }
 
 
-	public function postConfig($user_uuid, $default_value, $key, $value, $per_page, $page, $search, $filter) {
+	public function postConfig($user_uuid, $default_value, $key, $value) {
 		$data = [
 			'default_value' => $default_value,
 			'key' => $key,
@@ -52,7 +52,7 @@ class Mailbox {
         ])->get($this->getRequestUrl('email/count-unread'), $data);
 	}  
 
-	public function postEmaildeleteEmails($user_uuid, $ids, $per_page, $page, $search, $filter) {
+	public function postEmaildeleteEmails($user_uuid, $ids) {
 		$data = [
 			'ids' => $ids,
 		];
@@ -62,7 +62,7 @@ class Mailbox {
         ])->post($this->getRequestUrl('email/delete-emails'), $data);
 	}   
 
-	public function postEmailrestoreEmails($user_uuid, $ids, $per_page, $page, $search, $filter) {
+	public function postEmailrestoreEmails($user_uuid, $ids) {
 		$data = [
 			'ids' => $ids,
 		];
@@ -72,7 +72,7 @@ class Mailbox {
         ])->post($this->getRequestUrl('email/restore-emails'), $data);
 	}   
 
-	public function postEmailupdateRead($user_uuid, $ids, $per_page, $page, $search, $filter) {
+	public function postEmailupdateRead($user_uuid, $ids) {
 		$data = [
 			'ids' => $ids,
 		];
@@ -82,7 +82,7 @@ class Mailbox {
         ])->post($this->getRequestUrl('email/update-read'), $data);
 	}   
 
-	public function postEmailAccountcreate($user_uuid, $email_address, $password, $per_page, $page, $search, $filter) {
+	public function postEmailAccountcreate($user_uuid, $email_address, $password) {
 		$data = [
 			'email_address' => $email_address,
 			'password' => $password,
@@ -119,7 +119,7 @@ class Mailbox {
         ])->get($this->getRequestUrl('emails/trash'), $data);
 	}  
 
-	public function postFolder($user_uuid, $title, $per_page, $page, $search, $filter) {
+	public function postFolder($user_uuid, $title) {
 		$data = [
 			'title' => $title,
 		];
@@ -155,7 +155,7 @@ class Mailbox {
         ])->get($this->getRequestUrl('mail-box/'), $data);
 	}  
 
-	public function postSendEmail($user_uuid, $body, $email_address, $files, $subject, $type, $per_page, $page, $search, $filter) {
+	public function postSendEmail($user_uuid, $body, $email_address, $files, $subject, $type) {
 		$data = [
 			'body' => $body,
 			'email_address' => $email_address,
@@ -169,7 +169,7 @@ class Mailbox {
         ])->post($this->getRequestUrl('send-email/'), $data);
 	}   
 
-	public function postSent($user_uuid, $body, $email_account_id, $status, $subject, $per_page, $page, $search, $filter) {
+	public function postSent($user_uuid, $body, $email_account_id, $status, $subject) {
 		$data = [
 			'body' => $body,
 			'email_account_id' => $email_account_id,
@@ -195,7 +195,7 @@ class Mailbox {
         ])->get($this->getRequestUrl('sent-email-address'), $data);
 	}  
 
-	public function postSentEmailAddress($user_uuid, $email_account_id, $email_address, $type, $per_page, $page, $search, $filter) {
+	public function postSentEmailAddress($user_uuid, $email_account_id, $email_address, $type) {
 		$data = [
 			'email_account_id' => $email_account_id,
 			'email_address' => $email_address,
@@ -207,7 +207,7 @@ class Mailbox {
         ])->post($this->getRequestUrl('sent-email-address'), $data);
 	}   
 
-	public function postSentdeleteSents($user_uuid, $ids, $per_page, $page, $search, $filter) {
+	public function postSentdeleteSents($user_uuid, $ids) {
 		$data = [
 			'ids' => $ids,
 		];
