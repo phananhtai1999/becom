@@ -10,10 +10,7 @@
     "require": {
         "php": "^7.3|^8.0",
         "ext-curl": "*",
-        "ext-exif": "*",
-        "ext-gd": "*",
         "ext-json": "*",
-        "ext-mysqli": "*",
         "aws/aws-sdk-php": "^3.216",
         "barryvdh/laravel-dompdf": "*",
         "baum/baum": "*",
@@ -35,10 +32,11 @@
         "spatie/laravel-translatable": "*",
         "srmklive/paypal": "~3.0",
         "stripe/stripe-php": "^10.0",
-        "techup/connector": "dev-main",
-        "techup/mailbox": "dev-dev",
+        "techup/connector": "*",
+        "techup/mailbox": "*",
+        "techup/site_controller": "*",
         "torann/geoip": "*",
-        "tymon/jwt-auth": "^1.0@dev"
+        "tymon/jwt-auth": "*"
     },
     "require-dev": {
         "facade/ignition": "^2.5",
@@ -99,6 +97,13 @@
         "techup/mailbox": {
             "type": "path",
             "url": "packages/techup/mailbox",
+            "options": {
+                "symlink": true
+            }
+        },
+        "techup/site_controller": {
+            "type": "path",
+            "url": "packages/techup/site_controller",
             "options": {
                 "symlink": true
             }
