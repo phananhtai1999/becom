@@ -9,11 +9,13 @@ class LanguageResource extends AbstractJsonResource
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
      */
     public function toArray($request)
     {
+        $flagColumns = $request->get('flag', []);
+
         $data = [
             'code' => $this->getKey(),
             'name' => $this->name,
@@ -23,6 +25,13 @@ class LanguageResource extends AbstractJsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
         ];
+
+        //Remove unnecessary value
+        foreach ($flagColumns as $column) {
+            if (in_array($column, array_keys($data))) {
+                $data[$column] = null;
+            }
+        }
 
         return $data;
     }
