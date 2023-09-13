@@ -14,7 +14,7 @@ class LanguageResource extends AbstractJsonResource
      */
     public function toArray($request)
     {
-        $flagColumns = $request->get('flag', []);
+        $excludeColumns = $request->get('flag', []);
 
         $data = [
             'code' => $this->getKey(),
@@ -27,7 +27,7 @@ class LanguageResource extends AbstractJsonResource
         ];
 
         //Remove unnecessary value
-        foreach ($flagColumns as $column) {
+        foreach ($excludeColumns as $column) {
             if (in_array($column, array_keys($data))) {
                 $data[$column] = null;
             }
