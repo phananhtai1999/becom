@@ -63,7 +63,7 @@ class ArticleResource extends AbstractJsonResource
             $data['paragraph_type'] = new ParagraphTypeResource($this->paragraphType);
         }
 
-        //Remove unnecessary value
+        //Exclude unnecessary value
         foreach ($excludeColumns as $column) {
             if (in_array($column, array_keys($data))) {
                 $data[$column] = null;
