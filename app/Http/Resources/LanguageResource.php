@@ -14,7 +14,7 @@ class LanguageResource extends AbstractJsonResource
      */
     public function toArray($request)
     {
-        $excludeColumns = $request->get('flag', []);
+        $excludeColumns = $request->get('exclude', []);
 
         $data = [
             'code' => $this->getKey(),
