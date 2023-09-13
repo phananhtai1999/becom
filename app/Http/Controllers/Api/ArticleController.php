@@ -234,7 +234,7 @@ class ArticleController extends AbstractRestAPIController
         //Role editor limit by config days
         if (!$role && $config) {
             $models = $this->service->getCollectionWithPaginationByCondition($request, [
-                ['user_uuid' => auth()->user()->getKey()],
+                ['user_uuid', auth()->user()->getKey()],
                 ['updated_at', '>=', Carbon::now()->subDays($config->value)]
             ]);
         } else {
