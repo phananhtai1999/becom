@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Abstracts\AbstractService;
 use App\Models\Language;
 use App\Models\QueryBuilders\LanguageQueryBuilder;
+use Illuminate\Support\Facades\File;
 
 class LanguageService extends AbstractService
 {
@@ -33,5 +34,10 @@ class LanguageService extends AbstractService
         }
 
         return true;
+    }
+
+    public function languagesSupport()
+    {
+        return array_map('basename', File::directories(resource_path('lang')));
     }
 }

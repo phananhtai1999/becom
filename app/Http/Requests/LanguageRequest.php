@@ -3,7 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
-use App\Models\Language;
+use App\Services\LanguageService;
 use Illuminate\Validation\Rule;
 
 class LanguageRequest extends AbstractRequest
@@ -26,7 +26,7 @@ class LanguageRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'code' => ['required', 'string', Rule::in(app(Language::class)->languagesSupport), Rule::unique('languages','code')],
+            'code' => ['required', 'string', Rule::in(app(LanguageService::class)->languagesSupport()), Rule::unique('languages','code')],
             'name' => ['required', 'string', Rule::unique('languages','name')],
             'flag_image' => ['nullable', 'string'],
             'fe' => ['required', 'json'],

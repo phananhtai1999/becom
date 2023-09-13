@@ -13,7 +13,6 @@ use App\Http\Requests\SaveTranslatesJsonRequest;
 use App\Http\Requests\UpdateLanguageRequest;
 use App\Http\Resources\LanguageResource;
 use App\Http\Resources\LanguageResourceCollection;
-use App\Models\Language;
 use App\Services\LanguageService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\File;
@@ -98,7 +97,7 @@ class LanguageController extends AbstractRestAPIController
     public function saveTranslates(SaveTranslatesJsonRequest $request)
     {
         $translates = json_decode($request->get('translates_json'), true);
-        $languagesSupport = app(Language::class)->languagesSupport;
+        $languagesSupport = $this->service->languagesSupport();
         foreach ($translates as $code => $translate) {
             if (!in_array($code, $languagesSupport)) {
                 $this->sendValidationFailedJsonResponse(["error" => __('messages.not_change_code')]);
@@ -119,7 +118,7 @@ class LanguageController extends AbstractRestAPIController
      */
     public function languageSupport()
     {
-        $languagesSupport = app(Language::class)->languagesSupport;
+        $languagesSupport = $this->service->languagesSupport();
         $listLanguages = [];
         foreach ($languagesSupport as $languageSupport) {
             $listLanguages[] = ["code" => $languageSupport, "name" => config('languages.codes')[$languageSupport]];
