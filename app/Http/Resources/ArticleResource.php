@@ -15,7 +15,7 @@ class ArticleResource extends AbstractJsonResource
      */
     public function toArray($request)
     {
-        $excludeColumns = $request->get('exclude', []);
+        $excludeColumns = request()->get('exclude', []);
         $expand = request()->get('expand', []);
 
         $formatContent = (new ArticleService())->formatContent($this->content_type, $this->content, $this->contents);
