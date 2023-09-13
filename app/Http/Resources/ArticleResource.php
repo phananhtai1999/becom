@@ -15,6 +15,7 @@ class ArticleResource extends AbstractJsonResource
      */
     public function toArray($request)
     {
+        $excludeColumns = $request->get('exclude', []);
         $expand = request()->get('expand', []);
 
         $formatContent = (new ArticleService())->formatContent($this->content_type, $this->content, $this->contents);
@@ -60,6 +61,13 @@ class ArticleResource extends AbstractJsonResource
 
         if (\in_array('article__paragraph_type', $expand)) {
             $data['paragraph_type'] = new ParagraphTypeResource($this->paragraphType);
+        }
+
+        //Exclude unnecessary value
+        foreach ($excludeColumns as $column) {
+            if (in_array($column, array_keys($data))) {
+                $data[$column] = null;
+            }
         }
 
         return $data;
