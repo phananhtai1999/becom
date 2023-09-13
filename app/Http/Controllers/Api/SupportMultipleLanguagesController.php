@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
-use App\Models\Language;
+use App\Services\LanguageService;
 use Illuminate\Http\Request;
 
 class SupportMultipleLanguagesController extends AbstractRestAPIController
@@ -16,7 +16,7 @@ class SupportMultipleLanguagesController extends AbstractRestAPIController
     {
         $lang = $request->get('lang') ? $request->get('lang') : 'en';
 
-        $languagesSupport = app(Language::class)->languagesSupport;
+        $languagesSupport = app(LanguageService::class)->languagesSupport();
 
         if (!in_array($lang, $languagesSupport)) {
             return $this->sendValidationFailedJsonResponse();
