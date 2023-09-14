@@ -13,7 +13,7 @@ class UploadMailBoxFileRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        return is_file($value) && in_array($value->getClientOriginalExtension(), ['mp4', 'jpeg', 'png', 'jpg', 'doc', 'docx']);
+        return is_file($value) && in_array($value->getClientOriginalExtension(), config('extension-file'));
     }
 
     /**
@@ -23,6 +23,6 @@ class UploadMailBoxFileRule implements Rule
      */
     public function message()
     {
-        return 'The :attribute must be a file and file of type: mp4, jpeg, png, jpg, doc, docx.';
+        return 'The :attribute must be a file and file of type: ' . implode(', ', config('extension-file'));
     }
 }
