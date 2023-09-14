@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Abstracts\AbstractService;
 use App\Models\Config;
+use App\Models\Role;
 use Illuminate\Support\Facades\Storage;
 
 class UploadService extends AbstractService
@@ -16,7 +17,7 @@ class UploadService extends AbstractService
     {
         if (in_array($type, \config('filestructure.website'))) {
             $configS3 = (new ConfigService())->findConfigByKey(Config::CONFIG_S3_WEBSITE);
-        } elseif (auth()->user()->roles->whereIn('slug', ["editor","admin"])->count()) {
+        } elseif (auth()->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_EDITOR, Role::ADMIN_ROOT])->count()) {
             $configS3 = (new ConfigService())->findConfigByKey(Config::CONFIG_S3_SYSTEM);
         } else {
             $configS3 = (new ConfigService())->findConfigByKey(Config::CONFIG_S3_USER);

@@ -296,9 +296,11 @@ class UserService extends AbstractService
      */
     public function getCurrentUserRole(): string
     {
-        if (auth()->user()->roles->whereIn('slug', ['admin'])->count()) {
+        if (auth()->user()->roles->whereIn('slug', Role::ROLE_ROOT)->count()) {
+            $char = 'r' . auth()->user()->getkey();
+        } elseif (auth()->user()->roles->whereIn('slug', [Role::ADMIN_ROOT])->count()) {
             $char = 'a' . auth()->user()->getkey();
-        } elseif (auth()->user()->roles->whereIn('slug', ['editor'])->count()) {
+        } elseif (auth()->user()->roles->whereIn('slug', [Role::ROLE_EDITOR])->count()) {
             $char = 'e' . auth()->user()->getkey();
         } else {
             $char = 'u' . auth()->user()->getkey();
@@ -312,14 +314,14 @@ class UserService extends AbstractService
         $indexRequest = $this->getIndexRequest($request);
 
         return $this->modelQueryBuilderClass::searchQuery($indexRequest['search'], $indexRequest['search_by'])
-            ->whereDoesntHave('roles', function (Builder $query){
+            ->whereDoesntHave('roles', function (Builder $query) {
                 $query->where('name', 'root');
             })->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
     }
 
     public function showUserOfAdminById($id)
     {
-        return $this->model->whereDoesntHave('roles', function (Builder $query){
+        return $this->model->whereDoesntHave('roles', function (Builder $query) {
             $query->where('name', 'root');
         })->where('uuid', $id)->firstOrFail();
     }
