@@ -4,12 +4,14 @@ namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
 use App\Http\Requests\UploadImgRequest;
+use App\Http\Requests\UploadMailBoxFileRequest;
 use App\Http\Requests\UploadVideoRequest;
 use App\Services\UploadService;
 use App\Services\UserService;
 use Aws\Exception\CredentialsException;
 use Aws\S3\Exception\S3Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class UploadController extends AbstractRestAPIController
@@ -55,6 +57,11 @@ class UploadController extends AbstractRestAPIController
         return $this->upload($request->video, $request->type);
     }
 
+    public function uploadMailBoxFile(UploadMailBoxFileRequest $request)
+    {
+        return $this->upload($request->file, $request->type);
+    }
+
     /**
      * @param $uploadType
      * @param $type
@@ -65,7 +72,13 @@ class UploadController extends AbstractRestAPIController
         try {
             //File structure by role
             $char = $this->userService->getCurrentUserRole();
-            $imageName = $char . '-' . Str::uuid() . '_' . time() . '.' . $uploadType->getClientOriginalExtension();
+
+            $fileName = Str::uuid() . '_' . time() . '.' . $uploadType->getClientOriginalExtension();
+            $imageName = $char . '-' . $fileName;
+            //Image name mailbox
+            if ($type === 'mailbox') {
+                $imageName = 'mailbox/' . auth()->user()->getkey() . "/$fileName";
+            }
             //Bucket S3
             $configS3 = $this->uploadService->getStorageServiceByType($type);
             //Check storage service exists or not
@@ -73,11 +86,22 @@ class UploadController extends AbstractRestAPIController
             //Upload
             $path = $disk->putFileAs('public/upload', $uploadType, $imageName);
 
-            return $this->sendCreatedJsonResponse([
-                'data' => [
+            $data = [
+                "slug" => $path,
+                "absolute_slug" => $disk->url($path)
+            ];
+            //Url mailbox file
+            if ($type === 'mailbox') {
+
+                $data = [
                     "slug" => $path,
-                    "absolute_slug" => $disk->url($path)
-                ]
+                    "absolute_slug" => $disk->url($path),
+                    'file_name' => pathinfo($uploadType->getClientOriginalName(), PATHINFO_FILENAME),
+                    'size' => Storage::disk('s3')->size($path)
+                ];
+            }
+            return $this->sendCreatedJsonResponse([
+                'data' => $data
             ]);
         } catch (S3Exception|\InvalidArgumentException|CredentialsException $exception) {
             return $this->sendValidationFailedJsonResponse();

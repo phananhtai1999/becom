@@ -120,6 +120,7 @@ Route::get('/auth/callback/github', [AuthBySocialNetworkController::class, 'logi
 
 Route::post('/upload-img', [UploadController::class, 'uploadImage'])->name('upload-image')->middleware('auth:api');
 Route::post('/upload-video', [UploadController::class, 'uploadVideo'])->name('upload-video')->middleware('auth:api');
+Route::post('/upload-mailbox-file', [UploadController::class, 'uploadMailBoxFile'])->name('upload-mailbox-file')->middleware('auth:api');
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'user.'], function () {
     Route::group(['middleware' => ['role:root'], 'as' => 'root.'], function () {
