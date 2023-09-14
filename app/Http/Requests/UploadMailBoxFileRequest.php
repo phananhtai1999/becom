@@ -26,7 +26,7 @@ class UploadMailBoxFileRequest extends AbstractRequest
     {
         return [
             'type' => ['required', 'string', 'in:mailbox'],
-            'file' => ['required', new UploadMailBoxFileRule()],
+            'file' => ['required', 'file', 'mimes:mp4,jpg,jpeg,png,gif,doc,docx,pdf,zip,rar,mov,ogg']
         ];
     }
 }
