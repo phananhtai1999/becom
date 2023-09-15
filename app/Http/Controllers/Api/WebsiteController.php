@@ -136,9 +136,8 @@ class WebsiteController extends AbstractRestAPIController
 
                 DB::commit();
             } catch (\Exception $e) {
-
                 DB::rollback();
-                dd($e);
+                throw $e;
             }
         }
     }
