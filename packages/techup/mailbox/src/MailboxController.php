@@ -69,6 +69,14 @@ class MailboxController  extends Controller
 
 	}   
 
+	public function postEmailupdateUnread(Request $request) {
+		$user_uuid = auth()->user()->getkey();
+		$ids = $request->get('ids');
+	    $data = Mailbox::postEmailupdateUnread($user_uuid, $ids);
+	    return response()->json($data->json(), $data->status());
+
+	}   
+
 
 	public function postEmailAccountcreate(Request $request) {
 		$user_uuid = auth()->user()->getkey();

@@ -25,6 +25,8 @@ Route::group(['middleware' => ['auth:api'], 'prefix'=>'mailbox', 'as' => 'mailbo
 
 	Route::post('email/update-read', [MailboxController::class, 'postEmailupdateRead'])->name('postEmailupdateRead');
 
+	Route::post('email/update-unread', [MailboxController::class, 'postEmailupdateUnread'])->name('postEmailupdateUnread');
+
 	Route::post('email_account/create', [MailboxController::class, 'postEmailAccountcreate'])->name('postEmailAccountcreate');
 
 	Route::get('emails', [MailboxController::class, 'getEmails'])->name('getEmails');
