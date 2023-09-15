@@ -80,6 +80,16 @@ class Mailbox {
             'x-user-id' => $user_uuid,
             'Authorization' => 'Bearer ' . config('mailbox.access_token')
         ])->post($this->getRequestUrl('email/update-read'), $data);
+	} 
+	
+	public function postEmailupdateUnread($user_uuid, $ids) {
+		$data = [
+			'ids' => $ids,
+		];
+		return Http::accept('application/json')->withHeaders([
+            'x-user-id' => $user_uuid,
+            'Authorization' => 'Bearer ' . config('mailbox.access_token')
+        ])->post($this->getRequestUrl('email/update-unread'), $data);
 	}   
 
 	public function postEmailAccountcreate($user_uuid, $email_address, $password) {
