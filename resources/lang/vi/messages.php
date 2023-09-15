@@ -55,4 +55,5 @@ return array(
     'scenario_running' => 'Chiến dịch kịch bản đang hoạt động.',
     'campaign_in_scenario' => 'Chiến dịch nằm trong chiến dịch kịch bản.',
     'send_scenario_success' => 'Gửi Email Theo Kịch Bản Thành Công.',
+    'domain_must_active' => 'Domain phải được kích hoạt.',
 );
