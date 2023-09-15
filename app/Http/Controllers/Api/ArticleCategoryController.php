@@ -36,8 +36,8 @@ class ArticleCategoryController extends AbstractRestAPIController
      */
     public function __construct(
         ArticleCategoryService $service,
-        LanguageService $languageService,
-        ArticleService  $articleService
+        LanguageService        $languageService,
+        ArticleService         $articleService
     )
     {
         $this->service = $service;
@@ -57,12 +57,16 @@ class ArticleCategoryController extends AbstractRestAPIController
     {
         $request = app($this->storeRequest);
 
-        if (!$this->languageService->checkLanguages($request->title)) {
+        if (!$this->languageService->checkLanguages($request->title)
+            || ($request->keyword && !$this->languageService->checkLanguages($request->keyword))
+            || ($request->description && !$this->languageService->checkLanguages($request->description))) {
+
             return $this->sendValidationFailedJsonResponse();
         }
 
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => auth()->user()->getKey()
+            'user_uuid' => auth()->user()->getKey(),
+            'description' => $request->keyword ? array_merge($request->keyword, $request->description ?? $request->keyword) : $request->description
         ]));
 
         return $this->sendCreatedJsonResponse(
@@ -78,12 +82,22 @@ class ArticleCategoryController extends AbstractRestAPIController
     {
         $request = app($this->editRequest);
 
-        if ($request->title && !$this->languageService->checkLanguages($request->title)) {
+        if (($request->title && !$this->languageService->checkLanguages($request->title))
+            || ($request->keyword && !$this->languageService->checkLanguages($request->keyword))
+            || ($request->description && !$this->languageService->checkLanguages($request->description))) {
+
             return $this->sendValidationFailedJsonResponse();
         }
         $model = $this->service->findOrFailById($id);
 
-        $this->service->update($model, $request->except(['user_uuid', 'publish_status']));
+        //Generate description by keyword and value lang != null
+        $description = array_merge(\request('keyword', []), !empty($model->descriptions) ? $model->descriptions : [], array_filter(\request('description', []), function ($value) {
+            return $value !== null;
+        }));
+
+        $this->service->update($model, array_merge($request->except(['user_uuid', 'publish_status']), [
+            'description' => $description
+        ]));
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)

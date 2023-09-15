@@ -3,13 +3,18 @@
 namespace App\Models;
 
 use App\Abstracts\AbstractModel;
+use App\Http\Controllers\Traits\ModelFilterDescriptionLanguageTrait;
+use App\Http\Controllers\Traits\ModelFilterKeywordLanguageTrait;
+use App\Services\UserService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Translatable\HasTranslations;
 
 class WebsitePage extends AbstractModel
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, HasTranslations,
+        ModelFilterDescriptionLanguageTrait, ModelFilterKeywordLanguageTrait;
 
     const PUBLISHED_PUBLISH_STATUS = 1;
     const PENDING_PUBLISH_STATUS = 2;
@@ -26,6 +31,8 @@ class WebsitePage extends AbstractModel
      */
     protected $primaryKey = "uuid";
 
+    public $translatable = ['keyword', 'description'];
+
     /**
      * @var string[]
      */
@@ -38,7 +45,10 @@ class WebsitePage extends AbstractModel
         'is_default',
         'website_page_category_uuid',
         'display_type',
-        'reject_reason'
+        'reject_reason',
+        'keyword',
+        'description',
+        'feature_image',
     ];
 
     /**
@@ -49,10 +59,17 @@ class WebsitePage extends AbstractModel
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
-        'user_uuid' =>  'integer',
+        'user_uuid' => 'integer',
         'website_page_category_uuid' => 'integer',
         'is_default' => 'boolean',
         'reject_reason' => 'array',
+        'keyword' => 'array',
+        'description' => 'array',
+    ];
+
+    protected $appends = [
+        'keywords',
+        'descriptions',
     ];
 
     /**
@@ -74,5 +91,15 @@ class WebsitePage extends AbstractModel
     public function websites()
     {
         return $this->belongsToMany(Website::class, 'website_website_page', 'website_page_uuid', 'website_uuid')->orderBy('created_at')->withPivot(['is_homepage', 'ordering'])->withTimestamps()->first();
+    }
+
+    public function getKeywordsAttribute()
+    {
+        return $this->keyword && app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('keyword') : $this->keyword;
+    }
+
+    public function getDescriptionsAttribute()
+    {
+        return $this->description && app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('description') : $this->description;
     }
 }

@@ -73,7 +73,9 @@ class ArticleController extends AbstractRestAPIController
         $request = app($this->storeRequest);
 
         if (!$this->languageService->checkLanguages($request->title)
-            || !$this->languageService->checkLanguages($request->content)) {
+            || !$this->languageService->checkLanguages($request->content)
+            || ($request->keyword && !$this->languageService->checkLanguages($request->keyword))
+            || ($request->description && !$this->languageService->checkLanguages($request->description))) {
 
             return $this->sendValidationFailedJsonResponse();
         }
@@ -84,7 +86,8 @@ class ArticleController extends AbstractRestAPIController
         $model = $this->service->create(array_merge($request->except(['reject_reason']), [
             'user_uuid' => auth()->user()->getKey(),
             'content_for_user' => $request->content_for_user ?: Article::PUBLIC_CONTENT_FOR_USER,
-            'content' => $content
+            'content' => $content,
+            'description' => $request->keyword ? array_merge($request->keyword, $request->description ?? $request->keyword) : $request->description
         ]));
 
         // Update Article Series By Article Uuid
@@ -98,12 +101,16 @@ class ArticleController extends AbstractRestAPIController
     /**
      * @param $id
      * @return JsonResponse
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function edit($id)
     {
         $request = app($this->editRequest);
         if (($request->title && !$this->languageService->checkLanguages($request->title))
-            || ($request->content && !$this->languageService->checkLanguages($request->content))) {
+            || ($request->content && !$this->languageService->checkLanguages($request->content))
+            || ($request->keyword && !$this->languageService->checkLanguages($request->keyword))
+            || ($request->description && !$this->languageService->checkLanguages($request->description))) {
 
             return $this->sendValidationFailedJsonResponse();
         }
@@ -120,8 +127,15 @@ class ArticleController extends AbstractRestAPIController
         //Check content exist or not
         $checkContent = $request->content ? array_merge($model->getTranslations('content'), $request->content) : $model->getTranslations('content');
         $content = $this->service->mapTypeLabelToContent($checkContent, $model->content_type);
+        //Generate description by keyword and value lang != null
+        $description = array_merge(\request('keyword', []), !empty($model->descriptions) ? $model->descriptions : [], array_filter(\request('description', []), function ($value) {
+            return $value !== null;
+        }));
 
-        $this->service->update($model, array_merge($role, ['content' => $content]));
+        $this->service->update($model, array_merge($role, [
+            'content' => $content,
+            'description' => $description
+        ]));
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -220,7 +234,7 @@ class ArticleController extends AbstractRestAPIController
         //Role editor limit by config days
         if (!$role && $config) {
             $models = $this->service->getCollectionWithPaginationByCondition($request, [
-                ['user_uuid' => auth()->user()->getKey()],
+                ['user_uuid', auth()->user()->getKey()],
                 ['updated_at', '>=', Carbon::now()->subDays($config->value)]
             ]);
         } else {
@@ -273,7 +287,9 @@ class ArticleController extends AbstractRestAPIController
     public function storeUnpublishedArticle(UnpublishedArticleRequest $request)
     {
         if (!$this->languageService->checkLanguages($request->title)
-            || !$this->languageService->checkLanguages($request->get('content'))) {
+            || !$this->languageService->checkLanguages($request->get('content'))
+            || ($request->keyword && !$this->languageService->checkLanguages($request->keyword))
+            || ($request->description && !$this->languageService->checkLanguages($request->description))) {
 
             return $this->sendValidationFailedJsonResponse();
         }
@@ -282,7 +298,8 @@ class ArticleController extends AbstractRestAPIController
 
         $model = $this->service->create(array_merge($request->except(['reject_reason']), [
             'user_uuid' => auth()->user()->getKey(),
-            'content' => $content
+            'content' => $content,
+            'description' => $request->keyword ? array_merge($request->keyword, $request->description ?? $request->keyword) : $request->description
         ]));
 
         // Update Article Series By Article Uuid
@@ -302,7 +319,9 @@ class ArticleController extends AbstractRestAPIController
     {
         $model = $this->service->showArticleForEditorById($id);
         if (($request->title && !$this->languageService->checkLanguages($request->title))
-            || ($request->get('content') && !$this->languageService->checkLanguages($request->get('content')))) {
+            || ($request->get('content') && !$this->languageService->checkLanguages($request->get('content')))
+            || ($request->keyword && !$this->languageService->checkLanguages($request->keyword))
+            || ($request->description && !$this->languageService->checkLanguages($request->description))) {
 
             return $this->sendValidationFailedJsonResponse();
         }
@@ -316,9 +335,14 @@ class ArticleController extends AbstractRestAPIController
         //Check content exist or not
         $checkContent = $request->get('content') ? array_merge($model->getTranslations('content'), $request->get('content')) : $model->getTranslations('content');
         $content = $this->service->mapTypeLabelToContent($checkContent, $model->content_type);
+        //Generate description by keyword and value lang != null
+        $description = array_merge(\request('keyword', []), !empty($model->descriptions) ? $model->descriptions : [], array_filter(\request('description', []), function ($value) {
+            return $value !== null;
+        }));
 
         $this->service->update($model, array_merge($request->except(['user_uuid']), [
-            'content' => $content
+            'content' => $content,
+            'description' => $description
         ]));
 
         return $this->sendCreatedJsonResponse(

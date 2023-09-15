@@ -17,9 +17,21 @@ Route::group(['middleware' => ['auth:api'], 'prefix'=>'mailbox', 'as' => 'mailbo
 
 	Route::get('configs', [MailboxController::class, 'getConfigs'])->name('getConfigs');
 
+	Route::get('email/count-unread', [MailboxController::class, 'getEmailcountUnread'])->name('getEmailcountUnread');
+
+	Route::post('email/delete-emails', [MailboxController::class, 'postEmaildeleteEmails'])->name('postEmaildeleteEmails');
+
+	Route::post('email/restore-emails', [MailboxController::class, 'postEmailrestoreEmails'])->name('postEmailrestoreEmails');
+
+	Route::post('email/update-read', [MailboxController::class, 'postEmailupdateRead'])->name('postEmailupdateRead');
+
+	Route::post('email/update-unread', [MailboxController::class, 'postEmailupdateUnread'])->name('postEmailupdateUnread');
+
 	Route::post('email_account/create', [MailboxController::class, 'postEmailAccountcreate'])->name('postEmailAccountcreate');
 
 	Route::get('emails', [MailboxController::class, 'getEmails'])->name('getEmails');
+
+	Route::get('emails/trash', [MailboxController::class, 'getEmailstrash'])->name('getEmailstrash');
 
 	Route::post('folder', [MailboxController::class, 'postFolder'])->name('postFolder');
 
@@ -29,7 +41,15 @@ Route::group(['middleware' => ['auth:api'], 'prefix'=>'mailbox', 'as' => 'mailbo
 
 	Route::post('send-email/', [MailboxController::class, 'postSendEmail'])->name('postSendEmail');
 
-	Route::get('sents/', [MailboxController::class, 'getSents'])->name('getSents');
+	Route::post('sent', [MailboxController::class, 'postSent'])->name('postSent');
+
+	Route::get('sent-email-address', [MailboxController::class, 'getSentEmailAddress'])->name('getSentEmailAddress');
+
+	Route::post('sent-email-address', [MailboxController::class, 'postSentEmailAddress'])->name('postSentEmailAddress');
+
+	Route::post('sent/delete-sents', [MailboxController::class, 'postSentdeleteSents'])->name('postSentdeleteSents');
+
+	Route::get('sents', [MailboxController::class, 'getSents'])->name('getSents');
 
 	Route::delete("attachments/delete/{id}", [MailboxController::class, 'deleteAttachmentsdeleteid'])->name('deleteAttachmentsdeleteid');
 
@@ -42,10 +62,6 @@ Route::group(['middleware' => ['auth:api'], 'prefix'=>'mailbox', 'as' => 'mailbo
 	Route::get("config/{id}", [MailboxController::class, 'getConfigid'])->name('getConfigid');
 
 	Route::put("config/{id}", [MailboxController::class, 'putConfigid'])->name('putConfigid');
-
-	Route::delete("conversation/delete/{id}", [MailboxController::class, 'deleteConversationdeleteid'])->name('deleteConversationdeleteid');
-
-	Route::get("conversation/{id}", [MailboxController::class, 'getConversationid'])->name('getConversationid');
 
 	Route::get("email/get-email-conversation/{id}", [MailboxController::class, 'getEmailgetEmailConversationid'])->name('getEmailgetEmailConversationid');
 
@@ -61,10 +77,16 @@ Route::group(['middleware' => ['auth:api'], 'prefix'=>'mailbox', 'as' => 'mailbo
 
 	Route::put("folder/{id}", [MailboxController::class, 'putFolderid'])->name('putFolderid');
 
-	Route::delete("send-email-address/delete/{id}", [MailboxController::class, 'deleteSendEmailAddressdeleteid'])->name('deleteSendEmailAddressdeleteid');
+	Route::delete("sent-email-address/{id}", [MailboxController::class, 'deleteSentEmailAddressid'])->name('deleteSentEmailAddressid');
 
-	Route::get("send-email-address/{id}", [MailboxController::class, 'getSendEmailAddressid'])->name('getSendEmailAddressid');
+	Route::get("sent-email-address/{id}", [MailboxController::class, 'getSentEmailAddressid'])->name('getSentEmailAddressid');
 
-	Route::delete("sents/delete/{id}", [MailboxController::class, 'deleteSentsdeleteid'])->name('deleteSentsdeleteid');
+	Route::put("sent-email-address/{id}", [MailboxController::class, 'putSentEmailAddressid'])->name('putSentEmailAddressid');
+
+	Route::delete("sent/{id}", [MailboxController::class, 'deleteSentid'])->name('deleteSentid');
+
+	Route::get("sent/{id}", [MailboxController::class, 'getSentid'])->name('getSentid');
+
+	Route::put("sent/{id}", [MailboxController::class, 'putSentid'])->name('putSentid');
 
 });

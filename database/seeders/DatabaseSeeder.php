@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             MailTemplateDefaultSeeder::class,
             GroupSeeder::class,
             ConfigSeeder::class,
+            UpdateMetaTagTypeConfigSeeder::class,
             PermissionSeeder::class,
             LanguageSeeder::class,
             PlatformPackageSeeder::class,

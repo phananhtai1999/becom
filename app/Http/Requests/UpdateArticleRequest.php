@@ -4,6 +4,8 @@ namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
 use App\Rules\ArticleContentRule;
+use App\Rules\CustomDescriptionRule;
+use App\Rules\CustomKeywordRule;
 use Illuminate\Validation\Rule;
 
 class UpdateArticleRequest extends AbstractRequest
@@ -39,6 +41,10 @@ class UpdateArticleRequest extends AbstractRequest
             'content_type' => ['required', 'string', 'in:single,paragraph'],
             'single_purpose_uuid' => ['nullable', 'required_if:content_type,single', 'numeric', 'min:1', Rule::exists('single_purposes', 'uuid')->whereNull('deleted_at')],
             'paragraph_type_uuid' => ['nullable', 'required_if:content_type,paragraph', 'numeric', 'min:1', Rule::exists('paragraph_types', 'uuid')->whereNull('deleted_at')],
+            'keyword' => ['nullable', 'array', new CustomKeywordRule($this->id, $this->request->get('keyword'), 'articles')],
+            'keyword.*' => ['nullable', 'string', 'not_in:0'],
+            'description' => ['nullable', 'array', new CustomDescriptionRule($this->id, $this->request->get('keyword'), $this->request->get('description'), 'articles')],
+            'description.*' => ['nullable', 'string', 'not_in:0'],
         ];
 
         if ($this->request->get('content_type') === 'single') {

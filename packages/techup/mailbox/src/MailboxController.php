@@ -21,10 +21,61 @@ class MailboxController  extends Controller
 
 	public function getConfigs(Request $request) {
 		$user_uuid = auth()->user()->getkey();
-		$data = Mailbox::getConfigs($user_uuid);
+		$per_page = $request->get('per_page');
+		$page = $request->get('page');
+		$search = $request->get('search');
+		$filter = $request->get('filter');
+		$data = Mailbox::getConfigs($user_uuid, $per_page, $page, $search, $filter);
 	    return response()->json($data->json(), $data->status());
 
 	}  
+
+
+	public function getEmailcountUnread(Request $request) {
+		$user_uuid = auth()->user()->getkey();
+		$per_page = $request->get('per_page');
+		$page = $request->get('page');
+		$search = $request->get('search');
+		$filter = $request->get('filter');
+		$data = Mailbox::getEmailcountUnread($user_uuid, $per_page, $page, $search, $filter);
+	    return response()->json($data->json(), $data->status());
+
+	}  
+
+
+	public function postEmaildeleteEmails(Request $request) {
+		$user_uuid = auth()->user()->getkey();
+		$ids = $request->get('ids');
+	    $data = Mailbox::postEmaildeleteEmails($user_uuid, $ids);
+	    return response()->json($data->json(), $data->status());
+
+	}   
+
+
+	public function postEmailrestoreEmails(Request $request) {
+		$user_uuid = auth()->user()->getkey();
+		$ids = $request->get('ids');
+	    $data = Mailbox::postEmailrestoreEmails($user_uuid, $ids);
+	    return response()->json($data->json(), $data->status());
+
+	}   
+
+
+	public function postEmailupdateRead(Request $request) {
+		$user_uuid = auth()->user()->getkey();
+		$ids = $request->get('ids');
+	    $data = Mailbox::postEmailupdateRead($user_uuid, $ids);
+	    return response()->json($data->json(), $data->status());
+
+	}   
+
+	public function postEmailupdateUnread(Request $request) {
+		$user_uuid = auth()->user()->getkey();
+		$ids = $request->get('ids');
+	    $data = Mailbox::postEmailupdateUnread($user_uuid, $ids);
+	    return response()->json($data->json(), $data->status());
+
+	}   
 
 
 	public function postEmailAccountcreate(Request $request) {
@@ -39,7 +90,23 @@ class MailboxController  extends Controller
 
 	public function getEmails(Request $request) {
 		$user_uuid = auth()->user()->getkey();
-		$data = Mailbox::getEmails($user_uuid);
+		$per_page = $request->get('per_page');
+		$page = $request->get('page');
+		$search = $request->get('search');
+		$filter = $request->get('filter');
+		$data = Mailbox::getEmails($user_uuid, $per_page, $page, $search, $filter);
+	    return response()->json($data->json(), $data->status());
+
+	}  
+
+
+	public function getEmailstrash(Request $request) {
+		$user_uuid = auth()->user()->getkey();
+		$per_page = $request->get('per_page');
+		$page = $request->get('page');
+		$search = $request->get('search');
+		$filter = $request->get('filter');
+		$data = Mailbox::getEmailstrash($user_uuid, $per_page, $page, $search, $filter);
 	    return response()->json($data->json(), $data->status());
 
 	}  
@@ -56,7 +123,11 @@ class MailboxController  extends Controller
 
 	public function getFolders(Request $request) {
 		$user_uuid = auth()->user()->getkey();
-		$data = Mailbox::getFolders($user_uuid);
+		$per_page = $request->get('per_page');
+		$page = $request->get('page');
+		$search = $request->get('search');
+		$filter = $request->get('filter');
+		$data = Mailbox::getFolders($user_uuid, $per_page, $page, $search, $filter);
 	    return response()->json($data->json(), $data->status());
 
 	}  
@@ -64,7 +135,11 @@ class MailboxController  extends Controller
 
 	public function getMailBox(Request $request) {
 		$user_uuid = auth()->user()->getkey();
-		$data = Mailbox::getMailBox($user_uuid);
+		$per_page = $request->get('per_page');
+		$page = $request->get('page');
+		$search = $request->get('search');
+		$filter = $request->get('filter');
+		$data = Mailbox::getMailBox($user_uuid, $per_page, $page, $search, $filter);
 	    return response()->json($data->json(), $data->status());
 
 	}  
@@ -83,9 +158,57 @@ class MailboxController  extends Controller
 	}   
 
 
+	public function postSent(Request $request) {
+		$user_uuid = auth()->user()->getkey();
+		$body = $request->get('body');
+		$email_account_id = $request->get('email_account_id');
+		$status = $request->get('status');
+		$subject = $request->get('subject');
+	    $data = Mailbox::postSent($user_uuid, $body, $email_account_id, $status, $subject);
+	    return response()->json($data->json(), $data->status());
+
+	}   
+
+
+	public function getSentEmailAddress(Request $request) {
+		$user_uuid = auth()->user()->getkey();
+		$per_page = $request->get('per_page');
+		$page = $request->get('page');
+		$search = $request->get('search');
+		$filter = $request->get('filter');
+		$data = Mailbox::getSentEmailAddress($user_uuid, $per_page, $page, $search, $filter);
+	    return response()->json($data->json(), $data->status());
+
+	}  
+
+
+	public function postSentEmailAddress(Request $request) {
+		$user_uuid = auth()->user()->getkey();
+		$email_account_id = $request->get('email_account_id');
+		$email_address = $request->get('email_address');
+		$type = $request->get('type');
+	    $data = Mailbox::postSentEmailAddress($user_uuid, $email_account_id, $email_address, $type);
+	    return response()->json($data->json(), $data->status());
+
+	}   
+
+
+	public function postSentdeleteSents(Request $request) {
+		$user_uuid = auth()->user()->getkey();
+		$ids = $request->get('ids');
+	    $data = Mailbox::postSentdeleteSents($user_uuid, $ids);
+	    return response()->json($data->json(), $data->status());
+
+	}   
+
+
 	public function getSents(Request $request) {
 		$user_uuid = auth()->user()->getkey();
-		$data = Mailbox::getSents($user_uuid);
+		$per_page = $request->get('per_page');
+		$page = $request->get('page');
+		$search = $request->get('search');
+		$filter = $request->get('filter');
+		$data = Mailbox::getSents($user_uuid, $per_page, $page, $search, $filter);
 	    return response()->json($data->json(), $data->status());
 
 	}  
@@ -137,21 +260,6 @@ class MailboxController  extends Controller
 	    $data = Mailbox::putConfigid($user_uuid, $default_value, $key, $value, $id);
 	    return response()->json($data->json(), $data->status());
 	}    
-
-
-	public function deleteConversationdeleteid(Request $request, $id) {
-		$user_uuid = auth()->user()->getkey();
-	   	$data = Mailbox::deleteConversationdeleteid($user_uuid, $id);
-	    return response()->json($data->json(), $data->status());
-	} 
-
-
-	public function getConversationid(Request $request, $id) {
-		$user_uuid = auth()->user()->getkey();
-		$data = Mailbox::getConversationid($user_uuid, $id);
-	    return response()->json($data->json(), $data->status());
-
-	}  
 
 
 	public function getEmailgetEmailConversationid(Request $request, $id) {
@@ -210,25 +318,54 @@ class MailboxController  extends Controller
 	}    
 
 
-	public function deleteSendEmailAddressdeleteid(Request $request, $id) {
+	public function deleteSentEmailAddressid(Request $request, $id) {
 		$user_uuid = auth()->user()->getkey();
-	   	$data = Mailbox::deleteSendEmailAddressdeleteid($user_uuid, $id);
+	   	$data = Mailbox::deleteSentEmailAddressid($user_uuid, $id);
 	    return response()->json($data->json(), $data->status());
 	} 
 
 
-	public function getSendEmailAddressid(Request $request, $id) {
+	public function getSentEmailAddressid(Request $request, $id) {
 		$user_uuid = auth()->user()->getkey();
-		$data = Mailbox::getSendEmailAddressid($user_uuid, $id);
+		$data = Mailbox::getSentEmailAddressid($user_uuid, $id);
 	    return response()->json($data->json(), $data->status());
 
 	}  
 
 
-	public function deleteSentsdeleteid(Request $request, $id) {
+	public function putSentEmailAddressid(Request $request, $id) {	
 		$user_uuid = auth()->user()->getkey();
-	   	$data = Mailbox::deleteSentsdeleteid($user_uuid, $id);
+		$email_account_id = $request->get('email_account_id');
+		$email_address = $request->get('email_address');
+		$type = $request->get('type');
+	    $data = Mailbox::putSentEmailAddressid($user_uuid, $email_account_id, $email_address, $type, $id);
+	    return response()->json($data->json(), $data->status());
+	}    
+
+
+	public function deleteSentid(Request $request, $id) {
+		$user_uuid = auth()->user()->getkey();
+	   	$data = Mailbox::deleteSentid($user_uuid, $id);
 	    return response()->json($data->json(), $data->status());
 	} 
+
+
+	public function getSentid(Request $request, $id) {
+		$user_uuid = auth()->user()->getkey();
+		$data = Mailbox::getSentid($user_uuid, $id);
+	    return response()->json($data->json(), $data->status());
+
+	}  
+
+
+	public function putSentid(Request $request, $id) {	
+		$user_uuid = auth()->user()->getkey();
+		$body = $request->get('body');
+		$email_account_id = $request->get('email_account_id');
+		$status = $request->get('status');
+		$subject = $request->get('subject');
+	    $data = Mailbox::putSentid($user_uuid, $body, $email_account_id, $status, $subject, $id);
+	    return response()->json($data->json(), $data->status());
+	}    
 
 }

@@ -9,11 +9,13 @@ class LanguageResource extends AbstractJsonResource
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
      */
     public function toArray($request)
     {
+        $excludeColumns = request()->get('exclude', []);
+
         $data = [
             'code' => $this->getKey(),
             'name' => $this->name,
@@ -23,6 +25,13 @@ class LanguageResource extends AbstractJsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
         ];
+
+        //Exclude unnecessary value
+        foreach ($excludeColumns as $column) {
+            if (in_array($column, array_keys($data))) {
+                $data[$column] = null;
+            }
+        }
 
         return $data;
     }
