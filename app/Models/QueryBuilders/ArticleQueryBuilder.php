@@ -21,11 +21,15 @@ class ArticleQueryBuilder extends AbstractQueryBuilder
     }
 
     /**
-     * @return SortsQuery|QueryBuilder
+     * @return ArticleQueryBuilder|QueryBuilder
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public static function initialQuery()
     {
         $modelKeyName = (new Article())->getKeyName();
+        //Exclude value
+        $select = array_diff(array_merge(['created_at', 'updated_at'], (new Article())->getFillable()), request()->get('exclude', []));
 
         return static::for(static::baseQuery())
             ->allowedFields([
@@ -112,8 +116,7 @@ class ArticleQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::scope('title_by_root', 'titleByRoot'),
                 AllowedFilter::scope('keyword'),
                 AllowedFilter::scope('description'),
-            ]);
-
+            ])->select($select);
     }
 
     /**
@@ -128,6 +131,8 @@ class ArticleQueryBuilder extends AbstractQueryBuilder
      * @param $search
      * @param $searchBy
      * @return mixed
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public static function searchQuery($search, $searchBy)
     {

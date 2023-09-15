@@ -21,11 +21,15 @@ class LanguageQueryBuilder extends AbstractQueryBuilder
     }
 
     /**
-     * @return SortsQuery|QueryBuilder
+     * @return LanguageQueryBuilder|QueryBuilder
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public static function initialQuery()
     {
         $modelKeyName = (new Language())->getKeyName();
+        //Exclude value
+        $select = array_diff(array_merge(['created_at', 'updated_at'], (new Language())->getFillable()), request()->get('exclude', []));
 
         return static::for(static::baseQuery())
             ->allowedFields([
@@ -54,7 +58,7 @@ class LanguageQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__flag_image', 'flag_image'),
                 'status',
                 AllowedFilter::exact('exact__status', 'status'),
-            ]);
+            ])->select($select);
     }
 
     /**
@@ -69,6 +73,8 @@ class LanguageQueryBuilder extends AbstractQueryBuilder
      * @param $search
      * @param $searchBy
      * @return mixed
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public static function searchQuery($search, $searchBy)
     {
