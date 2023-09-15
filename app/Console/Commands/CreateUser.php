@@ -83,7 +83,7 @@ class CreateUser extends Command
 
                 $roleIds = [];
                 foreach ($roleSlugs as $roleSlug) {
-                    $roleIds[] = Role::where('slug', $roleSlug)->first()->getKey();
+                    $roleIds[] = optional(Role::where('slug', $roleSlug)->first())->getKey();
                 }
 
                 $model->roles()->sync(

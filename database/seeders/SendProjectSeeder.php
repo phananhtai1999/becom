@@ -19,10 +19,10 @@ class SendProjectSeeder extends Seeder
         $admin = User::where('email', 'admin@sendemail.techupcorp')->first();
 
         SendProject::factory(5)->create([
-            'user_uuid' => $user->uuid
+            'user_uuid' => optional($user)->uuid
         ]);
         SendProject::factory(5)->create([
-            'user_uuid' => $admin->uuid
+            'user_uuid' => optional($admin)->uuid
         ]);
     }
 }

@@ -79,7 +79,7 @@ class UpdatePartnerTrackingByYear extends Command
                     ['month', $time->month],
                     ['year', $time->year],
                 ])->first();
-                $totalAmount += $userPayment->total_payment;
+                $totalAmount += optional($userPayment)->total_payment;
             }
             return [
                 'partner_uuid' => Partner::where('code', $key)->withTrashed()->first()->uuid,
