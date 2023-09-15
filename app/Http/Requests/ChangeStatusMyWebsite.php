@@ -6,7 +6,7 @@ use App\Abstracts\AbstractRequest;
 use App\Models\Website;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-
+use DB;
 class ChangeStatusMyWebsite extends AbstractRequest
 {
     /**
@@ -27,12 +27,23 @@ class ChangeStatusMyWebsite extends AbstractRequest
     public function rules()
     {
         return [
-            'websites' => ['required', 'array', 'min:1'],
-            'websites.*' => ['numeric', 'min:1', Rule::exists('websites', 'uuid')->where(function ($query) {
+        'websites' => ['required', 'array', 'min:1'],
+        'websites.*' => [
+            'numeric',
+            'min:1',
+            Rule::exists('websites', 'uuid')->where(function ($query) {
                 return $query->where('user_uuid', auth()->user()->getKey())
                     ->where('publish_status', '<>', $this->request->get('publish_status'));
-            })],
-            'publish_status' => ['required', 'numeric', Rule::in(Website::PUBLISHED_PUBLISH_STATUS, Website::PENDING_PUBLISH_STATUS)]
-        ];
+            }),
+            function ($attribute, $value, $fail) {
+                $website = Website::find($value);
+                $isVerified = ($website && $website->domain && $website->domain->verified_at);
+                if (!$isVerified && $this->request->get('publish_status') == Website::PUBLISHED_PUBLISH_STATUS) {
+                    $fail(__('messages.domain_must_active'));
+                }
+            }
+        ],
+        'publish_status' => ['required', 'numeric', Rule::in(Website::PUBLISHED_PUBLISH_STATUS, Website::PENDING_PUBLISH_STATUS)]
+    ];
     }
 }
