@@ -69,6 +69,7 @@ class MailboxController  extends Controller
 
 	}   
 
+
 	public function postEmailupdateUnread(Request $request) {
 		$user_uuid = auth()->user()->getkey();
 		$ids = $request->get('ids');
@@ -147,12 +148,14 @@ class MailboxController  extends Controller
 
 	public function postSendEmail(Request $request) {
 		$user_uuid = auth()->user()->getkey();
+		$bcc = $request->get('bcc');
 		$body = $request->get('body');
+		$cc = $request->get('cc');
 		$email_address = $request->get('email_address');
 		$files = $request->get('files');
 		$subject = $request->get('subject');
 		$type = $request->get('type');
-	    $data = Mailbox::postSendEmail($user_uuid, $body, $email_address, $files, $subject, $type);
+	    $data = Mailbox::postSendEmail($user_uuid, $bcc, $body, $cc, $email_address, $files, $subject, $type);
 	    return response()->json($data->json(), $data->status());
 
 	}   

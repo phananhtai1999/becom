@@ -80,8 +80,8 @@ class Mailbox {
             'x-user-id' => $user_uuid,
             'Authorization' => 'Bearer ' . config('mailbox.access_token')
         ])->post($this->getRequestUrl('email/update-read'), $data);
-	} 
-	
+	}   
+
 	public function postEmailupdateUnread($user_uuid, $ids) {
 		$data = [
 			'ids' => $ids,
@@ -165,9 +165,11 @@ class Mailbox {
         ])->get($this->getRequestUrl('mail-box/'), $data);
 	}  
 
-	public function postSendEmail($user_uuid, $body, $email_address, $files, $subject, $type) {
+	public function postSendEmail($user_uuid, $bcc, $body, $cc, $email_address, $files, $subject, $type) {
 		$data = [
+			'bcc' => $bcc,
 			'body' => $body,
+			'cc' => $cc,
 			'email_address' => $email_address,
 			'files' => $files,
 			'subject' => $subject,
