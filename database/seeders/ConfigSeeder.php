@@ -11,7 +11,8 @@ class ConfigSeeder extends Seeder
 {
     /**
      * Seed the application's database.
-     *
+     * Update history
+     * 2023-09-16: Add tracking_ids
      * @return void
      */
     public function run()
@@ -416,6 +417,17 @@ class ConfigSeeder extends Seeder
                 'type' => 'meta_tag',
                 'group_id' => $generalGroupUuid,
                 'status' => 'public',
+            ],
+            [
+                'key' => 'tracking_ids',
+                'value' => [
+                    'google' => null,
+                    'facebook' => null,
+                    'tiktok' => null,
+                ],
+                'type' => 'tracking',
+                'group_id' => $generalGroupUuid,
+                'status' => 'system',
             ],
         ];
         Cache::forget('config');
