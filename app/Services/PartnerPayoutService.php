@@ -14,8 +14,8 @@ class PartnerPayoutService extends AbstractService
 
     public function getTotalAmountUsedOfPartner($partnerUuid)
     {
-        return $this->model->where('partner_uuid', $partnerUuid)
-            ->whereIn('status', ['new', 'accept'])->selectRaw('Sum(amount) as total_amounts')->first()->total_amounts;
+        return optional($this->model->where('partner_uuid', $partnerUuid)
+            ->whereIn('status', ['new', 'accept'])->selectRaw('Sum(amount) as total_amounts')->first())->total_amounts;
     }
 
 }

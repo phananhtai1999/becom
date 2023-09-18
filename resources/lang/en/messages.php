@@ -58,4 +58,5 @@ return array(
     'scenario_running' => 'The scenario campaign is working.',
     'campaign_in_scenario' => 'The campaign is in the scenario campaign.',
     'send_scenario_success' => 'Send Email By Scenario Success.',
+    'domain_must_active' => 'Domain must activate.',
 );

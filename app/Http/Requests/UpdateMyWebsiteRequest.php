@@ -57,6 +57,8 @@ class UpdateMyWebsiteRequest extends AbstractRequest
             })],
             'website_pages.*.is_homepage' =>  ['nullable','boolean'],
             'website_pages.*.ordering' =>  ['nullable','numeric', 'min:1'],
+            'tracking_ids' => ['nullable', 'array'],
+            'tracking_ids.*' => ['nullable', 'string', 'max:300'],
         ];
     }
 }

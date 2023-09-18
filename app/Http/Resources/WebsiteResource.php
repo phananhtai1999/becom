@@ -24,6 +24,7 @@ class WebsiteResource extends AbstractJsonResource
             'footer_section_uuid' => $this->footer_section_uuid,
             'user_uuid' => $this->user_uuid,
             'publish_status' => $this->publish_status,
+            'tracking_ids' => $this->tracking_ids,
             'logo' => $this->logo,
             'description' => $this->description,
             'created_at' => $this->created_at,

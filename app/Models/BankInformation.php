@@ -52,7 +52,7 @@ class BankInformation extends Model
      */
     public function getPayoutFeeAttribute()
     {
-        return Config::where('key', 'payout_fee')->first()->value;
+        return optional(Config::where('key', 'payout_fee')->first())->value;
     }
 
 }

@@ -39,6 +39,7 @@ class Website extends AbstractModel
         'publish_status',
         'logo',
         'domain_uuid',
+        'tracking_ids',
     ];
 
     /**
@@ -52,6 +53,7 @@ class Website extends AbstractModel
         'footer_section_uuid' =>  'integer',
         'header_section_uuid' =>  'integer',
         'domain_uuid' =>  'integer',
+        'tracking_ids' =>  'array',
     ];
 
     /**

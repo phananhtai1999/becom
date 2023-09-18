@@ -280,7 +280,7 @@ class UserService extends AbstractService
     public function getMinCodeByNumberOfUser()
     {
         $min = $power = 6;
-        $lastUser = ($this->model->orderBy('uuid', 'DESC')->first())->uuid;
+        $lastUser = optional($this->model->orderBy('uuid', 'DESC')->first())->uuid;
         $nextPower = pow(10, $power + 1);
         while ($lastUser >= $nextPower) {
             $min++;

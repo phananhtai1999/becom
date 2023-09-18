@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
-use App\Rules\UploadMailBoxFileRule;
 
 class UploadMailBoxFileRequest extends AbstractRequest
 {
