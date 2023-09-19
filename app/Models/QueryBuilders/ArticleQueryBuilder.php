@@ -29,7 +29,7 @@ class ArticleQueryBuilder extends AbstractQueryBuilder
     {
         $modelKeyName = (new Article())->getKeyName();
         //Exclude value
-        $select = array_diff(array_merge(['created_at', 'updated_at'], (new Article())->getFillable()), request()->get('exclude', []));
+        $select = array_diff(array_merge(['created_at', 'updated_at', $modelKeyName], (new Article())->getFillable()), request()->get('exclude', []));
 
         return static::for(static::baseQuery())
             ->allowedFields([
