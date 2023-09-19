@@ -395,7 +395,7 @@ class ContactService extends AbstractService
             ->whereDate('contacts.updated_at', '<=', $endDate)
             ->first();
 
-        return optional((int)$totalContact)->points;
+        return (int)$totalContact->points;
     }
 
     /**
