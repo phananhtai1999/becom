@@ -17,6 +17,8 @@ Route::group(['middleware' => ['auth:api'], 'prefix'=>'mailbox', 'as' => 'mailbo
 
 	Route::get('configs', [MailboxController::class, 'getConfigs'])->name('getConfigs');
 
+	Route::get('email-searchs', [MailboxController::class, 'getEmailSearchs'])->name('getEmailSearchs');
+
 	Route::get('email/count-unread', [MailboxController::class, 'getEmailcountUnread'])->name('getEmailcountUnread');
 
 	Route::post('email/delete-emails', [MailboxController::class, 'postEmaildeleteEmails'])->name('postEmaildeleteEmails');
