@@ -39,6 +39,19 @@ class Mailbox {
         ])->get($this->getRequestUrl('configs'), $data);
 	}  
 
+	public function getEmailSearchs($user_uuid, $per_page, $page, $search, $filter) {
+		$data = [
+			'per_page' => $per_page,
+			'page' => $page,
+			'search' => $search,
+			'filter' => $filter,
+		];
+		return Http::accept('application/json')->withHeaders([
+            'x-user-id' => $user_uuid,
+            'Authorization' => 'Bearer ' . config('mailbox.access_token')
+        ])->get($this->getRequestUrl('email-searchs'), $data);
+	}  
+
 	public function getEmailcountUnread($user_uuid, $per_page, $page, $search, $filter) {
 		$data = [
 			'per_page' => $per_page,

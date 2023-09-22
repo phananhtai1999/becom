@@ -31,6 +31,18 @@ class MailboxController  extends Controller
 	}  
 
 
+	public function getEmailSearchs(Request $request) {
+		$user_uuid = auth()->user()->getkey();
+		$per_page = $request->get('per_page');
+		$page = $request->get('page');
+		$search = $request->get('search');
+		$filter = $request->get('filter');
+		$data = Mailbox::getEmailSearchs($user_uuid, $per_page, $page, $search, $filter);
+	    return response()->json($data->json(), $data->status());
+
+	}  
+
+
 	public function getEmailcountUnread(Request $request) {
 		$user_uuid = auth()->user()->getkey();
 		$per_page = $request->get('per_page');
