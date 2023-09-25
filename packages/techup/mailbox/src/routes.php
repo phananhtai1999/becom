@@ -53,6 +53,10 @@ Route::group(['middleware' => ['auth:api'], 'prefix'=>'mailbox', 'as' => 'mailbo
 
 	Route::get('sents', [MailboxController::class, 'getSents'])->name('getSents');
 
+	Route::get('setting', [MailboxController::class, 'getSetting'])->name('getSetting');
+
+	Route::post('setting', [MailboxController::class, 'postSetting'])->name('postSetting');
+
 	Route::delete("attachments/delete/{id}", [MailboxController::class, 'deleteAttachmentsdeleteid'])->name('deleteAttachmentsdeleteid');
 
 	Route::get("attachments/get-by-email/{id}", [MailboxController::class, 'getAttachmentsgetByEmailid'])->name('getAttachmentsgetByEmailid');
