@@ -178,13 +178,14 @@ class Mailbox {
         ])->get($this->getRequestUrl('mail-box/'), $data);
 	}  
 
-	public function postSendEmail($user_uuid, $bcc, $body, $cc, $email_address, $files, $subject, $type) {
+	public function postSendEmail($user_uuid, $bcc, $body, $cc, $email_address, $files, $schedule_at, $subject, $type) {
 		$data = [
 			'bcc' => $bcc,
 			'body' => $body,
 			'cc' => $cc,
 			'email_address' => $email_address,
 			'files' => $files,
+			'schedule_at' => $schedule_at,
 			'subject' => $subject,
 			'type' => $type,
 		];
