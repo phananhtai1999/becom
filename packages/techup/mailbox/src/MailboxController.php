@@ -165,9 +165,10 @@ class MailboxController  extends Controller
 		$cc = $request->get('cc');
 		$email_address = $request->get('email_address');
 		$files = $request->get('files');
+		$schedule_at = $request->get('schedule_at');
 		$subject = $request->get('subject');
 		$type = $request->get('type');
-	    $data = Mailbox::postSendEmail($user_uuid, $bcc, $body, $cc, $email_address, $files, $subject, $type);
+	    $data = Mailbox::postSendEmail($user_uuid, $bcc, $body, $cc, $email_address, $files, $schedule_at, $subject, $type);
 	    return response()->json($data->json(), $data->status());
 
 	}   
