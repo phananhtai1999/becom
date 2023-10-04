@@ -28,7 +28,7 @@ class ConfigRequest extends AbstractRequest
         $validate = [
             'key' => ['required', 'string', Rule::unique('configs')->whereNull('deleted_at')],
             'value' => ['nullable', 'string'],
-            'type' => ['required', 'in:image,boolean,numeric,string,smtp_account,s3,mailbox,meta_tag'],
+            'type' => ['required', 'in:image,boolean,numeric,string,smtp_account,s3,mailbox,meta_tag,tracking'],
             'status' => ['required', 'in:public,system,private'],
             'default_value' => ['nullable', 'string'],
             'group_id' => ['required', 'numeric', 'min:1', Rule::exists('groups', 'uuid')->whereNull('deleted_at')],
@@ -96,6 +96,19 @@ class ConfigRequest extends AbstractRequest
             $validate["value.fb:pages"] = ['nullable', 'string'];
             $validate['value'] = ['required', 'array'];
             $validate['value.image'] = ['nullable', 'string'];
+        } elseif ($this->request->get('type') === Config::CONFIG_TRACKING_TYPE) {
+            $validate['value'] = ['required', 'array'];
+            $validate['value.*'] = ['nullable', 'string', 'max:300'];
+            $requiredKeys = ['facebook', 'google', 'tiktok'];
+            if (is_array($this->request->get('value'))) {
+                $missingKeys = array_diff($requiredKeys, array_keys($this->request->get('value')));
+                if (!empty($missingKeys)) {
+                    foreach ($missingKeys as $key) {
+                        $validate["value.$key"] = ['required', 'string'];
+                        $validate["value.$key.*"] = ['nullable', 'string'];
+                    }
+                }
+            }
         }
 
         return $validate;

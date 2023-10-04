@@ -39,6 +39,7 @@ class WebsiteQueryBuilder extends AbstractQueryBuilder
                 'publish_status',
                 'logo',
                 'domain_uuid',
+                'tracking_ids',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -51,6 +52,7 @@ class WebsiteQueryBuilder extends AbstractQueryBuilder
                 'publish_status',
                 'logo',
                 'domain_uuid',
+                'tracking_ids',
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -80,7 +82,9 @@ class WebsiteQueryBuilder extends AbstractQueryBuilder
                 'user.username',
                 AllowedFilter::exact('exact__user.username', 'user.username'),
                 'user.email',
-                AllowedFilter::exact('exact__user.email', 'user.email')
+                AllowedFilter::exact('exact__user.email', 'user.email'),
+                'tracking_ids',
+                AllowedFilter::exact('exact__tracking_ids', 'tracking_ids'),
             ]);
     }
 

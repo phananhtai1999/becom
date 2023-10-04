@@ -17,6 +17,8 @@ Route::group(['middleware' => ['auth:api'], 'prefix'=>'mailbox', 'as' => 'mailbo
 
 	Route::get('configs', [MailboxController::class, 'getConfigs'])->name('getConfigs');
 
+	Route::get('email-searchs', [MailboxController::class, 'getEmailSearchs'])->name('getEmailSearchs');
+
 	Route::get('email/count-unread', [MailboxController::class, 'getEmailcountUnread'])->name('getEmailcountUnread');
 
 	Route::post('email/delete-emails', [MailboxController::class, 'postEmaildeleteEmails'])->name('postEmaildeleteEmails');
@@ -50,6 +52,10 @@ Route::group(['middleware' => ['auth:api'], 'prefix'=>'mailbox', 'as' => 'mailbo
 	Route::post('sent/delete-sents', [MailboxController::class, 'postSentdeleteSents'])->name('postSentdeleteSents');
 
 	Route::get('sents', [MailboxController::class, 'getSents'])->name('getSents');
+
+	Route::get('setting', [MailboxController::class, 'getSetting'])->name('getSetting');
+
+	Route::post('setting', [MailboxController::class, 'postSetting'])->name('postSetting');
 
 	Route::delete("attachments/delete/{id}", [MailboxController::class, 'deleteAttachmentsdeleteid'])->name('deleteAttachmentsdeleteid');
 

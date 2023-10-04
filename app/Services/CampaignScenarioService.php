@@ -56,8 +56,8 @@ class CampaignScenarioService extends AbstractService
             ['parent_uuid', $campaignScenarioUuid],
             ['type', "open"]
         ])->first();
-        $scenario = $campaignScenarioOpen->scenario;
-        $checkTimeScenario = $scenario->last_stopped_at ?? $scenario->created_at;
+        $scenario = optional($campaignScenarioOpen)->scenario;
+        $checkTimeScenario = optional($scenario)->last_stopped_at ?? optional($scenario->created_at);
         if (($timeSendEmail >= $checkTimeScenario) &&
             (!$campaignScenarioNotOpen||($timeSendEmail->addDays($campaignScenarioNotOpen->open_within) >= Carbon::now()))) {
             return $campaignScenarioOpen;

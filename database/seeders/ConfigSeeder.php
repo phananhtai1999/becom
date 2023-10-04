@@ -11,20 +11,21 @@ class ConfigSeeder extends Seeder
 {
     /**
      * Seed the application's database.
-     *
+     * Update history
+     * 2023-09-16: Add tracking_ids
      * @return void
      */
     public function run()
     {
-        $companyGroupUuid = Group::where('name', 'company')->first()->uuid;
-        $paymentGroupUuid = Group::where('name', 'payment')->first()->uuid;
-        $otpGroupUuid = Group::where('name', 'otp')->first()->uuid;
-        $s3GroupUuid = Group::where('name', 's3')->first()->uuid;
-        $siteGroupUuid = Group::where('name', 'site')->first()->uuid;
-        $assetGroupUuid = Group::where('name', 'asset')->first()->uuid;
-        $payoutGroupUuid = Group::where('name', 'payout')->first()->uuid;
-        $generalGroupUuid = Group::where('name', 'general')->first()->uuid;
-        $mailboxGroupUuid = Group::where('name', 'mailbox')->first()->uuid;
+        $companyGroupUuid = optional(Group::where('name', 'company')->first())->uuid;
+        $paymentGroupUuid = optional(Group::where('name', 'payment')->first())->uuid;
+        $otpGroupUuid = optional(Group::where('name', 'otp')->first())->uuid;
+        $s3GroupUuid = optional(Group::where('name', 's3')->first())->uuid;
+        $siteGroupUuid = optional(Group::where('name', 'site')->first())->uuid;
+        $assetGroupUuid = optional(Group::where('name', 'asset')->first())->uuid;
+        $payoutGroupUuid = optional(Group::where('name', 'payout')->first())->uuid;
+        $generalGroupUuid = optional(Group::where('name', 'general')->first())->uuid;
+        $mailboxGroupUuid = optional(Group::where('name', 'mailbox')->first())->uuid;
         $configs = [
             [
                 'key' => 'smtp_auto',
@@ -416,6 +417,17 @@ class ConfigSeeder extends Seeder
                 'type' => 'meta_tag',
                 'group_id' => $generalGroupUuid,
                 'status' => 'public',
+            ],
+            [
+                'key' => 'tracking_ids',
+                'value' => [
+                    'google' => null,
+                    'facebook' => null,
+                    'tiktok' => null,
+                ],
+                'type' => 'tracking',
+                'group_id' => $generalGroupUuid,
+                'status' => 'system',
             ],
         ];
         Cache::forget('config');

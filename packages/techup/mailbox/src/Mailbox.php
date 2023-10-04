@@ -39,6 +39,19 @@ class Mailbox {
         ])->get($this->getRequestUrl('configs'), $data);
 	}  
 
+	public function getEmailSearchs($user_uuid, $per_page, $page, $search, $filter) {
+		$data = [
+			'per_page' => $per_page,
+			'page' => $page,
+			'search' => $search,
+			'filter' => $filter,
+		];
+		return Http::accept('application/json')->withHeaders([
+            'x-user-id' => $user_uuid,
+            'Authorization' => 'Bearer ' . config('mailbox.access_token')
+        ])->get($this->getRequestUrl('email-searchs'), $data);
+	}  
+
 	public function getEmailcountUnread($user_uuid, $per_page, $page, $search, $filter) {
 		$data = [
 			'per_page' => $per_page,
@@ -80,8 +93,8 @@ class Mailbox {
             'x-user-id' => $user_uuid,
             'Authorization' => 'Bearer ' . config('mailbox.access_token')
         ])->post($this->getRequestUrl('email/update-read'), $data);
-	} 
-	
+	}   
+
 	public function postEmailupdateUnread($user_uuid, $ids) {
 		$data = [
 			'ids' => $ids,
@@ -165,11 +178,14 @@ class Mailbox {
         ])->get($this->getRequestUrl('mail-box/'), $data);
 	}  
 
-	public function postSendEmail($user_uuid, $body, $email_address, $files, $subject, $type) {
+	public function postSendEmail($user_uuid, $bcc, $body, $cc, $email_address, $files, $schedule_at, $subject, $type) {
 		$data = [
+			'bcc' => $bcc,
 			'body' => $body,
+			'cc' => $cc,
 			'email_address' => $email_address,
 			'files' => $files,
+			'schedule_at' => $schedule_at,
 			'subject' => $subject,
 			'type' => $type,
 		];
@@ -239,6 +255,29 @@ class Mailbox {
             'Authorization' => 'Bearer ' . config('mailbox.access_token')
         ])->get($this->getRequestUrl('sents'), $data);
 	}  
+
+	public function getSetting($user_uuid, $per_page, $page, $search, $filter) {
+		$data = [
+			'per_page' => $per_page,
+			'page' => $page,
+			'search' => $search,
+			'filter' => $filter,
+		];
+		return Http::accept('application/json')->withHeaders([
+            'x-user-id' => $user_uuid,
+            'Authorization' => 'Bearer ' . config('mailbox.access_token')
+        ])->get($this->getRequestUrl('setting'), $data);
+	}  
+
+	public function postSetting($user_uuid, $value) {
+		$data = [
+			'value' => $value,
+		];
+		return Http::accept('application/json')->withHeaders([
+            'x-user-id' => $user_uuid,
+            'Authorization' => 'Bearer ' . config('mailbox.access_token')
+        ])->post($this->getRequestUrl('setting'), $data);
+	}   
 
 	public function deleteAttachmentsdeleteid($user_uuid, $id) {
 		return Http::accept('application/json')->withHeaders([
@@ -393,12 +432,9 @@ class Mailbox {
         ])->get($this->getRequestUrl("sent/{$id}"), $data);
 	}  
 
-	public function putSentid($user_uuid, $body, $email_account_id, $status, $subject, $id) {	
+	public function putSentid($user_uuid, $star, $id) {	
 		$data = [
-			'body' => $body,
-			'email_account_id' => $email_account_id,
-			'status' => $status,
-			'subject' => $subject,
+			'star' => $star,
 		];
 		return Http::accept('application/json')->withHeaders([
             'x-user-id' => $user_uuid,

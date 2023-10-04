@@ -31,6 +31,18 @@ class MailboxController  extends Controller
 	}  
 
 
+	public function getEmailSearchs(Request $request) {
+		$user_uuid = auth()->user()->getkey();
+		$per_page = $request->get('per_page');
+		$page = $request->get('page');
+		$search = $request->get('search');
+		$filter = $request->get('filter');
+		$data = Mailbox::getEmailSearchs($user_uuid, $per_page, $page, $search, $filter);
+	    return response()->json($data->json(), $data->status());
+
+	}  
+
+
 	public function getEmailcountUnread(Request $request) {
 		$user_uuid = auth()->user()->getkey();
 		$per_page = $request->get('per_page');
@@ -68,6 +80,7 @@ class MailboxController  extends Controller
 	    return response()->json($data->json(), $data->status());
 
 	}   
+
 
 	public function postEmailupdateUnread(Request $request) {
 		$user_uuid = auth()->user()->getkey();
@@ -147,12 +160,15 @@ class MailboxController  extends Controller
 
 	public function postSendEmail(Request $request) {
 		$user_uuid = auth()->user()->getkey();
+		$bcc = $request->get('bcc');
 		$body = $request->get('body');
+		$cc = $request->get('cc');
 		$email_address = $request->get('email_address');
 		$files = $request->get('files');
+		$schedule_at = $request->get('schedule_at');
 		$subject = $request->get('subject');
 		$type = $request->get('type');
-	    $data = Mailbox::postSendEmail($user_uuid, $body, $email_address, $files, $subject, $type);
+	    $data = Mailbox::postSendEmail($user_uuid, $bcc, $body, $cc, $email_address, $files, $schedule_at, $subject, $type);
 	    return response()->json($data->json(), $data->status());
 
 	}   
@@ -212,6 +228,27 @@ class MailboxController  extends Controller
 	    return response()->json($data->json(), $data->status());
 
 	}  
+
+
+	public function getSetting(Request $request) {
+		$user_uuid = auth()->user()->getkey();
+		$per_page = $request->get('per_page');
+		$page = $request->get('page');
+		$search = $request->get('search');
+		$filter = $request->get('filter');
+		$data = Mailbox::getSetting($user_uuid, $per_page, $page, $search, $filter);
+	    return response()->json($data->json(), $data->status());
+
+	}  
+
+
+	public function postSetting(Request $request) {
+		$user_uuid = auth()->user()->getkey();
+		$value = $request->get('value');
+	    $data = Mailbox::postSetting($user_uuid, $value);
+	    return response()->json($data->json(), $data->status());
+
+	}   
 
 
 	public function deleteAttachmentsdeleteid(Request $request, $id) {
@@ -360,11 +397,8 @@ class MailboxController  extends Controller
 
 	public function putSentid(Request $request, $id) {	
 		$user_uuid = auth()->user()->getkey();
-		$body = $request->get('body');
-		$email_account_id = $request->get('email_account_id');
-		$status = $request->get('status');
-		$subject = $request->get('subject');
-	    $data = Mailbox::putSentid($user_uuid, $body, $email_account_id, $status, $subject, $id);
+		$star = $request->get('star');
+	    $data = Mailbox::putSentid($user_uuid, $star, $id);
 	    return response()->json($data->json(), $data->status());
 	}    
 

@@ -24,6 +24,7 @@ class Config extends AbstractModel
     const CONFIG_MAILBOX_DMARC = 'mailbox_dmarc_domain';
     const CONFIG_MAILBOX_DKIM = 'mailbox_dkim_domain';
     const CONFIG_META_TAG_TYPE = 'meta_tag';
+    const CONFIG_TRACKING_TYPE = 'tracking';
 
     /**
      * @var string
