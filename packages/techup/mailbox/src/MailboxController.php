@@ -251,6 +251,24 @@ class MailboxController  extends Controller
 	}   
 
 
+	public function postTrashdelete(Request $request) {
+		$user_uuid = auth()->user()->getkey();
+		$objects = $request->get('objects');
+	    $data = Mailbox::postTrashdelete($user_uuid, $objects);
+	    return response()->json($data->json(), $data->status());
+
+	}   
+
+
+	public function postTrashrestore(Request $request) {
+		$user_uuid = auth()->user()->getkey();
+		$objects = $request->get('objects');
+	    $data = Mailbox::postTrashrestore($user_uuid, $objects);
+	    return response()->json($data->json(), $data->status());
+
+	}   
+
+
 	public function deleteAttachmentsdeleteid(Request $request, $id) {
 		$user_uuid = auth()->user()->getkey();
 	   	$data = Mailbox::deleteAttachmentsdeleteid($user_uuid, $id);
