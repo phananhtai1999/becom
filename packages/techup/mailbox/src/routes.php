@@ -57,6 +57,10 @@ Route::group(['middleware' => ['auth:api'], 'prefix'=>'mailbox', 'as' => 'mailbo
 
 	Route::post('setting', [MailboxController::class, 'postSetting'])->name('postSetting');
 
+	Route::post('trash/delete', [MailboxController::class, 'postTrashdelete'])->name('postTrashdelete');
+
+	Route::post('trash/restore', [MailboxController::class, 'postTrashrestore'])->name('postTrashrestore');
+
 	Route::delete("attachments/delete/{id}", [MailboxController::class, 'deleteAttachmentsdeleteid'])->name('deleteAttachmentsdeleteid');
 
 	Route::get("attachments/get-by-email/{id}", [MailboxController::class, 'getAttachmentsgetByEmailid'])->name('getAttachmentsgetByEmailid');

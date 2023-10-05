@@ -279,6 +279,26 @@ class Mailbox {
         ])->post($this->getRequestUrl('setting'), $data);
 	}   
 
+	public function postTrashdelete($user_uuid, $objects) {
+		$data = [
+			'objects' => $objects,
+		];
+		return Http::accept('application/json')->withHeaders([
+            'x-user-id' => $user_uuid,
+            'Authorization' => 'Bearer ' . config('mailbox.access_token')
+        ])->post($this->getRequestUrl('trash/delete'), $data);
+	}   
+
+	public function postTrashrestore($user_uuid, $objects) {
+		$data = [
+			'objects' => $objects,
+		];
+		return Http::accept('application/json')->withHeaders([
+            'x-user-id' => $user_uuid,
+            'Authorization' => 'Bearer ' . config('mailbox.access_token')
+        ])->post($this->getRequestUrl('trash/restore'), $data);
+	}   
+
 	public function deleteAttachmentsdeleteid($user_uuid, $id) {
 		return Http::accept('application/json')->withHeaders([
             'x-user-id' => $user_uuid,
