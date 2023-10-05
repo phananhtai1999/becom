@@ -4,10 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
 use App\Http\Controllers\Traits\RestDestroyTrait;
-use App\Http\Controllers\Traits\RestEditTrait;
 use App\Http\Controllers\Traits\RestIndexMyTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
-use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\AcceptPublishWebsitePageRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyWebsitePageRequest;
@@ -24,11 +22,10 @@ use App\Services\MyWebsitePageService;
 use App\Services\WebsitePageService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class WebsitePageController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestIndexMyTrait;
+    use RestIndexTrait, RestDestroyTrait, RestIndexMyTrait;
 
     /**
      * @var MyWebsitePageService
@@ -59,6 +56,17 @@ class WebsitePageController extends AbstractRestAPIController
         $this->indexRequest = IndexRequest::class;
         $this->storeRequest = WebsitePageRequest::class;
         $this->editRequest = UpdateWebsitePageRequest::class;
+    }
+
+    public function show(IndexRequest $request, $id)
+    {
+        $model = $this->myService->findOneWhereOrFail($request->publish_status ?
+            [['publish_status', $request->publish_status], ['uuid', $id]]
+            : [['uuid', $id]]);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
     }
 
     /**
