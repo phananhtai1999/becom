@@ -28,6 +28,7 @@ class UnpublishedWebsitePageRequest extends AbstractRequest
     {
         return [
             'title' => ['required', 'string'],
+            'slug' => ['nullable', 'string'],
             'template' => ['required', 'string'],
             'template_json' => ['required', 'string'],
             'website_page_category_uuid' => ['required', 'numeric', Rule::exists('website_page_categories', 'uuid')->whereNull('deleted_at')],
