@@ -37,7 +37,8 @@ class MyWebsitePageQueryBuilder extends AbstractQueryBuilder
                 'publish_status',
                 'is_default',
                 'display_type',
-                'reject_reason'
+                'reject_reason',
+                'slug',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -50,7 +51,8 @@ class MyWebsitePageQueryBuilder extends AbstractQueryBuilder
                 'publish_status',
                 'is_default',
                 'display_type',
-                'reject_reason'
+                'reject_reason',
+                'slug',
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -79,6 +81,8 @@ class MyWebsitePageQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__reject_reason', 'reject_reason'),
                 'display_type',
                 AllowedFilter::exact('exact__display_type', 'display_type'),
+                'slug',
+                AllowedFilter::exact('exact__slug', 'slug'),
             ]);
     }
 

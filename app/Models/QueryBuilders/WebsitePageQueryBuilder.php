@@ -41,6 +41,7 @@ class WebsitePageQueryBuilder extends AbstractQueryBuilder
                 'keyword',
                 'description',
                 'feature_image',
+                'slug',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -57,6 +58,7 @@ class WebsitePageQueryBuilder extends AbstractQueryBuilder
                 'keyword',
                 'description',
                 'feature_image',
+                'slug',
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -89,6 +91,8 @@ class WebsitePageQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::scope('description'),
                 'feature_image',
                 AllowedFilter::exact('exact__feature_image', 'feature_image'),
+                'slug',
+                AllowedFilter::exact('exact__slug', 'slug'),
             ]);
     }
 
