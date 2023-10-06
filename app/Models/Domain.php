@@ -75,4 +75,9 @@ class Domain extends AbstractModel
     {
         return $this->hasOne(DomainVerification::class, 'domain_uuid', 'uuid');
     }
+
+    public function websites()
+    {
+        return $this->hasMany(Website::class, 'domain_uuid', 'uuid');
+    }
 }
