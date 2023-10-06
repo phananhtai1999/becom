@@ -5,6 +5,7 @@ namespace App\Models\QueryBuilders;
 use App\Abstracts\AbstractQueryBuilder;
 use App\Models\Domain;
 use App\Models\SearchQueryBuilders\SearchQueryBuilder;
+use Illuminate\Database\Eloquent\Builder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\Concerns\SortsQuery;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -60,7 +61,15 @@ class MyDomainQueryBuilder extends AbstractQueryBuilder
                 'active_mailbox',
                 AllowedFilter::exact('exact__active_mailbox', 'active_mailbox'),
                 'active_mailbox_status',
-                AllowedFilter::exact('exact__active_mailbox_status', 'active_mailbox_status')
+                AllowedFilter::exact('exact__active_mailbox_status', 'active_mailbox_status'),
+                AllowedFilter::callback("domain_unique", function (Builder $query, $value) {
+                    if ($value === 'domain_unique') {
+                        $query->whereDoesntHave('websites', function (Builder $query) {
+                            $query->whereNotNull('domain_uuid')
+                                ->whereColumn('user_uuid', 'domains.owner_uuid');
+                        });
+                    }
+                }),
             ]);
     }
 
