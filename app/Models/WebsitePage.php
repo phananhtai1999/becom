@@ -109,11 +109,11 @@ class WebsitePage extends AbstractModel
 
     public function getKeywordsAttribute()
     {
-        return $this->keyword && app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('keyword') : $this->keyword;
+        return $this->keyword ? $this->getTranslations('keyword') : $this->keyword;
     }
 
     public function getDescriptionsAttribute()
     {
-        return $this->description && app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('description') : $this->description;
+        return $this->description ? $this->getTranslations('description') : $this->description;
     }
 }
