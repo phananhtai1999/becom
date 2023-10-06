@@ -15,4 +15,16 @@ class WebsiteService extends AbstractService
     protected $modelClass = Website::class;
 
     protected $modelQueryBuilderClass = WebsiteQueryBuilder::class;
+
+    public function publicWebsiteByDomainAndPublishStatus($domainName)
+    {
+        return $this->model->where('publish_status', Website::PUBLISHED_PUBLISH_STATUS)
+            ->whereHas('domain', function ($query) use ($domainName) {
+                $query->where([
+                    ['name', $domainName],
+                    ['verified_at', '!=', null]
+                ]);
+            })
+            ->firstOrFail();
+    }
 }
