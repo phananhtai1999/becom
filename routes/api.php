@@ -1305,6 +1305,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website'], function () {
     });
 });
 Route::get('public/website/{id}', [WebsiteController::class, 'show'])->name('website.show');
+Route::get('public/website', [WebsiteController::class, 'publicWebsiteByDomainAndPublishStatus'])->name('website.public');
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'asset'], function () {
     Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {

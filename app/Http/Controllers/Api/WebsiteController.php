@@ -34,9 +34,10 @@ class WebsiteController extends AbstractRestAPIController
     protected $myService;
 
     public function __construct(
-        WebsiteService $service,
+        WebsiteService   $service,
         MyWebsiteService $myService
-    ) {
+    )
+    {
         $this->resourceClass = WebsiteResource::class;
         $this->resourceCollectionClass = WebsiteResourceCollection::class;
         $this->service = $service;
@@ -129,7 +130,7 @@ class WebsiteController extends AbstractRestAPIController
                         $websiteUuid
                     );
                 }
-                
+
                 $this->service->update($website, [
                     "publish_status" => $request->get("publish_status"),
                 ]);
@@ -140,5 +141,14 @@ class WebsiteController extends AbstractRestAPIController
                 throw $e;
             }
         }
+    }
+
+    public function publicWebsiteByDomainAndPublishStatus(IndexRequest $request)
+    {
+        $model = $this->service->publicWebsiteByDomainAndPublishStatus($request->domain_name);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
     }
 }
