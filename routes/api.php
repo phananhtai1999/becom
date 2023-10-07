@@ -624,6 +624,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website_page'], function ()
 });
 
 Route::get('public/website-page/{id}', [WebsitePageController::class, 'show'])->name('website_page_public.show');
+Route::get('public/website-page', [WebsitePageController::class, 'publicWebsitePageByDomainAndSlug'])->name('website_page.public');
 
 //Platform Package
 Route::get('/platform-packages', [PlatformPackageController::class, 'index']);
