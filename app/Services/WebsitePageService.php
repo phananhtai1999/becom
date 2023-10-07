@@ -3,8 +3,8 @@
 namespace App\Services;
 
 use App\Abstracts\AbstractService;
-use App\Models\QueryBuilders\MailTemplateQueryBuilder;
 use App\Models\QueryBuilders\WebsitePageQueryBuilder;
+use App\Models\Website;
 use App\Models\WebsitePage;
 use Carbon\Carbon;
 
@@ -66,7 +66,7 @@ class WebsitePageService extends AbstractService
         $times = [];
         $result = [];
 
-        if ($groupBy == "hour"){
+        if ($groupBy == "hour") {
             $dateFormat = "%Y-%m-%d %H:00:00";
 
             $endDate = $endDate->endOfDay();
@@ -76,7 +76,7 @@ class WebsitePageService extends AbstractService
             }
         }
 
-        if ($groupBy == "date"){
+        if ($groupBy == "date") {
             $dateFormat = "%Y-%m-%d";
             while ($currentDate <= $endDate) {
                 $times[] = $currentDate->format('Y-m-d');
@@ -84,7 +84,7 @@ class WebsitePageService extends AbstractService
             }
         }
 
-        if ($groupBy == "month"){
+        if ($groupBy == "month") {
             $dateFormat = "%Y-%m";
             while ($currentDate <= $endDate) {
                 $times[] = $currentDate->format('Y-m');
@@ -93,28 +93,44 @@ class WebsitePageService extends AbstractService
         }
 
         $charts = $this->getWebsitePageChartByDateFormat($dateFormat, $startDate, $endDate)->keyBy('label');
-        foreach ($times as $time){
-            $chartByTime = $charts->first(function($item, $key) use ($time){
+        foreach ($times as $time) {
+            $chartByTime = $charts->first(function ($item, $key) use ($time) {
                 return $key == $time;
             });
 
-            if($chartByTime){
+            if ($chartByTime) {
                 $result[] = [
                     'label' => $time,
-                    'approve'  => $chartByTime->approve,
-                    'pending'  => $chartByTime->pending,
-                    'reject'  => $chartByTime->reject
+                    'approve' => $chartByTime->approve,
+                    'pending' => $chartByTime->pending,
+                    'reject' => $chartByTime->reject
                 ];
-            }else{
+            } else {
                 $result [] = [
                     'label' => $time,
-                    'approve'  => 0,
-                    'pending'  => 0,
-                    'reject'  => 0,
+                    'approve' => 0,
+                    'pending' => 0,
+                    'reject' => 0,
                 ];
             }
         }
 
         return $result;
+    }
+
+    public function publicWebsitePageByDomainAndSlug($domainName, $slug)
+    {
+        $webpage = (new Website())->whereHas('domain', function ($query) use ($domainName) {
+            $query->where([
+                ['name', $domainName],
+                ['verified_at', '!=', null]
+            ]);
+        })
+            ->where('publish_status', Website::PUBLISHED_PUBLISH_STATUS)
+            ->firstOrFail()->websitePagesPublic
+            ->where('slug', $slug)
+            ->first();
+
+        return $webpage ?? abort(404);
     }
 }
