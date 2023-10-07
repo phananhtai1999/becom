@@ -328,4 +328,12 @@ class WebsitePageController extends AbstractRestAPIController
         );
     }
 
+    public function publicWebsitePageByDomainAndSlug(IndexRequest $request)
+    {
+        $model = $this->service->publicWebsitePageByDomainAndSlug($request->domain_name, $request->slug);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
 }
