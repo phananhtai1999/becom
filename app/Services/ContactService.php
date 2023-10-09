@@ -728,23 +728,38 @@ class ContactService extends AbstractService
      */
     public function search($search, $searchBy): QueryBuilder
     {
-        if ($search && !empty($searchBy)) {
-            //Get all fields
-            $getFillAble = app(Contact::class)->getFillable();
-            $query = $this->filteringByCustomContactField();
-            $query->where(function ($query) use ($search, $searchBy, $getFillAble) {
-                foreach ($searchBy as $value) {
-                    $query->when(in_array($value, $getFillAble), function ($q) use ($search, $value) {
+        try {
+            if ($search && !empty($searchBy)) {
+                //Get all fields
+                $getFillAble = app(Contact::class)->getFillable();
+                $getTableName = app(Contact::class)->getTable();
+                $query = $this->filteringByCustomContactField();
+                $query->where(function ($query) use ($search, $searchBy, $getFillAble, $getTableName) {
+                    foreach ($searchBy as $value) {
+                        $query->when(in_array($value, $getFillAble), function ($q) use ($search, $value, $getTableName) {
+                            $q->orWhere($getTableName . '.' . $value, 'like', '%' . $search . '%');
+                        });
+                        //Handle search in relational table
+                        $query->when(!in_array($value, $getFillAble), function ($q) use ($search, $value) {
 
-                        return $q->orWhere($value, 'like', '%' . $search . '%');
-                    });
-                }
-            });
+                            $lastDotPosition = strrpos($value, '.');
+                            $relationship = substr($value, 0, $lastDotPosition);
+                            $columnName = substr($value, $lastDotPosition + 1);
 
-            return $query;
+                            $q->orWhereHas($relationship, function ($q) use ($search, $columnName) {
+                                $q->where($columnName, 'like', '%' . $search . '%');
+                            });
+                        });
+                    }
+                });
+
+                return $query;
+            }
+
+            return $this->filteringByCustomContactField();
+        } catch (\BadMethodCallException $exception) {
+            return $this->filteringByCustomContactField();
         }
-
-        return $this->filteringByCustomContactField();
     }
 
     /**
