@@ -32,9 +32,11 @@ class SearchQueryBuilder extends QueryBuilder
                             $relationship = substr($value, 0, $lastDotPosition);
                             $columnName = substr($value, $lastDotPosition + 1);
 
-                            $q->orWhereHas($relationship, function ($q) use ($search, $columnName) {
-                                $q->where($columnName, 'like', '%' . $search . '%');
-                            });
+                            if (method_exists($relationship, $columnName)) {
+                                $q->orWhereHas($relationship, function ($q) use ($search, $columnName) {
+                                    $q->where($columnName, 'like', '%' . $search . '%');
+                                });
+                            }
                         });
                     }
                 });

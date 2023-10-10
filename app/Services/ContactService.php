@@ -6,6 +6,7 @@ use App\Abstracts\AbstractService;
 use App\Http\Resources\StatusResource;
 use App\Models\Contact;
 use App\Models\QueryBuilders\ContactQueryBuilder;
+use App\Models\SearchQueryBuilders\SearchQueryBuilder;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -728,38 +729,10 @@ class ContactService extends AbstractService
      */
     public function search($search, $searchBy): QueryBuilder
     {
-        try {
-            if ($search && !empty($searchBy)) {
-                //Get all fields
-                $getFillAble = app(Contact::class)->getFillable();
-                $getTableName = app(Contact::class)->getTable();
-                $query = $this->filteringByCustomContactField();
-                $query->where(function ($query) use ($search, $searchBy, $getFillAble, $getTableName) {
-                    foreach ($searchBy as $value) {
-                        $query->when(in_array($value, $getFillAble), function ($q) use ($search, $value, $getTableName) {
-                            $q->orWhere($getTableName . '.' . $value, 'like', '%' . $search . '%');
-                        });
-                        //Handle search in relational table
-                        $query->when(!in_array($value, $getFillAble), function ($q) use ($search, $value) {
+        $baseQuery = Contact::class;
+        $query = $this->filteringByCustomContactField();
 
-                            $lastDotPosition = strrpos($value, '.');
-                            $relationship = substr($value, 0, $lastDotPosition);
-                            $columnName = substr($value, $lastDotPosition + 1);
-
-                            $q->orWhereHas($relationship, function ($q) use ($search, $columnName) {
-                                $q->where($columnName, 'like', '%' . $search . '%');
-                            });
-                        });
-                    }
-                });
-
-                return $query;
-            }
-
-            return $this->filteringByCustomContactField();
-        } catch (\BadMethodCallException $exception) {
-            return $this->filteringByCustomContactField();
-        }
+        return SearchQueryBuilder::search($baseQuery, $query, $search, $searchBy);
     }
 
     /**
