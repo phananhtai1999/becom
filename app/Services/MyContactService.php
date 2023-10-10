@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Abstracts\AbstractService;
 use App\Models\Contact;
 use App\Models\QueryBuilders\MyContactQueryBuilder;
+use App\Models\SearchQueryBuilders\SearchQueryBuilder;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -545,23 +546,10 @@ class MyContactService extends AbstractService
      */
     public function search($search, $searchBy): QueryBuilder
     {
-        if ($search && !empty($searchBy)) {
-            //Get all fields
-            $getFillAble = app(Contact::class)->getFillable();
-            $query = $this->filteringByMyCustomContactField();
-            $query->where(function ($query) use ($search, $searchBy, $getFillAble) {
-                foreach ($searchBy as $value) {
-                    $query->when(in_array($value, $getFillAble), function ($q) use ($search, $value) {
+        $baseQuery = Contact::class;
+        $query = $this->filteringByMyCustomContactField();
 
-                        return $q->orWhere($value, 'like', '%' . $search . '%');
-                    });
-                }
-            });
-
-            return $query;
-        }
-
-        return $this->filteringByMyCustomContactField();
+        return SearchQueryBuilder::search($baseQuery, $query, $search, $searchBy);
     }
 
     /**

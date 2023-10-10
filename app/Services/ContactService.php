@@ -6,6 +6,7 @@ use App\Abstracts\AbstractService;
 use App\Http\Resources\StatusResource;
 use App\Models\Contact;
 use App\Models\QueryBuilders\ContactQueryBuilder;
+use App\Models\SearchQueryBuilders\SearchQueryBuilder;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -728,23 +729,10 @@ class ContactService extends AbstractService
      */
     public function search($search, $searchBy): QueryBuilder
     {
-        if ($search && !empty($searchBy)) {
-            //Get all fields
-            $getFillAble = app(Contact::class)->getFillable();
-            $query = $this->filteringByCustomContactField();
-            $query->where(function ($query) use ($search, $searchBy, $getFillAble) {
-                foreach ($searchBy as $value) {
-                    $query->when(in_array($value, $getFillAble), function ($q) use ($search, $value) {
+        $baseQuery = Contact::class;
+        $query = $this->filteringByCustomContactField();
 
-                        return $q->orWhere($value, 'like', '%' . $search . '%');
-                    });
-                }
-            });
-
-            return $query;
-        }
-
-        return $this->filteringByCustomContactField();
+        return SearchQueryBuilder::search($baseQuery, $query, $search, $searchBy);
     }
 
     /**

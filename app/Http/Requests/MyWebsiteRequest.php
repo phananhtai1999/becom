@@ -30,20 +30,20 @@ class MyWebsiteRequest extends AbstractRequest
     {
         return [
             'title' => ['required', 'string'],
-//            'header_section_uuid' => ['required', 'numeric', Rule::exists('section_templates', 'uuid')->where(function ($query) {
-//                return $query->where(function ($q) {
-//                    $q->where('user_uuid', auth()->user()->getKey())
-//                        ->orWhere('is_default', true);
-//                })->where('publish_status', SectionTemplate::PUBLISHED_PUBLISH_STATUS)
-//                    ->whereNull('deleted_at');
-//            })],
-//            'footer_section_uuid' => ['required', 'numeric', Rule::exists('section_templates', 'uuid')->where(function ($query) {
-//                return $query->where(function ($q) {
-//                    $q->where('user_uuid', auth()->user()->getKey())
-//                        ->orWhere('is_default', true);
-//                })->where('publish_status', SectionTemplate::PUBLISHED_PUBLISH_STATUS)
-//                    ->whereNull('deleted_at');
-//            })],
+            'header_section_uuid' => ['required', 'numeric', Rule::exists('section_templates', 'uuid')->where(function ($query) {
+                return $query->where(function ($q) {
+                    $q->where('user_uuid', auth()->user()->getKey())
+                        ->orWhere('is_default', true);
+                })->where('publish_status', SectionTemplate::PUBLISHED_PUBLISH_STATUS)
+                    ->whereNull('deleted_at');
+            })],
+            'footer_section_uuid' => ['required', 'numeric', Rule::exists('section_templates', 'uuid')->where(function ($query) {
+                return $query->where(function ($q) {
+                    $q->where('user_uuid', auth()->user()->getKey())
+                        ->orWhere('is_default', true);
+                })->where('publish_status', SectionTemplate::PUBLISHED_PUBLISH_STATUS)
+                    ->whereNull('deleted_at');
+            })],
             'description' => ['nullable', 'string'],
             'logo' => ['nullable', 'string'],
             'domain_uuid' => ['required', 'numeric', Rule::exists('domains', 'uuid')->where(function ($q) {
