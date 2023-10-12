@@ -52,7 +52,7 @@ class WebsiteController extends AbstractRestAPIController
                 "user_uuid" => auth()
                     ->user()
                     ->getKey(),
-                "publish_status" => Website::PUBLISHED_PUBLISH_STATUS,
+                "publish_status" => Website::PENDING_PUBLISH_STATUS,
             ])
         );
 
