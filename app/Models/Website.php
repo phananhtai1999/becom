@@ -49,11 +49,11 @@ class Website extends AbstractModel
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
-        'user_uuid' =>  'integer',
-        'footer_section_uuid' =>  'integer',
-        'header_section_uuid' =>  'integer',
-        'domain_uuid' =>  'integer',
-        'tracking_ids' =>  'array',
+        'user_uuid' => 'integer',
+        'footer_section_uuid' => 'integer',
+        'header_section_uuid' => 'integer',
+        'domain_uuid' => 'integer',
+        'tracking_ids' => 'array',
     ];
 
     /**
@@ -81,6 +81,18 @@ class Website extends AbstractModel
 
     public function websitePages()
     {
-        return $this->belongsToMany(WebsitePage::class, 'website_website_page', 'website_uuid', 'website_page_uuid')->withPivot(['is_homepage', 'ordering'])->withTimestamps();
+        return $this->belongsToMany(WebsitePage::class, 'website_website_page', 'website_uuid', 'website_page_uuid')->withPivot(['is_homepage', 'ordering'])->select($this->getFillablesWebsitePage())->withTimestamps();
+    }
+
+    public function websitePagesPublic()
+    {
+        return $this->belongsToMany(WebsitePage::class, 'website_website_page', 'website_uuid', 'website_page_uuid')->withPivot(['is_homepage', 'ordering'])->where('publish_status', WebsitePage::PUBLISHED_PUBLISH_STATUS)->select($this->getFillablesWebsitePage())->withTimestamps();
+    }
+
+    public function getFillablesWebsitePage()
+    {
+        $modelKeyName = (new WebsitePage())->getKeyName();
+
+        return array_diff(array_merge((new WebsitePage())->getFillable(), ["website_pages.$modelKeyName", 'website_pages.deleted_at', 'website_pages.created_at', 'website_pages.updated_at']), request()->get('exclude_website_page', []));
     }
 }

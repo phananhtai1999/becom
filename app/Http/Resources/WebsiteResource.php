@@ -57,6 +57,16 @@ class WebsiteResource extends AbstractJsonResource
             });
         }
 
+        if (\in_array('website_public__website_pages_public', $expand)) {
+            $data['website_pages_public'] = WebsitePageResource::collection($this->websitePagesPublic)
+                ->map(function ($webPage) {
+                    $data = $webPage->toArray(null);
+                    $data['is_homepage'] = $webPage->pivot->is_homepage;
+                    $data['ordering'] = $webPage->pivot->ordering;
+                    return $data;
+                });
+        }
+
         return $data;
     }
 }

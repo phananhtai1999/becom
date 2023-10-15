@@ -9,12 +9,14 @@ use App\Services\UserService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Sluggable\HasSlug;
+use Spatie\Sluggable\SlugOptions;
 use Spatie\Translatable\HasTranslations;
 
 class WebsitePage extends AbstractModel
 {
     use HasFactory, SoftDeletes, HasTranslations,
-        ModelFilterDescriptionLanguageTrait, ModelFilterKeywordLanguageTrait;
+        ModelFilterDescriptionLanguageTrait, ModelFilterKeywordLanguageTrait, HasSlug;
 
     const PUBLISHED_PUBLISH_STATUS = 1;
     const PENDING_PUBLISH_STATUS = 2;
@@ -49,6 +51,7 @@ class WebsitePage extends AbstractModel
         'keyword',
         'description',
         'feature_image',
+        'slug',
     ];
 
     /**
@@ -71,6 +74,17 @@ class WebsitePage extends AbstractModel
         'keywords',
         'descriptions',
     ];
+
+    public function getSlugOptions(): SlugOptions
+    {
+        return SlugOptions::create()
+            ->generateSlugsFrom('title')
+            ->saveSlugsTo('slug')
+            ->slugsShouldBeNoLongerThan(100)
+            ->usingSeparator('-')
+            ->allowDuplicateSlugs()
+            ->doNotGenerateSlugsOnUpdate();
+    }
 
     /**
      * @return BelongsTo
@@ -95,11 +109,11 @@ class WebsitePage extends AbstractModel
 
     public function getKeywordsAttribute()
     {
-        return $this->keyword && app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('keyword') : $this->keyword;
+        return $this->keyword ? $this->getTranslations('keyword') : $this->keyword;
     }
 
     public function getDescriptionsAttribute()
     {
-        return $this->description && app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('description') : $this->description;
+        return $this->description ? $this->getTranslations('description') : $this->description;
     }
 }

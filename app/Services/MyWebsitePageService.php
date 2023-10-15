@@ -34,4 +34,13 @@ class MyWebsitePageService extends AbstractService
 
         return $this->destroy($websitePage->getKey());
     }
+
+    public function checkUniqueSlug($uuids)
+    {
+        $websitePages = $this->model->whereIn('uuid', $uuids)->get();
+        $slugs = $websitePages->pluck('slug')->toArray();
+        $uniqueSlugs = array_unique($slugs);
+
+        return count($slugs) === count($uniqueSlugs);
+    }
 }

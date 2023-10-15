@@ -28,6 +28,7 @@ class UpdateMyWebsitePageRequest extends AbstractRequest
     {
         return [
             'title' => ['string'],
+            'slug' => ['string'],
             'template' => ['string'],
             'template_json' => ['string'],
             'website_page_category_uuid' => ['numeric', Rule::exists('website_page_categories', 'uuid')->whereNull('deleted_at')],

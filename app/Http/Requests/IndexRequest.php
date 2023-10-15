@@ -30,6 +30,8 @@ class IndexRequest extends AbstractRequest
             'filter' => ['array'],
             'filter.*' => ['nullable', 'string'],
             'sort' => ['nullable', 'string'],
+            'exclude' => ['array'],
+            'exclude.*' => ['nullable', 'string'],
             'search' =>  ['nullable', 'string'],
             'search_by' => ['array'],
             'search_by.*' => ['nullable', 'string'],
