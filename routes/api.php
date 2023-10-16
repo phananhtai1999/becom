@@ -24,6 +24,7 @@ use App\Http\Controllers\Api\CountryController;
 use App\Http\Controllers\Api\CreditHistoryController;
 use App\Http\Controllers\Api\CreditPackageController;
 use App\Http\Controllers\Api\CreditTransactionHistoryController;
+use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\DomainController;
 use App\Http\Controllers\Api\DomainVerificationController;
 use App\Http\Controllers\Api\EditorChartController;
@@ -907,6 +908,24 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'position.'], function () {
         Route::get('/my/position/{id}', [PositionController::class, 'showMyPosition'])->name('show');
         Route::put('/my/position/{id}', [PositionController::class, 'editMyPosition'])->name('edit');
         Route::delete('/my/position/{id}', [PositionController::class, 'destroyMyPosition'])->name('destroy');
+    });
+});
+
+Route::group(['middleware' => ['auth:api'], 'as' => 'department.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
+        Route::get('/departments', [DepartmentController::class, 'index'])->name('index');
+        Route::post('/department', [DepartmentController::class, 'store'])->name('store');
+        Route::get('/department/{id}', [DepartmentController::class, 'show'])->name('show');
+        Route::put('/department/{id}', [DepartmentController::class, 'edit'])->name('edit');
+        Route::delete('/department/{id}', [DepartmentController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::group(['as' => 'my.'], function () {
+        Route::get('/my/departments', [DepartmentController::class, 'indexMy'])->name('index');
+        Route::post('/my/department', [DepartmentController::class, 'storeMyDepartment'])->name('store');
+        Route::get('/my/department/{id}', [DepartmentController::class, 'showMyDepartment'])->name('show');
+        Route::put('/my/department/{id}', [DepartmentController::class, 'editMyDepartment'])->name('edit');
+        Route::delete('/my/department/{id}', [DepartmentController::class, 'destroyMyDepartment'])->name('destroy');
     });
 });
 
