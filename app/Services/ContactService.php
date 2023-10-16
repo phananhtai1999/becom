@@ -719,6 +719,7 @@ class ContactService extends AbstractService
                 $this->getDuplicateFiltersByNumeric('dob'),
                 $this->getDuplicateFiltersByNumeric('user_uuid'),
                 $this->getFilterRelationshipWithUser('user.username'),
+                AllowedFilter::scope('exact__positions.name', 'positionName'),
             ]);
     }
 
