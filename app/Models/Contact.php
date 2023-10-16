@@ -64,7 +64,7 @@ class Contact extends AbstractModel
      */
     public function getFullNameAttribute()
     {
-        return $this->first_name . ' '. $this->last_name;
+        return $this->first_name . ' ' . $this->last_name;
     }
 
     /**
@@ -166,6 +166,7 @@ class Contact extends AbstractModel
     {
         return $this->belongsToMany(Department::class, 'company_contact', 'contact_uuid', 'department_uuid')->withTimestamps();
     }
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
@@ -197,7 +198,7 @@ class Contact extends AbstractModel
      */
     public function scopeStatusName(Builder $query, ...$name)
     {
-        return $query->where('status_uuid',function ($q) use ($name) {
+        return $query->where('status_uuid', function ($q) use ($name) {
             $q->select('a.uuid')
                 ->from('status as a')
                 ->whereColumn('a.uuid', 'contacts.status_uuid')
@@ -206,6 +207,22 @@ class Contact extends AbstractModel
                     $langDefault = config('app.fallback_locale');
                     foreach ($name as $value) {
                         $i->orWhereRaw("IFNULL(JSON_UNQUOTE(JSON_EXTRACT(a.name, '$.$lang')),JSON_UNQUOTE(JSON_EXTRACT(a.name, '$.$langDefault'))) = '$value'");
+                    }
+                });
+        });
+    }
+
+    public function scopePositionName(Builder $query, ...$name)
+    {
+        return $query->whereExists(function ($q) use ($name) {
+            $q->from('company_contact')
+                ->join('positions', 'company_contact.position_uuid', '=', 'positions.uuid')
+                ->whereRaw('contacts.uuid = company_contact.contact_uuid')
+                ->where(function ($i) use ($name) {
+                    $lang = app()->getLocale();
+                    $langDefault = config('app.fallback_locale');
+                    foreach ($name as $value) {
+                        $i->orWhereRaw("IFNULL(JSON_UNQUOTE(JSON_EXTRACT(positions.name, '$.$lang')),JSON_UNQUOTE(JSON_EXTRACT(positions.name, '$.$langDefault'))) = '$value'");
                     }
                 });
         });
