@@ -62,6 +62,10 @@ class ContactResource extends AbstractJsonResource
             $data['position'] = PositionResource::collection($this->positions);
         }
 
+        if (\in_array('contact__departments', $expand)) {
+            $data['departments'] = DepartmentResource::collection($this->departments);
+        }
+
         if (\in_array('contact__notes', $expand)) {
             $data['note'] = NoteResource::collection($this->notes);
         }

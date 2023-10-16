@@ -162,6 +162,10 @@ class Contact extends AbstractModel
         return $this->belongsToMany(Position::class, 'company_contact', 'contact_uuid', 'position_uuid')->withTimestamps();
     }
 
+    public function departments()
+    {
+        return $this->belongsToMany(Department::class, 'company_contact', 'contact_uuid', 'department_uuid')->withTimestamps();
+    }
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
