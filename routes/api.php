@@ -800,7 +800,6 @@ Route::get('/language/{id}', [LanguageController::class, 'show'])->name('languag
 //Article Category
 Route::group(['middleware' => ['auth:api'], 'as' => 'article-category.'], function () {
     Route::group(['middleware' => ['role:root,admin,editor'], 'as' => 'author.'], function () {
-        Route::post('/article-category', [ArticleCategoryController::class, 'store'])->name('store');
         Route::put('/article-category/{id}', [ArticleCategoryController::class, 'edit'])->name('edit');
 //        Route::delete('/article-category/{id}', [ArticleCategoryController::class, 'destroy'])->name('destroy');
         Route::get('/article-categories', [ArticleCategoryController::class, 'index'])->name('index');
@@ -808,6 +807,8 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'article-category.'], functi
         Route::put('/article-category/change-status/{id}', [ArticleCategoryController::class, 'changeStatus'])->name('changeStatus');
         Route::post('/delete-article-category/{id}', [ArticleCategoryController::class, 'deleteCategory']);
     });
+    Route::post('/article-category', [ArticleCategoryController::class, 'store'])->name('store');
+
 });
 Route::get('public/article-categories', [ArticleCategoryController::class, 'indexPublic'])->name('article-categories-public.index');
 Route::get('public/article-category/{id}', [ArticleCategoryController::class, 'showPublic'])->name('article-categories-public.show');
@@ -839,12 +840,12 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'article.'], function () {
     Route::group(['middleware' => ['role:root,admin,editor']], function () {
         Route::get('/unpublished-articles', [ArticleController::class, 'indexUnpublishedArticle'])->name('index-unpublished');
         Route::get('/unpublished-article/{id}', [ArticleController::class, 'showUnpublishedArticle'])->name('show-unpublished');
-        Route::post('/unpublished-article', [ArticleController::class, 'storeUnpublishedArticle'])->name('store-unpublished');
         Route::put('/unpublished-article/{id}', [ArticleController::class, 'editUnpublishedArticle'])->name('edit-unpublished');
         //Check role editor for change status
         Route::post('article/change-status', [ArticleController::class, 'changeStatusArticle'])->name('changeStatusArticle');
     });
 
+    Route::post('/unpublished-article', [ArticleController::class, 'storeUnpublishedArticle'])->name('store-unpublished');
     Route::get('my/articles', [ArticleController::class, 'indexMy'])->name('indexMy');
     Route::delete('my/article/{id}', [ArticleController::class, 'deleteMy'])->name('indexMy');
 
