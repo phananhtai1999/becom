@@ -21,6 +21,7 @@ class WebsitePageResource extends AbstractJsonResource
             'title' => $this->title,
             'slug' => $this->slug,
             'user_uuid' => $this->user_uuid,
+            'type' => $this->type,
             'website_page_category_uuid' => $this->website_page_category_uuid,
             'display_type' => $this->display_type,
             'template' => $this->template,
