@@ -55,11 +55,15 @@ class ContactResource extends AbstractJsonResource
         }
 
         if (\in_array('contact__companies', $expand)) {
-            $data['company'] = CompanyResource::collection($this->companies);
+            $data['companies'] = CompanyResource::collection($this->companies);
         }
 
         if (\in_array('contact__positions', $expand)) {
-            $data['position'] = PositionResource::collection($this->positions);
+            $data['positions'] = PositionResource::collection($this->positions);
+        }
+
+        if (\in_array('contact__departments', $expand)) {
+            $data['departments'] = DepartmentResource::collection($this->departments);
         }
 
         if (\in_array('contact__notes', $expand)) {

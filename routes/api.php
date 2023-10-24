@@ -24,6 +24,7 @@ use App\Http\Controllers\Api\CountryController;
 use App\Http\Controllers\Api\CreditHistoryController;
 use App\Http\Controllers\Api\CreditPackageController;
 use App\Http\Controllers\Api\CreditTransactionHistoryController;
+use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\DomainController;
 use App\Http\Controllers\Api\DomainVerificationController;
 use App\Http\Controllers\Api\EditorChartController;
@@ -609,6 +610,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website_page'], function ()
         Route::get('/unpublished-website-page/{id}', [WebsitePageController::class, 'showUnpublishedWebsitePage'])->name('show-unpublished');
         Route::post('/unpublished-website-page', [WebsitePageController::class, 'storeUnpublishedWebsitePage'])->name('store-unpublished');
         Route::put('/unpublished-website-page/{id}', [WebsitePageController::class, 'editUnpublishedWebsitePage'])->name('edit-unpublished');
+        Route::get('shortcode-supports', [WebsitePageController::class, 'configShortcode'])->name('index-config-shortcode');
     });
 
     Route::group(['as' => 'my.'], function () {
@@ -799,7 +801,6 @@ Route::get('/language/{id}', [LanguageController::class, 'show'])->name('languag
 //Article Category
 Route::group(['middleware' => ['auth:api'], 'as' => 'article-category.'], function () {
     Route::group(['middleware' => ['role:root,admin,editor'], 'as' => 'author.'], function () {
-        Route::post('/article-category', [ArticleCategoryController::class, 'store'])->name('store');
         Route::put('/article-category/{id}', [ArticleCategoryController::class, 'edit'])->name('edit');
 //        Route::delete('/article-category/{id}', [ArticleCategoryController::class, 'destroy'])->name('destroy');
         Route::get('/article-categories', [ArticleCategoryController::class, 'index'])->name('index');
@@ -807,6 +808,8 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'article-category.'], functi
         Route::put('/article-category/change-status/{id}', [ArticleCategoryController::class, 'changeStatus'])->name('changeStatus');
         Route::post('/delete-article-category/{id}', [ArticleCategoryController::class, 'deleteCategory']);
     });
+    Route::post('/article-category', [ArticleCategoryController::class, 'store'])->name('store');
+
 });
 Route::get('public/article-categories', [ArticleCategoryController::class, 'indexPublic'])->name('article-categories-public.index');
 Route::get('public/article-category/{id}', [ArticleCategoryController::class, 'showPublic'])->name('article-categories-public.show');
@@ -838,12 +841,12 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'article.'], function () {
     Route::group(['middleware' => ['role:root,admin,editor']], function () {
         Route::get('/unpublished-articles', [ArticleController::class, 'indexUnpublishedArticle'])->name('index-unpublished');
         Route::get('/unpublished-article/{id}', [ArticleController::class, 'showUnpublishedArticle'])->name('show-unpublished');
-        Route::post('/unpublished-article', [ArticleController::class, 'storeUnpublishedArticle'])->name('store-unpublished');
         Route::put('/unpublished-article/{id}', [ArticleController::class, 'editUnpublishedArticle'])->name('edit-unpublished');
         //Check role editor for change status
         Route::post('article/change-status', [ArticleController::class, 'changeStatusArticle'])->name('changeStatusArticle');
     });
 
+    Route::post('/unpublished-article', [ArticleController::class, 'storeUnpublishedArticle'])->name('store-unpublished');
     Route::get('my/articles', [ArticleController::class, 'indexMy'])->name('indexMy');
     Route::delete('my/article/{id}', [ArticleController::class, 'deleteMy'])->name('indexMy');
 
@@ -907,6 +910,24 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'position.'], function () {
         Route::get('/my/position/{id}', [PositionController::class, 'showMyPosition'])->name('show');
         Route::put('/my/position/{id}', [PositionController::class, 'editMyPosition'])->name('edit');
         Route::delete('/my/position/{id}', [PositionController::class, 'destroyMyPosition'])->name('destroy');
+    });
+});
+
+Route::group(['middleware' => ['auth:api'], 'as' => 'department.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
+        Route::get('/departments', [DepartmentController::class, 'index'])->name('index');
+        Route::post('/department', [DepartmentController::class, 'store'])->name('store');
+        Route::get('/department/{id}', [DepartmentController::class, 'show'])->name('show');
+        Route::put('/department/{id}', [DepartmentController::class, 'edit'])->name('edit');
+        Route::delete('/department/{id}', [DepartmentController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::group(['as' => 'my.'], function () {
+        Route::get('/my/departments', [DepartmentController::class, 'indexMy'])->name('index');
+        Route::post('/my/department', [DepartmentController::class, 'storeMyDepartment'])->name('store');
+        Route::get('/my/department/{id}', [DepartmentController::class, 'showMyDepartment'])->name('show');
+        Route::put('/my/department/{id}', [DepartmentController::class, 'editMyDepartment'])->name('edit');
+        Route::delete('/my/department/{id}', [DepartmentController::class, 'destroyMyDepartment'])->name('destroy');
     });
 });
 

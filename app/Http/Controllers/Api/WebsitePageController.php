@@ -7,6 +7,7 @@ use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestIndexMyTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Requests\AcceptPublishWebsitePageRequest;
+use App\Http\Requests\ConfigShortcodeRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyWebsitePageRequest;
 use App\Http\Requests\UnpublishedWebsitePageRequest;
@@ -67,6 +68,12 @@ class WebsitePageController extends AbstractRestAPIController
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
         );
+    }
+
+    public function configShortcode(ConfigShortcodeRequest $request)
+    {
+
+        return $this->sendOkJsonResponse(['data' => config('shortcode.' . $request->get('type'))]);
     }
 
     /**

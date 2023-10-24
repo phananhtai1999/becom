@@ -516,7 +516,8 @@ class ContactController extends AbstractRestAPIController
         foreach ($arrayPivot as $value) {
             $arrayPush = [
                 'company_uuid' => $value['company_uuid'],
-                'position_uuid' => $value['position_uuid'] ?? null
+                'position_uuid' => $value['position_uuid'] ?? null,
+                'department_uuid' => $value['department_uuid'] ?? null
             ];
             array_push($array, $arrayPush);
         }

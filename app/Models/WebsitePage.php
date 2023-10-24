@@ -23,6 +23,10 @@ class WebsitePage extends AbstractModel
     const REJECT_PUBLISH_STATUS = 3;
     const DRAFT_PUBLISH_STATUS = 4;
 
+    const STATIC_TYPE = 'static';
+    const ARTICLE_DETAIL_TYPE = 'article_detail';
+    const ARTICLE_CATEGORY_TYPE = 'article_category';
+
     /**
      * @var string
      */
@@ -43,6 +47,7 @@ class WebsitePage extends AbstractModel
         'template',
         'template_json',
         'user_uuid',
+        'type',
         'publish_status',
         'is_default',
         'website_page_category_uuid',

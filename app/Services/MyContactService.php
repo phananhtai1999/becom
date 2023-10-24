@@ -8,7 +8,6 @@ use App\Models\QueryBuilders\MyContactQueryBuilder;
 use App\Models\SearchQueryBuilders\SearchQueryBuilder;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -536,6 +535,7 @@ class MyContactService extends AbstractService
                 $this->getMyDuplicateFiltersByNumeric('dob'),
                 $this->getMyDuplicateFiltersByNumeric('user_uuid'),
                 $this->getMyFilterRelationshipWithUser('user.username'),
+                AllowedFilter::scope('exact__positions.name', 'positionName'),
             ]);
     }
 
