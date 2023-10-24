@@ -7,6 +7,7 @@ use App\Models\QueryBuilders\WebsitePageQueryBuilder;
 use App\Models\Website;
 use App\Models\WebsitePage;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 class WebsitePageService extends AbstractService
 {
@@ -132,5 +133,29 @@ class WebsitePageService extends AbstractService
             ->first();
 
         return $webpage ?? abort(404);
+    }
+
+    public function renderContent($websitePage, $article = null, $articleCategory = null)
+    {
+        if ($websitePage->type == WebsitePage::ARTICLE_DETAIL_TYPE) {
+            $search = array_map(function ($item) {
+                return '{' . $item . '}';
+            }, config('shortcode.category'));
+            $replace = [
+                $article->title ?? null, $article->content ?? null, $article->keyword ?? null,
+                $article->description ?? null, $article->short_content ?? null
+            ];
+        } else {
+            $search = array_map(function ($item) {
+                return '{' . $item . '}';
+            }, config('shortcode.article'));
+            $replace = [
+                $articleCategory->title ?? null, $articleCategory->content ?? null, $articleCategory->keyword ?? null,
+                $articleCategory->description ?? null, $articleCategory->short_content ?? null
+            ];
+        }
+        $websitePage->template = Str::replace($search, $replace, $websitePage->template);
+
+        return $websitePage;
     }
 }

@@ -10,6 +10,7 @@ use App\Http\Requests\AcceptPublishWebsitePageRequest;
 use App\Http\Requests\ConfigShortcodeRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyWebsitePageRequest;
+use App\Http\Requests\ShowWebsitePageRequest;
 use App\Http\Requests\UnpublishedWebsitePageRequest;
 use App\Http\Requests\UpdateMyWebsitePageRequest;
 use App\Http\Requests\UpdateUnpublishedWebsitePageRequest;
@@ -17,7 +18,10 @@ use App\Http\Requests\UpdateWebsitePageRequest;
 use App\Http\Requests\WebsitePageRequest;
 use App\Http\Resources\WebsitePageResource;
 use App\Http\Resources\WebsitePageResourceCollection;
+use App\Models\ArticleCategory;
 use App\Models\WebsitePage;
+use App\Services\ArticleCategoryService;
+use App\Services\ArticleService;
 use App\Services\LanguageService;
 use App\Services\MyWebsitePageService;
 use App\Services\WebsitePageService;
@@ -46,12 +50,16 @@ class WebsitePageController extends AbstractRestAPIController
     public function __construct(
         WebsitePageService   $service,
         MyWebsitePageService $myService,
-        LanguageService      $languageService
+        LanguageService      $languageService,
+        ArticleService $articleService,
+        ArticleCategoryService $articleCategoryService
     )
     {
         $this->service = $service;
         $this->myService = $myService;
         $this->languageService = $languageService;
+        $this->articleService = $articleService;
+        $this->articleCategoryService = $articleCategoryService;
         $this->resourceCollectionClass = WebsitePageResourceCollection::class;
         $this->resourceClass = WebsitePageResource::class;
         $this->indexRequest = IndexRequest::class;
@@ -59,15 +67,20 @@ class WebsitePageController extends AbstractRestAPIController
         $this->editRequest = UpdateWebsitePageRequest::class;
     }
 
-    public function show(IndexRequest $request, $id)
+    public function show(ShowWebsitePageRequest $request, $id)
     {
-        $model = $this->myService->findOneWhereOrFail($request->publish_status ?
+        $websitePage = $this->myService->findOneWhereOrFail($request->publish_status ?
             [['publish_status', $request->publish_status], ['uuid', $id]]
             : [['uuid', $id]]);
+        if ($websitePage->type == WebsitePage::ARTICLE_DETAIL_TYPE) {
+            $article = $this->articleService->findOneWhereOrFail(['slug' => $request->get('article_slug')]);
+            $websitePage = $this->service->renderContent($websitePage, $article);
+        } elseif ($websitePage->type == WebsitePage::ARTICLE_CATEGORY_TYPE) {
+            $articleCategory = $this->articleCategoryService->findOneWhereOrFail(['slug' => $request->get('article_category_slug')]);
+            $websitePage = $this->service->renderContent($websitePage, $articleCategory);
+        }
 
-        return $this->sendOkJsonResponse(
-            $this->service->resourceToData($this->resourceClass, $model)
-        );
+        return $this->sendOkJsonResponse([$websitePage]);
     }
 
     public function configShortcode(ConfigShortcodeRequest $request)
