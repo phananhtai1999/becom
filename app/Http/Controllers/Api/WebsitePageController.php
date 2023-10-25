@@ -77,7 +77,7 @@ class WebsitePageController extends AbstractRestAPIController
             $websitePage = $this->service->renderContent($websitePage, $article);
         } elseif ($websitePage->type == WebsitePage::ARTICLE_CATEGORY_TYPE) {
             $articleCategory = $this->articleCategoryService->findOneWhereOrFail(['slug' => $request->get('article_category_slug')]);
-            $websitePage = $this->service->renderContent($websitePage, $articleCategory);
+            $websitePage = $this->service->renderContent($websitePage, null, $articleCategory);
         }
 
         return $this->sendOkJsonResponse([$websitePage]);
