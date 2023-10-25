@@ -16,6 +16,7 @@ use App\Http\Requests\UpdateMyWebsitePageRequest;
 use App\Http\Requests\UpdateUnpublishedWebsitePageRequest;
 use App\Http\Requests\UpdateWebsitePageRequest;
 use App\Http\Requests\WebsitePageRequest;
+use App\Http\Resources\ArticleResourceCollection;
 use App\Http\Resources\WebsitePageResource;
 use App\Http\Resources\WebsitePageResourceCollection;
 use App\Models\ArticleCategory;
@@ -72,15 +73,20 @@ class WebsitePageController extends AbstractRestAPIController
         $websitePage = $this->myService->findOneWhereOrFail($request->publish_status ?
             [['publish_status', $request->publish_status], ['uuid', $id]]
             : [['uuid', $id]]);
+        $response = $this->sendOkJsonResponse(['data' => $websitePage]);
         if ($websitePage->type == WebsitePage::ARTICLE_DETAIL_TYPE) {
             $article = $this->articleService->findOneWhereOrFail(['slug' => $request->get('article_slug')]);
             $websitePage = $this->service->renderContent($websitePage, $article);
+            $response = $this->sendOkJsonResponse(['data' => $websitePage]);
         } elseif ($websitePage->type == WebsitePage::ARTICLE_CATEGORY_TYPE) {
             $articleCategory = $this->articleCategoryService->findOneWhereOrFail(['slug' => $request->get('article_category_slug')]);
-            $websitePage = $this->service->renderContent($websitePage, null, $articleCategory);
+            $articles = $this->articleService->getCollectionWithPaginationByCondition($request, ['article_category_uuid' => $articleCategory->uuid]);
+            $articlesResource = $this->articleService->resourceCollectionToData(ArticleResourceCollection::class, $articles);
+            $websitePage = $this->service->renderContent($websitePage, null, $articleCategory, $articles);
+            $response = $this->sendOkJsonResponse(['data' => $websitePage, 'links' => $articlesResource['links'], 'meta' => $articlesResource['meta']]);
         }
 
-        return $this->sendOkJsonResponse([$websitePage]);
+        return $response;
     }
 
     public function configShortcode(ConfigShortcodeRequest $request)

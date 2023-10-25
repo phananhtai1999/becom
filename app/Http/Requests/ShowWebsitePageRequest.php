@@ -25,6 +25,8 @@ class ShowWebsitePageRequest extends FormRequest
     public function rules()
     {
         $validate = [
+            'per_page' => ['integer', 'min:1', 'max:100'],
+            'page' => ['integer', 'min:1'],
             'publish_status' => ['integer', 'min:1'],
         ];
         $websitePage = WebsitePage::find($this->id);

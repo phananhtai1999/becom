@@ -135,7 +135,7 @@ class WebsitePageService extends AbstractService
         return $webpage ?? abort(404);
     }
 
-    public function renderContent($websitePage, $article = null, $articleCategory = null)
+    public function renderContent($websitePage, $article = null, $articleCategory = null, $articles = null)
     {
         if ($websitePage->type == WebsitePage::ARTICLE_DETAIL_TYPE) {
             $searchReplaceMap = [
@@ -151,7 +151,7 @@ class WebsitePageService extends AbstractService
             if (preg_match('/{categorylist}(.*?){\/categorylist}/s', $websitePage->template, $matches)) {
                 $contentInsideCategoryList = $matches[1];
                 $categoryList = '';
-                foreach ($articleCategory->articles as $article) {
+                foreach ($articles as $article) {
                     $searchReplaceMap = [
                         '{article.title}' => $article->title ?? null,
                         '{article.content}' => $article->content ?? null,
