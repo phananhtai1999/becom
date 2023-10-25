@@ -7,6 +7,7 @@ use App\Models\QueryBuilders\WebsitePageQueryBuilder;
 use App\Models\Website;
 use App\Models\WebsitePage;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 class WebsitePageService extends AbstractService
 {
@@ -132,5 +133,50 @@ class WebsitePageService extends AbstractService
             ->first();
 
         return $webpage ?? abort(404);
+    }
+
+    public function renderContent($websitePage, $article = null, $articleCategory = null, $articles = null)
+    {
+        if ($websitePage->type == WebsitePage::ARTICLE_DETAIL_TYPE) {
+            $searchReplaceMap = [
+                '{article.title}' => $article->title ?? null,
+                '{article.content}' => $article->content ?? null,
+                '{article.video}' => $articleCategory->video ?? null,
+                '{article.image}' => $articleCategory->image ?? null,
+                '{article.keyword}' => $article->keyword ?? null,
+                '{article.description}' => $article->description ?? null,
+                '{article.short_content}' => $article->short_content ?? null,
+            ];
+        } else {
+            if (preg_match('/{categorylist}(.*?){\/categorylist}/s', $websitePage->template, $matches)) {
+                $contentInsideCategoryList = $matches[1];
+                $categoryList = '';
+                foreach ($articles as $article) {
+                    $searchReplaceMap = [
+                        '{article.title}' => $article->title ?? null,
+                        '{article.content}' => $article->content ?? null,
+                        '{article.video}' => $articleCategory->video ?? null,
+                        '{article.image}' => $articleCategory->image ?? null,
+                        '{article.keyword}' => $article->keyword ?? null,
+                        '{article.description}' => $article->description ?? null,
+                        '{article.short_content}' => $article->short_content ?? null,
+                    ];
+                    $categoryList .= Str::replace(array_keys($searchReplaceMap), $searchReplaceMap, $contentInsideCategoryList);
+                }
+                $websitePage->template = preg_replace('/{categorylist}(.*?){\/categorylist}/s', $categoryList, $websitePage->template);
+            }
+            $searchReplaceMap = [
+                '{category.title}' => $articleCategory->title ?? null,
+                '{category.content}' => $articleCategory->content ?? null,
+                '{category.feature_image}' => $articleCategory->feature_image ?? null,
+                '{category.image}' => $articleCategory->image ?? null,
+                '{category.keyword}' => $articleCategory->keyword ?? null,
+                '{category.description}' => $articleCategory->description ?? null,
+                '{category.short_content}' => $articleCategory->short_content ?? null,
+            ];
+        }
+        $websitePage->template = Str::replace(array_keys($searchReplaceMap), $searchReplaceMap, $websitePage->template);
+
+        return $websitePage;
     }
 }
