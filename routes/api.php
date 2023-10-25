@@ -1403,9 +1403,9 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'single-purpose'], function 
     });
 
     Route::group(['middleware' => ['role:root,admin,editor'], 'as' => 'author.'], function () {
-        Route::get('single-purposes', [SinglePurposeController::class, 'index']);
         Route::get('single-purpose/{id}', [SinglePurposeController::class, 'show']);
     });
+    Route::get('single-purposes', [SinglePurposeController::class, 'index']);
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'paragraph-type'], function () {
@@ -1416,9 +1416,9 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'paragraph-type'], function 
     });
 
     Route::group(['middleware' => ['role:root,admin,editor'], 'as' => 'author.'], function () {
-        Route::get('paragraph-types', [ParagraphTypeController::class, 'index']);
         Route::get('paragraph-type/{id}', [ParagraphTypeController::class, 'show']);
     });
+    Route::get('paragraph-types', [ParagraphTypeController::class, 'index']);
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'article-series'], function () {
