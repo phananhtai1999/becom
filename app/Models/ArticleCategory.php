@@ -137,6 +137,14 @@ class ArticleCategory extends AbstractModel
     }
 
     /**
+     * @return HasMany
+     */
+    public function articles()
+    {
+        return $this->hasMany(Article::class, 'article_category_uuid', 'uuid');
+    }
+
+    /**
      * @param Builder $query
      * @param $check
      * @return Builder|void
