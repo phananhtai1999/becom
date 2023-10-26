@@ -239,4 +239,14 @@ class AbstractRestAPIController extends BaseController
             return $this->sendValidationFailedJsonResponse();
         }
     }
+
+    public function getUserUuid() {
+        if(($this->user()->userTeam && !$this->user()->userTeam['is_blocked'])) {
+            $user_uuid = auth()->user()->userTeam->team->owner_uuid;
+        } else {
+            $user_uuid = auth()->user()->getkey();
+        }
+
+        return $user_uuid;
+    }
 }

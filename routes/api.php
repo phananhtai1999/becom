@@ -801,6 +801,7 @@ Route::get('/language/{id}', [LanguageController::class, 'show'])->name('languag
 //Article Category
 Route::group(['middleware' => ['auth:api'], 'as' => 'article-category.'], function () {
     Route::group(['middleware' => ['role:root,admin,editor'], 'as' => 'author.'], function () {
+        Route::post('/article-category', [ArticleCategoryController::class, 'store'])->name('store');
         Route::put('/article-category/{id}', [ArticleCategoryController::class, 'edit'])->name('edit');
 //        Route::delete('/article-category/{id}', [ArticleCategoryController::class, 'destroy'])->name('destroy');
         Route::get('/article-categories', [ArticleCategoryController::class, 'index'])->name('index');
@@ -808,7 +809,14 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'article-category.'], functi
         Route::put('/article-category/change-status/{id}', [ArticleCategoryController::class, 'changeStatus'])->name('changeStatus');
         Route::post('/delete-article-category/{id}', [ArticleCategoryController::class, 'deleteCategory']);
     });
-    Route::post('/article-category', [ArticleCategoryController::class, 'store'])->name('store');
+
+    Route::group(['as' => 'my.'], function () {
+        Route::get('/my/article-categories', [ArticleCategoryController::class, 'indexMy'])->name('indexMy');
+        Route::post('/my/article-category', [ArticleCategoryController::class, 'storeMy'])->name('storeMy');
+        Route::get('/my/article-category/{id}', [ArticleCategoryController::class, 'showMy'])->name('showMy');
+        Route::put('/my/article-category/{id}', [ArticleCategoryController::class, 'editMy'])->name('editMy');
+        Route::delete('/my/article-category/{id}', [ArticleCategoryController::class, 'destroyMy'])->name('destroyMy');
+    });
 
 });
 Route::get('public/article-categories', [ArticleCategoryController::class, 'indexPublic'])->name('article-categories-public.index');
