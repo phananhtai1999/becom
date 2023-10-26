@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
-use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\Article\ArticleCategoryRequest;
@@ -53,17 +52,86 @@ class ArticleCategoryController extends AbstractRestAPIController
     /**
      * @return JsonResponse
      */
-    public function store()
+    public function storeMy(ArticleCategoryRequest $request)
     {
-        $request = app($this->storeRequest);
-
-        if (!$this->languageService->checkLanguages($request->title)
-            || ($request->keyword && !$this->languageService->checkLanguages($request->keyword))
-            || ($request->description && !$this->languageService->checkLanguages($request->description))) {
+        if ($this->checkLanguageArticleCategory($request)) {
 
             return $this->sendValidationFailedJsonResponse();
         }
+        $user_uuid = $this->getUserUuid();
+        $model = $this->service->create(array_merge($request->all(), [
+            'user_uuid' => $user_uuid,
+            'description' => $request->keyword ? array_merge($request->keyword, $request->description ?? $request->keyword) : $request->description
+        ]));
 
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    public function indexMy(IndexRequest $request)
+    {
+        $user_uuid = $this->getUserUuid();
+        $articleCategories = $this->service->getCollectionWithPaginationByCondition($request, ['user_uuid' => $user_uuid]);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $articleCategories)
+        );
+    }
+
+    public function showMy($id)
+    {
+        $user_uuid = $this->getUserUuid();
+        $model = $this->service->findOneWhereOrFail([
+            ['user_uuid', $user_uuid],
+            ['uuid', $id]
+        ]);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    public function editMy($id)
+    {
+        $request = app($this->editRequest);
+        $user_uuid = $this->getUserUuid();
+        $model = $this->service->findOneWhereOrFail([
+            ['user_uuid', $user_uuid],
+            ['uuid', $id]
+        ]);
+        $this->service->update($model, array_merge($request->all(), [
+            'user_uuid' => $user_uuid,
+        ]));
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    public function destroyMy($id)
+    {
+        $user_uuid = $this->getUserUuid();
+        $model = $this->service->findOneWhereOrFail([
+            ['user_uuid', $user_uuid],
+            ['uuid', $id]
+        ]);
+        $this->service->destroy($model->uuid);
+
+        return $this->sendOkJsonResponse();
+    }
+
+
+    /**
+     * @return JsonResponse
+     */
+    public function store()
+    {
+        $request = app($this->storeRequest);
+        if ($this->checkLanguageArticleCategory($request)) {
+
+            return $this->sendValidationFailedJsonResponse();
+        }
         $model = $this->service->create(array_merge($request->all(), [
             'user_uuid' => auth()->user()->getKey(),
             'description' => $request->keyword ? array_merge($request->keyword, $request->description ?? $request->keyword) : $request->description
@@ -81,10 +149,7 @@ class ArticleCategoryController extends AbstractRestAPIController
     public function edit($id)
     {
         $request = app($this->editRequest);
-
-        if (($request->title && !$this->languageService->checkLanguages($request->title))
-            || ($request->keyword && !$this->languageService->checkLanguages($request->keyword))
-            || ($request->description && !$this->languageService->checkLanguages($request->description))) {
+        if ($this->checkLanguageArticleCategory($request)) {
 
             return $this->sendValidationFailedJsonResponse();
         }
@@ -177,5 +242,17 @@ class ArticleCategoryController extends AbstractRestAPIController
         $this->service->destroy($id);
 
         return $this->sendOkJsonResponse();
+    }
+
+    private function checkLanguageArticleCategory($request): bool
+    {
+        if (($request->title && !$this->languageService->checkLanguages($request->title))
+            || ($request->keyword && !$this->languageService->checkLanguages($request->keyword))
+            || ($request->description && !$this->languageService->checkLanguages($request->description))) {
+
+            return True;
+        }
+
+        return False;
     }
 }
