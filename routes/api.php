@@ -846,6 +846,14 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'article.'], function () {
         Route::get('/article/{id}', [ArticleController::class, 'show'])->name('show');
     });
 
+    Route::group(['as' => 'my.'], function () {
+        Route::get('/my/articles', [ArticleController::class, 'indexMy'])->name('indexMy');
+        Route::post('/my/article', [ArticleController::class, 'storeMy'])->name('storeMy');
+        Route::get('/my/article/{id}', [ArticleController::class, 'showMy'])->name('showMy');
+        Route::put('/my/article/{id}', [ArticleController::class, 'editMy'])->name('editMy');
+        Route::delete('/my/article/{id}', [ArticleController::class, 'destroyMy'])->name('destroyMy');
+    });
+
     Route::group(['middleware' => ['role:root,admin,editor']], function () {
         Route::get('/unpublished-articles', [ArticleController::class, 'indexUnpublishedArticle'])->name('index-unpublished');
         Route::get('/unpublished-article/{id}', [ArticleController::class, 'showUnpublishedArticle'])->name('show-unpublished');
