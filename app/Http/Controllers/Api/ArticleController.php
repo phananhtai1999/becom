@@ -470,6 +470,35 @@ class ArticleController extends AbstractRestAPIController
         return $this->sendOkJsonResponse();
     }
 
+
+    public function changeStatusMyArticle(ChangeStatusArticleRequest $request)
+    {
+        $articleUuids = $request->articles;
+        foreach ($articleUuids as $articleUuid) {
+            $user_uuid = $this->getUserUuid();
+            $model = $this->service->findOneWhere([
+                ['user_uuid', $user_uuid],
+                ['uuid', $articleUuid]
+            ]);
+            if ($model) {
+                $list_reason = $model->reject_reason;
+                if ($request->get('publish_status') == Article::REJECT_PUBLISH_STATUS) {
+                    $list_reason[] = [
+                        'content' => $request->get('reject_reason'),
+                        'created_at' => Carbon::now()
+                    ];
+                }
+                $this->service->update($model, [
+                    'publish_status' => $request->get('publish_status'),
+                    'reject_reason' => $list_reason,
+                    'content_for_user' => $request->get('content_for_user') ?? $model->content_for_user,
+                ]);
+            }
+        }
+
+        return $this->sendOkJsonResponse();
+    }
+
     public function deleteMy($id)
     {
         $user_uuid = $this->getUserUuid();

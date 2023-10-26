@@ -852,6 +852,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'article.'], function () {
         Route::get('/my/article/{id}', [ArticleController::class, 'showMy'])->name('showMy');
         Route::put('/my/article/{id}', [ArticleController::class, 'editMy'])->name('editMy');
         Route::delete('/my/article/{id}', [ArticleController::class, 'destroyMy'])->name('destroyMy');
+        Route::post('my/article/change-status', [ArticleController::class, 'changeStatusMyArticle'])->name('changeStatusArticle');
     });
 
     Route::group(['middleware' => ['role:root,admin,editor']], function () {
