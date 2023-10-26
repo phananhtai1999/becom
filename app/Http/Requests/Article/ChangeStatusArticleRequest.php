@@ -38,17 +38,6 @@ class ChangeStatusArticleRequest extends AbstractRequest
             'content_for_user' => ['nullable', 'string', 'in:public,login,payment,editor,admin'],
         ];
 
-        //Check role editor
-        if (!auth()->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ADMIN_ROOT])->count())
-        {
-            $validate['publish_status'] = ['required', 'numeric', Rule::in(Article::PENDING_PUBLISH_STATUS, Article::DRAFT_PUBLISH_STATUS)];
-            $validate['articles.*'] = ['numeric', 'min:1', Rule::exists('articles', 'uuid')->where(function ($query) {
-                return $query->where([
-                    ['publish_status', '<>', $this->request->get('publish_status')],
-                ])->whereNull('deleted_at');
-            })];
-        }
-
         if ($this->request->get('publish_status') == Article::REJECT_PUBLISH_STATUS) {
             $validate['reject_reason'] = ['required', 'string'];
         }
