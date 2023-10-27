@@ -8,6 +8,7 @@ use App\Http\Requests\Article\ChangeStatusArticleRequest;
 use App\Http\Requests\Article\UnpublishedArticleRequest;
 use App\Http\Requests\Article\UpdateUnpublishedArticleRequest;
 use App\Http\Requests\ArticleRequest;
+use App\Http\Requests\ChangeStatusMyArticleRequest;
 use App\Http\Requests\ChartRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyArticleRequest;
@@ -471,7 +472,7 @@ class ArticleController extends AbstractRestAPIController
     }
 
 
-    public function changeStatusMyArticle(ChangeStatusArticleRequest $request)
+    public function changeStatusMyArticle(ChangeStatusMyArticleRequest $request)
     {
         $articleUuids = $request->articles;
         foreach ($articleUuids as $articleUuid) {
