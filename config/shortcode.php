@@ -8,8 +8,6 @@ return [
         'category.keyword',
         'category.description',
         'category.short_content',
-        'categorylist',
-        '/categorylist',
     ],
     'article' => [
         'article.title',
