@@ -84,6 +84,9 @@ class WebsitePageController extends AbstractRestAPIController
             $articlesResource = $this->articleService->resourceCollectionToData(ArticleResourceCollection::class, $articles);
             $websitePage = $this->service->renderContent($websitePage, null, $articleCategory, $articles);
             $response = $this->sendOkJsonResponse(['data' => $websitePage, 'links' => $articlesResource['links'], 'meta' => $articlesResource['meta']]);
+        } elseif ($websitePage->type == WebsitePage::HOME_ARTICLES_TYPE) {
+            $websitePage = $this->service->renderContentForHomeArticles($websitePage);
+            $response = $this->sendOkJsonResponse(['data' => $websitePage]);
         }
 
         return $response;

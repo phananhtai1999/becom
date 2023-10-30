@@ -2,6 +2,7 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
+use App\Models\Article;
 use App\Rules\ArticleContentRule;
 use Illuminate\Validation\Rule;
 
@@ -40,7 +41,7 @@ class MyArticleRequest extends AbstractRequest
             'description' => ['nullable', 'array'],
             'description.en' => ['required_with:description', 'string', 'not_in:0'],
             'description.*' => ['required_with:description', 'string'],
-            'publish_status' => ['numeric', 'min:1', 'max:5'],
+            'publish_status' => ['required','numeric', 'min:1', 'max:5'],
             'content_for_user' => ['nullable', 'string', 'in:public,login,payment,editor,admin'],
             'article_category_uuid' => ['nullable', 'numeric', 'min:1', Rule::exists('article_categories', 'uuid')->whereNull('deleted_at')],
             'content_type' => ['required', 'string', 'in:single,paragraph'],
@@ -50,8 +51,8 @@ class MyArticleRequest extends AbstractRequest
                 return $query->whereNull('article_uuid')->whereNotNull('parent_uuid')->whereNull('deleted_at');
             })],
         ];
-        if (empty(auth()->user()->team)) {
-            $validate['publish_status'] = array_merge(['required'], $validate['publish_status']);
+        if (auth()->user()->team) {
+            $validate['publish_status'] = array_merge([Rule::in([Article::PENDING_PUBLISH_STATUS, Article::DRAFT_PUBLISH_STATUS])], $validate['publish_status']);
         }
         if ($this->request->get('content_type') === 'single') {
             $validate['paragraph_type_uuid'] = ['nullable', 'in:NULL'];
