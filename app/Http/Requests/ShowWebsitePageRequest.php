@@ -32,7 +32,7 @@ class ShowWebsitePageRequest extends FormRequest
         $websitePage = WebsitePage::find($this->id);
         if ($websitePage->type == WebsitePage::ARTICLE_DETAIL_TYPE) {
             $validate['article_slug'] = ['required', 'exists:articles,slug'];
-        } else {
+        } elseif ($websitePage->type == WebsitePage::ARTICLE_CATEGORY_TYPE) {
             $validate['article_category_slug'] = ['required', 'exists:article_categories,slug'];
         }
 

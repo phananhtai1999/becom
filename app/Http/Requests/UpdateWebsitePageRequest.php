@@ -33,7 +33,7 @@ class UpdateWebsitePageRequest extends AbstractRequest
             'template' => ['string'],
             'template_json' => ['string'],
             'website_page_category_uuid' => ['numeric', Rule::exists('website_page_categories','uuid')->whereNull('deleted_at')],
-            'type' => ['string', Rule::in(WebsitePage::STATIC_TYPE,WebsitePage::ARTICLE_DETAIL_TYPE, WebsitePage::ARTICLE_CATEGORY_TYPE,)],
+            'type' => ['string', Rule::in(WebsitePage::STATIC_TYPE,WebsitePage::ARTICLE_DETAIL_TYPE, WebsitePage::ARTICLE_CATEGORY_TYPE, WebsitePage::HOME_ARTICLES_TYPE)],
             'publish_status' => ['numeric', 'min:1', 'max:4'],
             'is_default' => ['boolean'],
             'display_type' => ['string', 'in:page,in_page'],

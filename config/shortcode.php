@@ -4,7 +4,7 @@ return [
         'category.title',
         'category.content',
         'category.image',
-        'article.feature_image',
+        'category.feature_image',
         'category.keyword',
         'category.description',
         'category.short_content',
@@ -15,9 +15,18 @@ return [
         'article.title',
         'article.content',
         'article.image',
-        'category.video',
+        'article.video',
         'article.keyword',
         'article.description',
         'article.short_content',
+    ],
+    'home_article' => [
+        'home_article.title',
+        'home_article.content',
+        'home_article.image',
+        'home_article.video',
+        'home_article.keyword',
+        'home_article.description',
+        'home_article.short_content'
     ]
 ];

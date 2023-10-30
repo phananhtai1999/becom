@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Abstracts\AbstractService;
+use App\Models\Article;
 use App\Models\QueryBuilders\WebsitePageQueryBuilder;
 use App\Models\Website;
 use App\Models\WebsitePage;
@@ -135,7 +136,7 @@ class WebsitePageService extends AbstractService
         return $webpage ?? abort(404);
     }
 
-    public function renderContent($websitePage, $article = null, $articleCategory = null, $articles = null)
+    public function renderContent($websitePage, $article = null, $articleCategory = null, $articles = null, $homeArticles = null)
     {
         if ($websitePage->type == WebsitePage::ARTICLE_DETAIL_TYPE) {
             $searchReplaceMap = [
@@ -147,7 +148,7 @@ class WebsitePageService extends AbstractService
                 '{article.description}' => $article->description ?? null,
                 '{article.short_content}' => $article->short_content ?? null,
             ];
-        } else {
+        } elseif ($websitePage->type == WebsitePage::ARTICLE_CATEGORY_TYPE) {
             if (preg_match('/{categorylist}(.*?){\/categorylist}/s', $websitePage->template, $matches)) {
                 $contentInsideCategoryList = $matches[1];
                 $categoryList = '';
@@ -176,6 +177,35 @@ class WebsitePageService extends AbstractService
             ];
         }
         $websitePage->template = Str::replace(array_keys($searchReplaceMap), $searchReplaceMap, $websitePage->template);
+
+        return $websitePage;
+    }
+
+    public function renderContentForHomeArticles($websitePage) {
+        $pattern = '/data-article-count="(\d+)"/';
+        preg_match($pattern, $websitePage->template, $articleCount);
+        $articleCount = isset($articleCount[1]) ? (int)$articleCount[1] : 10;
+
+        $articles_data = Article::orderBy('created_at', 'DESC')->paginate($articleCount);
+        $pattern = '/<article.*?>(.*?)<\/article>/s';
+        $websitePage->template = preg_replace_callback($pattern, function ($matches) use ($articles_data) {
+            $article_data = $articles_data->shift();
+            if (!$article_data) {
+                return $matches[0];
+            }
+
+            $searchReplaceMap = [
+                '{home_article.title}' => $article_data->title ?? null,
+                '{home_article.content}' => $article_data->content ?? null,
+                '{home_article.video}' => $article_data->video ?? null,
+                '{home_article.image}' => $article_data->image ?? null,
+                '{home_article.keyword}' => $article_data->keyword ?? null,
+                '{home_article.description}' => $article_data->description ?? null,
+                '{home_article.short_content}' => $article_data->short_content ?? null,
+            ];
+
+            return str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $matches[0]);
+        }, $websitePage->template);
 
         return $websitePage;
     }

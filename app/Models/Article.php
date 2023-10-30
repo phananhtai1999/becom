@@ -200,7 +200,7 @@ class Article extends AbstractModel
      */
     public function getTitlesAttribute()
     {
-        return app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('title') : $this->title;
+        return $this->getTranslations('title');
     }
 
     public function getKeywordsAttribute()
