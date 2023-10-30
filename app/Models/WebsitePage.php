@@ -26,6 +26,7 @@ class WebsitePage extends AbstractModel
     const STATIC_TYPE = 'static';
     const ARTICLE_DETAIL_TYPE = 'article_detail';
     const ARTICLE_CATEGORY_TYPE = 'article_category';
+    const HOME_ARTICLES_TYPE = 'home_articles';
 
     /**
      * @var string
