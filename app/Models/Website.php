@@ -15,7 +15,10 @@ class Website extends AbstractModel
     use HasFactory;
 
     const PUBLISHED_PUBLISH_STATUS = 1;
-    const PENDING_PUBLISH_STATUS = 2;
+    const BLOCKED_PUBLISH_STATUS = 2;
+    const PENDING_PUBLISH_STATUS = 3;
+    const REJECT_PUBLISH_STATUS = 4;
+    const DRAFT_PUBLISH_STATUS = 5;
 
     /**
      * @var string[]
