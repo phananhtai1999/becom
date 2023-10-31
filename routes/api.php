@@ -1343,6 +1343,16 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website'], function () {
         Route::delete('my/website/{id}', [WebsiteController::class, 'destroyMy'])->name('destroy');
         Route::post('my/websites/change-status', [WebsiteController::class, 'changeStatusMyWebsite'])->name('changeStatusMyWebsite');
     });
+
+    Route::group(['middleware' => ['role:root,admin,editor']], function () {
+        Route::get('/unpublished-websites', [WebsiteController::class, 'indexUnpublishedWebsite'])->name('index-unpublished-website');
+        Route::get('/unpublished-website/{id}', [WebsiteController::class, 'showUnpublishedWebsite'])->name('show-unpublished-website');
+        Route::put('/unpublished-website/{id}', [WebsiteController::class, 'editUnpublishedWebsite'])->name('edit-unpublished-website');
+        //Check role editor for change status
+        Route::post('article/change-status', [WebsiteController::class, 'changeStatusArticle'])->name('changeStatusArticle');
+    });
+
+    Route::post('/unpublished-website', [WebsiteController::class, 'storeUnpublishedWebsite'])->name('store-unpublished-website');
 });
 Route::get('public/website/{id}', [WebsiteController::class, 'show'])->name('website.show');
 Route::get('public/website', [WebsiteController::class, 'publicWebsiteByDomainAndPublishStatus'])->name('website.public');

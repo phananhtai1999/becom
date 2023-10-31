@@ -13,9 +13,12 @@ use App\Http\Requests\ChangeStatusMyWebsite;
 use App\Http\Requests\ChangeStatusWebsite;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyWebsiteRequest;
+use App\Http\Requests\UnpublishedWebsiteRequest;
 use App\Http\Requests\UpdateMyWebsiteRequest;
+use App\Http\Requests\UpdateUnpublishedWebsiteRequest;
 use App\Http\Resources\WebsiteResource;
 use App\Http\Resources\WebsiteResourceCollection;
+use App\Models\Article;
 use App\Models\Website;
 use App\Services\MyWebsiteService;
 use App\Services\WebsiteService;
@@ -146,6 +149,67 @@ class WebsiteController extends AbstractRestAPIController
     public function publicWebsiteByDomainAndPublishStatus(IndexRequest $request)
     {
         $model = $this->service->publicWebsiteByDomainAndPublishStatus($request->domain_name);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    public function storeUnpublishedWebsite(UnpublishedWebsiteRequest $request)
+    {
+        $model = $this->myService->create(
+            array_merge([
+                "user_uuid" => auth()->user()->getKey(),
+                "publish_status" => Website::PENDING_PUBLISH_STATUS,
+            ], $request->all())
+        );
+
+        $model->websitePages()->attach($this->getWebsitePagesByRequest($request->get("website_pages", [])));
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    public function indexUnpublishedWebsite(IndexRequest $request)
+    {
+        $models = $this->service->getCollectionWithPaginationByCondition($request,
+            ['publish_status' => Article::PENDING_PUBLISH_STATUS]);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+        );
+    }
+
+    public function editUnpublishedWebsite($id, UpdateUnpublishedWebsiteRequest $request)
+    {
+        $model = $this->myService->showMyWebsite($id);
+
+        $this->myService->update(
+            $model,
+            $request->except(["user_uuid", "publish_status"])
+        );
+
+        $model
+            ->websitePages()
+            ->sync(
+                $this->getWebsitePagesByRequest(
+                    $request->get("website_pages", [])
+                )
+            );
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    public function showUnpublishedWebsite($id)
+    {
+        $model = $this->service->findOneWhereOrFail([
+            'user_uuid' => auth()->user()->getkey(),
+            'publish_status' => Article::PENDING_PUBLISH_STATUS,
+            'uuid' => $id
+        ]);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
