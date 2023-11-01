@@ -239,4 +239,20 @@ class WebsiteController extends AbstractRestAPIController
 
         return $this->sendOkJsonResponse();
     }
+
+    /**
+     * @param ChangeStatusWebsiteRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
+    public function defaultWebsites(IndexRequest $request)
+    {
+        $models = $this->service->getCollectionWithPaginationByCondition($request, [
+            ['domain_uuid', null],
+        ]);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+        );
+    }
 }
