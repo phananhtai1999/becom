@@ -199,7 +199,7 @@ class WebsiteController extends AbstractRestAPIController
 
         $this->myService->update(
             $model,
-            $request->except(["user_uuid", "publish_status"])
+            $request->except(["user_uuid"])
         );
 
         $model
