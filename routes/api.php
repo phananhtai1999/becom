@@ -1349,7 +1349,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website'], function () {
         Route::get('/unpublished-website/{id}', [WebsiteController::class, 'showUnpublishedWebsite'])->name('show-unpublished-website');
         Route::put('/unpublished-website/{id}', [WebsiteController::class, 'editUnpublishedWebsite'])->name('edit-unpublished-website');
         //Check role editor for change status
-        Route::post('article/change-status', [WebsiteController::class, 'changeStatusArticle'])->name('changeStatusArticle');
+        Route::post('unpublished-websites/change-status', [WebsiteController::class, 'changeStatusWebsite'])->name('change-status-website');
     });
 
     Route::post('/unpublished-website', [WebsiteController::class, 'storeUnpublishedWebsite'])->name('store-unpublished-website');
