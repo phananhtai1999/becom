@@ -19,4 +19,11 @@ class UserTeamService extends AbstractService
             ->where('team_uuid', $id)
             ->paginate($request['per_page'], $request['columns'], $request['page_name'], $request['page']);
     }
+
+    public function listTeamMemberOfAllTeam($request)
+    {
+        $request = $this->getIndexRequest($request);
+        return $this->modelQueryBuilderClass::searchQuery($request['search'], $request['search_by'])
+            ->paginate($request['per_page'], $request['columns'], $request['page_name'], $request['page']);
+    }
 }
