@@ -31,7 +31,7 @@ class ChangeStatusAssetRequest extends AbstractRequest
         ];
 
         //Check role editor
-        if (!auth()->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ADMIN_ROOT])->count())
+        if (!auth()->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->count())
         {
             $validate['status'] = ['required', Rule::in(Asset::PENDING_STATUS, Asset::DRAFT_STATUS)];
         }

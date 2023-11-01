@@ -67,7 +67,7 @@ class AutoDeleteDraftArticleOfEditor extends Command
         $draftArticles = $this->articleService->findAllWhere([['publish_status', Article::DRAFT_PUBLISH_STATUS]]);
         foreach ($draftArticles as $article) {
             //Check role user
-            $roleAdminAndRoot = optional(optional(optional($this->userService->findOneWhere([['uuid', $article->user_uuid]]))->roles)->whereIn('slug', [Role::ADMIN_ROOT, Role::ROLE_ROOT]))->count();
+            $roleAdminAndRoot = optional(optional(optional($this->userService->findOneWhere([['uuid', $article->user_uuid]]))->roles)->whereIn('slug', [Role::ROLE_ADMIN, Role::ROLE_ROOT]))->count();
             $config = $this->configService->findConfigByKey('time_allowed_view_articles_of_editor');
             //Delete Article role editor
             if (!$roleAdminAndRoot && $config) {

@@ -247,7 +247,7 @@ class UserService extends AbstractService
             return false;
         }
 
-        return auth()->user()->roles->whereIn('slug', [Role::ADMIN_ROOT, Role::ROLE_ROOT, Role::ROLE_EDITOR])->count();
+        return auth()->user()->roles->whereIn('slug', [Role::ROLE_ADMIN, Role::ROLE_ROOT, Role::ROLE_EDITOR])->count();
     }
 
     /**
@@ -259,7 +259,7 @@ class UserService extends AbstractService
             return false;
         }
 
-        return auth()->user()->roles->whereIn('slug', [Role::ADMIN_ROOT, Role::ROLE_ROOT])->count();
+        return auth()->user()->roles->whereIn('slug', [Role::ROLE_ADMIN, Role::ROLE_ROOT])->count();
     }
 
     public function getUsersByRole($role)
@@ -298,7 +298,7 @@ class UserService extends AbstractService
     {
         if (auth()->user()->roles->whereIn('slug', Role::ROLE_ROOT)->count()) {
             $char = 'r' . auth()->user()->getkey();
-        } elseif (auth()->user()->roles->whereIn('slug', [Role::ADMIN_ROOT])->count()) {
+        } elseif (auth()->user()->roles->whereIn('slug', [Role::ROLE_ADMIN])->count()) {
             $char = 'a' . auth()->user()->getkey();
         } elseif (auth()->user()->roles->whereIn('slug', [Role::ROLE_EDITOR])->count()) {
             $char = 'e' . auth()->user()->getkey();

@@ -89,7 +89,7 @@ class ConfigService extends AbstractService
     {
         //Check auth:api
         $check = false;
-        if (auth()->guest() || !optional(optional(optional(auth()->user())->roles)->whereIn('slug', [Role::ROLE_ROOT, Role::ADMIN_ROOT]))->count()) {
+        if (auth()->guest() || !optional(optional(optional(auth()->user())->roles)->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN]))->count()) {
             $check = true;
         }
 
