@@ -9,8 +9,10 @@ use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestMyDestroyTrait;
 use App\Http\Controllers\Traits\RestMyShowTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
+use App\Http\Requests\Article\ChangeStatusArticleRequest;
 use App\Http\Requests\ChangeStatusMyWebsite;
 use App\Http\Requests\ChangeStatusWebsite;
+use App\Http\Requests\ChangeStatusWebsiteRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyWebsiteRequest;
 use App\Http\Requests\UnpublishedWebsiteRequest;
@@ -22,6 +24,7 @@ use App\Models\Article;
 use App\Models\Website;
 use App\Services\MyWebsiteService;
 use App\Services\WebsiteService;
+use Carbon\Carbon;
 use Techup\SiteController\Facades\SiteController;
 use DB;
 
@@ -59,9 +62,7 @@ class WebsiteController extends AbstractRestAPIController
             ])
         );
 
-        $model
-            ->websitePages()
-            ->attach(
+        $model->websitePages()->attach(
                 $this->getWebsitePagesByRequest(
                     $request->get("website_pages", [])
                 )
@@ -95,6 +96,17 @@ class WebsiteController extends AbstractRestAPIController
     }
 
     public function getWebsitePagesByRequest($webpages)
+    {
+        return collect($webpages)->map(function ($webpage) {
+            return [
+                "website_page_uuid" => $webpage["uuid"],
+                "is_homepage" => $webpage["is_homepage"] ?? 0,
+                "ordering" => $webpage["ordering"],
+            ];
+        });
+    }
+
+    public function validateWebsitePagesByRequest($webpages)
     {
         return collect($webpages)->map(function ($webpage) {
             return [
@@ -187,7 +199,7 @@ class WebsiteController extends AbstractRestAPIController
 
         $this->myService->update(
             $model,
-            $request->except(["user_uuid", "publish_status"])
+            $request->except(["user_uuid"])
         );
 
         $model
@@ -214,5 +226,17 @@ class WebsiteController extends AbstractRestAPIController
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
         );
+    }
+
+    /**
+     * @param ChangeStatusWebsiteRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
+    public function changeStatusWebsite(ChangeStatusWebsiteRequest $request)
+    {
+        $this->changeStatusWebsiteByRequest($request);
+
+        return $this->sendOkJsonResponse();
     }
 }
