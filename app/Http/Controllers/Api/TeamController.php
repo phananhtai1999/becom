@@ -28,6 +28,7 @@ use App\Mail\SendInviteToTeam;
 use App\Mail\SendInviteToTeamByAccount;
 use App\Models\Invite;
 use App\Models\PlatformPackage;
+use App\Models\Role;
 use App\Models\Team;
 use App\Services\ContactListService;
 use App\Services\InviteService;
@@ -253,6 +254,28 @@ class TeamController extends Controller
     public function listMember(IndexRequest $request, $id)
     {
         $model = $this->userTeamService->listTeamMember($id, $request);
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->userTeamResourceCollectionClass, $model)
+        );
+    }
+
+    /**
+     * @param IndexRequest $request
+     * @param $id
+     * @return JsonResponse
+     */
+    public function listMemberOfAllTeam(IndexRequest $request)
+    {
+        if ($this->user()->roles->whereIn('slug', [Role::ROLE_ADMIN, Role::ROLE_ROOT])->first()) {
+            $model = $this->userTeamService->listTeamMemberOfAllTeam($request);
+        } else {
+            if ($this->user()->userTeam) {
+                $model = $this->userTeamService->listTeamMember($this->user()->userTeam->team_uuid, $request);
+            } else {
+                $model = [];
+            }
+        }
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->userTeamResourceCollectionClass, $model)

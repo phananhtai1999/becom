@@ -27,7 +27,7 @@ class ArticleSeriesRule implements Rule
     public function passes($attribute, $value)
     {
         $user = (new  UserService())->findOneById($value);
-        $role = optional(optional(optional($user)->roles)->whereIn('slug', [Role::ADMIN_ROOT, Role::ROLE_ROOT]))->count();
+        $role = optional(optional(optional($user)->roles)->whereIn('slug', [Role::ROLE_ADMIN, Role::ROLE_ROOT]))->count();
         $roleEditor = optional(optional(optional($user)->roles)->whereIn('slug', [Role::ROLE_EDITOR]))->count();
 
         if ($user && $roleEditor && !$role)

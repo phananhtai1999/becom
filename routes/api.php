@@ -1069,6 +1069,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'team.'], function () {
         Route::delete('/team/{id}', [TeamController::class, 'destroy'])->name('destroy');
     });
 
+    Route::get('/all-member', [TeamController::class, 'listMemberOfAllTeam'])->name('listMemberOfAllTeam');
     Route::get('/list-member/{id}', [TeamController::class, 'listMember'])->name('listMember');
     Route::get('/join-team', [TeamController::class, 'joinTeam'])->name('joinTeam');
     Route::get('/invite-user', [TeamController::class, 'inviteUser'])->name('inviteUser');

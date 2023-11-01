@@ -348,7 +348,7 @@ class ArticleController extends AbstractRestAPIController
      */
     public function indexUnpublishedArticle(IndexRequest $request)
     {
-        $role = auth()->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ADMIN_ROOT])->count();
+        $role = auth()->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->count();
         $config = $this->configService->findConfigByKey('time_allowed_view_articles_of_editor');
         //Role editor limit by config days
         if (!$role && $config) {
