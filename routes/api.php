@@ -1352,6 +1352,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website'], function () {
         Route::post('unpublished-websites/change-status', [WebsiteController::class, 'changeStatusWebsite'])->name('change-status-website');
     });
 
+    Route::get('/default-websites', [WebsiteController::class, 'defaultWebsites'])->name('default-websites');
     Route::post('/unpublished-website', [WebsiteController::class, 'storeUnpublishedWebsite'])->name('store-unpublished-website');
 });
 Route::get('public/website/{id}', [WebsiteController::class, 'show'])->name('website.show');

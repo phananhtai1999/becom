@@ -32,12 +32,11 @@ class ChangeStatusWebsite extends AbstractRequest
             'numeric',
             'min:1',
             Rule::exists('websites', 'uuid')->where(function ($query) {
-                return $query->where('user_uuid', auth()->user()->getKey())
-                    ->where('publish_status', '<>', $this->request->get('publish_status'));
+                return $query->where('publish_status', '<>', $this->request->get('publish_status'));
             }),
             function ($attribute, $value, $fail) {
                 $website = Website::find($value);
-               
+
                 $isVerified = ($website && $website->domain && $website->domain->verified_at);
                 if (!$isVerified && $this->request->get('publish_status') == Website::PUBLISHED_PUBLISH_STATUS) {
                     $fail(__('messages.domain_must_active'));
