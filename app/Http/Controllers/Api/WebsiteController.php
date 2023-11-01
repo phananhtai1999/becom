@@ -62,9 +62,7 @@ class WebsiteController extends AbstractRestAPIController
             ])
         );
 
-        $model
-            ->websitePages()
-            ->attach(
+        $model->websitePages()->attach(
                 $this->getWebsitePagesByRequest(
                     $request->get("website_pages", [])
                 )
@@ -98,6 +96,17 @@ class WebsiteController extends AbstractRestAPIController
     }
 
     public function getWebsitePagesByRequest($webpages)
+    {
+        return collect($webpages)->map(function ($webpage) {
+            return [
+                "website_page_uuid" => $webpage["uuid"],
+                "is_homepage" => $webpage["is_homepage"] ?? 0,
+                "ordering" => $webpage["ordering"],
+            ];
+        });
+    }
+
+    public function validateWebsitePagesByRequest($webpages)
     {
         return collect($webpages)->map(function ($webpage) {
             return [
@@ -190,7 +199,7 @@ class WebsiteController extends AbstractRestAPIController
 
         $this->myService->update(
             $model,
-            $request->except(["user_uuid", "publish_status"])
+            $request->except(["user_uuid"])
         );
 
         $model

@@ -109,14 +109,18 @@ class ArticleCategoryController extends AbstractRestAPIController
         );
     }
 
-    public function destroyMy($id)
+    public function destroyMy($id, DestroyArticleCategoryRequest $request)
     {
-        $user_uuid = $this->getUserUuid();
-        $model = $this->service->findOneWhereOrFail([
-            ['user_uuid', $user_uuid],
-            ['uuid', $id]
-        ]);
-        $this->service->destroy($model->uuid);
+        $articleCategory = $this->service->findOrFailById($id);
+        $catsChildAndSelf = $articleCategory->getDescendantsAndSelf()->pluck('uuid');
+
+        $goCatUuid = $request->get('article_category_uuid');
+        $articles = $this->articleService->findAllWhereIn('article_category_uuid', $catsChildAndSelf, ['uuid', 'article_category_uuid']);
+        if (($articles->count() > 0 && !$goCatUuid) || (in_array($goCatUuid, $catsChildAndSelf->toArray()))) {
+            return $this->sendValidationFailedJsonResponse(["errors" => ["article_category_uuid" => "The selected article category uuid is invalid"]]);
+        }
+        $this->articleService->moveArticlesCategoryOfArticles($articles, $goCatUuid);
+        $this->service->destroy($id);
 
         return $this->sendOkJsonResponse();
     }

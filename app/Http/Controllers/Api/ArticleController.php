@@ -144,7 +144,7 @@ class ArticleController extends AbstractRestAPIController
         $checkContent = $request->content ? array_merge($model->getTranslations('content'), $request->content) : $model->getTranslations('content');
         $content = $this->service->mapTypeLabelToContent($checkContent, $model->content_type);
         //Generate description by keyword and value lang != null
-        $description = array_merge(\request('keyword', []), !empty($model->descriptions) ? [$model->descriptions] : [], array_filter(\request('description', []), function ($value) {
+        $description = array_merge(\request('keyword', []), !empty($model->descriptions) ? $model->descriptions : [], array_filter(\request('description', []), function ($value) {
             return $value !== null;
         }));
 

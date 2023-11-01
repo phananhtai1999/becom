@@ -7,6 +7,7 @@ use App\Models\SectionTemplate;
 use App\Rules\CheckUniqueSlugWebsitePageRule;
 use App\Rules\CheckWebsiteDomainRule;
 use App\Rules\CheckWebsitePagesRule;
+use App\Rules\UniqueWebsitePage;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -57,7 +58,7 @@ class UnpublishedWebsiteRequest extends FormRequest
                     $q->where('user_uuid', auth()->user()->getKey())
                         ->orWhere('is_default', true);
                 })->whereNull('deleted_at');
-            }), new CheckUniqueSlugWebsitePageRule($this->request->get('website_pages'))],
+            }), new CheckUniqueSlugWebsitePageRule($this->request->get('website_pages')), new UniqueWebsitePage($this->request->get('website_pages'))],
             'website_pages.*.is_homepage' => ['nullable', 'boolean'],
             'website_pages.*.ordering' => ['nullable', 'numeric', 'min:1'],
             'tracking_ids' => ['nullable', 'array'],
