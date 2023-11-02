@@ -253,7 +253,7 @@ class TeamController extends Controller
      */
     public function listMember(IndexRequest $request, $id)
     {
-        $model = $this->userTeamService->listTeamMember($id, $request);
+        $model = $this->userTeamService->listTeamMember([$id], $request);
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->userTeamResourceCollectionClass, $model)
@@ -270,8 +270,11 @@ class TeamController extends Controller
         if ($this->user()->roles->whereIn('slug', [Role::ROLE_ADMIN, Role::ROLE_ROOT])->first()) {
             $model = $this->userTeamService->listTeamMemberOfAllTeam($request);
         } else {
+            $team_uuids = $this->service->findAllWhere(['owner_uuid' => $this->user()->getKey()])->pluck('uuid');
             if ($this->user()->userTeam) {
-                $model = $this->userTeamService->listTeamMember($this->user()->userTeam->team_uuid, $request);
+                $model = $this->userTeamService->listTeamMember([$this->user()->userTeam->team_uuid], $request);
+            } elseif($team_uuids){
+                $model = $this->userTeamService->listTeamMember($team_uuids, $request);
             } else {
                 $model = [];
             }
