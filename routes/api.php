@@ -1334,6 +1334,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website'], function () {
         Route::get('website/{id}', [WebsiteController::class, 'show'])->name('show');
         Route::delete('website/{id}', [WebsiteController::class, 'destroy'])->name('destroy');
         Route::post('websites/change-status', [WebsiteController::class, 'changeStatus'])->name('changeStatus');
+        Route::post('websites/change-status-default', [WebsiteController::class, 'changeStatusDefaultWebsite'])->name('changeStatus');
     });
 
     Route::group(['as' => 'my.'], function () {

@@ -10,6 +10,7 @@ use App\Http\Controllers\Traits\RestMyDestroyTrait;
 use App\Http\Controllers\Traits\RestMyShowTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\Article\ChangeStatusArticleRequest;
+use App\Http\Requests\ChangeStatusDefaultWebsiteRequest;
 use App\Http\Requests\ChangeStatusMyWebsite;
 use App\Http\Requests\ChangeStatusWebsite;
 use App\Http\Requests\ChangeStatusWebsiteRequest;
@@ -21,6 +22,7 @@ use App\Http\Requests\UpdateUnpublishedWebsiteRequest;
 use App\Http\Resources\WebsiteResource;
 use App\Http\Resources\WebsiteResourceCollection;
 use App\Models\Article;
+use App\Models\Role;
 use App\Models\Website;
 use App\Services\MyWebsiteService;
 use App\Services\WebsiteService;
@@ -247,12 +249,29 @@ class WebsiteController extends AbstractRestAPIController
      */
     public function defaultWebsites(IndexRequest $request)
     {
-        $models = $this->service->getCollectionWithPaginationByCondition($request, [
-            ['domain_uuid', null],
-        ]);
+        if (auth()->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->count()) {
+            $models = $this->service->getDefaultWebsiteForAdmin($request);
+        } else {
+            $models = $this->service->getCollectionWithPaginationByCondition($request, [
+                'domain_uuid' => null,
+                'publish_status' => Website::PUBLISHED_PUBLISH_STATUS,
+            ]);
+        }
 
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
         );
+    }
+
+    public function changeStatusDefaultWebsite(ChangeStatusDefaultWebsiteRequest $request)
+    {
+        foreach ($request->websites as $websiteUuid) {
+            $website = $this->service->findOneById($websiteUuid);
+            $this->service->update($website, [
+                "publish_status" => $request->get("publish_status"),
+            ]);
+        }
+
+        return $this->sendOkJsonResponse();
     }
 }
