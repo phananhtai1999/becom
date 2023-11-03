@@ -19,6 +19,7 @@ use App\Http\Requests\MyWebsiteRequest;
 use App\Http\Requests\UnpublishedWebsiteRequest;
 use App\Http\Requests\UpdateMyWebsiteRequest;
 use App\Http\Requests\UpdateUnpublishedWebsiteRequest;
+use App\Http\Requests\WebsiteRequest;
 use App\Http\Resources\WebsiteResource;
 use App\Http\Resources\WebsiteResourceCollection;
 use App\Models\Article;
@@ -53,6 +54,22 @@ class WebsiteController extends AbstractRestAPIController
         $this->indexRequest = IndexRequest::class;
     }
 
+    public function store(WebsiteRequest $request)
+    {
+        $model = $this->myService->create(
+            array_merge([
+                "user_uuid" => auth()->user()->getKey(),
+                "publish_status" => Website::PUBLISHED_PUBLISH_STATUS,
+            ], $request->all())
+        );
+
+        $model->websitePages()->attach($this->getWebsitePagesByRequest($request->get("website_pages", [])));
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
     public function storeMy(MyWebsiteRequest $request)
     {
         $model = $this->myService->create(
@@ -60,7 +77,7 @@ class WebsiteController extends AbstractRestAPIController
                 "user_uuid" => auth()
                     ->user()
                     ->getKey(),
-                "publish_status" => Website::PENDING_PUBLISH_STATUS,
+                "publish_status" => Website::BLOCKED_PUBLISH_STATUS,
             ])
         );
 
