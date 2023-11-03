@@ -2,15 +2,16 @@
 
 namespace App\Http\Requests;
 
-use App\Abstracts\AbstractRequest;
+use App\Models\Article;
 use App\Models\SectionTemplate;
 use App\Rules\CheckUniqueSlugWebsitePageRule;
 use App\Rules\CheckWebsiteDomainRule;
 use App\Rules\CheckWebsitePagesRule;
 use App\Rules\UniqueWebsitePage;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class MyWebsiteRequest extends AbstractRequest
+class UnpublishedWebsiteRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -47,7 +48,7 @@ class MyWebsiteRequest extends AbstractRequest
             })],
             'description' => ['nullable', 'string'],
             'logo' => ['nullable', 'string'],
-            'domain_uuid' => ['required', 'numeric', Rule::exists('domains', 'uuid')->where(function ($q) {
+            'domain_uuid' => ['numeric', Rule::exists('domains', 'uuid')->where(function ($q) {
                 return $q->where('owner_uuid', auth()->user()->getKey())
                     ->whereNull('deleted_at');
             }), CheckWebsiteDomainRule::uniqueDomain($this->id)],
@@ -62,6 +63,7 @@ class MyWebsiteRequest extends AbstractRequest
             'website_pages.*.ordering' => ['nullable', 'numeric', 'min:1'],
             'tracking_ids' => ['nullable', 'array'],
             'tracking_ids.*' => ['nullable', 'string', 'max:300'],
+            'publish_status' => ['required', 'numeric', Rule::in(Article::PENDING_PUBLISH_STATUS, Article::DRAFT_PUBLISH_STATUS)],
         ];
     }
 }

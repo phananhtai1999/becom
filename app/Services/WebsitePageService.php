@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Abstracts\AbstractService;
+use App\Models\Article;
+use App\Models\ArticleCategory;
 use App\Models\QueryBuilders\WebsitePageQueryBuilder;
 use App\Models\Website;
 use App\Models\WebsitePage;
@@ -135,48 +137,143 @@ class WebsitePageService extends AbstractService
         return $webpage ?? abort(404);
     }
 
-    public function renderContent($websitePage, $article = null, $articleCategory = null, $articles = null)
+    public function renderContent($websitePage, $article)
     {
-        if ($websitePage->type == WebsitePage::ARTICLE_DETAIL_TYPE) {
-            $searchReplaceMap = [
-                '{article.title}' => $article->title ?? null,
-                '{article.content}' => $article->content ?? null,
-                '{article.video}' => $articleCategory->video ?? null,
-                '{article.image}' => $articleCategory->image ?? null,
-                '{article.keyword}' => $article->keyword ?? null,
-                '{article.description}' => $article->description ?? null,
-                '{article.short_content}' => $article->short_content ?? null,
-            ];
-        } else {
-            if (preg_match('/{categorylist}(.*?){\/categorylist}/s', $websitePage->template, $matches)) {
-                $contentInsideCategoryList = $matches[1];
-                $categoryList = '';
-                foreach ($articles as $article) {
-                    $searchReplaceMap = [
-                        '{article.title}' => $article->title ?? null,
-                        '{article.content}' => $article->content ?? null,
-                        '{article.video}' => $articleCategory->video ?? null,
-                        '{article.image}' => $articleCategory->image ?? null,
-                        '{article.keyword}' => $article->keyword ?? null,
-                        '{article.description}' => $article->description ?? null,
-                        '{article.short_content}' => $article->short_content ?? null,
-                    ];
-                    $categoryList .= Str::replace(array_keys($searchReplaceMap), $searchReplaceMap, $contentInsideCategoryList);
-                }
-                $websitePage->template = preg_replace('/{categorylist}(.*?){\/categorylist}/s', $categoryList, $websitePage->template);
-            }
-            $searchReplaceMap = [
-                '{category.title}' => $articleCategory->title ?? null,
-                '{category.content}' => $articleCategory->content ?? null,
-                '{category.feature_image}' => $articleCategory->feature_image ?? null,
-                '{category.image}' => $articleCategory->image ?? null,
-                '{category.keyword}' => $articleCategory->keyword ?? null,
-                '{category.description}' => $articleCategory->description ?? null,
-                '{category.short_content}' => $articleCategory->short_content ?? null,
-            ];
-        }
+        $searchReplaceMap = [
+            '{article.title}' => $article->title ?? null,
+            '{article.content}' => $article->content ?? null,
+            '{article.video}' => $article->video ?? null,
+            '{article.image}' => $article->image ?? null,
+            '{article.keyword}' => $article->keyword ?? null,
+            '{article.description}' => $article->description ?? null,
+            '{article.short_content}' => $article->short_content ?? null,
+        ];
         $websitePage->template = Str::replace(array_keys($searchReplaceMap), $searchReplaceMap, $websitePage->template);
 
         return $websitePage;
+    }
+
+    public function renderContentForArticleCategory($websitePage, $articleCategory)
+    {
+        $pattern = '/data-article-count="(\d+)"/';
+        preg_match($pattern, $websitePage->template, $articleCount);
+        $articleCount = isset($articleCount[1]) ? (int)$articleCount[1] : 10;
+        $articlesData = Article::where('article_category_uuid', $articleCategory->uuid)->orderBy('created_at', 'DESC')->paginate($articleCount);
+        $pattern = '/<article.*?>(.*?)<\/article>/s';
+        $websitePage->template = preg_replace_callback($pattern, function ($matches) use ($articlesData) {
+            $articleData = $articlesData->shift();
+            if (!$articleData) {
+                return $matches[0];
+            }
+
+            $searchReplaceMap = [
+                '{article.title}' => $articleData->title ?? null,
+                '{article.content}' => $articleData->content ?? null,
+                '{article.video}' => $articleData->video ?? null,
+                '{article.image}' => $articleData->image ?? null,
+                '{article.keyword}' => $articleData->keyword ?? null,
+                '{article.description}' => $articleData->description ?? null,
+                '{article.short_content}' => $articleData->short_content ?? null,
+            ];
+
+            return str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $matches[0]);
+        }, $websitePage->template);
+
+
+        preg_match('/data-children-category-count="(\d+)"/', $websitePage->template, $childrenCategoryCount);
+        $childrenCategoryCount = isset($childrenCategoryCount[1]) ? (int)$childrenCategoryCount[1] : 10;
+        $childrenCategoriesData = ArticleCategory::where('parent_uuid', $articleCategory->uuid)->orderBy('created_at', 'DESC')->paginate($childrenCategoryCount);
+        $websitePage->template = preg_replace_callback('/<children_category.*?>(.*?)<\/children_category>/s', function ($matches) use ($childrenCategoriesData) {
+
+            $childrenCategoryData = $childrenCategoriesData->shift();
+
+            if (!$childrenCategoryData) {
+                return $matches[0];
+            }
+
+            $searchReplaceMap = [
+                '{children_category.title}' => $childrenCategoryData->title ?? null,
+                '{children_category.content}' => $childrenCategoryData->content ?? null,
+                '{children_category.feature_image}' => $childrenCategoryData->feature_image ?? null,
+                '{children_category.image}' => $childrenCategoryData->image ?? null,
+                '{children_category.keyword}' => $childrenCategoryData->keyword ?? null,
+                '{children_category.description}' => $childrenCategoryData->description ?? null,
+                '{children_category.short_content}' => $childrenCategoryData->short_content ?? null,
+            ];
+            $matches[0] = str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $matches[0]);
+            $matches[0] = $this->replaceGrandChildrenCategory($matches[0], $childrenCategoryData);
+
+            return $matches[0];
+
+        }, $websitePage->template);
+
+        return $websitePage;
+    }
+
+    public function renderContentForHomeArticles($websitePage)
+    {
+        $pattern = '/data-article-count="(\d+)"/';
+        preg_match($pattern, $websitePage->template, $articleCount);
+        $articleCount = isset($articleCount[1]) ? (int)$articleCount[1] : 10;
+
+        $articles_data = Article::orderBy('created_at', 'DESC')->paginate($articleCount);
+        $pattern = '/<article.*?>(.*?)<\/article>/s';
+        $websitePage->template = preg_replace_callback($pattern, function ($matches) use ($articles_data) {
+            $article_data = $articles_data->shift();
+            if (!$article_data) {
+                return $matches[0];
+            }
+
+            $searchReplaceMap = [
+                '{home_article.title}' => $article_data->title ?? null,
+                '{home_article.content}' => $article_data->content ?? null,
+                '{home_article.video}' => $article_data->video ?? null,
+                '{home_article.image}' => $article_data->image ?? null,
+                '{home_article.keyword}' => $article_data->keyword ?? null,
+                '{home_article.description}' => $article_data->description ?? null,
+                '{home_article.short_content}' => $article_data->short_content ?? null,
+            ];
+
+            return str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $matches[0]);
+        }, $websitePage->template);
+
+        return $websitePage;
+    }
+
+    /**
+     * @param $matches
+     * @param $childrenCategoryData
+     * @return array
+     */
+    function replaceGrandChildrenCategory($matches, $childrenCategoryData)
+    {
+        preg_match('/data-grand-children-category-count="(\d+)"/', $matches, $grandChildrenCategoryCount);
+        $grandChildrenCategoryCount = isset($grandChildrenCategoryCount[1]) ? (int)$grandChildrenCategoryCount[1] : 10;
+        $grandChildrenCategoriesData = ArticleCategory::where('parent_uuid', $childrenCategoryData->uuid)->orderBy('created_at', 'DESC')->paginate($grandChildrenCategoryCount);
+        $matches = preg_replace_callback('/<grand_children_category.*?>(.*?)<\/grand_children_category>/s', function ($grandChildMatches) use ($grandChildrenCategoriesData) {
+            $grandChildrenCategoryData = $grandChildrenCategoriesData->shift();
+
+            if (!$grandChildrenCategoryData) {
+                return $grandChildMatches[0];
+            }
+            $grandChildSearchReplaceMap = [
+                '{grand_children_category.title}' => $grandChildrenCategoryData->title ?? null,
+                '{grand_children_category.content}' => $grandChildrenCategoryData->content ?? null,
+                '{grand_children_category.feature_image}' => $grandChildrenCategoryData->feature_image ?? null,
+                '{grand_children_category.image}' => $grandChildrenCategoryData->image ?? null,
+                '{grand_children_category.keyword}' => $grandChildrenCategoryData->keyword ?? null,
+                '{grand_children_category.description}' => $grandChildrenCategoryData->description ?? null,
+                '{grand_children_category.short_content}' => $grandChildrenCategoryData->short_content ?? null,
+            ];
+
+            return str_replace(array_keys($grandChildSearchReplaceMap), $grandChildSearchReplaceMap, $grandChildMatches[0]);
+        }, $matches);
+        return $matches;
+    }
+
+    private function getDataCount($websitePage) {
+        $pattern = '/data-article-count="(\d+)"/';
+        preg_match($pattern, $websitePage->template, $articleCount);
+        $articleCount = isset($articleCount[1]) ? (int)$articleCount[1] : 10;
     }
 }

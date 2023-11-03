@@ -69,7 +69,7 @@ class AssetService extends AbstractService
 
     public function addJsCodeToIndex($models) {
         $mainUrl = $this->getConfigByKeyInCache('main_url');
-        $code = auth()->user()->partner->code ?? Role::ADMIN_ROOT;
+        $code = auth()->user()->partner->code ?? Role::ROLE_ADMIN;
         foreach ($models as $model) {
             if ($model->type == Asset::TYPE_IMAGE) {
                 $jsCode = '<script type="text/javascript" src="' . asset("/") . 'api/generate-image?pn=' . $model->uuid . '&as=' . $model->uuid . '&link=' . $mainUrl->value . '?ref=' . $code . '"> </script>';

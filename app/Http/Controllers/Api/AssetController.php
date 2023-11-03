@@ -114,7 +114,7 @@ class AssetController extends AbstractRestAPIController
 
     public function generateJsCode(GenerateJsCodeAssetRequest $request)
     {
-        if (empty(auth()->user()->partner) && auth()->user()->role != Role::ADMIN_ROOT) {
+        if (empty(auth()->user()->partner) && auth()->user()->role != Role::ROLE_ADMIN) {
             return $this->sendJsonResponse(false, __('asset.failed_partner'), [], 403);
         }
         $mainUrl = $this->service->getConfigByKeyInCache('main_url');
@@ -221,7 +221,7 @@ class AssetController extends AbstractRestAPIController
 
     public function indexPublishAssets(IndexRequest $request)
     {
-        if (empty(auth()->user()->partner) && !auth()->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ADMIN_ROOT])) {
+        if (empty(auth()->user()->partner) && !auth()->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             return $this->sendJsonResponse(false, __('asset.failed_partner'), [], 403);
         }
         $models = $this->service->getCollectionWithPaginationByCondition($request,

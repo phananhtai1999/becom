@@ -8,8 +8,10 @@ use App\Http\Requests\Article\ChangeStatusArticleRequest;
 use App\Http\Requests\Article\UnpublishedArticleRequest;
 use App\Http\Requests\Article\UpdateUnpublishedArticleRequest;
 use App\Http\Requests\ArticleRequest;
+use App\Http\Requests\ChangeStatusMyArticleRequest;
 use App\Http\Requests\ChartRequest;
 use App\Http\Requests\IndexRequest;
+use App\Http\Requests\MyArticleRequest;
 use App\Http\Requests\UpdateArticleRequest;
 use App\Http\Resources\ArticleResource;
 use App\Http\Resources\ArticleResourceCollection;
@@ -63,6 +65,98 @@ class ArticleController extends AbstractRestAPIController
         $this->editRequest = UpdateArticleRequest::class;
         $this->indexRequest = IndexRequest::class;
         $this->languageService = $languageService;
+    }
+    /**
+     * @return JsonResponse
+     */
+    public function storeMy(MyArticleRequest $request)
+    {
+        if (!$this->languageService->checkLanguages($request->title)
+            || !$this->languageService->checkLanguages($request->get('content'))
+            || ($request->keyword && !$this->languageService->checkLanguages($request->keyword))
+            || ($request->description && !$this->languageService->checkLanguages($request->description))) {
+
+            return $this->sendValidationFailedJsonResponse();
+        }
+
+        //Map type_label to content
+        $content = $this->service->mapTypeLabelToContent($request->get('content'), $request->content_type);
+
+        if($this->user()->userTeam && !$this->user()->userTeam['is_blocked'] && $this->user()->getKey != auth()->user()->userTeam->team->owner_uuid) {
+            $user_uuid = auth()->user()->userTeam->team->owner_uuid;
+            $model = $this->service->create(array_merge($request->except(['reject_reason']), [
+                'user_uuid' => $user_uuid,
+                'content_for_user' => $request->content_for_user ?: Article::PUBLIC_CONTENT_FOR_USER,
+                'content' => $content,
+                'publish_status' => Article::PENDING_PUBLISH_STATUS,
+                'description' => $request->keyword ? array_merge($request->keyword, $request->description ?? $request->keyword) : $request->description
+            ]));
+        } else {
+            $user_uuid = auth()->user()->getkey();
+            $model = $this->service->create(array_merge($request->except(['reject_reason']), [
+                'user_uuid' => $user_uuid,
+                'content_for_user' => $request->content_for_user ?: Article::PUBLIC_CONTENT_FOR_USER,
+                'content' => $content,
+                'description' => $request->keyword ? array_merge($request->keyword, $request->description ?? $request->keyword) : $request->description
+            ]));
+        }
+
+        // Update Article Series By Article Uuid
+        $this->articleSeriesService->updateArticleSeriesByArticleUuid($request->article_series_uuid, $model->uuid);
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    public function showMy($id)
+    {
+        $user_uuid = $this->getUserUuid();
+        $model = $this->service->findOneWhereOrFail([
+            ['user_uuid', $user_uuid],
+            ['uuid', $id]
+        ]);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    public function editMy($id)
+    {
+        $request = app($this->editRequest);
+        if (($request->title && !$this->languageService->checkLanguages($request->title))
+            || ($request->content && !$this->languageService->checkLanguages($request->content))
+            || ($request->keyword && !$this->languageService->checkLanguages($request->keyword))
+            || ($request->description && !$this->languageService->checkLanguages($request->description))) {
+
+            return $this->sendValidationFailedJsonResponse();
+        }
+        $user_uuid = $this->getUserUuid();
+        $model = $this->service->findOneWhereOrFail([
+            ['user_uuid', $user_uuid],
+            ['uuid', $id]
+        ]);
+        if ($model->content_type != $request->content_type) {
+            return $this->sendValidationFailedJsonResponse();
+        }
+        //Check content exist or not
+        $checkContent = $request->content ? array_merge($model->getTranslations('content'), $request->content) : $model->getTranslations('content');
+        $content = $this->service->mapTypeLabelToContent($checkContent, $model->content_type);
+        //Generate description by keyword and value lang != null
+        $description = array_merge(\request('keyword', []), !empty($model->descriptions) ? $model->descriptions : [], array_filter(\request('description', []), function ($value) {
+            return $value !== null;
+        }));
+
+        $this->service->update($model, array_merge($request->all(), [
+            'content' => $content,
+            'user_uuid' => $user_uuid,
+            'description' => $description
+        ]));
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
     }
 
     /**
@@ -229,17 +323,18 @@ class ArticleController extends AbstractRestAPIController
 
     public function indexMy(IndexRequest $request)
     {
-        $role = auth()->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ADMIN_ROOT])->count();
+        $role = auth()->user()->roles->whereIn('slug', [Role::ROLE_EDITOR])->count();
         $config = $this->configService->findConfigByKey('time_allowed_view_articles_of_editor');
         //Role editor limit by config days
-        if (!$role && $config) {
+        if ($role && $config) {
             $models = $this->service->getCollectionWithPaginationByCondition($request, [
                 ['user_uuid', auth()->user()->getKey()],
                 ['updated_at', '>=', Carbon::now()->subDays($config->value)]
             ]);
         } else {
+            $user_uuid = $this->getUserUuid();
             $models = $this->service->getCollectionWithPaginationByCondition($request,
-                ['user_uuid' => auth()->user()->getKey()]);
+                ['user_uuid' => $user_uuid]);
         }
 
         return $this->sendOkJsonResponse(
@@ -253,7 +348,7 @@ class ArticleController extends AbstractRestAPIController
      */
     public function indexUnpublishedArticle(IndexRequest $request)
     {
-        $role = auth()->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ADMIN_ROOT])->count();
+        $role = auth()->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->count();
         $config = $this->configService->findConfigByKey('time_allowed_view_articles_of_editor');
         //Role editor limit by config days
         if (!$role && $config) {
@@ -376,10 +471,40 @@ class ArticleController extends AbstractRestAPIController
         return $this->sendOkJsonResponse();
     }
 
+
+    public function changeStatusMyArticle(ChangeStatusMyArticleRequest $request)
+    {
+        $articleUuids = $request->articles;
+        foreach ($articleUuids as $articleUuid) {
+            $user_uuid = $this->getUserUuid();
+            $model = $this->service->findOneWhere([
+                ['user_uuid', $user_uuid],
+                ['uuid', $articleUuid]
+            ]);
+            if ($model) {
+                $list_reason = $model->reject_reason;
+                if ($request->get('publish_status') == Article::REJECT_PUBLISH_STATUS) {
+                    $list_reason[] = [
+                        'content' => $request->get('reject_reason'),
+                        'created_at' => Carbon::now()
+                    ];
+                }
+                $this->service->update($model, [
+                    'publish_status' => $request->get('publish_status'),
+                    'reject_reason' => $list_reason,
+                    'content_for_user' => $request->get('content_for_user') ?? $model->content_for_user,
+                ]);
+            }
+        }
+
+        return $this->sendOkJsonResponse();
+    }
+
     public function deleteMy($id)
     {
+        $user_uuid = $this->getUserUuid();
         $model = $this->service->findOneWhereOrFail([
-            ['user_uuid', auth()->user()->getKey()],
+            ['user_uuid', $user_uuid],
             ['uuid', $id]
         ]);
 

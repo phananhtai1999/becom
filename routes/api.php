@@ -610,8 +610,9 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website_page'], function ()
         Route::get('/unpublished-website-page/{id}', [WebsitePageController::class, 'showUnpublishedWebsitePage'])->name('show-unpublished');
         Route::post('/unpublished-website-page', [WebsitePageController::class, 'storeUnpublishedWebsitePage'])->name('store-unpublished');
         Route::put('/unpublished-website-page/{id}', [WebsitePageController::class, 'editUnpublishedWebsitePage'])->name('edit-unpublished');
-        Route::get('shortcode-supports', [WebsitePageController::class, 'configShortcode'])->name('index-config-shortcode');
     });
+
+    Route::get('shortcode-supports', [WebsitePageController::class, 'configShortcode'])->name('index-config-shortcode');
 
     Route::group(['as' => 'my.'], function () {
         Route::get('my/website-pages', [WebsitePageController::class, 'indexMy'])->name('indexMyWebsitePage');
@@ -801,6 +802,7 @@ Route::get('/language/{id}', [LanguageController::class, 'show'])->name('languag
 //Article Category
 Route::group(['middleware' => ['auth:api'], 'as' => 'article-category.'], function () {
     Route::group(['middleware' => ['role:root,admin,editor'], 'as' => 'author.'], function () {
+        Route::post('/article-category', [ArticleCategoryController::class, 'store'])->name('store');
         Route::put('/article-category/{id}', [ArticleCategoryController::class, 'edit'])->name('edit');
 //        Route::delete('/article-category/{id}', [ArticleCategoryController::class, 'destroy'])->name('destroy');
         Route::get('/article-categories', [ArticleCategoryController::class, 'index'])->name('index');
@@ -808,7 +810,14 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'article-category.'], functi
         Route::put('/article-category/change-status/{id}', [ArticleCategoryController::class, 'changeStatus'])->name('changeStatus');
         Route::post('/delete-article-category/{id}', [ArticleCategoryController::class, 'deleteCategory']);
     });
-    Route::post('/article-category', [ArticleCategoryController::class, 'store'])->name('store');
+
+    Route::group(['as' => 'my.'], function () {
+        Route::get('/my/article-categories', [ArticleCategoryController::class, 'indexMy'])->name('indexMy');
+        Route::post('/my/article-category', [ArticleCategoryController::class, 'storeMy'])->name('storeMy');
+        Route::get('/my/article-category/{id}', [ArticleCategoryController::class, 'showMy'])->name('showMy');
+        Route::put('/my/article-category/{id}', [ArticleCategoryController::class, 'editMy'])->name('editMy');
+        Route::delete('/my/article-category/{id}', [ArticleCategoryController::class, 'destroyMy'])->name('destroyMy');
+    });
 
 });
 Route::get('public/article-categories', [ArticleCategoryController::class, 'indexPublic'])->name('article-categories-public.index');
@@ -836,6 +845,15 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'article.'], function () {
         Route::put('/article/{id}', [ArticleController::class, 'edit'])->name('edit');
         Route::delete('/article/{id}', [ArticleController::class, 'destroy'])->name('destroy');
         Route::get('/article/{id}', [ArticleController::class, 'show'])->name('show');
+    });
+
+    Route::group(['as' => 'my.'], function () {
+        Route::get('/my/articles', [ArticleController::class, 'indexMy'])->name('indexMy');
+        Route::post('/my/article', [ArticleController::class, 'storeMy'])->name('storeMy');
+        Route::get('/my/article/{id}', [ArticleController::class, 'showMy'])->name('showMy');
+        Route::put('/my/article/{id}', [ArticleController::class, 'editMy'])->name('editMy');
+        Route::delete('/my/article/{id}', [ArticleController::class, 'destroyMy'])->name('destroyMy');
+        Route::post('my/article/change-status', [ArticleController::class, 'changeStatusMyArticle'])->name('changeStatusArticle');
     });
 
     Route::group(['middleware' => ['role:root,admin,editor']], function () {
@@ -1049,8 +1067,12 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'team.'], function () {
         Route::get('/team/{id}', [TeamController::class, 'show'])->name('show');
         Route::put('/team/{id}', [TeamController::class, 'edit'])->name('edit');
         Route::delete('/team/{id}', [TeamController::class, 'destroy'])->name('destroy');
+
+        Route::put('/block-member/{id}', [TeamController::class, 'blockMemberForAdmin'])->name('blockMemberForAdmin');
+        Route::put('/unblock-member/{id}', [TeamController::class, 'unBlockMemberForAdmin'])->name('unBlockMemberForAdmin');
     });
 
+    Route::get('/all-member', [TeamController::class, 'listMemberOfAllTeam'])->name('listMemberOfAllTeam');
     Route::get('/list-member/{id}', [TeamController::class, 'listMember'])->name('listMember');
     Route::get('/join-team', [TeamController::class, 'joinTeam'])->name('joinTeam');
     Route::get('/invite-user', [TeamController::class, 'inviteUser'])->name('inviteUser');
@@ -1315,6 +1337,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website'], function () {
         Route::get('website/{id}', [WebsiteController::class, 'show'])->name('show');
         Route::delete('website/{id}', [WebsiteController::class, 'destroy'])->name('destroy');
         Route::post('websites/change-status', [WebsiteController::class, 'changeStatus'])->name('changeStatus');
+        Route::post('websites/change-status-default', [WebsiteController::class, 'changeStatusDefaultWebsite'])->name('changeStatus');
     });
 
     Route::group(['as' => 'my.'], function () {
@@ -1325,6 +1348,17 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website'], function () {
         Route::delete('my/website/{id}', [WebsiteController::class, 'destroyMy'])->name('destroy');
         Route::post('my/websites/change-status', [WebsiteController::class, 'changeStatusMyWebsite'])->name('changeStatusMyWebsite');
     });
+
+    Route::group(['middleware' => ['role:root,admin,editor']], function () {
+        Route::get('/unpublished-websites', [WebsiteController::class, 'indexUnpublishedWebsite'])->name('index-unpublished-website');
+        Route::get('/unpublished-website/{id}', [WebsiteController::class, 'showUnpublishedWebsite'])->name('show-unpublished-website');
+        Route::put('/unpublished-website/{id}', [WebsiteController::class, 'editUnpublishedWebsite'])->name('edit-unpublished-website');
+        //Check role editor for change status
+        Route::post('unpublished-websites/change-status', [WebsiteController::class, 'changeStatusWebsite'])->name('change-status-website');
+    });
+
+    Route::get('/default-websites', [WebsiteController::class, 'defaultWebsites'])->name('default-websites');
+    Route::post('/unpublished-website', [WebsiteController::class, 'storeUnpublishedWebsite'])->name('store-unpublished-website');
 });
 Route::get('public/website/{id}', [WebsiteController::class, 'show'])->name('website.show');
 Route::get('public/website', [WebsiteController::class, 'publicWebsiteByDomainAndPublishStatus'])->name('website.public');
@@ -1403,9 +1437,9 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'single-purpose'], function 
     });
 
     Route::group(['middleware' => ['role:root,admin,editor'], 'as' => 'author.'], function () {
-        Route::get('single-purposes', [SinglePurposeController::class, 'index']);
         Route::get('single-purpose/{id}', [SinglePurposeController::class, 'show']);
     });
+    Route::get('single-purposes', [SinglePurposeController::class, 'index']);
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'paragraph-type'], function () {
@@ -1416,9 +1450,9 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'paragraph-type'], function 
     });
 
     Route::group(['middleware' => ['role:root,admin,editor'], 'as' => 'author.'], function () {
-        Route::get('paragraph-types', [ParagraphTypeController::class, 'index']);
         Route::get('paragraph-type/{id}', [ParagraphTypeController::class, 'show']);
     });
+    Route::get('paragraph-types', [ParagraphTypeController::class, 'index']);
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'article-series'], function () {

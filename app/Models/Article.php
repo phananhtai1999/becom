@@ -192,7 +192,7 @@ class Article extends AbstractModel
      */
     public function getContentsAttribute()
     {
-        return app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('content') : $this->content;
+        return $this->getTranslations('content');
     }
 
     /**
@@ -200,17 +200,17 @@ class Article extends AbstractModel
      */
     public function getTitlesAttribute()
     {
-        return app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('title') : $this->title;
+        return $this->getTranslations('title');
     }
 
     public function getKeywordsAttribute()
     {
-        return app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('keyword') : $this->keyword;
+        return $this->getTranslations('keyword');
     }
 
     public function getDescriptionsAttribute()
     {
-        return app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('description') : $this->description;
+        return $this->getTranslations('description');
     }
 
     public function scopeArticleCategoryTitle(Builder $query, ...$titles)

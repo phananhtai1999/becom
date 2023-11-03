@@ -24,8 +24,9 @@ class WebsitePage extends AbstractModel
     const DRAFT_PUBLISH_STATUS = 4;
 
     const STATIC_TYPE = 'static';
-    const ARTICLE_DETAIL_TYPE = 'article_detail';
-    const ARTICLE_CATEGORY_TYPE = 'article_category';
+    const ARTICLE_DETAIL_TYPE = 'news.article_detail';
+    const ARTICLE_CATEGORY_TYPE = 'news.article_category';
+    const HOME_ARTICLES_TYPE = 'news.home_articles';
 
     /**
      * @var string

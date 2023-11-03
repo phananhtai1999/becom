@@ -27,4 +27,17 @@ class WebsiteService extends AbstractService
             })
             ->firstOrFail();
     }
+
+    public function getDefaultWebsiteForAdmin(\App\Http\Requests\IndexRequest $request)
+    {
+        $indexRequest = $this->getIndexRequest($request);
+
+        return $this->modelQueryBuilderClass::searchQuery($indexRequest['search'], $indexRequest['search_by'])
+            ->where('domain_uuid', null)
+            ->where(function ($q) {
+                return $q->where('publish_status', Website::PUBLISHED_PUBLISH_STATUS)
+                    ->orWhere('publish_status', Website::BLOCKED_PUBLISH_STATUS);
+            })
+            ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
+    }
 }
