@@ -158,7 +158,9 @@ class WebsitePageService extends AbstractService
         $pattern = '/data-article-count="(\d+)"/';
         preg_match($pattern, $websitePage->template, $articleCount);
         $articleCount = isset($articleCount[1]) ? (int)$articleCount[1] : 10;
-        $articlesData = Article::where('article_category_uuid', $articleCategory->uuid)->orderBy('created_at', 'DESC')->paginate($articleCount);
+        preg_match('/article-sort="(.*?)"/', $websitePage->template, $sortName);
+        preg_match('/article-sort-order="(.*?)"/', $websitePage->template, $sortOrder);
+        $articlesData = Article::where('article_category_uuid', $articleCategory->uuid)->orderBy($sortName[1] ?? 'created_at', $sortOrder[1] ?? 'DESC')->paginate($articleCount);
         $pattern = '/<article.*?>(.*?)<\/article>/s';
         $websitePage->template = preg_replace_callback($pattern, function ($matches) use ($articlesData) {
             $articleData = $articlesData->shift();
@@ -182,7 +184,9 @@ class WebsitePageService extends AbstractService
 
         preg_match('/data-children-category-count="(\d+)"/', $websitePage->template, $childrenCategoryCount);
         $childrenCategoryCount = isset($childrenCategoryCount[1]) ? (int)$childrenCategoryCount[1] : 10;
-        $childrenCategoriesData = ArticleCategory::where('parent_uuid', $articleCategory->uuid)->orderBy('created_at', 'DESC')->paginate($childrenCategoryCount);
+        preg_match('/category-sort="(.*?)"/', $websitePage->template, $sortName);
+        preg_match('/category-sort-order="(.*?)"/', $websitePage->template, $sortOrder);
+        $childrenCategoriesData = ArticleCategory::where('parent_uuid', $articleCategory->uuid)->orderBy($sortName[1] ?? 'created_at', $sortOrder[1] ?? 'DESC')->paginate($childrenCategoryCount);
         $websitePage->template = preg_replace_callback('/<children_category.*?>(.*?)<\/children_category>/s', function ($matches) use ($childrenCategoriesData) {
 
             $childrenCategoryData = $childrenCategoriesData->shift();
@@ -212,11 +216,17 @@ class WebsitePageService extends AbstractService
 
     public function renderContentForHomeArticles($websitePage)
     {
+        //get number article need to parse
         $pattern = '/data-article-count="(\d+)"/';
-        preg_match($pattern, $websitePage->template, $articleCount);
-        $articleCount = isset($articleCount[1]) ? (int)$articleCount[1] : 10;
+        preg_match_all($pattern, $websitePage->template, $matches);
+        $numbers = array_map('intval', $matches[1]);
+        $articleCount = array_sum($numbers);
+        $articleCount = isset($articleCount) ? (int)$articleCount : 10;
 
-        $articles_data = Article::orderBy('created_at', 'DESC')->paginate($articleCount);
+        //get orderby
+        preg_match('/article-sort="(.*?)"/', $websitePage->template, $sortName);
+        preg_match('/article-sort-order="(.*?)"/', $websitePage->template, $sortOrder);
+        $articles_data = Article::orderBy($sortName[1] ?? 'created_at', $sortOrder[1] ?? 'DESC')->paginate($articleCount);
         $pattern = '/<article.*?>(.*?)<\/article>/s';
         $websitePage->template = preg_replace_callback($pattern, function ($matches) use ($articles_data) {
             $article_data = $articles_data->shift();
@@ -225,18 +235,63 @@ class WebsitePageService extends AbstractService
             }
 
             $searchReplaceMap = [
-                '{home_article.title}' => $article_data->title ?? null,
-                '{home_article.content}' => $article_data->content ?? null,
-                '{home_article.video}' => $article_data->video ?? null,
-                '{home_article.image}' => $article_data->image ?? null,
-                '{home_article.keyword}' => $article_data->keyword ?? null,
-                '{home_article.description}' => $article_data->description ?? null,
-                '{home_article.short_content}' => $article_data->short_content ?? null,
+                '{article.title}' => $article_data->title ?? null,
+                '{article.content}' => $article_data->content ?? null,
+                '{article.video}' => $article_data->video ?? null,
+                '{article.image}' => $article_data->image ?? null,
+                '{article.keyword}' => $article_data->keyword ?? null,
+                '{article.description}' => $article_data->description ?? null,
+                '{article.short_content}' => $article_data->short_content ?? null,
             ];
 
             return str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $matches[0]);
         }, $websitePage->template);
 
+        preg_match('/data-category-count="(\d+)"/', $websitePage->template, $categoryCount);
+        $categoryCount = isset($categoryCount[1]) ? (int)$categoryCount[1] : 10;
+
+        //get orderby
+        preg_match('/category-sort="(.*?)"/', $websitePage->template, $sortName);
+        preg_match('/category-sort-order="(.*?)"/', $websitePage->template, $sortOrder);
+        $categoriesData = ArticleCategory::where('parent_uuid', null)->orderBy($sortName[1] ?? 'created_at', $sortOrder[1] ?? 'DESC')->paginate($categoryCount);
+        $websitePage->template = preg_replace_callback('/<category.*?>(.*?)<\/category>/s', function ($matches) use ($categoriesData) {
+            $categoryData = $categoriesData->shift();
+
+            if (!$categoryData) {
+                return $matches[0];
+            }
+
+            $searchReplaceMap = [
+                '{category.title}' => $categoryData->title ?? null,
+                '{category.content}' => $categoryData->content ?? null,
+                '{category.feature_image}' => $categoryData->feature_image ?? null,
+                '{category.image}' => $categoryData->image ?? null,
+                '{category.keyword}' => $categoryData->keyword ?? null,
+                '{category.description}' => $categoryData->description ?? null,
+                '{category.short_content}' => $categoryData->short_content ?? null,
+            ];
+            $matches[0] = str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $matches[0]);
+            $matches[0] = $this->replacechildrenCategory($matches[0], $categoryData);
+
+            $childrenCategoriesUuid = ArticleCategory::where('parent_uuid', $categoryData->uuid)->get()->pluck('uuid');
+            $article = Article::whereIn('article_category_uuid', array_merge($childrenCategoriesUuid->toArray(),[$categoryData->uuid]))->orderBy('created_at', 'DESC')->first();
+            if ($article) {
+                $searchReplaceArticleMap = [
+                    '{article.title}' => $article->title ?? null,
+                    '{article.content}' => $article->content ?? null,
+                    '{article.video}' => $article->video ?? null,
+                    '{article.image}' => $article->image ?? null,
+                    '{article.keyword}' => $article->keyword ?? null,
+                    '{article.description}' => $article->description ?? null,
+                    '{article.short_content}' => $article->short_content ?? null,
+                ];
+                $matches[0] = Str::replace(array_keys($searchReplaceArticleMap), $searchReplaceArticleMap, $matches[0]);
+            }
+
+
+            return $matches[0];
+
+        }, $websitePage->template);
         return $websitePage;
     }
 
@@ -249,7 +304,11 @@ class WebsitePageService extends AbstractService
     {
         preg_match('/data-grand-children-category-count="(\d+)"/', $matches, $grandChildrenCategoryCount);
         $grandChildrenCategoryCount = isset($grandChildrenCategoryCount[1]) ? (int)$grandChildrenCategoryCount[1] : 10;
-        $grandChildrenCategoriesData = ArticleCategory::where('parent_uuid', $childrenCategoryData->uuid)->orderBy('created_at', 'DESC')->paginate($grandChildrenCategoryCount);
+
+        //get orderby
+        preg_match('/grand-children-category-sort="(.*?)"/', $matches, $sortName);
+        preg_match('/grand-children-category-sort-order="(.*?)"/', $matches, $sortOrder);
+        $grandChildrenCategoriesData = ArticleCategory::where('parent_uuid', $childrenCategoryData->uuid)->orderBy($sortName[1] ?? 'created_at', $sortOrder[1] ?? 'DESC')->paginate($grandChildrenCategoryCount);
         $matches = preg_replace_callback('/<grand_children_category.*?>(.*?)<\/grand_children_category>/s', function ($grandChildMatches) use ($grandChildrenCategoriesData) {
             $grandChildrenCategoryData = $grandChildrenCategoriesData->shift();
 
@@ -267,6 +326,35 @@ class WebsitePageService extends AbstractService
             ];
 
             return str_replace(array_keys($grandChildSearchReplaceMap), $grandChildSearchReplaceMap, $grandChildMatches[0]);
+        }, $matches);
+        return $matches;
+    }
+
+    function replaceChildrenCategory($matches, $categoryData)
+    {
+        preg_match('/data-children-category-count="(\d+)"/', $matches, $childrenCategoryCount);
+        $childrenCategoryCount = isset($grandChildrenCategoryCount[1]) ? (int)$childrenCategoryCount[1] : 10;
+        //get orderby
+        preg_match('/children-category-sort="(.*?)"/', $matches, $sortName);
+        preg_match('/children-category-sort-order="(.*?)"/', $matches, $sortOrder);
+        $childrenCategoriesData = ArticleCategory::where('parent_uuid', $categoryData->uuid)->orderBy($sortName[1] ?? 'created_at', $sortOrder[1] ?? 'DESC')->paginate($childrenCategoryCount);
+        $matches = preg_replace_callback('/<children_category.*?>(.*?)<\/children_category>/s', function ($childMatches) use ($childrenCategoriesData) {
+            $childrenCategoryData = $childrenCategoriesData->shift();
+
+            if (!$childrenCategoryData) {
+                return $childMatches[0];
+            }
+            $childSearchReplaceMap = [
+                '{children_category.title}' => $childrenCategoryData->title ?? null,
+                '{children_category.content}' => $childrenCategoryData->content ?? null,
+                '{children_category.feature_image}' => $childrenCategoryData->feature_image ?? null,
+                '{children_category.image}' => $childrenCategoryData->image ?? null,
+                '{children_category.keyword}' => $childrenCategoryData->keyword ?? null,
+                '{children_category.description}' => $childrenCategoryData->description ?? null,
+                '{children_category.short_content}' => $childrenCategoryData->short_content ?? null,
+            ];
+
+            return str_replace(array_keys($childSearchReplaceMap), $childSearchReplaceMap, $childMatches[0]);
         }, $matches);
         return $matches;
     }
