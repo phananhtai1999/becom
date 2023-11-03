@@ -1,13 +1,33 @@
 <?php
 return [
     'category' => [
-        'category.title',
-        'category.content',
-        'category.image',
-        'category.feature_image',
-        'category.keyword',
-        'category.description',
-        'category.short_content',
+        'category' => [
+            'category.title',
+            'category.content',
+            'category.image',
+            'category.feature_image',
+            'category.keyword',
+            'category.description',
+            'category.short_content'
+        ],
+        'children_category' => [
+            'children_category.title',
+            'children_category.content',
+            'children_category.image',
+            'children_category.feature_image',
+            'children_category.keyword',
+            'children_category.description',
+            'children_category.short_content'
+        ],
+        'grand_children_category' => [
+            'grand_children_category.title',
+            'grand_children_category.content',
+            'grand_children_category.image',
+            'grand_children_category.feature_image',
+            'grand_children_category.keyword',
+            'grand_children_category.description',
+            'grand_children_category.short_content',
+        ],
     ],
     'article' => [
         'article.title',
