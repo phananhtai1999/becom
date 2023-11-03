@@ -423,4 +423,17 @@ class TeamController extends Controller
 
         return $this->sendValidationFailedJsonResponse();
     }
+
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
+    public function deleteMemberForAdmin($id)
+    {
+        $model = $this->userTeamService->findOrFailById($id);
+        $model->user->userTeamContactLists()->detach();
+        $this->userTeamService->destroy($model->uuid);
+        Cache::forget('team_permission_' . $model->user_uuid);
+        return $this->sendOkJsonResponse();
+    }
 }
