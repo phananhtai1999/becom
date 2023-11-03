@@ -36,7 +36,7 @@ class WebsiteService extends AbstractService
             ->where('domain_uuid', null)
             ->where(function ($q) {
                 return $q->where('publish_status', Website::PUBLISHED_PUBLISH_STATUS)
-                    ->orWhere('publish_status', Website::PENDING_PUBLISH_STATUS);
+                    ->orWhere('publish_status', Website::BLOCKED_PUBLISH_STATUS);
             })
             ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
     }

@@ -26,6 +26,7 @@ use App\Http\Resources\UserTeamResource;
 use App\Http\Resources\UserTeamResourceCollection;
 use App\Mail\SendInviteToTeam;
 use App\Mail\SendInviteToTeamByAccount;
+use App\Models\Email;
 use App\Models\Invite;
 use App\Models\PlatformPackage;
 use App\Models\Role;
@@ -348,9 +349,11 @@ class TeamController extends Controller
     public function deleteMember($id)
     {
         $model = $this->userTeamService->findOrFailById($id);
-        if (!$this->checkTeamOwner($model->team_uuid)) {
+        if ($this->user()->roles->whereNotIn('slug', ["admin", "root"])->count()) {
+            if (!$this->checkTeamOwner($model->team_uuid)) {
 
-            return $this->sendJsonResponse(false, 'You are not owner of team to set permission', [], 403);
+                return $this->sendJsonResponse(false, 'You are not owner of team to delete member', [], 403);
+            }
         }
         $model->user->userTeamContactLists()->detach();
         $this->userTeamService->destroy($model->uuid);
@@ -362,9 +365,11 @@ class TeamController extends Controller
     public function blockMember($id)
     {
         $model = $this->userTeamService->findOrFailById($id);
-        if (!$this->checkTeamOwner($model->team_uuid)) {
+        if ($this->user()->roles->whereNotIn('slug', ["admin", "root"])->count()) {
+            if (!$this->checkTeamOwner($model->team_uuid)) {
 
-            return $this->sendJsonResponse(false, 'You are not owner of team to set permission', [], 403);
+                return $this->sendJsonResponse(false, 'You are not owner of team to set permission', [], 403);
+            }
         }
         $this->userTeamService->update($model, ['is_blocked' => true]);
 
@@ -374,10 +379,28 @@ class TeamController extends Controller
     public function unBlockMember($id)
     {
         $model = $this->userTeamService->findOrFailById($id);
-        if (!$this->checkTeamOwner($model->team_uuid)) {
+        if ($this->user()->roles->whereNotIn('slug', ["admin", "root"])->count()) {
+            if (!$this->checkTeamOwner($model->team_uuid)) {
 
-            return $this->sendJsonResponse(false, 'You are not owner of team to set permission', [], 403);
+                return $this->sendJsonResponse(false, 'You are not owner of team to set permission', [], 403);
+            }
         }
+        $this->userTeamService->update($model, ['is_blocked' => false]);
+
+        return $this->sendOkJsonResponse();
+    }
+
+    public function blockMemberForAdmin($id)
+    {
+        $model = $this->userTeamService->findOrFailById($id);
+        $this->userTeamService->update($model, ['is_blocked' => true]);
+
+        return $this->sendOkJsonResponse();
+    }
+
+    public function unBlockMemberForAdmin($id)
+    {
+        $model = $this->userTeamService->findOrFailById($id);
         $this->userTeamService->update($model, ['is_blocked' => false]);
 
         return $this->sendOkJsonResponse();

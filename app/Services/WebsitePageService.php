@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Abstracts\AbstractService;
 use App\Models\Article;
+use App\Models\ArticleCategory;
 use App\Models\QueryBuilders\WebsitePageQueryBuilder;
 use App\Models\Website;
 use App\Models\WebsitePage;
@@ -178,16 +179,33 @@ class WebsitePageService extends AbstractService
             return str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $matches[0]);
         }, $websitePage->template);
 
-        $searchReplaceMap = [
-            '{category.title}' => $articleCategory->title ?? null,
-            '{category.content}' => $articleCategory->content ?? null,
-            '{category.feature_image}' => $articleCategory->feature_image ?? null,
-            '{category.image}' => $articleCategory->image ?? null,
-            '{category.keyword}' => $articleCategory->keyword ?? null,
-            '{category.description}' => $articleCategory->description ?? null,
-            '{category.short_content}' => $articleCategory->short_content ?? null,
-        ];
-        $websitePage->template = Str::replace(array_keys($searchReplaceMap), $searchReplaceMap, $websitePage->template);
+
+        preg_match('/data-children-category-count="(\d+)"/', $websitePage->template, $childrenCategoryCount);
+        $childrenCategoryCount = isset($childrenCategoryCount[1]) ? (int)$childrenCategoryCount[1] : 10;
+        $childrenCategoriesData = ArticleCategory::where('parent_uuid', $articleCategory->uuid)->orderBy('created_at', 'DESC')->paginate($childrenCategoryCount);
+        $websitePage->template = preg_replace_callback('/<children_category.*?>(.*?)<\/children_category>/s', function ($matches) use ($childrenCategoriesData) {
+
+            $childrenCategoryData = $childrenCategoriesData->shift();
+
+            if (!$childrenCategoryData) {
+                return $matches[0];
+            }
+
+            $searchReplaceMap = [
+                '{children_category.title}' => $childrenCategoryData->title ?? null,
+                '{children_category.content}' => $childrenCategoryData->content ?? null,
+                '{children_category.feature_image}' => $childrenCategoryData->feature_image ?? null,
+                '{children_category.image}' => $childrenCategoryData->image ?? null,
+                '{children_category.keyword}' => $childrenCategoryData->keyword ?? null,
+                '{children_category.description}' => $childrenCategoryData->description ?? null,
+                '{children_category.short_content}' => $childrenCategoryData->short_content ?? null,
+            ];
+            $matches[0] = str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $matches[0]);
+            $matches[0] = $this->replaceGrandChildrenCategory($matches[0], $childrenCategoryData);
+
+            return $matches[0];
+
+        }, $websitePage->template);
 
         return $websitePage;
     }
@@ -220,6 +238,37 @@ class WebsitePageService extends AbstractService
         }, $websitePage->template);
 
         return $websitePage;
+    }
+
+    /**
+     * @param $matches
+     * @param $childrenCategoryData
+     * @return array
+     */
+    function replaceGrandChildrenCategory($matches, $childrenCategoryData)
+    {
+        preg_match('/data-grand-children-category-count="(\d+)"/', $matches, $grandChildrenCategoryCount);
+        $grandChildrenCategoryCount = isset($grandChildrenCategoryCount[1]) ? (int)$grandChildrenCategoryCount[1] : 10;
+        $grandChildrenCategoriesData = ArticleCategory::where('parent_uuid', $childrenCategoryData->uuid)->orderBy('created_at', 'DESC')->paginate($grandChildrenCategoryCount);
+        $matches = preg_replace_callback('/<grand_children_category.*?>(.*?)<\/grand_children_category>/s', function ($grandChildMatches) use ($grandChildrenCategoriesData) {
+            $grandChildrenCategoryData = $grandChildrenCategoriesData->shift();
+
+            if (!$grandChildrenCategoryData) {
+                return $grandChildMatches[0];
+            }
+            $grandChildSearchReplaceMap = [
+                '{grand_children_category.title}' => $grandChildrenCategoryData->title ?? null,
+                '{grand_children_category.content}' => $grandChildrenCategoryData->content ?? null,
+                '{grand_children_category.feature_image}' => $grandChildrenCategoryData->feature_image ?? null,
+                '{grand_children_category.image}' => $grandChildrenCategoryData->image ?? null,
+                '{grand_children_category.keyword}' => $grandChildrenCategoryData->keyword ?? null,
+                '{grand_children_category.description}' => $grandChildrenCategoryData->description ?? null,
+                '{grand_children_category.short_content}' => $grandChildrenCategoryData->short_content ?? null,
+            ];
+
+            return str_replace(array_keys($grandChildSearchReplaceMap), $grandChildSearchReplaceMap, $grandChildMatches[0]);
+        }, $matches);
+        return $matches;
     }
 
     private function getDataCount($websitePage) {
