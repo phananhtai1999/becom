@@ -349,9 +349,11 @@ class TeamController extends Controller
     public function deleteMember($id)
     {
         $model = $this->userTeamService->findOrFailById($id);
-        if (!$this->checkTeamOwner($model->team_uuid)) {
+        if ($this->user()->roles->whereNotIn('slug', ["admin", "root"])->count()) {
+            if (!$this->checkTeamOwner($model->team_uuid)) {
 
-            return $this->sendJsonResponse(false, 'You are not owner of team to set permission', [], 403);
+                return $this->sendJsonResponse(false, 'You are not owner of team to delete member', [], 403);
+            }
         }
         $model->user->userTeamContactLists()->detach();
         $this->userTeamService->destroy($model->uuid);
