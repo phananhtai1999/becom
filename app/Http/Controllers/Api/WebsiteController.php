@@ -19,6 +19,7 @@ use App\Http\Requests\MyWebsiteRequest;
 use App\Http\Requests\UnpublishedWebsiteRequest;
 use App\Http\Requests\UpdateMyWebsiteRequest;
 use App\Http\Requests\UpdateUnpublishedWebsiteRequest;
+use App\Http\Requests\UpdateWebsiteRequest;
 use App\Http\Requests\WebsiteRequest;
 use App\Http\Resources\WebsiteResource;
 use App\Http\Resources\WebsiteResourceCollection;
@@ -57,15 +58,34 @@ class WebsiteController extends AbstractRestAPIController
     public function store(WebsiteRequest $request)
     {
         $model = $this->myService->create(
-            array_merge([
-                "user_uuid" => auth()->user()->getKey(),
+            array_merge($request->all(), [
+                "user_uuid" => $request->get('user_uuid') ?? auth()->user()->getKey(),
                 "publish_status" => Website::PUBLISHED_PUBLISH_STATUS,
-            ], $request->all())
+            ])
         );
 
         $model->websitePages()->attach($this->getWebsitePagesByRequest($request->get("website_pages", [])));
 
         return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    public function edit($id, UpdateWebsiteRequest $request)
+    {
+        $model = $this->service->findOrFailById($id);
+
+        $this->myService->update($model, $request->all());
+
+        $model
+            ->websitePages()
+            ->sync(
+                $this->getWebsitePagesByRequest(
+                    $request->get("website_pages", [])
+                )
+            );
+
+        return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
         );
     }

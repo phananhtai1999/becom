@@ -1339,6 +1339,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website'], function () {
         Route::post('websites/change-status', [WebsiteController::class, 'changeStatus'])->name('changeStatus');
         Route::post('websites/change-status-default', [WebsiteController::class, 'changeStatusDefaultWebsite'])->name('changeStatus');
         Route::post('website', [WebsiteController::class, 'store'])->name('store');
+        Route::put('website/{id}', [WebsiteController::class, 'edit'])->name('edit');
     });
 
     Route::group(['as' => 'my.'], function () {
