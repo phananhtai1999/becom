@@ -197,9 +197,11 @@ class TeamController extends Controller
 
     public function setPermissionForTeam(SetPermissionForTeamRequest $request)
     {
-        if (!$this->checkTeamOwner($request->get('team_uuid'))) {
+        if ($this->user()->roles->whereNotIn('slug', ["admin", "root"])->count()) {
+            if (!$this->checkTeamOwner($request->get('team_uuid'))) {
 
-            return $this->sendJsonResponse(false, 'You are not owner of team to set permission', [], 403);
+                return $this->sendJsonResponse(false, 'You are not owner of team to set permission', [], 403);
+            }
         }
         $model = $this->userTeamService->findOneWhere([
             'user_uuid' => $request->get('user_uuid'),
@@ -225,11 +227,12 @@ class TeamController extends Controller
      */
     public function setContactList(SetContactListRequest $request)
     {
-        if (!$this->checkTeamOwner($request->get('team_uuid'))) {
+        if ($this->user()->roles->whereNotIn('slug', ["admin", "root"])->count()) {
+            if (!$this->checkTeamOwner($request->get('team_uuid'))) {
 
-            return $this->sendJsonResponse(false, 'You are not owner of team to set permission', [], 403);
+                return $this->sendJsonResponse(false, 'You are not owner of team to set contact list', [], 403);
+            }
         }
-
         $user = $this->userService->findOrFailById($request->get('user_uuid'));
         $model = $this->userTeamService->findOneWhere([
             'user_uuid' => $request->get('user_uuid'),
@@ -274,7 +277,7 @@ class TeamController extends Controller
             $team_uuids = $this->service->findAllWhere(['owner_uuid' => $this->user()->getKey()])->pluck('uuid');
             if ($this->user()->userTeam) {
                 $model = $this->userTeamService->listTeamMember([$this->user()->userTeam->team_uuid], $request);
-            } elseif($team_uuids){
+            } elseif ($team_uuids) {
                 $model = $this->userTeamService->listTeamMember($team_uuids, $request);
             } else {
                 $model = [];
@@ -368,7 +371,7 @@ class TeamController extends Controller
         if ($this->user()->roles->whereNotIn('slug', ["admin", "root"])->count()) {
             if (!$this->checkTeamOwner($model->team_uuid)) {
 
-                return $this->sendJsonResponse(false, 'You are not owner of team to set permission', [], 403);
+                return $this->sendJsonResponse(false, 'You are not owner of team to block member', [], 403);
             }
         }
         $this->userTeamService->update($model, ['is_blocked' => true]);
