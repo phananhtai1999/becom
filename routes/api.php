@@ -1068,8 +1068,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'team.'], function () {
         Route::put('/team/{id}', [TeamController::class, 'edit'])->name('edit');
         Route::delete('/team/{id}', [TeamController::class, 'destroy'])->name('destroy');
 
-        Route::put('/block-member/{id}', [TeamController::class, 'blockMemberForAdmin'])->name('blockMemberForAdmin');
-        Route::put('/unblock-member/{id}', [TeamController::class, 'unBlockMemberForAdmin'])->name('unBlockMemberForAdmin');
+        Route::get('/permission-of-user/{id}', [TeamController::class, 'getPermissionOfUser']);
     });
 
     Route::get('/all-member', [TeamController::class, 'listMemberOfAllTeam'])->name('listMemberOfAllTeam');

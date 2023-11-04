@@ -1,15 +1,15 @@
 <?php
 return [
     'category' => [
-        'title' => 'category.title',
-        'content' => 'category.content',
-        'image' => 'category.image',
-        'feature_image' => 'category.feature_image',
-        'keyword' => 'category.keyword',
-        'description' => 'category.description',
-        'short_content' => 'category.short_content'
+        'category.title',
+        'category.content',
+        'category.image',
+        'category.feature_image',
+        'category.keyword',
+        'category.description',
+        'category.short_content'
     ],
-    'home_article' => [
+    'article' => [
         'article.title',
         'article.content',
         'article.image',
