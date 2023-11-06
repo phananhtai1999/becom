@@ -12,6 +12,7 @@ class Team extends AbstractModel
 
     const LINK_INVITE = 'link';
     const ACCOUNT_INVITE = 'account';
+    const ALREADY_EXISTS_ACCOUNT = 'exists_account';
     /**
      * @var string
      */
