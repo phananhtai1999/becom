@@ -106,6 +106,15 @@ class TeamController extends Controller
         );
     }
 
+    public function showMy($id)
+    {
+        $model = $this->service->findOneWhereOrFail(['uuid' => $id, 'owner_uuid' => $this->user()->getKey()]);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
     public function storeMy(MyTeamRequest $request)
     {
         $model = $this->service->create(array_merge($request->all(), [
