@@ -174,6 +174,13 @@ class TeamController extends Controller
                 DB::commit();
 
                 return $this->sendCreatedJsonResponse();
+            } elseif ($request->get('type') == Team::ALREADY_EXISTS_ACCOUNT) {
+                $user = $this->userService->findOrFailById($request->get('user_uuid'));
+                $this->userTeamService->create(array_merge($request->all(), [
+                    'user_uuid' => $user->uuid,
+                ]));
+
+                return $this->sendCreatedJsonResponse();
             }
 
             return $this->sendValidationFailedJsonResponse();
@@ -182,7 +189,6 @@ class TeamController extends Controller
             return $this->sendInternalServerErrorJsonResponse();
         }
     }
-
 
     public function joinTeam(JoinTeamRequest $request)
     {
