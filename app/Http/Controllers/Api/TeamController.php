@@ -305,6 +305,13 @@ class TeamController extends Controller
         return $this->sendOkJsonResponse(['data' => $permisions]);
     }
 
+    public function getPermissionOfUser($id)
+    {
+        $permissions = $this->permissionService->getPermissionOfUser($id);
+
+        return $this->sendOkJsonResponse(['data' => $permissions]);
+    }
+
     /**
      * @param $id
      * @return JsonResponse
