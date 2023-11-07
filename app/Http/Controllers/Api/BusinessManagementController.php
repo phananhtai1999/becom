@@ -280,14 +280,4 @@ class BusinessManagementController extends AbstractRestAPIController
         }
 
     }
-
-    public function setBusinessLeader($id)
-    {
-        $businessMember = $this->userBusinessService->findOrFailById($id);
-        $businessMember->update(['is_leader' => !$businessMember->is_leader]);
-
-        return $this->sendOkJsonResponse(
-            $this->service->resourceToData($this->userBusinessResourceClass, $businessMember)
-        );
-    }
 }

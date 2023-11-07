@@ -17,6 +17,7 @@ use App\Http\Requests\ResetPasswordEmailTeamMemberRequest;
 use App\Http\Requests\SetContactListRequest;
 use App\Http\Requests\SetPermissionForTeamRequest;
 use App\Http\Requests\MyTeamRequest;
+use App\Http\Requests\SetTeamLeaderRequest;
 use App\Http\Requests\TeamRequest;
 use App\Http\Requests\UpdateTeamRequest;
 use App\Http\Resources\ContactListResourceCollection;
@@ -60,7 +61,7 @@ class TeamController extends Controller
         InviteService      $inviteService,
         PermissionService  $permissionService,
         ContactListService $contactListService,
-        MyTeamService      $myService,
+        MyTeamService      $myService
     )
     {
         $this->service = $service;
@@ -465,26 +466,59 @@ class TeamController extends Controller
     public function storeBusinessTeam(BusinessTeamRequest $request)
     {
         $teamModel = $this->service->create(array_merge($request->all(), [
-            'owner_uuid' => $request->get('team_owner_uuid'),
+            'owner_uuid' => $this->user()->getKey(),
         ]));
 
+        //add team member with user uuid
         $teamModel->business()->attach([$request->get("business_uuid")]);
-        foreach ($request->get('team_member_uuids') as $userUuid) {
-            $existingRecord = $this->userTeamService->findOneWhere([
-                'team_uuid' => $teamModel->uuid,
-                'user_uuid' => $userUuid
-            ]);
-
-            if (!$existingRecord) {
-                $this->userTeamService->create([
+        if ($request->get('team_member_uuids')) {
+            foreach ($request->get('team_member_uuids') as $userUuid) {
+                $existingRecord = $this->userTeamService->findOneWhere([
                     'team_uuid' => $teamModel->uuid,
                     'user_uuid' => $userUuid
                 ]);
+
+                if (!$existingRecord) {
+                    $this->userTeamService->create([
+                        'team_uuid' => $teamModel->uuid,
+                        'user_uuid' => $userUuid
+                    ]);
+                }
+            }
+        }
+
+        //add team member with team uuid
+        if ($request->get('team_uuid')) {
+            $user_uuids = $this->userTeamService->findAllWhere([
+                'team_uuid' => $request->get('team_uuid')
+            ])->pluck('user_uuid')->toArray();
+            foreach ($user_uuids as $userUuid) {
+                $existingRecord = $this->userTeamService->findOneWhere([
+                    'team_uuid' => $teamModel->uuid,
+                    'user_uuid' => $userUuid
+                ]);
+
+                if (!$existingRecord) {
+                    $this->userTeamService->create([
+                        'team_uuid' => $teamModel->uuid,
+                        'user_uuid' => $userUuid
+                    ]);
+                }
             }
         }
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $teamModel)
+        );
+    }
+
+    public function setTeamLeader(SetTeamLeaderRequest $request)
+    {
+        $team = $this->service->findOrFailById($request->get('team_uuid'));
+        $team->update(['leader_uuid' => $request->get('team_member_uuid')]);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $team)
         );
     }
 }

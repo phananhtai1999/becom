@@ -20,6 +20,7 @@ class TeamResource extends JsonResource
         $data = [
             'uuid' => $this->uuid,
             'name' => $this->name,
+            'leader_uuid' => $this->leader_uuid,
             'num_of_team_member' => $this->NumOfTeamMember,
             'owner_uuid' => $this->owner_uuid,
             'created_at' => $this->created_at,
