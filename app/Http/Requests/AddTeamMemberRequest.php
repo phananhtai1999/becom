@@ -32,7 +32,8 @@ class AddTeamMemberRequest extends FormRequest
             'type' => ['required', Rule::in([Team::ALREADY_EXISTS_ACCOUNT, Team::ACCOUNT_INVITE])],
         ];
         if ($this->request->get('type') == Team::ALREADY_EXISTS_ACCOUNT){
-            $validate['user_uuid'] = ['required', 'integer', 'min:1', 'exists:users,uuid'];
+            $validate['user_uuids'] = ['required', 'array', 'min:1'];
+            $validate['user_uuids.*'] = ['required', 'integer', 'min:1', Rule::exists('users', 'uuid')->whereNull('deleted_at')];
         } elseif ($this->request->get('type') == Team::ACCOUNT_INVITE) {
             $validate = array_merge($validate, [
                 'username' => ['required', 'string', "regex:/^(?!.*\.\.)[a-zA-Z0-9]*(?:\.[a-zA-Z0-9]+)*$/", Rule::unique('users', 'username')->whereNull('deleted_at'), new InviteRule($this->request->get('domain'))],
