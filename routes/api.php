@@ -622,6 +622,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website_page'], function ()
         Route::delete('my/website-page/{id}', [WebsitePageController::class, 'destroyMyWebsitePage'])->name('destroyMyWebsitePage');
     });
 
+    Route::get('/get-website-page', [WebsitePageController::class, 'getWebsitePage'])->name('getWebsitePage');
     Route::get('/website-pages-default', [WebsitePageController::class, 'getWebsitePagesDefault'])->name('getWebsitePagesDefault');
     Route::get('/website-page-default/{id}', [WebsitePageController::class, 'showWebsitePagesDefault'])->name('showWebsitePagesDefault');
 });
@@ -1068,8 +1069,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'team.'], function () {
         Route::put('/team/{id}', [TeamController::class, 'edit'])->name('edit');
         Route::delete('/team/{id}', [TeamController::class, 'destroy'])->name('destroy');
 
-        Route::put('/block-member/{id}', [TeamController::class, 'blockMemberForAdmin'])->name('blockMemberForAdmin');
-        Route::put('/unblock-member/{id}', [TeamController::class, 'unBlockMemberForAdmin'])->name('unBlockMemberForAdmin');
+        Route::get('/permission-of-user/{id}', [TeamController::class, 'getPermissionOfUser']);
     });
 
     Route::get('/all-member', [TeamController::class, 'listMemberOfAllTeam'])->name('listMemberOfAllTeam');
@@ -1088,6 +1088,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'team.'], function () {
 
     Route::group(['as' => 'my.'], function () {
         Route::get('my/teams', [TeamController::class, 'indexMy'])->name('indexMy');
+        Route::get('my/team/{id}', [TeamController::class, 'showMy'])->name('showMy');
         Route::post('/my/team', [TeamController::class, 'storeMy'])->name('storeMy');
         Route::put('/my/team/{id}', [TeamController::class, 'editMy'])->name('editMy');
         Route::delete('/my/team/{id}', [TeamController::class, 'destroyMy'])->name('destroyMy');
@@ -1263,6 +1264,8 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'business-management.'], fun
         Route::put('/business-management/{id}', [BusinessManagementController::class, 'edit'])->name('edit');
         Route::delete('/business-management/{id}', [BusinessManagementController::class, 'destroy'])->name('destroy');
     });
+    Route::post('business/add-member', [BusinessManagementController::class, 'addBusinessMember'])->name('addBusinessMember');
+    Route::post('business/set-leader/{id}', [BusinessManagementController::class, 'setBusinessLeader'])->name('addBusinessMember');
 
     Route::group(['as' => 'my.'], function () {
         Route::get('/my/business-managements', [BusinessManagementController::class, 'indexMy'])->name('index');

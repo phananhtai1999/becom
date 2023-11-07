@@ -12,6 +12,7 @@ use App\Models\QueryBuilders\CreditPackageQueryBuilder;
 use App\Models\QueryBuilders\PermissionQueryBuilder;
 use App\Models\QueryBuilders\SubscriptionPlanQueryBuilder;
 use App\Models\QueryBuilders\SortTotalCreditOfCampaignQueryBuilder;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -32,6 +33,17 @@ class PermissionService extends AbstractService
     {
         $permissions = $owner->userPlatformPackage->platformPackage->permissions;
         foreach ($owner->userAddOns as $userAddOn) {
+            $permissions = $permissions->merge($userAddOn->addOnSubscriptionPlan->addOn->permissions ?? []);
+        }
+
+        return $permissions;
+    }
+
+    public function getPermissionOfUser($userUuid)
+    {
+        $user = User::find($userUuid);
+        $permissions = $user->userPlatformPackage->platformPackage->permissions ?? [];
+        foreach ($user->userAddOns as $userAddOn) {
             $permissions = $permissions->merge($userAddOn->addOnSubscriptionPlan->addOn->permissions ?? []);
         }
 

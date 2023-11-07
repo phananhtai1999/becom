@@ -106,6 +106,15 @@ class TeamController extends Controller
         );
     }
 
+    public function showMy($id)
+    {
+        $model = $this->service->findOneWhereOrFail(['uuid' => $id, 'owner_uuid' => $this->user()->getKey()]);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
     public function storeMy(MyTeamRequest $request)
     {
         $model = $this->service->create(array_merge($request->all(), [
@@ -174,6 +183,11 @@ class TeamController extends Controller
                 DB::commit();
 
                 return $this->sendCreatedJsonResponse();
+            } elseif ($request->get('type') == Team::ALREADY_EXISTS_ACCOUNT) {
+                $this->userTeamService->create($request->all());
+                DB::commit();
+
+                return $this->sendCreatedJsonResponse();
             }
 
             return $this->sendValidationFailedJsonResponse();
@@ -182,7 +196,6 @@ class TeamController extends Controller
             return $this->sendInternalServerErrorJsonResponse();
         }
     }
-
 
     public function joinTeam(JoinTeamRequest $request)
     {
@@ -303,6 +316,13 @@ class TeamController extends Controller
         $permisions = $this->permissionService->getPermissionOfTeam($team->owner);
 
         return $this->sendOkJsonResponse(['data' => $permisions]);
+    }
+
+    public function getPermissionOfUser($id)
+    {
+        $permissions = $this->permissionService->getPermissionOfUser($id);
+
+        return $this->sendOkJsonResponse(['data' => $permissions]);
     }
 
     /**
