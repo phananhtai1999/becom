@@ -622,7 +622,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website_page'], function ()
         Route::delete('my/website-page/{id}', [WebsitePageController::class, 'destroyMyWebsitePage'])->name('destroyMyWebsitePage');
     });
 
-    Route::get('/get-website-page', [WebsitePageController::class, 'getWebsitePage'])->name('getWebsitePage');
+    Route::get('/get-website-page/{id}', [WebsitePageController::class, 'getWebsitePage'])->name('getWebsitePage');
     Route::get('/website-pages-default', [WebsitePageController::class, 'getWebsitePagesDefault'])->name('getWebsitePagesDefault');
     Route::get('/website-page-default/{id}', [WebsitePageController::class, 'showWebsitePagesDefault'])->name('showWebsitePagesDefault');
 });
@@ -1071,6 +1071,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'team.'], function () {
 
         Route::get('/permission-of-user/{id}', [TeamController::class, 'getPermissionOfUser']);
     });
+    Route::post('/business/team', [TeamController::class, 'storeBusinessTeam'])->name('storeBusinessTeam');
 
     Route::get('/all-member', [TeamController::class, 'listMemberOfAllTeam'])->name('listMemberOfAllTeam');
     Route::get('/list-member/{id}', [TeamController::class, 'listMember'])->name('listMember');
