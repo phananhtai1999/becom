@@ -371,7 +371,7 @@ class TeamController extends Controller
         );
     }
 
-    public function destroyMy(MyUpdateTeamRequest $request, $id)
+    public function destroyMy($id)
     {
         $model = $this->myService->findOneWhereOrFail([
             'owner_uuid' => auth()->user()->getKey(),

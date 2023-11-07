@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateTeamRequest extends FormRequest
 {
@@ -24,7 +25,8 @@ class UpdateTeamRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => ['string']
+            'name' => ['string'],
+            'parent_team_uuid' => ['nullable', 'numeric', Rule::exists('teams', 'uuid')->whereNull('deleted_at')]
         ];
     }
 }
