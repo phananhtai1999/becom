@@ -186,9 +186,20 @@ class TeamController extends Controller
 
                 return $this->sendCreatedJsonResponse();
             } elseif ($request->get('type') == Team::ALREADY_EXISTS_ACCOUNT) {
-                $this->userTeamService->create($request->all());
-                DB::commit();
+                foreach ($request->get('user_uuids') as $userUuid) {
+                    $existingRecord = $this->userTeamService->findOneWhere([
+                        'team_uuid' => $request->get('team_uuid'),
+                        'user_uuid' => $userUuid
+                    ]);
 
+                    if (!$existingRecord) {
+                        $this->userTeamService->create([
+                            'team_uuid' => $request->get('team_uuid'),
+                            'user_uuid' => $userUuid
+                        ]);
+                    }
+                }
+                DB::commit();
                 return $this->sendCreatedJsonResponse();
             }
 

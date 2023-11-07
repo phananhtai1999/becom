@@ -19,11 +19,13 @@ use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Resources\UserBusinessResource;
 use App\Models\PlatformPackage;
 use App\Models\Team;
+use App\Models\UserBusiness;
 use App\Services\BusinessManagementService;
 use App\Services\DomainService;
 use App\Services\MyBusinessManagementService;
 use App\Services\MyDomainService;
 use App\Services\UserBusinessService;
+use App\Services\UserService;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -49,6 +51,11 @@ class BusinessManagementController extends AbstractRestAPIController
     protected $myDomainService;
 
     /**
+     * @var UserService
+     */
+    protected $userService;
+
+    /**
      * @param BusinessManagementService $service
      * @param MyBusinessManagementService $myService
      * @param DomainService $domainService
@@ -59,7 +66,8 @@ class BusinessManagementController extends AbstractRestAPIController
         MyBusinessManagementService $myService,
         DomainService               $domainService,
         MyDomainService             $myDomainService,
-        UserBusinessService $userBusinessService
+        UserBusinessService $userBusinessService,
+        UserService $userService
     )
     {
         $this->service = $service;
@@ -73,6 +81,7 @@ class BusinessManagementController extends AbstractRestAPIController
         $this->storeRequest = BusinessManagementRequest::class;
         $this->editRequest = UpdateBusinessManagementRequest::class;
         $this->indexRequest = IndexRequest::class;
+        $this->userService = $userService;
     }
 
     /**
@@ -225,21 +234,51 @@ class BusinessManagementController extends AbstractRestAPIController
      */
     public function addBusinessMember(AddBusinessMemberRequest $request)
     {
-        foreach ($request->get('user_uuids') as $userUuid) {
-            $existingRecord = $this->userBusinessService->findOneWhere([
-                'business_uuid' => $request->get('business_uuid'),
-                'user_uuid' => $userUuid
-            ]);
+        DB::beginTransaction();
+        try{
+            if($request->get('type') == UserBusiness::ALREADY_EXISTS_ACCOUNT){
+                foreach ($request->get('user_uuids') as $userUuid) {
+                    $existingRecord = $this->userBusinessService->findOneWhere([
+                        'business_uuid' => $request->get('business_uuid'),
+                        'user_uuid' => $userUuid
+                    ]);
 
-            if (!$existingRecord) {
-                $this->userBusinessService->create([
-                    'business_uuid' => $request->get('business_uuid'),
-                    'user_uuid' => $userUuid
+                    if (!$existingRecord) {
+                        $this->userBusinessService->create([
+                            'business_uuid' => $request->get('business_uuid'),
+                            'user_uuid' => $userUuid
+                        ]);
+                    }
+                }
+                DB::commit();
+                return $this->sendCreatedJsonResponse();
+            }elseif($request->get('type') == UserBusiness::ACCOUNT_INVITE){
+                $passwordRandom = $this->generateRandomString(10);
+                $email = $request->get('username') . '@' . $request->get('domain');
+                $user = $this->userService->create([
+                    'email' => $email,
+                    'first_name' => $request->get('first_name'),
+                    'last_name' => $request->get('last_name'),
+                    'username' => $request->get('username'),
+                    'can_add_smtp_account' => 0,
+                    'password' => Hash::make($request->get('password'))
                 ]);
+                $user->roles()->attach([config('user.default_role_uuid')]);
+                $user->userPlatformPackage()->create(['platform_package_uuid' => PlatformPackage::DEFAULT_PLATFORM_PACKAGE_1]);
+                $this->userBusinessService->create(array_merge($request->all(), [
+                    'user_uuid' => $user->uuid,
+                ]));
+                Mailbox::postEmailAccountcreate($user->uuid, $email, $passwordRandom);
+                DB::commit();
+
+                return $this->sendCreatedJsonResponse();
             }
+
+        } catch (ConnectionException $exception){
+            DB::rollBack();
+            return $this->sendInternalServerErrorJsonResponse();
         }
 
-        return $this->sendCreatedJsonResponse();
     }
 
     public function setBusinessLeader($id)

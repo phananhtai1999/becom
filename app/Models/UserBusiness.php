@@ -10,6 +10,8 @@ class UserBusiness extends Model
 {
     use HasFactory, SoftDeletes;
 
+    const ACCOUNT_INVITE = 'account';
+    const ALREADY_EXISTS_ACCOUNT = 'exists_account';
 
     /**
      * @var string
