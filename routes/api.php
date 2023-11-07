@@ -1265,6 +1265,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'business-management.'], fun
         Route::delete('/business-management/{id}', [BusinessManagementController::class, 'destroy'])->name('destroy');
     });
     Route::post('business/add-member', [BusinessManagementController::class, 'addBusinessMember'])->name('addBusinessMember');
+    Route::post('business/set-leader/{id}', [BusinessManagementController::class, 'setBusinessLeader'])->name('addBusinessMember');
 
     Route::group(['as' => 'my.'], function () {
         Route::get('/my/business-managements', [BusinessManagementController::class, 'indexMy'])->name('index');
