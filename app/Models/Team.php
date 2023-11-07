@@ -29,6 +29,8 @@ class Team extends AbstractModel
     protected $fillable = [
         'name',
         'owner_uuid',
+        'parent_team_uuid',
+        'leader_uuid'
     ];
 
     /**
@@ -38,6 +40,7 @@ class Team extends AbstractModel
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
+        'leader_uuid' => 'integer'
     ];
     /**
      * @var string[]
@@ -48,6 +51,16 @@ class Team extends AbstractModel
     public function owner()
     {
         return $this->belongsTo(User::class, 'owner_uuid', 'uuid');
+    }
+
+    public function childrenTeam()
+    {
+        return $this->hasMany(__CLASS__, 'parent_team_uuid');
+    }
+
+    public function parentTeam()
+    {
+        return $this->belongsTo(__CLASS__, 'parent_team_uuid');
     }
 
 
