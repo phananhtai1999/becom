@@ -1072,6 +1072,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'team.'], function () {
         Route::get('/permission-of-user/{id}', [TeamController::class, 'getPermissionOfUser']);
     });
     Route::post('/business/team', [TeamController::class, 'storeBusinessTeam'])->name('storeBusinessTeam');
+    Route::post('team/set-leader', [TeamController::class, 'setTeamLeader'])->name('addBusinessMember');
 
     Route::get('/all-member', [TeamController::class, 'listMemberOfAllTeam'])->name('listMemberOfAllTeam');
     Route::get('/list-member/{id}', [TeamController::class, 'listMember'])->name('listMember');
@@ -1266,7 +1267,6 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'business-management.'], fun
         Route::delete('/business-management/{id}', [BusinessManagementController::class, 'destroy'])->name('destroy');
     });
     Route::post('business/add-member', [BusinessManagementController::class, 'addBusinessMember'])->name('addBusinessMember');
-    Route::post('business/set-leader/{id}', [BusinessManagementController::class, 'setBusinessLeader'])->name('addBusinessMember');
 
     Route::group(['as' => 'my.'], function () {
         Route::get('/my/business-managements', [BusinessManagementController::class, 'indexMy'])->name('index');
