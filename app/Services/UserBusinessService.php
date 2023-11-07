@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Abstracts\AbstractService;
-use App\Models\QueryBuilders\UserBusinessQueryBuilder;
+use App\Models\QueryBuilders\BusinessTeamQueryBuilder;
 use App\Models\UserBusiness;
 use App\Models\UserTeam;
 
@@ -11,7 +11,7 @@ class UserBusinessService extends AbstractService
 {
     protected $modelClass = UserBusiness::class;
 
-    protected $modelQueryBuilderClass = UserBusinessQueryBuilder::class;
+    protected $modelQueryBuilderClass = BusinessTeamQueryBuilder::class;
 
     public function listTeamMember($id, $request)
     {

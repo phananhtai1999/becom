@@ -24,11 +24,7 @@ class ShowWebsitePageRequest extends FormRequest
      */
     public function rules()
     {
-        $validate = [
-            'per_page' => ['integer', 'min:1', 'max:100'],
-            'page' => ['integer', 'min:1'],
-            'publish_status' => ['integer', 'min:1'],
-        ];
+        $validate = [];
         $websitePage = WebsitePage::find($this->id);
         if ($websitePage->type == WebsitePage::ARTICLE_DETAIL_TYPE) {
             $validate['article_slug'] = ['required', 'exists:articles,slug'];

@@ -8,6 +8,7 @@ use App\Http\Controllers\Traits\RestEditTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestStoreTrait;
 use App\Http\Requests\AddTeamMemberRequest;
+use App\Http\Requests\BusinessTeamRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\InviteUserRequest;
 use App\Http\Requests\JoinTeamRequest;
@@ -31,6 +32,7 @@ use App\Models\Invite;
 use App\Models\PlatformPackage;
 use App\Models\Role;
 use App\Models\Team;
+use App\Services\BusinessTeamService;
 use App\Services\ContactListService;
 use App\Services\InviteService;
 use App\Services\MyTeamService;
@@ -58,7 +60,7 @@ class TeamController extends Controller
         InviteService      $inviteService,
         PermissionService  $permissionService,
         ContactListService $contactListService,
-        MyTeamService      $myService
+        MyTeamService      $myService,
     )
     {
         $this->service = $service;
@@ -447,5 +449,31 @@ class TeamController extends Controller
         }
 
         return $this->sendValidationFailedJsonResponse();
+    }
+
+    public function storeBusinessTeam(BusinessTeamRequest $request)
+    {
+        $teamModel = $this->service->create(array_merge($request->all(), [
+            'owner_uuid' => $request->get('team_owner_uuid'),
+        ]));
+
+        $teamModel->business()->attach([$request->get("business_uuid")]);
+        foreach ($request->get('team_member_uuids') as $userUuid) {
+            $existingRecord = $this->userTeamService->findOneWhere([
+                'team_uuid' => $teamModel->uuid,
+                'user_uuid' => $userUuid
+            ]);
+
+            if (!$existingRecord) {
+                $this->userTeamService->create([
+                    'team_uuid' => $teamModel->uuid,
+                    'user_uuid' => $userUuid
+                ]);
+            }
+        }
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $teamModel)
+        );
     }
 }
