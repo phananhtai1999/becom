@@ -469,9 +469,13 @@ class TeamController extends Controller
         $teamModel = $this->service->create(array_merge($request->all(), [
             'owner_uuid' => $this->user()->getKey(),
         ]));
-
+        if ($this->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->count()) {
+            $businessUuid = $request->get("business_uuid");
+        } else {
+            $businessUuid = $this->user()->businessManagements->first()->uuid;
+        }
         //add team member with user uuid
-        $teamModel->business()->attach([$request->get("business_uuid")]);
+        $teamModel->business()->attach([$businessUuid]);
         if ($request->get('team_member_uuids')) {
             foreach ($request->get('team_member_uuids') as $userUuid) {
                 $existingRecord = $this->userTeamService->findOneWhere([

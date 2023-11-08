@@ -19,6 +19,7 @@ use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Resources\UserBusinessResource;
 use App\Models\PlatformPackage;
+use App\Models\Role;
 use App\Models\Team;
 use App\Models\UserBusiness;
 use App\Services\BusinessManagementService;
@@ -241,16 +242,21 @@ class BusinessManagementController extends AbstractRestAPIController
     {
         DB::beginTransaction();
         try{
+            if ($this->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->count()) {
+                $businessUuid = $request->get("business_uuid");
+            } else {
+                $businessUuid = $this->user()->businessManagements->first()->uuid;
+            }
             if($request->get('type') == UserBusiness::ALREADY_EXISTS_ACCOUNT){
                 foreach ($request->get('user_uuids') as $userUuid) {
                     $existingRecord = $this->userBusinessService->findOneWhere([
-                        'business_uuid' => $request->get('business_uuid'),
+                        'business_uuid' => $businessUuid,
                         'user_uuid' => $userUuid
                     ]);
 
                     if (!$existingRecord) {
                         $this->userBusinessService->create([
-                            'business_uuid' => $request->get('business_uuid'),
+                            'business_uuid' => $businessUuid,
                             'user_uuid' => $userUuid
                         ]);
                     }
@@ -270,8 +276,9 @@ class BusinessManagementController extends AbstractRestAPIController
                 ]);
                 $user->roles()->attach([config('user.default_role_uuid')]);
                 $user->userPlatformPackage()->create(['platform_package_uuid' => PlatformPackage::DEFAULT_PLATFORM_PACKAGE_1]);
-                $this->userBusinessService->create(array_merge($request->all(), [
-                    'user_uuid' => $user->uuid,
+                $this->userBusinessService->create(array_merge([
+                    'business_uuid' => $businessUuid,
+                    'user_uuid' => $user->uuid
                 ]));
                 Mailbox::postEmailAccountcreate($user->uuid, $email, $passwordRandom);
                 DB::commit();
