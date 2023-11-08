@@ -17,6 +17,7 @@ use App\Http\Requests\ResetPasswordEmailTeamMemberRequest;
 use App\Http\Requests\SetContactListRequest;
 use App\Http\Requests\SetPermissionForTeamRequest;
 use App\Http\Requests\MyTeamRequest;
+use App\Http\Requests\SetTeamAddOnRequest;
 use App\Http\Requests\SetTeamLeaderRequest;
 use App\Http\Requests\TeamRequest;
 use App\Http\Requests\UpdateTeamRequest;
@@ -516,6 +517,20 @@ class TeamController extends Controller
     {
         $team = $this->service->findOrFailById($request->get('team_uuid'));
         $team->update(['leader_uuid' => $request->get('team_member_uuid')]);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $team)
+        );
+    }
+
+    /**
+     * @param SetTeamAddOnRequest $request
+     * @return JsonResponse
+     */
+    public function setAddOnForTeam(SetTeamAddOnRequest $request)
+    {
+        $team = $this->service->findOrFailById($request->get('team_uuid'));
+        $team->addons()->sync($request->get('add_on_uuids', []));
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $team)
