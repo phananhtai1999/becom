@@ -1073,8 +1073,9 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'team.'], function () {
     });
     Route::post('/business/team', [TeamController::class, 'storeBusinessTeam'])->name('storeBusinessTeam');
     Route::post('team/set-leader', [TeamController::class, 'setTeamLeader'])->name('addBusinessMember');
+    Route::get('business/add-on-for-team/{id}', [TeamController::class, 'getAddOnForTeam'])->name('getAddOnForTeam');
 
-    Route::get('/all-member', [TeamController::class, 'listMemberOfAllTeam'])->name('listMemberOfAllTeam');
+    Route::get('/all-team-member', [TeamController::class, 'listMemberOfAllTeam'])->name('listMemberOfAllTeam');
     Route::get('/list-member/{id}', [TeamController::class, 'listMember'])->name('listMember');
     Route::get('/join-team', [TeamController::class, 'joinTeam'])->name('joinTeam');
     Route::get('/invite-user', [TeamController::class, 'inviteUser'])->name('inviteUser');
@@ -1269,6 +1270,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'business-management.'], fun
     Route::post('business/add-member', [BusinessManagementController::class, 'addBusinessMember'])->name('addBusinessMember');
     Route::get('business/get-add-ons/{id}', [BusinessManagementController::class, 'getAddOns'])->name('getAddOns');
     Route::post('business/set-add-on-for-team', [TeamController::class, 'setAddOnForTeam'])->name('setAddOnForTeam');
+    Route::get('/all-business-member', [BusinessManagementController::class, 'listMemberOfBusiness'])->name('listMemberOfBusiness');
 
     Route::group(['as' => 'my.'], function () {
         Route::get('/my/business-managements', [BusinessManagementController::class, 'indexMy'])->name('index');
