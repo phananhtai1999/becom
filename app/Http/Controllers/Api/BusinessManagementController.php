@@ -12,6 +12,7 @@ use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyBusinessManagementRequest;
 use App\Http\Requests\UpdateBusinessManagementRequest;
 use App\Http\Requests\UpdateMyBusinessManagementRequest;
+use App\Http\Resources\AddOnResourceCollection;
 use App\Http\Resources\BusinessManagementResource;
 use App\Http\Resources\BusinessManagementResourceCollection;
 use App\Http\Controllers\Traits\RestIndexTrait;
@@ -24,6 +25,7 @@ use App\Services\BusinessManagementService;
 use App\Services\DomainService;
 use App\Services\MyBusinessManagementService;
 use App\Services\MyDomainService;
+use App\Services\UserAddOnService;
 use App\Services\UserBusinessService;
 use App\Services\UserService;
 use Illuminate\Http\Client\ConnectionException;
@@ -67,7 +69,8 @@ class BusinessManagementController extends AbstractRestAPIController
         DomainService               $domainService,
         MyDomainService             $myDomainService,
         UserBusinessService $userBusinessService,
-        UserService $userService
+        UserService $userService,
+        UserAddOnService $userAddOnService
     )
     {
         $this->service = $service;
@@ -78,10 +81,12 @@ class BusinessManagementController extends AbstractRestAPIController
         $this->resourceCollectionClass = BusinessManagementResourceCollection::class;
         $this->resourceClass = BusinessManagementResource::class;
         $this->userBusinessResourceClass = UserBusinessResource::class;
+        $this->addOnResourceCollectionClass = AddOnResourceCollection::class;
         $this->storeRequest = BusinessManagementRequest::class;
         $this->editRequest = UpdateBusinessManagementRequest::class;
         $this->indexRequest = IndexRequest::class;
         $this->userService = $userService;
+        $this->userAddOnService = $userAddOnService;
     }
 
     /**
@@ -279,5 +284,19 @@ class BusinessManagementController extends AbstractRestAPIController
             return $this->sendInternalServerErrorJsonResponse();
         }
 
+    }
+
+    public function getAddOns($id)
+    {
+        $business = $this->service->findOrFailById($id);
+        $userAddOns = $this->userAddOnService->findAllWhere(['user_uuid' => $business->owner_uuid], ['user_uuid', 'add_on_subscription_plan_uuid'], true);
+        $addOns = [];
+        foreach ($userAddOns as $userAddOn) {
+            $addOns[] = $userAddOn->addOnSubscriptionPlan->addOn ?? [];
+        }
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->addOnResourceCollectionClass, $addOns)
+        );
     }
 }
