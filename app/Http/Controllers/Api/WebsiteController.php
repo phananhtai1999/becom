@@ -187,7 +187,7 @@ class WebsiteController extends AbstractRestAPIController
                     );
                 }
 
-                $this->changeStatusWebsitePageByStatusWebsite($website, $request->get("publish_status"));
+                $this->changeStatusTemplateByStatusWebsite($website, $request->get("publish_status"));
                 $this->service->update($website, [
                     "publish_status" => $request->get("publish_status"),
                 ]);
@@ -307,7 +307,7 @@ class WebsiteController extends AbstractRestAPIController
     {
         foreach ($request->websites as $websiteUuid) {
             $website = $this->service->findOneById($websiteUuid);
-            $this->changeStatusWebsitePageByStatusWebsite($website, $request->get("publish_status"));
+            $this->changeStatusTemplateByStatusWebsite($website, $request->get("publish_status"));
             $this->service->update($website, [
                 "publish_status" => $request->get("publish_status"),
             ]);
@@ -316,7 +316,7 @@ class WebsiteController extends AbstractRestAPIController
         return $this->sendOkJsonResponse();
     }
 
-    public function changeStatusWebsitePageByStatusWebsite($website, $publicStatus)
+    public function changeStatusTemplateByStatusWebsite($website, $publicStatus)
     {
         if (in_array($publicStatus, [Website::PUBLISHED_PUBLISH_STATUS, Website::PENDING_PUBLISH_STATUS])){
             $statusWebsitePage = $publicStatus == Website::PUBLISHED_PUBLISH_STATUS
