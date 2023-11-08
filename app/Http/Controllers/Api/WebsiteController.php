@@ -25,7 +25,9 @@ use App\Http\Resources\WebsiteResource;
 use App\Http\Resources\WebsiteResourceCollection;
 use App\Models\Article;
 use App\Models\Role;
+use App\Models\SectionTemplate;
 use App\Models\Website;
+use App\Models\WebsitePage;
 use App\Services\MyWebsiteService;
 use App\Services\WebsiteService;
 use Carbon\Carbon;
@@ -185,6 +187,7 @@ class WebsiteController extends AbstractRestAPIController
                     );
                 }
 
+                $this->changeStatusWebsitePageByStatusWebsite($website, $request->get("publish_status"));
                 $this->service->update($website, [
                     "publish_status" => $request->get("publish_status"),
                 ]);
@@ -304,11 +307,35 @@ class WebsiteController extends AbstractRestAPIController
     {
         foreach ($request->websites as $websiteUuid) {
             $website = $this->service->findOneById($websiteUuid);
+            $this->changeStatusWebsitePageByStatusWebsite($website, $request->get("publish_status"));
             $this->service->update($website, [
                 "publish_status" => $request->get("publish_status"),
             ]);
         }
 
         return $this->sendOkJsonResponse();
+    }
+
+    public function changeStatusWebsitePageByStatusWebsite($website, $publicStatus)
+    {
+        if (in_array($publicStatus, [Website::PUBLISHED_PUBLISH_STATUS, Website::PENDING_PUBLISH_STATUS])){
+            $statusWebsitePage = $publicStatus == Website::PUBLISHED_PUBLISH_STATUS
+                ? WebsitePage::PUBLISHED_PUBLISH_STATUS : WebsitePage::PENDING_PUBLISH_STATUS;
+            $website->websitePages()
+                ->where('publish_status', '<>', $statusWebsitePage)->get()->map(function ($websitePage) use ($statusWebsitePage){
+                    $this->service->update($websitePage, ["publish_status" => $statusWebsitePage]);
+                });
+
+            $statusSectionTemplate = $publicStatus == Website::PUBLISHED_PUBLISH_STATUS
+                ? SectionTemplate::PUBLISHED_PUBLISH_STATUS : SectionTemplate::PENDING_PUBLISH_STATUS;
+            $headerSection = $website->headerSection;
+            $footerSection = $website->footerSection;
+            if ($headerSection && $headerSection->publish_status != $statusSectionTemplate){
+                $this->service->update($headerSection, ["publish_status" => $statusWebsitePage]);
+            }
+            if ($footerSection && $footerSection->publish_status != $statusSectionTemplate){
+                $this->service->update($footerSection, ["publish_status" => $statusWebsitePage]);
+            }
+        }
     }
 }
