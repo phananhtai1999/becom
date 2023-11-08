@@ -148,8 +148,12 @@ abstract class AbstractService
      * @param array|null $select
      * @return mixed
      */
-    public function findAllWhere($where = null, array $select = null)
+    public function findAllWhere($where = null, array $select = null, $distinct = false)
     {
+        if ($distinct) {
+            return $this->model->select($select ?? '*')->where($where)->distinct()->get();
+        }
+
         return $this->model->select($select ?? '*')->where($where)->get();
     }
 
