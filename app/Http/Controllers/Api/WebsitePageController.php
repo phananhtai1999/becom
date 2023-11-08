@@ -374,4 +374,13 @@ class WebsitePageController extends AbstractRestAPIController
             $this->service->resourceToData($this->resourceClass, $model)
         );
     }
+
+    public function listMyAcceptedWebsitePages(IndexRequest $request)
+    {
+        $models = $this->myService->getIsCanUseWebsitePages($request);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+        );
+    }
 }
