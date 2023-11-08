@@ -17,6 +17,7 @@ use App\Http\Requests\ResetPasswordEmailTeamMemberRequest;
 use App\Http\Requests\SetContactListRequest;
 use App\Http\Requests\SetPermissionForTeamRequest;
 use App\Http\Requests\MyTeamRequest;
+use App\Http\Requests\SetTeamAddOnRequest;
 use App\Http\Requests\SetTeamLeaderRequest;
 use App\Http\Requests\TeamRequest;
 use App\Http\Requests\UpdateTeamRequest;
@@ -468,9 +469,13 @@ class TeamController extends Controller
         $teamModel = $this->service->create(array_merge($request->all(), [
             'owner_uuid' => $this->user()->getKey(),
         ]));
-
+        if ($this->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->count()) {
+            $businessUuid = $request->get("business_uuid");
+        } else {
+            $businessUuid = $this->user()->businessManagements->first()->uuid;
+        }
         //add team member with user uuid
-        $teamModel->business()->attach([$request->get("business_uuid")]);
+        $teamModel->business()->attach([$businessUuid]);
         if ($request->get('team_member_uuids')) {
             foreach ($request->get('team_member_uuids') as $userUuid) {
                 $existingRecord = $this->userTeamService->findOneWhere([
@@ -516,6 +521,20 @@ class TeamController extends Controller
     {
         $team = $this->service->findOrFailById($request->get('team_uuid'));
         $team->update(['leader_uuid' => $request->get('team_member_uuid')]);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $team)
+        );
+    }
+
+    /**
+     * @param SetTeamAddOnRequest $request
+     * @return JsonResponse
+     */
+    public function setAddOnForTeam(SetTeamAddOnRequest $request)
+    {
+        $team = $this->service->findOrFailById($request->get('team_uuid'));
+        $team->addons()->sync($request->get('add_on_uuids', []));
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $team)
