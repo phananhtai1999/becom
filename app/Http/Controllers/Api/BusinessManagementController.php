@@ -282,7 +282,7 @@ class BusinessManagementController extends AbstractRestAPIController
                     'business_uuid' => $businessUuid,
                     'user_uuid' => $user->uuid
                 ]));
-//                Mailbox::postEmailAccountcreate($user->uuid, $email, $passwordRandom);
+                Mailbox::postEmailAccountcreate($user->uuid, $email, $passwordRandom);
                 DB::commit();
 
                 return $this->sendCreatedJsonResponse();

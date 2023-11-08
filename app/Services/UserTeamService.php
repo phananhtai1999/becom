@@ -12,7 +12,7 @@ class UserTeamService extends AbstractService
 
     protected $modelQueryBuilderClass = UserTeamQueryBuilder::class;
 
-    public function listBusinessMember($id, $request)
+    public function listTeamMember($id, $request)
     {
         $request = $this->getIndexRequest($request);
         return $this->modelQueryBuilderClass::searchQuery($request['search'], $request['search_by'])
@@ -20,7 +20,7 @@ class UserTeamService extends AbstractService
             ->paginate($request['per_page'], $request['columns'], $request['page_name'], $request['page']);
     }
 
-    public function listMemberOfBusiness($request)
+    public function listTeamMemberOfAllTeam($request)
     {
         $request = $this->getIndexRequest($request);
         return $this->modelQueryBuilderClass::searchQuery($request['search'], $request['search_by'])
