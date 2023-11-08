@@ -18,6 +18,7 @@ use App\Http\Resources\BusinessManagementResourceCollection;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Resources\UserBusinessResource;
+use App\Http\Resources\UserBusinessResourceCollection;
 use App\Models\PlatformPackage;
 use App\Models\Role;
 use App\Models\Team;
@@ -82,6 +83,7 @@ class BusinessManagementController extends AbstractRestAPIController
         $this->resourceCollectionClass = BusinessManagementResourceCollection::class;
         $this->resourceClass = BusinessManagementResource::class;
         $this->userBusinessResourceClass = UserBusinessResource::class;
+        $this->userBusinessResourceCollectionClass = UserBusinessResourceCollection::class;
         $this->addOnResourceCollectionClass = AddOnResourceCollection::class;
         $this->storeRequest = BusinessManagementRequest::class;
         $this->editRequest = UpdateBusinessManagementRequest::class;
@@ -280,7 +282,7 @@ class BusinessManagementController extends AbstractRestAPIController
                     'business_uuid' => $businessUuid,
                     'user_uuid' => $user->uuid
                 ]));
-                Mailbox::postEmailAccountcreate($user->uuid, $email, $passwordRandom);
+//                Mailbox::postEmailAccountcreate($user->uuid, $email, $passwordRandom);
                 DB::commit();
 
                 return $this->sendCreatedJsonResponse();
@@ -304,6 +306,24 @@ class BusinessManagementController extends AbstractRestAPIController
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->addOnResourceCollectionClass, $addOns)
+        );
+    }
+
+    public function listMemberOfBusiness(IndexRequest $request)
+    {
+        if ($this->user()->roles->whereIn('slug', [Role::ROLE_ADMIN, Role::ROLE_ROOT])->first()) {
+            $model = $this->userBusinessService->listMemberOfAllBusiness($request);
+        } else {
+            $business = $this->service->findOneWhere((['owner_uuid' => $this->user()->getKey()]));
+            if ($business) {
+                $model = $this->userBusinessService->listBusinessMember([$business->uuid], $request);
+            } else {
+                $model = [];
+            }
+        }
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->userBusinessResourceCollectionClass, $model)
         );
     }
 }

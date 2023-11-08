@@ -13,15 +13,15 @@ class UserBusinessService extends AbstractService
 
     protected $modelQueryBuilderClass = UserBusinessQueryBuilder::class;
 
-    public function listTeamMember($id, $request)
+    public function listBusinessMember($id, $request)
     {
         $request = $this->getIndexRequest($request);
         return $this->modelQueryBuilderClass::searchQuery($request['search'], $request['search_by'])
-            ->whereIn('team_uuid', $id)
+            ->whereIn('business_uuid', $id)
             ->paginate($request['per_page'], $request['columns'], $request['page_name'], $request['page']);
     }
 
-    public function listTeamMemberOfAllTeam($request)
+    public function listMemberOfAllBusiness($request)
     {
         $request = $this->getIndexRequest($request);
         return $this->modelQueryBuilderClass::searchQuery($request['search'], $request['search_by'])

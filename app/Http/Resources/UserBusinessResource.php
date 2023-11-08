@@ -14,7 +14,10 @@ class UserBusinessResource extends JsonResource
      */
     public function toArray($request)
     {
-        return [
+        $expand = request()->get('expand', []);
+
+        $data = [
+            'uuid' => $this->getKey(),
             'user_uuid' => $this->user_uuid,
             'business_uuid' => $this->business_uuid,
             'is_leader' => $this->is_leader,
@@ -22,5 +25,14 @@ class UserBusinessResource extends JsonResource
             'updated_at' => $this->updated_at,
             'deleted_at' => $this->deleted_at,
         ];
+
+        if (\in_array('user_business__business', $expand)) {
+            $data['business'] = new BusinessCategoryResource($this->business);
+        }
+        if (\in_array('user_business__user', $expand)) {
+            $data['user'] = new UserResource($this->user);
+        }
+
+        return $data;
     }
 }
