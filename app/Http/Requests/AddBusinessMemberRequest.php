@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Role;
 use App\Models\UserBusiness;
 use App\Rules\InviteRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -28,10 +29,12 @@ class AddBusinessMemberRequest extends FormRequest
     public function rules()
     {
         $validate = [
-            'business_uuid' => ['required', Rule::exists('business_managements', 'uuid')->whereNull('deleted_at')],
             'type' => ['required', Rule::in([UserBusiness::ALREADY_EXISTS_ACCOUNT, UserBusiness::ACCOUNT_INVITE])],
         ];
-
+        if (auth()->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->count())
+        {
+            $validate['business_uuid'] = ['required', 'integer', Rule::exists('business_managements', 'uuid')->whereNull('deleted_at')];
+        }
         if ($this->request->get('type') == UserBusiness::ALREADY_EXISTS_ACCOUNT){
             $validate['user_uuids'] = ['required', 'array', 'min:1'];
             $validate['user_uuids.*'] = ['required', 'integer', 'min:1', Rule::exists('users', 'uuid')->whereNull('deleted_at')];
