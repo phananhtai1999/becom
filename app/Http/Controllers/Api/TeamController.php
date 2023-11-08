@@ -21,6 +21,8 @@ use App\Http\Requests\SetTeamAddOnRequest;
 use App\Http\Requests\SetTeamLeaderRequest;
 use App\Http\Requests\TeamRequest;
 use App\Http\Requests\UpdateTeamRequest;
+use App\Http\Resources\AddOnResource;
+use App\Http\Resources\AddOnResourceCollection;
 use App\Http\Resources\ContactListResourceCollection;
 use App\Http\Resources\TeamResource;
 use App\Http\Resources\TeamResourceCollection;
@@ -74,6 +76,7 @@ class TeamController extends Controller
         $this->permissionService = $permissionService;
         $this->contactListService = $contactListService;
         $this->resourceCollectionClass = TeamResourceCollection::class;
+        $this->addOnResourceCollectionClass = AddOnResourceCollection::class;
         $this->userTeamResourceClass = UserTeamResource::class;
         $this->contactListresourceCollectionClass = ContactListResourceCollection::class;
         $this->userTeamResourceCollectionClass = UserTeamResourceCollection::class;
@@ -492,26 +495,6 @@ class TeamController extends Controller
             }
         }
 
-        //add team member with team uuid
-        if ($request->get('team_uuid')) {
-            $user_uuids = $this->userTeamService->findAllWhere([
-                'team_uuid' => $request->get('team_uuid')
-            ])->pluck('user_uuid')->toArray();
-            foreach ($user_uuids as $userUuid) {
-                $existingRecord = $this->userTeamService->findOneWhere([
-                    'team_uuid' => $teamModel->uuid,
-                    'user_uuid' => $userUuid
-                ]);
-
-                if (!$existingRecord) {
-                    $this->userTeamService->create([
-                        'team_uuid' => $teamModel->uuid,
-                        'user_uuid' => $userUuid
-                    ]);
-                }
-            }
-        }
-
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $teamModel)
         );
@@ -538,6 +521,15 @@ class TeamController extends Controller
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $team)
+        );
+    }
+
+    public function getAddOnForTeam($id)
+    {
+        $team = $this->service->findOrFailById($id);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->addOnResourceCollectionClass, $team->addons)
         );
     }
 }
