@@ -20,6 +20,7 @@ use App\Http\Requests\MyTeamRequest;
 use App\Http\Requests\SetTeamAddOnRequest;
 use App\Http\Requests\SetTeamLeaderRequest;
 use App\Http\Requests\TeamRequest;
+use App\Http\Requests\UpdateBusinessTeamRequest;
 use App\Http\Requests\UpdateTeamRequest;
 use App\Http\Resources\AddOnResource;
 use App\Http\Resources\AddOnResourceCollection;
@@ -36,6 +37,7 @@ use App\Models\Invite;
 use App\Models\PlatformPackage;
 use App\Models\Role;
 use App\Models\Team;
+use App\Services\AddOnService;
 use App\Services\BusinessTeamService;
 use App\Services\ContactListService;
 use App\Services\InviteService;
@@ -43,6 +45,7 @@ use App\Services\MyTeamService;
 use App\Services\PermissionService;
 use App\Services\SmtpAccountService;
 use App\Services\TeamService;
+use App\Services\UserBusinessService;
 use App\Services\UserService;
 use App\Services\UserTeamService;
 use Illuminate\Http\Client\ConnectionException;
@@ -64,7 +67,9 @@ class TeamController extends Controller
         InviteService      $inviteService,
         PermissionService  $permissionService,
         ContactListService $contactListService,
-        MyTeamService      $myService
+        MyTeamService      $myService,
+        UserBusinessService $userBusinessService,
+        AddOnService $addOnService
     )
     {
         $this->service = $service;
@@ -75,6 +80,8 @@ class TeamController extends Controller
         $this->inviteService = $inviteService;
         $this->permissionService = $permissionService;
         $this->contactListService = $contactListService;
+        $this->userBusinessService = $userBusinessService;
+        $this->addOnService = $addOnService;
         $this->resourceCollectionClass = TeamResourceCollection::class;
         $this->addOnResourceCollectionClass = AddOnResourceCollection::class;
         $this->userTeamResourceClass = UserTeamResource::class;
@@ -170,6 +177,15 @@ class TeamController extends Controller
     {
         DB::beginTransaction();
         try {
+            //get business uuid
+            if ($this->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->count()) {
+                $businessUuid = $request->get("business_uuid");
+            } else {
+                $businesses= $this->user()->businessManagements;
+                if (!empty($businesses)) {
+                    $businessUuid = $businesses->first()->uuid;
+                }
+            }
             if ($request->get('type') == Team::ACCOUNT_INVITE) {
                 $passwordRandom = $this->generateRandomString(10);
                 $email = $request->get('username') . '@' . $request->get('domain');
@@ -186,6 +202,11 @@ class TeamController extends Controller
                 $this->userTeamService->create(array_merge($request->all(), [
                     'user_uuid' => $user->uuid,
                 ]));
+
+                $this->userBusinessService->create([
+                    'business_uuid' => $businessUuid,
+                    'user_uuid' => $user->uuid
+                ]);
                 Mailbox::postEmailAccountcreate($user->uuid, $email, $passwordRandom);
                 DB::commit();
 
@@ -202,6 +223,17 @@ class TeamController extends Controller
                             'team_uuid' => $request->get('team_uuid'),
                             'user_uuid' => $userUuid
                         ]);
+
+                        $userBusiness = $this->userBusinessService->findOneWhere([
+                            'business_uuid' => $businessUuid,
+                            'user_uuid' => $userUuid
+                        ]);
+                        if (!$userBusiness) {
+                            $this->userBusinessService->create([
+                                'business_uuid' => $businessUuid,
+                                'user_uuid' => $userUuid
+                            ]);
+                        }
                     }
                 }
                 DB::commit();
@@ -500,6 +532,48 @@ class TeamController extends Controller
         );
     }
 
+    /**
+     * @param UpdateBusinessTeamRequest $request
+     * @param $id
+     * @return JsonResponse
+     */
+    public function editBusinessTeam(UpdateBusinessTeamRequest $request, $id)
+    {
+        if ($this->user()->roles->whereNotIn('slug', [Role::ROLE_ADMIN, Role::ROLE_ROOT])->count()) {
+            if (!$this->checkTeamOwner($id)) {
+
+                return $this->sendJsonResponse(false, 'You are not owner of team to edit', [], 403);
+            }
+        }
+        $teamModel = $this->myService->findOrFailById($id);
+        $this->service->update($teamModel, $request->all());
+        $teamModel->users()->sync($request->get('team_member_uuids'));
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $teamModel)
+        );
+    }
+
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
+    public function destroyBusinessTeam($id)
+    {
+        if ($this->user()->roles->whereNotIn('slug', [Role::ROLE_ADMIN, Role::ROLE_ROOT])->count()) {
+            if (!$this->checkTeamOwner($id)) {
+
+                return $this->sendJsonResponse(false, 'You are not owner of team to edit', [], 403);
+            }
+        }
+        $model = $this->myService->findOneWhereOrFail([
+            'uuid' => $id
+        ]);
+        $this->destroy($model->uuid);
+
+        return $this->sendOkJsonResponse();
+    }
+
     public function setTeamLeader(SetTeamLeaderRequest $request)
     {
         $team = $this->service->findOrFailById($request->get('team_uuid'));
@@ -524,12 +598,12 @@ class TeamController extends Controller
         );
     }
 
-    public function getAddOnForTeam($id)
+    public function getAddOnOfTeam(IndexRequest $request, $id)
     {
-        $team = $this->service->findOrFailById($id);
+        $addOns = $this->addOnService->getAddOnsByTeam($request, $id);
 
         return $this->sendOkJsonResponse(
-            $this->service->resourceToData($this->addOnResourceCollectionClass, $team->addons)
+            $this->service->resourceCollectionToData($this->addOnResourceCollectionClass, $addOns)
         );
     }
 }

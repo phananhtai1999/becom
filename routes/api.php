@@ -603,6 +603,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website_page'], function ()
         Route::put('website-page/{id}', [WebsitePageController::class, 'edit'])->name('edit');
         Route::delete('/website-page/{id}', [WebsitePageController::class, 'destroy'])->name('destroy');
         Route::post('website-page/change-status', [WebsitePageController::class, 'changeStatusWebsitePage'])->name('changeStatusWebsitePage');
+        Route::get("accepted-website-pages", [WebsitePageController::class, 'listAcceptedWebsitePages'])->name('listAcceptedWebsitePages');
     });
 
     Route::group(['middleware' => ['role:root,admin,editor']], function () {
@@ -731,6 +732,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'section-template'], functio
         Route::put('section-template/{id}', [SectionTemplateController::class, 'edit'])->name('edit');
         Route::delete('/section-template/{id}', [SectionTemplateController::class, 'destroy'])->name('destroy');
         Route::post('section-template/change-status', [SectionTemplateController::class, 'changeStatusSectionTemplate'])->name('acceptPublishSectionTemplate');
+        Route::get("accepted-section-templates", [SectionTemplateController::class, 'listAcceptedSectionTemplate'])->name('listAcceptedSectionTemplate');
     });
 
     Route::group(['middleware' => ['role:root,admin,editor']], function () {
@@ -1073,9 +1075,12 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'team.'], function () {
 
         Route::get('/permission-of-user/{id}', [TeamController::class, 'getPermissionOfUser']);
     });
+    //business
     Route::post('/business/team', [TeamController::class, 'storeBusinessTeam'])->name('storeBusinessTeam');
+    Route::put('/business/team/{id}', [TeamController::class, 'editBusinessTeam'])->name('editBusinessTeam');
+    Route::delete('/business/team/{id}', [TeamController::class, 'destroyBusinessTeam'])->name('destroyBusinessTeam');
     Route::post('team/set-leader', [TeamController::class, 'setTeamLeader'])->name('addBusinessMember');
-    Route::get('business/add-on-for-team/{id}', [TeamController::class, 'getAddOnForTeam'])->name('getAddOnForTeam');
+    Route::get('business/add-on-of-team/{id}', [TeamController::class, 'getAddOnOfTeam'])->name('getAddOnForTeam');
 
     Route::get('/all-team-member', [TeamController::class, 'listMemberOfAllTeam'])->name('listMemberOfAllTeam');
     Route::get('/list-member/{id}', [TeamController::class, 'listMember'])->name('listMember');
@@ -1270,7 +1275,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'business-management.'], fun
         Route::delete('/business-management/{id}', [BusinessManagementController::class, 'destroy'])->name('destroy');
     });
     Route::post('business/add-member', [BusinessManagementController::class, 'addBusinessMember'])->name('addBusinessMember');
-    Route::get('business/get-add-ons/{id}', [BusinessManagementController::class, 'getAddOns'])->name('getAddOns');
+    Route::get('business/get-add-ons', [BusinessManagementController::class, 'getAddOns'])->name('getAddOns');
     Route::post('business/set-add-on-for-team', [TeamController::class, 'setAddOnForTeam'])->name('setAddOnForTeam');
     Route::get('/all-business-member', [BusinessManagementController::class, 'listMemberOfBusiness'])->name('listMemberOfBusiness');
 
@@ -1359,7 +1364,6 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website'], function () {
         Route::put('my/website/{id}', [WebsiteController::class, 'editMy'])->name('edit');
         Route::delete('my/website/{id}', [WebsiteController::class, 'destroyMy'])->name('destroy');
         Route::post('my/websites/change-status', [WebsiteController::class, 'changeStatusMyWebsite'])->name('changeStatusMyWebsite');
-        Route::post('my/copy-default-website/{id}', [WebsiteController::class, 'copyMyDefaultWebsite'])->name('copyMyDefaultWebsite');
     });
 
     Route::group(['middleware' => ['role:root,admin,editor']], function () {
@@ -1370,6 +1374,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website'], function () {
         Route::post('unpublished-websites/change-status', [WebsiteController::class, 'changeStatusWebsite'])->name('change-status-website');
     });
 
+    Route::post('copy-default-website/{id}', [WebsiteController::class, 'copyDefaultWebsite'])->name('copyDefaultWebsite');
     Route::get('/default-websites', [WebsiteController::class, 'defaultWebsites'])->name('default-websites');
     Route::post('/unpublished-website', [WebsiteController::class, 'storeUnpublishedWebsite'])->name('store-unpublished-website');
 });

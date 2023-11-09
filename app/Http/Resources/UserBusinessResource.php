@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Team;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class UserBusinessResource extends JsonResource
@@ -20,7 +21,6 @@ class UserBusinessResource extends JsonResource
             'uuid' => $this->getKey(),
             'user_uuid' => $this->user_uuid,
             'business_uuid' => $this->business_uuid,
-            'is_leader' => $this->is_leader,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'deleted_at' => $this->deleted_at,
@@ -31,6 +31,9 @@ class UserBusinessResource extends JsonResource
         }
         if (\in_array('user_business__user', $expand)) {
             $data['user'] = new UserResource($this->user);
+        }
+        if (\in_array('user_business__team', $expand)) {
+            $data['teams'] = TeamResource::collection($this->user->teams);
         }
 
         return $data;
