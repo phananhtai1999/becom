@@ -43,4 +43,17 @@ class MyWebsitePageService extends AbstractService
 
         return count($slugs) === count($uniqueSlugs);
     }
+
+    public function getIsCanUseWebsitePages($request)
+    {
+        $isCanUseWebsitePages = $this->model
+            ->leftJoin('website_website_page', 'website_website_page.website_page_uuid', 'website_pages.uuid')
+            ->whereNull('website_website_page.website_page_uuid')
+            ->where('website_pages.user_uuid', auth()->user()->getKey())->get()->pluck('uuid');
+        $indexRequest = $this->getIndexRequest($request);
+
+        return $this->modelQueryBuilderClass::searchQuery($indexRequest['search'], $indexRequest['search_by'])
+            ->whereIn('uuid', $isCanUseWebsitePages)
+            ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
+    }
 }
