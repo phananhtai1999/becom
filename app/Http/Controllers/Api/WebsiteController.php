@@ -344,11 +344,7 @@ class WebsiteController extends AbstractRestAPIController
 
     public function copyDefaultWebsite($id, CopyDefaultWebsiteRequest $request)
     {
-        $defaultWebsite = $this->service->findOneWhereOrFail([
-            'domain_uuid' => null,
-            'publish_status' => Website::PUBLISHED_PUBLISH_STATUS,
-            'uuid' => $id
-        ]);
+        $copyWebsite = $this->service->showCopyWebsiteByUuid($id);
 
         if($this->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->count()){
             $statusTemplate = SectionTemplate::PUBLISHED_PUBLISH_STATUS;
@@ -367,12 +363,12 @@ class WebsiteController extends AbstractRestAPIController
 
         DB::beginTransaction();
         try{
-            $headerWebsite = $this->sectionTemplateService->create(array_merge($defaultWebsite->headerSection->toArray(), [
+            $headerWebsite = $this->sectionTemplateService->create(array_merge($copyWebsite->headerSection->toArray(), [
                 "user_uuid"=> auth()->user()->getKey(),
                 'publish_status' => $statusTemplate,
                 "is_default" => $isDefault
             ]));
-            $footerWebsite = $this->sectionTemplateService->create(array_merge($defaultWebsite->footerSection->toArray(), [
+            $footerWebsite = $this->sectionTemplateService->create(array_merge($copyWebsite->footerSection->toArray(), [
                 "user_uuid"=> auth()->user()->getKey(),
                 'publish_status' => $statusTemplate,
                 "is_default" => $isDefault
@@ -385,7 +381,7 @@ class WebsiteController extends AbstractRestAPIController
                 'publish_status' => $statusWebsite,
             ]));
 
-            $websitePages = $defaultWebsite->websitePages->map(function ($item) use ($statusTemplate, $isDefault){
+            $websitePages = $copyWebsite->websitePages->map(function ($item) use ($statusTemplate, $isDefault){
                 $websitePage = $this->websitePageService->create(array_merge($item->toArray(), [
                     'user_uuid' => auth()->user()->getKey(),
                     'is_default' => $isDefault,
