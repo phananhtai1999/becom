@@ -125,4 +125,23 @@ class SectionTemplateService extends AbstractService
 
         return $result;
     }
+
+    public function getCanUseUuidsSectionTemplates()
+    {
+        return $this->model->doesntHave('headerWebsite')->doesntHave('footerWebsite')
+            ->where(function ($query){
+                return $query->where('user_uuid', auth()->user()->getKey())
+                    ->orWhere('is_default', true);
+            })->get()->pluck('uuid');
+    }
+
+    public function getIsCanUseSectionTemplates($request)
+    {
+        $isCanUseSectionTemplates = $this->getCanUseUuidsSectionTemplates();
+        $indexRequest = $this->getIndexRequest($request);
+
+        return $this->modelQueryBuilderClass::searchQuery($indexRequest['search'], $indexRequest['search_by'])
+            ->whereIn('uuid', $isCanUseSectionTemplates)
+            ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
+    }
 }
