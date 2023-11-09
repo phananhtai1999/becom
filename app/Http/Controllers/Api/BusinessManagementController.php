@@ -8,6 +8,7 @@ use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\AddBusinessMemberRequest;
 use App\Http\Requests\AddTeamMemberRequest;
 use App\Http\Requests\BusinessManagementRequest;
+use App\Http\Requests\GetAddOnOfBusinessRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyBusinessManagementRequest;
 use App\Http\Requests\UpdateBusinessManagementRequest;
@@ -278,10 +279,10 @@ class BusinessManagementController extends AbstractRestAPIController
                 ]);
                 $user->roles()->attach([config('user.default_role_uuid')]);
                 $user->userPlatformPackage()->create(['platform_package_uuid' => PlatformPackage::DEFAULT_PLATFORM_PACKAGE_1]);
-                $this->userBusinessService->create(array_merge([
+                $this->userBusinessService->create([
                     'business_uuid' => $businessUuid,
                     'user_uuid' => $user->uuid
-                ]));
+                ]);
                 Mailbox::postEmailAccountcreate($user->uuid, $email, $passwordRandom);
                 DB::commit();
 
@@ -295,9 +296,17 @@ class BusinessManagementController extends AbstractRestAPIController
 
     }
 
-    public function getAddOns($id)
+    public function getAddOns(GetAddOnOfBusinessRequest $request)
     {
-        $business = $this->service->findOrFailById($id);
+        if ($this->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->count()) {
+            $businessUuid = $request->get("business_uuid");
+        } else {
+            $businesses= $this->user()->businessManagements;
+            if (!empty($businesses)) {
+                $businessUuid = $businesses->first()->uuid;
+            }
+        }
+        $business = $this->service->findOrFailById($businessUuid);
         $userAddOns = $this->userAddOnService->findAllWhere(['user_uuid' => $business->owner_uuid], ['user_uuid', 'add_on_subscription_plan_uuid'], true);
         $addOns = [];
         foreach ($userAddOns as $userAddOn) {

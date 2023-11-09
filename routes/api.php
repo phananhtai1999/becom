@@ -1273,7 +1273,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'business-management.'], fun
         Route::delete('/business-management/{id}', [BusinessManagementController::class, 'destroy'])->name('destroy');
     });
     Route::post('business/add-member', [BusinessManagementController::class, 'addBusinessMember'])->name('addBusinessMember');
-    Route::get('business/get-add-ons/{id}', [BusinessManagementController::class, 'getAddOns'])->name('getAddOns');
+    Route::get('business/get-add-ons', [BusinessManagementController::class, 'getAddOns'])->name('getAddOns');
     Route::post('business/set-add-on-for-team', [TeamController::class, 'setAddOnForTeam'])->name('setAddOnForTeam');
     Route::get('/all-business-member', [BusinessManagementController::class, 'listMemberOfBusiness'])->name('listMemberOfBusiness');
 
