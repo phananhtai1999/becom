@@ -14,7 +14,7 @@ use App\Http\Requests\ChangeStatusDefaultWebsiteRequest;
 use App\Http\Requests\ChangeStatusMyWebsite;
 use App\Http\Requests\ChangeStatusWebsite;
 use App\Http\Requests\ChangeStatusWebsiteRequest;
-use App\Http\Requests\CopyMyDefaultWebsiteRequest;
+use App\Http\Requests\CopyDefaultWebsiteRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyWebsiteRequest;
 use App\Http\Requests\UnpublishedWebsiteRequest;
@@ -342,38 +342,54 @@ class WebsiteController extends AbstractRestAPIController
         }
     }
 
-    public function copyMyDefaultWebsite($id, CopyMyDefaultWebsiteRequest $request)
+    public function copyDefaultWebsite($id, CopyDefaultWebsiteRequest $request)
     {
         $defaultWebsite = $this->service->findOneWhereOrFail([
             'domain_uuid' => null,
             'publish_status' => Website::PUBLISHED_PUBLISH_STATUS,
             'uuid' => $id
         ]);
+
+        if($this->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->count()){
+            $statusTemplate = SectionTemplate::PUBLISHED_PUBLISH_STATUS;
+            $statusWebsite = Website::PUBLISHED_PUBLISH_STATUS;
+            $isDefault = true;
+        }elseif($this->user()->roles->whereIn('slug', [Role::ROLE_EDITOR])->count()){
+            $statusTemplate = $request->get('publish_status') == Website::PENDING_PUBLISH_STATUS
+                ? SectionTemplate::PENDING_PUBLISH_STATUS : SectionTemplate::DRAFT_PUBLISH_STATUS;
+            $statusWebsite = $request->get('publish_status');
+            $isDefault = true;
+        }else{
+            $statusTemplate = SectionTemplate::PUBLISHED_PUBLISH_STATUS;
+            $statusWebsite = Website::PENDING_PUBLISH_STATUS;
+            $isDefault = false;
+        }
+
         DB::beginTransaction();
         try{
             $headerWebsite = $this->sectionTemplateService->create(array_merge($defaultWebsite->headerSection->toArray(), [
                 "user_uuid"=> auth()->user()->getKey(),
-                'publish_status' => SectionTemplate::PUBLISHED_PUBLISH_STATUS,
-                "is_default" => false
+                'publish_status' => $statusTemplate,
+                "is_default" => $isDefault
             ]));
             $footerWebsite = $this->sectionTemplateService->create(array_merge($defaultWebsite->footerSection->toArray(), [
                 "user_uuid"=> auth()->user()->getKey(),
-                'publish_status' => SectionTemplate::PUBLISHED_PUBLISH_STATUS,
-                "is_default" => false
+                'publish_status' => $statusTemplate,
+                "is_default" => $isDefault
             ]));
 
             $website = $this->service->create(array_merge($request->all(), [
                 'header_section_uuid' => $headerWebsite->uuid,
                 'footer_section_uuid' => $footerWebsite->uuid,
                 'user_uuid' => auth()->user()->getKey(),
-                'publish_status' => Website::PUBLISHED_PUBLISH_STATUS,
+                'publish_status' => $statusWebsite,
             ]));
 
-            $websitePages = $defaultWebsite->websitePages->map(function ($item){
+            $websitePages = $defaultWebsite->websitePages->map(function ($item) use ($statusTemplate, $isDefault){
                 $websitePage = $this->websitePageService->create(array_merge($item->toArray(), [
                     'user_uuid' => auth()->user()->getKey(),
-                    'is_default' => false,
-                    'publish_status' => WebsitePage::PUBLISHED_PUBLISH_STATUS
+                    'is_default' => $isDefault,
+                    'publish_status' => $statusTemplate
                 ]));
                 $pivot = $item->pivot->toArray();
                 return [
