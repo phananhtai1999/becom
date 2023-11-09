@@ -620,6 +620,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website_page'], function ()
         Route::get('my/website-page/{id}', [WebsitePageController::class, 'showMyWebsitePage'])->name('showMyWebsitePage');
         Route::put('my/website-page/{id}', [WebsitePageController::class, 'editMyWebsitePage'])->name('editMyWebsitePage');
         Route::delete('my/website-page/{id}', [WebsitePageController::class, 'destroyMyWebsitePage'])->name('destroyMyWebsitePage');
+        Route::get("my/accepted-website-pages", [WebsitePageController::class, 'listMyAcceptedWebsitePages'])->name('listMyAcceptedWebsitePages');
     });
 
     Route::get('/get-website-page/{id}', [WebsitePageController::class, 'getWebsitePage'])->name('getWebsitePage');
@@ -745,6 +746,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'section-template'], functio
         Route::get('my/section-template/{id}', [SectionTemplateController::class, 'showMySectionTemplate'])->name('showMySectionTemplate');
         Route::put('my/section-template/{id}', [SectionTemplateController::class, 'editMySectionTemplate'])->name('editMySectionTemplate');
         Route::delete('my/section-template/{id}', [SectionTemplateController::class, 'destroyMySectionTemplate'])->name('destroyMySectionTemplate');
+        Route::get("my/accepted-section-templates", [SectionTemplateController::class, 'listMyAcceptedSectionTemplate'])->name('listMyAcceptedSectionTemplate');
     });
 
     Route::get('/section-templates-default', [SectionTemplateController::class, 'getSectionTemplatesDefault'])->name('getWebsitePagesDefault');

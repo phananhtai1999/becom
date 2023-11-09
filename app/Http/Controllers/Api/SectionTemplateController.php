@@ -247,4 +247,17 @@ class SectionTemplateController extends AbstractRestAPIController
         );
     }
 
+    /**
+     * @param IndexRequest $request
+     * @return JsonResponse
+     */
+    public function listMyAcceptedSectionTemplate(IndexRequest $request)
+    {
+        $models = $this->myService->getIsCanUseSectionTemplates($request);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+        );
+    }
+
 }
