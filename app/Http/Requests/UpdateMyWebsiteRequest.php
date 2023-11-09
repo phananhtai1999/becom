@@ -35,16 +35,14 @@ class UpdateMyWebsiteRequest extends AbstractRequest
                 return $query->where(function ($q) {
                     $q->where('user_uuid', auth()->user()->getKey())
                         ->orWhere('is_default', true);
-                })->where('publish_status', SectionTemplate::PUBLISHED_PUBLISH_STATUS)
-                    ->where('uuid', '<>', $this->request->get('footer_section_uuid'))
+                })->where('uuid', '<>', $this->request->get('footer_section_uuid'))
                     ->whereNull('deleted_at');
             }), CheckIsCanUseSectionTemplate::IsCanUseSectionTemplate($this->request->get('header_section_uuid'), $this->id)],
             'footer_section_uuid' => ['numeric', Rule::exists('section_templates', 'uuid')->where(function ($query) {
                 return $query->where(function ($q) {
                     $q->where('user_uuid', auth()->user()->getKey())
                         ->orWhere('is_default', true);
-                })->where('publish_status', SectionTemplate::PUBLISHED_PUBLISH_STATUS)
-                    ->where('uuid', '<>', $this->request->get('header_section_uuid'))
+                })->where('uuid', '<>', $this->request->get('header_section_uuid'))
                     ->whereNull('deleted_at');
             }), CheckIsCanUseSectionTemplate::IsCanUseSectionTemplate($this->request->get('footer_section_uuid'), $this->id)],
             'description' => ['nullable', 'string'],
