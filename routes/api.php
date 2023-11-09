@@ -1359,6 +1359,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website'], function () {
         Route::put('my/website/{id}', [WebsiteController::class, 'editMy'])->name('edit');
         Route::delete('my/website/{id}', [WebsiteController::class, 'destroyMy'])->name('destroy');
         Route::post('my/websites/change-status', [WebsiteController::class, 'changeStatusMyWebsite'])->name('changeStatusMyWebsite');
+        Route::post('my/copy-default-website/{id}', [WebsiteController::class, 'copyMyDefaultWebsite'])->name('copyMyDefaultWebsite');
     });
 
     Route::group(['middleware' => ['role:root,admin,editor']], function () {
