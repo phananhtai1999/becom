@@ -603,6 +603,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website_page'], function ()
         Route::put('website-page/{id}', [WebsitePageController::class, 'edit'])->name('edit');
         Route::delete('/website-page/{id}', [WebsitePageController::class, 'destroy'])->name('destroy');
         Route::post('website-page/change-status', [WebsitePageController::class, 'changeStatusWebsitePage'])->name('changeStatusWebsitePage');
+        Route::get("accepted-website-pages", [WebsitePageController::class, 'listAcceptedWebsitePages'])->name('listAcceptedWebsitePages');
     });
 
     Route::group(['middleware' => ['role:root,admin,editor']], function () {
@@ -731,6 +732,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'section-template'], functio
         Route::put('section-template/{id}', [SectionTemplateController::class, 'edit'])->name('edit');
         Route::delete('/section-template/{id}', [SectionTemplateController::class, 'destroy'])->name('destroy');
         Route::post('section-template/change-status', [SectionTemplateController::class, 'changeStatusSectionTemplate'])->name('acceptPublishSectionTemplate');
+        Route::get("accepted-section-templates", [SectionTemplateController::class, 'listAcceptedSectionTemplate'])->name('listAcceptedSectionTemplate');
     });
 
     Route::group(['middleware' => ['role:root,admin,editor']], function () {

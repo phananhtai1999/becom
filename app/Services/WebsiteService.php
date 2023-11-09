@@ -40,4 +40,18 @@ class WebsiteService extends AbstractService
             })
             ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
     }
+
+    public function showCopyWebsiteByUuid($uuid)
+    {
+        return $this->model->where('uuid', $uuid)
+            ->where(function ($query) {
+                return $query->where('user_uuid', auth()->user()->getKey())
+                    ->orWhere(function ($q) {
+                        return $q->where([
+                            'domain_uuid' => null,
+                            'publish_status' => Website::PUBLISHED_PUBLISH_STATUS,
+                        ]);
+                    });
+            })->firstOrFail();
+    }
 }
