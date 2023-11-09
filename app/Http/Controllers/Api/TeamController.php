@@ -20,6 +20,7 @@ use App\Http\Requests\MyTeamRequest;
 use App\Http\Requests\SetTeamAddOnRequest;
 use App\Http\Requests\SetTeamLeaderRequest;
 use App\Http\Requests\TeamRequest;
+use App\Http\Requests\UpdateBusinessTeamRequest;
 use App\Http\Requests\UpdateTeamRequest;
 use App\Http\Resources\AddOnResource;
 use App\Http\Resources\AddOnResourceCollection;
@@ -500,6 +501,48 @@ class TeamController extends Controller
         );
     }
 
+    /**
+     * @param UpdateBusinessTeamRequest $request
+     * @param $id
+     * @return JsonResponse
+     */
+    public function editBusinessTeam(UpdateBusinessTeamRequest $request, $id)
+    {
+        if ($this->user()->roles->whereNotIn('slug', [Role::ROLE_ADMIN, Role::ROLE_ROOT])->count()) {
+            if (!$this->checkTeamOwner($id)) {
+
+                return $this->sendJsonResponse(false, 'You are not owner of team to edit', [], 403);
+            }
+        }
+        $teamModel = $this->myService->findOrFailById($id);
+        $this->service->update($teamModel, $request->all());
+        $teamModel->users()->sync($request->get('team_member_uuids'));
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $teamModel)
+        );
+    }
+
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
+    public function destroyBusinessTeam($id)
+    {
+        if ($this->user()->roles->whereNotIn('slug', [Role::ROLE_ADMIN, Role::ROLE_ROOT])->count()) {
+            if (!$this->checkTeamOwner($id)) {
+
+                return $this->sendJsonResponse(false, 'You are not owner of team to edit', [], 403);
+            }
+        }
+        $model = $this->myService->findOneWhereOrFail([
+            'uuid' => $id
+        ]);
+        $this->destroy($model->uuid);
+
+        return $this->sendOkJsonResponse();
+    }
+
     public function setTeamLeader(SetTeamLeaderRequest $request)
     {
         $team = $this->service->findOrFailById($request->get('team_uuid'));
@@ -524,7 +567,7 @@ class TeamController extends Controller
         );
     }
 
-    public function getAddOnForTeam($id)
+    public function getAddOnOfTeam($id)
     {
         $team = $this->service->findOrFailById($id);
 

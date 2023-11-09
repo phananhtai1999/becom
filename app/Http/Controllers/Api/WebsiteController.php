@@ -145,17 +145,6 @@ class WebsiteController extends AbstractRestAPIController
         });
     }
 
-    public function validateWebsitePagesByRequest($webpages)
-    {
-        return collect($webpages)->map(function ($webpage) {
-            return [
-                "website_page_uuid" => $webpage["uuid"],
-                "is_homepage" => $webpage["is_homepage"] ?? 0,
-                "ordering" => $webpage["ordering"],
-            ];
-        });
-    }
-
     public function changeStatus(ChangeStatusWebsite $request)
     {
         $this->changeStatusWebsiteByRequest($request);

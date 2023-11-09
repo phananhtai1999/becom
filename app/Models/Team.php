@@ -68,6 +68,10 @@ class Team extends AbstractModel
         return $this->hasMany(UserTeam::class, 'team_uuid', 'uuid');
     }
 
+    public function users() {
+        return $this->belongsToMany(User::class, 'user_teams', 'team_uuid','user_uuid')->withTimestamps();
+    }
+
     public function business() {
         return $this->belongsToMany(BusinessManagement::class, 'business_team', 'team_uuid','business_uuid')->withTimestamps();
     }
