@@ -5,6 +5,7 @@ namespace App\Abstracts;
 use App\Models\AddOn;
 use App\Models\Permission;
 use App\Models\PlatformPackage;
+use App\Models\Team;
 use Aws\Exception\CredentialsException;
 use Aws\S3\Exception\S3Exception;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -177,7 +178,7 @@ class AbstractRestAPIController extends BaseController
      * @return bool
      */
     public function checkTeamOwner($teamId) {
-        if ($this->service->findOneById($teamId)->owner_uuid != auth()->user()->getKey()) {
+        if (Team::findOrFail($teamId)->owner_uuid != auth()->user()->getKey()) {
 
             return false;
         }
