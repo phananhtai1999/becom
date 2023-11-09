@@ -14,6 +14,7 @@ use App\Http\Requests\ChangeStatusDefaultWebsiteRequest;
 use App\Http\Requests\ChangeStatusMyWebsite;
 use App\Http\Requests\ChangeStatusWebsite;
 use App\Http\Requests\ChangeStatusWebsiteRequest;
+use App\Http\Requests\CopyMyDefaultWebsiteRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyWebsiteRequest;
 use App\Http\Requests\UnpublishedWebsiteRequest;
@@ -29,10 +30,12 @@ use App\Models\SectionTemplate;
 use App\Models\Website;
 use App\Models\WebsitePage;
 use App\Services\MyWebsiteService;
+use App\Services\SectionTemplateService;
+use App\Services\WebsitePageService;
 use App\Services\WebsiteService;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Techup\SiteController\Facades\SiteController;
-use DB;
 
 class WebsiteController extends AbstractRestAPIController
 {
@@ -45,9 +48,18 @@ class WebsiteController extends AbstractRestAPIController
 
     protected $myService;
 
+    /**
+     * @var SectionTemplateService
+     */
+    protected $sectionTemplateService;
+
+    protected $websitePageService;
+
     public function __construct(
         WebsiteService   $service,
-        MyWebsiteService $myService
+        MyWebsiteService $myService,
+        SectionTemplateService $sectionTemplateService,
+        WebsitePageService $websitePageService
     )
     {
         $this->resourceClass = WebsiteResource::class;
@@ -55,6 +67,8 @@ class WebsiteController extends AbstractRestAPIController
         $this->service = $service;
         $this->myService = $myService;
         $this->indexRequest = IndexRequest::class;
+        $this->sectionTemplateService = $sectionTemplateService;
+        $this->websitePageService = $websitePageService;
     }
 
     public function store(WebsiteRequest $request)
@@ -336,6 +350,59 @@ class WebsiteController extends AbstractRestAPIController
             if ($footerSection && $footerSection->publish_status != $statusSectionTemplate){
                 $this->service->update($footerSection, ["publish_status" => $statusWebsitePage]);
             }
+        }
+    }
+
+    public function copyMyDefaultWebsite($id, CopyMyDefaultWebsiteRequest $request)
+    {
+        $defaultWebsite = $this->service->findOneWhereOrFail([
+            'domain_uuid' => null,
+            'publish_status' => Website::PUBLISHED_PUBLISH_STATUS,
+            'uuid' => $id
+        ]);
+        DB::beginTransaction();
+        try{
+            $headerWebsite = $this->sectionTemplateService->create(array_merge($defaultWebsite->headerSection->toArray(), [
+                "user_uuid"=> auth()->user()->getKey(),
+                'publish_status' => SectionTemplate::PUBLISHED_PUBLISH_STATUS,
+                "is_default" => false
+            ]));
+            $footerWebsite = $this->sectionTemplateService->create(array_merge($defaultWebsite->footerSection->toArray(), [
+                "user_uuid"=> auth()->user()->getKey(),
+                'publish_status' => SectionTemplate::PUBLISHED_PUBLISH_STATUS,
+                "is_default" => false
+            ]));
+
+            $website = $this->service->create(array_merge($request->all(), [
+                'header_section_uuid' => $headerWebsite->uuid,
+                'footer_section_uuid' => $footerWebsite->uuid,
+                'user_uuid' => auth()->user()->getKey(),
+                'publish_status' => Website::PUBLISHED_PUBLISH_STATUS,
+            ]));
+
+            $websitePages = $defaultWebsite->websitePages->map(function ($item){
+                $websitePage = $this->websitePageService->create(array_merge($item->toArray(), [
+                    'user_uuid' => auth()->user()->getKey(),
+                    'is_default' => false,
+                    'publish_status' => WebsitePage::PUBLISHED_PUBLISH_STATUS
+                ]));
+                $pivot = $item->pivot->toArray();
+                return [
+                    "website_page_uuid" => $websitePage->uuid,
+                    "is_homepage" => $pivot['is_homepage'],
+                    "ordering" => $pivot['ordering']
+                ];
+            });
+
+            $website->websitePages()->sync($websitePages);
+
+            DB::commit();
+            return $this->sendCreatedJsonResponse(
+                $this->service->resourceToData($this->resourceClass, $website)
+            );
+        }catch (\Exception $exception){
+            DB::rollback();
+            throw $exception;
         }
     }
 }
