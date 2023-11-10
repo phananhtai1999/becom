@@ -156,6 +156,8 @@ class WebsitePageService extends AbstractService
     public function renderContent($websitePage, $article)
     {
         $searchReplaceMap = [
+            '{article.uuid}' => $article->uuid ?? null,
+            '{article.slug}' => $article->slug ?? null,
             '{article.title}' => $article->title ?? null,
             '{article.content}' => $article->content ?? null,
             '{article.video}' => $article->video ?? null,
@@ -185,6 +187,8 @@ class WebsitePageService extends AbstractService
             }
 
             $searchReplaceMap = [
+                '{article.uuid}' => $articleData->uuid ?? null,
+                '{article.slug}' => $articleData->slug ?? null,
                 '{article.title}' => $articleData->title ?? null,
                 '{article.content}' => $articleData->content ?? null,
                 '{article.video}' => $articleData->video ?? null,
@@ -212,6 +216,8 @@ class WebsitePageService extends AbstractService
             }
 
             $searchReplaceMap = [
+                '{children_category.uuid}' => $childrenCategoryData->uuid ?? null,
+                '{children_category.slug}' => $childrenCategoryData->slug ?? null,
                 '{children_category.title}' => $childrenCategoryData->title ?? null,
                 '{children_category.content}' => $childrenCategoryData->content ?? null,
                 '{children_category.feature_image}' => $childrenCategoryData->feature_image ?? null,
@@ -251,6 +257,8 @@ class WebsitePageService extends AbstractService
             }
 
             $searchReplaceMap = [
+                '{article.uuid}' => $article_data->uuid ?? null,
+                '{article.slug}' => $article_data->slug ?? null,
                 '{article.title}' => $article_data->title ?? null,
                 '{article.content}' => $article_data->content ?? null,
                 '{article.video}' => $article_data->video ?? null,
@@ -278,6 +286,8 @@ class WebsitePageService extends AbstractService
             }
 
             $searchReplaceMap = [
+                '{category.uuid}' => $categoryData->uuid ?? null,
+                '{category.slug}' => $categoryData->slug ?? null,
                 '{category.title}' => $categoryData->title ?? null,
                 '{category.content}' => $categoryData->content ?? null,
                 '{category.feature_image}' => $categoryData->feature_image ?? null,
@@ -293,6 +303,8 @@ class WebsitePageService extends AbstractService
             $article = Article::whereIn('article_category_uuid', array_merge($childrenCategoriesUuid->toArray(),[$categoryData->uuid]))->orderBy('created_at', 'DESC')->first();
             if ($article) {
                 $searchReplaceArticleMap = [
+                    '{article.uuid}' => $article->uuid ?? null,
+                    '{article.slug}' => $article->slug ?? null,
                     '{article.title}' => $article->title ?? null,
                     '{article.content}' => $article->content ?? null,
                     '{article.video}' => $article->video ?? null,
@@ -332,6 +344,8 @@ class WebsitePageService extends AbstractService
                 return $grandChildMatches[0];
             }
             $grandChildSearchReplaceMap = [
+                '{grand_children_category.uuid}' => $grandChildrenCategoryData->uuid ?? null,
+                '{grand_children_category.slug}' => $grandChildrenCategoryData->slug ?? null,
                 '{grand_children_category.title}' => $grandChildrenCategoryData->title ?? null,
                 '{grand_children_category.content}' => $grandChildrenCategoryData->content ?? null,
                 '{grand_children_category.feature_image}' => $grandChildrenCategoryData->feature_image ?? null,
@@ -361,6 +375,8 @@ class WebsitePageService extends AbstractService
                 return $childMatches[0];
             }
             $childSearchReplaceMap = [
+                '{children_category.uuid}' => $childrenCategoryData->uuid ?? null,
+                '{children_category.slug}' => $childrenCategoryData->slug ?? null,
                 '{children_category.title}' => $childrenCategoryData->title ?? null,
                 '{children_category.content}' => $childrenCategoryData->content ?? null,
                 '{children_category.feature_image}' => $childrenCategoryData->feature_image ?? null,

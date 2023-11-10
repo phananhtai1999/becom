@@ -1,6 +1,8 @@
 <?php
 return [
     'category' => [
+        'category.uuid',
+        'category.slug',
         'category.title',
         'category.content',
         'category.image',
@@ -10,6 +12,8 @@ return [
         'category.short_content'
     ],
     'article' => [
+        'article.uuid',
+        'article.slug',
         'article.title',
         'article.content',
         'article.image',
@@ -19,6 +23,8 @@ return [
         'article.short_content'
     ],
     'children_category' => [
+        'children_category.uuid',
+        'children_category.slug',
         'children_category.title',
         'children_category.content',
         'children_category.image',
@@ -28,6 +34,8 @@ return [
         'children_category.short_content'
     ],
     'grand_children_category' => [
+        'grand_children_category.uuid',
+        'grand_children_category.slug',
         'grand_children_category.title',
         'grand_children_category.content',
         'grand_children_category.image',
