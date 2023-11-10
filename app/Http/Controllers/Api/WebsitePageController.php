@@ -68,7 +68,18 @@ class WebsitePageController extends AbstractRestAPIController
         $this->editRequest = UpdateWebsitePageRequest::class;
     }
 
-    public function show(ShowWebsitePageRequest $request, $id)
+    public function show(IndexRequest $request, $id)
+    {
+        $model = $this->myService->findOneWhereOrFail($request->publish_status ?
+            [['publish_status', $request->publish_status], ['uuid', $id]]
+            : [['uuid', $id]]);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    public function getWebsitePage(ShowWebsitePageRequest $request, $id)
     {
         $websitePage = $this->myService->findOneWhereOrFail($request->publish_status ?
             [['publish_status', $request->publish_status], ['uuid', $id]]
@@ -361,6 +372,24 @@ class WebsitePageController extends AbstractRestAPIController
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    public function listMyAcceptedWebsitePages(IndexRequest $request)
+    {
+        $models = $this->myService->getIsCanUseWebsitePages($request);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+        );
+    }
+
+    public function listAcceptedWebsitePages(IndexRequest $request)
+    {
+        $models = $this->service->getIsCanUseWebsitePages($request);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
         );
     }
 }

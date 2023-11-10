@@ -3,9 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-class UpdateTeamRequest extends FormRequest
+class SetTeamAddOnRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,8 +24,9 @@ class UpdateTeamRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => ['string'],
-            'parent_team_uuid' => ['nullable', 'numeric', Rule::exists('teams', 'uuid')->whereNull('deleted_at')]
+            'team_uuid' => ['required', 'exists:teams,uuid'],
+            'add_on_uuids' => ['required', 'array'],
+            'add_on_uuids.*' => ['required', 'integer', 'exists:add_ons,uuid']
         ];
     }
 }

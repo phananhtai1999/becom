@@ -56,6 +56,16 @@ class SectionTemplate extends AbstractModel
         'reject_reason' => 'array',
     ];
 
+    public function headerWebsite()
+    {
+        return $this->hasOne(Website::class, 'header_section_uuid', 'uuid');
+    }
+
+    public function footerWebsite()
+    {
+        return $this->hasOne(Website::class, 'footer_section_uuid', 'uuid');
+    }
+
     /**
      * @return BelongsTo
      */

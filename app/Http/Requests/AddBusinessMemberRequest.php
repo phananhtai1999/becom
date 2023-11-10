@@ -2,13 +2,14 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Team;
+use App\Models\Role;
+use App\Models\UserBusiness;
 use App\Rules\InviteRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
-class AddTeamMemberRequest extends FormRequest
+class AddBusinessMemberRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -28,13 +29,16 @@ class AddTeamMemberRequest extends FormRequest
     public function rules()
     {
         $validate = [
-            'team_uuid' => ['required', Rule::exists('teams', 'uuid')->whereNull('deleted_at')],
-            'type' => ['required', Rule::in([Team::ALREADY_EXISTS_ACCOUNT, Team::ACCOUNT_INVITE])],
+            'type' => ['required', Rule::in([UserBusiness::ALREADY_EXISTS_ACCOUNT, UserBusiness::ACCOUNT_INVITE])],
         ];
-        if ($this->request->get('type') == Team::ALREADY_EXISTS_ACCOUNT){
+        if (auth()->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->count())
+        {
+            $validate['business_uuid'] = ['required', 'integer', Rule::exists('business_managements', 'uuid')->whereNull('deleted_at')];
+        }
+        if ($this->request->get('type') == UserBusiness::ALREADY_EXISTS_ACCOUNT){
             $validate['user_uuids'] = ['required', 'array', 'min:1'];
             $validate['user_uuids.*'] = ['required', 'integer', 'min:1', Rule::exists('users', 'uuid')->whereNull('deleted_at')];
-        } elseif ($this->request->get('type') == Team::ACCOUNT_INVITE) {
+        } elseif ($this->request->get('type') == UserBusiness::ACCOUNT_INVITE) {
             $validate = array_merge($validate, [
                 'username' => ['required', 'string', "regex:/^(?!.*\.\.)[a-zA-Z0-9]*(?:\.[a-zA-Z0-9]+)*$/", Rule::unique('users', 'username')->whereNull('deleted_at'), new InviteRule($this->request->get('domain'))],
                 'first_name' => ['required', 'string', "regex:/^[^(\|\]~`!@#$%^&*+=\-_{}\\\;:\"'?><,.\/’)\[]*$/"],

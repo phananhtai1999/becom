@@ -309,4 +309,5 @@ class UserController extends AbstractRestAPIController
 
         return $this->sendOkJsonResponse();
     }
+    
 }

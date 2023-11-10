@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class UpdateTeamRequest extends FormRequest
+class SetTeamLeaderRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,8 +25,9 @@ class UpdateTeamRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => ['string'],
-            'parent_team_uuid' => ['nullable', 'numeric', Rule::exists('teams', 'uuid')->whereNull('deleted_at')]
+            'team_uuid' => ['required', 'integer', 'exists:teams,uuid'],
+            'team_member_uuid' => ['required', 'integer', Rule::exists('user_teams', 'user_uuid')
+                ->where('team_uuid', $this->request->get('team_uuid'))]
         ];
     }
 }

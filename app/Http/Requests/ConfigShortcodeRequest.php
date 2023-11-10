@@ -25,7 +25,7 @@ class ConfigShortcodeRequest extends FormRequest
     public function rules()
     {
         return [
-            'type' => ['required', 'string', Rule::in('article', 'category', 'home_article')],
+            'type' => ['required', 'string'],
         ];
     }
 }

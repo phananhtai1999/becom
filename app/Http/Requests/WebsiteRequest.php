@@ -12,7 +12,7 @@ use App\Rules\UniqueWebsitePage;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class UnpublishedWebsiteRequest extends FormRequest
+class WebsiteRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -49,7 +49,7 @@ class UnpublishedWebsiteRequest extends FormRequest
             }), CheckIsCanUseSectionTemplate::IsCanUseSectionTemplate($this->request->get('footer_section_uuid'))],
             'description' => ['nullable', 'string'],
             'logo' => ['nullable', 'string'],
-            'domain_uuid' => ['numeric', Rule::exists('domains', 'uuid')->where(function ($q) {
+            'domain_uuid' => ['nullable', 'numeric', Rule::exists('domains', 'uuid')->where(function ($q) {
                 return $q->where('owner_uuid', auth()->user()->getKey())
                     ->whereNull('deleted_at');
             }), CheckWebsiteDomainRule::uniqueDomain($this->id)],
@@ -64,7 +64,7 @@ class UnpublishedWebsiteRequest extends FormRequest
             'website_pages.*.ordering' => ['nullable', 'numeric', 'min:1'],
             'tracking_ids' => ['nullable', 'array'],
             'tracking_ids.*' => ['nullable', 'string', 'max:300'],
-            'publish_status' => ['required', 'numeric', Rule::in(Article::PENDING_PUBLISH_STATUS, Article::DRAFT_PUBLISH_STATUS)],
+            'user_uuid' => ['nullable', 'numeric', Rule::exists('users', 'uuid')->whereNull('deleted_at')]
         ];
     }
 }

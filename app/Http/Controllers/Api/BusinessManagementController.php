@@ -5,19 +5,36 @@ namespace App\Http\Controllers\Api;
 use App\Abstracts\AbstractRestAPIController;
 use App\Http\Controllers\Traits\RestIndexMyTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
+use App\Http\Requests\AddBusinessMemberRequest;
+use App\Http\Requests\AddTeamMemberRequest;
 use App\Http\Requests\BusinessManagementRequest;
+use App\Http\Requests\GetAddOnOfBusinessRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyBusinessManagementRequest;
 use App\Http\Requests\UpdateBusinessManagementRequest;
 use App\Http\Requests\UpdateMyBusinessManagementRequest;
+use App\Http\Resources\AddOnResourceCollection;
 use App\Http\Resources\BusinessManagementResource;
 use App\Http\Resources\BusinessManagementResourceCollection;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
+use App\Http\Resources\UserBusinessResource;
+use App\Http\Resources\UserBusinessResourceCollection;
+use App\Models\PlatformPackage;
+use App\Models\Role;
+use App\Models\Team;
+use App\Models\UserBusiness;
 use App\Services\BusinessManagementService;
 use App\Services\DomainService;
 use App\Services\MyBusinessManagementService;
 use App\Services\MyDomainService;
+use App\Services\UserAddOnService;
+use App\Services\UserBusinessService;
+use App\Services\UserService;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Techup\Mailbox\Facades\Mailbox;
 
 class BusinessManagementController extends AbstractRestAPIController
 {
@@ -39,6 +56,11 @@ class BusinessManagementController extends AbstractRestAPIController
     protected $myDomainService;
 
     /**
+     * @var UserService
+     */
+    protected $userService;
+
+    /**
      * @param BusinessManagementService $service
      * @param MyBusinessManagementService $myService
      * @param DomainService $domainService
@@ -48,18 +70,27 @@ class BusinessManagementController extends AbstractRestAPIController
         BusinessManagementService   $service,
         MyBusinessManagementService $myService,
         DomainService               $domainService,
-        MyDomainService             $myDomainService
+        MyDomainService             $myDomainService,
+        UserBusinessService $userBusinessService,
+        UserService $userService,
+        UserAddOnService $userAddOnService
     )
     {
         $this->service = $service;
         $this->myService = $myService;
         $this->domainService = $domainService;
         $this->myDomainService = $myDomainService;
+        $this->userBusinessService = $userBusinessService;
         $this->resourceCollectionClass = BusinessManagementResourceCollection::class;
         $this->resourceClass = BusinessManagementResource::class;
+        $this->userBusinessResourceClass = UserBusinessResource::class;
+        $this->userBusinessResourceCollectionClass = UserBusinessResourceCollection::class;
+        $this->addOnResourceCollectionClass = AddOnResourceCollection::class;
         $this->storeRequest = BusinessManagementRequest::class;
         $this->editRequest = UpdateBusinessManagementRequest::class;
         $this->indexRequest = IndexRequest::class;
+        $this->userService = $userService;
+        $this->userAddOnService = $userAddOnService;
     }
 
     /**
@@ -204,5 +235,104 @@ class BusinessManagementController extends AbstractRestAPIController
         $this->myService->deleteMyBusinessManagement($id);
 
         return $this->sendOkJsonResponse();
+    }
+
+    /**
+     * @param AddBusinessMemberRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function addBusinessMember(AddBusinessMemberRequest $request)
+    {
+        DB::beginTransaction();
+        try{
+            if ($this->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->count()) {
+                $businessUuid = $request->get("business_uuid");
+            } else {
+                $businessUuid = $this->user()->businessManagements->first()->uuid;
+            }
+            if($request->get('type') == UserBusiness::ALREADY_EXISTS_ACCOUNT){
+                foreach ($request->get('user_uuids') as $userUuid) {
+                    $existingRecord = $this->userBusinessService->findOneWhere([
+                        'business_uuid' => $businessUuid,
+                        'user_uuid' => $userUuid
+                    ]);
+
+                    if (!$existingRecord) {
+                        $this->userBusinessService->create([
+                            'business_uuid' => $businessUuid,
+                            'user_uuid' => $userUuid
+                        ]);
+                    }
+                }
+                DB::commit();
+                return $this->sendCreatedJsonResponse();
+            }elseif($request->get('type') == UserBusiness::ACCOUNT_INVITE){
+                $passwordRandom = $this->generateRandomString(10);
+                $email = $request->get('username') . '@' . $request->get('domain');
+                $user = $this->userService->create([
+                    'email' => $email,
+                    'first_name' => $request->get('first_name'),
+                    'last_name' => $request->get('last_name'),
+                    'username' => $request->get('username'),
+                    'can_add_smtp_account' => 0,
+                    'password' => Hash::make($request->get('password'))
+                ]);
+                $user->roles()->attach([config('user.default_role_uuid')]);
+                $user->userPlatformPackage()->create(['platform_package_uuid' => PlatformPackage::DEFAULT_PLATFORM_PACKAGE_1]);
+                $this->userBusinessService->create([
+                    'business_uuid' => $businessUuid,
+                    'user_uuid' => $user->uuid
+                ]);
+                Mailbox::postEmailAccountcreate($user->uuid, $email, $passwordRandom);
+                DB::commit();
+
+                return $this->sendCreatedJsonResponse();
+            }
+
+        } catch (ConnectionException $exception){
+            DB::rollBack();
+            return $this->sendInternalServerErrorJsonResponse();
+        }
+
+    }
+
+    public function getAddOns(GetAddOnOfBusinessRequest $request)
+    {
+        if ($this->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->count()) {
+            $businessUuid = $request->get("business_uuid");
+        } else {
+            $businesses= $this->user()->businessManagements;
+            if (!empty($businesses)) {
+                $businessUuid = $businesses->first()->uuid;
+            }
+        }
+        $business = $this->service->findOrFailById($businessUuid);
+        $userAddOns = $this->userAddOnService->findAllWhere(['user_uuid' => $business->owner_uuid], ['user_uuid', 'add_on_subscription_plan_uuid'], true);
+        $addOns = [];
+        foreach ($userAddOns as $userAddOn) {
+            $addOns[] = $userAddOn->addOnSubscriptionPlan->addOn ?? [];
+        }
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->addOnResourceCollectionClass, $addOns)
+        );
+    }
+
+    public function listMemberOfBusiness(IndexRequest $request)
+    {
+        if ($this->user()->roles->whereIn('slug', [Role::ROLE_ADMIN, Role::ROLE_ROOT])->first()) {
+            $model = $this->userBusinessService->listMemberOfAllBusiness($request);
+        } else {
+            $business = $this->service->findOneWhere((['owner_uuid' => $this->user()->getKey()]));
+            if ($business) {
+                $model = $this->userBusinessService->listBusinessMember([$business->uuid], $request);
+            } else {
+                $model = [];
+            }
+        }
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->userBusinessResourceCollectionClass, $model)
+        );
     }
 }

@@ -603,6 +603,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website_page'], function ()
         Route::put('website-page/{id}', [WebsitePageController::class, 'edit'])->name('edit');
         Route::delete('/website-page/{id}', [WebsitePageController::class, 'destroy'])->name('destroy');
         Route::post('website-page/change-status', [WebsitePageController::class, 'changeStatusWebsitePage'])->name('changeStatusWebsitePage');
+        Route::get("accepted-website-pages", [WebsitePageController::class, 'listAcceptedWebsitePages'])->name('listAcceptedWebsitePages');
     });
 
     Route::group(['middleware' => ['role:root,admin,editor']], function () {
@@ -620,8 +621,10 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website_page'], function ()
         Route::get('my/website-page/{id}', [WebsitePageController::class, 'showMyWebsitePage'])->name('showMyWebsitePage');
         Route::put('my/website-page/{id}', [WebsitePageController::class, 'editMyWebsitePage'])->name('editMyWebsitePage');
         Route::delete('my/website-page/{id}', [WebsitePageController::class, 'destroyMyWebsitePage'])->name('destroyMyWebsitePage');
+        Route::get("my/accepted-website-pages", [WebsitePageController::class, 'listMyAcceptedWebsitePages'])->name('listMyAcceptedWebsitePages');
     });
 
+    Route::get('/get-website-page/{id}', [WebsitePageController::class, 'getWebsitePage'])->name('getWebsitePage');
     Route::get('/website-pages-default', [WebsitePageController::class, 'getWebsitePagesDefault'])->name('getWebsitePagesDefault');
     Route::get('/website-page-default/{id}', [WebsitePageController::class, 'showWebsitePagesDefault'])->name('showWebsitePagesDefault');
 });
@@ -729,6 +732,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'section-template'], functio
         Route::put('section-template/{id}', [SectionTemplateController::class, 'edit'])->name('edit');
         Route::delete('/section-template/{id}', [SectionTemplateController::class, 'destroy'])->name('destroy');
         Route::post('section-template/change-status', [SectionTemplateController::class, 'changeStatusSectionTemplate'])->name('acceptPublishSectionTemplate');
+        Route::get("accepted-section-templates", [SectionTemplateController::class, 'listAcceptedSectionTemplate'])->name('listAcceptedSectionTemplate');
     });
 
     Route::group(['middleware' => ['role:root,admin,editor']], function () {
@@ -744,6 +748,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'section-template'], functio
         Route::get('my/section-template/{id}', [SectionTemplateController::class, 'showMySectionTemplate'])->name('showMySectionTemplate');
         Route::put('my/section-template/{id}', [SectionTemplateController::class, 'editMySectionTemplate'])->name('editMySectionTemplate');
         Route::delete('my/section-template/{id}', [SectionTemplateController::class, 'destroyMySectionTemplate'])->name('destroyMySectionTemplate');
+        Route::get("my/accepted-section-templates", [SectionTemplateController::class, 'listMyAcceptedSectionTemplate'])->name('listMyAcceptedSectionTemplate');
     });
 
     Route::get('/section-templates-default', [SectionTemplateController::class, 'getSectionTemplatesDefault'])->name('getWebsitePagesDefault');
@@ -1068,11 +1073,16 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'team.'], function () {
         Route::put('/team/{id}', [TeamController::class, 'edit'])->name('edit');
         Route::delete('/team/{id}', [TeamController::class, 'destroy'])->name('destroy');
 
-        Route::put('/block-member/{id}', [TeamController::class, 'blockMemberForAdmin'])->name('blockMemberForAdmin');
-        Route::put('/unblock-member/{id}', [TeamController::class, 'unBlockMemberForAdmin'])->name('unBlockMemberForAdmin');
+        Route::get('/permission-of-user/{id}', [TeamController::class, 'getPermissionOfUser']);
     });
+    //business
+    Route::post('/business/team', [TeamController::class, 'storeBusinessTeam'])->name('storeBusinessTeam');
+    Route::put('/business/team/{id}', [TeamController::class, 'editBusinessTeam'])->name('editBusinessTeam');
+    Route::delete('/business/team/{id}', [TeamController::class, 'destroyBusinessTeam'])->name('destroyBusinessTeam');
+    Route::post('team/set-leader', [TeamController::class, 'setTeamLeader'])->name('addBusinessMember');
+    Route::get('business/add-on-of-team/{id}', [TeamController::class, 'getAddOnOfTeam'])->name('getAddOnForTeam');
 
-    Route::get('/all-member', [TeamController::class, 'listMemberOfAllTeam'])->name('listMemberOfAllTeam');
+    Route::get('/all-team-member', [TeamController::class, 'listMemberOfAllTeam'])->name('listMemberOfAllTeam');
     Route::get('/list-member/{id}', [TeamController::class, 'listMember'])->name('listMember');
     Route::get('/join-team', [TeamController::class, 'joinTeam'])->name('joinTeam');
     Route::get('/invite-user', [TeamController::class, 'inviteUser'])->name('inviteUser');
@@ -1088,6 +1098,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'team.'], function () {
 
     Route::group(['as' => 'my.'], function () {
         Route::get('my/teams', [TeamController::class, 'indexMy'])->name('indexMy');
+        Route::get('my/team/{id}', [TeamController::class, 'showMy'])->name('showMy');
         Route::post('/my/team', [TeamController::class, 'storeMy'])->name('storeMy');
         Route::put('/my/team/{id}', [TeamController::class, 'editMy'])->name('editMy');
         Route::delete('/my/team/{id}', [TeamController::class, 'destroyMy'])->name('destroyMy');
@@ -1263,6 +1274,10 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'business-management.'], fun
         Route::put('/business-management/{id}', [BusinessManagementController::class, 'edit'])->name('edit');
         Route::delete('/business-management/{id}', [BusinessManagementController::class, 'destroy'])->name('destroy');
     });
+    Route::post('business/add-member', [BusinessManagementController::class, 'addBusinessMember'])->name('addBusinessMember');
+    Route::get('business/get-add-ons', [BusinessManagementController::class, 'getAddOns'])->name('getAddOns');
+    Route::post('business/set-add-on-for-team', [TeamController::class, 'setAddOnForTeam'])->name('setAddOnForTeam');
+    Route::get('/all-business-member', [BusinessManagementController::class, 'listMemberOfBusiness'])->name('listMemberOfBusiness');
 
     Route::group(['as' => 'my.'], function () {
         Route::get('/my/business-managements', [BusinessManagementController::class, 'indexMy'])->name('index');
@@ -1338,6 +1353,8 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website'], function () {
         Route::delete('website/{id}', [WebsiteController::class, 'destroy'])->name('destroy');
         Route::post('websites/change-status', [WebsiteController::class, 'changeStatus'])->name('changeStatus');
         Route::post('websites/change-status-default', [WebsiteController::class, 'changeStatusDefaultWebsite'])->name('changeStatus');
+        Route::post('website', [WebsiteController::class, 'store'])->name('store');
+        Route::put('website/{id}', [WebsiteController::class, 'edit'])->name('edit');
     });
 
     Route::group(['as' => 'my.'], function () {
@@ -1357,6 +1374,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website'], function () {
         Route::post('unpublished-websites/change-status', [WebsiteController::class, 'changeStatusWebsite'])->name('change-status-website');
     });
 
+    Route::post('copy-default-website/{id}', [WebsiteController::class, 'copyDefaultWebsite'])->name('copyDefaultWebsite');
     Route::get('/default-websites', [WebsiteController::class, 'defaultWebsites'])->name('default-websites');
     Route::post('/unpublished-website', [WebsiteController::class, 'storeUnpublishedWebsite'])->name('store-unpublished-website');
 });
