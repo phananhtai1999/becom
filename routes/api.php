@@ -1278,6 +1278,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'business-management.'], fun
     Route::post('business/block-member/{id}', [BusinessManagementController::class, 'blockBusinessMember'])->name('blockBusinessMember');
     Route::get('business/get-add-ons', [BusinessManagementController::class, 'getAddOns'])->name('getAddOns');
     Route::post('business/set-add-on-for-team', [TeamController::class, 'setAddOnForTeam'])->name('setAddOnForTeam');
+    Route::post('business/unset-add-on-for-team', [TeamController::class, 'unsetAddOnForTeam'])->name('unsetAddOnForTeamMember');
     Route::get('/all-business-member', [BusinessManagementController::class, 'listMemberOfBusiness'])->name('listMemberOfBusiness');
 
     Route::group(['as' => 'my.'], function () {
