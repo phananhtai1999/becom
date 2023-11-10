@@ -21,6 +21,7 @@ class UserBusinessResource extends JsonResource
             'uuid' => $this->getKey(),
             'user_uuid' => $this->user_uuid,
             'business_uuid' => $this->business_uuid,
+            'is_blocked' => $this->is_blocked,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'deleted_at' => $this->deleted_at,

@@ -29,7 +29,7 @@ class UserBusiness extends Model
     protected $fillable = [
         'user_uuid',
         'business_uuid',
-        'is_leader',
+        'is_blocked',
     ];
 
     /**

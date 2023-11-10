@@ -7,6 +7,7 @@ use App\Http\Controllers\Traits\RestIndexMyTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\AddBusinessMemberRequest;
 use App\Http\Requests\AddTeamMemberRequest;
+use App\Http\Requests\BlockBusinessMemberRequest;
 use App\Http\Requests\BusinessManagementRequest;
 use App\Http\Requests\GetAddOnOfBusinessRequest;
 use App\Http\Requests\IndexRequest;
@@ -248,7 +249,13 @@ class BusinessManagementController extends AbstractRestAPIController
             if ($this->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->count()) {
                 $businessUuid = $request->get("business_uuid");
             } else {
-                $businessUuid = $this->user()->businessManagements->first()->uuid;
+                $businesses= $this->user()->businessManagements;
+                if ($businesses->toArray()) {
+                    $businessUuid = $businesses->first()->uuid;
+                } else {
+
+                    return $this->sendJsonResponse(false, 'Does not have business', [], 403);
+                }
             }
             if($request->get('type') == UserBusiness::ALREADY_EXISTS_ACCOUNT){
                 foreach ($request->get('user_uuids') as $userUuid) {
@@ -283,7 +290,7 @@ class BusinessManagementController extends AbstractRestAPIController
                     'business_uuid' => $businessUuid,
                     'user_uuid' => $user->uuid
                 ]);
-                Mailbox::postEmailAccountcreate($user->uuid, $email, $passwordRandom);
+//                Mailbox::postEmailAccountcreate($user->uuid, $email, $passwordRandom);
                 DB::commit();
 
                 return $this->sendCreatedJsonResponse();
@@ -302,8 +309,11 @@ class BusinessManagementController extends AbstractRestAPIController
             $businessUuid = $request->get("business_uuid");
         } else {
             $businesses= $this->user()->businessManagements;
-            if (!empty($businesses)) {
+            if ($businesses->toArray()) {
                 $businessUuid = $businesses->first()->uuid;
+            } else {
+
+                return $this->sendJsonResponse(false, 'Does not have business', [], 403);
             }
         }
         $business = $this->service->findOrFailById($businessUuid);
@@ -333,6 +343,27 @@ class BusinessManagementController extends AbstractRestAPIController
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->userBusinessResourceCollectionClass, $model)
+        );
+    }
+
+    public function blockBusinessMember($id, BlockBusinessMemberRequest $request)
+    {
+        if ($this->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->first()) {
+            $businessUuid = $request->get("business_uuid");
+        } else {
+            $businesses = $this->user()->businessManagements;
+            if ($businesses->toArray()) {
+                $businessUuid = $businesses->first()->uuid;
+            } else {
+
+                return $this->sendJsonResponse(false, 'Does not have business', [], 403);
+            }
+        }
+        $userBusiness = $this->userBusinessService->findOneWhereOrFail(['business_uuid' => $businessUuid, 'user_uuid' => $id]);
+        $userBusiness->update(['is_blocked' => !$userBusiness->is_blocked]);
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->userBusinessResourceClass, $userBusiness)
         );
     }
 }
