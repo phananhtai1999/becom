@@ -7,6 +7,7 @@ use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestEditTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestStoreTrait;
+use App\Http\Requests\addChildTeamRequest;
 use App\Http\Requests\AddTeamMemberRequest;
 use App\Http\Requests\BusinessTeamRequest;
 use App\Http\Requests\IndexRequest;
@@ -613,7 +614,7 @@ class TeamController extends Controller
         if ($this->user()->roles->whereNotIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->first()) {
             if (!$this->checkTeamOwner($request->get('team_uuid'))) {
 
-                return $this->sendJsonResponse(false, 'You are not owner of team to set permission', [], 403);
+                return $this->sendJsonResponse(false, 'You are not owner of team to unset add-on', [], 403);
             }
         }
         $team = $this->service->findOrFailById($request->get('team_uuid'));
@@ -621,6 +622,20 @@ class TeamController extends Controller
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $team)
         );
+    }
+
+    /**
+     * @param addChildTeamRequest $request
+     * @return JsonResponse
+     */
+    public function addChildrenForTeam(addChildTeamRequest $request)
+    {
+        foreach ($request->get('child_team_uuids') as $childTeamUuid) {
+            $childTeam = $this->service->findOrFailById($childTeamUuid);
+            $childTeam->update(['parent_team_uuid' => $request->get('team_uuid')]);
+        }
+
+        return $this->sendOkJsonResponse();
     }
 
     public function getAddOnOfTeam(IndexRequest $request, $id)

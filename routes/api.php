@@ -1077,6 +1077,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'team.'], function () {
     });
     //business
     Route::post('/business/team', [TeamController::class, 'storeBusinessTeam'])->name('storeBusinessTeam');
+    Route::post('/add-child-for-team', [TeamController::class, 'addChildrenForTeam'])->name('addChildrenForTeam');
     Route::put('/business/team/{id}', [TeamController::class, 'editBusinessTeam'])->name('editBusinessTeam');
     Route::delete('/business/team/{id}', [TeamController::class, 'destroyBusinessTeam'])->name('destroyBusinessTeam');
     Route::post('team/set-leader', [TeamController::class, 'setTeamLeader'])->name('addBusinessMember');
@@ -1275,6 +1276,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'business-management.'], fun
         Route::delete('/business-management/{id}', [BusinessManagementController::class, 'destroy'])->name('destroy');
     });
     Route::post('business/add-member', [BusinessManagementController::class, 'addBusinessMember'])->name('addBusinessMember');
+    Route::delete('business/remove-member/{id}', [BusinessManagementController::class, 'removeBusinessMember'])->name('removeBusinessMember');
     Route::post('business/block-member/{id}', [BusinessManagementController::class, 'blockBusinessMember'])->name('blockBusinessMember');
     Route::get('business/get-add-ons', [BusinessManagementController::class, 'getAddOns'])->name('getAddOns');
     Route::post('business/set-add-on-for-team', [TeamController::class, 'setAddOnForTeam'])->name('setAddOnForTeam');

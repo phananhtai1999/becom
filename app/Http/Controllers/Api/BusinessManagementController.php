@@ -12,6 +12,7 @@ use App\Http\Requests\BusinessManagementRequest;
 use App\Http\Requests\GetAddOnOfBusinessRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyBusinessManagementRequest;
+use App\Http\Requests\RemoveBusinessMemberRequest;
 use App\Http\Requests\UpdateBusinessManagementRequest;
 use App\Http\Requests\UpdateMyBusinessManagementRequest;
 use App\Http\Resources\AddOnResourceCollection;
@@ -365,5 +366,24 @@ class BusinessManagementController extends AbstractRestAPIController
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->userBusinessResourceClass, $userBusiness)
         );
+    }
+
+    public function removeBusinessMember($id, RemoveBusinessMemberRequest $request)
+    {
+        if ($this->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->first()) {
+            $businessUuid = $request->get("business_uuid");
+        } else {
+            $businesses = $this->user()->businessManagements;
+            if ($businesses->toArray()) {
+                $businessUuid = $businesses->first()->uuid;
+            } else {
+
+                return $this->sendJsonResponse(false, 'You do not have business', [], 403);
+            }
+        }
+        $userBusiness = $this->userBusinessService->findOneWhereOrFail(['business_uuid' => $businessUuid, 'user_uuid' => $id]);
+        $userBusiness->delete();
+
+        return $this->sendCreatedJsonResponse();
     }
 }

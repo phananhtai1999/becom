@@ -173,6 +173,19 @@ class WebsitePageService extends AbstractService
 
     public function renderContentForArticleCategory($websitePage, $articleCategory)
     {
+        $searchArticleReplaceMap = [
+            '{category.uuid}' => $articleCategory->uuid ?? null,
+            '{category.slug}' => $articleCategory->slug ?? null,
+            '{category.title}' => $articleCategory->title ?? null,
+            '{category.content}' => $articleCategory->content ?? null,
+            '{category.feature_image}' => $articleCategory->feature_image ?? null,
+            '{category.image}' => $articleCategory->image ?? null,
+            '{category.keyword}' => $articleCategory->keyword ?? null,
+            '{category.description}' => $articleCategory->description ?? null,
+            '{category.short_content}' => $articleCategory->short_content ?? null,
+        ];
+        $websitePage->template = str_replace(array_keys($searchArticleReplaceMap), $searchArticleReplaceMap, $websitePage->template);
+
         $pattern = '/data-article-count="(\d+)"/';
         preg_match($pattern, $websitePage->template, $articleCount);
         $articleCount = isset($articleCount[1]) ? (int)$articleCount[1] : 10;
