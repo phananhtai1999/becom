@@ -76,7 +76,6 @@ class WebsiteController extends AbstractRestAPIController
         $model = $this->myService->create(
             array_merge($request->all(), [
                 "user_uuid" => $request->get('user_uuid') ?? auth()->user()->getKey(),
-                "publish_status" => Website::PUBLISHED_PUBLISH_STATUS,
             ])
         );
 
@@ -112,8 +111,7 @@ class WebsiteController extends AbstractRestAPIController
             array_merge($request->all(), [
                 "user_uuid" => auth()
                     ->user()
-                    ->getKey(),
-                "publish_status" => Website::BLOCKED_PUBLISH_STATUS,
+                    ->getKey()
             ])
         );
 
@@ -134,7 +132,7 @@ class WebsiteController extends AbstractRestAPIController
 
         $this->myService->update(
             $model,
-            $request->except(["user_uuid", "publish_status"])
+            $request->except(["user_uuid"])
         );
 
         $model
@@ -217,7 +215,6 @@ class WebsiteController extends AbstractRestAPIController
         $model = $this->myService->create(
             array_merge([
                 "user_uuid" => auth()->user()->getKey(),
-                "publish_status" => Website::PENDING_PUBLISH_STATUS,
             ], $request->all())
         );
 
@@ -357,7 +354,7 @@ class WebsiteController extends AbstractRestAPIController
             $isDefault = true;
         }else{
             $statusTemplate = SectionTemplate::PUBLISHED_PUBLISH_STATUS;
-            $statusWebsite = Website::PENDING_PUBLISH_STATUS;
+            $statusWebsite = Website::BLOCKED_PUBLISH_STATUS;
             $isDefault = false;
         }
 

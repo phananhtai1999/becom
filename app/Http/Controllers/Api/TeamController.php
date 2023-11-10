@@ -7,6 +7,7 @@ use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestEditTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestStoreTrait;
+use App\Http\Requests\addChildTeamRequest;
 use App\Http\Requests\AddTeamMemberRequest;
 use App\Http\Requests\BusinessTeamRequest;
 use App\Http\Requests\IndexRequest;
@@ -14,6 +15,7 @@ use App\Http\Requests\InviteUserRequest;
 use App\Http\Requests\JoinTeamRequest;
 use App\Http\Requests\MyUpdateTeamRequest;
 use App\Http\Requests\ResetPasswordEmailTeamMemberRequest;
+use App\Http\Requests\SetAddOnTeamMemberRequest;
 use App\Http\Requests\SetContactListRequest;
 use App\Http\Requests\SetPermissionForTeamRequest;
 use App\Http\Requests\MyTeamRequest;
@@ -182,8 +184,11 @@ class TeamController extends Controller
                 $businessUuid = $request->get("business_uuid");
             } else {
                 $businesses= $this->user()->businessManagements;
-                if (!empty($businesses)) {
+                if ($businesses->toArray()) {
                     $businessUuid = $businesses->first()->uuid;
+                } else {
+
+                    return $this->sendJsonResponse(false, 'Does not have business', [], 403);
                 }
             }
             if ($request->get('type') == Team::ACCOUNT_INVITE) {
@@ -507,7 +512,13 @@ class TeamController extends Controller
         if ($this->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->count()) {
             $businessUuid = $request->get("business_uuid");
         } else {
-            $businessUuid = $this->user()->businessManagements->first()->uuid;
+            $businesses= $this->user()->businessManagements;
+            if ($businesses->toArray()) {
+                $businessUuid = $businesses->first()->uuid;
+            } else {
+
+                return $this->sendJsonResponse(false, 'Does not have business', [], 403);
+            }
         }
         //add team member with user uuid
         $teamModel->business()->attach([$businessUuid]);
@@ -547,7 +558,7 @@ class TeamController extends Controller
         }
         $teamModel = $this->myService->findOrFailById($id);
         $this->service->update($teamModel, $request->all());
-        $teamModel->users()->sync($request->get('team_member_uuids'));
+        $teamModel->users()->syncWithoutDetaching($request->get('team_member_uuids'));
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $teamModel)
@@ -591,11 +602,40 @@ class TeamController extends Controller
     public function setAddOnForTeam(SetTeamAddOnRequest $request)
     {
         $team = $this->service->findOrFailById($request->get('team_uuid'));
-        $team->addons()->sync($request->get('add_on_uuids', []));
+        $team->addons()->syncWithoutDetaching($request->get('add_on_uuids', []));
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $team)
         );
+    }
+
+    public function unsetAddOnForTeam(SetAddOnTeamMemberRequest $request)
+    {
+        if ($this->user()->roles->whereNotIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->first()) {
+            if (!$this->checkTeamOwner($request->get('team_uuid'))) {
+
+                return $this->sendJsonResponse(false, 'You are not owner of team to unset add-on', [], 403);
+            }
+        }
+        $team = $this->service->findOrFailById($request->get('team_uuid'));
+        $team->addons()->detach($request->get('add_on_uuids', []));
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $team)
+        );
+    }
+
+    /**
+     * @param addChildTeamRequest $request
+     * @return JsonResponse
+     */
+    public function addChildrenForTeam(addChildTeamRequest $request)
+    {
+        foreach ($request->get('child_team_uuids') as $childTeamUuid) {
+            $childTeam = $this->service->findOrFailById($childTeamUuid);
+            $childTeam->update(['parent_team_uuid' => $request->get('team_uuid')]);
+        }
+
+        return $this->sendOkJsonResponse();
     }
 
     public function getAddOnOfTeam(IndexRequest $request, $id)
