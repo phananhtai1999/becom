@@ -1096,6 +1096,8 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'team.'], function () {
     Route::put('/block-member/{id}', [TeamController::class, 'blockMember'])->name('blockMember');
     Route::put('/unblock-member/{id}', [TeamController::class, 'unBlockMember'])->name('unBlockMember');
     Route::post('/reset-password', [TeamController::class, 'resetPassword'])->name('reset-password');
+    Route::post('/set-addon-member/{id}', [TeamController::class, 'setAddOnMember'])->name('setAddOnMember');
+
 
     Route::group(['as' => 'my.'], function () {
         Route::get('my/teams', [TeamController::class, 'indexMy'])->name('indexMy');
