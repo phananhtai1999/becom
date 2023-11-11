@@ -345,7 +345,7 @@ class WebsiteController extends AbstractRestAPIController
 
         if($this->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->count()){
             $statusTemplate = SectionTemplate::PUBLISHED_PUBLISH_STATUS;
-            $statusWebsite = Website::PUBLISHED_PUBLISH_STATUS;
+            $statusWebsite = $request->get('publish_status');
             $isDefault = true;
         }elseif($this->user()->roles->whereIn('slug', [Role::ROLE_EDITOR])->count()){
             $statusTemplate = $request->get('publish_status') == Website::PENDING_PUBLISH_STATUS
@@ -354,7 +354,7 @@ class WebsiteController extends AbstractRestAPIController
             $isDefault = true;
         }else{
             $statusTemplate = SectionTemplate::PUBLISHED_PUBLISH_STATUS;
-            $statusWebsite = Website::BLOCKED_PUBLISH_STATUS;
+            $statusWebsite = $request->get('publish_status');
             $isDefault = false;
         }
 

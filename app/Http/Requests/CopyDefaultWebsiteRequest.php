@@ -33,7 +33,7 @@ class CopyDefaultWebsiteRequest extends AbstractRequest
     public function rules()
     {
         $validate = [
-            'title' => ['required', 'string'],
+            'title' => ['nullable','required_unless:publish_status,'.Website::DRAFT_PUBLISH_STATUS, 'string'],
             'description' => ['nullable', 'string'],
             'logo' => ['nullable', 'string'],
             'tracking_ids' => ['nullable', 'array'],
@@ -41,9 +41,13 @@ class CopyDefaultWebsiteRequest extends AbstractRequest
         ];
 
         if($this->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->count()){
-            return $validate;
-        }
-        if ($this->user()->roles->whereIn('slug', [Role::ROLE_EDITOR])->count()){
+            $validate['publish_status'] = ['required', 'numeric',
+                Rule::in(
+                    Website::PUBLISHED_PUBLISH_STATUS,
+                    Website::DRAFT_PUBLISH_STATUS
+                )
+            ];
+        }elseif ($this->user()->roles->whereIn('slug', [Role::ROLE_EDITOR])->count()){
             $validate['publish_status'] = ['required', 'numeric',
                 Rule::in(
                     Website::PENDING_PUBLISH_STATUS,
@@ -51,10 +55,16 @@ class CopyDefaultWebsiteRequest extends AbstractRequest
                 )
             ];
         }else{
-            $validate['domain_uuid'] = ['required', 'numeric', Rule::exists('domains', 'uuid')->where(function ($q) {
+            $validate['domain_uuid'] = ['nullable','required_unless:publish_status,'.Website::DRAFT_PUBLISH_STATUS, 'numeric', Rule::exists('domains', 'uuid')->where(function ($q) {
                 return $q->where('owner_uuid', auth()->user()->getKey())
                     ->whereNull('deleted_at');
             }), CheckWebsiteDomainRule::uniqueDomain($this->id)];
+            $validate['publish_status'] = ['required', 'numeric',
+                Rule::in(
+                    Website::BLOCKED_PUBLISH_STATUS,
+                    Website::DRAFT_PUBLISH_STATUS
+                )
+            ];
         }
 
         return $validate;
