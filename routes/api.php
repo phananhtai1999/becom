@@ -1077,6 +1077,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'team.'], function () {
     });
     //business
     Route::post('/business/team', [TeamController::class, 'storeBusinessTeam'])->name('storeBusinessTeam');
+    Route::get('/business/team/{id}', [TeamController::class, 'businessTeam'])->name('businessTeam');
     Route::post('/add-child-for-team', [TeamController::class, 'addChildrenForTeam'])->name('addChildrenForTeam');
     Route::put('/business/team/{id}', [TeamController::class, 'editBusinessTeam'])->name('editBusinessTeam');
     Route::delete('/business/team/{id}', [TeamController::class, 'destroyBusinessTeam'])->name('destroyBusinessTeam');

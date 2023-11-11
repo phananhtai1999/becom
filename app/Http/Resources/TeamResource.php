@@ -32,6 +32,7 @@ class TeamResource extends JsonResource
         }
 
         if (\in_array('team__children_team', $expand)) {
+            request()->merge(['expand' => []]);
             $data['children_team'] = self::collection($this->childrenTeam);
         }
 

@@ -646,4 +646,17 @@ class TeamController extends Controller
             $this->service->resourceCollectionToData($this->addOnResourceCollectionClass, $addOns)
         );
     }
+
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
+    public function businessTeam($id)
+    {
+        $team = $this->service->findOrFailById($id);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $team)
+        );
+    }
 }
