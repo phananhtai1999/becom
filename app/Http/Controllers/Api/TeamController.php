@@ -14,6 +14,7 @@ use App\Http\Requests\IndexRequest;
 use App\Http\Requests\InviteUserRequest;
 use App\Http\Requests\JoinTeamRequest;
 use App\Http\Requests\MyUpdateTeamRequest;
+use App\Http\Requests\removeTeamMemberRequest;
 use App\Http\Requests\ResetPasswordEmailTeamMemberRequest;
 use App\Http\Requests\SetAddOnForMemberRequest;
 use App\Http\Requests\SetAddOnTeamMemberRequest;
@@ -448,16 +449,18 @@ class TeamController extends Controller
         return $this->sendOkJsonResponse();
     }
 
-    public function deleteMember($id)
+    public function deleteMember(RemoveTeamMemberRequest $request, $id)
     {
-        $model = $this->userTeamService->findOrFailById($id);
-        if ($this->user()->roles->whereNotIn('slug', ["admin", "root"])->count()) {
-            if (!$this->checkTeamOwner($model->team_uuid)) {
+        $model = $this->userTeamService->findOneWhereOrFail(['user_uuid' => $id, 'team_uuid' => $request->get('team_uuid')]);
+
+        if ($this->user()->roles->whereNotIn('slug', [Role::ROLE_ADMIN, Role::ROLE_ROOT])->count()) {
+            if (!$this->checkTeamOwner($request->get('team_uuid'))) {
 
                 return $this->sendJsonResponse(false, 'You are not owner of team to delete member', [], 403);
             }
         }
-        $model->user->userTeamContactLists()->detach();
+        $user = $this->userService->findOrFailById($id);
+        $user->userTeamContactLists()->detach();
         $this->userTeamService->destroy($model->uuid);
         Cache::forget('team_permission_' . $model->user_uuid);
 
