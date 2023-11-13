@@ -3,11 +3,10 @@
 namespace App\Http\Requests;
 
 use App\Models\Role;
-use App\Rules\TeamsBelongToSameBusinessRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class GetAddOnOfBusinessRequest extends FormRequest
+class GetBusinessMemberRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
