@@ -10,6 +10,7 @@ use App\Http\Requests\AddTeamMemberRequest;
 use App\Http\Requests\BlockBusinessMemberRequest;
 use App\Http\Requests\BusinessManagementRequest;
 use App\Http\Requests\GetAddOnOfBusinessRequest;
+use App\Http\Requests\GetBusinessMemberRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyBusinessManagementRequest;
 use App\Http\Requests\RemoveBusinessMemberRequest;
@@ -26,6 +27,7 @@ use App\Models\PlatformPackage;
 use App\Models\Role;
 use App\Models\Team;
 use App\Models\UserBusiness;
+use App\Services\AddOnService;
 use App\Services\BusinessManagementService;
 use App\Services\DomainService;
 use App\Services\MyBusinessManagementService;
@@ -75,7 +77,8 @@ class BusinessManagementController extends AbstractRestAPIController
         MyDomainService             $myDomainService,
         UserBusinessService $userBusinessService,
         UserService $userService,
-        UserAddOnService $userAddOnService
+        UserAddOnService $userAddOnService,
+        AddOnService $addOnService
     )
     {
         $this->service = $service;
@@ -93,6 +96,7 @@ class BusinessManagementController extends AbstractRestAPIController
         $this->indexRequest = IndexRequest::class;
         $this->userService = $userService;
         $this->userAddOnService = $userAddOnService;
+        $this->addOnService = $addOnService;
     }
 
     /**
@@ -317,31 +321,28 @@ class BusinessManagementController extends AbstractRestAPIController
                 return $this->sendJsonResponse(false, 'Does not have business', [], 403);
             }
         }
-        $business = $this->service->findOrFailById($businessUuid);
-        $userAddOns = $this->userAddOnService->findAllWhere(['user_uuid' => $business->owner_uuid], ['user_uuid', 'add_on_subscription_plan_uuid'], true);
-        $addOns = [];
-        foreach ($userAddOns as $userAddOn) {
-            $addOns[] = $userAddOn->addOnSubscriptionPlan->addOn ?? [];
-        }
+        $addOns = $this->addOnService->getAddOnsByBusiness($request, $businessUuid, $request->get('exclude_team_uuid'));
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->addOnResourceCollectionClass, $addOns)
         );
     }
 
-    public function listMemberOfBusiness(IndexRequest $request)
+    public function listMemberOfBusiness(GetBusinessMemberRequest $request)
     {
-        if ($this->user()->roles->whereIn('slug', [Role::ROLE_ADMIN, Role::ROLE_ROOT])->first()) {
-            $model = $this->userBusinessService->listMemberOfAllBusiness($request);
+        if ($this->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->count()) {
+            $businessUuid = $request->get("business_uuid");
         } else {
-            $business = $this->service->findOneWhere((['owner_uuid' => $this->user()->getKey()]));
-            if ($business) {
-                $model = $this->userBusinessService->listBusinessMember([$business->uuid], $request);
+            $businesses= $this->user()->businessManagements;
+            if ($businesses->toArray()) {
+                $businessUuid = $businesses->first()->uuid;
             } else {
-                $model = [];
+
+                return $this->sendJsonResponse(false, 'Does not have business', [], 403);
             }
         }
 
+        $model = $this->userBusinessService->listBusinessMember([$businessUuid], $request, $request->get('exclude_team_uuid'));
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->userBusinessResourceCollectionClass, $model)
         );

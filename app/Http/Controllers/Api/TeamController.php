@@ -14,6 +14,7 @@ use App\Http\Requests\IndexRequest;
 use App\Http\Requests\InviteUserRequest;
 use App\Http\Requests\JoinTeamRequest;
 use App\Http\Requests\MyUpdateTeamRequest;
+use App\Http\Requests\removeTeamMemberRequest;
 use App\Http\Requests\ResetPasswordEmailTeamMemberRequest;
 use App\Http\Requests\SetAddOnForMemberRequest;
 use App\Http\Requests\SetAddOnTeamMemberRequest;
@@ -290,22 +291,25 @@ class TeamController extends Controller
         );
     }
 
-    public function setAddOnMember(SetAddOnForMemberRequest $request, $id)
+    public function setAddOnsMembers(SetAddOnForMemberRequest $request, $id)
     {
         if ($this->user()->roles->whereNotIn('slug', ["admin", "root"])->count()) {
             if (!$this->checkTeamOwner($id)) {
 
-                return $this->sendJsonResponse(false, 'You are not owner of team to set contact list', [], 403);
+                return $this->sendJsonResponse(false, 'You are not owner of team to set add ons', [], 403);
             }
         }
 
-        $userTeam = $this->userTeamService->findOneWhereOrFail([
-           'team_uuid' => $id,
-           'user_uuid' => $request->get('user_uuid')
-        ]);
-        $this->userTeamService->update($userTeam, [
-           'add_on_uuids' =>  $request->get('add_on_uuids')
-        ]);
+        foreach ($request->get('user_uuids') as $user_uuid){
+            $userTeam = $this->userTeamService->findOneWhereOrFail([
+                'team_uuid' => $id,
+                'user_uuid' => $user_uuid
+            ]);
+            $this->userTeamService->update($userTeam, [
+                'add_on_uuids' => array_values(array_unique(array_merge($userTeam->add_on_uuids ?? [], $request->get('add_on_uuids'))))
+
+            ]);
+        }
 
         return $this->sendOkJsonResponse();
     }
@@ -445,16 +449,18 @@ class TeamController extends Controller
         return $this->sendOkJsonResponse();
     }
 
-    public function deleteMember($id)
+    public function deleteMember(RemoveTeamMemberRequest $request, $id)
     {
-        $model = $this->userTeamService->findOrFailById($id);
-        if ($this->user()->roles->whereNotIn('slug', ["admin", "root"])->count()) {
-            if (!$this->checkTeamOwner($model->team_uuid)) {
+        $model = $this->userTeamService->findOneWhereOrFail(['user_uuid' => $id, 'team_uuid' => $request->get('team_uuid')]);
+
+        if ($this->user()->roles->whereNotIn('slug', [Role::ROLE_ADMIN, Role::ROLE_ROOT])->count()) {
+            if (!$this->checkTeamOwner($request->get('team_uuid'))) {
 
                 return $this->sendJsonResponse(false, 'You are not owner of team to delete member', [], 403);
             }
         }
-        $model->user->userTeamContactLists()->detach();
+        $user = $this->userService->findOrFailById($id);
+        $user->userTeamContactLists()->detach();
         $this->userTeamService->destroy($model->uuid);
         Cache::forget('team_permission_' . $model->user_uuid);
 
@@ -630,7 +636,7 @@ class TeamController extends Controller
         );
     }
 
-    public function unsetAddOnForTeam(SetAddOnTeamMemberRequest $request)
+    public function unsetAddOnForTeam(SetTeamAddOnRequest $request)
     {
         if ($this->user()->roles->whereNotIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->first()) {
             if (!$this->checkTeamOwner($request->get('team_uuid'))) {
