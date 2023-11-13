@@ -609,7 +609,7 @@ class TeamController extends Controller
         );
     }
 
-    public function unsetAddOnForTeam(SetAddOnTeamMemberRequest $request)
+    public function unsetAddOnForTeam(SetTeamAddOnRequest $request)
     {
         if ($this->user()->roles->whereNotIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->first()) {
             if (!$this->checkTeamOwner($request->get('team_uuid'))) {
