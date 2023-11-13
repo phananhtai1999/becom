@@ -26,6 +26,7 @@ use App\Models\PlatformPackage;
 use App\Models\Role;
 use App\Models\Team;
 use App\Models\UserBusiness;
+use App\Services\AddOnService;
 use App\Services\BusinessManagementService;
 use App\Services\DomainService;
 use App\Services\MyBusinessManagementService;
@@ -75,7 +76,8 @@ class BusinessManagementController extends AbstractRestAPIController
         MyDomainService             $myDomainService,
         UserBusinessService $userBusinessService,
         UserService $userService,
-        UserAddOnService $userAddOnService
+        UserAddOnService $userAddOnService,
+        AddOnService $addOnService
     )
     {
         $this->service = $service;
@@ -93,6 +95,7 @@ class BusinessManagementController extends AbstractRestAPIController
         $this->indexRequest = IndexRequest::class;
         $this->userService = $userService;
         $this->userAddOnService = $userAddOnService;
+        $this->addOnService = $addOnService;
     }
 
     /**
@@ -317,12 +320,7 @@ class BusinessManagementController extends AbstractRestAPIController
                 return $this->sendJsonResponse(false, 'Does not have business', [], 403);
             }
         }
-        $business = $this->service->findOrFailById($businessUuid);
-        $userAddOns = $this->userAddOnService->findAllWhere(['user_uuid' => $business->owner_uuid], ['user_uuid', 'add_on_subscription_plan_uuid'], true);
-        $addOns = [];
-        foreach ($userAddOns as $userAddOn) {
-            $addOns[] = $userAddOn->addOnSubscriptionPlan->addOn ?? [];
-        }
+        $addOns = $this->addOnService->getAddOnsByBusiness($request, $businessUuid, $request->get('exclude_team_uuid'));
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->addOnResourceCollectionClass, $addOns)
