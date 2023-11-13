@@ -1077,6 +1077,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'team.'], function () {
     });
     //business
     Route::post('/business/team', [TeamController::class, 'storeBusinessTeam'])->name('storeBusinessTeam');
+    Route::get('/business/team/{id}', [TeamController::class, 'businessTeam'])->name('businessTeam');
     Route::post('/add-child-for-team', [TeamController::class, 'addChildrenForTeam'])->name('addChildrenForTeam');
     Route::put('/business/team/{id}', [TeamController::class, 'editBusinessTeam'])->name('editBusinessTeam');
     Route::delete('/business/team/{id}', [TeamController::class, 'destroyBusinessTeam'])->name('destroyBusinessTeam');
@@ -1096,6 +1097,8 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'team.'], function () {
     Route::put('/block-member/{id}', [TeamController::class, 'blockMember'])->name('blockMember');
     Route::put('/unblock-member/{id}', [TeamController::class, 'unBlockMember'])->name('unBlockMember');
     Route::post('/reset-password', [TeamController::class, 'resetPassword'])->name('reset-password');
+    Route::post('/set-addon-member/{id}', [TeamController::class, 'setAddOnMember'])->name('setAddOnMember');
+
 
     Route::group(['as' => 'my.'], function () {
         Route::get('my/teams', [TeamController::class, 'indexMy'])->name('indexMy');

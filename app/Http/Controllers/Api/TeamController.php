@@ -15,6 +15,7 @@ use App\Http\Requests\InviteUserRequest;
 use App\Http\Requests\JoinTeamRequest;
 use App\Http\Requests\MyUpdateTeamRequest;
 use App\Http\Requests\ResetPasswordEmailTeamMemberRequest;
+use App\Http\Requests\SetAddOnForMemberRequest;
 use App\Http\Requests\SetAddOnTeamMemberRequest;
 use App\Http\Requests\SetContactListRequest;
 use App\Http\Requests\SetPermissionForTeamRequest;
@@ -287,6 +288,26 @@ class TeamController extends Controller
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->userTeamResourceClass, $model)
         );
+    }
+
+    public function setAddOnMember(SetAddOnForMemberRequest $request, $id)
+    {
+        if ($this->user()->roles->whereNotIn('slug', ["admin", "root"])->count()) {
+            if (!$this->checkTeamOwner($id)) {
+
+                return $this->sendJsonResponse(false, 'You are not owner of team to set contact list', [], 403);
+            }
+        }
+
+        $userTeam = $this->userTeamService->findOneWhereOrFail([
+           'team_uuid' => $id,
+           'user_uuid' => $request->get('user_uuid')
+        ]);
+        $this->userTeamService->update($userTeam, [
+           'add_on_uuids' =>  $request->get('add_on_uuids')
+        ]);
+
+        return $this->sendOkJsonResponse();
     }
 
     /**
@@ -644,6 +665,19 @@ class TeamController extends Controller
 
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData($this->addOnResourceCollectionClass, $addOns)
+        );
+    }
+
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
+    public function businessTeam($id)
+    {
+        $team = $this->service->findOrFailById($id);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $team)
         );
     }
 }
