@@ -684,13 +684,35 @@ class TeamController extends Controller
         );
     }
 
+    /**
+     * @param IndexRequest $request
+     * @param $id
+     * @return JsonResponse
+     */
     public function assignedBusinessTeam(IndexRequest $request, $id)
     {
         $addOn = $this->addOnService->findOrFailById($id);
         $teamUuids = $addOn->teams()->pluck('uuid')->toArray();
         $teams = $this->service->getTeamsByIds($teamUuids, $request);
+
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData($this->resourceCollectionClass, $teams)
+        );
+    }
+
+    /**
+     * @param IndexRequest $request
+     * @param $id
+     * @return JsonResponse
+     */
+    public function assignedTeamMember(IndexRequest $request, $id)
+    {
+        $addOn = $this->addOnService->findOrFailById($id);
+        $userTeamUuids = $addOn->userTeams->pluck('uuid')->toArray();
+        $userTeams = $this->userTeamService->getUserTeamsByIds($userTeamUuids, $request);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $userTeams)
         );
     }
 }
