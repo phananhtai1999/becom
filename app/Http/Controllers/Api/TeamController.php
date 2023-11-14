@@ -64,16 +64,16 @@ class TeamController extends Controller
     use RestShowTrait, RestDestroyTrait, RestEditTrait, RestStoreTrait;
 
     public function __construct(
-        TeamService        $service,
-        UserTeamService    $userTeamService,
-        SmtpAccountService $smtpAccountService,
-        UserService        $userService,
-        InviteService      $inviteService,
-        PermissionService  $permissionService,
-        ContactListService $contactListService,
-        MyTeamService      $myService,
+        TeamService         $service,
+        UserTeamService     $userTeamService,
+        SmtpAccountService  $smtpAccountService,
+        UserService         $userService,
+        InviteService       $inviteService,
+        PermissionService   $permissionService,
+        ContactListService  $contactListService,
+        MyTeamService       $myService,
         UserBusinessService $userBusinessService,
-        AddOnService $addOnService
+        AddOnService        $addOnService
     )
     {
         $this->service = $service;
@@ -185,7 +185,7 @@ class TeamController extends Controller
             if ($this->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->count()) {
                 $businessUuid = $request->get("business_uuid");
             } else {
-                $businesses= $this->user()->businessManagements;
+                $businesses = $this->user()->businessManagements;
                 if ($businesses->toArray()) {
                     $businessUuid = $businesses->first()->uuid;
                 } else {
@@ -300,7 +300,7 @@ class TeamController extends Controller
             }
         }
 
-        foreach ($request->get('user_uuids') as $user_uuid){
+        foreach ($request->get('user_uuids') as $user_uuid) {
             $userTeam = $this->userTeamService->findOneWhereOrFail([
                 'team_uuid' => $request->get('team_uuid'),
                 'user_uuid' => $user_uuid
@@ -536,7 +536,7 @@ class TeamController extends Controller
         if ($this->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->count()) {
             $businessUuid = $request->get("business_uuid");
         } else {
-            $businesses= $this->user()->businessManagements;
+            $businesses = $this->user()->businessManagements;
             if ($businesses->toArray()) {
                 $businessUuid = $businesses->first()->uuid;
             } else {
@@ -681,6 +681,16 @@ class TeamController extends Controller
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $team)
+        );
+    }
+
+    public function assignedBusinessTeam(IndexRequest $request, $id)
+    {
+        $addOn = $this->addOnService->findOrFailById($id);
+        $teamUuids = $addOn->teams()->pluck('uuid')->toArray();
+        $teams = $this->service->getTeamsByIds($teamUuids, $request);
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $teams)
         );
     }
 }
