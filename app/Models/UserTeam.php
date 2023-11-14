@@ -60,6 +60,6 @@ class UserTeam extends Model
 
     public function addOns()
     {
-        return AddOn::whereIn('uuid', $this->add_on_uuids ?? [])->get();
+        return $this->belongsToMany(AddOn::class, 'user_team_add_on', 'user_team_uuid', 'add_on_uuid');
     }
 }
