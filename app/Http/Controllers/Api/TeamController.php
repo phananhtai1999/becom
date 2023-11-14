@@ -291,10 +291,10 @@ class TeamController extends Controller
         );
     }
 
-    public function setAddOnsMembers(SetAddOnForMemberRequest $request, $id)
+    public function setAddOnsMembers(SetAddOnForMemberRequest $request)
     {
-        if ($this->user()->roles->whereNotIn('slug', ["admin", "root"])->count()) {
-            if (!$this->checkTeamOwner($id)) {
+        if ($this->user()->roles->whereNotIn('slug', [Role::ROLE_ADMIN, Role::ROLE_ROOT])->count()) {
+            if (!$this->checkTeamOwner($request->get('team_uuid'))) {
 
                 return $this->sendJsonResponse(false, 'You are not owner of team to set add ons', [], 403);
             }
@@ -302,13 +302,10 @@ class TeamController extends Controller
 
         foreach ($request->get('user_uuids') as $user_uuid){
             $userTeam = $this->userTeamService->findOneWhereOrFail([
-                'team_uuid' => $id,
+                'team_uuid' => $request->get('team_uuid'),
                 'user_uuid' => $user_uuid
             ]);
-            $this->userTeamService->update($userTeam, [
-                'add_on_uuids' => array_values(array_unique(array_merge($userTeam->add_on_uuids ?? [], $request->get('add_on_uuids'))))
-
-            ]);
+            $userTeam->addOns()->syncWithoutDetaching($request->get('add_on_uuids'), []);
         }
 
         return $this->sendOkJsonResponse();
