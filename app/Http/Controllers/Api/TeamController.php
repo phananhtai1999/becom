@@ -695,12 +695,13 @@ class TeamController extends Controller
      * @param $id
      * @return JsonResponse
      */
-    public function businessTeam($id)
+    public function businessTeam(IndexRequest $request, $id)
     {
         $team = $this->service->findOrFailById($id);
+        $childrenTeam = $this->service->getCollectionWithPaginationByCondition($request, ['parent_team_uuid' => $id]);
 
         return $this->sendOkJsonResponse(
-            $this->service->resourceToData($this->resourceClass, $team)
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $childrenTeam)
         );
     }
 
