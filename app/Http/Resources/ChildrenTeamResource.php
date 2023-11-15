@@ -2,10 +2,9 @@
 
 namespace App\Http\Resources;
 
-use App\Models\User;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class TeamResource extends JsonResource
+class ChildrenTeamResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -15,8 +14,7 @@ class TeamResource extends JsonResource
      */
     public function toArray($request)
     {
-        $expand = request()->get('expand', []);
-        $data = [
+        return [
             'uuid' => $this->uuid,
             'name' => $this->name,
             'leader_uuid' => $this->leader_uuid,
@@ -26,18 +24,5 @@ class TeamResource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
-        if (\in_array('team__owner', $expand)) {
-            $data['owner'] = new UserResource($this->owner);
-        }
-
-        if (\in_array('team__children_team', $expand)) {
-            $data['children_team'] = ChildrenTeamResource::collection($this->childrenTeam);
-        }
-
-        if (\in_array('team__parent_team', $expand)) {
-            $data['parent_team'] = new TeamResource($this->parentTeam);
-        }
-
-        return $data;
     }
 }
