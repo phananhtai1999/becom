@@ -26,4 +26,12 @@ class UserTeamService extends AbstractService
         return $this->modelQueryBuilderClass::searchQuery($request['search'], $request['search_by'])
             ->paginate($request['per_page'], $request['columns'], $request['page_name'], $request['page']);
     }
+
+    public function getUserTeamsByIds($userTeamUuids, $request)
+    {
+        $indexRequest = $this->getIndexRequest($request);
+        return UserTeamQueryBuilder::searchQuery($indexRequest['search'], $indexRequest['search_by'])
+            ->whereIn('uuid', $userTeamUuids)
+            ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
+    }
 }

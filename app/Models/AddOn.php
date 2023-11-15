@@ -57,4 +57,12 @@ class AddOn extends Model
     {
         return $this->hasMany(AddOnSubscriptionPlan::class, 'add_on_uuid', 'uuid');
     }
+
+    public function teams() {
+        return $this->belongsToMany(Team::class, 'team_add_on', 'add_on_uuid','team_uuid')->withTimestamps();
+    }
+
+    public function userTeams() {
+        return $this->belongsToMany(UserTeam::class, 'user_team_add_on', 'add_on_uuid','user_team_uuid')->withTimestamps();
+    }
 }
