@@ -311,6 +311,26 @@ class TeamController extends Controller
         return $this->sendOkJsonResponse();
     }
 
+    public function unsetAddOnsMembers(SetAddOnForMemberRequest $request)
+    {
+        if ($this->user()->roles->whereNotIn('slug', [Role::ROLE_ADMIN, Role::ROLE_ROOT])->count()) {
+            if (!$this->checkTeamOwner($request->get('team_uuid'))) {
+
+                return $this->sendJsonResponse(false, 'You are not owner of team to set add ons', [], 403);
+            }
+        }
+
+        foreach ($request->get('user_uuids') as $user_uuid) {
+            $userTeam = $this->userTeamService->findOneWhereOrFail([
+                'team_uuid' => $request->get('team_uuid'),
+                'user_uuid' => $user_uuid
+            ]);
+            $userTeam->addOns()->detach($request->get('add_on_uuids'), []);
+        }
+
+        return $this->sendOkJsonResponse();
+    }
+
     /**
      * @param SetContactListRequest $request
      * @return JsonResponse
