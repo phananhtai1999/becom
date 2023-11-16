@@ -21,6 +21,9 @@ class WebsitePageShortCodeResource extends JsonResource
             'parent_uuid' => $this->parent_uuid,
             'name' => $this->name,
             'short_code' => $this->short_code,
+            'created_at' => $this->created_at,
+            'update_at' => $this->update_at,
+            'deleted_at' => $this->deleted_at,
         ];
     }
 }
