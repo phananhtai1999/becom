@@ -76,6 +76,7 @@ use App\Http\Controllers\Api\SendProjectController;
 use App\Http\Controllers\Api\WebsiteController;
 use App\Http\Controllers\Api\WebsitePageCategoryController;
 use App\Http\Controllers\Api\WebsitePageController;
+use App\Http\Controllers\Api\WebsitePageShortCodeController;
 use App\Http\Controllers\Api\WebsiteVerificationController;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Route;
@@ -604,6 +605,15 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website_page'], function ()
         Route::delete('/website-page/{id}', [WebsitePageController::class, 'destroy'])->name('destroy');
         Route::post('website-page/change-status', [WebsitePageController::class, 'changeStatusWebsitePage'])->name('changeStatusWebsitePage');
         Route::get("accepted-website-pages", [WebsitePageController::class, 'listAcceptedWebsitePages'])->name('listAcceptedWebsitePages');
+
+    });
+
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
+        Route::get('short-codes', [WebsitePageShortCodeController::class, 'index'])->name('index');
+        Route::post('short-code', [WebsitePageShortCodeController::class, 'store'])->name('store');
+        Route::get('short-code/{id}', [WebsitePageShortCodeController::class, 'show'])->name('show');
+        Route::put('short-code/{id}', [WebsitePageShortCodeController::class, 'edit'])->name('edit');
+        Route::delete('/short-code/{id}', [WebsitePageShortCodeController::class, 'destroy'])->name('destroy');
     });
     Route::get('get-website-pages', [WebsitePageController::class, 'getWebsitePagesWithReplace'])->name('edit');
 
