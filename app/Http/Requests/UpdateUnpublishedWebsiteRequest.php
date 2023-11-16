@@ -65,6 +65,7 @@ class UpdateUnpublishedWebsiteRequest extends FormRequest
             'tracking_ids' => ['nullable', 'array'],
             'tracking_ids.*' => ['nullable', 'string', 'max:300'],
             'publish_status' => ['numeric', Rule::in(Website::PENDING_PUBLISH_STATUS, Website::DRAFT_PUBLISH_STATUS)],
+            'is_active_news_page' => ['boolean'],
         ];
     }
 }
