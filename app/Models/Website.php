@@ -43,6 +43,7 @@ class Website extends AbstractModel
         'logo',
         'domain_uuid',
         'tracking_ids',
+        'is_active_news_page',
     ];
 
     /**

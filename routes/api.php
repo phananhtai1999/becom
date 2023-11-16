@@ -1367,6 +1367,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website'], function () {
         Route::post('website', [WebsiteController::class, 'store'])->name('store');
         Route::put('website/{id}', [WebsiteController::class, 'edit'])->name('edit');
     });
+    Route::post('toggle-news-page/{id}', [WebsiteController::class, 'toggleNewsPage'])->name('toggleNewsPage');
 
     Route::group(['as' => 'my.'], function () {
         Route::get('my/websites', [WebsiteController::class, 'indexMy'])->name('index');

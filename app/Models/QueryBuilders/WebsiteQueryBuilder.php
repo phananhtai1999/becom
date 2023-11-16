@@ -40,6 +40,7 @@ class WebsiteQueryBuilder extends AbstractQueryBuilder
                 'logo',
                 'domain_uuid',
                 'tracking_ids',
+                'is_active_news_page',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -53,6 +54,7 @@ class WebsiteQueryBuilder extends AbstractQueryBuilder
                 'logo',
                 'domain_uuid',
                 'tracking_ids',
+                'is_active_news_page',
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -63,6 +65,8 @@ class WebsiteQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__description', 'description'),
                 'logo',
                 AllowedFilter::exact('exact__logo', 'logo'),
+                'is_active_news_page',
+                AllowedFilter::exact('exact__is_active_news_page', 'is_active_news_page'),
                 'header_section_uuid',
                 AllowedFilter::exact('exact__header_section_uuid', 'header_section_uuid'),
                 'headerSection.title',
