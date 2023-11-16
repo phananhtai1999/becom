@@ -15,6 +15,7 @@ use App\Http\Requests\ChangeStatusMyWebsite;
 use App\Http\Requests\ChangeStatusWebsite;
 use App\Http\Requests\ChangeStatusWebsiteRequest;
 use App\Http\Requests\CopyDefaultWebsiteRequest;
+use App\Http\Requests\GetWebsitePagesRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyWebsiteRequest;
 use App\Http\Requests\UnpublishedWebsiteRequest;

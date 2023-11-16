@@ -153,6 +153,20 @@ class WebsitePageService extends AbstractService
         return $webpage ?? abort(404);
     }
 
+    public function getWebsitePageByDomain($domainName)
+    {
+        $website = (new Website())->whereHas('domain', function ($query) use ($domainName) {
+            $query->where([
+                ['name', $domainName],
+                ['verified_at', '!=', null]
+            ]);
+        })
+            ->where('publish_status', Website::PUBLISHED_PUBLISH_STATUS)
+            ->firstOrFail();
+
+        return $website->websitePagesPublic()->paginate();
+    }
+
     public function renderContent($websitePage, $article)
     {
         $searchReplaceMap = [

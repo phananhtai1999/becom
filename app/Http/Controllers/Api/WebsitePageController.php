@@ -8,6 +8,7 @@ use App\Http\Controllers\Traits\RestIndexMyTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Requests\AcceptPublishWebsitePageRequest;
 use App\Http\Requests\ConfigShortcodeRequest;
+use App\Http\Requests\GetWebsitePagesRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyWebsitePageRequest;
 use App\Http\Requests\ShowWebsitePageRequest;
@@ -99,6 +100,26 @@ class WebsitePageController extends AbstractRestAPIController
         }
 
         return $response;
+    }
+
+
+    public function getWebsitePagesWithReplace(GetWebsitePagesRequest $request)
+    {
+        $websitePages = $this->service->getWebsitePageByDomain($request->get('domain'));
+        foreach ($websitePages as  $key => $websitePage) {
+            if ($websitePage->type == WebsitePage::ARTICLE_DETAIL_TYPE) {
+                $article = $this->articleService->findOneWhereOrFail(['slug' => $request->get('article_slug')]);
+                $websitePages[$key] = $this->service->renderContent($websitePage, $article);
+            } elseif ($websitePage->type == WebsitePage::ARTICLE_CATEGORY_TYPE) {
+                $articleCategory = $this->articleCategoryService->findOneWhereOrFail(['slug' => $request->get('article_category_slug')]);
+                $websitePages[$key] = $this->service->renderContentForArticleCategory($websitePage, $articleCategory);
+            } elseif ($websitePage->type == WebsitePage::HOME_ARTICLES_TYPE) {
+                $websitePages[$key] = $this->service->renderContentForHomeArticles($websitePage);
+            }
+        }
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $websitePages)
+        );
     }
 
     public function configShortcode(ConfigShortcodeRequest $request)

@@ -605,6 +605,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website_page'], function ()
         Route::post('website-page/change-status', [WebsitePageController::class, 'changeStatusWebsitePage'])->name('changeStatusWebsitePage');
         Route::get("accepted-website-pages", [WebsitePageController::class, 'listAcceptedWebsitePages'])->name('listAcceptedWebsitePages');
     });
+    Route::get('get-website-pages', [WebsitePageController::class, 'getWebsitePagesWithReplace'])->name('edit');
 
     Route::group(['middleware' => ['role:root,admin,editor']], function () {
         Route::get('/unpublished-website-pages', [WebsitePageController::class, 'indexUnpublishedWebsitePage'])->name('index-unpublished');
@@ -1083,6 +1084,8 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'team.'], function () {
     Route::delete('/business/team/{id}', [TeamController::class, 'destroyBusinessTeam'])->name('destroyBusinessTeam');
     Route::post('team/set-leader', [TeamController::class, 'setTeamLeader'])->name('addBusinessMember');
     Route::get('business/add-on-of-team/{id}', [TeamController::class, 'getAddOnOfTeam'])->name('getAddOnForTeam');
+    Route::get('business/assigned-of-teams/{id}', [TeamController::class, 'assignedBusinessTeam'])->name('assignedBusinessTeam');
+    Route::get('business/assigned-of-team-members/{id}', [TeamController::class, 'assignedTeamMember'])->name('assignedTeamMember');
 
     Route::get('/all-team-member', [TeamController::class, 'listMemberOfAllTeam'])->name('listMemberOfAllTeam');
     Route::get('/list-member/{id}', [TeamController::class, 'listMember'])->name('listMember');
@@ -1097,7 +1100,8 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'team.'], function () {
     Route::put('/block-member/{id}', [TeamController::class, 'blockMember'])->name('blockMember');
     Route::put('/unblock-member/{id}', [TeamController::class, 'unBlockMember'])->name('unBlockMember');
     Route::post('/reset-password', [TeamController::class, 'resetPassword'])->name('reset-password');
-    Route::post('/set-addons-members/{id}', [TeamController::class, 'setAddOnsMembers'])->name('setAddOnsMembers');
+    Route::post('/set-addons-members', [TeamController::class, 'setAddOnsMembers'])->name('setAddOnsMembers');
+    Route::post('/unset-addons-members', [TeamController::class, 'unsetAddOnsMembers'])->name('unsetAddOnsMembers');
 
 
     Route::group(['as' => 'my.'], function () {

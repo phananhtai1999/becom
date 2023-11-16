@@ -28,4 +28,12 @@ class TeamService extends AbstractService
 
         return $this->collectionPagination($result, $indexRequest['per_page'], $indexRequest['page']);
     }
+
+    public function getTeamsByIds($teamUuids, $request)
+    {
+        $indexRequest = $this->getIndexRequest($request);
+        return TeamQueryBuilder::searchQuery($indexRequest['search'], $indexRequest['search_by'])
+            ->whereIn('uuid', $teamUuids)
+            ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
+    }
 }
