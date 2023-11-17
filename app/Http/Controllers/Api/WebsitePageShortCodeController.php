@@ -8,6 +8,7 @@ use App\Http\Controllers\Traits\RestEditTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestStoreTrait;
+use App\Http\Requests\ConfigShortcodeRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\UpdateWebsitePageShortCodeRequest;
 use App\Http\Requests\WebsitePageShortCodeRequest;
@@ -27,5 +28,14 @@ class WebsitePageShortCodeController extends AbstractRestAPIController
         $this->storeRequest = WebsitePageShortCodeRequest::class;
         $this->editRequest = UpdateWebsitePageShortCodeRequest::class;
         $this->indexRequest = IndexRequest::class;
+    }
+
+    public function configShortcode(ConfigShortcodeRequest $request)
+    {
+        $shortCode = $this->service->findAllWhere(['type' => $request->get('type'), 'parent_uuid' => null]);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $shortCode)
+        );
     }
 }

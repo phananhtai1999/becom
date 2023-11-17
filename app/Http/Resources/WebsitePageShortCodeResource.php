@@ -14,7 +14,9 @@ class WebsitePageShortCodeResource extends JsonResource
      */
     public function toArray($request)
     {
-        return [
+        $expand = request()->get('expand', []);
+
+        $data = [
             'uuid' => $this->uuid,
             'type' => $this->type,
             'key' => $this->key,
@@ -25,5 +27,11 @@ class WebsitePageShortCodeResource extends JsonResource
             'update_at' => $this->update_at,
             'deleted_at' => $this->deleted_at,
         ];
+
+        if (\in_array('website_page_short_code__children_short_code', $expand)) {
+            $data['children_short_code'] = self::collection($this->childrenWebsitePageShortCode);
+        }
+
+        return $data;
     }
 }
