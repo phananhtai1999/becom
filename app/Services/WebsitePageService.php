@@ -153,7 +153,7 @@ class WebsitePageService extends AbstractService
         return $webpage ?? abort(404);
     }
 
-    public function getWebsitePageByDomain($domainName)
+    public function getWebsitePageByDomainAndWebsitePageSlug($domainName, $websitePageSlug)
     {
         $website = (new Website())->whereHas('domain', function ($query) use ($domainName) {
             $query->where([
@@ -164,7 +164,8 @@ class WebsitePageService extends AbstractService
             ->where('publish_status', Website::PUBLISHED_PUBLISH_STATUS)
             ->firstOrFail();
 
-        return $website->websitePagesPublic()->paginate();
+        $websitePage = $website->websitePagesPublic()->where(['slug' => $websitePageSlug])->firstOrFail();
+        return $this->model->where(['uuid' => $websitePage->uuid])->firstOrFail();
     }
 
     public function renderContent($websitePage, $article)

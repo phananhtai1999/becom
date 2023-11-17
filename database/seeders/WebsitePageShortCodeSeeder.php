@@ -40,9 +40,27 @@ class WebsitePageShortCodeSeeder extends Seeder
                 'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE
             ],
             [
-                'name' => 'sort inside article category',
-                'key' => 'article_category.sort',
-                'short_code' => 'sort_element',
+                'name' => 'article list inside article category',
+                'key' => 'article_category.article_list',
+                'short_code' => 'article_list',
+                'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE
+            ],
+            [
+                'name' => 'category list inside article category',
+                'key' => 'article_category.category_list',
+                'short_code' => 'category_list',
+                'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE
+            ],
+            [
+                'name' => 'children category list inside article category',
+                'key' => 'article_category.children_category_list',
+                'short_code' => 'children_category_list',
+                'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE
+            ],
+            [
+                'name' => 'grand children category list inside article category',
+                'key' => 'article_category.grand_children_category_list',
+                'short_code' => 'grand_children_category_list',
                 'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE
             ],
             [
@@ -72,9 +90,21 @@ class WebsitePageShortCodeSeeder extends Seeder
                 'type' => WebsitePageShortCode::HOME_ARTICLES_TYPE
             ],
             [
-                'name' => 'sort inside home article',
-                'key' => 'home_articles.sort',
-                'short_code' => 'sort_element',
+                'name' => 'article list inside home article',
+                'key' => 'home_articles.article_list',
+                'short_code' => 'article_list',
+                'type' => WebsitePageShortCode::HOME_ARTICLES_TYPE
+            ],
+            [
+                'name' => 'category list inside home article',
+                'key' => 'home_articles.category_list',
+                'short_code' => 'category_list',
+                'type' => WebsitePageShortCode::HOME_ARTICLES_TYPE
+            ],
+            [
+                'name' => 'children category list inside home article',
+                'key' => 'home_articles.children_category_list',
+                'short_code' => 'children_category_list',
                 'type' => WebsitePageShortCode::HOME_ARTICLES_TYPE
             ],
             [
@@ -84,28 +114,29 @@ class WebsitePageShortCodeSeeder extends Seeder
                 'type' => WebsitePageShortCode::HOME_ARTICLES_TYPE
             ],
         ];
-
         $sorts = [
             'article_category' => [
-                [
-                    'name' => 'sort for article inside article category',
-                    'key' => 'article_category.article_sort',
-                    'short_code' => 'article-sort',
-                    'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE
-                ],
-                [
-                    'name' => 'sort for category inside article category',
-                    'key' => 'article_category.category_sort',
-                    'short_code' => 'category-sort',
-                    'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE
-                ],
-                [
+                'article_sort' =>
+                    [
+                        'name' => 'sort for article inside article category',
+                        'key' => 'article_category.article_sort',
+                        'short_code' => 'article-sort',
+                        'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE
+                    ],
+                'category_sort' =>
+                    [
+                        'name' => 'sort for category inside article category',
+                        'key' => 'article_category.category_sort',
+                        'short_code' => 'category-sort',
+                        'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE
+                    ],
+                'children_category_sort' => [
                     'name' => 'sort for children category inside article category',
                     'key' => 'article_category.children_category_sort',
                     'short_code' => 'children-category-sort',
                     'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE
                 ],
-                [
+                'grand_children_category_sort' => [
                     'name' => 'sort for grand children category inside article category',
                     'key' => 'article_category.grand_children_category_sort',
                     'short_code' => 'grand-children-category-sort',
@@ -115,19 +146,19 @@ class WebsitePageShortCodeSeeder extends Seeder
 
             //homes article
             'home_articles' => [
-                [
+                'article_sort' => [
                     'name' => 'sort for article inside home articles',
                     'key' => 'home_articles.article_sort',
                     'short_code' => 'article-sort',
                     'type' => WebsitePageShortCode::HOME_ARTICLES_TYPE
                 ],
-                [
+                'category_sort' => [
                     'name' => 'sort for category inside home articles',
                     'key' => 'home_articles.category_sort',
                     'short_code' => 'category-sort',
                     'type' => WebsitePageShortCode::HOME_ARTICLES_TYPE
                 ],
-                [
+                'children_category_sort' => [
                     'name' => 'sort for children category inside home articles',
                     'key' => 'home_articles.children_category_sort',
                     'short_code' => 'children-category-sort',
@@ -135,27 +166,77 @@ class WebsitePageShortCodeSeeder extends Seeder
                 ],
             ]
         ];
+        $sortOrders = [
+            'article_category' => [
+                'article_sort_order' => [
+                    'name' => 'sort order for article inside article category',
+                    'key' => 'article_category.article_sort_order',
+                    'short_code' => 'article-sort-order',
+                    'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE
+                ],
+                'category_sort_order' => [
+                    'name' => 'sort order for category inside article category',
+                    'key' => 'article_category.category_sort_order',
+                    'short_code' => 'category-sort-order',
+                    'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE
+                ],
+                'children_category_sort_order' => [
+                    'name' => 'sort order for children category inside article category',
+                    'key' => 'article_category.children_category_sort_order',
+                    'short_code' => 'children-category-sort-order',
+                    'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE
+                ],
+                'grand_children_category_sort_order' => [
+                    'name' => 'sort order for grand children category inside article category',
+                    'key' => 'article_category.grand_children_category_sort_order',
+                    'short_code' => 'grand-children-category-sort-order',
+                    'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE
+                ],
+            ],
+
+            //homes article
+            'home_articles' => [
+                'article_sort_order' => [
+                    'name' => 'sort order for article inside home articles',
+                    'key' => 'home_articles.article_sort_order',
+                    'short_code' => 'article-sort-order',
+                    'type' => WebsitePageShortCode::HOME_ARTICLES_TYPE
+                ],
+                'category_sort_order' => [
+                    'name' => 'sort order for category inside home articles',
+                    'key' => 'home_articles.category_sort_order',
+                    'short_code' => 'category-sort-order',
+                    'type' => WebsitePageShortCode::HOME_ARTICLES_TYPE
+                ],
+                'children_category_sort_order' => [
+                    'name' => 'sort order for children category inside home articles',
+                    'key' => 'home_articles.children_category_sort_order',
+                    'short_code' => 'children-category-sort-order',
+                    'type' => WebsitePageShortCode::HOME_ARTICLES_TYPE
+                ],
+            ]
+        ];
         $counts = [
             'article_category' => [
-                [
+                'article_count' => [
                     'name' => 'count for article inside article category',
                     'key' => 'article_category.article_count',
                     'short_code' => 'data-article-count',
                     'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE
                 ],
-                [
+                'category_count' => [
                     'name' => 'count for category inside article category',
                     'key' => 'article_category.category_count',
                     'short_code' => 'data-category-count',
                     'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE
                 ],
-                [
+                'children_category_count' => [
                     'name' => 'count for children category inside article category',
                     'key' => 'article_category.children_category_count',
                     'short_code' => 'data-children-category-count',
                     'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE
                 ],
-                [
+                'grand_children_category_count' => [
                     'name' => 'count for grand children category inside article category',
                     'key' => 'article_category.grand_children_category_count',
                     'short_code' => 'data-grand-children-category-count',
@@ -165,19 +246,19 @@ class WebsitePageShortCodeSeeder extends Seeder
 
             //homes article
             'home_articles' => [
-                [
+                'article_count' => [
                     'name' => 'count for article inside home articles',
                     'key' => 'home_articles.article_count',
                     'short_code' => 'data-article-count',
                     'type' => WebsitePageShortCode::HOME_ARTICLES_TYPE
                 ],
-                [
+                'category_count' => [
                     'name' => 'count for category inside home articles',
                     'key' => 'home_articles.category_count',
                     'short_code' => 'data-category-count',
                     'type' => WebsitePageShortCode::HOME_ARTICLES_TYPE
                 ],
-                [
+                'children_category_count' => [
                     'name' => 'count for children category inside home articles',
                     'key' => 'home_articles.children_category_count',
                     'short_code' => 'data-children-category-count',
@@ -623,6 +704,62 @@ class WebsitePageShortCodeSeeder extends Seeder
                         'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE
                     ],
                 ],
+                'article-sort-order' => [
+                    [
+                        'name' => 'sort order by desc for article',
+                        'key' => 'article_category.article_sort_order.desc',
+                        'short_code' => 'desc',
+                        'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE
+                    ],
+                    [
+                        'name' => 'sort order by asc for article',
+                        'key' => 'article_category.article_sort_order.asc',
+                        'short_code' => 'asc',
+                        'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE
+                    ]
+                ],
+                'category-sort-order' => [
+                    [
+                        'name' => 'sort order by desc for category',
+                        'key' => 'article_category.category_sort_order.desc',
+                        'short_code' => 'desc',
+                        'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE
+                    ],
+                    [
+                        'name' => 'sort order by asc for category',
+                        'key' => 'article_category.category_sort_order.asc',
+                        'short_code' => 'asc',
+                        'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE
+                    ]
+                ],
+                'children-category-sort-order' => [
+                    [
+                        'name' => 'sort order by desc for children category',
+                        'key' => 'article_category.children_category_sort_order.desc',
+                        'short_code' => 'desc',
+                        'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE
+                    ],
+                    [
+                        'name' => 'sort order by asc for children category',
+                        'key' => 'article_category.children_category_sort_order.asc',
+                        'short_code' => 'asc',
+                        'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE
+                    ]
+                ],
+                'grand-children-category-sort-order' => [
+                    [
+                        'name' => 'sort order by desc for grand children category',
+                        'key' => 'article_category.grand_children_category_sort_order.desc',
+                        'short_code' => 'desc',
+                        'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE
+                    ],
+                    [
+                        'name' => 'sort order by asc for children category',
+                        'key' => 'article_category.grand_children_category_sort_order.asc',
+                        'short_code' => 'asc',
+                        'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE
+                    ]
+                ],
             ],
             'article_detail' => [
                 [
@@ -1005,65 +1142,49 @@ class WebsitePageShortCodeSeeder extends Seeder
                         'type' => WebsitePageShortCode::HOME_ARTICLES_TYPE
                     ],
                 ],
+                'article-sort-order' => [
+                    [
+                        'name' => 'sort order by desc for article',
+                        'key' => 'home_articles.article_sort_order.desc',
+                        'short_code' => 'desc',
+                        'type' => WebsitePageShortCode::HOME_ARTICLES_TYPE
+                    ],
+                    [
+                        'name' => 'sort order by asc for article',
+                        'key' => 'home_articles.article_sort_order.asc',
+                        'short_code' => 'asc',
+                        'type' => WebsitePageShortCode::HOME_ARTICLES_TYPE
+                    ]
+                ],
+                'category-sort-order' => [
+                    [
+                        'name' => 'sort order by desc for category',
+                        'key' => 'home_articles.category_sort_order.desc',
+                        'short_code' => 'desc',
+                        'type' => WebsitePageShortCode::HOME_ARTICLES_TYPE
+                    ],
+                    [
+                        'name' => 'sort order by asc for category',
+                        'key' => 'home_articles.category_sort_order.asc',
+                        'short_code' => 'asc',
+                        'type' => WebsitePageShortCode::HOME_ARTICLES_TYPE
+                    ]
+                ],
+                'children-category-sort-order' => [
+                    [
+                        'name' => 'sort order by desc for children category',
+                        'key' => 'home_articles.children_category_sort_order.desc',
+                        'short_code' => 'desc',
+                        'type' => WebsitePageShortCode::HOME_ARTICLES_TYPE
+                    ],
+                    [
+                        'name' => 'sort order by asc for children category',
+                        'key' => 'home_articles.children_category_sort_order.asc',
+                        'short_code' => 'asc',
+                        'type' => WebsitePageShortCode::HOME_ARTICLES_TYPE
+                    ]
+                ],
             ],
-            'element_count' => [
-                'data-grand-children-category-count',
-                'data-children-category-count',
-                'data-article-count',
-                'data-category-count',
-            ],
-            'category-sort' => [
-                'created_at',
-                'uuid',
-                'image',
-                'slug',
-                'parent_uuid',
-                'publish_status',
-                'title',
-                'keyword',
-                'description',
-                'feature_image',
-            ],
-            'children-category-sort' => [
-                'created_at',
-                'uuid',
-                'image',
-                'slug',
-                'parent_uuid',
-                'publish_status',
-                'title',
-                'keyword',
-                'description',
-                'feature_image',
-            ],
-            'grand-children-category-sort' => [
-                'created_at',
-                'uuid',
-                'image',
-                'slug',
-                'parent_uuid',
-                'publish_status',
-                'title',
-                'keyword',
-                'description',
-                'feature_image',
-            ],
-            'article-sort-order' => [
-                'asc',
-                'desc'
-            ],
-            'category-sort-order' => [
-                'asc',
-                'desc'
-            ],
-            'children-category-sort-order' => [
-                'asc',
-                'desc'
-            ],
-            'grand-children-category-sort-order' => [
-                'asc',
-                'desc'
-            ]
         ];
 
         //create parent first
@@ -1074,14 +1195,69 @@ class WebsitePageShortCodeSeeder extends Seeder
         //create sort (order by)
         foreach ($sorts as $key => $sort) {
             if ($key == 'article_category') {
-                foreach ($sort as $articleCategorySort) {
-                    $parentSort = WebsitePageShortCode::where(['key' => 'article_category.sort'])->first();
-                    WebsitePageShortCode::updateOrCreate(['key' => $articleCategorySort['key']], array_merge(['parent_uuid' => $parentSort->uuid], $articleCategorySort));
+                foreach ($sort as $sortKey => $articleCategorySort) {
+                    if ($sortKey == 'article_sort') {
+
+                        $parentSort = WebsitePageShortCode::where(['key' => 'article_category.article_list'])->first();
+                        WebsitePageShortCode::updateOrCreate(['key' => $articleCategorySort['key']], array_merge(['parent_uuid' => $parentSort->uuid], $articleCategorySort));
+                    } elseif ($sortKey == 'category_sort') {
+                        $parentSort = WebsitePageShortCode::where(['key' => 'article_category.category_list'])->first();
+                        WebsitePageShortCode::updateOrCreate(['key' => $articleCategorySort['key']], array_merge(['parent_uuid' => $parentSort->uuid], $articleCategorySort));
+                    } elseif ($sortKey == 'children_category_sort') {
+                        $parentSort = WebsitePageShortCode::where(['key' => 'article_category.children_category_list'])->first();
+                        WebsitePageShortCode::updateOrCreate(['key' => $articleCategorySort['key']], array_merge(['parent_uuid' => $parentSort->uuid], $articleCategorySort));
+                    } elseif ($sortKey == 'grand_children_category_sort') {
+                        $parentSort = WebsitePageShortCode::where(['key' => 'article_category.grand_children_category_list'])->first();
+                        WebsitePageShortCode::updateOrCreate(['key' => $articleCategorySort['key']], array_merge(['parent_uuid' => $parentSort->uuid], $articleCategorySort));
+                    }
                 }
             } elseif ($key == 'home_articles') {
-                foreach ($sort as $homeArticlesSort) {
-                    $parentSort = WebsitePageShortCode::where(['key' => 'home_articles.sort'])->first();
-                    WebsitePageShortCode::updateOrCreate(['key' => $homeArticlesSort['key']], array_merge(['parent_uuid' => $parentSort->uuid], $homeArticlesSort));
+                foreach ($sort as $sortKey => $homeArticleSort) {
+                    if ($sortKey == 'article_sort') {
+                        $parentSort = WebsitePageShortCode::where(['key' => 'home_articles.article_list'])->first();
+                        WebsitePageShortCode::updateOrCreate(['key' => $homeArticleSort['key']], array_merge(['parent_uuid' => $parentSort->uuid], $homeArticleSort));
+                    } elseif ($sortKey == 'category_sort') {
+                        $parentSort = WebsitePageShortCode::where(['key' => 'home_articles.category_list'])->first();
+                        WebsitePageShortCode::updateOrCreate(['key' => $homeArticleSort['key']], array_merge(['parent_uuid' => $parentSort->uuid], $homeArticleSort));
+                    } elseif ($sortKey == 'children_category_sort') {
+                        $parentSort = WebsitePageShortCode::where(['key' => 'home_articles.children_category_list'])->first();
+                        WebsitePageShortCode::updateOrCreate(['key' => $homeArticleSort['key']], array_merge(['parent_uuid' => $parentSort->uuid], $homeArticleSort));
+                    }
+                }
+            }
+        }//create sort (order by)
+
+        //create sort order (asc or desc)
+        foreach ($sortOrders as $key => $sortOrder) {
+            if ($key == 'article_category') {
+                foreach ($sortOrder as $sortOrderKey => $articleCategorySortOrder) {
+                    if ($sortOrderKey == 'article_sort_order') {
+
+                        $parentSort = WebsitePageShortCode::where(['key' => 'article_category.article_list'])->first();
+                        WebsitePageShortCode::updateOrCreate(['key' => $articleCategorySortOrder['key']], array_merge(['parent_uuid' => $parentSort->uuid], $articleCategorySortOrder));
+                    } elseif ($sortOrderKey == 'category_sort_order') {
+                        $parentSort = WebsitePageShortCode::where(['key' => 'article_category.category_list'])->first();
+                        WebsitePageShortCode::updateOrCreate(['key' => $articleCategorySortOrder['key']], array_merge(['parent_uuid' => $parentSort->uuid], $articleCategorySortOrder));
+                    } elseif ($sortOrderKey == 'children_category_sort_order') {
+                        $parentSort = WebsitePageShortCode::where(['key' => 'article_category.children_category_list'])->first();
+                        WebsitePageShortCode::updateOrCreate(['key' => $articleCategorySortOrder['key']], array_merge(['parent_uuid' => $parentSort->uuid], $articleCategorySortOrder));
+                    } elseif ($sortOrderKey == 'grand_children_category_sort_order') {
+                        $parentSort = WebsitePageShortCode::where(['key' => 'article_category.grand_children_category_list'])->first();
+                        WebsitePageShortCode::updateOrCreate(['key' => $articleCategorySortOrder['key']], array_merge(['parent_uuid' => $parentSort->uuid], $articleCategorySortOrder));
+                    }
+                }
+            } elseif ($key == 'home_articles') {
+                foreach ($sortOrder as $sortOrderKey => $homeArticleSortOrder) {
+                    if ($sortOrderKey == 'article_sort_order') {
+                        $parentSort = WebsitePageShortCode::where(['key' => 'home_articles.article_list'])->first();
+                        WebsitePageShortCode::updateOrCreate(['key' => $homeArticleSortOrder['key']], array_merge(['parent_uuid' => $parentSort->uuid], $homeArticleSortOrder));
+                    } elseif ($sortOrderKey == 'category_sort_order') {
+                        $parentSort = WebsitePageShortCode::where(['key' => 'home_articles.category_list'])->first();
+                        WebsitePageShortCode::updateOrCreate(['key' => $homeArticleSortOrder['key']], array_merge(['parent_uuid' => $parentSort->uuid], $homeArticleSortOrder));
+                    } elseif ($sortOrderKey == 'children_category_sort_order') {
+                        $parentSort = WebsitePageShortCode::where(['key' => 'home_articles.children_category_list'])->first();
+                        WebsitePageShortCode::updateOrCreate(['key' => $homeArticleSortOrder['key']], array_merge(['parent_uuid' => $parentSort->uuid], $homeArticleSortOrder));
+                    }
                 }
             }
         }
@@ -1089,14 +1265,33 @@ class WebsitePageShortCodeSeeder extends Seeder
         //create count (per page)
         foreach ($counts as $key => $count) {
             if ($key == 'article_category') {
-                foreach ($count as $articleCategoryCount) {
-                    $parentCount = WebsitePageShortCode::where(['key' => 'article_category.count'])->first();
-                    WebsitePageShortCode::updateOrCreate(['key' => $articleCategoryCount['key']], array_merge(['parent_uuid' => $parentCount->uuid], $articleCategoryCount));
+                foreach ($count as $countKey => $articleCategoryCount) {
+                    if ($countKey == 'article_count') {
+                        $parentCount = WebsitePageShortCode::where(['key' => 'article_category.article_list'])->first();
+                        WebsitePageShortCode::updateOrCreate(['key' => $articleCategoryCount['key']], array_merge(['parent_uuid' => $parentCount->uuid], $articleCategoryCount));
+                    } elseif ($countKey == 'category_count') {
+                        $parentCount = WebsitePageShortCode::where(['key' => 'article_category.category_list'])->first();
+                        WebsitePageShortCode::updateOrCreate(['key' => $articleCategoryCount['key']], array_merge(['parent_uuid' => $parentCount->uuid], $articleCategoryCount));
+                    } elseif ($countKey == 'children_category_count') {
+                        $parentCount = WebsitePageShortCode::where(['key' => 'article_category.children_category_list'])->first();
+                        WebsitePageShortCode::updateOrCreate(['key' => $articleCategoryCount['key']], array_merge(['parent_uuid' => $parentCount->uuid], $articleCategoryCount));
+                    } elseif ($countKey == 'grand_children_category_count') {
+                        $parentCount = WebsitePageShortCode::where(['key' => 'article_category.grand_children_category_list'])->first();
+                        WebsitePageShortCode::updateOrCreate(['key' => $articleCategoryCount['key']], array_merge(['parent_uuid' => $parentCount->uuid], $articleCategoryCount));
+                    }
                 }
             } elseif ($key == 'home_articles') {
-                foreach ($count as $homeArticlesCount) {
-                    $parentCount = WebsitePageShortCode::where(['key' => 'home_articles.count'])->first();
-                    WebsitePageShortCode::updateOrCreate(['key' => $homeArticlesCount['key']], array_merge(['parent_uuid' => $parentCount->uuid], $homeArticlesCount));
+                foreach ($count as $countKey => $homeArticleCount) {
+                    if ($countKey == 'article_count') {
+                        $parentCount = WebsitePageShortCode::where(['key' => 'home_articles.article_list'])->first();
+                        WebsitePageShortCode::updateOrCreate(['key' => $homeArticleCount['key']], array_merge(['parent_uuid' => $parentCount->uuid], $homeArticleCount));
+                    } elseif ($countKey == 'category_count') {
+                        $parentCount = WebsitePageShortCode::where(['key' => 'home_articles.category_list'])->first();
+                        WebsitePageShortCode::updateOrCreate(['key' => $homeArticleCount['key']], array_merge(['parent_uuid' => $parentCount->uuid], $homeArticleCount));
+                    } elseif ($countKey == 'children_category_count') {
+                        $parentCount = WebsitePageShortCode::where(['key' => 'home_articles.children_category_list'])->first();
+                        WebsitePageShortCode::updateOrCreate(['key' => $homeArticleCount['key']], array_merge(['parent_uuid' => $parentCount->uuid], $homeArticleCount));
+                    }
                 }
             }
         }
@@ -1143,6 +1338,26 @@ class WebsitePageShortCodeSeeder extends Seeder
                     $parent = WebsitePageShortCode::where(['key' => 'article_category.grand_children_category_sort'])->first();
                     WebsitePageShortCode::updateOrCreate(['key' => $articleShortCode['key']], array_merge(['parent_uuid' => $parent->uuid], $articleShortCode));
                 }
+            } elseif ($key == 'article-sort-order') {
+                foreach ($articleCategoryShortCode as $articleShortCode) {
+                    $parent = WebsitePageShortCode::where(['key' => 'article_category.article_sort_order'])->first();
+                    WebsitePageShortCode::updateOrCreate(['key' => $articleShortCode['key']], array_merge(['parent_uuid' => $parent->uuid], $articleShortCode));
+                }
+            } elseif ($key == 'category-sort-order') {
+                foreach ($articleCategoryShortCode as $articleShortCode) {
+                    $parent = WebsitePageShortCode::where(['key' => 'article_category.category_sort_order'])->first();
+                    WebsitePageShortCode::updateOrCreate(['key' => $articleShortCode['key']], array_merge(['parent_uuid' => $parent->uuid], $articleShortCode));
+                }
+            } elseif ($key == 'children-category-sort-order') {
+                foreach ($articleCategoryShortCode as $articleShortCode) {
+                    $parent = WebsitePageShortCode::where(['key' => 'article_category.children_category_sort_order'])->first();
+                    WebsitePageShortCode::updateOrCreate(['key' => $articleShortCode['key']], array_merge(['parent_uuid' => $parent->uuid], $articleShortCode));
+                }
+            } elseif ($key == 'grand-children-category-sort-order') {
+                foreach ($articleCategoryShortCode as $articleShortCode) {
+                    $parent = WebsitePageShortCode::where(['key' => 'article_category.grand_children_category_sort_order'])->first();
+                    WebsitePageShortCode::updateOrCreate(['key' => $articleShortCode['key']], array_merge(['parent_uuid' => $parent->uuid], $articleShortCode));
+                }
             }
         }
 
@@ -1179,6 +1394,21 @@ class WebsitePageShortCodeSeeder extends Seeder
             } elseif ($key == 'children-category-sort') {
                 foreach ($homeArticleShortCode as $articleShortCode) {
                     $parent = WebsitePageShortCode::where(['key' => 'home_articles.children_category_sort'])->first();
+                    WebsitePageShortCode::updateOrCreate(['key' => $articleShortCode['key']], array_merge(['parent_uuid' => $parent->uuid], $articleShortCode));
+                }
+            } elseif ($key == 'article-sort-order') {
+                foreach ($homeArticleShortCode as $homeArticleSort) {
+                    $parent = WebsitePageShortCode::where(['key' => 'home_articles.article_sort_order'])->first();
+                    WebsitePageShortCode::updateOrCreate(['key' => $homeArticleSort['key']], array_merge(['parent_uuid' => $parent->uuid], $homeArticleSort));
+                }
+            } elseif ($key == 'category-sort-order') {
+                foreach ($homeArticleShortCode as $articleShortCode) {
+                    $parent = WebsitePageShortCode::where(['key' => 'home_articles.category_sort_order'])->first();
+                    WebsitePageShortCode::updateOrCreate(['key' => $articleShortCode['key']], array_merge(['parent_uuid' => $parent->uuid], $articleShortCode));
+                }
+            } elseif ($key == 'children-category-sort-order') {
+                foreach ($homeArticleShortCode as $articleShortCode) {
+                    $parent = WebsitePageShortCode::where(['key' => 'home_articles.children_category_sort_order'])->first();
                     WebsitePageShortCode::updateOrCreate(['key' => $articleShortCode['key']], array_merge(['parent_uuid' => $parent->uuid], $articleShortCode));
                 }
             }
