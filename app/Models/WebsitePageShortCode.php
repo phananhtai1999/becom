@@ -52,4 +52,9 @@ class WebsitePageShortCode extends Model
     {
         return $this->belongsTo(__CLASS__, 'parent_uuid');
     }
+
+    public function childrenWebsitePageShortCode()
+    {
+        return $this->hasMany(__CLASS__, 'parent_uuid');
+    }
 }

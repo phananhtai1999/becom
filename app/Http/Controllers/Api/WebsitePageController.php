@@ -27,6 +27,7 @@ use App\Services\ArticleService;
 use App\Services\LanguageService;
 use App\Services\MyWebsitePageService;
 use App\Services\WebsitePageService;
+use App\Services\WebsitePageShortCodeService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 
@@ -120,12 +121,6 @@ class WebsitePageController extends AbstractRestAPIController
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData($this->resourceCollectionClass, $websitePages)
         );
-    }
-
-    public function configShortcode(ConfigShortcodeRequest $request)
-    {
-
-        return $this->sendOkJsonResponse(['data' => config('shortcode.' . $request->get('type'))]);
     }
 
     /**

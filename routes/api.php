@@ -608,13 +608,12 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website_page'], function ()
 
     });
 
-    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
-        Route::get('short-codes', [WebsitePageShortCodeController::class, 'index'])->name('index');
-        Route::post('short-code', [WebsitePageShortCodeController::class, 'store'])->name('store');
-        Route::get('short-code/{id}', [WebsitePageShortCodeController::class, 'show'])->name('show');
-        Route::put('short-code/{id}', [WebsitePageShortCodeController::class, 'edit'])->name('edit');
-        Route::delete('/short-code/{id}', [WebsitePageShortCodeController::class, 'destroy'])->name('destroy');
-    });
+    Route::get('short-codes', [WebsitePageShortCodeController::class, 'index'])->name('index');
+    Route::post('short-code', [WebsitePageShortCodeController::class, 'store'])->name('store');
+    Route::get('short-code/{id}', [WebsitePageShortCodeController::class, 'show'])->name('show');
+    Route::put('short-code/{id}', [WebsitePageShortCodeController::class, 'edit'])->name('edit');
+    Route::delete('/short-code/{id}', [WebsitePageShortCodeController::class, 'destroy'])->name('destroy');
+
     Route::get('get-website-pages', [WebsitePageController::class, 'getWebsitePagesWithReplace'])->name('edit');
 
     Route::group(['middleware' => ['role:root,admin,editor']], function () {
@@ -624,7 +623,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website_page'], function ()
         Route::put('/unpublished-website-page/{id}', [WebsitePageController::class, 'editUnpublishedWebsitePage'])->name('edit-unpublished');
     });
 
-    Route::get('shortcode-supports', [WebsitePageController::class, 'configShortcode'])->name('index-config-shortcode');
+    Route::get('shortcode-supports', [WebsitePageShortCodeController::class, 'configShortcode'])->name('index-config-shortcode');
 
     Route::group(['as' => 'my.'], function () {
         Route::get('my/website-pages', [WebsitePageController::class, 'indexMy'])->name('indexMyWebsitePage');
