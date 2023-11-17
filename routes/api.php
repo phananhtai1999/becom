@@ -614,7 +614,6 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website_page'], function ()
     Route::put('short-code/{id}', [WebsitePageShortCodeController::class, 'edit'])->name('edit');
     Route::delete('/short-code/{id}', [WebsitePageShortCodeController::class, 'destroy'])->name('destroy');
 
-    Route::get('get-website-pages', [WebsitePageController::class, 'getWebsitePagesWithReplace'])->name('edit');
 
     Route::group(['middleware' => ['role:root,admin,editor']], function () {
         Route::get('/unpublished-website-pages', [WebsitePageController::class, 'indexUnpublishedWebsitePage'])->name('index-unpublished');
@@ -639,6 +638,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website_page'], function ()
     Route::get('/website-page-default/{id}', [WebsitePageController::class, 'showWebsitePagesDefault'])->name('showWebsitePagesDefault');
 });
 
+Route::get('get-website-pages', [WebsitePageController::class, 'getWebsitePagesWithReplace'])->name('edit');
 Route::get('public/website-page/{id}', [WebsitePageController::class, 'show'])->name('website_page_public.show');
 Route::get('public/website-page', [WebsitePageController::class, 'publicWebsitePageByDomainAndSlug'])->name('website_page.public');
 
