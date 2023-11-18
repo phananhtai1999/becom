@@ -404,4 +404,13 @@ class WebsiteController extends AbstractRestAPIController
             throw $exception;
         }
     }
+
+    public function toggleNewsPage($id) {
+        $website = $this->service->findOrFailById($id);
+        $website->update(['is_active_news_page' => !$website->is_active_news_page]);
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $website)
+        );
+    }
 }

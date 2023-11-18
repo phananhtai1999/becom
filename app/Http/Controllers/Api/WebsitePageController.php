@@ -24,9 +24,11 @@ use App\Models\ArticleCategory;
 use App\Models\WebsitePage;
 use App\Services\ArticleCategoryService;
 use App\Services\ArticleService;
+use App\Services\DomainService;
 use App\Services\LanguageService;
 use App\Services\MyWebsitePageService;
 use App\Services\WebsitePageService;
+use App\Services\WebsitePageShortCodeService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 
@@ -50,11 +52,12 @@ class WebsitePageController extends AbstractRestAPIController
      * @param LanguageService $languageService
      */
     public function __construct(
-        WebsitePageService   $service,
-        MyWebsitePageService $myService,
-        LanguageService      $languageService,
-        ArticleService $articleService,
-        ArticleCategoryService $articleCategoryService
+        WebsitePageService     $service,
+        MyWebsitePageService   $myService,
+        LanguageService        $languageService,
+        ArticleService         $articleService,
+        ArticleCategoryService $articleCategoryService,
+        DomainService          $domainService
     )
     {
         $this->service = $service;
@@ -62,6 +65,7 @@ class WebsitePageController extends AbstractRestAPIController
         $this->languageService = $languageService;
         $this->articleService = $articleService;
         $this->articleCategoryService = $articleCategoryService;
+        $this->domainService = $domainService;
         $this->resourceCollectionClass = WebsitePageResourceCollection::class;
         $this->resourceClass = WebsitePageResource::class;
         $this->indexRequest = IndexRequest::class;
@@ -105,27 +109,20 @@ class WebsitePageController extends AbstractRestAPIController
 
     public function getWebsitePagesWithReplace(GetWebsitePagesRequest $request)
     {
-        $websitePages = $this->service->getWebsitePageByDomain($request->get('domain'));
-        foreach ($websitePages as  $key => $websitePage) {
-            if ($websitePage->type == WebsitePage::ARTICLE_DETAIL_TYPE) {
-                $article = $this->articleService->findOneWhereOrFail(['slug' => $request->get('article_slug')]);
-                $websitePages[$key] = $this->service->renderContent($websitePage, $article);
-            } elseif ($websitePage->type == WebsitePage::ARTICLE_CATEGORY_TYPE) {
-                $articleCategory = $this->articleCategoryService->findOneWhereOrFail(['slug' => $request->get('article_category_slug')]);
-                $websitePages[$key] = $this->service->renderContentForArticleCategory($websitePage, $articleCategory);
-            } elseif ($websitePage->type == WebsitePage::HOME_ARTICLES_TYPE) {
-                $websitePages[$key] = $this->service->renderContentForHomeArticles($websitePage);
-            }
+        $websitePage = $this->service->getWebsitePageByDomainAndWebsitePageSlug($request->get('domain'), $request->get('website_page_slug'));
+        if ($websitePage->type == WebsitePage::ARTICLE_DETAIL_TYPE) {
+            $article = $this->articleService->findOneWhereOrFail(['slug' => $request->get('article_slug')]);
+            $websitePage = $this->service->renderContent($websitePage, $article);
+        } elseif ($websitePage->type == WebsitePage::ARTICLE_CATEGORY_TYPE) {
+            $articleCategory = $this->articleCategoryService->findOneWhereOrFail(['slug' => $request->get('article_category_slug')]);
+            $websitePage = $this->service->renderContentForArticleCategory($websitePage, $articleCategory);
+        } elseif ($websitePage->type == WebsitePage::HOME_ARTICLES_TYPE) {
+            $websitePage = $this->service->renderContentForHomeArticles($websitePage);
         }
+
         return $this->sendOkJsonResponse(
-            $this->service->resourceCollectionToData($this->resourceCollectionClass, $websitePages)
+            $this->service->resourceToData($this->resourceClass, $websitePage)
         );
-    }
-
-    public function configShortcode(ConfigShortcodeRequest $request)
-    {
-
-        return $this->sendOkJsonResponse(['data' => config('shortcode.' . $request->get('type'))]);
     }
 
     /**

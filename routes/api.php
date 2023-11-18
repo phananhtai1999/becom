@@ -76,6 +76,7 @@ use App\Http\Controllers\Api\SendProjectController;
 use App\Http\Controllers\Api\WebsiteController;
 use App\Http\Controllers\Api\WebsitePageCategoryController;
 use App\Http\Controllers\Api\WebsitePageController;
+use App\Http\Controllers\Api\WebsitePageShortCodeController;
 use App\Http\Controllers\Api\WebsiteVerificationController;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Route;
@@ -604,8 +605,15 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website_page'], function ()
         Route::delete('/website-page/{id}', [WebsitePageController::class, 'destroy'])->name('destroy');
         Route::post('website-page/change-status', [WebsitePageController::class, 'changeStatusWebsitePage'])->name('changeStatusWebsitePage');
         Route::get("accepted-website-pages", [WebsitePageController::class, 'listAcceptedWebsitePages'])->name('listAcceptedWebsitePages');
+
     });
-    Route::get('get-website-pages', [WebsitePageController::class, 'getWebsitePagesWithReplace'])->name('edit');
+
+    Route::get('short-codes', [WebsitePageShortCodeController::class, 'index'])->name('index');
+    Route::post('short-code', [WebsitePageShortCodeController::class, 'store'])->name('store');
+    Route::get('short-code/{id}', [WebsitePageShortCodeController::class, 'show'])->name('show');
+    Route::put('short-code/{id}', [WebsitePageShortCodeController::class, 'edit'])->name('edit');
+    Route::delete('/short-code/{id}', [WebsitePageShortCodeController::class, 'destroy'])->name('destroy');
+
 
     Route::group(['middleware' => ['role:root,admin,editor']], function () {
         Route::get('/unpublished-website-pages', [WebsitePageController::class, 'indexUnpublishedWebsitePage'])->name('index-unpublished');
@@ -614,7 +622,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website_page'], function ()
         Route::put('/unpublished-website-page/{id}', [WebsitePageController::class, 'editUnpublishedWebsitePage'])->name('edit-unpublished');
     });
 
-    Route::get('shortcode-supports', [WebsitePageController::class, 'configShortcode'])->name('index-config-shortcode');
+    Route::get('shortcode-supports', [WebsitePageShortCodeController::class, 'configShortcode'])->name('index-config-shortcode');
 
     Route::group(['as' => 'my.'], function () {
         Route::get('my/website-pages', [WebsitePageController::class, 'indexMy'])->name('indexMyWebsitePage');
@@ -630,6 +638,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website_page'], function ()
     Route::get('/website-page-default/{id}', [WebsitePageController::class, 'showWebsitePagesDefault'])->name('showWebsitePagesDefault');
 });
 
+Route::get('get-website-pages', [WebsitePageController::class, 'getWebsitePagesWithReplace'])->name('edit');
 Route::get('public/website-page/{id}', [WebsitePageController::class, 'show'])->name('website_page_public.show');
 Route::get('public/website-page', [WebsitePageController::class, 'publicWebsitePageByDomainAndSlug'])->name('website_page.public');
 
@@ -1367,6 +1376,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website'], function () {
         Route::post('website', [WebsiteController::class, 'store'])->name('store');
         Route::put('website/{id}', [WebsiteController::class, 'edit'])->name('edit');
     });
+    Route::post('toggle-news-page/{id}', [WebsiteController::class, 'toggleNewsPage'])->name('toggleNewsPage');
 
     Route::group(['as' => 'my.'], function () {
         Route::get('my/websites', [WebsiteController::class, 'indexMy'])->name('index');
