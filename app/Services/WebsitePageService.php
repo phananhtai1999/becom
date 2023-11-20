@@ -164,8 +164,13 @@ class WebsitePageService extends AbstractService
             ->where('publish_status', Website::PUBLISHED_PUBLISH_STATUS)
             ->firstOrFail();
 
-        $websitePage = $website->websitePagesPublic()->where(['slug' => $websitePageSlug])->firstOrFail();
-        return $this->model->where(['uuid' => $websitePage->uuid])->firstOrFail();
+        if($websitePageSlug){
+            $websitePage = $website->websitePagesPublic()->where(['slug' => $websitePageSlug])->firstOrFail();
+        }else{
+            $websitePage = $website->websitePagesPublic()->wherePivot('is_homepage', 1)->firstOrFail();
+        }
+
+        return $websitePage;
     }
 
     public function renderContent($websitePage, $article)
