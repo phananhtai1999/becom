@@ -3,12 +3,12 @@
 namespace App\Services;
 
 use App\Abstracts\AbstractService;
-use App\Models\Group;
+use App\Models\Location;
 use App\Models\QueryBuilders\LocationQueryBuilder;
 
-class GroupService extends AbstractService
+class LocationService extends AbstractService
 {
-    protected $modelClass = Group::class;
+    protected $modelClass = Location::class;
 
     protected $modelQueryBuilderClass = LocationQueryBuilder::class;
 }

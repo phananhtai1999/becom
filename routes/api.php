@@ -34,6 +34,7 @@ use App\Http\Controllers\Api\FormController;
 use App\Http\Controllers\Api\GroupController;
 use App\Http\Controllers\Api\InvoiceController;
 use App\Http\Controllers\Api\LanguageController;
+use App\Http\Controllers\Api\LocationController;
 use App\Http\Controllers\Api\MailOpenTrackingController;
 use App\Http\Controllers\Api\MailSendingHistoryController;
 use App\Http\Controllers\Api\MailTemplateController;
@@ -961,6 +962,24 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'department.'], function () 
         Route::get('/my/department/{id}', [DepartmentController::class, 'showMyDepartment'])->name('show');
         Route::put('/my/department/{id}', [DepartmentController::class, 'editMyDepartment'])->name('edit');
         Route::delete('/my/department/{id}', [DepartmentController::class, 'destroyMyDepartment'])->name('destroy');
+    });
+});
+
+Route::group(['middleware' => ['auth:api'], 'as' => 'location.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
+        Route::get('/locations', [LocationController::class, 'index'])->name('index');
+        Route::post('/location', [LocationController::class, 'store'])->name('store');
+        Route::get('/location/{id}', [LocationController::class, 'show'])->name('show');
+        Route::put('/location/{id}', [LocationController::class, 'edit'])->name('edit');
+        Route::delete('/location/{id}', [LocationController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::group(['as' => 'my.'], function () {
+        Route::get('/my/locations', [LocationController::class, 'indexMy'])->name('index');
+        Route::post('/my/location', [LocationController::class, 'storeMy'])->name('store');
+        Route::get('/my/location/{id}', [LocationController::class, 'showMy'])->name('show');
+        Route::put('/my/location/{id}', [LocationController::class, 'editMy'])->name('edit');
+        Route::delete('/my/location/{id}', [LocationController::class, 'destroyMy'])->name('destroy');
     });
 });
 
