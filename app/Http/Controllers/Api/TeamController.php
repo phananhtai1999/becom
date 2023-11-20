@@ -8,6 +8,7 @@ use App\Http\Controllers\Traits\RestEditTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestStoreTrait;
 use App\Http\Requests\addChildTeamRequest;
+use App\Http\Requests\AddTeamForDepartmentRequest;
 use App\Http\Requests\AddTeamMemberRequest;
 use App\Http\Requests\BusinessTeamRequest;
 use App\Http\Requests\IndexRequest;
@@ -735,5 +736,20 @@ class TeamController extends Controller
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData($this->resourceCollectionClass, $userTeams)
         );
+    }
+
+
+    /**
+     * @param AddTeamForDepartmentRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function addTeamForDepartment(AddTeamForDepartmentRequest $request)
+    {
+        foreach ($request->get('team_uuids') as $childTeamUuid) {
+            $childTeam = $this->service->findOrFailById($childTeamUuid);
+            $childTeam->update(['department_uuid' => $request->get('department_uuid')]);
+        }
+
+        return $this->sendOkJsonResponse();
     }
 }

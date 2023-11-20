@@ -58,6 +58,8 @@ class WebsitePageShortCodeQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__parent_uuid', 'parent_uuid'),
                 'short_code',
                 AllowedFilter::exact('exact__short_code', 'short_code'),
+                AllowedFilter::scope('short_code_root'),
+
             ]);
     }
 

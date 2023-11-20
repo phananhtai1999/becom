@@ -29,6 +29,7 @@ class Team extends AbstractModel
     protected $fillable = [
         'name',
         'owner_uuid',
+        'department_uuid',
         'parent_team_uuid',
         'leader_uuid'
     ];
