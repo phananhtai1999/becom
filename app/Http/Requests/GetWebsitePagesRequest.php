@@ -27,7 +27,7 @@ class GetWebsitePagesRequest extends FormRequest
     {
         $validate = [
             'domain' => ['required', 'string', 'regex:/^(?!(www|http|https)\.)\w+(\.\w+)+$/'],
-            'website_page_slug' => ['required', 'string', Rule::exists('website_pages', 'slug')
+            'website_page_slug' => ['nullable', 'string', Rule::exists('website_pages', 'slug')
                 ->whereNull('deleted_at')],
         ];
 

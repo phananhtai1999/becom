@@ -118,14 +118,16 @@ class WebsitePageController extends AbstractRestAPIController
     public function getWebsitePageWithReplace(GetWebsitePagesRequest $request)
     {
         $websitePage = $this->service->getWebsitePageByDomainAndWebsitePageSlug($request->get('domain'), $request->get('website_page_slug'));
-        if ($websitePage->type == WebsitePage::ARTICLE_DETAIL_TYPE) {
-            $article = $this->articleService->findOneWhereOrFail(['slug' => $request->get('article_slug')]);
-            $websitePage = $this->service->renderContent($websitePage, $article);
-        } elseif ($websitePage->type == WebsitePage::ARTICLE_CATEGORY_TYPE) {
-            $articleCategory = $this->articleCategoryService->findOneWhereOrFail(['slug' => $request->get('article_category_slug')]);
-            $websitePage = $this->service->renderContentForArticleCategory($websitePage, $articleCategory);
-        } elseif ($websitePage->type == WebsitePage::HOME_ARTICLES_TYPE) {
-            $websitePage = $this->service->renderContentForHomeArticles($websitePage);
+        if($request->get('website_page_slug')){
+            if ($websitePage->type == WebsitePage::ARTICLE_DETAIL_TYPE) {
+                $article = $this->articleService->findOneWhereOrFail(['slug' => $request->get('article_slug')]);
+                $websitePage = $this->service->renderContent($websitePage, $article);
+            } elseif ($websitePage->type == WebsitePage::ARTICLE_CATEGORY_TYPE) {
+                $articleCategory = $this->articleCategoryService->findOneWhereOrFail(['slug' => $request->get('article_category_slug')]);
+                $websitePage = $this->service->renderContentForArticleCategory($websitePage, $articleCategory);
+            } elseif ($websitePage->type == WebsitePage::HOME_ARTICLES_TYPE) {
+                $websitePage = $this->service->renderContentForHomeArticles($websitePage);
+            }
         }
 
         return $this->sendOkJsonResponse(
