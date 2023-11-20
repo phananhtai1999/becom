@@ -91,11 +91,19 @@ class WebsitePageController extends AbstractRestAPIController
             : [['uuid', $id]]);
         $response = $this->sendOkJsonResponse(['data' => $websitePage]);
         if ($websitePage->type == WebsitePage::ARTICLE_DETAIL_TYPE) {
-            $article = $this->articleService->findOneWhereOrFail(['slug' => $request->get('article_slug')]);
+            if($request->get('article_slug')){
+                $article = $this->articleService->findOneWhereOrFail(['slug' => $request->get('article_slug')]);
+            }else{
+                $article = $this->articleService->getLastArticle();
+            }
             $websitePage = $this->service->renderContent($websitePage, $article);
             $response = $this->sendOkJsonResponse(['data' => $websitePage]);
         } elseif ($websitePage->type == WebsitePage::ARTICLE_CATEGORY_TYPE) {
-            $articleCategory = $this->articleCategoryService->findOneWhereOrFail(['slug' => $request->get('article_category_slug')]);
+            if($request->get('article_category_slug')){
+                $articleCategory = $this->articleCategoryService->findOneWhereOrFail(['slug' => $request->get('article_category_slug')]);
+            }else{
+                $articleCategory = $this->articleCategoryService->getLastArticleCategory();
+            }
             $websitePage = $this->service->renderContentForArticleCategory($websitePage, $articleCategory);
             $response = $this->sendOkJsonResponse(['data' => $websitePage]);
         } elseif ($websitePage->type == WebsitePage::HOME_ARTICLES_TYPE) {
