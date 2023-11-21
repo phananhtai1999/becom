@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Abstracts\AbstractRestAPIController;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestIndexMyTrait;
+use App\Http\Requests\AddDepartmentForTeamRequest;
 use App\Http\Requests\DepartmentRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyDepartmentRequest;
@@ -165,6 +166,21 @@ class DepartmentController extends AbstractRestAPIController
     public function destroyMyDepartment($id)
     {
         $this->myService->deleteMyDepartment($id);
+
+        return $this->sendOkJsonResponse();
+    }
+
+
+    /**
+     * @param AddTeamForDepartmentRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function addDepartmentForBusiness(AddDepartmentForTeamRequest $request)
+    {
+        foreach ($request->get('department_uuids') as $departmentUuid) {
+            $department = $this->service->findOrFailById($departmentUuid);
+            $department->update(['business_uuid' => $request->get('business_uuid')]);
+        }
 
         return $this->sendOkJsonResponse();
     }
