@@ -58,6 +58,22 @@ class AuthServiceProvider extends ServiceProvider
                         return true;
                     }
                 }
+
+                //team add on
+                $cacheUserTeamAddOns = Cache::rememberForever('team_add_on_permission_' . $user->uuid, function () use ($user) {
+                    $permissions = [];
+                    foreach ($user->userTeam->addOns as $userTeamAddOn) {
+                        $permissions[] = $userTeamAddOn->addOn->permissions ?? [];
+                    }
+                    return $permissions;
+                });
+                foreach ($cacheUserTeamAddOns as $permissions) {
+                    foreach ($permissions as $permission) {
+                        if (in_array($code, $permission->api_methods ?? [])) {
+                            return true;
+                        }
+                    }
+                }
             }
             //check platform
             if (isset($user->userPlatformPackage->platform_package_uuid)) {
