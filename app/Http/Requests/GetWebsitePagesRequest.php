@@ -30,7 +30,13 @@ class GetWebsitePagesRequest extends FormRequest
             'website_page_slug' => ['nullable', 'string', Rule::exists('website_pages', 'slug')
                 ->whereNull('deleted_at')],
             'article_slug' => ['exists:articles,slug'],
-            'article_category_slug' => ['exists:article_categories,slug']
+            'article_category_slug' => ['exists:article_categories,slug', function ($attribute, $value, $fail) {
+                $articleCategorySlug = $this->request->get('article_category_slug');
+
+                if ($articleCategorySlug && $articleCategorySlug === $value) {
+                    $fail("Article slug can't same with article category slug.");
+                }
+            }]
         ];
     }
 }
