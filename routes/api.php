@@ -34,6 +34,7 @@ use App\Http\Controllers\Api\FormController;
 use App\Http\Controllers\Api\GroupController;
 use App\Http\Controllers\Api\InvoiceController;
 use App\Http\Controllers\Api\LanguageController;
+use App\Http\Controllers\Api\LocationController;
 use App\Http\Controllers\Api\MailOpenTrackingController;
 use App\Http\Controllers\Api\MailSendingHistoryController;
 use App\Http\Controllers\Api\MailTemplateController;
@@ -638,7 +639,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website_page'], function ()
     Route::get('/website-page-default/{id}', [WebsitePageController::class, 'showWebsitePagesDefault'])->name('showWebsitePagesDefault');
 });
 
-Route::get('get-website-pages', [WebsitePageController::class, 'getWebsitePagesWithReplace'])->name('edit');
+Route::get('get-website-page', [WebsitePageController::class, 'getWebsitePageWithReplace'])->name('edit');
 Route::get('public/website-page/{id}', [WebsitePageController::class, 'show'])->name('website_page_public.show');
 Route::get('public/website-page', [WebsitePageController::class, 'publicWebsitePageByDomainAndSlug'])->name('website_page.public');
 
@@ -962,6 +963,27 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'department.'], function () 
         Route::put('/my/department/{id}', [DepartmentController::class, 'editMyDepartment'])->name('edit');
         Route::delete('/my/department/{id}', [DepartmentController::class, 'destroyMyDepartment'])->name('destroy');
     });
+
+    Route::post('business/add-department', [DepartmentController::class, 'addDepartmentForBusiness'])->name('addDepartmentForBusiness');
+    Route::post('location/add-department', [DepartmentController::class, 'addDepartmentForLocation'])->name('addDepartmentForLocation');
+});
+
+Route::group(['middleware' => ['auth:api'], 'as' => 'location.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
+        Route::get('/locations', [LocationController::class, 'index'])->name('index');
+        Route::post('/location', [LocationController::class, 'store'])->name('store');
+        Route::get('/location/{id}', [LocationController::class, 'show'])->name('show');
+        Route::put('/location/{id}', [LocationController::class, 'edit'])->name('edit');
+        Route::delete('/location/{id}', [LocationController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::group(['as' => 'my.'], function () {
+        Route::get('/my/locations', [LocationController::class, 'indexMy'])->name('index');
+        Route::post('/my/location', [LocationController::class, 'storeMy'])->name('store');
+        Route::get('/my/location/{id}', [LocationController::class, 'showMy'])->name('show');
+        Route::put('/my/location/{id}', [LocationController::class, 'editMy'])->name('edit');
+        Route::delete('/my/location/{id}', [LocationController::class, 'destroyMy'])->name('destroy');
+    });
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'note.'], function () {
@@ -1095,6 +1117,8 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'team.'], function () {
     Route::get('business/add-on-of-team/{id}', [TeamController::class, 'getAddOnOfTeam'])->name('getAddOnForTeam');
     Route::get('business/assigned-of-teams/{id}', [TeamController::class, 'assignedBusinessTeam'])->name('assignedBusinessTeam');
     Route::get('business/assigned-of-team-members/{id}', [TeamController::class, 'assignedTeamMember'])->name('assignedTeamMember');
+
+    Route::post('department/add-team', [TeamController::class, 'addTeamForDepartment'])->name('addTeamForDepartment');
 
     Route::get('/all-team-member', [TeamController::class, 'listMemberOfAllTeam'])->name('listMemberOfAllTeam');
     Route::get('/list-member/{id}', [TeamController::class, 'listMember'])->name('listMember');

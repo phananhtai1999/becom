@@ -2,10 +2,9 @@
 
 namespace App\Http\Requests;
 
-use App\Abstracts\AbstractRequest;
-use Illuminate\Validation\Rule;
+use Illuminate\Foundation\Http\FormRequest;
 
-class MyDepartmentRequest extends AbstractRequest
+class AddTeamForDepartmentRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,10 +24,9 @@ class MyDepartmentRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'name' => ['required', 'array', 'min:1'],
-            'name.en' => ['required', 'string'],
-            'name.*' => ['required', 'string'],
-            'business_uuid' => ['integer', 'exists:businesses,uuid'],
+            'team_uuids' => ['required', 'array'],
+            'department_uuid' => ['required', 'integer', 'exists:departments,uuid'],
+            'team_uuids.*' => ['required', 'integer', 'exists:teams,uuid']
         ];
     }
 }

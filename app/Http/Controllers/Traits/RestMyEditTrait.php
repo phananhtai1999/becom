@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Traits;
 
 trait RestMyEditTrait
 {
-    public function edit($id)
+    public function editMy($id)
     {
         $request = app($this->editMyRequest);
 

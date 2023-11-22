@@ -395,4 +395,9 @@ class ArticleService extends AbstractService
 
         return $content;
     }
+
+    public function getLastArticle()
+    {
+        return $this->model->orderBy('created_at', 'desc')->first();
+    }
 }

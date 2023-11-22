@@ -3,21 +3,21 @@
 namespace App\Models\QueryBuilders;
 
 use App\Abstracts\AbstractQueryBuilder;
-use App\Models\Role;
+use App\Models\Group;
+use App\Models\Location;
 use App\Models\SearchQueryBuilders\SearchQueryBuilder;
-use App\Models\WebsitePageShortCode;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\Concerns\SortsQuery;
 use Spatie\QueryBuilder\QueryBuilder;
 
-class WebsitePageShortCodeQueryBuilder extends AbstractQueryBuilder
+class LocationQueryBuilder extends AbstractQueryBuilder
 {
     /**
      * @return string
      */
     public static function baseQuery()
     {
-        return WebsitePageShortCode::class;
+        return Location::class;
     }
 
     /**
@@ -25,41 +25,23 @@ class WebsitePageShortCodeQueryBuilder extends AbstractQueryBuilder
      */
     public static function initialQuery()
     {
-        $modelKeyName = (new Role())->getKeyName();
+        $modelKeyName = (new Group())->getKeyName();
 
         return static::for(static::baseQuery())
             ->allowedFields([
                 $modelKeyName,
-                'type',
-                'key',
-                'parent_uuid',
                 'name',
-                'short_code',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
                 $modelKeyName,
-                'type',
-                'key',
-                'parent_uuid',
                 'name',
-                'short_code',
             ])
             ->allowedFilters([
                 $modelKeyName,
                 AllowedFilter::exact('exact__' . $modelKeyName, $modelKeyName),
                 'name',
                 AllowedFilter::exact('exact__name', 'name'),
-                'type',
-                AllowedFilter::exact('exact__type', 'type'),
-                'key',
-                AllowedFilter::exact('exact__key', 'key'),
-                'parent_uuid',
-                AllowedFilter::exact('exact__parent_uuid', 'parent_uuid'),
-                'short_code',
-                AllowedFilter::exact('exact__short_code', 'short_code'),
-                AllowedFilter::scope('short_code_root'),
-
             ]);
     }
 
@@ -68,7 +50,7 @@ class WebsitePageShortCodeQueryBuilder extends AbstractQueryBuilder
      */
     public static function fillAble()
     {
-        return WebsitePageShortCode::class;
+        return Location::class;
     }
 
     /**

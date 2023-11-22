@@ -2,10 +2,10 @@
 
 namespace App\Http\Requests;
 
-use App\Abstracts\AbstractRequest;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class MyDepartmentRequest extends AbstractRequest
+class LocationRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,10 +25,11 @@ class MyDepartmentRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'name' => ['required', 'array', 'min:1'],
-            'name.en' => ['required', 'string'],
-            'name.*' => ['required', 'string'],
-            'business_uuid' => ['integer', 'exists:businesses,uuid'],
+            'name' => ['required', 'string', Rule::unique('locations', 'name')
+                ->where('user_uuid', auth()->user()->getKey())
+                ->whereNull('deleted_at')],
+            'address' => ['string'],
+            'user_uuid' => ['required', 'exists:users,uuid']
         ];
     }
 }

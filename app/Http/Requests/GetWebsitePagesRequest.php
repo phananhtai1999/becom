@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Models\WebsitePage;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class GetWebsitePagesRequest extends FormRequest
 {
@@ -24,17 +25,12 @@ class GetWebsitePagesRequest extends FormRequest
      */
     public function rules()
     {
-        $validate = [
+        return [
             'domain' => ['required', 'string', 'regex:/^(?!(www|http|https)\.)\w+(\.\w+)+$/'],
-            'website_page_slug' => ['required', 'string'],
+            'website_page_slug' => ['nullable', 'string', Rule::exists('website_pages', 'slug')
+                ->whereNull('deleted_at')],
+            'article_slug' => ['exists:articles,slug'],
+            'article_category_slug' => ['exists:article_categories,slug']
         ];
-        $websitePage = WebsitePage::where(['slug' => $this->request->get('website_page_slug')])->first();
-        if ($websitePage->type == WebsitePage::ARTICLE_DETAIL_TYPE) {
-            $validate['article_slug'] = ['required', 'exists:articles,slug'];
-        } elseif ($websitePage->type == WebsitePage::ARTICLE_CATEGORY_TYPE) {
-            $validate['article_category_slug'] = ['required', 'exists:article_categories,slug'];
-        }
-
-        return $validate;
     }
 }

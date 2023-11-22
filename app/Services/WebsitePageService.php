@@ -164,8 +164,29 @@ class WebsitePageService extends AbstractService
             ->where('publish_status', Website::PUBLISHED_PUBLISH_STATUS)
             ->firstOrFail();
 
-        $websitePage = $website->websitePagesPublic()->where(['slug' => $websitePageSlug])->firstOrFail();
-        return $this->model->where(['uuid' => $websitePage->uuid])->firstOrFail();
+        if($websitePageSlug){
+            $websitePage = $website->websitePagesPublic()->where(['slug' => $websitePageSlug])->firstOrFail();
+        }else{
+            $websitePage = $website->websitePagesPublic()->wherePivot('is_homepage', 1)->firstOrFail();
+        }
+
+        return $websitePage;
+    }
+
+    public function getNewsWebsitePagesByDomain($domainName)
+    {
+        $website = (new Website())->whereHas('domain', function ($query) use ($domainName) {
+            $query->where([
+                ['name', $domainName],
+                ['verified_at', '!=', null]
+            ]);
+        })
+            ->where('publish_status', Website::PUBLISHED_PUBLISH_STATUS)
+            ->firstOrFail();
+
+        return $website->websitePagesPublic()
+            ->whereIn('type', [WebsitePage::ARTICLE_CATEGORY_TYPE, WebsitePage::HOME_ARTICLES_TYPE, WebsitePage::ARTICLE_DETAIL_TYPE])
+            ->get();
     }
 
     public function renderContent($websitePage, $article)

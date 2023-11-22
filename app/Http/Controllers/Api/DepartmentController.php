@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Abstracts\AbstractRestAPIController;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestIndexMyTrait;
+use App\Http\Requests\AddDepartmentForBusinessRequest;
+use App\Http\Requests\AddDepartmentForLocationRequest;
 use App\Http\Requests\DepartmentRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyDepartmentRequest;
@@ -17,6 +19,7 @@ use App\Http\Resources\DepartmentResourceCollection;
 use App\Services\DepartmentService;
 use App\Services\LanguageService;
 use App\Services\MyDepartmentService;
+use Illuminate\Http\JsonResponse;
 
 class DepartmentController extends AbstractRestAPIController
 {
@@ -54,7 +57,7 @@ class DepartmentController extends AbstractRestAPIController
     }
 
     /**
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */
@@ -78,7 +81,7 @@ class DepartmentController extends AbstractRestAPIController
 
     /**
      * @param $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */
@@ -104,7 +107,7 @@ class DepartmentController extends AbstractRestAPIController
 
     /**
      * @param MyDepartmentRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function storeMyDepartment(MyDepartmentRequest $request)
     {
@@ -124,7 +127,7 @@ class DepartmentController extends AbstractRestAPIController
 
     /**
      * @param $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function showMyDepartment($id)
     {
@@ -138,7 +141,7 @@ class DepartmentController extends AbstractRestAPIController
     /**
      * @param UpdateMyDepartmentRequest $request
      * @param $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function editMyDepartment(UpdateMyDepartmentRequest $request, $id)
     {
@@ -160,11 +163,40 @@ class DepartmentController extends AbstractRestAPIController
 
     /**
      * @param $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function destroyMyDepartment($id)
     {
         $this->myService->deleteMyDepartment($id);
+
+        return $this->sendOkJsonResponse();
+    }
+
+
+    /**
+     * @param AddDepartmentForBusinessRequest $request
+     * @return JsonResponse
+     */
+    public function addDepartmentForBusiness(AddDepartmentForBusinessRequest $request)
+    {
+        foreach ($request->get('department_uuids') as $departmentUuid) {
+            $department = $this->service->findOrFailById($departmentUuid);
+            $department->update(['business_uuid' => $request->get('business_uuid')]);
+        }
+
+        return $this->sendOkJsonResponse();
+    }
+
+    /**
+     * @param AddDepartmentForLocationRequest $request
+     * @return JsonResponse
+     */
+    public function addDepartmentForLocation(AddDepartmentForLocationRequest $request)
+    {
+        foreach ($request->get('department_uuids') as $departmentUuid) {
+            $department = $this->service->findOrFailById($departmentUuid);
+            $department->update(['location_uuid' => $request->get('location_uuid')]);
+        }
 
         return $this->sendOkJsonResponse();
     }

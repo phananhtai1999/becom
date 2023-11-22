@@ -32,6 +32,10 @@ class WebsitePageShortCodeResource extends JsonResource
             $data['children_short_code'] = self::collection($this->childrenWebsitePageShortCode);
         }
 
+        if (\in_array('website_page_short_code__parent_short_code', $expand)) {
+            $data['parent_short_code'] = new WebsitePageShortCodeResource($this->parentWebsitePageShortCode);
+        }
+
         return $data;
     }
 }

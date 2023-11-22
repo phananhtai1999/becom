@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -56,5 +57,12 @@ class WebsitePageShortCode extends Model
     public function childrenWebsitePageShortCode()
     {
         return $this->hasMany(__CLASS__, 'parent_uuid');
+    }
+
+    public function scopeShortCodeRoot(Builder $query, $check)
+    {
+        if ($check) {
+            return $query->whereNull('parent_uuid');
+        }
     }
 }
