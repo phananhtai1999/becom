@@ -40,4 +40,9 @@ class UserTeamAddOn extends Model
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
     ];
+
+    public function addOn()
+    {
+        return $this->belongsTo(AddOn::class, 'uuid', 'add_on');
+    }
 }
