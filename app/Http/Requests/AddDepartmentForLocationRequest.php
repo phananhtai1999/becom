@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class AddDepartmentForTeamRequest extends FormRequest
+class AddDepartmentForLocationRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,7 +25,7 @@ class AddDepartmentForTeamRequest extends FormRequest
     {
         return [
             'department_uuids' => ['required', 'array'],
-            'business_uuid' => ['required', 'integer', 'exists:business_managements,uuid'],
+            'location_uuid' => ['required', 'integer', 'exists:locations,uuid'],
             'department_uuids.*' => ['required', 'integer', 'exists:teams,uuid']
         ];
     }

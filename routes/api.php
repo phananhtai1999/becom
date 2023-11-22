@@ -965,6 +965,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'department.'], function () 
     });
 
     Route::post('business/add-department', [DepartmentController::class, 'addDepartmentForBusiness'])->name('addDepartmentForBusiness');
+    Route::post('location/add-department', [DepartmentController::class, 'addDepartmentForLocation'])->name('addDepartmentForLocation');
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'location.'], function () {

@@ -15,6 +15,7 @@ class AddBusinessIdToDepartmentsTable extends Migration
     {
         Schema::table('departments', function (Blueprint $table) {
             $table->bigInteger('business_uuid')->nullable()->after('name');
+            $table->bigInteger('location_uuid')->nullable()->after('name');
         });
     }
 
@@ -26,6 +27,7 @@ class AddBusinessIdToDepartmentsTable extends Migration
     public function down()
     {
         Schema::table('departments', function (Blueprint $table) {
+            $table->dropColumn('business_uuid');
             $table->dropColumn('business_uuid');
         });
     }
