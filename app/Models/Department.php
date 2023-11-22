@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Abstracts\AbstractModel;
 use App\Http\Controllers\Traits\ModelFilterExactNameLanguageTrait;
 use App\Http\Controllers\Traits\ModelFilterNameLanguageTrait;
+use App\Http\Requests\AddDepartmentForTeamRequest;
 use App\Services\UserService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -29,6 +30,7 @@ class Department extends AbstractModel
      */
     protected $fillable = [
         'name',
+        'business_uuid',
         'user_uuid'
     ];
 
@@ -68,6 +70,11 @@ class Department extends AbstractModel
     public function user()
     {
         return $this->belongsTo(User::class, 'user_uuid', 'uuid');
+    }
+
+    public function business()
+    {
+        return $this->belongsTo(BusinessManagement::class, 'business_uuid', 'uuid');
     }
 
     /**

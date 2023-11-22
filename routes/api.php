@@ -963,6 +963,8 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'department.'], function () 
         Route::put('/my/department/{id}', [DepartmentController::class, 'editMyDepartment'])->name('edit');
         Route::delete('/my/department/{id}', [DepartmentController::class, 'destroyMyDepartment'])->name('destroy');
     });
+
+    Route::post('business/add-department', [DepartmentController::class, 'addDepartmentForBusiness'])->name('addDepartmentForBusiness');
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'location.'], function () {
