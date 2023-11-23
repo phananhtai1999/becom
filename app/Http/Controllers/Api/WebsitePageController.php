@@ -91,17 +91,21 @@ class WebsitePageController extends AbstractRestAPIController
             : [['uuid', $id]]);
         $response = $this->sendOkJsonResponse(['data' => $websitePage]);
         if ($websitePage->type == WebsitePage::ARTICLE_DETAIL_TYPE) {
-            if($request->get('article_slug')){
+            if ($request->get('article_slug')) {
                 $article = $this->articleService->findOneWhereOrFail(['slug' => $request->get('article_slug')]);
-            }else{
+            } elseif ($request->get('article_uuid')) {
+                $article = $this->articleService->findOrFailById($request->get('article_uuid'));
+            } else {
                 $article = $this->articleService->getLastArticle();
             }
             $websitePage = $this->service->renderContent($websitePage, $article);
             $response = $this->sendOkJsonResponse(['data' => $websitePage]);
         } elseif ($websitePage->type == WebsitePage::ARTICLE_CATEGORY_TYPE) {
-            if($request->get('article_category_slug')){
+            if ($request->get('article_category_slug')) {
                 $articleCategory = $this->articleCategoryService->findOneWhereOrFail(['slug' => $request->get('article_category_slug')]);
-            }else{
+            } elseif ($request->get('article_category_uuid')) {
+                $articleCategory = $this->articleCategoryService->findOrFailById($request->get('article_category_uuid'));
+            } else {
                 $articleCategory = $this->articleCategoryService->getLastArticleCategory();
             }
             $websitePage = $this->service->renderContentForArticleCategory($websitePage, $articleCategory);
@@ -118,7 +122,7 @@ class WebsitePageController extends AbstractRestAPIController
     public function getWebsitePageWithReplace(GetWebsitePagesRequest $request)
     {
         $websitePage = $this->service->getWebsitePageByDomainAndWebsitePageSlug($request->get('domain'), $request->get('website_page_slug'));
-        if(!$request->get('article_slug') && !$request->get('article_category_slug')){
+        if (!$request->get('article_slug') && !$request->get('article_category_slug')) {
             $websitePage = $this->service->renderContentForHomeArticles($websitePage);
         } else {
             $websitePages = $this->service->getNewsWebsitePagesByDomain($request->get('domain'));
