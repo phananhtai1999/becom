@@ -223,8 +223,8 @@ class WebsitePageService extends AbstractService
 
         preg_match('/data-children-category-count="(\d+)"/', $websitePage->template, $childrenCategoryCount);
         $childrenCategoryCount = isset($childrenCategoryCount[1]) ? (int)$childrenCategoryCount[1] : 10;
-        preg_match('/category-sort="(.*?)"/', $websitePage->template, $sortName);
-        preg_match('/category-sort-order="(.*?)"/', $websitePage->template, $sortOrder);
+        preg_match('/children-category-sort="(.*?)"/', $websitePage->template, $sortName);
+        preg_match('/children-category-sort-order="(.*?)"/', $websitePage->template, $sortOrder);
         $childrenCategoriesData = ArticleCategory::where('parent_uuid', $articleCategory->uuid)->orderBy($sortName[1] ?? 'created_at', $sortOrder[1] ?? 'DESC')->paginate($childrenCategoryCount);
         $websitePage->template = preg_replace_callback('/<children_category.*?>(.*?)<\/children_category>/s', function ($matches) use ($childrenCategoriesData) {
 
@@ -247,28 +247,6 @@ class WebsitePageService extends AbstractService
 
     public function renderContentForHomeArticles($websitePage)
     {
-        //get number article need to parse
-        $pattern = '/data-article-count="(\d+)"/';
-        preg_match_all($pattern, $websitePage->template, $matches);
-        $numbers = array_map('intval', $matches[1]);
-        $articleCount = array_sum($numbers);
-        $articleCount = isset($articleCount) ? (int)$articleCount : 10;
-
-        //get orderby
-        preg_match('/article-sort="(.*?)"/', $websitePage->template, $sortName);
-        preg_match('/article-sort-order="(.*?)"/', $websitePage->template, $sortOrder);
-        $articles_data = Article::orderBy($sortName[1] ?? 'created_at', $sortOrder[1] ?? 'DESC')->paginate($articleCount);
-        $pattern = '/<article.*?>(.*?)<\/article>/s';
-        $websitePage->template = preg_replace_callback($pattern, function ($matches) use ($articles_data) {
-            $article_data = $articles_data->shift();
-            if (!$article_data) {
-                return $matches[0];
-            }
-
-            $searchReplaceMap = $this->searchReplaceMapForArticle($articles_data);
-
-            return str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $matches[0]);
-        }, $websitePage->template);
 
         preg_match('/data-category-count="(\d+)"/', $websitePage->template, $categoryCount);
         $categoryCount = isset($categoryCount[1]) ? (int)$categoryCount[1] : 10;
@@ -298,6 +276,30 @@ class WebsitePageService extends AbstractService
             return $matches[0];
 
         }, $websitePage->template);
+
+        //get number article need to parse
+        $pattern = '/data-article-count="(\d+)"/';
+        preg_match_all($pattern, $websitePage->template, $matches);
+        $numbers = array_map('intval', $matches[1]);
+        $articleCount = array_sum($numbers);
+        $articleCount = isset($articleCount) ? (int)$articleCount : 10;
+
+        //get orderby
+        preg_match('/article-sort="(.*?)"/', $websitePage->template, $sortName);
+        preg_match('/article-sort-order="(.*?)"/', $websitePage->template, $sortOrder);
+        $articles_data = Article::orderBy($sortName[1] ?? 'created_at', $sortOrder[1] ?? 'DESC')->paginate($articleCount);
+                $pattern = '/<article.*?>(.*?)<\/article>/s';
+        $websitePage->template = preg_replace_callback($pattern, function ($matches) use ($articles_data) {
+            $article_data = $articles_data->shift();
+            if (!$article_data) {
+                return $matches[0];
+            }
+
+            $searchReplaceMap = $this->searchReplaceMapForArticle($articles_data);
+
+            return str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $matches[0]);
+        }, $websitePage->template);
+
         return $websitePage;
     }
 

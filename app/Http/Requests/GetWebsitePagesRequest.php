@@ -31,7 +31,7 @@ class GetWebsitePagesRequest extends FormRequest
                 ->whereNull('deleted_at')],
             'article_slug' => ['exists:articles,slug'],
             'article_category_slug' => ['exists:article_categories,slug', function ($attribute, $value, $fail) {
-                $articleCategorySlug = $this->request->get('article_category_slug');
+                $articleCategorySlug = $this->request->get('article_slug');
 
                 if ($articleCategorySlug && $articleCategorySlug === $value) {
                     $fail("Article slug can't same with article category slug.");
