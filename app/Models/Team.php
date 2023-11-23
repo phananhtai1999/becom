@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Abstracts\AbstractModel;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -84,5 +85,12 @@ class Team extends AbstractModel
     public function getNumOfTeamMemberAttribute()
     {
         return count($this->userTeam);
+    }
+
+    public function scopeTeamRoot(Builder $query, $check)
+    {
+        if ($check) {
+            return $query->whereNull('parent_team_uuid');
+        }
     }
 }
