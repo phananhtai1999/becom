@@ -126,7 +126,7 @@ class WebsitePageService extends AbstractService
         $isCanUseWebsitePages = $this->model
             ->leftJoin('website_website_page', 'website_website_page.website_page_uuid', 'website_pages.uuid')
             ->whereNull('website_website_page.website_page_uuid')
-            ->where(function ($query){
+            ->where(function ($query) {
                 return $query->where('website_pages.user_uuid', auth()->user()->getKey())
                     ->orWhere('website_pages.is_default', true);
             })->get()->pluck('uuid');
@@ -164,9 +164,9 @@ class WebsitePageService extends AbstractService
             ->where('publish_status', Website::PUBLISHED_PUBLISH_STATUS)
             ->firstOrFail();
 
-        if($websitePageSlug){
+        if ($websitePageSlug) {
             $websitePage = $website->websitePagesPublic()->where(['slug' => $websitePageSlug])->firstOrFail();
-        }else{
+        } else {
             $websitePage = $website->websitePagesPublic()->wherePivot('is_homepage', 1)->firstOrFail();
         }
 
@@ -191,17 +191,7 @@ class WebsitePageService extends AbstractService
 
     public function renderContent($websitePage, $article)
     {
-        $searchReplaceMap = [
-            '{article.uuid}' => $article->uuid ?? null,
-            '{article.slug}' => $article->slug ?? null,
-            '{article.title}' => $article->title ?? null,
-            '{article.content}' => $article->content ?? null,
-            '{article.video}' => $article->video ?? null,
-            '{article.image}' => $article->image ?? null,
-            '{article.keyword}' => $article->keyword ?? null,
-            '{article.description}' => $article->description ?? null,
-            '{article.short_content}' => $article->short_content ?? null,
-        ];
+        $searchReplaceMap = $this->searchReplaceMapForArticle($article);
         $websitePage->template = Str::replace(array_keys($searchReplaceMap), $searchReplaceMap, $websitePage->template);
 
         return $websitePage;
@@ -209,17 +199,7 @@ class WebsitePageService extends AbstractService
 
     public function renderContentForArticleCategory($websitePage, $articleCategory)
     {
-        $searchArticleReplaceMap = [
-            '{category.uuid}' => $articleCategory->uuid ?? null,
-            '{category.slug}' => $articleCategory->slug ?? null,
-            '{category.title}' => $articleCategory->title ?? null,
-            '{category.content}' => $articleCategory->content ?? null,
-            '{category.feature_image}' => $articleCategory->feature_image ?? null,
-            '{category.image}' => $articleCategory->image ?? null,
-            '{category.keyword}' => $articleCategory->keyword ?? null,
-            '{category.description}' => $articleCategory->description ?? null,
-            '{category.short_content}' => $articleCategory->short_content ?? null,
-        ];
+        $searchArticleReplaceMap = $this->searchReplaceMapForCategory($articleCategory);
         $websitePage->template = str_replace(array_keys($searchArticleReplaceMap), $searchArticleReplaceMap, $websitePage->template);
 
         $pattern = '/data-article-count="(\d+)"/';
@@ -235,17 +215,7 @@ class WebsitePageService extends AbstractService
                 return $matches[0];
             }
 
-            $searchReplaceMap = [
-                '{article.uuid}' => $articleData->uuid ?? null,
-                '{article.slug}' => $articleData->slug ?? null,
-                '{article.title}' => $articleData->title ?? null,
-                '{article.content}' => $articleData->content ?? null,
-                '{article.video}' => $articleData->video ?? null,
-                '{article.image}' => $articleData->image ?? null,
-                '{article.keyword}' => $articleData->keyword ?? null,
-                '{article.description}' => $articleData->description ?? null,
-                '{article.short_content}' => $articleData->short_content ?? null,
-            ];
+            $searchReplaceMap = $this->searchReplaceMapForArticle($articleData);
 
             return str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $matches[0]);
         }, $websitePage->template);
@@ -264,17 +234,7 @@ class WebsitePageService extends AbstractService
                 return $matches[0];
             }
 
-            $searchReplaceMap = [
-                '{children_category.uuid}' => $childrenCategoryData->uuid ?? null,
-                '{children_category.slug}' => $childrenCategoryData->slug ?? null,
-                '{children_category.title}' => $childrenCategoryData->title ?? null,
-                '{children_category.content}' => $childrenCategoryData->content ?? null,
-                '{children_category.feature_image}' => $childrenCategoryData->feature_image ?? null,
-                '{children_category.image}' => $childrenCategoryData->image ?? null,
-                '{children_category.keyword}' => $childrenCategoryData->keyword ?? null,
-                '{children_category.description}' => $childrenCategoryData->description ?? null,
-                '{children_category.short_content}' => $childrenCategoryData->short_content ?? null,
-            ];
+            $searchReplaceMap = $this->searchReplaceMapForChildrenCategory($childrenCategoryData);
             $matches[0] = str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $matches[0]);
             $matches[0] = $this->replaceGrandChildrenCategory($matches[0], $childrenCategoryData);
 
@@ -305,17 +265,7 @@ class WebsitePageService extends AbstractService
                 return $matches[0];
             }
 
-            $searchReplaceMap = [
-                '{article.uuid}' => $article_data->uuid ?? null,
-                '{article.slug}' => $article_data->slug ?? null,
-                '{article.title}' => $article_data->title ?? null,
-                '{article.content}' => $article_data->content ?? null,
-                '{article.video}' => $article_data->video ?? null,
-                '{article.image}' => $article_data->image ?? null,
-                '{article.keyword}' => $article_data->keyword ?? null,
-                '{article.description}' => $article_data->description ?? null,
-                '{article.short_content}' => $article_data->short_content ?? null,
-            ];
+            $searchReplaceMap = $this->searchReplaceMapForArticle($articles_data);
 
             return str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $matches[0]);
         }, $websitePage->template);
@@ -334,37 +284,16 @@ class WebsitePageService extends AbstractService
                 return $matches[0];
             }
 
-            $searchReplaceMap = [
-                '{category.uuid}' => $categoryData->uuid ?? null,
-                '{category.slug}' => $categoryData->slug ?? null,
-                '{category.title}' => $categoryData->title ?? null,
-                '{category.content}' => $categoryData->content ?? null,
-                '{category.feature_image}' => $categoryData->feature_image ?? null,
-                '{category.image}' => $categoryData->image ?? null,
-                '{category.keyword}' => $categoryData->keyword ?? null,
-                '{category.description}' => $categoryData->description ?? null,
-                '{category.short_content}' => $categoryData->short_content ?? null,
-            ];
+            $searchReplaceMap = $this->searchReplaceMapForCategory($categoryData);
             $matches[0] = str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $matches[0]);
             $matches[0] = $this->replacechildrenCategory($matches[0], $categoryData);
 
             $childrenCategoriesUuid = ArticleCategory::where('parent_uuid', $categoryData->uuid)->get()->pluck('uuid');
-            $article = Article::whereIn('article_category_uuid', array_merge($childrenCategoriesUuid->toArray(),[$categoryData->uuid]))->orderBy('created_at', 'DESC')->first();
+            $article = Article::whereIn('article_category_uuid', array_merge($childrenCategoriesUuid->toArray(), [$categoryData->uuid]))->orderBy('created_at', 'DESC')->first();
             if ($article) {
-                $searchReplaceArticleMap = [
-                    '{article.uuid}' => $article->uuid ?? null,
-                    '{article.slug}' => $article->slug ?? null,
-                    '{article.title}' => $article->title ?? null,
-                    '{article.content}' => $article->content ?? null,
-                    '{article.video}' => $article->video ?? null,
-                    '{article.image}' => $article->image ?? null,
-                    '{article.keyword}' => $article->keyword ?? null,
-                    '{article.description}' => $article->description ?? null,
-                    '{article.short_content}' => $article->short_content ?? null,
-                ];
+                $searchReplaceArticleMap = $this->searchReplaceMapForArticle($article);
                 $matches[0] = Str::replace(array_keys($searchReplaceArticleMap), $searchReplaceArticleMap, $matches[0]);
             }
-
 
             return $matches[0];
 
@@ -423,26 +352,63 @@ class WebsitePageService extends AbstractService
             if (!$childrenCategoryData) {
                 return $childMatches[0];
             }
-            $childSearchReplaceMap = [
-                '{children_category.uuid}' => $childrenCategoryData->uuid ?? null,
-                '{children_category.slug}' => $childrenCategoryData->slug ?? null,
-                '{children_category.title}' => $childrenCategoryData->title ?? null,
-                '{children_category.content}' => $childrenCategoryData->content ?? null,
-                '{children_category.feature_image}' => $childrenCategoryData->feature_image ?? null,
-                '{children_category.image}' => $childrenCategoryData->image ?? null,
-                '{children_category.keyword}' => $childrenCategoryData->keyword ?? null,
-                '{children_category.description}' => $childrenCategoryData->description ?? null,
-                '{children_category.short_content}' => $childrenCategoryData->short_content ?? null,
-            ];
+            $childSearchReplaceMap = $this->searchReplaceMapForChildrenCategory($childrenCategoryData);
 
             return str_replace(array_keys($childSearchReplaceMap), $childSearchReplaceMap, $childMatches[0]);
         }, $matches);
         return $matches;
     }
 
-    private function getDataCount($websitePage) {
+    private function getDataCount($websitePage)
+    {
         $pattern = '/data-article-count="(\d+)"/';
         preg_match($pattern, $websitePage->template, $articleCount);
         $articleCount = isset($articleCount[1]) ? (int)$articleCount[1] : 10;
+    }
+
+    private function searchReplaceMapForArticle($article)
+    {
+        return [
+            '{article.uuid}' => $article->uuid ?? null,
+            '{article.article_category_uuid}' => $article->article_category_uuid ?? null,
+            '{article.slug}' => $article->slug ?? null,
+            '{article.title}' => $article->title ?? null,
+            '{article.content}' => $article->content ?? null,
+            '{article.video}' => $article->video ?? null,
+            '{article.image}' => $article->image ?? null,
+            '{article.keyword}' => $article->keyword ?? null,
+            '{article.description}' => $article->description ?? null,
+            '{article.short_content}' => $article->short_content ?? null,
+        ];
+    }
+
+    private function searchReplaceMapForCategory($articleCategory)
+    {
+        return [
+            '{category.uuid}' => $articleCategory->uuid ?? null,
+            '{category.slug}' => $articleCategory->slug ?? null,
+            '{category.title}' => $articleCategory->title ?? null,
+            '{category.content}' => $articleCategory->content ?? null,
+            '{category.feature_image}' => $articleCategory->feature_image ?? null,
+            '{category.image}' => $articleCategory->image ?? null,
+            '{category.keyword}' => $articleCategory->keyword ?? null,
+            '{category.description}' => $articleCategory->description ?? null,
+            '{category.short_content}' => $articleCategory->short_content ?? null,
+        ];
+    }
+
+    private function searchReplaceMapForChildrenCategory($childrenCategory)
+    {
+        return [
+            '{children_category.uuid}' => $childrenCategory->uuid ?? null,
+            '{children_category.slug}' => $childrenCategory->slug ?? null,
+            '{children_category.title}' => $childrenCategory->title ?? null,
+            '{children_category.content}' => $childrenCategory->content ?? null,
+            '{children_category.feature_image}' => $childrenCategory->feature_image ?? null,
+            '{children_category.image}' => $childrenCategory->image ?? null,
+            '{children_category.keyword}' => $childrenCategory->keyword ?? null,
+            '{children_category.description}' => $childrenCategory->description ?? null,
+            '{children_category.short_content}' => $childrenCategory->short_content ?? null,
+        ];
     }
 }
