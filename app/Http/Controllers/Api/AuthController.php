@@ -418,9 +418,7 @@ class AuthController extends AbstractRestAPIController
 
         //Kiểm tra country và gửi email khi khác country
         SendNotificationSystemForLoginEvent::dispatch($user, \request()->ip(), \request()->userAgent());
-        Cache::forget('platform_permission_' . $user->uuid);
-        Cache::forget('add_on_permission_' . $user->uuid);
-        Cache::forget('config');
+        $this->removeCache($user->uuid);
         return \response()->json(array_merge([
             'status' => true,
             "code" => 0,
