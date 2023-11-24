@@ -250,4 +250,17 @@ class AbstractRestAPIController extends BaseController
 
         return $user_uuid;
     }
+
+    public function removeCache($userUuid) {
+        Cache::forget('platform_permission_' . $userUuid);
+        Cache::forget('add_on_permission_' . $userUuid);
+        Cache::forget('team_leader_add_on_permission_' . $userUuid);
+        Cache::forget('team_permission_' . $userUuid);
+        Cache::forget('team_add_on_permission_' . $userUuid);
+        Cache::forget('config');
+    }
+
+    public function removeTeamPermissionCache($userUuid) {
+        Cache::forget('team_permission_' . $userUuid);
+    }
 }
