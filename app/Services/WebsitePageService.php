@@ -227,7 +227,6 @@ class WebsitePageService extends AbstractService
         preg_match('/children-category-sort-order="(.*?)"/', $websitePage->template, $sortOrder);
         $childrenCategoriesData = ArticleCategory::where('parent_uuid', $articleCategory->uuid)->orderBy($sortName[1] ?? 'created_at', $sortOrder[1] ?? 'DESC')->paginate($childrenCategoryCount);
         $websitePage->template = preg_replace_callback('/<children_category.*?>(.*?)<\/children_category>/s', function ($matches) use ($childrenCategoriesData) {
-
             $childrenCategoryData = $childrenCategoriesData->shift();
 
             if (!$childrenCategoryData) {
@@ -324,15 +323,15 @@ class WebsitePageService extends AbstractService
                 return $grandChildMatches[0];
             }
             $grandChildSearchReplaceMap = [
-                '{grand_children_category.uuid}' => $grandChildrenCategoryData->uuid ?? null,
-                '{grand_children_category.slug}' => $grandChildrenCategoryData->slug ?? null,
-                '{grand_children_category.title}' => $grandChildrenCategoryData->title ?? null,
-                '{grand_children_category.content}' => $grandChildrenCategoryData->content ?? null,
-                '{grand_children_category.feature_image}' => $grandChildrenCategoryData->feature_image ?? null,
-                '{grand_children_category.image}' => $grandChildrenCategoryData->image ?? null,
-                '{grand_children_category.keyword}' => $grandChildrenCategoryData->keyword ?? null,
-                '{grand_children_category.description}' => $grandChildrenCategoryData->description ?? null,
-                '{grand_children_category.short_content}' => $grandChildrenCategoryData->short_content ?? null,
+                '{grand_children_category.uuid}' => $grandChildrenCategoryData->uuid ?? 'This is grand children category sample',
+                '{grand_children_category.slug}' => $grandChildrenCategoryData->slug ?? 'This is grand children category sample',
+                '{grand_children_category.title}' => $grandChildrenCategoryData->title ?? 'This is grand children category sample',
+                '{grand_children_category.content}' => $grandChildrenCategoryData->content ?? 'This is grand children category sample',
+                '{grand_children_category.feature_image}' => $grandChildrenCategoryData->feature_image ?? 'This is grand children category sample',
+                '{grand_children_category.image}' => $grandChildrenCategoryData->image ?? 'This is grand children category sample',
+                '{grand_children_category.keyword}' => $grandChildrenCategoryData->keyword ?? 'This is grand children category sample',
+                '{grand_children_category.description}' => $grandChildrenCategoryData->description ?? 'This is grand children category sample',
+                '{grand_children_category.short_content}' => $grandChildrenCategoryData->short_content ?? 'This is grand children category sample',
             ];
 
             return str_replace(array_keys($grandChildSearchReplaceMap), $grandChildSearchReplaceMap, $grandChildMatches[0]);
@@ -371,46 +370,46 @@ class WebsitePageService extends AbstractService
     private function searchReplaceMapForArticle($article)
     {
         return [
-            '{article.uuid}' => $article->uuid ?? null,
-            '{article.article_category_uuid}' => $article->article_category_uuid ?? null,
-            '{article.slug}' => $article->slug ?? null,
-            '{article.title}' => $article->title ?? null,
-            '{article.content}' => $article->content ?? null,
-            '{article.video}' => $article->video ?? null,
-            '{article.image}' => $article->image ?? null,
-            '{article.keyword}' => $article->keyword ?? null,
-            '{article.description}' => $article->description ?? null,
-            '{article.short_content}' => $article->short_content ?? null,
+            '{article.uuid}' => $article->uuid ?? 'This is article uuid sample',
+            '{article.article_category_uuid}' => $article->article_category_uuid ?? 'This is article article_category_uuid sample',
+            '{article.slug}' => $article->slug ?? 'This is article slug sample',
+            '{article.title}' => $article->title ?? 'This is article title sample',
+            '{article.content}' => $article->content ?? 'This is article content sample',
+            '{article.video}' => $article->video ?? 'This is article video sample',
+            '{article.image}' => $article->image ?? 'This is article image sample',
+            '{article.keyword}' => $article->keyword ?? 'This is article keyword sample',
+            '{article.description}' => $article->description ?? 'This is article description sample',
+            '{article.short_content}' => $article->short_content ?? 'This is article short_content sample',
         ];
     }
 
     private function searchReplaceMapForCategory($articleCategory)
     {
         return [
-            '{category.uuid}' => $articleCategory->uuid ?? null,
-            '{category.slug}' => $articleCategory->slug ?? null,
-            '{category.title}' => $articleCategory->title ?? null,
-            '{category.content}' => $articleCategory->content ?? null,
-            '{category.feature_image}' => $articleCategory->feature_image ?? null,
-            '{category.image}' => $articleCategory->image ?? null,
-            '{category.keyword}' => $articleCategory->keyword ?? null,
-            '{category.description}' => $articleCategory->description ?? null,
-            '{category.short_content}' => $articleCategory->short_content ?? null,
+            '{category.uuid}' => $articleCategory->uuid ?? 'This is category uuid sample',
+            '{category.slug}' => $articleCategory->slug ?? 'This is category slug sample',
+            '{category.title}' => $articleCategory->title ?? 'This is category title sample',
+            '{category.content}' => $articleCategory->content ?? 'This is category content sample',
+            '{category.feature_image}' => $articleCategory->feature_image ?? 'This is category feature_image sample',
+            '{category.image}' => $articleCategory->image ?? 'This is category image sample',
+            '{category.keyword}' => $articleCategory->keyword ?? 'This is category keyword sample',
+            '{category.description}' => $articleCategory->description ?? 'This is category description sample',
+            '{category.short_content}' => $articleCategory->short_content ?? 'This is category short_content sample',
         ];
     }
 
     private function searchReplaceMapForChildrenCategory($childrenCategory)
     {
         return [
-            '{children_category.uuid}' => $childrenCategory->uuid ?? null,
-            '{children_category.slug}' => $childrenCategory->slug ?? null,
-            '{children_category.title}' => $childrenCategory->title ?? null,
-            '{children_category.content}' => $childrenCategory->content ?? null,
-            '{children_category.feature_image}' => $childrenCategory->feature_image ?? null,
-            '{children_category.image}' => $childrenCategory->image ?? null,
-            '{children_category.keyword}' => $childrenCategory->keyword ?? null,
-            '{children_category.description}' => $childrenCategory->description ?? null,
-            '{children_category.short_content}' => $childrenCategory->short_content ?? null,
+            '{children_category.uuid}' => $childrenCategory->uuid ?? 'This is children category sample',
+            '{children_category.slug}' => $childrenCategory->slug ?? 'This is children category sample',
+            '{children_category.title}' => $childrenCategory->title ?? 'This is children category sample',
+            '{children_category.content}' => $childrenCategory->content ?? 'This is children category sample',
+            '{children_category.feature_image}' => $childrenCategory->feature_image ?? 'This is children category sample',
+            '{children_category.image}' => $childrenCategory->image ?? 'This is children category sample',
+            '{children_category.keyword}' => $childrenCategory->keyword ?? 'This is children category sample',
+            '{children_category.description}' => $childrenCategory->description ?? 'This is children category sample',
+            '{children_category.short_content}' => $childrenCategory->short_content ?? 'This is children category sample',
         ];
     }
 }
