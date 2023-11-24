@@ -282,6 +282,12 @@ class WebsitePageShortCodeSeeder extends Seeder
                         'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE
                     ],
                     [
+                        'name' => 'article category uuid',
+                        'key' => 'article_category.article.article_category_uuid',
+                        'short_code' => 'article.article_category_uuid',
+                        'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE
+                    ],
+                    [
                         'name' => 'title',
                         'key' => 'article_category.article.title',
                         'short_code' => 'article.title',
@@ -768,6 +774,19 @@ class WebsitePageShortCodeSeeder extends Seeder
                     'short_code' => 'article.uuid',
                     'type' => WebsitePageShortCode::ARTICLE_DETAIL_TYPE
                 ],
+
+                [
+                    'name' => 'slug',
+                    'key' => 'article_detail.article.slug',
+                    'short_code' => 'article.slug',
+                    'type' => WebsitePageShortCode::ARTICLE_DETAIL_TYPE
+                ],
+                [
+                    'name' => 'article category uuid',
+                    'key' => 'article_detail.article.article_category_uuid',
+                    'short_code' => 'article.article_category_uuid',
+                    'type' => WebsitePageShortCode::ARTICLE_DETAIL_TYPE
+                ],
                 [
                     'name' => 'title',
                     'key' => 'article_detail.article.title',
@@ -823,6 +842,12 @@ class WebsitePageShortCodeSeeder extends Seeder
                         'name' => 'slug',
                         'key' => 'home_articles.article.slug',
                         'short_code' => 'article.slug',
+                        'type' => WebsitePageShortCode::HOME_ARTICLES_TYPE
+                    ],
+                    [
+                        'name' => 'article category uuid',
+                        'key' => 'home_articles.article.article_category_uuid',
+                        'short_code' => 'article.article_category_uuid',
                         'type' => WebsitePageShortCode::HOME_ARTICLES_TYPE
                     ],
                     [
@@ -1225,7 +1250,7 @@ class WebsitePageShortCodeSeeder extends Seeder
                     }
                 }
             }
-        }//create sort (order by)
+        }
 
         //create sort order (asc or desc)
         foreach ($sortOrders as $key => $sortOrder) {

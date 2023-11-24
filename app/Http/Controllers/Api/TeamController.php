@@ -278,7 +278,7 @@ class TeamController extends Controller
             'user_uuid' => $request->get('user_uuid'),
             'team_uuid' => $request->get('team_uuid')
         ]);
-        Cache::forget('team_permission_' . $request->get('user_uuid'));
+        $this->removeTeamPermissionCache($request->get('user_uuid'));
         if (empty($model)) {
 
             return $this->sendBadRequestJsonResponse(['message' => 'This user is not in the team']);
@@ -301,12 +301,13 @@ class TeamController extends Controller
             }
         }
 
-        foreach ($request->get('user_uuids') as $user_uuid) {
+        foreach ($request->get('user_uuids') as $userUuid) {
             $userTeam = $this->userTeamService->findOneWhereOrFail([
                 'team_uuid' => $request->get('team_uuid'),
-                'user_uuid' => $user_uuid
+                'user_uuid' => $userUuid
             ]);
             $userTeam->addOns()->syncWithoutDetaching($request->get('add_on_uuids'), []);
+            $this->removeCache($userUuid);
         }
 
         return $this->sendOkJsonResponse();
@@ -321,12 +322,13 @@ class TeamController extends Controller
             }
         }
 
-        foreach ($request->get('user_uuids') as $user_uuid) {
+        foreach ($request->get('user_uuids') as $userUuid) {
             $userTeam = $this->userTeamService->findOneWhereOrFail([
                 'team_uuid' => $request->get('team_uuid'),
-                'user_uuid' => $user_uuid
+                'user_uuid' => $userUuid
             ]);
             $userTeam->addOns()->detach($request->get('add_on_uuids'), []);
+            $this->removeCache($userUuid);
         }
 
         return $this->sendOkJsonResponse();
@@ -480,7 +482,7 @@ class TeamController extends Controller
         $user = $this->userService->findOrFailById($id);
         $user->userTeamContactLists()->detach();
         $this->userTeamService->destroy($model->uuid);
-        Cache::forget('team_permission_' . $model->user_uuid);
+        $this->removeTeamPermissionCache($model->user_uuid);
 
         return $this->sendOkJsonResponse();
     }
@@ -508,22 +510,6 @@ class TeamController extends Controller
                 return $this->sendJsonResponse(false, 'You are not owner of team to set permission', [], 403);
             }
         }
-        $this->userTeamService->update($model, ['is_blocked' => false]);
-
-        return $this->sendOkJsonResponse();
-    }
-
-    public function blockMemberForAdmin($id)
-    {
-        $model = $this->userTeamService->findOrFailById($id);
-        $this->userTeamService->update($model, ['is_blocked' => true]);
-
-        return $this->sendOkJsonResponse();
-    }
-
-    public function unBlockMemberForAdmin($id)
-    {
-        $model = $this->userTeamService->findOrFailById($id);
         $this->userTeamService->update($model, ['is_blocked' => false]);
 
         return $this->sendOkJsonResponse();

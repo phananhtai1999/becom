@@ -57,6 +57,7 @@ class MyTeamQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__updated_at', 'updated_at'),
                 AllowedFilter::scope('from__updated_at'),
                 AllowedFilter::scope('to__updated_at'),
+                AllowedFilter::scope('team_root'),
             ]);
     }
 
