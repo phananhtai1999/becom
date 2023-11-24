@@ -10,5 +10,5 @@ class GroupService extends AbstractService
 {
     protected $modelClass = Group::class;
 
-    protected $modelQueryBuilderClass = LocationQueryBuilder::class;
+    protected $modelQueryBuilderClass = GroupQueryBuilder::class;
 }
