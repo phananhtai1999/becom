@@ -26,14 +26,23 @@ class GetWebsitePagesRequest extends FormRequest
     public function rules()
     {
         return [
-            'domain' => ['required', 'string', 'regex:/^(?!(www|http|https)\.)\w+(\.\w+)+$/'],
+            'website_uuid' => ['nullable', 'integer', Rule::exists('websites', 'uuid')],
+            'domain' => [(Rule::requiredIf(empty($this->request->get('website_uuid')))), 'string', 'regex:/^(?!(www|http|https)\.)\w+(\.\w+)+$/'],
             'website_page_slug' => ['nullable', 'string', Rule::exists('website_pages', 'slug')
                 ->whereNull('deleted_at')],
             'article_slug' => ['exists:articles,slug'],
             'article_category_slug' => ['exists:article_categories,slug', function ($attribute, $value, $fail) {
-                $articleCategorySlug = $this->request->get('article_slug');
+                $articleSlug = $this->request->get('article_slug');
 
-                if ($articleCategorySlug && $articleCategorySlug === $value) {
+                if ($articleSlug && $articleSlug === $value) {
+                    $fail("Article slug can't same with article category slug.");
+                }
+            }],
+            'article_uuid' => ['exists:articles,uuid'],
+            'article_category_uuid' => ['exists:article_categories,uuid', function ($attribute, $value, $fail) {
+                $articleUuid = $this->request->get('article_uuid');
+
+                if ($articleUuid && $articleUuid === $value) {
                     $fail("Article slug can't same with article category slug.");
                 }
             }]

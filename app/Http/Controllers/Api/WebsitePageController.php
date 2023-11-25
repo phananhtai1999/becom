@@ -29,6 +29,7 @@ use App\Services\LanguageService;
 use App\Services\MyWebsitePageService;
 use App\Services\WebsitePageService;
 use App\Services\WebsitePageShortCodeService;
+use App\Services\WebsiteService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 
@@ -57,7 +58,8 @@ class WebsitePageController extends AbstractRestAPIController
         LanguageService        $languageService,
         ArticleService         $articleService,
         ArticleCategoryService $articleCategoryService,
-        DomainService          $domainService
+        DomainService          $domainService,
+        WebsiteService         $websiteService
     )
     {
         $this->service = $service;
@@ -66,6 +68,7 @@ class WebsitePageController extends AbstractRestAPIController
         $this->articleService = $articleService;
         $this->articleCategoryService = $articleCategoryService;
         $this->domainService = $domainService;
+        $this->websiteService = $websiteService;
         $this->resourceCollectionClass = WebsitePageResourceCollection::class;
         $this->resourceClass = WebsitePageResource::class;
         $this->indexRequest = IndexRequest::class;
@@ -121,19 +124,38 @@ class WebsitePageController extends AbstractRestAPIController
 
     public function getWebsitePageWithReplace(GetWebsitePagesRequest $request)
     {
-        $websitePage = $this->service->getWebsitePageByDomainAndWebsitePageSlug($request->get('domain'), $request->get('website_page_slug'));
-        if (!$request->get('article_slug') && !$request->get('article_category_slug')) {
+        if (!$request->get('domain')) {
+            $website = $this->websiteService->findOrFailById($request->get('website_uuid'));
+            $domain = $website->domain->name;
+
+        } else {
+            $domain = $request->get('domain');
+        }
+        $websitePage = $this->service->getWebsitePageByDomainAndWebsitePageSlug($domain, $request->get('website_page_slug'));
+
+        if (!$request->get('article_slug') && !$request->get('article_uuid')
+            && !$request->get('article_category_slug') && !$request->get('article_category_uuid')) {
             $websitePage = $this->service->renderContentForHomeArticles($websitePage);
         } else {
-            $websitePages = $this->service->getNewsWebsitePagesByDomain($request->get('domain'));
-            if ($request->get('article_slug') && $request->get('article_category_slug')) {
-                $websitePage = $websitePages->where('type', WebsitePage::ARTICLE_DETAIL_TYPE)->first();
-                $article = $this->articleService->findOneWhereOrFail(['slug' => $request->get('article_slug')]);
+            $newsWebsitePages = $this->service->getNewsWebsitePagesByDomain($domain);
+            if (($request->get('article_uuid') || $request->get('article_slug'))
+                && ($request->get('article_category_uuid') || $request->get('article_category_slug'))) {
+                $websitePage = $newsWebsitePages->where('type', WebsitePage::ARTICLE_DETAIL_TYPE)->first();
+                if ($request->get('article_uuid')) {
+                    $article = $this->articleService->findOrFailById($request->get('article_uuid'));
+                } else {
+                    $article = $this->articleService->findOneWhereOrFail(['slug' => $request->get('article_slug')]);
+                }
                 $websitePage = $this->service->renderContent($websitePage, $article);
 
-            } elseif (!$request->get('article_slug') && $request->get('article_category_slug')) {
-                $websitePage = $websitePages->where('type', WebsitePage::ARTICLE_CATEGORY_TYPE)->first();
-                $articleCategory = $this->articleCategoryService->findOneWhereOrFail(['slug' => $request->get('article_category_slug')]);
+            } elseif (!($request->get('article_uuid') || $request->get('article_slug'))
+                && ($request->get('article_category_uuid') || $request->get('article_category_slug'))) {
+                $websitePage = $newsWebsitePages->where('type', WebsitePage::ARTICLE_CATEGORY_TYPE)->first();
+                if ($request->get('article_category_uuid')) {
+                    $articleCategory = $this->articleCategoryService->findOrFailById($request->get('article_category_uuid'));
+                } else {
+                    $articleCategory = $this->articleCategoryService->findOneWhereOrFail(['slug' => $request->get('article_category_slug')]);
+                }
                 $websitePage = $this->service->renderContentForArticleCategory($websitePage, $articleCategory);
             }
         }
