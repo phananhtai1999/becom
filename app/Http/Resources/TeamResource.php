@@ -50,6 +50,10 @@ class TeamResource extends JsonResource
             $data['parent_team'] = new LocationResource($this->location);
         }
 
+        if (\in_array('team__team_members', $expand)) {
+            $data['team_member'] = UserTeamResource::collection($this->userTeam);
+        }
+
         return $data;
     }
 }
