@@ -15,7 +15,8 @@ class LocationResource extends JsonResource
      */
     public function toArray($request)
     {
-        return [
+        $expand = request()->get('expand', []);
+        $data = [
             'uuid' => $this->uuid,
             'name' => $this->name,
             'user_uuid' => $this->user_uuid,
@@ -24,5 +25,14 @@ class LocationResource extends JsonResource
             'updated_at' => $this->updated_at,
             'deleted_at' => $this->deleted_at,
         ];
+        if (\in_array('location__user', $expand)) {
+            $data['user'] = new UserResource($this->user);
+        }
+
+        if (\in_array('location__teams', $expand)) {
+            $data['teams'] = TeamResource::collection($this->teams);
+        }
+
+        return $data;
     }
 }

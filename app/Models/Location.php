@@ -26,8 +26,13 @@ class Location extends Model
         'deleted_at' => 'datetime',
     ];
 
-    public function departments()
+    public function teams()
     {
-        return $this->hasMany(Department::class);
+        return $this->hasMany(Team::class, 'location_uuid', 'uuid');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_uuid', 'uuid');
     }
 }

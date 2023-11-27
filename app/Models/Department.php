@@ -90,4 +90,10 @@ class Department extends AbstractModel
     {
         return app(UserService::class)->checkLanguagesPermissionWithAdminAndRootRole() ? $this->getTranslations('name') : $this->name;
     }
+
+    public function teams()
+    {
+        return $this->hasMany(Team::class, 'department_uuid', 'uuid');
+    }
+
 }
