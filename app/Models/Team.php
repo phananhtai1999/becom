@@ -31,6 +31,7 @@ class Team extends AbstractModel
         'name',
         'owner_uuid',
         'department_uuid',
+        'location_uuid',
         'parent_team_uuid',
         'leader_uuid'
     ];
@@ -63,6 +64,16 @@ class Team extends AbstractModel
     public function parentTeam()
     {
         return $this->belongsTo(__CLASS__, 'parent_team_uuid');
+    }
+
+    public function department()
+    {
+        return $this->belongsTo(Department::class, 'department_uuid');
+    }
+
+    public function location()
+    {
+        return $this->belongsTo(Location::class, 'location_uuid');
     }
 
 
