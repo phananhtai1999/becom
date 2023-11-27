@@ -10,6 +10,7 @@ use App\Http\Requests\AddDepartmentForLocationRequest;
 use App\Http\Requests\DepartmentRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyDepartmentRequest;
+use App\Http\Requests\RemoveTeamFromDepartmentRequest;
 use App\Http\Requests\UpdateDepartmentRequest;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
@@ -19,6 +20,7 @@ use App\Http\Resources\DepartmentResourceCollection;
 use App\Services\DepartmentService;
 use App\Services\LanguageService;
 use App\Services\MyDepartmentService;
+use App\Services\TeamService;
 use Illuminate\Http\JsonResponse;
 
 class DepartmentController extends AbstractRestAPIController
@@ -43,12 +45,14 @@ class DepartmentController extends AbstractRestAPIController
     public function __construct(
         DepartmentService   $service,
         MyDepartmentService $myService,
-        LanguageService $languageService
+        LanguageService $languageService,
+        TeamService $teamService
     )
     {
         $this->service = $service;
         $this->myService = $myService;
         $this->languageService = $languageService;
+        $this->teamService = $teamService;
         $this->resourceCollectionClass = DepartmentResourceCollection::class;
         $this->resourceClass = DepartmentResource::class;
         $this->storeRequest = DepartmentRequest::class;
@@ -196,6 +200,22 @@ class DepartmentController extends AbstractRestAPIController
         foreach ($request->get('department_uuids') as $departmentUuid) {
             $department = $this->service->findOrFailById($departmentUuid);
             $department->update(['location_uuid' => $request->get('location_uuid')]);
+        }
+
+        return $this->sendOkJsonResponse();
+    }
+
+    /**
+     * @param RemoveTeamFromDepartmentRequest $request
+     * @return JsonResponse
+     */
+    public function removeTeam(RemoveTeamFromDepartmentRequest $request)
+    {
+        foreach ($request->get('team_uuids') as $teamUuid) {
+            $team = $this->teamService->findOneWhere(['uuid' => $teamUuid, 'department_uuid' => $request->get('department_uuid')]);
+            if ($team) {
+                $team->update(['department_uuid' => null]);
+            }
         }
 
         return $this->sendOkJsonResponse();

@@ -16,11 +16,13 @@ use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestStoreTrait;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\LocationRequest;
+use App\Http\Requests\RemoveTeamFromLocationRequest;
 use App\Http\Requests\UpdateLocationRequest;
 use App\Http\Requests\MyLocationRequest;
 use App\Http\Resources\LocationResource;
 use App\Http\Resources\LocationResourceCollection;
 use App\Services\LocationService;
+use App\Services\TeamService;
 
 class LocationController extends AbstractRestAPIController
 {
@@ -29,10 +31,12 @@ class LocationController extends AbstractRestAPIController
 
     /**
      * @param LocationService $service
+     * @param TeamService $teamService
      */
-    public function __construct(LocationService $service)
+    public function __construct(LocationService $service, TeamService $teamService)
     {
         $this->service = $service;
+        $this->teamService = $teamService;
         $this->myService = $service;
         $this->resourceCollectionClass = LocationResourceCollection::class;
         $this->resourceClass = LocationResource::class;
@@ -41,5 +45,22 @@ class LocationController extends AbstractRestAPIController
         $this->editRequest = UpdateLocationRequest::class;
         $this->editMyRequest = UpdateLocationRequest::class;
         $this->indexRequest = IndexRequest::class;
+    }
+
+
+    /**
+     * @param RemoveTeamFromLocationRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function removeTeam(RemoveTeamFromLocationRequest $request)
+    {
+        foreach ($request->get('team_uuids') as $teamUuid) {
+            $team = $this->teamService->findOneWhere(['uuid' => $teamUuid, 'location_uuid' => $request->get('location_uuid')]);
+            if ($team) {
+                $team->update(['location_uuid' => null]);
+            }
+        }
+
+        return $this->sendOkJsonResponse();
     }
 }

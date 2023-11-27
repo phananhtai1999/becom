@@ -964,6 +964,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'department.'], function () 
         Route::delete('/my/department/{id}', [DepartmentController::class, 'destroyMyDepartment'])->name('destroy');
     });
 
+    Route::post('department/remove-team', [DepartmentController::class, 'removeTeam'])->name('removeTeam');
     Route::post('business/add-department', [DepartmentController::class, 'addDepartmentForBusiness'])->name('addDepartmentForBusiness');
     Route::post('location/add-department', [DepartmentController::class, 'addDepartmentForLocation'])->name('addDepartmentForLocation');
 });
@@ -984,6 +985,9 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'location.'], function () {
         Route::put('/my/location/{id}', [LocationController::class, 'editMy'])->name('edit');
         Route::delete('/my/location/{id}', [LocationController::class, 'destroyMy'])->name('destroy');
     });
+
+    Route::post('location/remove-team', [LocationController::class, 'removeTeam'])->name('removeTeam');
+
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'note.'], function () {
