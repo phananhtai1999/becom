@@ -43,11 +43,11 @@ class TeamResource extends JsonResource
         }
 
         if (\in_array('team__department', $expand)) {
-            $data['parent_team'] = new DepartmentResource($this->department);
+            $data['department'] = new DepartmentResource($this->department);
         }
 
         if (\in_array('team__location', $expand)) {
-            $data['parent_team'] = new LocationResource($this->location);
+            $data['location'] = new LocationResource($this->location);
         }
 
         if (\in_array('team__team_members', $expand)) {
