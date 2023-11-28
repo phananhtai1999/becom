@@ -173,6 +173,26 @@ class WebsitePageService extends AbstractService
         return $websitePage;
     }
 
+    public function getWebsitePageByDomainAndWebsitePageUuid($domainName, $websitePageUuid)
+    {
+        $website = (new Website())->whereHas('domain', function ($query) use ($domainName) {
+            $query->where([
+                ['name', $domainName],
+                ['verified_at', '!=', null]
+            ]);
+        })
+            ->where('publish_status', Website::PUBLISHED_PUBLISH_STATUS)
+            ->firstOrFail();
+
+        if ($websitePageUuid) {
+            $websitePage = $website->websitePagesPublic()->where(['uuid' => $websitePageUuid])->firstOrFail();
+        } else {
+            $websitePage = $website->websitePagesPublic()->wherePivot('is_homepage', 1)->firstOrFail();
+        }
+
+        return $websitePage;
+    }
+
     public function getNewsWebsitePagesByDomain($domainName)
     {
         $website = (new Website())->whereHas('domain', function ($query) use ($domainName) {
@@ -230,8 +250,8 @@ class WebsitePageService extends AbstractService
         $websitePage->template = str_replace(array_keys($searchArticleReplaceMap), $searchArticleReplaceMap, $websitePage->template);
 
         $pattern = '/data-article-count="(\d+)"/';
-        preg_match($pattern, $websitePage->template, $articleCount);
-        $articleCount = isset($articleCount[1]) ? (int)$articleCount[1] : 10;
+        preg_match_all($pattern, $websitePage->template, $articleCount);
+        $articleCount = isset($articleCount[1]) ? array_sum($articleCount[1]) : 10;
         preg_match('/article-sort="(.*?)"/', $websitePage->template, $sortName);
         preg_match('/article-sort-order="(.*?)"/', $websitePage->template, $sortOrder);
         $articlesData = Article::where('article_category_uuid', $articleCategory->uuid)->orderBy($sortName[1] ?? 'created_at', $sortOrder[1] ?? 'DESC')->paginate($articleCount);
@@ -323,21 +343,7 @@ class WebsitePageService extends AbstractService
         $grandChildrenCategoriesData = ArticleCategory::where('parent_uuid', $childrenCategoryData->uuid)->orderBy($sortName[1] ?? 'created_at', $sortOrder[1] ?? 'DESC')->paginate($grandChildrenCategoryCount);
         $matches = preg_replace_callback('/<grand_children_category.*?>(.*?)<\/grand_children_category>/s', function ($grandChildMatches) use ($grandChildrenCategoriesData) {
             $grandChildrenCategoryData = $grandChildrenCategoriesData->shift();
-
-            if (!$grandChildrenCategoryData) {
-                return $grandChildMatches[0];
-            }
-            $grandChildSearchReplaceMap = [
-                '{grand_children_category.uuid}' => $grandChildrenCategoryData->uuid ?? 'This is grand children category sample',
-                '{grand_children_category.slug}' => $grandChildrenCategoryData->slug ?? 'This is grand children category sample',
-                '{grand_children_category.title}' => $grandChildrenCategoryData->title ?? 'This is grand children category sample',
-                '{grand_children_category.content}' => $grandChildrenCategoryData->content ?? 'This is grand children category sample',
-                '{grand_children_category.feature_image}' => $grandChildrenCategoryData->feature_image ?? 'This is grand children category sample',
-                '{grand_children_category.image}' => $grandChildrenCategoryData->image ?? 'This is grand children category sample',
-                '{grand_children_category.keyword}' => $grandChildrenCategoryData->keyword ?? 'This is grand children category sample',
-                '{grand_children_category.description}' => $grandChildrenCategoryData->description ?? 'This is grand children category sample',
-                '{grand_children_category.short_content}' => $grandChildrenCategoryData->short_content ?? 'This is grand children category sample',
-            ];
+            $grandChildSearchReplaceMap = $this->searchReplaceMapForGrandChildrenCategory($grandChildrenCategoryData);
 
             return str_replace(array_keys($grandChildSearchReplaceMap), $grandChildSearchReplaceMap, $grandChildMatches[0]);
         }, $matches);
@@ -372,49 +378,125 @@ class WebsitePageService extends AbstractService
         $articleCount = isset($articleCount[1]) ? (int)$articleCount[1] : 10;
     }
 
-    private function searchReplaceMapForArticle($article)
+    private function searchReplaceMapForArticle($article = null)
     {
-        return [
-            '{article.uuid}' => $article->uuid ?? 'This is article uuid sample',
-            '{article.article_category_uuid}' => $article->article_category_uuid ?? 'This is article article_category_uuid sample',
-            '{article.slug}' => $article->slug ?? 'This is article slug sample',
-            '{article.title}' => $article->title ?? 'This is article title sample',
-            '{article.content}' => $article->content ?? 'This is article content sample',
-            '{article.video}' => $article->video ?? 'This is article video sample',
-            '{article.image}' => $article->image ?? 'This is article image sample',
-            '{article.keyword}' => $article->keyword ?? 'This is article keyword sample',
-            '{article.description}' => $article->description ?? 'This is article description sample',
-            '{article.short_content}' => $article->short_content ?? 'This is article short_content sample',
-        ];
+        if (!empty($article)) {
+            return [
+                '{article.uuid}' => $article->uuid ?? null,
+                '{article.article_category_uuid}' => $article->article_category_uuid ?? null,
+                '{article.slug}' => $article->slug ?? null,
+                '{article.title}' => $article->title ?? null,
+                '{article.content}' => $article->content ?? null,
+                '{article.video}' => $article->video ?? null,
+                '{article.image}' => $article->image ?? null,
+                '{article.keyword}' => $article->keyword ?? null,
+                '{article.description}' => $article->description ?? null,
+                '{article.short_content}' => $article->short_content ?? null,
+            ];
+        } else {
+            return [
+                '{article.uuid}' => 'This is article uuid sample',
+                '{article.article_category_uuid}' => 'This is article article_category_uuid sample',
+                '{article.slug}' => 'This is article slug sample',
+                '{article.title}' => 'This is article title sample',
+                '{article.content}' => 'This is article content sample',
+                '{article.video}' => 'This is article video sample',
+                '{article.image}' => 'This is article image sample',
+                '{article.keyword}' => 'This is article keyword sample',
+                '{article.description}' => 'This is article description sample',
+                '{article.short_content}' => 'This is article short_content sample',
+            ];
+        }
+
     }
 
-    private function searchReplaceMapForCategory($articleCategory)
+    private function searchReplaceMapForCategory($articleCategory = null)
     {
-        return [
-            '{category.uuid}' => $articleCategory->uuid ?? 'This is category uuid sample',
-            '{category.slug}' => $articleCategory->slug ?? 'This is category slug sample',
-            '{category.title}' => $articleCategory->title ?? 'This is category title sample',
-            '{category.content}' => $articleCategory->content ?? 'This is category content sample',
-            '{category.feature_image}' => $articleCategory->feature_image ?? 'This is category feature_image sample',
-            '{category.image}' => $articleCategory->image ?? 'This is category image sample',
-            '{category.keyword}' => $articleCategory->keyword ?? 'This is category keyword sample',
-            '{category.description}' => $articleCategory->description ?? 'This is category description sample',
-            '{category.short_content}' => $articleCategory->short_content ?? 'This is category short_content sample',
-        ];
+        if (!empty($articleCategory)) {
+            return [
+                '{category.uuid}' => $articleCategory->uuid ?? null,
+                '{category.slug}' => $articleCategory->slug ?? null,
+                '{category.title}' => $articleCategory->title ?? null,
+                '{category.content}' => $articleCategory->content ?? null,
+                '{category.feature_image}' => $articleCategory->feature_image ?? null,
+                '{category.image}' => $articleCategory->image ?? null,
+                '{category.keyword}' => $articleCategory->keyword ?? null,
+                '{category.description}' => $articleCategory->description ?? null,
+                '{category.short_content}' => $articleCategory->short_content ?? null,
+                ];
+
+        } else {
+            return [
+                '{category.uuid}' => 'This is category uuid sample',
+                '{category.slug}' => 'This is category slug sample',
+                '{category.title}' => 'This is category title sample',
+                '{category.content}' => 'This is category content sample',
+                '{category.feature_image}' => 'This is category feature_image sample',
+                '{category.image}' => 'This is category image sample',
+                '{category.keyword}' => 'This is category keyword sample',
+                '{category.description}' => 'This is category description sample',
+                '{category.short_content}' => 'This is category short_content sample',
+            ];
+        }
+
     }
 
-    private function searchReplaceMapForChildrenCategory($childrenCategory)
+    private function searchReplaceMapForChildrenCategory($childrenCategory = null)
     {
-        return [
-            '{children_category.uuid}' => $childrenCategory->uuid ?? 'This is children category sample',
-            '{children_category.slug}' => $childrenCategory->slug ?? 'This is children category sample',
-            '{children_category.title}' => $childrenCategory->title ?? 'This is children category sample',
-            '{children_category.content}' => $childrenCategory->content ?? 'This is children category sample',
-            '{children_category.feature_image}' => $childrenCategory->feature_image ?? 'This is children category sample',
-            '{children_category.image}' => $childrenCategory->image ?? 'This is children category sample',
-            '{children_category.keyword}' => $childrenCategory->keyword ?? 'This is children category sample',
-            '{children_category.description}' => $childrenCategory->description ?? 'This is children category sample',
-            '{children_category.short_content}' => $childrenCategory->short_content ?? 'This is children category sample',
-        ];
+        if (!empty($childrenCategory)) {
+            return [
+                '{children_category.uuid}' => $childrenCategory->uuid ?? null,
+                '{children_category.slug}' => $childrenCategory->slug ?? null,
+                '{children_category.title}' => $childrenCategory->title ?? null,
+                '{children_category.content}' => $childrenCategory->content ?? null,
+                '{children_category.feature_image}' => $childrenCategory->feature_image ?? null,
+                '{children_category.image}' => $childrenCategory->image ?? null,
+                '{children_category.keyword}' => $childrenCategory->keyword ?? null,
+                '{children_category.description}' => $childrenCategory->description ?? null,
+                '{children_category.short_content}' => $childrenCategory->short_content ?? null,
+            ];
+        } else {
+
+            return [
+                '{children_category.uuid}' => 'This is children category sample',
+                '{children_category.slug}' => 'This is children category sample',
+                '{children_category.title}' => 'This is children category sample',
+                '{children_category.content}' => 'This is children category sample',
+                '{children_category.feature_image}' => 'This is children category sample',
+                '{children_category.image}' => 'This is children category sample',
+                '{children_category.keyword}' => 'This is children category sample',
+                '{children_category.description}' => 'This is children category sample',
+                '{children_category.short_content}' => 'This is children category sample',
+            ];
+        }
+    }
+
+    private function searchReplaceMapForGrandChildrenCategory($grandChildrenCategory = null)
+    {
+        if (!empty($grandChildrenCategory)) {
+            return [
+                '{grand_children_category.uuid}' => $grandChildrenCategory->uuid ?? null,
+                '{grand_children_category.slug}' => $grandChildrenCategory->slug ?? null,
+                '{grand_children_category.title}' => $grandChildrenCategory->title ?? null,
+                '{grand_children_category.content}' => $grandChildrenCategory->content ?? null,
+                '{grand_children_category.feature_image}' => $grandChildrenCategory->feature_image ?? null,
+                '{grand_children_category.image}' => $grandChildrenCategory->image ?? null,
+                '{grand_children_category.keyword}' => $grandChildrenCategory->keyword ?? null,
+                '{grand_children_category.description}' => $grandChildrenCategory->description ?? null,
+                '{grand_children_category.short_content}' => $grandChildrenCategory->short_content ?? null,
+            ];
+        } else {
+            return [
+                '{grand_children_category.uuid}' => 'This is grand children category sample',
+                '{grand_children_category.slug}' => 'This is grand children category sample',
+                '{grand_children_category.title}' => 'This is grand children category sample',
+                '{grand_children_category.content}' => 'This is grand children category sample',
+                '{grand_children_category.feature_image}' => 'This is grand children category sample',
+                '{grand_children_category.image}' => 'This is grand children category sample',
+                '{grand_children_category.keyword}' => 'This is grand children category sample',
+                '{grand_children_category.description}' => 'This is grand children category sample',
+                '{grand_children_category.short_content}' => 'This is grand children category sample',
+            ];
+        }
     }
 }

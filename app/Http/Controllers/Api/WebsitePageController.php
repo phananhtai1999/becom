@@ -127,11 +127,16 @@ class WebsitePageController extends AbstractRestAPIController
         if (!$request->get('domain')) {
             $website = $this->websiteService->findOrFailById($request->get('website_uuid'));
             $domain = $website->domain->name;
-
         } else {
             $domain = $request->get('domain');
         }
-        $websitePage = $this->service->getWebsitePageByDomainAndWebsitePageSlug($domain, $request->get('website_page_slug'));
+
+        if ($request->get('website_page_slug')) {
+            $websitePage = $this->service->getWebsitePageByDomainAndWebsitePageSlug($domain, $request->get('website_page_slug'));
+        } else {
+            $websitePage = $this->service->getWebsitePageByDomainAndWebsitePageUuid($domain, $request->get('website_page_uuid'));
+
+        }
 
         if (!$request->get('article_slug') && !$request->get('article_uuid')
             && !$request->get('article_category_slug') && !$request->get('article_category_uuid')) {
