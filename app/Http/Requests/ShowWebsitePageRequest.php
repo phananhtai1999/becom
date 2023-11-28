@@ -25,7 +25,7 @@ class ShowWebsitePageRequest extends FormRequest
     public function rules()
     {
         $validate = [];
-        $websitePage = WebsitePage::find($this->id);
+        $websitePage = WebsitePage::findOrFail($this->id);
         if ($websitePage->type == WebsitePage::ARTICLE_DETAIL_TYPE) {
             $validate['article_slug'] = ['nullable', 'exists:articles,slug'];
             $validate['article_id'] = ['nullable', 'exists:articles,uuid'];

@@ -31,17 +31,27 @@ class LocationQueryBuilder extends AbstractQueryBuilder
             ->allowedFields([
                 $modelKeyName,
                 'name',
+                'user_uuid',
+                'address',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
                 $modelKeyName,
                 'name',
+                'user_uuid',
+                'address',
             ])
             ->allowedFilters([
                 $modelKeyName,
                 AllowedFilter::exact('exact__' . $modelKeyName, $modelKeyName),
                 'name',
                 AllowedFilter::exact('exact__name', 'name'),
+                'user_uuid',
+                AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
+                'address',
+                AllowedFilter::exact('exact__address', 'address'),
+                'teams.uuid',
+                AllowedFilter::exact('exact__teams.uuid', 'teams.uuid'),
             ]);
     }
 
