@@ -173,6 +173,26 @@ class WebsitePageService extends AbstractService
         return $websitePage;
     }
 
+    public function getWebsitePageByDomainAndWebsitePageUuid($domainName, $websitePageUuid)
+    {
+        $website = (new Website())->whereHas('domain', function ($query) use ($domainName) {
+            $query->where([
+                ['name', $domainName],
+                ['verified_at', '!=', null]
+            ]);
+        })
+            ->where('publish_status', Website::PUBLISHED_PUBLISH_STATUS)
+            ->firstOrFail();
+
+        if ($websitePageUuid) {
+            $websitePage = $website->websitePagesPublic()->where(['uuid' => $websitePageUuid])->firstOrFail();
+        } else {
+            $websitePage = $website->websitePagesPublic()->wherePivot('is_homepage', 1)->firstOrFail();
+        }
+
+        return $websitePage;
+    }
+
     public function getNewsWebsitePagesByDomain($domainName)
     {
         $website = (new Website())->whereHas('domain', function ($query) use ($domainName) {
