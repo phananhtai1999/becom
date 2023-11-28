@@ -14,7 +14,9 @@ class ChildrenTeamResource extends JsonResource
      */
     public function toArray($request)
     {
-        return [
+        $expand = request()->get('expand', []);
+
+        $data = [
             'uuid' => $this->uuid,
             'name' => $this->name,
             'leader_uuid' => $this->leader_uuid,
@@ -24,5 +26,11 @@ class ChildrenTeamResource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
+
+        if (\in_array('team__team_members', $expand)) {
+            $data['team_member'] = UserTeamResource::collection($this->userTeam);
+        }
+
+        return $data;
     }
 }
