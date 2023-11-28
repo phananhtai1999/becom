@@ -2,6 +2,8 @@
 
 namespace App\Http\Resources;
 
+use App\Models\BusinessManagement;
+use App\Models\Role;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class AddOnResource extends JsonResource
@@ -31,6 +33,18 @@ class AddOnResource extends JsonResource
         }
         if (\in_array('add_on__add_on_subscription_plan', $expand)) {
             $data['add_on_subscription_plan'] = AddOnSubscriptionPlanResource::collection($this->addOnSubscriptionPlans);
+        }
+
+        if (\in_array('add_on__teams', $expand)) {
+            $data['teams'] = TeamResource::collection($this->teams);
+        }
+
+        if (\in_array('add_on__members', $expand)) {
+            $data['members'] = TeamResource::collection($this->userTeams);
+        }
+
+        if (\in_array('add_on__members_in_business', $expand)) {
+            $data['members'] = $this->inBusiness();
         }
         return $data;
     }

@@ -34,6 +34,10 @@ class DepartmentResource extends AbstractJsonResource
             $data['user_role'] = RoleResource::collection(optional(optional($this->user)->roles));
         }
 
+        if (\in_array('department__teams', $expand)) {
+            $data['teams'] = TeamResource::collection($this->teams);
+        }
+
         return $data;
     }
 }

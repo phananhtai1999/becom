@@ -28,7 +28,9 @@ class MyTeamRequest extends FormRequest
             'name' => ['required', 'string'],
             'parent_team_uuid' => ['nullable', 'numeric', Rule::exists('teams', 'uuid')->where(function ($query){
                 return $query->where('owner_uuid', auth()->user()->getkey());
-            })->whereNull('deleted_at')]
+            })->whereNull('deleted_at')],
+            'department_uuid' => ['integer', 'exists:departments,uuid'],
+            'location_uuid' => ['integer', 'exists:locations,uuid'],
         ];
     }
 }
