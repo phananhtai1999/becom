@@ -33,7 +33,9 @@ class MyTeamQueryBuilder extends AbstractQueryBuilder
                 'name',
                 'owner_uuid',
                 'leader_uuid',
-                'parent_team_uuid'
+                'parent_team_uuid',
+                'department_uuid',
+                'location_uuid'
             ])
             ->defaultSort('-created_at')
             ->allowedFilters([
@@ -51,6 +53,10 @@ class MyTeamQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__leader_uuid', 'leader_uuid'),
                 'parent_team_uuid',
                 AllowedFilter::exact('exact__parent_team_uuid', 'parent_team_uuid'),
+                'department_uuid',
+                AllowedFilter::exact('exact__department_uuid', 'department_uuid'),
+                'location_uuid',
+                AllowedFilter::exact('exact__location_uuid', 'location_uuid'),
                 AllowedFilter::scope('from__created_at'),
                 AllowedFilter::scope('to__created_at'),
                 'updated_at',
