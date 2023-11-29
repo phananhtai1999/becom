@@ -38,7 +38,9 @@ class AddOnService extends AbstractService
             ->distinct()->get();
         $addOnUuids = [];
         foreach ($userAddOns as $userAddOn) {
-            $addOnUuids[] = $userAddOn->addOnSubscriptionPlan->addOn->uuid ?? [];
+            if ($userAddOn->addOnSubscriptionPlan) {
+                $addOnUuids[] = $userAddOn->addOnSubscriptionPlan->addOn->uuid;
+            }
         }
         $filteredAddOnUuids = array_diff($addOnUuids, $excludeAddOn ?? []);
 
