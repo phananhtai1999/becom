@@ -60,6 +60,7 @@ use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\ScenarioController;
 use App\Http\Controllers\Api\SectionCategoryController;
 use App\Http\Controllers\Api\SectionTemplateController;
+use App\Http\Controllers\Api\ShortCodeGroupController;
 use App\Http\Controllers\Api\SmtpAccountController;
 use App\Http\Controllers\Api\SmtpAccountEncryptionController;
 use App\Http\Controllers\Api\StatusController;
@@ -609,11 +610,20 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website_page'], function ()
 
     });
 
+    //short code
     Route::get('short-codes', [WebsitePageShortCodeController::class, 'index'])->name('index');
     Route::post('short-code', [WebsitePageShortCodeController::class, 'store'])->name('store');
     Route::get('short-code/{id}', [WebsitePageShortCodeController::class, 'show'])->name('show');
     Route::put('short-code/{id}', [WebsitePageShortCodeController::class, 'edit'])->name('edit');
     Route::delete('/short-code/{id}', [WebsitePageShortCodeController::class, 'destroy'])->name('destroy');
+
+    //Short code group
+    Route::get('short-code-groups', [ShortCodeGroupController::class, 'index'])->name('index');
+    Route::post('short-code-group', [ShortCodeGroupController::class, 'store'])->name('store');
+    Route::get('short-code-group/{id}', [ShortCodeGroupController::class, 'show'])->name('show');
+    Route::put('short-code-group/{id}', [ShortCodeGroupController::class, 'edit'])->name('edit');
+    Route::delete('/short-code-group/{id}', [ShortCodeGroupController::class, 'destroy'])->name('destroy');
+    Route::post('/mapping-short-code', [ShortCodeGroupController::class, 'mappingShortcode'])->name('mappingShortcode');
 
 
     Route::group(['middleware' => ['role:root,admin,editor']], function () {
