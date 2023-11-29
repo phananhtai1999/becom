@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class WebsitePageShortCode extends Model
@@ -64,5 +65,13 @@ class WebsitePageShortCode extends Model
         if ($check) {
             return $query->whereNull('parent_uuid');
         }
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function shortCodeGroups()
+    {
+        return $this->belongsToMany(ShortCodeGroup::class, 'short_code_short_code_group', 'short_code_uuid', 'short_code_group_uuid')->withTimestamps();
     }
 }
