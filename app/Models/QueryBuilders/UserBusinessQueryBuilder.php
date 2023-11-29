@@ -55,6 +55,13 @@ class UserBusinessQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__user.username', 'user.username'),
                 'user.email',
                 AllowedFilter::exact('exact__user.email', 'user.email'),
+                AllowedFilter::callback("user.teams.uuid", function (Builder $query, $values) {
+                    $query->whereHas('user', function ($q) use ($values) {
+                        $q->whereHas('teams', function ($q) use ($values) {
+                            $q->where('team_uuid', $values);
+                        });
+                    });
+                }),
                 AllowedFilter::callback("user.full_name", function (Builder $query, $values) {
                     $query->whereHas('user', function ($q) use ($values) {
                         if (is_array($values)) {
