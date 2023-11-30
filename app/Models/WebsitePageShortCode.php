@@ -31,7 +31,7 @@ class WebsitePageShortCode extends Model
      */
     protected $fillable = [
         'uuid',
-        'type',
+        'status',
         'key',
         'parent_uuid',
         'name',

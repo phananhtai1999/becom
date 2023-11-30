@@ -634,7 +634,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website_page'], function ()
     });
 
     Route::get('shortcode-supports', [WebsitePageShortCodeController::class, 'configShortcode'])->name('index-config-shortcode');
-    Route::get('shortcode-supportsss', [WebsitePageShortCodeController::class, 'getShortcode'])->name('getShortcode');
+    Route::get('toggle-shortcode/{id}', [WebsitePageShortCodeController::class, 'toggleStatus'])->name('toggleStatus');
 
     Route::group(['as' => 'my.'], function () {
         Route::get('my/website-pages', [WebsitePageController::class, 'indexMy'])->name('indexMyWebsitePage');
