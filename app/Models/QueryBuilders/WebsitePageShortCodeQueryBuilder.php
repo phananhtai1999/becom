@@ -30,7 +30,7 @@ class WebsitePageShortCodeQueryBuilder extends AbstractQueryBuilder
         return static::for(static::baseQuery())
             ->allowedFields([
                 $modelKeyName,
-                'type',
+                'status',
                 'key',
                 'parent_uuid',
                 'name',
@@ -39,7 +39,7 @@ class WebsitePageShortCodeQueryBuilder extends AbstractQueryBuilder
             ->defaultSort('-created_at')
             ->allowedSorts([
                 $modelKeyName,
-                'type',
+                'status',
                 'key',
                 'parent_uuid',
                 'name',
@@ -50,8 +50,8 @@ class WebsitePageShortCodeQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__' . $modelKeyName, $modelKeyName),
                 'name',
                 AllowedFilter::exact('exact__name', 'name'),
-                'type',
-                AllowedFilter::exact('exact__type', 'type'),
+                'status',
+                AllowedFilter::exact('exact__status', 'status'),
                 'key',
                 AllowedFilter::exact('exact__key', 'key'),
                 'parent_uuid',

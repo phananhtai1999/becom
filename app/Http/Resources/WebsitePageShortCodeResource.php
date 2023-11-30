@@ -18,7 +18,7 @@ class WebsitePageShortCodeResource extends JsonResource
 
         $data = [
             'uuid' => $this->uuid,
-            'type' => $this->type,
+            'status' => $this->status,
             'key' => $this->key,
             'parent_uuid' => $this->parent_uuid,
             'name' => $this->name,
