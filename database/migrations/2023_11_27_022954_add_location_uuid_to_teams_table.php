@@ -26,7 +26,7 @@ class AddLocationUuidToTeamsTable extends Migration
     public function down()
     {
         Schema::table('teams', function (Blueprint $table) {
-            $table->dropColumn('department_uuid');
+            $table->dropColumn('location_uuid');
         });
     }
 }

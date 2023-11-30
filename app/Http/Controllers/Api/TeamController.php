@@ -720,7 +720,7 @@ class TeamController extends Controller
         $userTeams = $this->userTeamService->getUserTeamsByIds($userTeamUuids, $request);
 
         return $this->sendOkJsonResponse(
-            $this->service->resourceCollectionToData($this->resourceCollectionClass, $userTeams)
+            $this->service->resourceCollectionToData($this->userTeamResourceCollectionClass, $userTeams)
         );
     }
 
