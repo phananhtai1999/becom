@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\ShortCodeGroup;
 use App\Models\WebsitePageShortCode;
 use Illuminate\Database\Seeder;
 
@@ -19,55 +20,63 @@ class ShortCodeSeeder extends Seeder
                 'name' => 'article element',
                 'key' => 'article',
                 'short_code' => 'article_element',
-                'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE
+                'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE,
+                'short_code_groups' => [ShortCodeGroup::ARTICLE_CATEGORY, ShortCodeGroup::HOME_ARTICLES, ShortCodeGroup::ARTICLE_DETAIL]
             ],
             [
                 'name' => 'category element',
                 'key' => 'category',
                 'short_code' => 'category_element',
-                'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE
+                'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE,
+                'short_code_groups' => [ShortCodeGroup::ARTICLE_CATEGORY, ShortCodeGroup::HOME_ARTICLES]
             ],
             [
                 'name' => 'children category',
                 'key' => 'children_category',
                 'short_code' => 'children_category_element',
-                'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE
+                'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE,
+                'short_code_groups' => [ShortCodeGroup::ARTICLE_CATEGORY, ShortCodeGroup::HOME_ARTICLES]
             ],
             [
                 'name' => 'grand children category',
                 'key' => 'grand_children_category',
                 'short_code' => 'grand_children_category_element',
-                'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE
+                'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE,
+                'short_code_groups' => [ShortCodeGroup::ARTICLE_CATEGORY, ShortCodeGroup::HOME_ARTICLES]
             ],
             [
                 'name' => 'article list',
                 'key' => 'article_list',
                 'short_code' => 'article_list',
-                'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE
+                'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE,
+                'short_code_groups' => [ShortCodeGroup::ARTICLE_CATEGORY, ShortCodeGroup::HOME_ARTICLES, ShortCodeGroup::ARTICLE_DETAIL]
             ],
             [
                 'name' => 'category list',
                 'key' => 'category_list',
                 'short_code' => 'category_list',
-                'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE
+                'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE,
+                'short_code_groups' => [ShortCodeGroup::ARTICLE_CATEGORY, ShortCodeGroup::HOME_ARTICLES]
             ],
             [
                 'name' => 'children category list',
                 'key' => 'children_category_list',
                 'short_code' => 'children_category_list',
-                'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE
+                'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE,
+                'short_code_groups' => [ShortCodeGroup::ARTICLE_CATEGORY, ShortCodeGroup::HOME_ARTICLES]
             ],
             [
                 'name' => 'grand children category',
                 'key' => 'grand_children_category_list',
                 'short_code' => 'grand_children_category_list',
-                'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE
+                'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE,
+                'short_code_groups' => [ShortCodeGroup::ARTICLE_CATEGORY, ShortCodeGroup::HOME_ARTICLES]
             ],
             [
                 'name' => 'count',
                 'key' => 'count',
                 'short_code' => 'count_element',
-                'type' => WebsitePageShortCode::ARTICLE_CATEGORY_TYPE
+                'short_code_groups' => [ShortCodeGroup::ARTICLE_CATEGORY, ShortCodeGroup::HOME_ARTICLES, ShortCodeGroup::ARTICLE_DETAIL]
             ],
         ];
         $sorts = [
@@ -655,7 +664,11 @@ class ShortCodeSeeder extends Seeder
 
         //create parent first
         foreach ($parentShortCodes as $parentShortCode) {
-            WebsitePageShortCode::updateOrCreate(['key' => $parentShortCode['key']], $parentShortCode);
+            $shortCodeGroups = $parentShortCode['short_code_groups'];
+            unset($parentShortCode['short_code_groups']);
+            $shortCode = WebsitePageShortCode::updateOrCreate(['key' => $parentShortCode['key']], $parentShortCode);
+            $shortCodeGroupUuid = ShortCodeGroup::whereIn('key', $shortCodeGroups)->get()->pluck('uuid')->toArray();
+            $shortCode->shortCodeGroups()->syncWithoutDetaching($shortCodeGroupUuid);
         }
 
         //create sort (order by)
@@ -774,6 +787,6 @@ class ShortCodeSeeder extends Seeder
             }
         }
 
-        
+
     }
 }
