@@ -14,15 +14,17 @@ use App\Http\Requests\UpdateWebsitePageShortCodeRequest;
 use App\Http\Requests\WebsitePageShortCodeRequest;
 use App\Http\Resources\WebsitePageShortCodeResource;
 use App\Http\Resources\WebsitePageShortCodeResourceCollection;
+use App\Services\ShortCodeGroupService;
 use App\Services\WebsitePageShortCodeService;
 
 class WebsitePageShortCodeController extends AbstractRestAPIController
 {
     use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestEditTrait, RestStoreTrait;
 
-    public function __construct(WebsitePageShortCodeService $service)
+    public function __construct(WebsitePageShortCodeService $service, ShortCodeGroupService $shortCodeGroupService)
     {
         $this->service = $service;
+        $this->shortCodeGroupService = $shortCodeGroupService;
         $this->resourceCollectionClass = WebsitePageShortCodeResourceCollection::class;
         $this->resourceClass = WebsitePageShortCodeResource::class;
         $this->storeRequest = WebsitePageShortCodeRequest::class;
@@ -32,10 +34,10 @@ class WebsitePageShortCodeController extends AbstractRestAPIController
 
     public function configShortcode(ConfigShortcodeRequest $request)
     {
-        $shortCode = $this->service->findAllWhere(['type' => $request->get('type'), 'parent_uuid' => null]);
+        $shortCode = $this->shortCodeGroupService->findOneWhere(['key' => $request->get('type')]);
 
         return $this->sendOkJsonResponse(
-            $this->service->resourceCollectionToData($this->resourceCollectionClass, $shortCode)
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $shortCode->shortCodes)
         );
     }
 }

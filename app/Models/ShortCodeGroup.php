@@ -10,7 +10,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class ShortCodeGroup extends Model
 {
     use HasFactory, SoftDeletes;
-
+    const ARTICLE_DETAIL = 'article_detail';
+    const ARTICLE_CATEGORY = 'article_category';
+    const HOME_ARTICLES = 'home_articles';
     /**
      * @var string
      */
