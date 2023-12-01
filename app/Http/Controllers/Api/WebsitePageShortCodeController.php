@@ -40,4 +40,18 @@ class WebsitePageShortCodeController extends AbstractRestAPIController
             $this->service->resourceCollectionToData($this->resourceCollectionClass, $shortCode->shortCodes)
         );
     }
+
+    /**
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function toggleStatus($id)
+    {
+        $shortCode = $this->service->findOrFailById($id);
+        $shortCode->update(['status' => !$shortCode->status]);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $shortCode)
+        );
+    }
 }
