@@ -15,6 +15,7 @@ use App\Http\Requests\ChangeStatusMyWebsite;
 use App\Http\Requests\ChangeStatusWebsite;
 use App\Http\Requests\ChangeStatusWebsiteRequest;
 use App\Http\Requests\CopyDefaultWebsiteRequest;
+use App\Http\Requests\GetWebsitePagesRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyWebsiteRequest;
 use App\Http\Requests\UnpublishedWebsiteRequest;
@@ -76,7 +77,6 @@ class WebsiteController extends AbstractRestAPIController
         $model = $this->myService->create(
             array_merge($request->all(), [
                 "user_uuid" => $request->get('user_uuid') ?? auth()->user()->getKey(),
-                "publish_status" => Website::PUBLISHED_PUBLISH_STATUS,
             ])
         );
 
@@ -112,8 +112,7 @@ class WebsiteController extends AbstractRestAPIController
             array_merge($request->all(), [
                 "user_uuid" => auth()
                     ->user()
-                    ->getKey(),
-                "publish_status" => Website::BLOCKED_PUBLISH_STATUS,
+                    ->getKey()
             ])
         );
 
@@ -134,7 +133,7 @@ class WebsiteController extends AbstractRestAPIController
 
         $this->myService->update(
             $model,
-            $request->except(["user_uuid", "publish_status"])
+            $request->except(["user_uuid"])
         );
 
         $model
@@ -217,7 +216,6 @@ class WebsiteController extends AbstractRestAPIController
         $model = $this->myService->create(
             array_merge([
                 "user_uuid" => auth()->user()->getKey(),
-                "publish_status" => Website::PENDING_PUBLISH_STATUS,
             ], $request->all())
         );
 
@@ -348,7 +346,7 @@ class WebsiteController extends AbstractRestAPIController
 
         if($this->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->count()){
             $statusTemplate = SectionTemplate::PUBLISHED_PUBLISH_STATUS;
-            $statusWebsite = Website::PUBLISHED_PUBLISH_STATUS;
+            $statusWebsite = $request->get('publish_status');
             $isDefault = true;
         }elseif($this->user()->roles->whereIn('slug', [Role::ROLE_EDITOR])->count()){
             $statusTemplate = $request->get('publish_status') == Website::PENDING_PUBLISH_STATUS
@@ -357,7 +355,7 @@ class WebsiteController extends AbstractRestAPIController
             $isDefault = true;
         }else{
             $statusTemplate = SectionTemplate::PUBLISHED_PUBLISH_STATUS;
-            $statusWebsite = Website::PENDING_PUBLISH_STATUS;
+            $statusWebsite = $request->get('publish_status');
             $isDefault = false;
         }
 
@@ -405,5 +403,14 @@ class WebsiteController extends AbstractRestAPIController
             DB::rollback();
             throw $exception;
         }
+    }
+
+    public function toggleNewsPage($id) {
+        $website = $this->service->findOrFailById($id);
+        $website->update(['is_active_news_page' => !$website->is_active_news_page]);
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $website)
+        );
     }
 }

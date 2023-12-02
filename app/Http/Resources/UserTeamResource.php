@@ -20,6 +20,7 @@ class UserTeamResource extends JsonResource
             'uuid' => $this->uuid,
             'team_uuid' => $this->team_uuid,
             'user_uuid' => $this->user_uuid,
+            'add_on_uuids' => $this->add_on_uuids,
             'permission_uuids' => $this->permission_uuids,
             'is_blocked' => $this->is_blocked,
             'created_at' => $this->created_at,
@@ -36,6 +37,9 @@ class UserTeamResource extends JsonResource
         }
         if (\in_array('user_team__permissions', $expand)) {
             $data['permissions'] = $this->permissions();
+        }
+        if (\in_array('user_team__add_ons', $expand)) {
+            $data['add_ons'] = $this->addOns();
         }
 
         return $data;

@@ -25,11 +25,13 @@ class ShowWebsitePageRequest extends FormRequest
     public function rules()
     {
         $validate = [];
-        $websitePage = WebsitePage::find($this->id);
+        $websitePage = WebsitePage::findOrFail($this->id);
         if ($websitePage->type == WebsitePage::ARTICLE_DETAIL_TYPE) {
-            $validate['article_slug'] = ['required', 'exists:articles,slug'];
+            $validate['article_slug'] = ['nullable', 'exists:articles,slug'];
+            $validate['article_id'] = ['nullable', 'exists:articles,uuid'];
         } elseif ($websitePage->type == WebsitePage::ARTICLE_CATEGORY_TYPE) {
-            $validate['article_category_slug'] = ['required', 'exists:article_categories,slug'];
+            $validate['article_category_slug'] = ['nullable', 'exists:article_categories,slug'];
+            $validate['article_category_id'] = ['nullable', 'exists:article_categories,uuid'];
         }
 
         return $validate;

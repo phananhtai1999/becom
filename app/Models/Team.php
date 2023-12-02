@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Abstracts\AbstractModel;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -29,6 +30,8 @@ class Team extends AbstractModel
     protected $fillable = [
         'name',
         'owner_uuid',
+        'department_uuid',
+        'location_uuid',
         'parent_team_uuid',
         'leader_uuid'
     ];
@@ -63,6 +66,16 @@ class Team extends AbstractModel
         return $this->belongsTo(__CLASS__, 'parent_team_uuid');
     }
 
+    public function department()
+    {
+        return $this->belongsTo(Department::class, 'department_uuid');
+    }
+
+    public function location()
+    {
+        return $this->belongsTo(Location::class, 'location_uuid');
+    }
+
 
     public function userTeam() {
         return $this->hasMany(UserTeam::class, 'team_uuid', 'uuid');
@@ -83,5 +96,12 @@ class Team extends AbstractModel
     public function getNumOfTeamMemberAttribute()
     {
         return count($this->userTeam);
+    }
+
+    public function scopeTeamRoot(Builder $query, $check)
+    {
+        if ($check) {
+            return $query->whereNull('parent_team_uuid');
+        }
     }
 }

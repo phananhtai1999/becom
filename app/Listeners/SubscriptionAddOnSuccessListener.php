@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use App\Abstracts\AbstractRestAPIController;
 use App\Models\AddOnSubscriptionHistory;
 use App\Models\Invoice;
 use App\Models\UserAddOn;

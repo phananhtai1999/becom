@@ -33,7 +33,9 @@ class DatabaseSeeder extends Seeder
             StatusSeeder::class,
             AssetGroupSeeder::class,
             AssetSizeSeeder::class,
-            BankInformationSeeder::class
+            BankInformationSeeder::class,
+            ShortCodeGroupSeeder::class,
+            ShortCodeSeeder::class
         ]);
         if (!App::environment('production')) {
             $this->call([

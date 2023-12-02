@@ -43,7 +43,7 @@ class ChangeStatusMyWebsite extends AbstractRequest
                 }
             }
         ],
-        'publish_status' => ['required', 'numeric', Rule::in(Website::PUBLISHED_PUBLISH_STATUS, Website::PENDING_PUBLISH_STATUS)]
+        'publish_status' => ['required', 'numeric', Rule::in(Website::PUBLISHED_PUBLISH_STATUS, Website::BLOCKED_PUBLISH_STATUS)]
     ];
     }
 }

@@ -7,10 +7,13 @@ use App\Http\Controllers\Traits\RestIndexMyTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\AddBusinessMemberRequest;
 use App\Http\Requests\AddTeamMemberRequest;
+use App\Http\Requests\BlockBusinessMemberRequest;
 use App\Http\Requests\BusinessManagementRequest;
 use App\Http\Requests\GetAddOnOfBusinessRequest;
+use App\Http\Requests\GetBusinessMemberRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyBusinessManagementRequest;
+use App\Http\Requests\RemoveBusinessMemberRequest;
 use App\Http\Requests\UpdateBusinessManagementRequest;
 use App\Http\Requests\UpdateMyBusinessManagementRequest;
 use App\Http\Resources\AddOnResourceCollection;
@@ -24,6 +27,7 @@ use App\Models\PlatformPackage;
 use App\Models\Role;
 use App\Models\Team;
 use App\Models\UserBusiness;
+use App\Services\AddOnService;
 use App\Services\BusinessManagementService;
 use App\Services\DomainService;
 use App\Services\MyBusinessManagementService;
@@ -73,7 +77,8 @@ class BusinessManagementController extends AbstractRestAPIController
         MyDomainService             $myDomainService,
         UserBusinessService $userBusinessService,
         UserService $userService,
-        UserAddOnService $userAddOnService
+        UserAddOnService $userAddOnService,
+        AddOnService $addOnService
     )
     {
         $this->service = $service;
@@ -91,6 +96,7 @@ class BusinessManagementController extends AbstractRestAPIController
         $this->indexRequest = IndexRequest::class;
         $this->userService = $userService;
         $this->userAddOnService = $userAddOnService;
+        $this->addOnService = $addOnService;
     }
 
     /**
@@ -248,7 +254,13 @@ class BusinessManagementController extends AbstractRestAPIController
             if ($this->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->count()) {
                 $businessUuid = $request->get("business_uuid");
             } else {
-                $businessUuid = $this->user()->businessManagements->first()->uuid;
+                $businesses= $this->user()->businessManagements;
+                if ($businesses->toArray()) {
+                    $businessUuid = $businesses->first()->uuid;
+                } else {
+
+                    return $this->sendJsonResponse(false, 'Does not have business', [], 403);
+                }
             }
             if($request->get('type') == UserBusiness::ALREADY_EXISTS_ACCOUNT){
                 foreach ($request->get('user_uuids') as $userUuid) {
@@ -283,7 +295,7 @@ class BusinessManagementController extends AbstractRestAPIController
                     'business_uuid' => $businessUuid,
                     'user_uuid' => $user->uuid
                 ]);
-                Mailbox::postEmailAccountcreate($user->uuid, $email, $passwordRandom);
+//                Mailbox::postEmailAccountcreate($user->uuid, $email, $passwordRandom);
                 DB::commit();
 
                 return $this->sendCreatedJsonResponse();
@@ -302,37 +314,77 @@ class BusinessManagementController extends AbstractRestAPIController
             $businessUuid = $request->get("business_uuid");
         } else {
             $businesses= $this->user()->businessManagements;
-            if (!empty($businesses)) {
+            if ($businesses->toArray()) {
                 $businessUuid = $businesses->first()->uuid;
+            } else {
+
+                return $this->sendJsonResponse(false, 'Does not have business', [], 403);
             }
         }
-        $business = $this->service->findOrFailById($businessUuid);
-        $userAddOns = $this->userAddOnService->findAllWhere(['user_uuid' => $business->owner_uuid], ['user_uuid', 'add_on_subscription_plan_uuid'], true);
-        $addOns = [];
-        foreach ($userAddOns as $userAddOn) {
-            $addOns[] = $userAddOn->addOnSubscriptionPlan->addOn ?? [];
-        }
+        $addOns = $this->addOnService->getAddOnsByBusiness($request, $businessUuid, $request->get('exclude_team_uuid'));
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->addOnResourceCollectionClass, $addOns)
         );
     }
 
-    public function listMemberOfBusiness(IndexRequest $request)
+    public function listMemberOfBusiness(GetBusinessMemberRequest $request)
     {
-        if ($this->user()->roles->whereIn('slug', [Role::ROLE_ADMIN, Role::ROLE_ROOT])->first()) {
-            $model = $this->userBusinessService->listMemberOfAllBusiness($request);
+        if ($this->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->count()) {
+            $businessUuid = $request->get("business_uuid");
         } else {
-            $business = $this->service->findOneWhere((['owner_uuid' => $this->user()->getKey()]));
-            if ($business) {
-                $model = $this->userBusinessService->listBusinessMember([$business->uuid], $request);
+            $businesses= $this->user()->businessManagements;
+            if ($businesses->toArray()) {
+                $businessUuid = $businesses->first()->uuid;
             } else {
-                $model = [];
+
+                return $this->sendJsonResponse(false, 'Does not have business', [], 403);
             }
         }
 
+        $model = $this->userBusinessService->listBusinessMember([$businessUuid], $request, $request->get('exclude_team_uuid'));
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->userBusinessResourceCollectionClass, $model)
         );
+    }
+
+    public function blockBusinessMember($id, BlockBusinessMemberRequest $request)
+    {
+        if ($this->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->first()) {
+            $businessUuid = $request->get("business_uuid");
+        } else {
+            $businesses = $this->user()->businessManagements;
+            if ($businesses->toArray()) {
+                $businessUuid = $businesses->first()->uuid;
+            } else {
+
+                return $this->sendJsonResponse(false, 'Does not have business', [], 403);
+            }
+        }
+        $userBusiness = $this->userBusinessService->findOneWhereOrFail(['business_uuid' => $businessUuid, 'user_uuid' => $id]);
+        $userBusiness->update(['is_blocked' => !$userBusiness->is_blocked]);
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->userBusinessResourceClass, $userBusiness)
+        );
+    }
+
+    public function removeBusinessMember($id, RemoveBusinessMemberRequest $request)
+    {
+        if ($this->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->first()) {
+            $businessUuid = $request->get("business_uuid");
+        } else {
+            $businesses = $this->user()->businessManagements;
+            if ($businesses->toArray()) {
+                $businessUuid = $businesses->first()->uuid;
+            } else {
+
+                return $this->sendJsonResponse(false, 'You do not have business', [], 403);
+            }
+        }
+        $userBusiness = $this->userBusinessService->findOneWhereOrFail(['business_uuid' => $businessUuid, 'user_uuid' => $id]);
+        $userBusiness->delete();
+
+        return $this->sendCreatedJsonResponse();
     }
 }

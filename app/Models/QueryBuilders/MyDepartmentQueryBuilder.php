@@ -31,12 +31,16 @@ class MyDepartmentQueryBuilder extends AbstractQueryBuilder
             ->allowedFields([
                 $modelKeyName,
                 'name',
+                'business_uuid',
+                'location_uuid',
                 'user_uuid'
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
                 $modelKeyName,
                 'name',
+                'business_uuid',
+                'location_uuid',
                 'user_uuid'
             ])
             ->allowedFilters([
@@ -48,6 +52,12 @@ class MyDepartmentQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__user.email', 'user.email'),
                 'user.roles.name',
                 AllowedFilter::exact('exact__user.roles.name', 'user.roles.name'),
+                'business_uuid',
+                AllowedFilter::exact('exact__business_uuid', 'business_uuid'),
+                'location_uuid',
+                AllowedFilter::exact('exact__location_uuid', 'location_uuid'),
+                'teams.uuid',
+                AllowedFilter::exact('exact__teams.uuid', 'teams.uuid'),
                 AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
                 AllowedFilter::callback("user_uuid", function (Builder $query, $value) {
                     if ($value === 'null') {

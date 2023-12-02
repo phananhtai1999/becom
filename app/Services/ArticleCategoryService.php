@@ -96,4 +96,9 @@ class ArticleCategoryService extends AbstractService
         return $this->findOrFailById($uuid)->getDescendantsAndSelf();
     }
 
+    public function getLastArticleCategory()
+    {
+        return $this->model->orderBy('created_at', 'desc')->first();
+    }
+
 }

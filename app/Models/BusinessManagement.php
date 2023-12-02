@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Abstracts\AbstractModel;
+use App\Http\Resources\UserTeamResource;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -109,4 +110,9 @@ class BusinessManagement extends AbstractModel
     {
         return $query->whereDate('updated_at', '<=', $date);
     }
+
+    public function userBusiness() {
+        return $this->hasMany(UserBusiness::class, 'business_uuid', 'uuid');
+    }
+
 }

@@ -2,6 +2,8 @@
 
 namespace App\Http\Resources;
 
+use App\Http\Requests\LocationRequest;
+use App\Models\Department;
 use App\Models\User;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -16,11 +18,12 @@ class TeamResource extends JsonResource
     public function toArray($request)
     {
         $expand = request()->get('expand', []);
-
         $data = [
             'uuid' => $this->uuid,
             'name' => $this->name,
             'leader_uuid' => $this->leader_uuid,
+            'department_uuid' => $this->department_uuid,
+            'location_uuid' => $this->location_uuid,
             'num_of_team_member' => $this->NumOfTeamMember,
             'owner_uuid' => $this->owner_uuid,
             'parent_team_uuid' => $this->parent_team_uuid,
@@ -32,11 +35,23 @@ class TeamResource extends JsonResource
         }
 
         if (\in_array('team__children_team', $expand)) {
-            $data['children_team'] = self::collection($this->childrenTeam);
+            $data['children_team'] = ChildrenTeamResource::collection($this->childrenTeam);
         }
 
         if (\in_array('team__parent_team', $expand)) {
             $data['parent_team'] = new TeamResource($this->parentTeam);
+        }
+
+        if (\in_array('team__department', $expand)) {
+            $data['department'] = new DepartmentResource($this->department);
+        }
+
+        if (\in_array('team__location', $expand)) {
+            $data['location'] = new LocationResource($this->location);
+        }
+
+        if (\in_array('team__team_members', $expand)) {
+            $data['team_member'] = UserTeamResource::collection($this->userTeam);
         }
 
         return $data;

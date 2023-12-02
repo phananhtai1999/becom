@@ -34,6 +34,7 @@ use App\Http\Controllers\Api\FormController;
 use App\Http\Controllers\Api\GroupController;
 use App\Http\Controllers\Api\InvoiceController;
 use App\Http\Controllers\Api\LanguageController;
+use App\Http\Controllers\Api\LocationController;
 use App\Http\Controllers\Api\MailOpenTrackingController;
 use App\Http\Controllers\Api\MailSendingHistoryController;
 use App\Http\Controllers\Api\MailTemplateController;
@@ -59,6 +60,7 @@ use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\ScenarioController;
 use App\Http\Controllers\Api\SectionCategoryController;
 use App\Http\Controllers\Api\SectionTemplateController;
+use App\Http\Controllers\Api\ShortCodeGroupController;
 use App\Http\Controllers\Api\SmtpAccountController;
 use App\Http\Controllers\Api\SmtpAccountEncryptionController;
 use App\Http\Controllers\Api\StatusController;
@@ -76,6 +78,7 @@ use App\Http\Controllers\Api\SendProjectController;
 use App\Http\Controllers\Api\WebsiteController;
 use App\Http\Controllers\Api\WebsitePageCategoryController;
 use App\Http\Controllers\Api\WebsitePageController;
+use App\Http\Controllers\Api\WebsitePageShortCodeController;
 use App\Http\Controllers\Api\WebsiteVerificationController;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Route;
@@ -604,7 +607,24 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website_page'], function ()
         Route::delete('/website-page/{id}', [WebsitePageController::class, 'destroy'])->name('destroy');
         Route::post('website-page/change-status', [WebsitePageController::class, 'changeStatusWebsitePage'])->name('changeStatusWebsitePage');
         Route::get("accepted-website-pages", [WebsitePageController::class, 'listAcceptedWebsitePages'])->name('listAcceptedWebsitePages');
+
     });
+
+    //short code
+    Route::get('short-codes', [WebsitePageShortCodeController::class, 'index'])->name('index');
+    Route::post('short-code', [WebsitePageShortCodeController::class, 'store'])->name('store');
+    Route::get('short-code/{id}', [WebsitePageShortCodeController::class, 'show'])->name('show');
+    Route::put('short-code/{id}', [WebsitePageShortCodeController::class, 'edit'])->name('edit');
+    Route::delete('/short-code/{id}', [WebsitePageShortCodeController::class, 'destroy'])->name('destroy');
+
+    //Short code group
+    Route::get('short-code-groups', [ShortCodeGroupController::class, 'index'])->name('index');
+    Route::post('short-code-group', [ShortCodeGroupController::class, 'store'])->name('store');
+    Route::get('short-code-group/{id}', [ShortCodeGroupController::class, 'show'])->name('show');
+    Route::put('short-code-group/{id}', [ShortCodeGroupController::class, 'edit'])->name('edit');
+    Route::delete('/short-code-group/{id}', [ShortCodeGroupController::class, 'destroy'])->name('destroy');
+    Route::post('/mapping-short-code', [ShortCodeGroupController::class, 'mappingShortcode'])->name('mappingShortcode');
+
 
     Route::group(['middleware' => ['role:root,admin,editor']], function () {
         Route::get('/unpublished-website-pages', [WebsitePageController::class, 'indexUnpublishedWebsitePage'])->name('index-unpublished');
@@ -613,7 +633,8 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website_page'], function ()
         Route::put('/unpublished-website-page/{id}', [WebsitePageController::class, 'editUnpublishedWebsitePage'])->name('edit-unpublished');
     });
 
-    Route::get('shortcode-supports', [WebsitePageController::class, 'configShortcode'])->name('index-config-shortcode');
+    Route::get('shortcode-supports', [WebsitePageShortCodeController::class, 'configShortcode'])->name('index-config-shortcode');
+    Route::get('toggle-shortcode/{id}', [WebsitePageShortCodeController::class, 'toggleStatus'])->name('toggleStatus');
 
     Route::group(['as' => 'my.'], function () {
         Route::get('my/website-pages', [WebsitePageController::class, 'indexMy'])->name('indexMyWebsitePage');
@@ -629,6 +650,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website_page'], function ()
     Route::get('/website-page-default/{id}', [WebsitePageController::class, 'showWebsitePagesDefault'])->name('showWebsitePagesDefault');
 });
 
+Route::get('get-website-page', [WebsitePageController::class, 'getWebsitePageWithReplace'])->name('edit');
 Route::get('public/website-page/{id}', [WebsitePageController::class, 'show'])->name('website_page_public.show');
 Route::get('public/website-page', [WebsitePageController::class, 'publicWebsitePageByDomainAndSlug'])->name('website_page.public');
 
@@ -952,6 +974,31 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'department.'], function () 
         Route::put('/my/department/{id}', [DepartmentController::class, 'editMyDepartment'])->name('edit');
         Route::delete('/my/department/{id}', [DepartmentController::class, 'destroyMyDepartment'])->name('destroy');
     });
+
+    Route::post('department/remove-team', [DepartmentController::class, 'removeTeam'])->name('removeTeam');
+    Route::post('business/add-department', [DepartmentController::class, 'addDepartmentForBusiness'])->name('addDepartmentForBusiness');
+    Route::post('location/add-department', [DepartmentController::class, 'addDepartmentForLocation'])->name('addDepartmentForLocation');
+});
+
+Route::group(['middleware' => ['auth:api'], 'as' => 'location.'], function () {
+    Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
+        Route::get('/locations', [LocationController::class, 'index'])->name('index');
+        Route::post('/location', [LocationController::class, 'store'])->name('store');
+        Route::get('/location/{id}', [LocationController::class, 'show'])->name('show');
+        Route::put('/location/{id}', [LocationController::class, 'edit'])->name('edit');
+        Route::delete('/location/{id}', [LocationController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::group(['as' => 'my.'], function () {
+        Route::get('/my/locations', [LocationController::class, 'indexMy'])->name('index');
+        Route::post('/my/location', [LocationController::class, 'storeMy'])->name('store');
+        Route::get('/my/location/{id}', [LocationController::class, 'showMy'])->name('show');
+        Route::put('/my/location/{id}', [LocationController::class, 'editMy'])->name('edit');
+        Route::delete('/my/location/{id}', [LocationController::class, 'destroyMy'])->name('destroy');
+    });
+
+    Route::post('location/remove-team', [LocationController::class, 'removeTeam'])->name('removeTeam');
+
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'note.'], function () {
@@ -1077,10 +1124,16 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'team.'], function () {
     });
     //business
     Route::post('/business/team', [TeamController::class, 'storeBusinessTeam'])->name('storeBusinessTeam');
+    Route::get('/business/team/{id}', [TeamController::class, 'businessTeam'])->name('businessTeam');
+    Route::post('/add-child-for-team', [TeamController::class, 'addChildrenForTeam'])->name('addChildrenForTeam');
     Route::put('/business/team/{id}', [TeamController::class, 'editBusinessTeam'])->name('editBusinessTeam');
     Route::delete('/business/team/{id}', [TeamController::class, 'destroyBusinessTeam'])->name('destroyBusinessTeam');
     Route::post('team/set-leader', [TeamController::class, 'setTeamLeader'])->name('addBusinessMember');
     Route::get('business/add-on-of-team/{id}', [TeamController::class, 'getAddOnOfTeam'])->name('getAddOnForTeam');
+    Route::get('business/assigned-of-teams/{id}', [TeamController::class, 'assignedBusinessTeam'])->name('assignedBusinessTeam');
+    Route::get('business/assigned-of-team-members/{id}', [TeamController::class, 'assignedTeamMember'])->name('assignedTeamMember');
+
+    Route::post('department/add-team', [TeamController::class, 'addTeamForDepartment'])->name('addTeamForDepartment');
 
     Route::get('/all-team-member', [TeamController::class, 'listMemberOfAllTeam'])->name('listMemberOfAllTeam');
     Route::get('/list-member/{id}', [TeamController::class, 'listMember'])->name('listMember');
@@ -1095,6 +1148,9 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'team.'], function () {
     Route::put('/block-member/{id}', [TeamController::class, 'blockMember'])->name('blockMember');
     Route::put('/unblock-member/{id}', [TeamController::class, 'unBlockMember'])->name('unBlockMember');
     Route::post('/reset-password', [TeamController::class, 'resetPassword'])->name('reset-password');
+    Route::post('/set-addons-members', [TeamController::class, 'setAddOnsMembers'])->name('setAddOnsMembers');
+    Route::post('/unset-addons-members', [TeamController::class, 'unsetAddOnsMembers'])->name('unsetAddOnsMembers');
+
 
     Route::group(['as' => 'my.'], function () {
         Route::get('my/teams', [TeamController::class, 'indexMy'])->name('indexMy');
@@ -1275,8 +1331,11 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'business-management.'], fun
         Route::delete('/business-management/{id}', [BusinessManagementController::class, 'destroy'])->name('destroy');
     });
     Route::post('business/add-member', [BusinessManagementController::class, 'addBusinessMember'])->name('addBusinessMember');
+    Route::delete('business/remove-member/{id}', [BusinessManagementController::class, 'removeBusinessMember'])->name('removeBusinessMember');
+    Route::post('business/block-member/{id}', [BusinessManagementController::class, 'blockBusinessMember'])->name('blockBusinessMember');
     Route::get('business/get-add-ons', [BusinessManagementController::class, 'getAddOns'])->name('getAddOns');
     Route::post('business/set-add-on-for-team', [TeamController::class, 'setAddOnForTeam'])->name('setAddOnForTeam');
+    Route::post('business/unset-add-on-for-team', [TeamController::class, 'unsetAddOnForTeam'])->name('unsetAddOnForTeamMember');
     Route::get('/all-business-member', [BusinessManagementController::class, 'listMemberOfBusiness'])->name('listMemberOfBusiness');
 
     Route::group(['as' => 'my.'], function () {
@@ -1356,6 +1415,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website'], function () {
         Route::post('website', [WebsiteController::class, 'store'])->name('store');
         Route::put('website/{id}', [WebsiteController::class, 'edit'])->name('edit');
     });
+    Route::post('toggle-news-page/{id}', [WebsiteController::class, 'toggleNewsPage'])->name('toggleNewsPage');
 
     Route::group(['as' => 'my.'], function () {
         Route::get('my/websites', [WebsiteController::class, 'indexMy'])->name('index');

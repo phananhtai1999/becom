@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Abstracts\AbstractModel;
 use App\Http\Controllers\Traits\ModelFilterExactNameLanguageTrait;
 use App\Http\Controllers\Traits\ModelFilterNameLanguageTrait;
+use App\Http\Requests\AddDepartmentForBusinessRequest;
 use App\Services\UserService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -29,6 +30,8 @@ class Department extends AbstractModel
      */
     protected $fillable = [
         'name',
+        'business_uuid',
+        'location_uuid',
         'user_uuid'
     ];
 
@@ -70,6 +73,16 @@ class Department extends AbstractModel
         return $this->belongsTo(User::class, 'user_uuid', 'uuid');
     }
 
+    public function business()
+    {
+        return $this->belongsTo(BusinessManagement::class, 'business_uuid', 'uuid');
+    }
+
+    public function location()
+    {
+        return $this->belongsTo(Location::class, 'location_uuid', 'uuid');
+    }
+
     /**
      * @return array|mixed
      */
@@ -77,4 +90,10 @@ class Department extends AbstractModel
     {
         return app(UserService::class)->checkLanguagesPermissionWithAdminAndRootRole() ? $this->getTranslations('name') : $this->name;
     }
+
+    public function teams()
+    {
+        return $this->hasMany(Team::class, 'department_uuid', 'uuid');
+    }
+
 }

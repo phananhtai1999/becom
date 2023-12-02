@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Models\Article;
 use App\Models\SectionTemplate;
+use App\Models\Website;
 use App\Rules\CheckIsCanUseSectionTemplate;
 use App\Rules\CheckUniqueSlugWebsitePageRule;
 use App\Rules\CheckWebsiteDomainRule;
@@ -31,15 +32,15 @@ class UpdateUnpublishedWebsiteRequest extends FormRequest
     public function rules()
     {
         return [
-            'title' => ['string'],
-            'header_section_uuid' => ['numeric', Rule::exists('section_templates', 'uuid')->where(function ($query) {
+            'title' => ['nullable', 'required_unless:publish_status,'.Website::DRAFT_PUBLISH_STATUS ,'string'],
+            'header_section_uuid' => ['nullable', 'required_unless:publish_status,'.Website::DRAFT_PUBLISH_STATUS ,'numeric', Rule::exists('section_templates', 'uuid')->where(function ($query) {
                 return $query->where(function ($q) {
                     $q->where('user_uuid', auth()->user()->getKey())
                         ->orWhere('is_default', true);
                 })->where('uuid', '<>', $this->request->get('footer_section_uuid'))
                     ->whereNull('deleted_at');
             }), CheckIsCanUseSectionTemplate::IsCanUseSectionTemplate($this->request->get('header_section_uuid'), $this->id)],
-            'footer_section_uuid' => ['numeric', Rule::exists('section_templates', 'uuid')->where(function ($query) {
+            'footer_section_uuid' => ['nullable', 'required_unless:publish_status,'.Website::DRAFT_PUBLISH_STATUS ,'numeric', Rule::exists('section_templates', 'uuid')->where(function ($query) {
                 return $query->where(function ($q) {
                     $q->where('user_uuid', auth()->user()->getKey())
                         ->orWhere('is_default', true);
@@ -48,12 +49,12 @@ class UpdateUnpublishedWebsiteRequest extends FormRequest
             }), CheckIsCanUseSectionTemplate::IsCanUseSectionTemplate($this->request->get('footer_section_uuid'), $this->id)],
             'description' => ['nullable', 'string'],
             'logo' => ['nullable', 'string'],
-            'domain_uuid' => ['numeric', Rule::exists('domains', 'uuid')->where(function ($q) {
+            'domain_uuid' => ['nullable', 'numeric', Rule::exists('domains', 'uuid')->where(function ($q) {
                 return $q->where('owner_uuid', auth()->user()->getKey())
                     ->whereNull('deleted_at');
             }), CheckWebsiteDomainRule::uniqueDomain($this->id)],
             'website_pages' => ['nullable', 'array', 'distinct', CheckWebsitePagesRule::singleHomepage(), CheckWebsitePagesRule::uniqueWebpageIds()],
-            'website_pages.*.uuid' => ['numeric', Rule::exists('website_pages', 'uuid')->where(function ($query) {
+            'website_pages.*.uuid' => ['nullable', 'required_unless:publish_status,'.Website::DRAFT_PUBLISH_STATUS ,'numeric', Rule::exists('website_pages', 'uuid')->where(function ($query) {
                 return $query->where(function ($q) {
                     $q->where('user_uuid', auth()->user()->getKey())
                         ->orWhere('is_default', true);
@@ -63,7 +64,8 @@ class UpdateUnpublishedWebsiteRequest extends FormRequest
             'website_pages.*.ordering' => ['nullable', 'numeric', 'min:1'],
             'tracking_ids' => ['nullable', 'array'],
             'tracking_ids.*' => ['nullable', 'string', 'max:300'],
-            'publish_status' => ['numeric', Rule::in(Article::PENDING_PUBLISH_STATUS, Article::DRAFT_PUBLISH_STATUS)],
+            'publish_status' => ['numeric', Rule::in(Website::PENDING_PUBLISH_STATUS, Website::DRAFT_PUBLISH_STATUS)],
+            'is_active_news_page' => ['boolean'],
         ];
     }
 }

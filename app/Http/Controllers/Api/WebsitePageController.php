@@ -8,6 +8,7 @@ use App\Http\Controllers\Traits\RestIndexMyTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Requests\AcceptPublishWebsitePageRequest;
 use App\Http\Requests\ConfigShortcodeRequest;
+use App\Http\Requests\GetWebsitePagesRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyWebsitePageRequest;
 use App\Http\Requests\ShowWebsitePageRequest;
@@ -23,9 +24,12 @@ use App\Models\ArticleCategory;
 use App\Models\WebsitePage;
 use App\Services\ArticleCategoryService;
 use App\Services\ArticleService;
+use App\Services\DomainService;
 use App\Services\LanguageService;
 use App\Services\MyWebsitePageService;
 use App\Services\WebsitePageService;
+use App\Services\WebsitePageShortCodeService;
+use App\Services\WebsiteService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 
@@ -49,11 +53,13 @@ class WebsitePageController extends AbstractRestAPIController
      * @param LanguageService $languageService
      */
     public function __construct(
-        WebsitePageService   $service,
-        MyWebsitePageService $myService,
-        LanguageService      $languageService,
-        ArticleService $articleService,
-        ArticleCategoryService $articleCategoryService
+        WebsitePageService     $service,
+        MyWebsitePageService   $myService,
+        LanguageService        $languageService,
+        ArticleService         $articleService,
+        ArticleCategoryService $articleCategoryService,
+        DomainService          $domainService,
+        WebsiteService         $websiteService
     )
     {
         $this->service = $service;
@@ -61,6 +67,8 @@ class WebsitePageController extends AbstractRestAPIController
         $this->languageService = $languageService;
         $this->articleService = $articleService;
         $this->articleCategoryService = $articleCategoryService;
+        $this->domainService = $domainService;
+        $this->websiteService = $websiteService;
         $this->resourceCollectionClass = WebsitePageResourceCollection::class;
         $this->resourceClass = WebsitePageResource::class;
         $this->indexRequest = IndexRequest::class;
@@ -86,11 +94,23 @@ class WebsitePageController extends AbstractRestAPIController
             : [['uuid', $id]]);
         $response = $this->sendOkJsonResponse(['data' => $websitePage]);
         if ($websitePage->type == WebsitePage::ARTICLE_DETAIL_TYPE) {
-            $article = $this->articleService->findOneWhereOrFail(['slug' => $request->get('article_slug')]);
+            if ($request->get('article_slug')) {
+                $article = $this->articleService->findOneWhereOrFail(['slug' => $request->get('article_slug')]);
+            } elseif ($request->get('article_uuid')) {
+                $article = $this->articleService->findOrFailById($request->get('article_uuid'));
+            } else {
+                $article = $this->articleService->getLastArticle();
+            }
             $websitePage = $this->service->renderContent($websitePage, $article);
             $response = $this->sendOkJsonResponse(['data' => $websitePage]);
         } elseif ($websitePage->type == WebsitePage::ARTICLE_CATEGORY_TYPE) {
-            $articleCategory = $this->articleCategoryService->findOneWhereOrFail(['slug' => $request->get('article_category_slug')]);
+            if ($request->get('article_category_slug')) {
+                $articleCategory = $this->articleCategoryService->findOneWhereOrFail(['slug' => $request->get('article_category_slug')]);
+            } elseif ($request->get('article_category_uuid')) {
+                $articleCategory = $this->articleCategoryService->findOrFailById($request->get('article_category_uuid'));
+            } else {
+                $articleCategory = $this->articleCategoryService->getLastArticleCategory();
+            }
             $websitePage = $this->service->renderContentForArticleCategory($websitePage, $articleCategory);
             $response = $this->sendOkJsonResponse(['data' => $websitePage]);
         } elseif ($websitePage->type == WebsitePage::HOME_ARTICLES_TYPE) {
@@ -101,10 +121,53 @@ class WebsitePageController extends AbstractRestAPIController
         return $response;
     }
 
-    public function configShortcode(ConfigShortcodeRequest $request)
-    {
 
-        return $this->sendOkJsonResponse(['data' => config('shortcode.' . $request->get('type'))]);
+    public function getWebsitePageWithReplace(GetWebsitePagesRequest $request)
+    {
+        if (!$request->get('domain')) {
+            $website = $this->websiteService->findOrFailById($request->get('website_uuid'));
+            $domain = $website->domain->name;
+        } else {
+            $domain = $request->get('domain');
+        }
+
+        if ($request->get('website_page_slug')) {
+            $websitePage = $this->service->getWebsitePageByDomainAndWebsitePageSlug($domain, $request->get('website_page_slug'));
+        } else {
+            $websitePage = $this->service->getWebsitePageByDomainAndWebsitePageUuid($domain, $request->get('website_page_uuid'));
+
+        }
+
+        if (!$request->get('article_slug') && !$request->get('article_uuid')
+            && !$request->get('article_category_slug') && !$request->get('article_category_uuid')) {
+            $websitePage = $this->service->renderContentForHomeArticles($websitePage);
+        } else {
+            $newsWebsitePages = $this->service->getNewsWebsitePagesByDomain($domain);
+            if (($request->get('article_uuid') || $request->get('article_slug'))
+                && ($request->get('article_category_uuid') || $request->get('article_category_slug'))) {
+                $websitePage = $newsWebsitePages->where('type', WebsitePage::ARTICLE_DETAIL_TYPE)->first();
+                if ($request->get('article_uuid')) {
+                    $article = $this->articleService->findOrFailById($request->get('article_uuid'));
+                } else {
+                    $article = $this->articleService->findOneWhereOrFail(['slug' => $request->get('article_slug')]);
+                }
+                $websitePage = $this->service->renderContent($websitePage, $article);
+
+            } elseif (!($request->get('article_uuid') || $request->get('article_slug'))
+                && ($request->get('article_category_uuid') || $request->get('article_category_slug'))) {
+                $websitePage = $newsWebsitePages->where('type', WebsitePage::ARTICLE_CATEGORY_TYPE)->first();
+                if ($request->get('article_category_uuid')) {
+                    $articleCategory = $this->articleCategoryService->findOrFailById($request->get('article_category_uuid'));
+                } else {
+                    $articleCategory = $this->articleCategoryService->findOneWhereOrFail(['slug' => $request->get('article_category_slug')]);
+                }
+                $websitePage = $this->service->renderContentForArticleCategory($websitePage, $articleCategory);
+            }
+        }
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $websitePage)
+        );
     }
 
     /**

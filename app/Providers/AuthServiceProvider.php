@@ -47,6 +47,25 @@ class AuthServiceProvider extends ServiceProvider
             if (!isset($user->userPlatformPackage->platform_package_uuid) && !isset($user->userAddOns) && !isset($user->userTeam->permission_uuids)) {
                 return false;
             }
+
+            //check team leader
+            if (isset($user->userTeam) && $user->userTeam->team->leader_uuid == $user->uuid) {
+                $cacheTeamLeaderAddOns = Cache::rememberForever('team_leader_add_on_permission_' . $user->uuid, function () use ($user) {
+                    $permissions = [];
+                    foreach ($user->userTeam->team->addOns as $addOn) {
+                        $permissions[] = $addOn->permissions ?? [];
+                    }
+                    return $permissions;
+                });
+                foreach ($cacheTeamLeaderAddOns as $permissions) {
+                    foreach ($permissions as $permission) {
+                        if (in_array($code, $permission->api_methods ?? [])) {
+                            return true;
+                        }
+                    }
+                }
+
+            }
             //check team
             if (isset($user->userTeam->permission_uuids) && !$user->userTeam->is_blocked) {
                 $cacheTeams = Cache::rememberForever('team_permission_' . $user->uuid, function () use ($user) {
@@ -56,6 +75,22 @@ class AuthServiceProvider extends ServiceProvider
                 foreach ($cacheTeams as $permission) {
                     if (in_array($code, $permission->api_methods ?? [])) {
                         return true;
+                    }
+                }
+
+                //team add on
+                $cacheUserTeamAddOns = Cache::rememberForever('team_add_on_permission_' . $user->uuid, function () use ($user) {
+                    $permissions = [];
+                    foreach ($user->userTeam->addOns as $userTeamAddOn) {
+                        $permissions[] = $userTeamAddOn->addOn->permissions ?? [];
+                    }
+                    return $permissions;
+                });
+                foreach ($cacheUserTeamAddOns as $permissions) {
+                    foreach ($permissions as $permission) {
+                        if (in_array($code, $permission->api_methods ?? [])) {
+                            return true;
+                        }
                     }
                 }
             }
