@@ -40,11 +40,11 @@ class AddOnResource extends JsonResource
         }
 
         if (\in_array('add_on__members', $expand)) {
-            $data['members'] = TeamResource::collection($this->userTeams);
+            $data['members'] = UserTeamResource::collection($this->userTeams);
         }
 
         if (\in_array('add_on__members_in_business', $expand)) {
-            $data['members'] = $this->inBusiness();
+            $data['members'] = UserTeamResource::collection($this->inBusiness());
         }
         return $data;
     }
