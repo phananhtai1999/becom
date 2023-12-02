@@ -213,6 +213,28 @@ class WebsitePageService extends AbstractService
         $searchReplaceMap = $this->searchReplaceMapForArticle($article);
         $websitePage->template = Str::replace(array_keys($searchReplaceMap), $searchReplaceMap, $websitePage->template);
 
+        //get number article need to parse
+        $pattern = '/data-article-count="(\d+)"/';
+        preg_match_all($pattern, $websitePage->template, $matches);
+        $numbers = array_map('intval', $matches[1]);
+        $articleCount = array_sum($numbers);
+        $articleCount = isset($articleCount) ? (int)$articleCount : 10;
+
+        //get orderby
+        preg_match('/article-sort="(.*?)"/', $websitePage->template, $sortName);
+        preg_match('/article-sort-order="(.*?)"/', $websitePage->template, $sortOrder);
+        $articles_data = Article::orderBy($sortName[1] ?? 'created_at', $sortOrder[1] ?? 'DESC')->paginate($articleCount);
+        $pattern = '/<article.*?>(.*?)<\/article>/s';
+        $websitePage->template = preg_replace_callback($pattern, function ($matches) use ($articles_data) {
+            $article_data = $articles_data->shift();
+            if (!$article_data) {
+                return $matches[0];
+            }
+
+            $searchReplaceMap = $this->searchReplaceMapForArticle($article_data);
+            return str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $matches[0]);
+        }, $websitePage->template);
+
         return $websitePage;
     }
 

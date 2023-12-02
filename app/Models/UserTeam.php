@@ -28,7 +28,6 @@ class UserTeam extends Model
         'user_uuid',
         'team_uuid',
         'permission_uuids',
-        'add_on_uuids',
         'is_blocked'
     ];
 
@@ -37,7 +36,6 @@ class UserTeam extends Model
      */
     protected $casts = [
         'permission_uuids' => 'array',
-        'add_on_uuids' => 'array',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
