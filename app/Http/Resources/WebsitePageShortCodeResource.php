@@ -20,7 +20,7 @@ class WebsitePageShortCodeResource extends JsonResource
             'uuid' => $this->uuid,
             'status' => $this->status,
             'key' => $this->key,
-            'parent_uuid' => $this->parent_uuid,
+            'parent_uuids' => $this->parent_uuids,
             'name' => $this->name,
             'short_code' => $this->short_code,
             'created_at' => $this->created_at,
