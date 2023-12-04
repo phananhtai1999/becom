@@ -624,6 +624,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website_page'], function ()
     Route::put('short-code-group/{id}', [ShortCodeGroupController::class, 'edit'])->name('edit');
     Route::delete('/short-code-group/{id}', [ShortCodeGroupController::class, 'destroy'])->name('destroy');
     Route::post('/mapping-short-code', [ShortCodeGroupController::class, 'mappingShortcode'])->name('mappingShortcode');
+    Route::post('/unmapping-short-code', [ShortCodeGroupController::class, 'unmappingShortcode'])->name('unmappingShortcode');
 
 
     Route::group(['middleware' => ['role:root,admin,editor']], function () {

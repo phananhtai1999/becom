@@ -40,4 +40,14 @@ class ShortCodeGroupController extends Controller
             $this->service->resourceToData($this->resourceClass, $shortCodeGroup)
         );
     }
+
+    public function unmappingShortcode(MapShortcodeRequest $request)
+    {
+        $shortCodeGroup = $this->service->findOrFailById($request->get('short_code_group_uuid'));
+        $shortCodeGroup->shortCodes()->detach($request->get('short_code_uuids'));
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $shortCodeGroup)
+        );
+    }
 }
