@@ -567,55 +567,59 @@ class ShortCodeSeeder extends Seeder
             $shortCodeGroupUuid = ShortCodeGroup::whereIn('key', $shortCodeGroups)->get()->pluck('uuid')->toArray();
             $shortCode->shortCodeGroups()->syncWithoutDetaching($shortCodeGroupUuid);
         }
+        $articleList = WebsitePageShortCode::where(['key' => 'article_list'])->first();
+        $categoryList = WebsitePageShortCode::where(['key' => 'category_list'])->first();
+        $childrenCategoryList = WebsitePageShortCode::where(['key' => 'children_category_list'])->first();
+        $grandChildrenCategoryList = WebsitePageShortCode::where(['key' => 'grand_children_category_list'])->first();
 
         //create sort (order by)
         foreach ($sorts as $key => $sort) {
             if ($key == 'article_sort') {
                 $parentSort = WebsitePageShortCode::where(['key' => 'article_list'])->first();
-                WebsitePageShortCode::updateOrCreate(['key' => $sort['key']], array_merge(['parent_uuid' => $parentSort->uuid], $sort));
+                WebsitePageShortCode::updateOrCreate(['key' => $sort['key']], array_merge(['parent_uuids' => [$articleList->uuid]], $sort));
             } elseif ($key == 'category_sort') {
                 $parentSort = WebsitePageShortCode::where(['key' => 'category_list'])->first();
-                WebsitePageShortCode::updateOrCreate(['key' => $sort['key']], array_merge(['parent_uuid' => $parentSort->uuid], $sort));
+                WebsitePageShortCode::updateOrCreate(['key' => $sort['key']], array_merge(['parent_uuids' => [$categoryList->uuid]], $sort));
             } elseif ($key == 'children_category_sort') {
                 $parentSort = WebsitePageShortCode::where(['key' => 'children_category_list'])->first();
-                WebsitePageShortCode::updateOrCreate(['key' => $sort['key']], array_merge(['parent_uuid' => $parentSort->uuid], $sort));
+                WebsitePageShortCode::updateOrCreate(['key' => $sort['key']], array_merge(['parent_uuids' => [$childrenCategoryList->uuid]], $sort));
             } elseif ($key == 'grand_children_category_sort') {
                 $parentSort = WebsitePageShortCode::where(['key' => 'grand_children_category_list'])->first();
-                WebsitePageShortCode::updateOrCreate(['key' => $sort['key']], array_merge(['parent_uuid' => $parentSort->uuid], $sort));
+                WebsitePageShortCode::updateOrCreate(['key' => $sort['key']], array_merge(['parent_uuids' => [$grandChildrenCategoryList->uuid]], $sort));
             }
         }
 
-        //create sort (order by)
         foreach ($elements as $key => $element) {
             if ($key == 'article') {
                 $parent = WebsitePageShortCode::where(['key' => 'article_list'])->first();
-                WebsitePageShortCode::updateOrCreate(['key' => $element['key']], array_merge(['parent_uuid' => $parent->uuid], $element));
+                WebsitePageShortCode::updateOrCreate(['key' => $element['key']], array_merge(['parent_uuids' => [$parent->uuid]], $element));
             } elseif ($key == 'category') {
                 $parent = WebsitePageShortCode::where(['key' => 'category_list'])->first();
-                WebsitePageShortCode::updateOrCreate(['key' => $element['key']], array_merge(['parent_uuid' => $parent->uuid], $element));
+                $categoryElement = WebsitePageShortCode::updateOrCreate(['key' => $element['key']], array_merge(['parent_uuids' => [$parent->uuid]], $element));
             } elseif ($key == 'children_category') {
                 $parent = WebsitePageShortCode::where(['key' => 'children_category_list'])->first();
-                WebsitePageShortCode::updateOrCreate(['key' => $element['key']], array_merge(['parent_uuid' => $parent->uuid], $element));
+                $childrenCategoryElement = WebsitePageShortCode::updateOrCreate(['key' => $element['key']], array_merge(['parent_uuids' => [$parent->uuid]], $element));
             } elseif ($key == 'grand_children_category') {
                 $parent = WebsitePageShortCode::where(['key' => 'grand_children_category_list'])->first();
-                WebsitePageShortCode::updateOrCreate(['key' => $element['key']], array_merge(['parent_uuid' => $parent->uuid], $element));
+                WebsitePageShortCode::updateOrCreate(['key' => $element['key']], array_merge(['parent_uuids' => [$parent->uuid]], $element));
             }
         }
+        $articleList->update(['parent_uuids' => [$categoryElement->uuid, $childrenCategoryElement->uuid]]);
 
         //create sort order (asc or desc)
         foreach ($sortOrders as $key => $sortOrder) {
             if ($key == 'article_sort_order') {
                 $parentSort = WebsitePageShortCode::where(['key' => 'article_list'])->first();
-                WebsitePageShortCode::updateOrCreate(['key' => $sortOrder['key']], array_merge(['parent_uuid' => $parentSort->uuid], $sortOrder));
+                WebsitePageShortCode::updateOrCreate(['key' => $sortOrder['key']], array_merge(['parent_uuids' => [$parentSort->uuid]], $sortOrder));
             } elseif ($key == 'category_sort_order') {
                 $parentSort = WebsitePageShortCode::where(['key' => 'category_list'])->first();
-                WebsitePageShortCode::updateOrCreate(['key' => $sortOrder['key']], array_merge(['parent_uuid' => $parentSort->uuid], $sortOrder));
+                WebsitePageShortCode::updateOrCreate(['key' => $sortOrder['key']], array_merge(['parent_uuids' => [$parentSort->uuid]], $sortOrder));
             } elseif ($key == 'children_category_sort_order') {
                 $parentSort = WebsitePageShortCode::where(['key' => 'children_category_list'])->first();
-                WebsitePageShortCode::updateOrCreate(['key' => $sortOrder['key']], array_merge(['parent_uuid' => $parentSort->uuid], $sortOrder));
+                WebsitePageShortCode::updateOrCreate(['key' => $sortOrder['key']], array_merge(['parent_uuids' => [$parentSort->uuid]], $sortOrder));
             } elseif ($key == 'grand_children_category_sort_order') {
                 $parentSort = WebsitePageShortCode::where(['key' => 'grand_children_category_list'])->first();
-                WebsitePageShortCode::updateOrCreate(['key' => $sortOrder['key']], array_merge(['parent_uuid' => $parentSort->uuid], $sortOrder));
+                WebsitePageShortCode::updateOrCreate(['key' => $sortOrder['key']], array_merge(['parent_uuids' => [$parentSort->uuid]], $sortOrder));
             }
         }
 
@@ -623,16 +627,16 @@ class ShortCodeSeeder extends Seeder
         foreach ($counts as $key => $count) {
             if ($key == 'article_count') {
                 $parentCount = WebsitePageShortCode::where(['key' => 'article_list'])->first();
-                WebsitePageShortCode::updateOrCreate(['key' => $count['key']], array_merge(['parent_uuid' => $parentCount->uuid], $count));
+                WebsitePageShortCode::updateOrCreate(['key' => $count['key']], array_merge(['parent_uuids' => [$parentCount->uuid]], $count));
             } elseif ($key == 'category_count') {
                 $parentCount = WebsitePageShortCode::where(['key' => 'category_list'])->first();
-                WebsitePageShortCode::updateOrCreate(['key' => $count['key']], array_merge(['parent_uuid' => $parentCount->uuid], $count));
+                WebsitePageShortCode::updateOrCreate(['key' => $count['key']], array_merge(['parent_uuids' => [$parentCount->uuid]], $count));
             } elseif ($key == 'children_category_count') {
                 $parentCount = WebsitePageShortCode::where(['key' => 'children_category_list'])->first();
-                WebsitePageShortCode::updateOrCreate(['key' => $count['key']], array_merge(['parent_uuid' => $parentCount->uuid], $count));
+                WebsitePageShortCode::updateOrCreate(['key' => $count['key']], array_merge(['parent_uuids' => [$parentCount->uuid]], $count));
             } elseif ($key == 'grand_children_category_count') {
                 $parentCount = WebsitePageShortCode::where(['key' => 'grand_children_category_list'])->first();
-                WebsitePageShortCode::updateOrCreate(['key' => $count['key']], array_merge(['parent_uuid' => $parentCount->uuid], $count));
+                WebsitePageShortCode::updateOrCreate(['key' => $count['key']], array_merge(['parent_uuids' => [$parentCount->uuid]], $count));
             }
         }
 
@@ -641,62 +645,62 @@ class ShortCodeSeeder extends Seeder
             if ($key == 'article') {
                 foreach ($shortCode as $articleShortCode) {
                     $parent = WebsitePageShortCode::where(['key' => 'article'])->first();
-                    WebsitePageShortCode::updateOrCreate(['key' => $articleShortCode['key']], array_merge(['parent_uuid' => $parent->uuid], $articleShortCode));
+                    WebsitePageShortCode::updateOrCreate(['key' => $articleShortCode['key']], array_merge(['parent_uuids' => [$parent->uuid]], $articleShortCode));
                 }
             } elseif ($key == 'category') {
                 foreach ($shortCode as $categoryShortCode) {
                     $parent = WebsitePageShortCode::where(['key' => 'category'])->first();
-                    WebsitePageShortCode::updateOrCreate(['key' => $categoryShortCode['key']], array_merge(['parent_uuid' => $parent->uuid], $categoryShortCode));
+                    WebsitePageShortCode::updateOrCreate(['key' => $categoryShortCode['key']], array_merge(['parent_uuids' => [$parent->uuid]], $categoryShortCode));
                 }
             } elseif ($key == 'children_category') {
                 foreach ($shortCode as $childrenCategory) {
                     $parent = WebsitePageShortCode::where(['key' => 'children_category'])->first();
-                    WebsitePageShortCode::updateOrCreate(['key' => $childrenCategory['key']], array_merge(['parent_uuid' => $parent->uuid], $childrenCategory));
+                    WebsitePageShortCode::updateOrCreate(['key' => $childrenCategory['key']], array_merge(['parent_uuids' => [$parent->uuid]], $childrenCategory));
                 }
             } elseif ($key == 'grand_children_category') {
                 foreach ($shortCode as $grandChildren) {
                     $parent = WebsitePageShortCode::where(['key' => 'grand_children_category'])->first();
-                    WebsitePageShortCode::updateOrCreate(['key' => $grandChildren['key']], array_merge(['parent_uuid' => $parent->uuid], $grandChildren));
+                    WebsitePageShortCode::updateOrCreate(['key' => $grandChildren['key']], array_merge(['parent_uuids' => [$parent->uuid]], $grandChildren));
                 }
             } elseif ($key == 'article-sort') {
                 foreach ($shortCode as $articleSort) {
                     $parent = WebsitePageShortCode::where(['key' => 'article_sort'])->first();
-                    WebsitePageShortCode::updateOrCreate(['key' => $articleSort['key']], array_merge(['parent_uuid' => $parent->uuid], $articleSort));
+                    WebsitePageShortCode::updateOrCreate(['key' => $articleSort['key']], array_merge(['parent_uuids' => [$parent->uuid]], $articleSort));
                 }
             } elseif ($key == 'category-sort') {
                 foreach ($shortCode as $categorySort) {
                     $parent = WebsitePageShortCode::where(['key' => 'category_sort'])->first();
-                    WebsitePageShortCode::updateOrCreate(['key' => $categorySort['key']], array_merge(['parent_uuid' => $parent->uuid], $categorySort));
+                    WebsitePageShortCode::updateOrCreate(['key' => $categorySort['key']], array_merge(['parent_uuids' => [$parent->uuid]], $categorySort));
                 }
             } elseif ($key == 'children-category-sort') {
                 foreach ($shortCode as $childrenCategorySort) {
                     $parent = WebsitePageShortCode::where(['key' => 'children_category_sort'])->first();
-                    WebsitePageShortCode::updateOrCreate(['key' => $childrenCategorySort['key']], array_merge(['parent_uuid' => $parent->uuid], $childrenCategorySort));
+                    WebsitePageShortCode::updateOrCreate(['key' => $childrenCategorySort['key']], array_merge(['parent_uuids' => [$parent->uuid]], $childrenCategorySort));
                 }
             } elseif ($key == 'grand-children-category-sort') {
                 foreach ($shortCode as $grandChildrenSort) {
                     $parent = WebsitePageShortCode::where(['key' => 'grand_children_category_sort'])->first();
-                    WebsitePageShortCode::updateOrCreate(['key' => $grandChildrenSort['key']], array_merge(['parent_uuid' => $parent->uuid], $grandChildrenSort));
+                    WebsitePageShortCode::updateOrCreate(['key' => $grandChildrenSort['key']], array_merge(['parent_uuids' => [$parent->uuid]], $grandChildrenSort));
                 }
             } elseif ($key == 'article-sort-order') {
                 foreach ($shortCode as $articleSortOrder) {
                     $parent = WebsitePageShortCode::where(['key' => 'article_sort_order'])->first();
-                    WebsitePageShortCode::updateOrCreate(['key' => $articleSortOrder['key']], array_merge(['parent_uuid' => $parent->uuid], $articleSortOrder));
+                    WebsitePageShortCode::updateOrCreate(['key' => $articleSortOrder['key']], array_merge(['parent_uuids' => [$parent->uuid]], $articleSortOrder));
                 }
             } elseif ($key == 'category-sort-order') {
                 foreach ($shortCode as $categorySortOrder) {
                     $parent = WebsitePageShortCode::where(['key' => 'category_sort_order'])->first();
-                    WebsitePageShortCode::updateOrCreate(['key' => $categorySortOrder['key']], array_merge(['parent_uuid' => $parent->uuid], $categorySortOrder));
+                    WebsitePageShortCode::updateOrCreate(['key' => $categorySortOrder['key']], array_merge(['parent_uuids' => [$parent->uuid]], $categorySortOrder));
                 }
             } elseif ($key == 'children-category-sort-order') {
                 foreach ($shortCode as $childrenCategorySortOrder) {
                     $parent = WebsitePageShortCode::where(['key' => 'children_category_sort_order'])->first();
-                    WebsitePageShortCode::updateOrCreate(['key' => $childrenCategorySortOrder['key']], array_merge(['parent_uuid' => $parent->uuid], $childrenCategorySortOrder));
+                    WebsitePageShortCode::updateOrCreate(['key' => $childrenCategorySortOrder['key']], array_merge(['parent_uuids' => [$parent->uuid]], $childrenCategorySortOrder));
                 }
             } elseif ($key == 'grand-children-category-sort-order') {
                 foreach ($shortCode as $grandChildrenSortOrder) {
                     $parent = WebsitePageShortCode::where(['key' => 'grand_children_category_sort_order'])->first();
-                    WebsitePageShortCode::updateOrCreate(['key' => $grandChildrenSortOrder['key']], array_merge(['parent_uuid' => $parent->uuid], $grandChildrenSortOrder));
+                    WebsitePageShortCode::updateOrCreate(['key' => $grandChildrenSortOrder['key']], array_merge(['parent_uuids' => [$parent->uuid]], $grandChildrenSortOrder));
                 }
             }
         }
