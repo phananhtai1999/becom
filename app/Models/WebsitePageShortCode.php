@@ -51,18 +51,25 @@ class WebsitePageShortCode extends Model
 
     public function parentWebsitePageShortCode()
     {
-        return WebsitePageShortCode::whereIn('uuid', $this->parent_uuids ?? [])->get();
+        return WebsitePageShortCode::whereIn('uuid', $this->parent_uuids ?? [])->where('status', true)->get();
     }
 
     public function childrenWebsitePageShortCode()
     {
-        return WebsitePageShortCode::whereJsonContains('parent_uuids', $this->uuid)->get();
+        return WebsitePageShortCode::whereJsonContains('parent_uuids', $this->uuid)->where('status', true)->get();
     }
 
     public function scopeShortCodeRoot(Builder $query, $check)
     {
         if ($check) {
             return $query->whereNull('parent_uuids');
+        }
+    }
+
+    public function scopeParentShortCode(Builder $query, $parent)
+    {
+        if ($parent) {
+            return $query->whereJsonContains('parent_uuids', $parent);
         }
     }
 

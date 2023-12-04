@@ -32,12 +32,30 @@ class WebsitePageShortCodeController extends AbstractRestAPIController
         $this->indexRequest = IndexRequest::class;
     }
 
+    public function store(WebsitePageShortCodeRequest $request)
+    {
+        $model = $this->service->create(array_merge($request->all(), ['parent_uuids' => array_map('intval', $request->get('parent_uuids'))]));
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    public function edit(UpdateWebsitePageShortCodeRequest $request)
+    {
+        $model = $this->service->create(array_merge($request->all(), ['parent_uuids' => array_map('intval', $request->get('parent_uuids'))]));
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
     public function configShortcode(ConfigShortcodeRequest $request)
     {
         $shortCode = $this->shortCodeGroupService->findOneWhere(['key' => $request->get('type')]);
 
         return $this->sendOkJsonResponse(
-            $this->service->resourceCollectionToData($this->resourceCollectionClass, $shortCode->shortCodes)
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $shortCode->shortCodes()->where('status', true)->get())
         );
     }
 
