@@ -63,7 +63,8 @@ class Article extends AbstractModel
         'reject_reason',
         'content_type',
         'single_purpose_uuid',
-        'paragraph_type_uuid'
+        'paragraph_type_uuid',
+        'app_id',
     ];
 
     public $translatable = ['title', 'content', 'keyword', 'description'];

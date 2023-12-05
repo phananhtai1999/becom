@@ -32,7 +32,8 @@ class Department extends AbstractModel
         'name',
         'business_uuid',
         'location_uuid',
-        'user_uuid'
+        'user_uuid',
+        'app_id',
     ];
 
     /**

@@ -28,6 +28,7 @@ class AddOnSubscriptionHistory extends Model
         'payment_method_uuid',
         'billing_address_uuid',
         'logs',
+        'app_id'
     ];
 
     /**

@@ -71,6 +71,7 @@ class ArticleSeries extends AbstractModel
         'assigned_ids',
         'list_keywords',
         'article_uuid',
+        'app_id',
     ];
 
     /**
