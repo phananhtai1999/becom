@@ -171,15 +171,9 @@ class WebsitePageService extends AbstractService
         return $websitePage;
     }
 
-    public function getWebsitePageByDomainAndWebsitePageUuid($domainName, $websitePageUuid)
+    public function getWebsitePageByWebsiteAndWebsitePageUuid($websiteUuid, $websitePageUuid)
     {
-        $website = (new Website())->whereHas('domain', function ($query) use ($domainName) {
-            $query->where([
-                ['name', $domainName],
-                ['verified_at', '!=', null]
-            ]);
-        })
-            ->firstOrFail();
+        $website = (new Website())->where('uuid', $websiteUuid)->firstOrFail();
 
         if ($websitePageUuid) {
             $websitePage = $website->websitePagesPublic()->where(['uuid' => $websitePageUuid])->firstOrFail();
@@ -200,6 +194,15 @@ class WebsitePageService extends AbstractService
         })
             ->where('publish_status', Website::PUBLISHED_PUBLISH_STATUS)
             ->firstOrFail();
+
+        return $website->websitePagesPublic()
+            ->whereIn('type', [WebsitePage::ARTICLE_CATEGORY_TYPE, WebsitePage::HOME_ARTICLES_TYPE, WebsitePage::ARTICLE_DETAIL_TYPE])
+            ->get();
+    }
+
+    public function getNewsWebsitePagesByWebsite($websiteUuid)
+    {
+        $website = (new Website())->where('uuid', $websiteUuid)->firstOrFail();
 
         return $website->websitePagesPublic()
             ->whereIn('type', [WebsitePage::ARTICLE_CATEGORY_TYPE, WebsitePage::HOME_ARTICLES_TYPE, WebsitePage::ARTICLE_DETAIL_TYPE])
@@ -235,7 +238,7 @@ class WebsitePageService extends AbstractService
     public function renderContentForHomeArticles($websitePage)
     {
         $replaceArticleService = new ReplaceArticleService();
-        $replaceCategoryService = new replaceCategoryService();
+        $replaceCategoryService = new ReplaceCategoryService();
         $websitePage->template = $replaceCategoryService->replaceListCategory($websitePage->template);
         $websitePage->template = $replaceArticleService->replaceListArticleForPageHome($websitePage->template);
 
