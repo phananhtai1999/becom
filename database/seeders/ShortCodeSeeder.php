@@ -605,6 +605,7 @@ class ShortCodeSeeder extends Seeder
             }
         }
         $articleList->update(['parent_uuids' => [$categoryElement->uuid, $childrenCategoryElement->uuid]]);
+        $childrenCategoryList->update(['parent_uuids' => [$categoryElement->uuid]]);
 
         //create sort order (asc or desc)
         foreach ($sortOrders as $key => $sortOrder) {
