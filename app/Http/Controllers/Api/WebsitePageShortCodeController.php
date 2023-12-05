@@ -41,11 +41,12 @@ class WebsitePageShortCodeController extends AbstractRestAPIController
         );
     }
 
-    public function edit(UpdateWebsitePageShortCodeRequest $request)
+    public function edit(UpdateWebsitePageShortCodeRequest $request, $id)
     {
-        $model = $this->service->create(array_merge($request->all(), ['parent_uuids' => array_map('intval', $request->get('parent_uuids'))]));
+        $model = $this->service->findOrFailById($id);
+        $this->service->update($model, array_merge($request->all(), ['parent_uuids' => array_map('intval', $request->get('parent_uuids'))]));
 
-        return $this->sendCreatedJsonResponse(
+        return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
         );
     }
