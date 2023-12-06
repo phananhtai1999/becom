@@ -69,6 +69,13 @@ class ShortCodeSeeder extends Seeder
                 'short_code' => 'grand_children_category_element',
             ],
         ];
+        $filters = [
+            'article_filter' => [
+                'name' => 'filter article',
+                'key' => 'filter_article',
+                'short_code' => 'data-filter-article-by-category',
+            ],
+        ];
         $sorts = [
             'article_sort' =>
                 [
@@ -586,6 +593,12 @@ class ShortCodeSeeder extends Seeder
             } elseif ($key == 'grand_children_category_sort') {
                 $parentSort = WebsitePageShortCode::where(['key' => 'grand_children_category_list'])->first();
                 WebsitePageShortCode::updateOrCreate(['key' => $sort['key']], array_merge(['parent_uuids' => [$grandChildrenCategoryList->uuid]], $sort));
+            }
+        }
+
+        foreach ($filters as $key => $filter) {
+            if ($key == 'article_filter') {
+                WebsitePageShortCode::updateOrCreate(['key' => $sort['key']], array_merge(['parent_uuids' => [$articleList->uuid]], $sort));
             }
         }
 

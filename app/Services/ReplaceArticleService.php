@@ -38,15 +38,20 @@ class ReplaceArticleService
         //get orderby
         preg_match('/article-sort="(.*?)"/', $template, $sortName);
         preg_match('/article-sort-order="(.*?)"/', $template, $sortOrder);
-        $articles_data = Article::orderBy($sortName[1] ?? 'created_at', $sortOrder[1] ?? 'DESC')->paginate($articleCount);
+        preg_match('/data-filter-article-by-category="(.*?)"/', $template, $sortFilterByCategory);
+        if ($sortFilterByCategory) {
+            $articlesData = Article::where('article_category_uuid', $sortFilterByCategory[1])->orderBy($sortName[1] ?? 'created_at', $sortOrder[1] ?? 'DESC')->paginate($articleCount);
+        } else {
+            $articlesData = Article::orderBy($sortName[1] ?? 'created_at', $sortOrder[1] ?? 'DESC')->paginate($articleCount);
+        }
         $pattern = '/<article.*?>(.*?)<\/article>/s';
-        return preg_replace_callback($pattern, function ($matches) use ($articles_data) {
-            $article_data = $articles_data->shift();
-            if (!$article_data) {
+        return preg_replace_callback($pattern, function ($matches) use ($articlesData) {
+            $articlesData = $articlesData->shift();
+            if (!$articlesData) {
                 return $matches[0];
             }
 
-            $searchReplaceMap = $this->searchReplaceMapForArticle($article_data);
+            $searchReplaceMap = $this->searchReplaceMapForArticle($articlesData);
             return str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $matches[0]);
         }, $template);
     }
