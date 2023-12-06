@@ -26,6 +26,18 @@ class ReplaceArticleService
         }, $template);
     }
 
+    public function replaceListArticleSpecific($template) {
+        preg_match('/<specific_article_list.*?>(.*?)<\/specific_article_list>/s', $template, $specificArticleList);
+        $pattern = '/<article.*?>(.*?)<\/article>/s';
+        return preg_replace_callback($pattern, function ($matches) {
+            preg_match('/data-article-specific="(.*?)"/', $matches[0], $articleUuid);
+            $article = Article::findOrfail($articleUuid);
+            $searchReplaceMap = $this->searchReplaceMapForArticle($article);
+
+            return str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $matches[0]);
+        }, $specificArticleList);
+    }
+
     public function replaceListArticleForPageHome($template) {
 
         //get number article need to parse
@@ -87,4 +99,5 @@ class ReplaceArticleService
         }
 
     }
+
 }
