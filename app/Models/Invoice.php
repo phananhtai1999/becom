@@ -27,7 +27,8 @@ class Invoice extends Model
         'billing_address_uuid',
         'user_uuid',
         'product_data',
-        'payment_method_uuid'
+        'payment_method_uuid',
+        'app_id',
     ];
 
     /**

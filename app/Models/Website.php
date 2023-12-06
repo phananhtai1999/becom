@@ -44,6 +44,7 @@ class Website extends AbstractModel
         'domain_uuid',
         'tracking_ids',
         'is_active_news_page',
+        'app_id',
     ];
 
     /**

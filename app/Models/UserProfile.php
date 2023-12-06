@@ -32,7 +32,8 @@ class UserProfile extends AbstractModel
         'cover_img',
         'credit',
         'can_add_smtp_account',
-        'can_remove_footer_template'
+        'can_remove_footer_template',
+        'app_id',
     ];
 
     /**

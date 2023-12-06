@@ -69,7 +69,8 @@ class SinglePurpose extends AbstractModel
         'slug',
         'parent_uuid',
         'user_uuid',
-        'title'
+        'title',
+        'app_id',
     ];
 
     /**

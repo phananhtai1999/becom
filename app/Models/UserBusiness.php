@@ -30,6 +30,7 @@ class UserBusiness extends Model
         'user_uuid',
         'business_uuid',
         'is_blocked',
+        'app_id',
     ];
 
     /**

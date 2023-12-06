@@ -29,7 +29,8 @@ class UserTeam extends Model
         'team_uuid',
         'permission_uuids',
         'add_on_uuids',
-        'is_blocked'
+        'is_blocked',
+        'app_id',
     ];
 
     /**

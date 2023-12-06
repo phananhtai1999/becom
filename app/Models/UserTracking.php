@@ -20,7 +20,8 @@ class UserTracking extends AbstractModel
         'location',
         'user_uuid',
         'postal_code',
-        'user_agent'
+        'user_agent',
+        'app_id',
     ];
 
     protected $casts = [

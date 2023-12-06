@@ -29,7 +29,8 @@ class Position extends AbstractModel
      */
     protected $fillable = [
         'name',
-        'user_uuid'
+        'user_uuid',
+        'app_id',
     ];
 
     /**
