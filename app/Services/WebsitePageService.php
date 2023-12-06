@@ -215,7 +215,7 @@ class WebsitePageService extends AbstractService
 
         $searchReplaceMap = $replaceArticleService->searchReplaceMapForArticle($article);
         $websitePage->template = Str::replace(array_keys($searchReplaceMap), $searchReplaceMap, $websitePage->template);
-        $websitePage->template = $replaceArticleService->replaceListArticleForPageHome($websitePage->template);
+        $websitePage->template = $replaceArticleService->replaceListArticleSpecific($websitePage->template);
 
         return $websitePage;
     }
@@ -230,6 +230,7 @@ class WebsitePageService extends AbstractService
         $websitePage->template = str_replace(array_keys($searchArticleReplaceMap), $searchArticleReplaceMap, $websitePage->template);
 
         $replaceArticleService = new ReplaceArticleService();
+        $websitePage->template = $replaceArticleService->replaceListArticleSpecific($websitePage->template);
         $websitePage->template = $replaceArticleService->replaceListArticle($websitePage->template, $articleCategory);
 
         return $websitePage;

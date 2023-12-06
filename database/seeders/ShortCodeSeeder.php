@@ -20,25 +20,31 @@ class ShortCodeSeeder extends Seeder
                 'name' => 'article list',
                 'key' => 'article_list',
                 'short_code' => 'article_list',
-                'short_code_groups' => [ShortCodeGroup::ARTICLE_CATEGORY, ShortCodeGroup::HOME_ARTICLES, ShortCodeGroup::ARTICLE_DETAIL]
+                'short_code_groups' => [ShortCodeGroup::HOME_ARTICLES]
+            ],
+            [
+                'name' => 'specific article list',
+                'key' => 'specific_article_list',
+                'short_code' => 'specific_article_list',
+                'short_code_groups' => [ShortCodeGroup::ARTICLE_CATEGORY, ShortCodeGroup::ARTICLE_DETAIL]
             ],
             [
                 'name' => 'category list',
                 'key' => 'category_list',
                 'short_code' => 'category_list',
-                'short_code_groups' => [ShortCodeGroup::ARTICLE_CATEGORY, ShortCodeGroup::HOME_ARTICLES]
+                'short_code_groups' => [ShortCodeGroup::HOME_ARTICLES]
             ],
             [
                 'name' => 'children category list',
                 'key' => 'children_category_list',
                 'short_code' => 'children_category_list',
-                'short_code_groups' => [ShortCodeGroup::ARTICLE_CATEGORY, ShortCodeGroup::HOME_ARTICLES]
+                'short_code_groups' => [ShortCodeGroup::HOME_ARTICLES]
             ],
             [
                 'name' => 'grand children category',
                 'key' => 'grand_children_category_list',
                 'short_code' => 'grand_children_category_list',
-                'short_code_groups' => [ShortCodeGroup::ARTICLE_CATEGORY, ShortCodeGroup::HOME_ARTICLES]
+                'short_code_groups' => [ShortCodeGroup::HOME_ARTICLES]
             ],
             [
                 'name' => 'count',
@@ -52,11 +58,13 @@ class ShortCodeSeeder extends Seeder
                 'name' => 'article element',
                 'key' => 'article',
                 'short_code' => 'article_element',
+                'short_code_groups' => [ShortCodeGroup::ARTICLE_DETAIL]
             ],
             'category' => [
                 'name' => 'category element',
                 'key' => 'category',
                 'short_code' => 'category_element',
+                'short_code_groups' => [ShortCodeGroup::ARTICLE_CATEGORY]
             ],
             'children_category' => [
                 'name' => 'children category',
@@ -74,6 +82,14 @@ class ShortCodeSeeder extends Seeder
                 'name' => 'filter article',
                 'key' => 'filter_article',
                 'short_code' => 'data-filter-article-by-category',
+            ],
+        ];
+
+        $specifics = [
+            'article' => [
+                'name' => 'data article specific',
+                'key' => 'data_article_specific',
+                'short_code' => 'data-article-specific',
             ],
         ];
         $sorts = [
@@ -578,6 +594,7 @@ class ShortCodeSeeder extends Seeder
         $categoryList = WebsitePageShortCode::where(['key' => 'category_list'])->first();
         $childrenCategoryList = WebsitePageShortCode::where(['key' => 'children_category_list'])->first();
         $grandChildrenCategoryList = WebsitePageShortCode::where(['key' => 'grand_children_category_list'])->first();
+        $specificArticleList = WebsitePageShortCode::where(['key' => 'specific_article_list'])->first();
 
         //create sort (order by)
         foreach ($sorts as $key => $sort) {
@@ -598,17 +615,31 @@ class ShortCodeSeeder extends Seeder
 
         foreach ($filters as $key => $filter) {
             if ($key == 'article_filter') {
-                WebsitePageShortCode::updateOrCreate(['key' => $sort['key']], array_merge(['parent_uuids' => [$articleList->uuid]], $sort));
+                WebsitePageShortCode::updateOrCreate(['key' => $filter['key']], array_merge(['parent_uuids' => [$articleList->uuid]], $filter));
+            }
+        }
+
+        foreach ($specifics as $key => $specific) {
+            if ($key == 'article') {
+                WebsitePageShortCode::updateOrCreate(['key' => $specific['key']], array_merge(['parent_uuids' => [$specificArticleList->uuid]], $specific));
             }
         }
 
         foreach ($elements as $key => $element) {
             if ($key == 'article') {
-                $parent = WebsitePageShortCode::where(['key' => 'article_list'])->first();
-                WebsitePageShortCode::updateOrCreate(['key' => $element['key']], array_merge(['parent_uuids' => [$parent->uuid]], $element));
+                $shortCodeGroups = $element['short_code_groups'];
+                unset($element['short_code_groups']);
+
+                $articleElement = WebsitePageShortCode::updateOrCreate(['key' => $element['key']], array_merge(['parent_uuids' => [$articleList->uuid, $specificArticleList->uuid]], $element));
+                $shortCodeGroupUuid = ShortCodeGroup::whereIn('key', $shortCodeGroups)->get()->pluck('uuid')->toArray();
+                $articleElement->shortCodeGroups()->syncWithoutDetaching($shortCodeGroupUuid);
             } elseif ($key == 'category') {
+                $shortCodeGroups = $element['short_code_groups'];
+                unset($element['short_code_groups']);
                 $parent = WebsitePageShortCode::where(['key' => 'category_list'])->first();
                 $categoryElement = WebsitePageShortCode::updateOrCreate(['key' => $element['key']], array_merge(['parent_uuids' => [$parent->uuid]], $element));
+                $shortCodeGroupUuid = ShortCodeGroup::whereIn('key', $shortCodeGroups)->get()->pluck('uuid')->toArray();
+                $categoryElement->shortCodeGroups()->syncWithoutDetaching($shortCodeGroupUuid);
             } elseif ($key == 'children_category') {
                 $parent = WebsitePageShortCode::where(['key' => 'children_category_list'])->first();
                 $childrenCategoryElement = WebsitePageShortCode::updateOrCreate(['key' => $element['key']], array_merge(['parent_uuids' => [$parent->uuid]], $element));
