@@ -23,7 +23,8 @@ class MyMailSendingHistoryService extends AbstractService
         $mailSendingHistory = $this->model->select('mail_sending_history.*')
             ->join('campaigns', 'campaigns.uuid', '=', 'mail_sending_history.campaign_uuid')
             ->where([
-                ['campaigns.user_uuid', auth()->user()->getKey()],
+                ['campaigns.user_uuid', auth()->user()],
+                ['campaigns.app_id', auth()->appId()],
                 ['mail_sending_history.uuid', $id]
             ])->first();
 
@@ -113,7 +114,10 @@ class MyMailSendingHistoryService extends AbstractService
             ->join('campaigns', 'campaigns.uuid', '=', 'mail_sending_history.campaign_uuid')
             ->whereDate('mail_sending_history.updated_at', '>=', $startDate)
             ->whereDate('mail_sending_history.updated_at', '<=', $endDate)
-            ->where('campaigns.user_uuid', auth()->user()->getKey())->first();
+            ->where([
+                ['campaigns.user_uuid', auth()->user()],
+                ['campaigns.app_id', auth()->appId()],
+            ])->first();
     }
 
     /**
@@ -127,7 +131,10 @@ class MyMailSendingHistoryService extends AbstractService
             ->join('campaigns', 'campaigns.uuid', '=', 'mail_sending_history.campaign_uuid')
             ->whereDate('mail_sending_history.updated_at', '>=', $startDate)
             ->whereDate('mail_sending_history.updated_at', '<=', $endDate)
-            ->where('campaigns.user_uuid', auth()->user()->getKey())
+            ->where([
+                ['campaigns.user_uuid', auth()->user()],
+                ['campaigns.app_id', auth()->appId()],
+            ])
             ->groupBy('label')
             ->orderBy('label', 'ASC')
             ->get();

@@ -154,7 +154,10 @@ class PaymentController extends AbstractRestAPIController
     public function cancelSubscription()
     {
         $currentSubscriptionHistory = $this->subscriptionHistoryService->currentSubscriptionHistory();
-        $userPlatformPackage = $this->userPlatformPackageService->findOneWhere(['user_uuid' => auth()->user()->getKey()]);
+        $userPlatformPackage = $this->userPlatformPackageService->findOneWhere([
+            'user_uuid' => auth()->user(),
+            'app_id' => auth()->appId(),
+        ]);
         try {
             if ($currentSubscriptionHistory->payment_method_uuid == PaymentMethod::PAYPAL) {
                 $this->paypalService->cancelSubscription($currentSubscriptionHistory->logs['id']);

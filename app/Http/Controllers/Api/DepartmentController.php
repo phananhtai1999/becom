@@ -45,8 +45,8 @@ class DepartmentController extends AbstractRestAPIController
     public function __construct(
         DepartmentService   $service,
         MyDepartmentService $myService,
-        LanguageService $languageService,
-        TeamService $teamService
+        LanguageService     $languageService,
+        TeamService         $teamService
     )
     {
         $this->service = $service;
@@ -75,7 +75,8 @@ class DepartmentController extends AbstractRestAPIController
         }
 
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => $request->get('user_uuid') ?? auth()->user()->getkey()
+            'user_uuid' => $request->get('user_uuid') ?? auth()->user(),
+            'app_id' => $request->get('user_uuid') ?? auth()->appId(),
         ]));
 
         return $this->sendCreatedJsonResponse(
@@ -101,7 +102,8 @@ class DepartmentController extends AbstractRestAPIController
         }
 
         $this->service->update($model, array_merge($request->all(), [
-            'user_uuid' => $request->get('user_uuid') ?? auth()->user()->getkey()
+            'user_uuid' => $request->get('user_uuid') ?? auth()->user(),
+            'app_id' => $request->get('user_uuid') ?? auth()->appId(),
         ]));
 
         return $this->sendOkJsonResponse(
@@ -121,7 +123,8 @@ class DepartmentController extends AbstractRestAPIController
         }
 
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => auth()->user()->getkey(),
+            'user_uuid' => auth()->user(),
+            'app_id' => auth()->appId(),
         ]));
 
         return $this->sendCreatedJsonResponse(
@@ -157,7 +160,8 @@ class DepartmentController extends AbstractRestAPIController
         }
 
         $this->service->update($model, array_merge($request->all(), [
-            'user_uuid' => auth()->user()->getkey(),
+            'user_uuid' => auth()->user(),
+            'app_id' => auth()->appId(),
         ]));
 
         return $this->sendOkJsonResponse(

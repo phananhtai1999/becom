@@ -50,7 +50,10 @@ class MyWebsitePageService extends AbstractService
         $isCanUseWebsitePages = $this->model
             ->leftJoin('website_website_page', 'website_website_page.website_page_uuid', 'website_pages.uuid')
             ->whereNull('website_website_page.website_page_uuid')
-            ->where('website_pages.user_uuid', auth()->user()->getKey())->get()->pluck('uuid');
+            ->where([
+                ['website_pages.user_uuid', auth()->user()],
+                ['website_pages.app_id', auth()->appId()]
+            ])->get()->pluck('uuid');
         $indexRequest = $this->getIndexRequest($request);
 
         return $this->modelQueryBuilderClass::searchQuery($indexRequest['search'], $indexRequest['search_by'])

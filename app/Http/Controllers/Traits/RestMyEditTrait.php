@@ -15,7 +15,8 @@ trait RestMyEditTrait
         ]);
 
         $this->service->update($model, array_merge($request->all(), [
-            'user_uuid' => auth()->user()->getkey(),
+           'user_uuid' => auth()->user(),
+            'app_id' => auth()->appId(),
         ]));
 
         return $this->sendOkJsonResponse(

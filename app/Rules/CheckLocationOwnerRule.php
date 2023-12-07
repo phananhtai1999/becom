@@ -29,7 +29,7 @@ class CheckLocationOwnerRule implements Rule
     public function passes($attribute, $value)
     {
         if (auth()->user()->roles->whereNotIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->first()) {
-            if (Location::findOrFail($value)->user_uuid != auth()->user()->getKey()) {
+            if (Location::findOrFail($value)->user_uuid != auth()->user()) {
 
                 return false;
             }

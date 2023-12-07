@@ -58,12 +58,14 @@ class UserCreditHistoryController extends AbstractRestAPIController
 
         if (empty($request->user_uuid)) {
             $data = array_merge($request->all(), [
-                'user_uuid' => auth()->user()->getkey(),
-                'add_by_uuid' => auth()->user()->getkey()
+                'user_uuid' => auth()->user(),
+                'add_by_uuid' => auth()->user(),
+                'app_id' => auth()->appId(),
             ]);
         } else {
             $data = array_merge($request->all(), [
-                'add_by_uuid' => auth()->user()->getkey()
+                'add_by_uuid' => auth()->user(),
+                'app_id' => auth()->appId(),
             ]);
         }
 

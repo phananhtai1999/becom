@@ -45,9 +45,9 @@ class MailTemplateController extends AbstractRestAPIController
      * @param SendProjectService $sendProjectService
      */
     public function __construct(
-        MailTemplateService $service,
+        MailTemplateService   $service,
         MyMailTemplateService $myService,
-        SendProjectService $sendProjectService
+        SendProjectService    $sendProjectService
     )
     {
         $this->service = $service;
@@ -70,8 +70,8 @@ class MailTemplateController extends AbstractRestAPIController
         $request = app($this->storeRequest);
 
         if (empty($request->get('send_project_uuid'))) {
-            $userUuid = auth()->user()->getKey();
-        }else {
+            $userUuid = auth()->user();
+        } else {
             $website = $this->sendProjectService->findOneById($request->get('send_project_uuid'));
             $userUuid = $website->user_uuid;
         }
@@ -98,7 +98,7 @@ class MailTemplateController extends AbstractRestAPIController
 
         if (empty($request->get('send_project_uuid')) || $model->send_project_uuid == $request->get('send_project_uuid')) {
             $data = $request->except('user_uuid');
-        }else {
+        } else {
             if (!$this->service->checkExistsMailTemplateInTables($id)) {
                 $website = $this->sendProjectService->findOneById($request->get('send_project_uuid'));
                 $data = array_merge($request->all(), [
@@ -137,7 +137,8 @@ class MailTemplateController extends AbstractRestAPIController
     public function storeMyMailTemplate(MyMailTemplateRequest $request)
     {
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => auth()->user()->getkey(),
+            'user_uuid' => auth()->user(),
+            'app_id' => auth()->appId(),
             'publish_status' => MailTemplate::PUBLISHED_PUBLISH_STATUS
         ]));
 
@@ -217,8 +218,8 @@ class MailTemplateController extends AbstractRestAPIController
     public function storeUnpublishedMailTemplate(UnpublishedMailTemplateRequest $request)
     {
         if (empty($request->get('send_project_uuid'))) {
-            $userUuid = auth()->user()->getKey();
-        }else {
+            $userUuid = auth()->user();
+        } else {
             $website = $this->sendProjectService->findOneById($request->get('send_project_uuid'));
             $userUuid = $website->user_uuid;
         }
@@ -256,7 +257,7 @@ class MailTemplateController extends AbstractRestAPIController
 
         if (empty($request->get('send_project_uuid')) || $model->send_project_uuid == $request->get('send_project_uuid')) {
             $data = $request->except('user_uuid');
-        }else {
+        } else {
             if (!$this->service->checkExistsMailTemplateInTables($id)) {
                 $website = $this->sendProjectService->findOneById($request->get('send_project_uuid'));
                 $data = array_merge($request->all(), [
@@ -283,11 +284,10 @@ class MailTemplateController extends AbstractRestAPIController
     public function changeStatusMailtemplate(AcceptPublishMailTemplateRequest $request)
     {
         $mailTemplateUuids = $request->mail_templates;
-        foreach ($mailTemplateUuids as $mailTemplateUuid)
-        {
+        foreach ($mailTemplateUuids as $mailTemplateUuid) {
             $model = $this->service->findOneById($mailTemplateUuid);
             $list_reason = $model->reject_reason;
-            if ($request->get('publish_status') == MailTemplate::REJECT_PUBLISH_STATUS){
+            if ($request->get('publish_status') == MailTemplate::REJECT_PUBLISH_STATUS) {
                 $list_reason[] = [
                     'content' => $request->get('reject_reason'),
                     'created_at' => Carbon::now()

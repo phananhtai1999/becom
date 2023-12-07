@@ -109,12 +109,13 @@ class BusinessManagementController extends AbstractRestAPIController
         $request = app($this->storeRequest);
 
         // User only have one Business Management
-        $businessManagement = $this->service->checkBusinessManagementOfUser($request->get('owner_uuid') ?? auth()->user()->getKey());
+        $businessManagement = $this->service->checkBusinessManagementOfUser($request->get('owner_uuid') ?? auth()->user(), auth()->appId());
         if ($businessManagement) {
             return $this->sendValidationFailedJsonResponse();
         }
         $model = $this->service->create(array_merge($request->except('domain_uuid'), [
-            'owner_uuid' => $request->get('owner_uuid') ?? auth()->user()->getKey(),
+            'owner_uuid' => $request->get('owner_uuid') ?? auth()->user(),
+            'app_id' => auth()->appId()
         ]));
 
         //check Domain Business Of User Exists Or Not
@@ -141,7 +142,7 @@ class BusinessManagementController extends AbstractRestAPIController
         $model = $this->service->findOrFailById($id);
 
         //User only have one Business Management
-        $businessManagement = $this->service->checkBusinessManagementOfUser($request->get('owner_uuid'));
+        $businessManagement = $this->service->checkBusinessManagementOfUser($request->get('owner_uuid'), auth()->appId());
         if ($businessManagement && $model->owner_uuid != $request->get('owner_uuid')) {
 
             return $this->sendValidationFailedJsonResponse();
@@ -170,13 +171,14 @@ class BusinessManagementController extends AbstractRestAPIController
     public function storeMyBusinessManagement(MyBusinessManagementRequest $request)
     {
         // User only have one Business Management
-        $businessManagement = $this->service->checkBusinessManagementOfUser(auth()->user()->getKey());
+        $businessManagement = $this->service->checkBusinessManagementOfUser(auth()->user(), auth()->appId());
         if ($businessManagement) {
             return $this->sendValidationFailedJsonResponse();
         }
 
         $model = $this->service->create(array_merge($request->except('domain_uuid'), [
-            'owner_uuid' => auth()->user()->getkey(),
+            'owner_uuid' => auth()->user(),
+            'app_id' => auth()->appId(),
         ]));
 
         //check Domain Business Of User Exists Or Not
@@ -214,7 +216,8 @@ class BusinessManagementController extends AbstractRestAPIController
         $model = $this->myService->showMyBusinessManagement($id);
 
         $this->service->update($model, array_merge($request->except('domain_uuid'), [
-            'owner_uuid' => auth()->user()->getkey(),
+            'owner_uuid' => auth()->user(),
+            'app_id' => auth()->appId(),
         ]));
         $model->businessCategories()->sync($request->business_categories ?? $model->business_categories);
 

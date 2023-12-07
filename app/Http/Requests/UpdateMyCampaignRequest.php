@@ -73,7 +73,7 @@ class UpdateMyCampaignRequest extends AbstractRequest
             })],
             'send_project_uuid' => ['numeric', 'min:1', Rule::exists('send_projects', 'uuid')->where(function ($query) {
 
-                return $query->where(                                [
+                return $query->where([
                     ['user_uuid', auth()->user()],
                     ['app_id', auth()->appId()]
                 ])->whereNull('deleted_at');
@@ -87,7 +87,7 @@ class UpdateMyCampaignRequest extends AbstractRequest
             'contact_list' => ['nullable', 'array', 'min:1'],
             'contact_list.*' => ['numeric', 'min:1', Rule::exists('contact_lists', 'uuid')->where(function ($query) {
 
-                return $query->where(                                                [
+                return $query->where([
                     ['user_uuid', auth()->user()],
                     ['app_id', auth()->appId()]
                 ])->whereNull('deleted_at');

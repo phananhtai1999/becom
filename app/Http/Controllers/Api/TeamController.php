@@ -137,7 +137,8 @@ class TeamController extends Controller
     public function storeMy(MyTeamRequest $request)
     {
         $model = $this->service->create(array_merge($request->all(), [
-            'owner_uuid' => auth()->user()->getkey(),
+            'owner_uuid' => auth()->user(),
+            'app_id' => auth()->appId(),
         ]));
 
         return $this->sendCreatedJsonResponse(
@@ -258,7 +259,8 @@ class TeamController extends Controller
     public function joinTeam(JoinTeamRequest $request)
     {
         $model = $this->userTeamService->create(array_merge($request->all(), [
-            'user_uuid' => auth()->user()->getkey(),
+           'user_uuid' => auth()->user(),
+            'app_id' => auth()->appId(),
         ]));
 
         return $this->sendCreatedJsonResponse(
@@ -446,7 +448,8 @@ class TeamController extends Controller
     public function editMy(MyUpdateTeamRequest $request, $id)
     {
         $model = $this->myService->findOneWhereOrFail([
-            'owner_uuid' => auth()->user()->getKey(),
+              'owner_uuid' => auth()->user(),
+            'app_id' => auth()->appId(),
             'uuid' => $id
         ]);
 
@@ -460,7 +463,8 @@ class TeamController extends Controller
     public function destroyMy($id)
     {
         $model = $this->myService->findOneWhereOrFail([
-            'owner_uuid' => auth()->user()->getKey(),
+              'owner_uuid' => auth()->user(),
+            'app_id' => auth()->appId(),
             'uuid' => $id
         ]);
 

@@ -36,7 +36,10 @@ class UpdateMySendProjectRequest extends AbstractRequest
             'description' => ['string'],
             'logo' => ['string'],
             'domain_uuid' => ['nullable', 'numeric', Rule::exists('domains', 'uuid')->where(function ($query) {
-                return $query->where('owner_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey())
+                return $query->where([
+                    ['owner_uuid', $this->request->get('user_uuid') ?? auth()->user()],
+                    ['app_id', $this->request->get('user_uuid') ?? auth()->appId()]
+                ])
                     ->whereNull('deleted_at');
             })],
         ];

@@ -17,7 +17,8 @@ class UserAddOnService extends AbstractService
     public function checkPurchasedAddOn($addOnSubscriptionPlanUuid)
     {
         return $this->model->where([
-            'user_uuid' => auth()->user()->getKey(),
+           'user_uuid' => auth()->user(),
+            'app_id' => auth()->appId(),
             'add_on_subscription_plan_uuid' => $addOnSubscriptionPlanUuid,
         ])->where('expiration_date', '>', Carbon::now())->first();
     }

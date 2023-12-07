@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
-use Illuminate\Validation\Rule;
 
 class UpdateMyFooterTemplateRequest extends AbstractRequest
 {
@@ -29,7 +28,7 @@ class UpdateMyFooterTemplateRequest extends AbstractRequest
             'template' => ['string'],
             'template_json' => ['string'],
             'type' => ['string', 'in:sms,email,telegram,viber'],
-            'active_by_uuid' => ['nullable','numeric', "in:".auth()->user()->getKey()]
+            'active_by_uuid' => ['nullable','numeric', "in:".auth()->user()]
         ];
     }
 }

@@ -118,7 +118,7 @@ class UserController extends AbstractRestAPIController
      */
     public function editMyProfile(UpdateMyProfileRequest $request)
     {
-        $model = $this->service->findOrFailById(auth()->user()->getkey());
+        $model = $this->service->findOrFailById(auth()->user());
 
         $data = $request->only(['first_name', 'last_name', 'avatar_img', 'cover_img']);
         $this->service->update($model, $data);
@@ -309,5 +309,5 @@ class UserController extends AbstractRestAPIController
 
         return $this->sendOkJsonResponse();
     }
-    
+
 }

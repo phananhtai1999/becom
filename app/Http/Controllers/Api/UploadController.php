@@ -77,7 +77,7 @@ class UploadController extends AbstractRestAPIController
             $imageName = $char . '-' . $fileName;
             //Image name mailbox
             if ($type === 'mailbox') {
-                $imageName = 'mailbox/' . auth()->user()->getkey() . "/$fileName";
+                $imageName = 'mailbox/' . auth()->user() . "/$fileName";
             }
             //Bucket S3
             $configS3 = $this->uploadService->getStorageServiceByType($type);

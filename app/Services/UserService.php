@@ -297,13 +297,13 @@ class UserService extends AbstractService
     public function getCurrentUserRole(): string
     {
         if (auth()->user()->roles->whereIn('slug', Role::ROLE_ROOT)->count()) {
-            $char = 'r' . auth()->user()->getkey();
+            $char = 'r' . auth()->user();
         } elseif (auth()->user()->roles->whereIn('slug', [Role::ROLE_ADMIN])->count()) {
-            $char = 'a' . auth()->user()->getkey();
+            $char = 'a' . auth()->user();
         } elseif (auth()->user()->roles->whereIn('slug', [Role::ROLE_EDITOR])->count()) {
-            $char = 'e' . auth()->user()->getkey();
+            $char = 'e' . auth()->user();
         } else {
-            $char = 'u' . auth()->user()->getkey();
+            $char = 'u' . auth()->user();
         }
 
         return $char;

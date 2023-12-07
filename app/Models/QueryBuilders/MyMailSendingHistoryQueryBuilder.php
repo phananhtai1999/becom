@@ -20,7 +20,10 @@ class MyMailSendingHistoryQueryBuilder extends AbstractQueryBuilder
     {
         return MailSendingHistory::select('mail_sending_history.*')
             ->join('campaigns', 'campaigns.uuid', '=', 'mail_sending_history.campaign_uuid')
-            ->where('campaigns.user_uuid', auth()->user()->getkey());
+            ->where([
+                ['campaigns.user_uuid', auth()->user()],
+                ['campaigns.app_id', auth()->appId()]
+            ]);
     }
 
     /**

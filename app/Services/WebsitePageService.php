@@ -133,7 +133,10 @@ class WebsitePageService extends AbstractService
             ->leftJoin('website_website_page', 'website_website_page.website_page_uuid', 'website_pages.uuid')
             ->whereNull('website_website_page.website_page_uuid')
             ->where(function ($query) {
-                return $query->where('website_pages.user_uuid', auth()->user()->getKey())
+                return $query->where([
+                    ['website_pages.user_uuid', auth()->user()],
+                    ['website_pages.app_id', auth()->appId()]
+                ])
                     ->orWhere('website_pages.is_default', true);
             })->get()->pluck('uuid');
         $indexRequest = $this->getIndexRequest($request);

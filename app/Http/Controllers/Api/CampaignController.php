@@ -226,7 +226,8 @@ class CampaignController extends AbstractRestAPIController
 
         if (empty($request->get('user_uuid'))) {
             $data = array_merge($request->all(), [
-                'user_uuid' => auth()->user()->getkey(),
+                'user_uuid' => auth()->user(),
+                'app_id' => auth()->appId(),
             ]);
         } else {
             $data = $request->all();
@@ -339,7 +340,7 @@ class CampaignController extends AbstractRestAPIController
      */
     public function storeMyCampaign(MyCampaignRequest $request)
     {
-        $user = $this->userService->findOrFailById(auth()->user()->getkey());
+        $user = $this->userService->findOrFailById(auth()->user());
         $configSmtpAuto = $this->configService->findConfigByKey('smtp_auto');
 
         if ($request->get('type') === "scenario" && count($request->get('contact_list')) > 1) {
@@ -357,7 +358,8 @@ class CampaignController extends AbstractRestAPIController
         }
 
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => auth()->user()->getkey(),
+            'user_uuid' => auth()->user(),
+            'app_id' => auth()->appId(),
         ]));
 
         $model->contactLists()->attach($request->get('contact_list', []));
@@ -398,7 +400,7 @@ class CampaignController extends AbstractRestAPIController
     {
         $model = $this->myService->findMyCampaignByKeyOrAbort($id);
 
-        $user = $this->userService->findOrFailById(auth()->user()->getkey());
+        $user = $this->userService->findOrFailById(auth()->user());
         $config = $this->configService->findConfigByKey('smtp_auto');
 
         if ($request->get('type') === "scenario" && count($request->get('contact_list')) > 1) {
@@ -442,7 +444,8 @@ class CampaignController extends AbstractRestAPIController
         }
 
         $this->service->update($model, array_merge($request->all(), [
-            'user_uuid' => auth()->user()->getkey(),
+            'user_uuid' => auth()->user(),
+            'app_id' => auth()->appId(),
         ]));
 
         $model->contactLists()->sync($request->contact_list ?? $model->contactLists);

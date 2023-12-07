@@ -68,7 +68,10 @@ class PlatformPackageController extends AbstractRestAPIController
      * @return JsonResponse
      */
     public function myPlatformPackage() {
-        $myPlatformPackage = $this->userPlatformPackageService->findOneWhere(['user_uuid' => auth()->user()->getKey()]);
+        $myPlatformPackage = $this->userPlatformPackageService->findOneWhere([
+            'user_uuid' => auth()->user(),
+            'app_id' => auth()->appId(),
+        ]);
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->userPlatformResourceClass, $myPlatformPackage)

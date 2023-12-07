@@ -28,7 +28,7 @@ class checkTeamOwnerRule implements Rule
     public function passes($attribute, $value)
     {
         if (auth()->user()->roles->whereNotIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->first()) {
-            if (Team::findOrFail($value)->owner_uuid != auth()->user()->getKey()) {
+            if (Team::findOrFail($value)->owner_uuid != auth()->user()) {
 
                 return false;
             }

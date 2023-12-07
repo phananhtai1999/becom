@@ -90,7 +90,11 @@ class AssetService extends AbstractService
 
     public function destroyMyAsset($id)
     {
-        $model = $this->findOneWhereOrFail(['uuid' => $id, 'user_uuid' => auth()->user()->getKey()]);
+        $model = $this->findOneWhereOrFail([
+            'uuid' => $id,
+            'user_uuid' => auth()->user(),
+            'app_id' => auth()->appId(),
+        ]);
         $model->delete();
     }
 

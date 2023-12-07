@@ -99,7 +99,8 @@ class MyCampaignService extends AbstractService
             ->join('send_projects', 'send_projects.uuid', '=', 'campaigns.send_project_uuid')
             ->where([
                 ['campaigns.uuid', $campaignUuid],
-                ['send_projects.user_uuid', auth()->user()->getKey()],
+                ['send_projects.user_uuid', auth()->user()],
+                ['send_projects.app_id', auth()->appid()],
                 ['campaigns.from_date', '<=', Carbon::now($timezone)],
                 ['campaigns.to_date', '>=', Carbon::now($timezone)],
                 ['campaigns.was_finished', false],
@@ -217,10 +218,10 @@ class MyCampaignService extends AbstractService
     {
         $string = $type === "month" ? "-01" : "";
         $todayCampaignTableSubQuery = $yesterdayCampaignTableSubQuery = $this->model->selectRaw("date_format(updated_at, '{$dateFormat}') as label, COUNT(uuid) as createCampaign")
-            ->whereRaw('date(updated_at) >= "' . $startDate . '" and date(updated_at) <= "' . $endDate . '" and user_uuid = ' . auth()->user()->getKey())
+            ->whereRaw('date(updated_at) >= "' . $startDate . '" and date(updated_at) <= "' . $endDate . '" and user_uuid = ' . auth()->user())
             ->groupBy('label')->toSql();
         $campaignStatusTable = $this->model->selectRaw("date_format(updated_at, '{$dateFormat}') as label,  COUNT(IF( status = 'active', 1, NULL ) ) as active, COUNT(IF( status <> 'active', 1, NULL ) ) as other")
-            ->whereRaw('date(updated_at) >= "' . $startDate . '" and date(updated_at) <= "' . $endDate . '" and user_uuid = ' . auth()->user()->getKey())
+            ->whereRaw('date(updated_at) >= "' . $startDate . '" and date(updated_at) <= "' . $endDate . '" and user_uuid = ' . auth()->user())
             ->groupBy('label')
             ->orderBy('label', 'ASC')->toSql();
 
@@ -242,10 +243,10 @@ class MyCampaignService extends AbstractService
         return $this->model->selectRaw("COUNT(IF( status = 'active', 1, NULL ) ) as active, COUNT(IF( status <> 'active', 1, NULL ) ) as other")
             ->whereDate('updated_at', '>=', $startDate)
             ->whereDate('updated_at', '<=', $endDate)
-            ->where(                [
-                    ['user_uuid', auth()->user()],
-                    ['app_id', auth()->appId()]
-                ])->first()->setAppends([]);
+            ->where([
+                ['user_uuid', auth()->user()],
+                ['app_id', auth()->appId()]
+            ])->first()->setAppends([]);
     }
 
     /**
