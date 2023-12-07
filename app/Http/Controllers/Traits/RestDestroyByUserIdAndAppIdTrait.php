@@ -10,7 +10,7 @@ trait RestDestroyByUserIdAndAppIdTrait
      * @param $id
      * @return JsonResponse
      */
-    public function destroy($id)
+    public function destroyMy($id)
     {
         $this->service->destroyByUserIdAndAppId($id);
 

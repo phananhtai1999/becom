@@ -55,7 +55,7 @@ class CompanyController extends AbstractRestAPIController
         $request = app($this->storeRequest);
 
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => auth()->user(),
+            'user_uuid' => $request->get('user_uuid') ?? auth()->user(),
             'app_id' => auth()->appId(),
         ]));
 
@@ -77,7 +77,7 @@ class CompanyController extends AbstractRestAPIController
         $model = $this->service->findOrFailById($id);
 
         $this->service->update($model, array_merge($request->all(), [
-            'user_uuid' => auth()->user(),
+            'user_uuid' => $request->get('user_uuid') ?? auth()->user(),
             'app_id' => auth()->appId(),
         ]));
 

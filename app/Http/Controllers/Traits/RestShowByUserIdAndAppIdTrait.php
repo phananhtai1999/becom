@@ -10,7 +10,7 @@ trait RestShowByUserIdAndAppIdTrait
      * @param $id
      * @return JsonResponse
      */
-    public function show($id)
+    public function showMy($id)
     {
         $model = $this->service->findOneWhereOrFailByUserUuidAndAppId($id);
 

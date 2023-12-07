@@ -29,7 +29,6 @@ class LocationRequest extends FormRequest
                 ->where('user_uuid', auth()->user()->getKey())
                 ->whereNull('deleted_at')],
             'address' => ['string'],
-            'user_uuid' => ['required', 'exists:users,uuid']
         ];
     }
 }

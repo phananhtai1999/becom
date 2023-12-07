@@ -56,7 +56,8 @@ class NoteController extends AbstractRestAPIController
         $request = app($this->storeRequest);
 
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => $request->get('user_uuid') ?? auth()->user()->getKey()
+            'user_uuid' => $request->get('user_uuid') ?? auth()->user(),
+            'app_id' => auth()->appId(),
         ]));
 
         //Add activity history
@@ -80,7 +81,8 @@ class NoteController extends AbstractRestAPIController
         $model = $this->service->findOrFailById($id);
 
         $this->service->update($model, array_merge($request->all(), [
-            'user_uuid' => $request->get('user_uuid') ?? auth()->user()->getKey()
+            'user_uuid' => $request->get('user_uuid') ?? auth()->user(),
+            'app_id' => auth()->appId(),
         ]));
 
         //Add activity history
@@ -115,7 +117,8 @@ class NoteController extends AbstractRestAPIController
     public function storeMyNote(MyNoteRequest $request)
     {
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => auth()->user()->getkey(),
+            'user_uuid' => auth()->user(),
+            'app_id' => auth()->appId(),
         ]));
 
         //Add activity history
@@ -149,7 +152,8 @@ class NoteController extends AbstractRestAPIController
         $model = $this->myService->showMyNote($id);
 
         $this->service->update($model, array_merge($request->all(), [
-            'user_uuid' => auth()->user()->getkey(),
+            'user_uuid' => auth()->user(),
+            'app_id' => auth()->appId()
         ]));
 
         //Add activity history

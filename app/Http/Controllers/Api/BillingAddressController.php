@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Abstracts\AbstractRestAPIController;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestEditTrait;
-use App\Http\Controllers\Traits\RestIndexMyTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\BillingAddressRequest;
@@ -39,12 +38,14 @@ class BillingAddressController extends AbstractRestAPIController
         $default = $this->service->defaultBillingAddress();
         if (!$default) {
             $model = $this->service->create(array_merge($request->all(), [
-                'user_uuid' => auth()->user()->getkey(),
+                'user_uuid' => auth()->user(),
+                'app_id' => auth()->appId(),
                 'is_default' => true
             ]));
         } else {
             $model = $this->service->create(array_merge($request->all(), [
-                'user_uuid' => auth()->user()->getkey(),
+                'user_uuid' => auth()->user(),
+                'app_id' => auth()->appId(),
             ]));
         }
 
@@ -60,11 +61,12 @@ class BillingAddressController extends AbstractRestAPIController
      */
     public function edit(UpdateBillingAddressRequest $request, $id)
     {
-        $billingAddress = $this->service->findOrFailById($id);
+        $billingAddress = $this->service->findOneWhereOrFailByUserUuidAndAppId($id);
         if ($billingAddress->billing_address != $request->get('billing_address')) {
-            $this->service->destroy($billingAddress->uuid);
+            $this->service->destroyByUserIdAndAppId($billingAddress->uuid);
             $billingAddress = $this->service->create(array_merge($billingAddress->toArray(), [
-                'user_uuid' => auth()->user()->getkey(),
+                'user_uuid' => auth()->user(),
+                'app_id' => auth()->appId(),
             ], $request->all()));
         } else {
             $this->service->update($billingAddress, $request->all());
@@ -77,7 +79,10 @@ class BillingAddressController extends AbstractRestAPIController
 
     public function myIndex()
     {
-        $models = $this->service->findAllWhere(['user_uuid' => auth()->user()->getKey()]);
+        $models = $this->service->findAllWhere([
+            ['user_uuid' => auth()->user()],
+            ['app_id' => auth()->appId()]
+        ]);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
