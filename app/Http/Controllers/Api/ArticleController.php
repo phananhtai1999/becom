@@ -92,7 +92,7 @@ class ArticleController extends AbstractRestAPIController
                 'description' => $request->keyword ? array_merge($request->keyword, $request->description ?? $request->keyword) : $request->description
             ]));
         } else {
-            $user_uuid = auth()->user()->getkey();
+            $user_uuid = auth()->user();
             $model = $this->service->create(array_merge($request->except(['reject_reason']), [
                 'user_uuid' => $user_uuid,
                 'content_for_user' => $request->content_for_user ?: Article::PUBLIC_CONTENT_FOR_USER,
@@ -178,7 +178,8 @@ class ArticleController extends AbstractRestAPIController
         $content = $this->service->mapTypeLabelToContent($request->content, $request->content_type);
 
         $model = $this->service->create(array_merge($request->except(['reject_reason']), [
-            'user_uuid' => auth()->user()->getKey(),
+            'user_uuid' => auth()->user(),
+            'app_id' => auth()->appId(),
             'content_for_user' => $request->content_for_user ?: Article::PUBLIC_CONTENT_FOR_USER,
             'content' => $content,
             'description' => $request->keyword ? array_merge($request->keyword, $request->description ?? $request->keyword) : $request->description
@@ -328,7 +329,8 @@ class ArticleController extends AbstractRestAPIController
         //Role editor limit by config days
         if ($role && $config) {
             $models = $this->service->getCollectionWithPaginationByCondition($request, [
-                ['user_uuid', auth()->user()->getKey()],
+                ['user_uuid', auth()->user()],
+                ['app_id', auth()->appId()],
                 ['updated_at', '>=', Carbon::now()->subDays($config->value)]
             ]);
         } else {
@@ -392,7 +394,8 @@ class ArticleController extends AbstractRestAPIController
         $content = $this->service->mapTypeLabelToContent($request->get('content'), $request->content_type);
 
         $model = $this->service->create(array_merge($request->except(['reject_reason']), [
-            'user_uuid' => auth()->user()->getKey(),
+            'user_uuid' => auth()->user(),
+            'app_id' => auth()->appId(),
             'content' => $content,
             'description' => $request->keyword ? array_merge($request->keyword, $request->description ?? $request->keyword) : $request->description
         ]));

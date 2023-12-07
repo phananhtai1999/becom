@@ -13,7 +13,8 @@ trait RestMyShowTrait
     public function showMy($id)
     {
         $model = $this->myService->findOneWhereOrFail([
-            ['user_uuid', auth()->user()->getkey()],
+            ['user_uuid', auth()->user()],
+            ['app_id', auth()->appId()],
             ['uuid', $id]
         ]);
 

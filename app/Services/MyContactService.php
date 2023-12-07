@@ -26,7 +26,8 @@ class MyContactService extends AbstractService
     public function findMyContactByKeyOrAbort($id)
     {
         return $this->findOneWhereOrFail([
-            ['user_uuid', auth()->user()->getkey()],
+            ['user_uuid', auth()->user()],
+            ['app_id', auth()->appId()],
             ['uuid', $id]
         ]);
     }
@@ -53,7 +54,10 @@ class MyContactService extends AbstractService
             ->whereDate('created_at', '>=', $startDate)
             ->whereDate('created_at', '<=', $endDate)
             ->whereNull('deleted_at')
-            ->where('user_uuid', auth()->user()->getkey())
+            ->where([
+                ['user_uuid', auth()->user()],
+                ['app_id', auth()->appId()]
+            ])
             ->get();
 
         return $totalMyContact['0']->contact;
@@ -71,7 +75,10 @@ class MyContactService extends AbstractService
             ->whereDate('created_at', '>=', $startDate)
             ->whereDate('created_at', '<=', $endDate)
             ->whereNull('deleted_at')
-            ->where('user_uuid', auth()->user()->getkey())
+            ->where([
+                ['user_uuid', auth()->user()],
+                ['app_id', auth()->appId()]
+            ])
             ->orderBy('label', 'ASC')
             ->groupby('label')
             ->get()->toArray();
@@ -89,7 +96,10 @@ class MyContactService extends AbstractService
             ->whereDate('created_at', '>=', $startDate)
             ->whereDate('created_at', '<=', $endDate)
             ->whereNull('deleted_at')
-            ->where('user_uuid', auth()->user()->getkey())
+            ->where([
+                ['user_uuid', auth()->user()],
+                ['app_id', auth()->appId()]
+            ])
             ->orderBy('label', 'ASC')
             ->groupby('label')
             ->get()->toArray();
@@ -426,7 +436,10 @@ class MyContactService extends AbstractService
     {
         $modelKeyName = $this->model->getKeyName();
 
-        return QueryBuilder::for($this->model->where('user_uuid', auth()->user()->getkey()))
+        return QueryBuilder::for($this->model->where([
+            ['user_uuid', auth()->user()],
+            ['app_id', auth()->appId()]
+        ]))
             ->allowedFields([
                 $modelKeyName,
                 'email',

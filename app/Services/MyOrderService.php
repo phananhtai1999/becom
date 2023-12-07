@@ -19,7 +19,8 @@ class MyOrderService extends AbstractService
     public function showMyOrder($id)
     {
         return $this->findOneWhereOrFail([
-            ['user_uuid', auth()->user()->getkey()],
+            ['user_uuid', auth()->user()],
+            ['app_id', auth()->appId()],
             ['uuid', $id]
         ]);
     }

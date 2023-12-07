@@ -18,7 +18,10 @@ class UserDetailService extends AbstractService
     public function myUserDetail()
     {
         return $this->model
-            ->where('user_uuid', auth()->user()->getKey())
+            ->where([
+                ['user_uuid', auth()->user()],
+                ['app_id', auth()->appId()]
+            ])
             ->first();
     }
 }

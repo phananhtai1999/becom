@@ -16,7 +16,10 @@ class MySmtpAccountQueryBuilder extends AbstractQueryBuilder
      */
     public static function baseQuery()
     {
-        return SmtpAccount::where('user_uuid', auth()->user()->getKey());
+        return SmtpAccount::where([
+            ['user_uuid', auth()->user()],
+            ['app_id', auth()->appId()]
+        ]);
     }
 
     /**

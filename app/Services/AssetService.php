@@ -53,7 +53,8 @@ class AssetService extends AbstractService
         return $loopCount;
     }
 
-    public function validateGif($filename, $uploadUrl) {
+    public function validateGif($filename, $uploadUrl)
+    {
         $duration = $this->getGifDuration($filename);
         $loop = $this->getGifLoopCount($filename);
         if (empty($loop) || $duration > 30 || $loop * $duration > 30) {
@@ -67,7 +68,8 @@ class AssetService extends AbstractService
         return ['is_failed' => false];
     }
 
-    public function addJsCodeToIndex($models) {
+    public function addJsCodeToIndex($models)
+    {
         $mainUrl = $this->getConfigByKeyInCache('main_url');
         $code = auth()->user()->partner->code ?? Role::ROLE_ADMIN;
         foreach ($models as $model) {
@@ -92,11 +94,15 @@ class AssetService extends AbstractService
         $model->delete();
     }
 
-    public function totalEditorAssetChart($startDate, $endDate){
+    public function totalEditorAssetChart($startDate, $endDate)
+    {
         return $this->model->selectRaw("COUNT(IF( status = 'publish', 1, NULL ) ) as approve,
         COUNT(IF( status = 'pending', 1, NULL ) ) as pending,
         COUNT(IF( status = 'reject', 1, NULL ) ) as reject")
-            ->where('user_uuid', auth()->user()->getKey())
+            ->where([
+                ['user_uuid', auth()->user()],
+                ['app_id', auth()->appId()]
+            ])
             ->whereDate('updated_at', '>=', $startDate)
             ->whereDate('updated_at', '<=', $endDate)
             ->first()->toArray();
@@ -108,7 +114,10 @@ class AssetService extends AbstractService
         COUNT(IF( status = 'publish', 1, NULL ) ) as approve,
         COUNT(IF( status = 'pending', 1, NULL ) ) as pending,
         COUNT(IF( status = 'reject', 1, NULL ) ) as reject")
-            ->where('user_uuid', auth()->user()->getKey())
+            ->where([
+                ['user_uuid', auth()->user()],
+                ['app_id', auth()->appId()]
+            ])
             ->whereDate('updated_at', '>=', $startDate)
             ->whereDate('updated_at', '<=', $endDate)
             ->groupBy('label')
@@ -124,7 +133,7 @@ class AssetService extends AbstractService
         $times = [];
         $result = [];
 
-        if ($groupBy == "hour"){
+        if ($groupBy == "hour") {
             $dateFormat = "%Y-%m-%d %H:00:00";
 
             $endDate = $endDate->endOfDay();
@@ -134,7 +143,7 @@ class AssetService extends AbstractService
             }
         }
 
-        if ($groupBy == "date"){
+        if ($groupBy == "date") {
             $dateFormat = "%Y-%m-%d";
             while ($currentDate <= $endDate) {
                 $times[] = $currentDate->format('Y-m-d');
@@ -142,7 +151,7 @@ class AssetService extends AbstractService
             }
         }
 
-        if ($groupBy == "month"){
+        if ($groupBy == "month") {
             $dateFormat = "%Y-%m";
             while ($currentDate <= $endDate) {
                 $times[] = $currentDate->format('Y-m');
@@ -152,19 +161,19 @@ class AssetService extends AbstractService
 
         $charts = $this->getAssetsChartByDateFormat($dateFormat, $startDate, $endDate)->keyBy('label');
 
-        foreach ($times as $time){
-            $mailByTime = $charts->first(function($item, $key) use ($time){
+        foreach ($times as $time) {
+            $mailByTime = $charts->first(function ($item, $key) use ($time) {
                 return $key == $time;
             });
 
-            if($mailByTime){
+            if ($mailByTime) {
                 $result[] = $mailByTime->toArray();
-            }else{
+            } else {
                 $result [] = [
                     'label' => $time,
-                    'approve'  => 0,
-                    'pending'  => 0,
-                    'reject'  => 0,
+                    'approve' => 0,
+                    'pending' => 0,
+                    'reject' => 0,
                 ];
             }
         }

@@ -30,7 +30,10 @@ class RemindRequest extends AbstractRequest
             'date' => ['required', 'date'],
             'contact' => ['required', 'array', 'min:1'],
             'contact.*' => ['numeric', 'min:1', Rule::exists('contacts', 'uuid')->where(function ($query) {
-                return $query->where('user_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey());
+                return $query->where([
+                    ['user_uuid', $this->request->get('user_uuid') ?? auth()->user()],
+                    ['app_id', auth()->appId()]
+                ]);
             })->whereNull('deleted_at')],
             'user_uuid' => ['nullable', 'numeric', Rule::exists('users','uuid')->whereNull('deleted_at')],
         ];

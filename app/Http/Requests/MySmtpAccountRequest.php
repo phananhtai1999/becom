@@ -29,7 +29,10 @@ class MySmtpAccountRequest extends AbstractRequest
             'mail_host' => ['required_if:mail_mailer,===,smtp', 'string'],
             'mail_port' => ['required_if:mail_mailer,===,smtp', 'string'],
             'mail_username' => ['required_if:mail_mailer,===,smtp', 'string', Rule::unique('smtp_accounts')->where(function ($query) {
-                return $query->where('user_uuid', auth()->user()->getkey())->whereNull('deleted_at');
+                return $query->where(                                [
+                    ['user_uuid', auth()->user()],
+                    ['app_id', auth()->appId()]
+                ])->whereNull('deleted_at');
             })],
             'mail_password' => ['required_if:mail_mailer,===,smtp', 'string'],
             'smtp_mail_encryption_uuid' => ['required', 'numeric', 'exists:smtp_account_encryptions,uuid'],
@@ -38,7 +41,10 @@ class MySmtpAccountRequest extends AbstractRequest
             'secret_key' => ['required_if:mail_mailer,===,telegram,viber', 'string'],
             'send_project_uuid' => ['required', 'numeric', 'min:1', Rule::exists('send_projects', 'uuid')->where(function ($query) {
 
-                return $query->where('user_uuid', auth()->user()->getkey())->whereNull('deleted_at');
+                return $query->where(                                [
+                    ['user_uuid', auth()->user()],
+                    ['app_id', auth()->appId()]
+                ])->whereNull('deleted_at');
             })],
         ];
     }

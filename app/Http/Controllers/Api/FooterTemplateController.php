@@ -71,7 +71,8 @@ class FooterTemplateController extends AbstractRestAPIController
     {
         $request = app($this->storeRequest);
         $model = $this->service->create(array_merge($request->except('active_by_uuid'), [
-            'user_uuid' => auth()->user()->getKey(),
+            'user_uuid' => auth()->user(),
+            'app_id' => auth()->appId(),
             'is_default' => false,
             'publish_status' => FooterTemplate::PUBLISHED_PUBLISH_STATUS
         ]));
@@ -91,7 +92,7 @@ class FooterTemplateController extends AbstractRestAPIController
         $model = $this->service->findOrFailById($id);
 
         if ($request->get('is_default')) {
-            if ($model->user_uuid != auth()->user()->getKey()) {
+            if ($model->user_uuid != auth()->user()) {
                 return $this->sendValidationFailedJsonResponse();
             }
             $this->service->changeIsDefaultFooterTemplateByType($request->get('type') ?? $model->type,
@@ -146,7 +147,8 @@ class FooterTemplateController extends AbstractRestAPIController
             return $this->sendJsonResponse(false, 'You need to buy platform/add-on', ['data' => $this->getPlatformByPermission(config('api.footer.create'))], 403);
         }
         $model = $this->service->create(array_merge($request->except('active_by_uuid'), [
-            'user_uuid' => auth()->user()->getKey(),
+            'user_uuid' => auth()->user(),
+            'app_id' => auth()->appId(),
             'is_default' => false,
             'publish_status' => FooterTemplate::PUBLISHED_PUBLISH_STATUS,
             'template_type' => 'ads'

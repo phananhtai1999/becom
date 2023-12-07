@@ -17,7 +17,10 @@ class MyFooterTemplateQueryBuilder extends AbstractQueryBuilder
      */
     public static function baseQuery()
     {
-        return FooterTemplate::where('user_uuid', auth()->user()->getKey());
+        return FooterTemplate::where([
+            ['user_uuid', auth()->user()],
+            ['app_id', auth()->appId()]
+        ]);
     }
 
     /**

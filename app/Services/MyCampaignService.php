@@ -24,7 +24,8 @@ class MyCampaignService extends AbstractService
     public function findMyCampaignByKeyOrAbort($id)
     {
         return $this->findOneWhereOrFail([
-            ['user_uuid', auth()->user()->getkey()],
+            ['user_uuid', auth()->user()],
+            ['app_id', auth()->appId()],
             ['uuid', $id]
         ]);
     }
@@ -48,12 +49,13 @@ class MyCampaignService extends AbstractService
     public function checkActiveMyCampainByColumn($column, $id)
     {
         $timezone = $this->getConfigByKeyInCache('timezone')->value;
-        if ($column === "type"){
+        if ($column === "type") {
             $activeCampaign = $this->model->where([
                 ['uuid', $id],
-                ['user_uuid', auth()->user()->getKey()]
+                ['user_uuid', auth()->user()],
+                ['app_id', auth()->appId()]
             ])->whereIn('type', ['simple', 'scenario'])->first();
-        }else {
+        } else {
             $query = [];
             if ($column === "was_finished") {
                 $query = [$column, false];
@@ -73,7 +75,8 @@ class MyCampaignService extends AbstractService
 
             $activeCampaign = $this->model->where([
                 ['uuid', $id],
-                ['user_uuid', auth()->user()->getKey()],
+                ['user_uuid', auth()->user()],
+                ['app_id', auth()->appId()],
                 $query
             ])->first();
 
@@ -103,7 +106,7 @@ class MyCampaignService extends AbstractService
                 ['campaigns.was_stopped_by_owner', false],
             ])->first();
 
-        if($myCampaign){
+        if ($myCampaign) {
             return true;
         }
         return false;
@@ -121,34 +124,34 @@ class MyCampaignService extends AbstractService
         $subDate = $startDate;
         $startDate = Carbon::parse($startDate);
 
-        if($groupBy === "hour"){
+        if ($groupBy === "hour") {
             $dateFormat = "%Y-%m-%d %H:00:00";
             $subDate = Carbon::parse($subDate)->subDay();
             $endDate = Carbon::parse($endDate)->endOfDay();
 
-            while($startDate <= $endDate){
+            while ($startDate <= $endDate) {
                 $times[] = $startDate->format('Y-m-d H:00:00');
                 $startDate = $startDate->addHour();
             }
         }
 
-        if($groupBy === "date"){
+        if ($groupBy === "date") {
             $dateFormat = "%Y-%m-%d";
             $subDate = Carbon::parse($subDate)->subDay();
             $endDate = Carbon::parse($endDate);
 
-            while($startDate <= $endDate){
+            while ($startDate <= $endDate) {
                 $times[] = $startDate->format('Y-m-d');
                 $startDate = $startDate->addDay();
             }
         }
 
-        if($groupBy === "month"){
+        if ($groupBy === "month") {
             $dateFormat = "%Y-%m";
             $subDate = Carbon::parse($subDate)->subMonth();
             $endDate = Carbon::parse($endDate);
 
-            while($startDate <= $endDate){
+            while ($startDate <= $endDate) {
                 $times[] = $startDate->format('Y-m');
                 $startDate = $startDate->addMonth();
             }
@@ -169,7 +172,7 @@ class MyCampaignService extends AbstractService
                         'other' => $campaignIncrease->other,
                         'increase' => $campaignIncrease->increase ?? $campaignIncrease->active + $campaignIncrease->other
                     ];
-                }else{
+                } else {
                     $prevTime = $time;
                     if ($groupBy === 'hour') {
                         $prevTime = Carbon::parse($prevTime)->subHour()->toDateTimeString();
@@ -214,10 +217,10 @@ class MyCampaignService extends AbstractService
     {
         $string = $type === "month" ? "-01" : "";
         $todayCampaignTableSubQuery = $yesterdayCampaignTableSubQuery = $this->model->selectRaw("date_format(updated_at, '{$dateFormat}') as label, COUNT(uuid) as createCampaign")
-            ->whereRaw('date(updated_at) >= "'.$startDate.'" and date(updated_at) <= "'.$endDate.'" and user_uuid = '.auth()->user()->getKey())
+            ->whereRaw('date(updated_at) >= "' . $startDate . '" and date(updated_at) <= "' . $endDate . '" and user_uuid = ' . auth()->user()->getKey())
             ->groupBy('label')->toSql();
         $campaignStatusTable = $this->model->selectRaw("date_format(updated_at, '{$dateFormat}') as label,  COUNT(IF( status = 'active', 1, NULL ) ) as active, COUNT(IF( status <> 'active', 1, NULL ) ) as other")
-            ->whereRaw('date(updated_at) >= "'.$startDate.'" and date(updated_at) <= "'.$endDate.'" and user_uuid = '.auth()->user()->getKey())
+            ->whereRaw('date(updated_at) >= "' . $startDate . '" and date(updated_at) <= "' . $endDate . '" and user_uuid = ' . auth()->user()->getKey())
             ->groupBy('label')
             ->orderBy('label', 'ASC')->toSql();
 
@@ -239,7 +242,10 @@ class MyCampaignService extends AbstractService
         return $this->model->selectRaw("COUNT(IF( status = 'active', 1, NULL ) ) as active, COUNT(IF( status <> 'active', 1, NULL ) ) as other")
             ->whereDate('updated_at', '>=', $startDate)
             ->whereDate('updated_at', '<=', $endDate)
-            ->where('user_uuid', auth()->user()->getKey())->first()->setAppends([]);
+            ->where(                [
+                    ['user_uuid', auth()->user()],
+                    ['app_id', auth()->appId()]
+                ])->first()->setAppends([]);
     }
 
     /**

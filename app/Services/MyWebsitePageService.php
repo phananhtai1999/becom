@@ -19,7 +19,8 @@ class MyWebsitePageService extends AbstractService
     public function showMyWebsitePageByUuid($id)
     {
         return $this->findOneWhereOrFail([
-            ['user_uuid', auth()->user()->getkey()],
+            ['user_uuid', auth()->user()],
+            ['app_id', auth()->appId()],
             ['uuid', $id]
         ]);
     }

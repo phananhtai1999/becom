@@ -18,7 +18,8 @@ class MyScenarioService extends AbstractService
     public function findMyScenarioByUuid($id)
     {
         return $this->findOneWhereOrFail([
-            ['user_uuid', auth()->user()->getkey()],
+            ['user_uuid', auth()->user()],
+            ['app_id', auth()->appId()],
             ['uuid', $id]
         ]);
     }
@@ -28,8 +29,8 @@ class MyScenarioService extends AbstractService
         $sortCredit = $request->get('sort');
         $request = $this->getIndexRequest($request);
         if ($sortCredit === 'number_credit') {
-            $result =  $this->modelQueryBuilderClass::searchQuery($request['search'], $request['search_by'])->get()->sortBy('number_credit');
-        }else{
+            $result = $this->modelQueryBuilderClass::searchQuery($request['search'], $request['search_by'])->get()->sortBy('number_credit');
+        } else {
             $result = $this->modelQueryBuilderClass::searchQuery($request['search'], $request['search_by'])->get()->sortByDesc('number_credit');
         }
 

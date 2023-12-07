@@ -16,7 +16,10 @@ class MySendProjectQueryBuilder extends AbstractQueryBuilder
      */
     public static function baseQuery()
     {
-        return SendProject::where('user_uuid', auth()->user()->getkey());
+        return SendProject::where([
+            ['user_uuid', auth()->user()],
+            ['app_id', auth()->appId()]
+        ]);
     }
 
     /**

@@ -9,7 +9,8 @@ trait RestMyEditTrait
         $request = app($this->editMyRequest);
 
         $model = $this->myService->findOneWhereOrFail([
-            ['user_uuid', auth()->user()->getkey()],
+            ['user_uuid', auth()->user()],
+            ['app_id', auth()->appId()],
             ['uuid', $id]
         ]);
 

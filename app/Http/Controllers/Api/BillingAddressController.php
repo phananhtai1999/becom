@@ -80,8 +80,8 @@ class BillingAddressController extends AbstractRestAPIController
     public function myIndex()
     {
         $models = $this->service->findAllWhere([
-            ['user_uuid' => auth()->user()],
-            ['app_id' => auth()->appId()]
+            'user_uuid' => auth()->user(),
+            'app_id' => auth()->appId()
         ]);
 
         return $this->sendOkJsonResponse(
