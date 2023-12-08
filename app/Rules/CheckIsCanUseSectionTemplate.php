@@ -3,6 +3,7 @@
 namespace App\Rules;
 
 use App\Models\Role;
+use App\Services\ConfigService;
 use App\Services\MySectionTemplateService;
 use App\Services\MyWebsiteService;
 use App\Services\SectionTemplateService;
@@ -12,7 +13,7 @@ class CheckIsCanUseSectionTemplate
     public static function IsCanUseSectionTemplate($uuid, $websiteUuid = null)
     {
         return function ($attribute, $value, $fail) use ($uuid, $websiteUuid) {
-            if (auth()->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])){
+            if ((new ConfigService())->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN])){
                 $uuidsSectionTemplatesCanUsed = (new SectionTemplateService())->getCanUseUuidsSectionTemplates()->toArray();
             }else{
                 $uuidsSectionTemplatesCanUsed = (new MySectionTemplateService())->getCanUseUuidsSectionTemplates()->toArray();

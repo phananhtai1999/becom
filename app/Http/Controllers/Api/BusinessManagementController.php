@@ -254,7 +254,7 @@ class BusinessManagementController extends AbstractRestAPIController
     {
         DB::beginTransaction();
         try{
-            if ($this->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->count()) {
+            if ($this->service->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
                 $businessUuid = $request->get("business_uuid");
             } else {
                 $businesses= $this->user()->businessManagements;
@@ -313,7 +313,7 @@ class BusinessManagementController extends AbstractRestAPIController
 
     public function getAddOns(GetAddOnOfBusinessRequest $request)
     {
-        if ($this->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->count()) {
+        if ($this->service->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             $businessUuid = $request->get("business_uuid");
         } else {
             $businesses= $this->user()->businessManagements;
@@ -333,7 +333,7 @@ class BusinessManagementController extends AbstractRestAPIController
 
     public function listMemberOfBusiness(GetBusinessMemberRequest $request)
     {
-        if ($this->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->count()) {
+        if ($this->service->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             $businessUuid = $request->get("business_uuid");
         } else {
             $businesses= $this->user()->businessManagements;
@@ -353,7 +353,7 @@ class BusinessManagementController extends AbstractRestAPIController
 
     public function blockBusinessMember($id, BlockBusinessMemberRequest $request)
     {
-        if ($this->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->first()) {
+        if ($this->service->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             $businessUuid = $request->get("business_uuid");
         } else {
             $businesses = $this->user()->businessManagements;
@@ -374,7 +374,7 @@ class BusinessManagementController extends AbstractRestAPIController
 
     public function removeBusinessMember($id, RemoveBusinessMemberRequest $request)
     {
-        if ($this->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->first()) {
+        if ($this->service->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             $businessUuid = $request->get("business_uuid");
         } else {
             $businesses = $this->user()->businessManagements;

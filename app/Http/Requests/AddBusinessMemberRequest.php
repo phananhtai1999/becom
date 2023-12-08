@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Models\Role;
 use App\Models\UserBusiness;
 use App\Rules\InviteRule;
+use App\Services\ConfigService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
@@ -31,7 +32,7 @@ class AddBusinessMemberRequest extends FormRequest
         $validate = [
             'type' => ['required', Rule::in([UserBusiness::ALREADY_EXISTS_ACCOUNT, UserBusiness::ACCOUNT_INVITE])],
         ];
-        if (auth()->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->count())
+        if ((new ConfigService())->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN]))
         {
             $validate['business_uuid'] = ['required', 'integer', Rule::exists('business_managements', 'uuid')->whereNull('deleted_at')];
         }

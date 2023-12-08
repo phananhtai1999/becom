@@ -57,10 +57,10 @@ class WebsiteController extends AbstractRestAPIController
     protected $websitePageService;
 
     public function __construct(
-        WebsiteService   $service,
-        MyWebsiteService $myService,
+        WebsiteService         $service,
+        MyWebsiteService       $myService,
         SectionTemplateService $sectionTemplateService,
-        WebsitePageService $websitePageService
+        WebsitePageService     $websitePageService
     )
     {
         $this->resourceClass = WebsiteResource::class;
@@ -118,10 +118,10 @@ class WebsiteController extends AbstractRestAPIController
         );
 
         $model->websitePages()->attach(
-                $this->getWebsitePagesByRequest(
-                    $request->get("website_pages", [])
-                )
-            );
+            $this->getWebsitePagesByRequest(
+                $request->get("website_pages", [])
+            )
+        );
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -263,7 +263,7 @@ class WebsiteController extends AbstractRestAPIController
     public function showUnpublishedWebsite($id)
     {
         $model = $this->service->findOneWhereOrFail([
-           'user_uuid' => auth()->user(),
+            'user_uuid' => auth()->user(),
             'app_id' => auth()->appId(),
             'publish_status' => Article::PENDING_PUBLISH_STATUS,
             'uuid' => $id
@@ -293,7 +293,7 @@ class WebsiteController extends AbstractRestAPIController
      */
     public function defaultWebsites(IndexRequest $request)
     {
-        if (auth()->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->count()) {
+        if ($this->service->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             $models = $this->service->getDefaultWebsiteForAdmin($request);
         } else {
             $models = $this->service->getCollectionWithPaginationByCondition($request, [
@@ -322,11 +322,11 @@ class WebsiteController extends AbstractRestAPIController
 
     public function changeStatusTemplateByStatusWebsite($website, $publicStatus)
     {
-        if (in_array($publicStatus, [Website::PUBLISHED_PUBLISH_STATUS, Website::PENDING_PUBLISH_STATUS])){
+        if (in_array($publicStatus, [Website::PUBLISHED_PUBLISH_STATUS, Website::PENDING_PUBLISH_STATUS])) {
             $statusWebsitePage = $publicStatus == Website::PUBLISHED_PUBLISH_STATUS
                 ? WebsitePage::PUBLISHED_PUBLISH_STATUS : WebsitePage::PENDING_PUBLISH_STATUS;
             $website->websitePages()
-                ->where('publish_status', '<>', $statusWebsitePage)->get()->map(function ($websitePage) use ($statusWebsitePage){
+                ->where('publish_status', '<>', $statusWebsitePage)->get()->map(function ($websitePage) use ($statusWebsitePage) {
                     $this->service->update($websitePage, ["publish_status" => $statusWebsitePage]);
                 });
 
@@ -334,10 +334,10 @@ class WebsiteController extends AbstractRestAPIController
                 ? SectionTemplate::PUBLISHED_PUBLISH_STATUS : SectionTemplate::PENDING_PUBLISH_STATUS;
             $headerSection = $website->headerSection;
             $footerSection = $website->footerSection;
-            if ($headerSection && $headerSection->publish_status != $statusSectionTemplate){
+            if ($headerSection && $headerSection->publish_status != $statusSectionTemplate) {
                 $this->service->update($headerSection, ["publish_status" => $statusWebsitePage]);
             }
-            if ($footerSection && $footerSection->publish_status != $statusSectionTemplate){
+            if ($footerSection && $footerSection->publish_status != $statusSectionTemplate) {
                 $this->service->update($footerSection, ["publish_status" => $statusWebsitePage]);
             }
         }
@@ -347,32 +347,32 @@ class WebsiteController extends AbstractRestAPIController
     {
         $copyWebsite = $this->service->showCopyWebsiteByUuid($id);
 
-        if($this->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->count()){
+        if ($this->service->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             $statusTemplate = SectionTemplate::PUBLISHED_PUBLISH_STATUS;
             $statusWebsite = $request->get('publish_status');
             $isDefault = true;
-        }elseif($this->user()->roles->whereIn('slug', [Role::ROLE_EDITOR])->count()){
+        } elseif ($this->service->checkUserRoles([Role::ROLE_EDITOR])) {
             $statusTemplate = $request->get('publish_status') == Website::PENDING_PUBLISH_STATUS
                 ? SectionTemplate::PENDING_PUBLISH_STATUS : SectionTemplate::DRAFT_PUBLISH_STATUS;
             $statusWebsite = $request->get('publish_status');
             $isDefault = true;
-        }else{
+        } else {
             $statusTemplate = SectionTemplate::PUBLISHED_PUBLISH_STATUS;
             $statusWebsite = $request->get('publish_status');
             $isDefault = false;
         }
 
         DB::beginTransaction();
-        try{
+        try {
             $headerWebsite = $this->sectionTemplateService->create(array_merge($copyWebsite->headerSection->toArray(), [
-                "user_uuid"=> auth()->user(),
-                "app_id"=> auth()->appId(),
+                "user_uuid" => auth()->user(),
+                "app_id" => auth()->appId(),
                 'publish_status' => $statusTemplate,
                 "is_default" => $isDefault
             ]));
             $footerWebsite = $this->sectionTemplateService->create(array_merge($copyWebsite->footerSection->toArray(), [
-                "user_uuid"=> auth()->user(),
-                "app_id"=> auth()->appId(),
+                "user_uuid" => auth()->user(),
+                "app_id" => auth()->appId(),
                 'publish_status' => $statusTemplate,
                 "is_default" => $isDefault
             ]));
@@ -380,15 +380,15 @@ class WebsiteController extends AbstractRestAPIController
             $website = $this->service->create(array_merge($request->all(), [
                 'header_section_uuid' => $headerWebsite->uuid,
                 'footer_section_uuid' => $footerWebsite->uuid,
-               'user_uuid' => auth()->user(),
-            'app_id' => auth()->appId(),
+                'user_uuid' => auth()->user(),
+                'app_id' => auth()->appId(),
                 'publish_status' => $statusWebsite,
             ]));
 
-            $websitePages = $copyWebsite->websitePages->map(function ($item) use ($statusTemplate, $isDefault){
+            $websitePages = $copyWebsite->websitePages->map(function ($item) use ($statusTemplate, $isDefault) {
                 $websitePage = $this->websitePageService->create(array_merge($item->toArray(), [
-                   'user_uuid' => auth()->user(),
-            'app_id' => auth()->appId(),
+                    'user_uuid' => auth()->user(),
+                    'app_id' => auth()->appId(),
                     'is_default' => $isDefault,
                     'publish_status' => $statusTemplate
                 ]));
@@ -406,13 +406,14 @@ class WebsiteController extends AbstractRestAPIController
             return $this->sendCreatedJsonResponse(
                 $this->service->resourceToData($this->resourceClass, $website)
             );
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             DB::rollback();
             throw $exception;
         }
     }
 
-    public function toggleNewsPage($id) {
+    public function toggleNewsPage($id)
+    {
         $website = $this->service->findOrFailById($id);
         $website->update(['is_active_news_page' => !$website->is_active_news_page]);
 

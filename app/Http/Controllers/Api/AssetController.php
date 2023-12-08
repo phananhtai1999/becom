@@ -57,7 +57,8 @@ class AssetController extends AbstractRestAPIController
             [
                 'url' => $uploadUrl['absolute_slug'],
                 'status' => Asset::PUBLISH_STATUS,
-                'user_uuid' => auth()->user()->uuid
+                'user_uuid' => auth()->user(),
+                'app_id' => auth()->appId(),
             ]));
 
         return $this->sendCreatedJsonResponse(
@@ -204,7 +205,8 @@ class AssetController extends AbstractRestAPIController
             $request->all(),
             [
                 'url' => $uploadUrl['absolute_slug'],
-                'user_uuid' => auth()->user()->uuid
+                'user_uuid' => auth()->user(),
+                'app_id' => auth()->appId(),
             ]));
 
         return $this->sendCreatedJsonResponse(
@@ -224,7 +226,7 @@ class AssetController extends AbstractRestAPIController
 
     public function indexPublishAssets(IndexRequest $request)
     {
-        if (empty(auth()->user()->partner) && !auth()->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
+        if (empty(auth()->user()->partner) && !$this->service->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             return $this->sendJsonResponse(false, __('asset.failed_partner'), [], 403);
         }
         $models = $this->service->getCollectionWithPaginationByCondition($request,
