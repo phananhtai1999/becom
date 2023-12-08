@@ -35,7 +35,10 @@ class UpdateMyEmailRequest extends AbstractRequest
             'send_projects' => ['required', 'array', 'min:1'],
             'send_projects.*' => ['numeric', 'min:1', Rule::exists('send_projects', 'uuid')->where(function ($query) {
 
-                return $query->where('user_uuid', auth()->user()->getkey())->whereNull('deleted_at');
+                return $query->where([
+                    ['user_uuid', auth()->user()],
+                    ['app_id', auth()->appId()],
+                ])->whereNull('deleted_at');
             })],
         ];
     }

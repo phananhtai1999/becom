@@ -19,8 +19,9 @@ class MyFormService extends AbstractService
      */
     public function showMyForm($id)
     {
-        return  $this->findOneWhereOrFail([
-            ['user_uuid', auth()->user()->getkey()],
+        return $this->findOneWhereOrFail([
+            ['user_uuid', auth()->user()],
+            ['app_id', auth()->appId()],
             ['uuid', $id]
         ]);
     }

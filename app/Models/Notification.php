@@ -28,7 +28,8 @@ class Notification extends Model
         'type_uuid',
         'content',
         'user_uuid',
-        'read'
+        'read',
+        'app_id',
     ];
 
     protected $casts = [

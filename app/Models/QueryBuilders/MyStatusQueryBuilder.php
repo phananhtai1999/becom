@@ -17,7 +17,10 @@ class MyStatusQueryBuilder extends AbstractQueryBuilder
      */
     public static function baseQuery()
     {
-        $myStatus = Status::where('user_uuid', auth()->user()->getkey());
+        $myStatus = Status::where([
+            ['user_uuid', auth()->user()],
+            ['app_id', auth()->appId()]
+        ]);
         if ($myStatus->count() != 0) {
 
             return $myStatus;
@@ -51,7 +54,7 @@ class MyStatusQueryBuilder extends AbstractQueryBuilder
                 $modelKeyName,
                 AllowedFilter::exact('exact__' . $modelKeyName, $modelKeyName),
                 AllowedFilter::scope('name'),
-                AllowedFilter::scope('exact__name','exactName'),
+                AllowedFilter::scope('exact__name', 'exactName'),
                 'points',
                 AllowedFilter::exact('exact__points', 'points'),
                 'user.email',

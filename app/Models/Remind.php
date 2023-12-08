@@ -33,6 +33,7 @@ class Remind extends AbstractModel
         'note',
         'date',
         'user_uuid',
+        'app_id',
     ];
 
     /**

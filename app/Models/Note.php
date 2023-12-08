@@ -31,7 +31,8 @@ class Note extends AbstractModel
     protected $fillable = [
         'note',
         'user_uuid',
-        'contact_uuid'
+        'contact_uuid',
+        'app_id',
     ];
 
     /**

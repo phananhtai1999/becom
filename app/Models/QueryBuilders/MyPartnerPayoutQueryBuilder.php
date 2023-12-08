@@ -19,7 +19,10 @@ class MyPartnerPayoutQueryBuilder extends AbstractQueryBuilder
     {
         return PartnerPayout::select('partner_payouts.*')
             ->join('partners', 'partners.uuid', '=', 'partner_payouts.partner_uuid')
-            ->where('partners.user_uuid', auth()->user()->getKey());
+            ->where([
+                ['partners.user_uuid', auth()->user()],
+                ['partners.app_id', auth()->appId()]
+            ]);
     }
 
     /**

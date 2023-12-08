@@ -17,7 +17,10 @@ class MyDepartmentQueryBuilder extends AbstractQueryBuilder
      */
     public static function baseQuery()
     {
-        return Department::where('user_uuid', auth()->user()->getkey());
+        return Department::where([
+            ['user_uuid', auth()->user()],
+            ['app_id', auth()->appId()]
+        ]);
     }
 
     /**
@@ -47,7 +50,7 @@ class MyDepartmentQueryBuilder extends AbstractQueryBuilder
                 $modelKeyName,
                 AllowedFilter::exact('exact__' . $modelKeyName, $modelKeyName),
                 AllowedFilter::scope('name'),
-                AllowedFilter::scope('exact__name','exactName'),
+                AllowedFilter::scope('exact__name', 'exactName'),
                 'user.email',
                 AllowedFilter::exact('exact__user.email', 'user.email'),
                 'user.roles.name',

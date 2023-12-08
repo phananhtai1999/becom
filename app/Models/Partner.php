@@ -45,7 +45,8 @@ class Partner extends AbstractModel
         'phone_number',
         'answer',
         'partner_category_uuid',
-        'code'
+        'code',
+        'app_id',
     ];
 
     /**

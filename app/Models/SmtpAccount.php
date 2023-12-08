@@ -37,7 +37,8 @@ class SmtpAccount extends AbstractModel
         'send_project_uuid',
         'user_uuid',
         'status',
-        'publish'
+        'publish',
+        'app_id',
     ];
 
     /**

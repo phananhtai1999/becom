@@ -26,7 +26,8 @@ class MyContactService extends AbstractService
     public function findMyContactByKeyOrAbort($id)
     {
         return $this->findOneWhereOrFail([
-            ['user_uuid', auth()->user()->getkey()],
+            ['user_uuid', auth()->user()],
+            ['app_id', auth()->appId()],
             ['uuid', $id]
         ]);
     }
@@ -53,7 +54,10 @@ class MyContactService extends AbstractService
             ->whereDate('created_at', '>=', $startDate)
             ->whereDate('created_at', '<=', $endDate)
             ->whereNull('deleted_at')
-            ->where('user_uuid', auth()->user()->getkey())
+            ->where([
+                ['user_uuid', auth()->user()],
+                ['app_id', auth()->appId()]
+            ])
             ->get();
 
         return $totalMyContact['0']->contact;
@@ -71,7 +75,10 @@ class MyContactService extends AbstractService
             ->whereDate('created_at', '>=', $startDate)
             ->whereDate('created_at', '<=', $endDate)
             ->whereNull('deleted_at')
-            ->where('user_uuid', auth()->user()->getkey())
+            ->where([
+                ['user_uuid', auth()->user()],
+                ['app_id', auth()->appId()]
+            ])
             ->orderBy('label', 'ASC')
             ->groupby('label')
             ->get()->toArray();
@@ -89,7 +96,10 @@ class MyContactService extends AbstractService
             ->whereDate('created_at', '>=', $startDate)
             ->whereDate('created_at', '<=', $endDate)
             ->whereNull('deleted_at')
-            ->where('user_uuid', auth()->user()->getkey())
+            ->where([
+                ['user_uuid', auth()->user()],
+                ['app_id', auth()->appId()]
+            ])
             ->orderBy('label', 'ASC')
             ->groupby('label')
             ->get()->toArray();
@@ -104,7 +114,7 @@ class MyContactService extends AbstractService
      */
     public function createQueryGetIncrease($startDate, $endDate, $dateFormat, $type)
     {
-        $currentUser = auth()->user()->getkey();
+        $currentUser = auth()->user();
         $string = $type === "month" ? "-01" : "";
         $todaySmtpAccountTableSubQuery = $yesterdaySmtpAccountTableSubQuery = "(SELECT date_format(created_at, '{$dateFormat}') as date_field, COUNT(uuid) as createContact
                   from contacts
@@ -275,7 +285,10 @@ class MyContactService extends AbstractService
         $totalMyContact = $this->model->selectRaw('sum(contacts.points) as points')
             ->join('contact_contact_list', 'contact_contact_list.contact_uuid', '=', 'contacts.uuid')
             ->join('contact_lists', 'contact_contact_list.contact_list_uuid', '=', 'contact_lists.uuid')
-            ->where('contact_lists.user_uuid', auth()->user()->getkey())
+            ->where([
+                ['contact_lists.user_uuid', auth()->user()],
+                ['contact_lists.app_id', auth()->appId()]
+            ])
             ->when($contactListUuid, function ($query, $contactListUuid) {
                 $query->where('contact_lists.uuid', $contactListUuid);
             })
@@ -307,7 +320,7 @@ class MyContactService extends AbstractService
 //where date(updated_at) >= '2022-11-21' AND date(updated_at) <= '2022-11-24'
 //GROUP By label) yest On yest.label = today.label - INTERVAL 1 day;
         $queryContactList = !empty($contactListUuid) ? "and cl.uuid = '{$contactListUuid}'" : "";
-        $currentUser = auth()->user()->getkey();
+        $currentUser = auth()->user();
         $string = $type === "month" ? "-01" : "";
         $todayPointsContactTableSubQuery = $yesterdayPointsContactTableSubQuery = "(SELECT date_format(c.updated_at, '{$dateFormat}') as label, sum(c.points) as points
                   from contacts c, contact_contact_list ccl, contact_lists cl
@@ -426,7 +439,10 @@ class MyContactService extends AbstractService
     {
         $modelKeyName = $this->model->getKeyName();
 
-        return QueryBuilder::for($this->model->where('user_uuid', auth()->user()->getkey()))
+        return QueryBuilder::for($this->model->where([
+            ['user_uuid', auth()->user()],
+            ['app_id', auth()->appId()]
+        ]))
             ->allowedFields([
                 $modelKeyName,
                 'email',

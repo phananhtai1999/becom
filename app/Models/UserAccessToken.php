@@ -38,7 +38,8 @@ class UserAccessToken extends AbstractModel
         'user_agent',
         'ip',
         'user_uuid',
-        'uuid'
+        'uuid',
+        'app_id',
     ];
 
     /**

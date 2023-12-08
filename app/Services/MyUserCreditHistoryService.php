@@ -22,8 +22,9 @@ class MyUserCreditHistoryService extends AbstractService
      */
     public function showMyUserCreditHistory($id)
     {
-        return  $this->findOneWhereOrFail([
-            ['user_uuid', auth()->user()->getkey()],
+        return $this->findOneWhereOrFail([
+            ['user_uuid', auth()->user()],
+            ['app_id', auth()->appId()],
             ['uuid', $id]
         ]);
     }
@@ -51,7 +52,10 @@ class MyUserCreditHistoryService extends AbstractService
     {
         return QueryBuilder::for($this->model)
             ->select('uuid', 'user_uuid', 'credit', DB::raw('NULL as campaign_uuid'), 'add_by_uuid', 'created_at')
-            ->where('user_uuid', auth()->user()->getkey())
+            ->where([
+                ['user_uuid', auth()->user()],
+                ['app_id', auth()->appId()]
+            ])
             ->unionAll($data)
             ->defaultSort('-created_at')
             ->allowedFilters([
@@ -75,7 +79,10 @@ class MyUserCreditHistoryService extends AbstractService
             ->whereDate('created_at', '>=', $startDate)
             ->whereDate('created_at', '<=', $endDate)
             ->whereNull('deleted_at')
-            ->where('user_uuid', auth()->user()->getkey())
+            ->where([
+                ['user_uuid', auth()->user()],
+                ['app_id', auth()->appId()]
+            ])
             ->get();
 
         return !empty($totalMyCreditAdded['0']->sum) ? $totalMyCreditAdded['0']->sum : 0;

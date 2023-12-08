@@ -18,7 +18,10 @@ class MyNotificationQueryBuilder extends AbstractQueryBuilder
      */
     public static function baseQuery()
     {
-        return Notification::where('user_uuid', auth()->user()->getKey());
+        return Notification::where([
+            ['user_uuid', auth()->user()],
+            ['app_id', auth()->appId()]
+        ]);
     }
 
     /**

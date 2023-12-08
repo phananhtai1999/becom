@@ -41,7 +41,10 @@ class WebsitePageService extends AbstractService
         return $this->model->selectRaw("COUNT(IF( publish_status = 1, 1, NULL ) ) as approve,
         COUNT(IF( publish_status = 2, 1, NULL ) ) as pending,
         COUNT(IF( publish_status = 3, 1, NULL ) ) as reject")
-            ->where('user_uuid', auth()->user()->getKey())
+            ->where([
+                ['user_uuid', auth()->user()],
+                ['app_id', auth()->appId()]
+            ])
             ->whereDate('updated_at', '>=', $startDate)
             ->whereDate('updated_at', '<=', $endDate)
             ->first()->setAppends([])->toArray();
@@ -53,7 +56,10 @@ class WebsitePageService extends AbstractService
         COUNT(IF( publish_status = 1, 1, NULL ) ) as approve,
         COUNT(IF( publish_status = 2, 1, NULL ) ) as pending,
         COUNT(IF( publish_status = 3, 1, NULL ) ) as reject")
-            ->where('user_uuid', auth()->user()->getKey())
+            ->where([
+                ['user_uuid', auth()->user()],
+                ['app_id', auth()->appId()]
+            ])
             ->whereDate('updated_at', '>=', $startDate)
             ->whereDate('updated_at', '<=', $endDate)
             ->groupBy('label')
@@ -127,7 +133,10 @@ class WebsitePageService extends AbstractService
             ->leftJoin('website_website_page', 'website_website_page.website_page_uuid', 'website_pages.uuid')
             ->whereNull('website_website_page.website_page_uuid')
             ->where(function ($query) {
-                return $query->where('website_pages.user_uuid', auth()->user()->getKey())
+                return $query->where([
+                    ['website_pages.user_uuid', auth()->user()],
+                    ['website_pages.app_id', auth()->appId()]
+                ])
                     ->orWhere('website_pages.is_default', true);
             })->get()->pluck('uuid');
         $indexRequest = $this->getIndexRequest($request);
@@ -422,7 +431,7 @@ class WebsitePageService extends AbstractService
                 '{category.keyword}' => $articleCategory->keyword ?? null,
                 '{category.description}' => $articleCategory->description ?? null,
                 '{category.short_content}' => $articleCategory->short_content ?? null,
-                ];
+            ];
 
         } else {
             return [

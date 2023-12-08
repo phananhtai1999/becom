@@ -33,7 +33,8 @@ class Scenario extends AbstractModel
         'name',
         'user_uuid',
         'status',
-        'last_stopped_at'
+        'last_stopped_at',
+        'app_id',
     ];
 
     /**

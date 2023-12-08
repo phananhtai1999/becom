@@ -32,7 +32,7 @@ class FooterTemplateService extends AbstractService
     public function changeIsDefaultFooterTemplateByType($type, $templateType, $uuid)
     {
         $footerTemplate = $this->findOneWhere([
-            ['type',  $type],
+            ['type', $type],
             ['is_default', true],
             ['template_type', $templateType],
             ['uuid', '<>', $uuid]
@@ -49,13 +49,14 @@ class FooterTemplateService extends AbstractService
     {
 //        $footerTemplate = $this->findOneWhere([
 //            'type' => $type,
-//            'active_by_uuid' => auth()->user()->getKey(),
-//            'user_uuid' => auth()->user()->getKey()
+//            'active_by_uuid' => auth()->user(),
+//            'user_uuid' => auth()->user()
 //        ]);
         $footerTemplate = $this->findOneWhere([
             ['type', $type],
-            ['active_by_uuid', auth()->user()->getKey()],
-            ['user_uuid', auth()->user()->getKey()],
+            ['active_by_uuid', auth()->user()],
+            ['user_uuid', auth()->user()],
+            ['app_id', auth()->appId()],
             ['uuid', '<>', $uuid]
         ]);
         if ($footerTemplate) {
@@ -73,7 +74,7 @@ class FooterTemplateService extends AbstractService
                 'active_by_uuid' => $user->uuid,
                 'template_type' => 'ads'
             ]);
-        }else{
+        } else {
             $footerTemplate = $this->findOneWhere([
                 'type' => $type,
                 'is_default' => true,
@@ -86,9 +87,9 @@ class FooterTemplateService extends AbstractService
     public function getFooterTemplateSubscribeForSendCampaignByType($type)
     {
         return $this->findOneWhere([
-                'type' => $type,
-                'is_default' => true,
-                'template_type' => 'subscribe'
-            ]);
+            'type' => $type,
+            'is_default' => true,
+            'template_type' => 'subscribe'
+        ]);
     }
 }

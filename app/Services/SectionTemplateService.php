@@ -46,7 +46,10 @@ class SectionTemplateService extends AbstractService
         return $this->model->selectRaw("COUNT(IF( publish_status = 1, 1, NULL ) ) as approve,
         COUNT(IF( publish_status = 2, 1, NULL ) ) as pending,
         COUNT(IF( publish_status = 3, 1, NULL ) ) as reject")
-            ->where('user_uuid', auth()->user()->getKey())
+            ->where([
+                ['user_uuid', auth()->user()],
+                ['app_id', auth()->appId()]
+            ])
             ->whereDate('updated_at', '>=', $startDate)
             ->whereDate('updated_at', '<=', $endDate)
             ->first()->setAppends([])->toArray();
@@ -58,7 +61,10 @@ class SectionTemplateService extends AbstractService
         COUNT(IF( publish_status = 1, 1, NULL ) ) as approve,
         COUNT(IF( publish_status = 2, 1, NULL ) ) as pending,
         COUNT(IF( publish_status = 3, 1, NULL ) ) as reject")
-            ->where('user_uuid', auth()->user()->getKey())
+            ->where([
+                ['user_uuid', auth()->user()],
+                ['app_id', auth()->appId()]
+            ])
             ->whereDate('updated_at', '>=', $startDate)
             ->whereDate('updated_at', '<=', $endDate)
             ->groupBy('label')
@@ -74,7 +80,7 @@ class SectionTemplateService extends AbstractService
         $times = [];
         $result = [];
 
-        if ($groupBy == "hour"){
+        if ($groupBy == "hour") {
             $dateFormat = "%Y-%m-%d %H:00:00";
 
             $endDate = $endDate->endOfDay();
@@ -84,7 +90,7 @@ class SectionTemplateService extends AbstractService
             }
         }
 
-        if ($groupBy == "date"){
+        if ($groupBy == "date") {
             $dateFormat = "%Y-%m-%d";
             while ($currentDate <= $endDate) {
                 $times[] = $currentDate->format('Y-m-d');
@@ -92,7 +98,7 @@ class SectionTemplateService extends AbstractService
             }
         }
 
-        if ($groupBy == "month"){
+        if ($groupBy == "month") {
             $dateFormat = "%Y-%m";
             while ($currentDate <= $endDate) {
                 $times[] = $currentDate->format('Y-m');
@@ -101,24 +107,24 @@ class SectionTemplateService extends AbstractService
         }
 
         $charts = $this->getSectionChartByDateFormat($dateFormat, $startDate, $endDate)->keyBy('label');
-        foreach ($times as $time){
-            $chartByTime = $charts->first(function($item, $key) use ($time){
+        foreach ($times as $time) {
+            $chartByTime = $charts->first(function ($item, $key) use ($time) {
                 return $key == $time;
             });
 
-            if($chartByTime){
+            if ($chartByTime) {
                 $result[] = [
                     'label' => $time,
-                    'approve'  => $chartByTime->approve,
-                    'pending'  => $chartByTime->pending,
-                    'reject'  => $chartByTime->reject
+                    'approve' => $chartByTime->approve,
+                    'pending' => $chartByTime->pending,
+                    'reject' => $chartByTime->reject
                 ];
-            }else{
+            } else {
                 $result [] = [
                     'label' => $time,
-                    'approve'  => 0,
-                    'pending'  => 0,
-                    'reject'  => 0,
+                    'approve' => 0,
+                    'pending' => 0,
+                    'reject' => 0,
                 ];
             }
         }
@@ -129,8 +135,11 @@ class SectionTemplateService extends AbstractService
     public function getCanUseUuidsSectionTemplates()
     {
         return $this->model->doesntHave('headerWebsite')->doesntHave('footerWebsite')
-            ->where(function ($query){
-                return $query->where('user_uuid', auth()->user()->getKey())
+            ->where(function ($query) {
+                return $query->where([
+                    ['user_uuid', auth()->user()],
+                    ['app_id', auth()->appId()]
+                ])
                     ->orWhere('is_default', true);
             })->get()->pluck('uuid');
     }

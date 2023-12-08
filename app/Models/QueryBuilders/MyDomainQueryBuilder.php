@@ -17,7 +17,10 @@ class MyDomainQueryBuilder extends AbstractQueryBuilder
      */
     public static function baseQuery()
     {
-        return Domain::where('owner_uuid', auth()->user()->getkey());
+        return Domain::where([
+                    ['owner_uuid', auth()->user()],
+                    ['app_id', auth()->appId()]
+                ]);
     }
 
     /**

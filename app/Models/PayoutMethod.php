@@ -40,7 +40,8 @@ class PayoutMethod extends Model
         'swift_code',
         'bank_name',
         'bank_address',
-        'currency'
+        'currency',
+        'app_id',
     ];
 
     /**

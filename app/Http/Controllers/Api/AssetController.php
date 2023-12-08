@@ -93,7 +93,10 @@ class AssetController extends AbstractRestAPIController
     public function indexMy(IndexRequest $request)
     {
         $models = $this->service->getCollectionWithPaginationByCondition($request,
-            ['user_uuid' => auth()->user()->getKey()]);
+            [
+                'user_uuid' => auth()->user(),
+                'app_id' => auth()->appId()
+            ]);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)

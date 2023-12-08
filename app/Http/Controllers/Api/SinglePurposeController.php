@@ -53,7 +53,8 @@ class SinglePurposeController extends AbstractRestAPIController
         }
 
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => auth()->user()->getKey()
+            'user_uuid' => auth()->user(),
+            'app_id' => auth()->appId()
         ]));
 
         return $this->sendCreatedJsonResponse(

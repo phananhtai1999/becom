@@ -30,6 +30,7 @@ class Domain extends AbstractModel
         'owner_uuid',
         'active_mailbox',
         'active_mailbox_status',
+        'app_id',
     ];
 
     /**

@@ -128,7 +128,10 @@ class ArticleService extends AbstractService
                     $query->whereIn('article_category_uuid', $articleCategoryPublicByUuids)
                         ->orWhereNull('article_category_uuid');
                 })
-                ->where('user_uuid', auth()->user()->getkey())
+                ->where([
+                    ['user_uuid', auth()->user()],
+                    ['app_id', auth()->appId()]
+                ])
                 ->where('updated_at', '>=', Carbon::now()->subDays($config->value))
                 ->paginate($perPage, $columns, $pageName, $page);
         } else {
@@ -139,7 +142,10 @@ class ArticleService extends AbstractService
                     $query->whereIn('article_category_uuid', $articleCategoryPublicByUuids)
                         ->orWhereNull('article_category_uuid');
                 })
-                ->where('user_uuid', auth()->user()->getkey())
+                ->where([
+                    ['user_uuid', auth()->user()],
+                    ['app_id', auth()->appId()]
+                ])
                 ->paginate($perPage, $columns, $pageName, $page);
         }
     }
@@ -257,7 +263,10 @@ class ArticleService extends AbstractService
         return $this->model->selectRaw("COUNT(IF( publish_status = 1, 1, NULL ) ) as approve,
         COUNT(IF( publish_status = 3, 1, NULL ) ) as pending,
         COUNT(IF( publish_status = 4, 1, NULL ) ) as reject")
-            ->where('user_uuid', auth()->user()->getKey())
+            ->where([
+                ['user_uuid', auth()->user()],
+                ['app_id', auth()->appId()]
+            ])
             ->whereDate('updated_at', '>=', $startDate)
             ->whereDate('updated_at', '<=', $endDate)
             ->first()->setAppends([])->toArray();
@@ -269,7 +278,10 @@ class ArticleService extends AbstractService
         COUNT(IF( publish_status = 1, 1, NULL ) ) as approve,
         COUNT(IF( publish_status = 3, 1, NULL ) ) as pending,
         COUNT(IF( publish_status = 4, 1, NULL ) ) as reject")
-            ->where('user_uuid', auth()->user()->getKey())
+            ->where([
+                ['user_uuid', auth()->user()],
+                ['app_id', auth()->appId()]
+            ])
             ->whereDate('updated_at', '>=', $startDate)
             ->whereDate('updated_at', '<=', $endDate)
             ->groupBy('label')

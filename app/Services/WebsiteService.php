@@ -45,7 +45,10 @@ class WebsiteService extends AbstractService
     {
         return $this->model->where('uuid', $uuid)
             ->where(function ($query) {
-                return $query->where('user_uuid', auth()->user()->getKey())
+                return $query->where([
+                    ['user_uuid', auth()->user()],
+                    ['app_id', auth()->appId()]
+                ])
                     ->orWhere(function ($q) {
                         return $q->where([
                             'domain_uuid' => null,

@@ -30,7 +30,8 @@ class PartnerPayout extends AbstractModel
         'amount',
         'time',
         'status',
-        'payout_method_uuid'
+        'payout_method_uuid',
+        'app_id',
     ];
 
     /**

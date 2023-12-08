@@ -51,6 +51,7 @@ class Campaign extends AbstractModel
         'send_type',
         'send_from_name',
         'send_from_email',
+        'app_id',
     ];
 
     /**

@@ -26,7 +26,6 @@ class CompanyRequest extends AbstractRequest
     {
         return [
             'name' => ['required', 'string'],
-            'user_uuid' => ['nullable', 'numeric', Rule::exists('users','uuid')->whereNull('deleted_at')],
         ];
     }
 }

@@ -17,7 +17,10 @@ class MyRemindQueryBuilder extends AbstractQueryBuilder
      */
     public static function baseQuery()
     {
-        return Remind::where('user_uuid', auth()->user()->getkey());
+        return Remind::where([
+            ['user_uuid', auth()->user()],
+            ['app_id', auth()->appId()]
+        ]);
     }
 
     /**

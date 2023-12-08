@@ -26,9 +26,11 @@ class NoteRequest extends AbstractRequest
     {
         return [
             'note' => ['required', 'string'],
-            'user_uuid' => ['nullable', 'numeric', Rule::exists('users','uuid')->whereNull('deleted_at')],
             'contact_uuid' => ['required', 'numeric', Rule::exists('contacts','uuid')->where(function ($query) {
-                return $query->where('user_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey());
+                return $query->where([
+                    ['user_uuid', $this->request->get('user_uuid') ?? auth()->user()],
+                    ['app_id', auth()->appId()]
+                ]);
             })->whereNull('deleted_at')],
         ];
     }

@@ -4,9 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
 use App\Http\Controllers\Traits\RestDestroyTrait;
-use App\Http\Controllers\Traits\RestIndexMyTrait;
 use App\Http\Requests\IndexRequest;
-use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Requests\ReadNotificationsRequest;
 use App\Http\Requests\UnReadNotificationsRequest;
 use App\Http\Resources\NotificationResource;
@@ -18,6 +16,7 @@ use Illuminate\Http\JsonResponse;
 class NotificationController extends AbstractRestAPIController
 {
     use  RestDestroyTrait;
+
     /**
      * @var
      */
@@ -59,10 +58,13 @@ class NotificationController extends AbstractRestAPIController
 
     public function indexMy()
     {
-        app($this->indexRequest);
+        $request = app($this->indexRequest);
 
-        $models = $this->myService->getCollectionWithPagination();
-        $statistical = $this->service->statisticalNotification(["user_uuid" => auth()->user()->getKey()]);
+        $models = $this->service->getCollectionByUserIdAndAppIdWithPagination($request);
+        $statistical = $this->service->statisticalNotification([
+            "user_uuid" => auth()->user(),
+            "app_id" => auth()->appId()
+        ]);
 
         $data = $this->myService->resourceCollectionToData($this->resourceCollectionClass, $models);
         $data['meta']['total_notifications'] = $statistical->total;
@@ -80,8 +82,9 @@ class NotificationController extends AbstractRestAPIController
     public function destroyMy($id)
     {
         $model = $this->myService->findOneWhereOrFail([
-            ['uuid' => $id],
-            ['user_uuid' => auth()->user()->getKey()],
+            'uuid' => $id,
+            'user_uuid' => auth()->user(),
+            'app_id' => auth()->appId(),
         ]);
 
         $this->myService->destroy($model->getKey());
@@ -96,7 +99,7 @@ class NotificationController extends AbstractRestAPIController
         return $this->sendOkJsonResponse();
     }
 
-    public function unreadNotifications(UnReadNotificationsRequest $request):JsonResponse
+    public function unreadNotifications(UnReadNotificationsRequest $request): JsonResponse
     {
         $this->service->updateReadByNotifications($request->get('notifications'), false);
 
@@ -105,6 +108,6 @@ class NotificationController extends AbstractRestAPIController
 
     public function getNotificationCategories()
     {
-        return $this->sendOkJsonResponse(['data'=> config('notificationsystem.categories')]);
+        return $this->sendOkJsonResponse(['data' => config('notificationsystem.categories')]);
     }
 }

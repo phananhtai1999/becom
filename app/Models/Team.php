@@ -33,7 +33,8 @@ class Team extends AbstractModel
         'department_uuid',
         'location_uuid',
         'parent_team_uuid',
-        'leader_uuid'
+        'leader_uuid',
+        'app_id',
     ];
 
     /**

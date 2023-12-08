@@ -30,6 +30,7 @@ class UserDetail extends AbstractModel
         'gender',
         'date_of_birth',
         'user_uuid',
+        'app_id',
     ];
 
     /**

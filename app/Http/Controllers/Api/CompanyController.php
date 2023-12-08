@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
 use App\Http\Controllers\Traits\RestDestroyTrait;
-use App\Http\Controllers\Traits\RestIndexMyTrait;
+use App\Http\Controllers\Traits\RestIndexByUserIdAndAppIdTrait;
 use App\Http\Requests\CompanyRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyCompanyRequest;
@@ -20,7 +20,7 @@ use App\Services\MyStatusService;
 
 class CompanyController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestIndexMyTrait;
+    use RestIndexTrait, RestShowTrait, RestDestroyTrait, RestIndexByUserIdAndAppIdTrait;
 
     /**
      * @var MyStatusService
@@ -55,7 +55,8 @@ class CompanyController extends AbstractRestAPIController
         $request = app($this->storeRequest);
 
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => $request->get('user_uuid') ?? auth()->user()->getkey()
+            'user_uuid' => $request->get('user_uuid') ?? auth()->user(),
+            'app_id' => auth()->appId(),
         ]));
 
         return $this->sendCreatedJsonResponse(
@@ -76,7 +77,8 @@ class CompanyController extends AbstractRestAPIController
         $model = $this->service->findOrFailById($id);
 
         $this->service->update($model, array_merge($request->all(), [
-            'user_uuid' => $request->get('user_uuid') ?? auth()->user()->getkey()
+            'user_uuid' => $request->get('user_uuid') ?? auth()->user(),
+            'app_id' => auth()->appId(),
         ]));
 
         return $this->sendOkJsonResponse(
@@ -91,7 +93,8 @@ class CompanyController extends AbstractRestAPIController
     public function storeMyCompany(MyCompanyRequest $request)
     {
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => auth()->user()->getkey(),
+            'user_uuid' => auth()->user(),
+            'app_id' => auth()->appId(),
         ]));
 
         return $this->sendCreatedJsonResponse(
@@ -122,7 +125,8 @@ class CompanyController extends AbstractRestAPIController
         $model = $this->myService->showMyCompany($id);
 
         $this->service->update($model, array_merge($request->all(), [
-            'user_uuid' => auth()->user()->getkey(),
+            'user_uuid' => auth()->user(),
+            'app_id' => auth()->appId(),
         ]));
 
         return $this->sendOkJsonResponse(

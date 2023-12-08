@@ -18,8 +18,9 @@ class MyDepartmentService extends AbstractService
      */
     public function showMyDepartment($id)
     {
-        return  $this->findOneWhereOrFail([
-            ['user_uuid', auth()->user()->getkey()],
+        return $this->findOneWhereOrFail([
+            ['user_uuid', auth()->user()],
+            ['app_id', auth()->appId()],
             ['uuid', $id]
         ]);
     }
@@ -31,7 +32,10 @@ class MyDepartmentService extends AbstractService
     public function showMyAndPublicDepartment($id)
     {
         return $this->model->where('uuid', $id)->where(function ($query) {
-            $query->where('user_uuid', auth()->user()->getkey())
+            $query->where([
+                ['user_uuid', auth()->user()],
+                ['app_id', auth()->appId()]
+            ])
                 ->orWhereNull('user_uuid');
         })->firstOrFail();
     }

@@ -18,7 +18,10 @@ class MyWebsiteQueryBuilder extends AbstractQueryBuilder
      */
     public static function baseQuery()
     {
-        return Website::where('user_uuid', auth()->user()->getKey());
+        return Website::where([
+            ['user_uuid', auth()->user()],
+            ['app_id', auth()->appId()]
+        ]);
     }
 
     /**

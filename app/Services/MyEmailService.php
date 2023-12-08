@@ -19,7 +19,8 @@ class MyEmailService extends AbstractService
     public function findMyEmailByKeyOrAbort($id)
     {
         return $this->findOneWhereOrFail([
-            ['user_uuid', auth()->user()->getkey()],
+            ['user_uuid', auth()->user()],
+            ['app_id', auth()->appId()],
             ['uuid', $id]
         ]);
     }

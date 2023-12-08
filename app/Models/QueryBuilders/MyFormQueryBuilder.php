@@ -16,7 +16,10 @@ class MyFormQueryBuilder extends AbstractQueryBuilder
      */
     public static function baseQuery()
     {
-        return Form::where('user_uuid', auth()->user()->getKey());
+        return Form::where([
+            ['user_uuid', auth()->user()],
+            ['app_id', auth()->appId()]
+        ]);
     }
 
     /**
@@ -31,7 +34,7 @@ class MyFormQueryBuilder extends AbstractQueryBuilder
                 $modelKeyName,
                 'title',
                 'contact_list_uuid',
-                'user_uuid'.
+                'user_uuid' .
                 'template',
                 'template_json',
                 'publish_status',
@@ -43,7 +46,7 @@ class MyFormQueryBuilder extends AbstractQueryBuilder
                 $modelKeyName,
                 'title',
                 'contact_list_uuid',
-                'user_uuid'.
+                'user_uuid' .
                 'template',
                 'template_json',
                 'publish_status',

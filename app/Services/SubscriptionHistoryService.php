@@ -25,13 +25,19 @@ class SubscriptionHistoryService extends AbstractService
     public function mySubscriptionHistories()
     {
 
-        return $this->model->where(['user_uuid' => auth()->user()->getKey()])->orderBy('uuid', 'DESC')->get();
+        return $this->model->where([
+            'user_uuid' => auth()->user(),
+            'app_id' => auth()->appId()
+        ])->orderBy('uuid', 'DESC')->get();
     }
 
     public function currentSubscriptionHistory()
     {
 
-        return $this->model->where(['user_uuid' => auth()->user()->getKey()])->orderBy('uuid', 'DESC')->first();
+        return $this->model->where([
+            'user_uuid' => auth()->user(),
+            'app_id' => auth()->appId()
+        ])->orderBy('uuid', 'DESC')->first();
     }
 
     public function findByLog($log)
@@ -44,6 +50,9 @@ class SubscriptionHistoryService extends AbstractService
      */
     public function getSubscriptionHistoryOfCurrentUser()
     {
-        return $this->model->where('user_uuid',auth()->user()->getkey())->first();
+        return $this->model->where([
+            ['user_uuid', auth()->user()],
+            ['app_id', auth()->appId()],
+        ])->first();
     }
 }

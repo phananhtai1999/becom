@@ -71,6 +71,7 @@ class ParagraphType extends AbstractModel
         'user_uuid',
         'title',
         'sort',
+        'app_id',
     ];
 
     /**

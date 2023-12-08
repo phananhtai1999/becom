@@ -34,6 +34,7 @@ class UserSocialProfile extends Model
         'social_profile_phone',
         'social_profile_address',
         'updated_info_at',
+        'app_id',
     ];
 
     /**

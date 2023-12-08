@@ -28,6 +28,7 @@ class UserCreditHistory extends AbstractModel
         'user_uuid',
         'add_by_uuid',
         'credit',
+        'app_id',
     ];
 
     /**

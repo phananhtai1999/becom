@@ -14,7 +14,8 @@ trait RestMyStoreTrait
         $request = app($this->storeMyRequest);
 
         $model = $this->myService->create(array_merge($request->all(), [
-            'user_uuid' => auth()->user()->getkey(),
+           'user_uuid' => auth()->user(),
+            'app_id' => auth()->appId(),
         ]));
 
         return $this->sendCreatedJsonResponse(

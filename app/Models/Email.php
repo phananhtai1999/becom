@@ -34,6 +34,7 @@ class Email extends AbstractModel
         'city',
         'job',
         'user_uuid',
+        'app_id',
     ];
 
     /**

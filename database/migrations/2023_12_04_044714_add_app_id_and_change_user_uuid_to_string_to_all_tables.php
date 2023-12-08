@@ -120,7 +120,6 @@ class AddAppIdAndChangeUserUuidToStringToAllTables extends Migration
             'partner_user',
             'payout_methods',
             'reminds',
-            'role_user',
             'scenarios',
             'section_templates',
             'send_projects',

@@ -39,7 +39,8 @@ class Contact extends AbstractModel
         'country',
         'user_uuid',
         'avatar',
-        'status_uuid'
+        'status_uuid',
+        'app_id',
     ];
 
     /**
