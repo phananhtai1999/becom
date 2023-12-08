@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Abstracts\AbstractRequest;
 use App\Models\Asset;
 use App\Models\Role;
+use App\Services\ConfigService;
 use Illuminate\Validation\Rule;
 
 class ChangeStatusAssetRequest extends AbstractRequest
@@ -31,7 +32,7 @@ class ChangeStatusAssetRequest extends AbstractRequest
         ];
 
         //Check role editor
-        if (!auth()->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->count())
+        if (!(new ConfigService())->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN]))
         {
             $validate['status'] = ['required', Rule::in(Asset::PENDING_STATUS, Asset::DRAFT_STATUS)];
         }

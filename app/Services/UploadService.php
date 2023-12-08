@@ -17,7 +17,7 @@ class UploadService extends AbstractService
     {
         if (in_array($type, \config('filestructure.website'))) {
             $configS3 = (new ConfigService())->findConfigByKey(Config::CONFIG_S3_WEBSITE);
-        } elseif (auth()->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_EDITOR, Role::ROLE_ADMIN])->count()) {
+        } elseif ($this->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN, Role::ROLE_EDITOR])) {
             $configS3 = (new ConfigService())->findConfigByKey(Config::CONFIG_S3_SYSTEM);
         } else {
             $configS3 = (new ConfigService())->findConfigByKey(Config::CONFIG_S3_USER);

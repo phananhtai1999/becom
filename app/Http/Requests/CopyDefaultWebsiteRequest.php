@@ -11,6 +11,7 @@ use App\Rules\CheckUniqueSlugWebsitePageRule;
 use App\Rules\CheckWebsiteDomainRule;
 use App\Rules\CheckWebsitePagesRule;
 use App\Rules\UniqueWebsitePage;
+use App\Services\ConfigService;
 use Illuminate\Validation\Rule;
 
 class CopyDefaultWebsiteRequest extends AbstractRequest
@@ -40,14 +41,14 @@ class CopyDefaultWebsiteRequest extends AbstractRequest
             'tracking_ids.*' => ['nullable', 'string', 'max:300'],
         ];
 
-        if($this->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->count()){
+        if((new ConfigService())->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN])){
             $validate['publish_status'] = ['required', 'numeric',
                 Rule::in(
                     Website::PUBLISHED_PUBLISH_STATUS,
                     Website::DRAFT_PUBLISH_STATUS
                 )
             ];
-        }elseif ($this->user()->roles->whereIn('slug', [Role::ROLE_EDITOR])->count()){
+        }elseif ((new ConfigService())->checkUserRoles([Role::ROLE_EDITOR])){
             $validate['publish_status'] = ['required', 'numeric',
                 Rule::in(
                     Website::PENDING_PUBLISH_STATUS,

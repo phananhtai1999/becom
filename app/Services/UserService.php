@@ -247,7 +247,7 @@ class UserService extends AbstractService
             return false;
         }
 
-        return auth()->user()->roles->whereIn('slug', [Role::ROLE_ADMIN, Role::ROLE_ROOT, Role::ROLE_EDITOR])->count();
+        return $this->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN, Role::ROLE_EDITOR]);
     }
 
     /**
@@ -259,7 +259,7 @@ class UserService extends AbstractService
             return false;
         }
 
-        return auth()->user()->roles->whereIn('slug', [Role::ROLE_ADMIN, Role::ROLE_ROOT])->count();
+        return $this->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN]);
     }
 
     public function getUsersByRole($role)
@@ -296,11 +296,11 @@ class UserService extends AbstractService
      */
     public function getCurrentUserRole(): string
     {
-        if (auth()->user()->roles->whereIn('slug', Role::ROLE_ROOT)->count()) {
+        if ($this->checkUserRoles([Role::ROLE_ROOT])) {
             $char = 'r' . auth()->user();
-        } elseif (auth()->user()->roles->whereIn('slug', [Role::ROLE_ADMIN])->count()) {
+        } elseif ($this->checkUserRoles([Role::ROLE_ADMIN])) {
             $char = 'a' . auth()->user();
-        } elseif (auth()->user()->roles->whereIn('slug', [Role::ROLE_EDITOR])->count()) {
+        } elseif ($this->checkUserRoles([Role::ROLE_EDITOR])) {
             $char = 'e' . auth()->user();
         } else {
             $char = 'u' . auth()->user();

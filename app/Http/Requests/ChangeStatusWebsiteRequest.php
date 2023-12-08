@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Models\Article;
 use App\Models\Role;
+use App\Services\ConfigService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -47,7 +48,7 @@ class ChangeStatusWebsiteRequest extends FormRequest
         if ($this->request->get('publish_status') == Article::REJECT_PUBLISH_STATUS) {
             $validate['reject_reason'] = ['required', 'string'];
         }
-        if ($this->user()->roles->whereIn('slug', [Role::ROLE_EDITOR])->count()) {
+        if ((new ConfigService())->checkUserRoles([Role::ROLE_EDITOR])) {
             $validate['publish_status'] = ['required', 'numeric',
                 Rule::in(
                     Article::PENDING_PUBLISH_STATUS,
