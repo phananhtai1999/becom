@@ -33,6 +33,7 @@ class UserTeamResource extends JsonResource
             $data['user'] = new UserResource($this->user);
         }
         if (\in_array('user_team__contact_lists', $expand)) {
+            //need function userteamcontaclist here
             $data['contact_lists'] = ContactListResource::collection(optional($this->user)->userTeamContactLists);
         }
         if (\in_array('user_team__permissions', $expand)) {

@@ -43,6 +43,7 @@ use App\Models\PlatformPackage;
 use App\Models\Role;
 use App\Models\Team;
 use App\Services\AddOnService;
+use App\Services\BusinessManagementService;
 use App\Services\BusinessTeamService;
 use App\Services\ContactListService;
 use App\Services\InviteService;
@@ -65,16 +66,17 @@ class TeamController extends Controller
     use RestShowTrait, RestDestroyTrait, RestEditTrait, RestStoreTrait;
 
     public function __construct(
-        TeamService         $service,
-        UserTeamService     $userTeamService,
-        SmtpAccountService  $smtpAccountService,
-        UserService         $userService,
-        InviteService       $inviteService,
-        PermissionService   $permissionService,
-        ContactListService  $contactListService,
-        MyTeamService       $myService,
-        UserBusinessService $userBusinessService,
-        AddOnService        $addOnService
+        TeamService               $service,
+        UserTeamService           $userTeamService,
+        SmtpAccountService        $smtpAccountService,
+        UserService               $userService,
+        BusinessManagementService $businessManagementService,
+        InviteService             $inviteService,
+        PermissionService         $permissionService,
+        ContactListService        $contactListService,
+        MyTeamService             $myService,
+        UserBusinessService       $userBusinessService,
+        AddOnService              $addOnService
     )
     {
         $this->service = $service;
@@ -83,6 +85,7 @@ class TeamController extends Controller
         $this->userTeamService = $userTeamService;
         $this->userService = $userService;
         $this->inviteService = $inviteService;
+        $this->businessManagementService = $businessManagementService;
         $this->permissionService = $permissionService;
         $this->contactListService = $contactListService;
         $this->userBusinessService = $userBusinessService;
@@ -127,7 +130,7 @@ class TeamController extends Controller
 
     public function showMy($id)
     {
-        $model = $this->service->findOneWhereOrFail(['uuid' => $id, 'owner_uuid' => $this->user()->getKey()]);
+        $model = $this->service->findOneWhereOrFail(['uuid' => $id, 'owner_uuid' => auth()->user(), 'app_id' => auth()->appId()]);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -168,6 +171,7 @@ class TeamController extends Controller
             $user->userPlatformPackage()->create(['platform_package_uuid' => PlatformPackage::DEFAULT_PLATFORM_PACKAGE_1]);
             $this->userTeamService->create(array_merge($request->all(), [
                 'user_uuid' => $user->uuid,
+                'app_id' => auth()->appId()
             ]));
             $this->smtpAccountService->sendEmailNotificationSystem($user, new SendInviteToTeamByAccount($user, $password));
         }
@@ -187,7 +191,7 @@ class TeamController extends Controller
             if ($this->service->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
                 $businessUuid = $request->get("business_uuid");
             } else {
-                $businesses = $this->user()->businessManagements;
+                $businesses = $this->businessManagementService->findAllWhere([['owner_uuid', auth()->user()], ['app_id', auth()->appId()]]);
                 if ($businesses->toArray()) {
                     $businessUuid = $businesses->first()->uuid;
                 } else {
@@ -210,13 +214,15 @@ class TeamController extends Controller
                 $user->userPlatformPackage()->create(['platform_package_uuid' => PlatformPackage::DEFAULT_PLATFORM_PACKAGE_1]);
                 $this->userTeamService->create(array_merge($request->all(), [
                     'user_uuid' => $user->uuid,
+                    'app_id' => auth()->appId()
                 ]));
 
                 $this->userBusinessService->create([
                     'business_uuid' => $businessUuid,
-                    'user_uuid' => $user->uuid
+                    'user_uuid' => $user->uuid,
+                    'app_id' => auth()->appId()
                 ]);
-                Mailbox::postEmailAccountcreate($user->uuid, $email, $passwordRandom);
+//                Mailbox::postEmailAccountcreate($user->uuid, $email, $passwordRandom);
                 DB::commit();
 
                 return $this->sendCreatedJsonResponse();
@@ -224,23 +230,27 @@ class TeamController extends Controller
                 foreach ($request->get('user_uuids') as $userUuid) {
                     $existingRecord = $this->userTeamService->findOneWhere([
                         'team_uuid' => $request->get('team_uuid'),
-                        'user_uuid' => $userUuid
+                        'user_uuid' => $userUuid,
+                        'app_id' => auth()->appId()
                     ]);
 
                     if (!$existingRecord) {
                         $this->userTeamService->create([
                             'team_uuid' => $request->get('team_uuid'),
-                            'user_uuid' => $userUuid
+                            'user_uuid' => $userUuid,
+                            'app_id' => auth()->appId()
                         ]);
 
                         $userBusiness = $this->userBusinessService->findOneWhere([
                             'business_uuid' => $businessUuid,
-                            'user_uuid' => $userUuid
+                            'user_uuid' => $userUuid,
+                            'app_id' => auth()->appId()
                         ]);
                         if (!$userBusiness) {
                             $this->userBusinessService->create([
                                 'business_uuid' => $businessUuid,
-                                'user_uuid' => $userUuid
+                                'user_uuid' => $userUuid,
+                                'app_id' => auth()->appId()
                             ]);
                         }
                     }
@@ -259,7 +269,7 @@ class TeamController extends Controller
     public function joinTeam(JoinTeamRequest $request)
     {
         $model = $this->userTeamService->create(array_merge($request->all(), [
-           'user_uuid' => auth()->user(),
+            'user_uuid' => auth()->user(),
             'app_id' => auth()->appId(),
         ]));
 
@@ -278,7 +288,8 @@ class TeamController extends Controller
         }
         $model = $this->userTeamService->findOneWhere([
             'user_uuid' => $request->get('user_uuid'),
-            'team_uuid' => $request->get('team_uuid')
+            'team_uuid' => $request->get('team_uuid'),
+            'app_id' => auth()->appId()
         ]);
         $this->removeTeamPermissionCache($request->get('user_uuid'));
         if (empty($model)) {
@@ -306,7 +317,8 @@ class TeamController extends Controller
         foreach ($request->get('user_uuids') as $userUuid) {
             $userTeam = $this->userTeamService->findOneWhereOrFail([
                 'team_uuid' => $request->get('team_uuid'),
-                'user_uuid' => $userUuid
+                'user_uuid' => $userUuid,
+                'app_id' => auth()->appId()
             ]);
             $userTeam->addOns()->syncWithoutDetaching($request->get('add_on_uuids'), []);
             $this->removeCache($userUuid);
@@ -327,7 +339,8 @@ class TeamController extends Controller
         foreach ($request->get('user_uuids') as $userUuid) {
             $userTeam = $this->userTeamService->findOneWhereOrFail([
                 'team_uuid' => $request->get('team_uuid'),
-                'user_uuid' => $userUuid
+                'user_uuid' => $userUuid,
+                'app_id' => auth()->appId()
             ]);
             $userTeam->addOns()->detach($request->get('add_on_uuids'), []);
             $this->removeCache($userUuid);
@@ -351,13 +364,15 @@ class TeamController extends Controller
         $user = $this->userService->findOrFailById($request->get('user_uuid'));
         $model = $this->userTeamService->findOneWhere([
             'user_uuid' => $request->get('user_uuid'),
-            'team_uuid' => $request->get('team_uuid')
+            'team_uuid' => $request->get('team_uuid'),
+            'app_id' => auth()->appId()
         ]);
         if (empty($model)) {
-
+            //need function userteamcontaclist here
             return $this->sendBadRequestJsonResponse(['message' => 'This user is not in the team']);
         }
 
+        $this->contactListService->
         $user->userTeamContactLists()->sync($request->get('contact_list_uuids', []));
 
         return $this->sendCreatedJsonResponse(
@@ -389,9 +404,10 @@ class TeamController extends Controller
         if ($this->service->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             $model = $this->userTeamService->listTeamMemberOfAllTeam($request);
         } else {
-            $team_uuids = $this->service->findAllWhere(['owner_uuid' => $this->user()->getKey()])->pluck('uuid');
-            if ($this->user()->userTeam) {
-                $model = $this->userTeamService->listTeamMember([$this->user()->userTeam->team_uuid], $request);
+            $team_uuids = $this->service->findAllWhere(['owner_uuid' => auth()->user(), 'app_id' => auth()->appId()])->pluck('uuid');
+            $userTeam = $this->userTeamService->getUserTeamByUserAndAppId(auth()->user(), auth()->appId());
+            if ($userTeam) {
+                $model = $this->userTeamService->listTeamMember([$userTeam->team_uuid], $request);
             } elseif ($team_uuids) {
                 $model = $this->userTeamService->listTeamMember($team_uuids, $request);
             } else {
@@ -415,9 +431,9 @@ class TeamController extends Controller
             return $this->sendJsonResponse(false, 'You are not owner of team to set permission', [], 403);
         }
         $team = $this->service->findOrFailById($id);
-        $permisions = $this->permissionService->getPermissionOfTeam($team->owner);
+        $permissions = $this->permissionService->getPermissionOfTeam($team->owner);
 
-        return $this->sendOkJsonResponse(['data' => $permisions]);
+        return $this->sendOkJsonResponse(['data' => $permissions]);
     }
 
     public function getPermissionOfUser($id)
@@ -448,7 +464,7 @@ class TeamController extends Controller
     public function editMy(MyUpdateTeamRequest $request, $id)
     {
         $model = $this->myService->findOneWhereOrFail([
-              'owner_uuid' => auth()->user(),
+            'owner_uuid' => auth()->user(),
             'app_id' => auth()->appId(),
             'uuid' => $id
         ]);
@@ -463,7 +479,7 @@ class TeamController extends Controller
     public function destroyMy($id)
     {
         $model = $this->myService->findOneWhereOrFail([
-              'owner_uuid' => auth()->user(),
+            'owner_uuid' => auth()->user(),
             'app_id' => auth()->appId(),
             'uuid' => $id
         ]);
@@ -484,6 +500,7 @@ class TeamController extends Controller
             }
         }
         $user = $this->userService->findOrFailById($id);
+        //need function userteamcontaclist here
         $user->userTeamContactLists()->detach();
         $this->userTeamService->destroy($model->uuid);
         $this->removeTeamPermissionCache($model->user_uuid);
@@ -547,7 +564,7 @@ class TeamController extends Controller
         if ($this->service->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             $businessUuid = $request->get("business_uuid");
         } else {
-            $businesses = $this->user()->businessManagements;
+            $businesses = $this->businessManagementService->findAllWhere([['owner_uuid', auth()->user()], ['app_id', auth()->appId()]]);
             if ($businesses->toArray()) {
                 $businessUuid = $businesses->first()->uuid;
             } else {
@@ -561,13 +578,15 @@ class TeamController extends Controller
             foreach ($request->get('team_member_uuids') as $userUuid) {
                 $existingRecord = $this->userTeamService->findOneWhere([
                     'team_uuid' => $teamModel->uuid,
-                    'user_uuid' => $userUuid
+                    'user_uuid' => $userUuid,
+                    'app_id' => auth()->user()
                 ]);
 
                 if (!$existingRecord) {
                     $this->userTeamService->create([
                         'team_uuid' => $teamModel->uuid,
-                        'user_uuid' => $userUuid
+                        'user_uuid' => $userUuid,
+                        'app_id' => auth()->user()
                     ]);
                 }
             }
@@ -593,6 +612,7 @@ class TeamController extends Controller
         }
         $teamModel = $this->myService->findOrFailById($id);
         $this->service->update($teamModel, $request->all());
+        //viết function cho chỗ này
         $teamModel->users()->syncWithoutDetaching($request->get('team_member_uuids'));
 
         return $this->sendCreatedJsonResponse(

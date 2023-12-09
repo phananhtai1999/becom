@@ -6,6 +6,7 @@ use App\Models\AddOn;
 use App\Models\Permission;
 use App\Models\PlatformPackage;
 use App\Models\Team;
+use App\Models\UserTeam;
 use Aws\Exception\CredentialsException;
 use Aws\S3\Exception\S3Exception;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -240,8 +241,10 @@ class AbstractRestAPIController extends BaseController
     }
 
     public function getUserUuid() {
-        if(($this->user()->userTeam && !$this->user()->userTeam['is_blocked'])) {
-            $user_uuid = auth()->user()->userTeam->team->owner_uuid;
+        $userTeam = UserTeam::where(['user_uuid' => auth()->user(), 'app_id' => auth()->appId()])->first();
+
+        if(($userTeam && !$userTeam['is_blocked'])) {
+            $user_uuid = $userTeam->team->owner_uuid;
         } else {
             $user_uuid = auth()->user();
         }

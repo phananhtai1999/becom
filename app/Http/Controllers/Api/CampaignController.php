@@ -45,6 +45,7 @@ use App\Services\SendEmailByCampaignService;
 use App\Services\SendEmailScheduleLogService;
 use App\Services\SmtpAccountService;
 use App\Services\UserService;
+use App\Services\UserTeamService;
 use Carbon\Carbon;
 use App\Services\MyCampaignService;
 use Illuminate\Http\JsonResponse;
@@ -164,7 +165,8 @@ class CampaignController extends AbstractRestAPIController
         ContactService                   $contactService,
         UserService                      $userService,
         ConfigService                    $configService,
-        CampaignScenarioService          $campaignScenarioService
+        CampaignScenarioService          $campaignScenarioService,
+        UserTeamService                  $userTeamService
     )
     {
         $this->service = $service;
@@ -188,6 +190,7 @@ class CampaignController extends AbstractRestAPIController
         $this->userService = $userService;
         $this->configService = $configService;
         $this->campaignScenarioService = $campaignScenarioService;
+        $this->userTeamService = $userTeamService;
     }
 
     /**
@@ -314,8 +317,9 @@ class CampaignController extends AbstractRestAPIController
     public function indexMyCampaign(IndexRequest $request)
     {
         $sortTotalCredit = explode(',', $request->sort);
-
-        if(($this->user()->userTeam && !$this->user()->userTeam['is_blocked']) && !empty($this->user()->userTeamContactLists)) {
+        $userTeam = $this->userTeamService->getUserTeamByUserAndAppId(auth()->user(), auth()->appId());
+        //need function userteamcontaclist here
+        if (($userTeam && !$userTeam['is_blocked']) && !empty($this->user()->userTeamContactLists)) {
             if ($sortTotalCredit[0] == 'number_credit_needed_to_start_campaign' || $sortTotalCredit[0] == '-number_credit_needed_to_start_campaign') {
                 $models = $this->myService->sortMyTotalCredit($request->get('per_page', '15'), $sortTotalCredit[0], $request->search, $request->search_by, $this->user()->userTeamContactLists()->pluck('contact_list_uuid'));
             } else {

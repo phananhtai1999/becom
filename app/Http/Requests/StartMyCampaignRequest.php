@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
 use App\Models\Campaign;
+use App\Services\UserTeamService;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 
@@ -27,7 +28,10 @@ class StartMyCampaignRequest extends AbstractRequest
     public function rules()
     {
         $campaignUuid = [];
-        if (($this->user()->userTeam && !$this->user()->userTeam['is_blocked']) && !empty($this->user()->userTeamContactLists)) {
+        $userTeamService = new UserTeamService();
+        $userTeam = $userTeamService->getUserTeamByUserAndAppId(auth()->user(), auth()->appId());
+        //need function userteamcontaclist here
+        if (($userTeam && !$userTeam['is_blocked']) && !empty($this->user()->userTeamContactLists)) {
             $campaignUuid = app(Campaign::class)->select('campaigns.*')
                 ->join('campaign_contact_list', 'campaigns.uuid', '=', 'campaign_contact_list.campaign_uuid')
                 ->WhereIn('campaign_contact_list.contact_list_uuid', auth()->user()->userTeamContactLists()->pluck('contact_list_uuid'))->get()->pluck('uuid');
