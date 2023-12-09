@@ -75,6 +75,7 @@ class BusinessManagementController extends AbstractRestAPIController
         MyBusinessManagementService $myService,
         DomainService               $domainService,
         MyDomainService             $myDomainService,
+        BusinessManagementService $businessManagementService,
         UserBusinessService $userBusinessService,
         UserService $userService,
         UserAddOnService $userAddOnService,
@@ -86,6 +87,7 @@ class BusinessManagementController extends AbstractRestAPIController
         $this->domainService = $domainService;
         $this->myDomainService = $myDomainService;
         $this->userBusinessService = $userBusinessService;
+        $this->businessManagementService = $businessManagementService;
         $this->resourceCollectionClass = BusinessManagementResourceCollection::class;
         $this->resourceClass = BusinessManagementResource::class;
         $this->userBusinessResourceClass = UserBusinessResource::class;
@@ -257,7 +259,7 @@ class BusinessManagementController extends AbstractRestAPIController
             if ($this->service->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
                 $businessUuid = $request->get("business_uuid");
             } else {
-                $businesses= $this->user()->businessManagements;
+                $businesses = $this->businessManagementService->findAllWhere([['owner_uuid', auth()->user()], ['app_id', auth()->appId()]]);
                 if ($businesses->toArray()) {
                     $businessUuid = $businesses->first()->uuid;
                 } else {
@@ -269,13 +271,15 @@ class BusinessManagementController extends AbstractRestAPIController
                 foreach ($request->get('user_uuids') as $userUuid) {
                     $existingRecord = $this->userBusinessService->findOneWhere([
                         'business_uuid' => $businessUuid,
-                        'user_uuid' => $userUuid
+                        'user_uuid' => $userUuid,
+                        'app_id', auth()->appId(),
                     ]);
 
                     if (!$existingRecord) {
                         $this->userBusinessService->create([
                             'business_uuid' => $businessUuid,
-                            'user_uuid' => $userUuid
+                            'user_uuid' => $userUuid,
+                            'app_id', auth()->appId(),
                         ]);
                     }
                 }
@@ -316,7 +320,7 @@ class BusinessManagementController extends AbstractRestAPIController
         if ($this->service->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             $businessUuid = $request->get("business_uuid");
         } else {
-            $businesses= $this->user()->businessManagements;
+            $businesses = $this->businessManagementService->findAllWhere([['owner_uuid', auth()->user()], ['app_id', auth()->appId()]]);
             if ($businesses->toArray()) {
                 $businessUuid = $businesses->first()->uuid;
             } else {
@@ -336,7 +340,7 @@ class BusinessManagementController extends AbstractRestAPIController
         if ($this->service->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             $businessUuid = $request->get("business_uuid");
         } else {
-            $businesses= $this->user()->businessManagements;
+            $businesses = $this->businessManagementService->findAllWhere([['owner_uuid', auth()->user()], ['app_id', auth()->appId()]]);
             if ($businesses->toArray()) {
                 $businessUuid = $businesses->first()->uuid;
             } else {
@@ -356,7 +360,7 @@ class BusinessManagementController extends AbstractRestAPIController
         if ($this->service->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             $businessUuid = $request->get("business_uuid");
         } else {
-            $businesses = $this->user()->businessManagements;
+            $businesses = $this->businessManagementService->findAllWhere([['owner_uuid', auth()->user()], ['app_id', auth()->appId()]]);
             if ($businesses->toArray()) {
                 $businessUuid = $businesses->first()->uuid;
             } else {
@@ -377,7 +381,7 @@ class BusinessManagementController extends AbstractRestAPIController
         if ($this->service->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             $businessUuid = $request->get("business_uuid");
         } else {
-            $businesses = $this->user()->businessManagements;
+            $businesses = $this->businessManagementService->findAllWhere([['owner_uuid', auth()->user()], ['app_id', auth()->appId()]]);
             if ($businesses->toArray()) {
                 $businessUuid = $businesses->first()->uuid;
             } else {
