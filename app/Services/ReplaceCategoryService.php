@@ -40,6 +40,12 @@ class ReplaceCategoryService extends ReplaceChildrenCategoryService
         }, $template);
     }
 
+    public function replaceCategoryInArticle($articleTemplate, $category) {
+        $searchReplaceMap = $this->searchReplaceMapForCategory($category);
+
+        return str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $articleTemplate);
+    }
+
     public function searchReplaceMapForCategory($articleCategory = null)
     {
         if (!empty($articleCategory)) {
