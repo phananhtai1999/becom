@@ -14,7 +14,7 @@ class AddIsDefaultToWebsitesTable extends Migration
     public function up()
     {
         Schema::table('websites', function (Blueprint $table) {
-            $table->boolean('is_default')->default(false);
+            $table->boolean('is_default')->default(false)->after('publish_status');
         });
     }
 

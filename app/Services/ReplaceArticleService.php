@@ -3,10 +3,11 @@
 namespace App\Services;
 
 use App\Models\Article;
+use Illuminate\Support\Str;
 
 class ReplaceArticleService
 {
-    public function replaceListArticle($template, $articleCategory) {
+    public function replaceListArticle($template, $articleCategory, $websitePage) {
         $pattern = '/data-article-count="(\d+)"/';
         preg_match_all($pattern, $template, $articleCount);
         $articleCount = isset($articleCount[1]) ? array_sum($articleCount[1]) : 10;
@@ -14,11 +15,14 @@ class ReplaceArticleService
         preg_match('/article-sort-order="(.*?)"/', $template, $sortOrder);
         $articlesData = Article::where('article_category_uuid', $articleCategory->uuid)->orderBy($sortName[1] ?? 'created_at', $sortOrder[1] ?? 'DESC')->paginate($articleCount);
         $pattern = '/<article.*?>(.*?)<\/article>/s';
-        return preg_replace_callback($pattern, function ($matches) use ($articlesData) {
+
+        return preg_replace_callback($pattern, function ($matches) use ($articlesData, $websitePage) {
             $articleData = $articlesData->shift();
             if (!$articleData) {
                 return $matches[0];
             }
+
+            $matches[0] = $this->replaceRedirectTag($articleData, $websitePage, $matches[0]);
 
             $searchReplaceMap = $this->searchReplaceMapForArticle($articleData);
 
@@ -26,13 +30,14 @@ class ReplaceArticleService
         }, $template);
     }
 
-    public function replaceListArticleSpecific($template) {
+    public function replaceListArticleSpecific($template, $websitePage) {
         preg_match('/<specific_article_list.*?>(.*?)<\/specific_article_list>/s', $template, $specificArticleList);
         if (!$specificArticleList) {
             return $template;
         }
         $pattern = '/<article.*?>(.*?)<\/article>/s';
-        return preg_replace_callback($pattern, function ($matches) {
+
+        return preg_replace_callback($pattern, function ($matches) use ($websitePage) {
             preg_match('/data-article-specific="(.*?)"/', $matches[0], $articleUuid);
             $article = Article::find($articleUuid);
             if (!$article) {
@@ -40,11 +45,13 @@ class ReplaceArticleService
             }
             $searchReplaceMap = $this->searchReplaceMapForArticle($article);
 
+            $matches[0] = $this->replaceRedirectTag($article, $websitePage, $matches[0]);
+
             return str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $matches[0]);
         }, $specificArticleList);
     }
 
-    public function replaceListArticleForPageHome($template) {
+    public function replaceListArticleForPageHome($template, $websitePage) {
 
         //get number article need to parse
         $pattern = '/data-article-count="(\d+)"/';
@@ -63,16 +70,39 @@ class ReplaceArticleService
             $articlesData = Article::orderBy($sortName[1] ?? 'created_at', $sortOrder[1] ?? 'DESC')->paginate($articleCount);
         }
         $pattern = '/<article.*?>(.*?)<\/article>/s';
-        return preg_replace_callback($pattern, function ($matches) use ($articlesData) {
+        return preg_replace_callback($pattern, function ($matches) use ($articlesData, $websitePage) {
             $articlesData = $articlesData->shift();
             if (!$articlesData) {
                 return $matches[0];
             }
+            //replace slug
+            $matches[0] = $this->replaceRedirectTag($articlesData, $websitePage, $matches[0]);
+            $category = $articlesData->articleCategory;
+            $replaceCategoryService = new ReplaceCategoryService();
+            $replaceCategoryService->replaceCategoryInArticle($matches[0], $category);
 
             $searchReplaceMap = $this->searchReplaceMapForArticle($articlesData);
             return str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $matches[0]);
         }, $template);
     }
+
+    public function replaceRedirectTag($article, $websitePage, $template) {
+        $domain = $websitePage->websites()->first()->domain;
+        $category = $article->articleCategory;
+        $replaceCategoryService = new ReplaceCategoryService();
+        $template = $this->replaceDomain($domain, $template);
+
+        return $replaceCategoryService->replaceCategoryInArticle($template, $category);
+    }
+
+    public function replaceDomain($domain, $template) {
+        $searchReplaceMap = [
+            '{domain.slug}' => $domain->slug ?? null,
+        ];
+
+        return Str::replace(array_keys($searchReplaceMap), $searchReplaceMap, $template);
+    }
+
 
     public function searchReplaceMapForArticle($article = null)
     {

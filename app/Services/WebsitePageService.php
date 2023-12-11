@@ -212,10 +212,13 @@ class WebsitePageService extends AbstractService
     public function renderContent($websitePage, $article)
     {
         $replaceArticleService = new ReplaceArticleService();
-
+        $replaceCategoryService = new ReplaceCategoryService();
+        $category = $article->articleCategory;
         $searchReplaceMap = $replaceArticleService->searchReplaceMapForArticle($article);
         $websitePage->template = Str::replace(array_keys($searchReplaceMap), $searchReplaceMap, $websitePage->template);
-        $websitePage->template = $replaceArticleService->replaceListArticleSpecific($websitePage->template);
+        $websitePage->template = $replaceArticleService->replaceListArticleSpecific($websitePage->template, $websitePage);
+        $websitePage->template = $replaceArticleService->replaceRedirectTag($article, $websitePage, $websitePage->template);
+        $replaceCategoryService->replaceCategoryInArticle($websitePage->template, $category);
 
         return $websitePage;
     }
@@ -230,8 +233,8 @@ class WebsitePageService extends AbstractService
         $websitePage->template = str_replace(array_keys($searchArticleReplaceMap), $searchArticleReplaceMap, $websitePage->template);
 
         $replaceArticleService = new ReplaceArticleService();
-        $websitePage->template = $replaceArticleService->replaceListArticleSpecific($websitePage->template);
-        $websitePage->template = $replaceArticleService->replaceListArticle($websitePage->template, $articleCategory);
+        $websitePage->template = $replaceArticleService->replaceListArticleSpecific($websitePage->template, $websitePage);
+        $websitePage->template = $replaceArticleService->replaceListArticle($websitePage->template, $articleCategory, $websitePage);
 
         return $websitePage;
     }
@@ -241,7 +244,7 @@ class WebsitePageService extends AbstractService
         $replaceArticleService = new ReplaceArticleService();
         $replaceCategoryService = new ReplaceCategoryService();
         $websitePage->template = $replaceCategoryService->replaceListCategory($websitePage->template);
-        $websitePage->template = $replaceArticleService->replaceListArticleForPageHome($websitePage->template);
+        $websitePage->template = $replaceArticleService->replaceListArticleForPageHome($websitePage->template, $websitePage);
 
         return $websitePage;
     }
