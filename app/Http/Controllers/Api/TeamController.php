@@ -454,7 +454,10 @@ class TeamController extends Controller
             return $this->sendJsonResponse(false, 'You are not owner of team to set permission', [], 403);
         }
         $team = $this->service->findOrFailById($id);
-        $contactLists = $this->contactListService->findAllWhere(['user_uuid' => $team->owner->uuid]);
+        $contactLists = $this->contactListService->findAllWhere([
+            'user_uuid' => $team->owner->uuid,
+            'app_id' => auth()->appId(),
+        ]);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData($this->contactListresourceCollectionClass, $contactLists)
@@ -491,7 +494,11 @@ class TeamController extends Controller
 
     public function deleteMember(RemoveTeamMemberRequest $request, $id)
     {
-        $model = $this->userTeamService->findOneWhereOrFail(['user_uuid' => $id, 'team_uuid' => $request->get('team_uuid')]);
+        $model = $this->userTeamService->findOneWhereOrFail([
+            'user_uuid' => $id,
+            'team_uuid' => $request->get('team_uuid'),
+            'app_id' => auth()->appId()
+        ]);
 
         if (!$this->service->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             if (!$this->checkTeamOwner($request->get('team_uuid'))) {

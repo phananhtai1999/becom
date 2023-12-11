@@ -161,6 +161,7 @@ class ArticleController extends AbstractRestAPIController
         $this->service->update($model, array_merge($request->all(), [
             'content' => $content,
             'user_uuid' => $user_uuid,
+            'app_id' => auth()->appId(),
             'description' => $description
         ]));
 
