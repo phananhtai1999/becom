@@ -77,6 +77,7 @@ class WebsiteController extends AbstractRestAPIController
         $model = $this->myService->create(
             array_merge($request->all(), [
                 "user_uuid" => $request->get('user_uuid') ?? auth()->user()->getKey(),
+                'is_default' => true,
             ])
         );
 
@@ -110,9 +111,8 @@ class WebsiteController extends AbstractRestAPIController
     {
         $model = $this->myService->create(
             array_merge($request->all(), [
-                "user_uuid" => auth()
-                    ->user()
-                    ->getKey()
+                "user_uuid" => auth()->user()->getKey(),
+                'is_default' => false,
             ])
         );
 
@@ -216,6 +216,7 @@ class WebsiteController extends AbstractRestAPIController
         $model = $this->myService->create(
             array_merge([
                 "user_uuid" => auth()->user()->getKey(),
+                'is_default' => true,
             ], $request->all())
         );
 

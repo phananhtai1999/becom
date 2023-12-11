@@ -44,12 +44,14 @@ class Website extends AbstractModel
         'domain_uuid',
         'tracking_ids',
         'is_active_news_page',
+        'is_default',
     ];
 
     /**
      * @var string[]
      */
     protected $casts = [
+        'is_default' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
