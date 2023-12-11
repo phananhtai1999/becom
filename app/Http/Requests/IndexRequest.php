@@ -24,7 +24,7 @@ class IndexRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'per_page' => ['integer', 'min:1', 'max:100'],
+            'per_page' => ['integer', 'min:1', 'max:200'],
             'page' => ['integer', 'min:1'],
             'sorted_by' =>  ['string', 'in:ASC,asc,DESC,desc'],
             'filter' => ['array'],

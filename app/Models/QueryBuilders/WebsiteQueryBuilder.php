@@ -41,6 +41,7 @@ class WebsiteQueryBuilder extends AbstractQueryBuilder
                 'domain_uuid',
                 'tracking_ids',
                 'is_active_news_page',
+                'is_default',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -55,11 +56,13 @@ class WebsiteQueryBuilder extends AbstractQueryBuilder
                 'domain_uuid',
                 'tracking_ids',
                 'is_active_news_page',
+                'is_default',
             ])
             ->allowedFilters([
                 $modelKeyName,
                 AllowedFilter::exact('exact__' . $modelKeyName, $modelKeyName),
                 'title',
+                'is_default',
                 AllowedFilter::exact('exact__title', 'title'),
                 'description',
                 AllowedFilter::exact('exact__description', 'description'),
@@ -75,6 +78,8 @@ class WebsiteQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__footer_section_uuid', 'footer_section_uuid'),
                 'footerSection.title',
                 AllowedFilter::exact('exact__footerSection.title', 'footerSection.title'),
+                'user_uuid',
+                AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
                 'user_uuid',
                 AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
                 'domain_uuid',
