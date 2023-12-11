@@ -29,7 +29,7 @@ class MyCampaignRequest extends AbstractRequest
             'tracking_key' => ['required', 'string'],
             'mail_template_uuid' => ['required', 'numeric', 'min:1', Rule::exists('mail_templates', 'uuid')->where(function ($query) use ($sendType) {
                 return $query->where([
-                    ['user_uuid', auth()->user()],
+                    ['user_uuid', auth()->userId()],
                     ['app_id', auth()->appId()],
                     ['type', $sendType],
                     ['publish_status', true]])->where(function ($q) {
@@ -46,7 +46,7 @@ class MyCampaignRequest extends AbstractRequest
                 if ($sendType == 'email') {
                     return $query->where([
                         ['send_project_uuid', $this->request->get('send_project_uuid')],
-                        ['user_uuid', auth()->user()],
+                        ['user_uuid', auth()->userId()],
                         ['app_id', auth()->appId()],
                         ['mail_mailer', 'smtp'],
                         ['status', 'work'],
@@ -55,7 +55,7 @@ class MyCampaignRequest extends AbstractRequest
                 } elseif ($sendType == 'sms') {
                     return $query->where([
                         ['send_project_uuid', $this->request->get('send_project_uuid')],
-                        ['user_uuid', auth()->user()],
+                        ['user_uuid', auth()->userId()],
                         ['app_id', auth()->appId()],
                         ['status', 'work'],
                         ['publish', true],
@@ -63,7 +63,7 @@ class MyCampaignRequest extends AbstractRequest
                 } else {
                     return $query->where([
                         ['send_project_uuid', $this->request->get('send_project_uuid')],
-                        ['user_uuid', auth()->user()],
+                        ['user_uuid', auth()->userId()],
                         ['app_id', auth()->appId()],
                         ['mail_mailer', $sendType],
                         ['status', 'work'],
@@ -73,7 +73,7 @@ class MyCampaignRequest extends AbstractRequest
             })],
             'send_project_uuid' => ['required', 'numeric', 'min:1', Rule::exists('send_projects', 'uuid')->where(function ($query) {
                 return $query->where([
-                    ['user_uuid', auth()->user()],
+                    ['user_uuid', auth()->userId()],
                     ['app_id', auth()->appId()]
                 ])->whereNull('deleted_at');
             })],
@@ -86,7 +86,7 @@ class MyCampaignRequest extends AbstractRequest
             'contact_list' => ['nullable', 'array', 'min:1'],
             'contact_list.*' => ['numeric', 'min:1', Rule::exists('contact_lists', 'uuid')->where(function ($query) {
                 return $query->where([
-                    ['user_uuid', auth()->user()],
+                    ['user_uuid', auth()->userId()],
                     ['app_id', auth()->appId()]
                 ])->whereNull('deleted_at');
             })]

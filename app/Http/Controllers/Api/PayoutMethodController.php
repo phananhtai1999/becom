@@ -34,13 +34,13 @@ class PayoutMethodController extends Controller
     {
         if (!$this->service->getDefault()) {
             $model = $this->service->create(array_merge($request->all(), [
-                'user_uuid' => auth()->user(),
+                'user_uuid' => auth()->userId(),
                 'app_id' => auth()->appId(),
                 'is_default' => true
             ]));
         } else {
             $model = $this->service->create(array_merge($request->all(), [
-                'user_uuid' => auth()->user(),
+                'user_uuid' => auth()->userId(),
                 'app_id' => auth()->appId(),
             ]));
         }

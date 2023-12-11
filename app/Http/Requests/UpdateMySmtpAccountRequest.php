@@ -30,7 +30,7 @@ class UpdateMySmtpAccountRequest extends AbstractRequest
             'mail_port' => ['required_if:mail_mailer,===,smtp', 'string'],
             'mail_username' => ['required_if:mail_mailer,===,smtp', 'string', Rule::unique('smtp_accounts')->ignore($this->id, 'uuid')->where(function ($query) {
                 return $query->where([
-                    ['user_uuid', auth()->user()],
+                    ['user_uuid', auth()->userId()],
                     ['app_id', auth()->appId()]
                 ])->whereNull('deleted_at');
             })],
@@ -42,7 +42,7 @@ class UpdateMySmtpAccountRequest extends AbstractRequest
             'send_project_uuid' => ['numeric', 'min:1', Rule::exists('send_projects', 'uuid')->where(function ($query) {
 
                 return $query->where([
-                    ['user_uuid', auth()->user()],
+                    ['user_uuid', auth()->userId()],
                     ['app_id', auth()->appId()]
                 ])->whereNull('deleted_at');
             })],

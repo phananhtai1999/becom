@@ -28,7 +28,7 @@ class UnReadNotificationsRequest extends AbstractRequest
             'notifications' => ['required', 'array'],
             'notifications.*' => ['required', 'numeric', Rule::exists('notifications', 'uuid')->where(function ($query) {
                 return $query->where('read', 1)->where([
-                    ['user_uuid', auth()->user()],
+                    ['user_uuid', auth()->userId()],
                     ['app_id', auth()->appId()]
                 ])->whereNull('deleted_at');
             })],

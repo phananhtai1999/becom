@@ -18,7 +18,7 @@ class MyStatusQueryBuilder extends AbstractQueryBuilder
     public static function baseQuery()
     {
         $myStatus = Status::where([
-            ['user_uuid', auth()->user()],
+            ['user_uuid', auth()->userId()],
             ['app_id', auth()->appId()]
         ]);
         if ($myStatus->count() != 0) {

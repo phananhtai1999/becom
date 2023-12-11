@@ -28,7 +28,7 @@ class UpdateNoteRequest extends AbstractRequest
             'note' => ['string'],
             'contact_uuid' => ['numeric', Rule::exists('contacts','uuid')->where(function ($query) {
                 return $query->where([
-                    ['user_uuid', $this->request->get('user_uuid') ?? auth()->user()],
+                    ['user_uuid', $this->request->get('user_uuid') ?? auth()->userId()],
                     ['app_id', auth()->appId()]
                 ]);
             })->whereNull('deleted_at')],

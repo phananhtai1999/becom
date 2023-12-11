@@ -129,7 +129,7 @@ class ArticleService extends AbstractService
                         ->orWhereNull('article_category_uuid');
                 })
                 ->where([
-                    ['user_uuid', auth()->user()],
+                    ['user_uuid', auth()->userId()],
                     ['app_id', auth()->appId()]
                 ])
                 ->where('updated_at', '>=', Carbon::now()->subDays($config->value))
@@ -143,7 +143,7 @@ class ArticleService extends AbstractService
                         ->orWhereNull('article_category_uuid');
                 })
                 ->where([
-                    ['user_uuid', auth()->user()],
+                    ['user_uuid', auth()->userId()],
                     ['app_id', auth()->appId()]
                 ])
                 ->paginate($perPage, $columns, $pageName, $page);
@@ -264,7 +264,7 @@ class ArticleService extends AbstractService
         COUNT(IF( publish_status = 3, 1, NULL ) ) as pending,
         COUNT(IF( publish_status = 4, 1, NULL ) ) as reject")
             ->where([
-                ['user_uuid', auth()->user()],
+                ['user_uuid', auth()->userId()],
                 ['app_id', auth()->appId()]
             ])
             ->whereDate('updated_at', '>=', $startDate)
@@ -279,7 +279,7 @@ class ArticleService extends AbstractService
         COUNT(IF( publish_status = 3, 1, NULL ) ) as pending,
         COUNT(IF( publish_status = 4, 1, NULL ) ) as reject")
             ->where([
-                ['user_uuid', auth()->user()],
+                ['user_uuid', auth()->userId()],
                 ['app_id', auth()->appId()]
             ])
             ->whereDate('updated_at', '>=', $startDate)

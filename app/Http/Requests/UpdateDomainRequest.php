@@ -29,7 +29,7 @@ class UpdateDomainRequest extends AbstractRequest
             'verified_at' => ['nullable', 'date'],
             'business_uuid' => ['nullable', 'numeric', Rule::exists('business_managements', 'uuid')->where(function ($query) {
                 return $query->where([
-                    ['owner_uuid', $this->request->get('owner_uuid') ?? auth()->user()],
+                    ['owner_uuid', $this->request->get('owner_uuid') ?? auth()->userId()],
                     ['app_id', auth()->appId()]
                 ]);
             })

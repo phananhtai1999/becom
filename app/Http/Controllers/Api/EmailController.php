@@ -59,7 +59,7 @@ class EmailController extends AbstractRestAPIController
 
         if (empty($request->get('user_uuid'))) {
             $data = array_merge($request->all(), [
-                'user_uuid' => auth()->user(),
+                'user_uuid' => auth()->userId(),
                 'app_id' => auth()->appId(),
             ]);
         } else {
@@ -123,7 +123,7 @@ class EmailController extends AbstractRestAPIController
     public function storeMyEmail(MyEmailRequest $request)
     {
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => auth()->user(),
+            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ]));
 
@@ -157,7 +157,7 @@ class EmailController extends AbstractRestAPIController
         $model = $this->myService->findMyEmailByKeyOrAbort($id);
 
         $this->service->update($model, array_merge($request->all(), [
-            'user_uuid' => auth()->user(),
+            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ]));
 

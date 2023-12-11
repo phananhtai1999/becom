@@ -19,7 +19,7 @@ class MyDomainService extends AbstractService
     public function showMyDomain($id)
     {
         return  $this->findOneWhereOrFail([
-            ['owner_uuid', auth()->user()],
+            ['owner_uuid', auth()->userId()],
             ['app_id', auth()->appId()],
             ['uuid', $id]
         ]);
@@ -44,7 +44,7 @@ class MyDomainService extends AbstractService
     {
         return $this->model->where([
             ['name', $domain],
-            ['owner_uuid', auth()->user()],
+            ['owner_uuid', auth()->userId()],
             ['app_id', auth()->appId()],
         ]);
     }

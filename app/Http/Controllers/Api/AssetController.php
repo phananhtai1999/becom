@@ -57,7 +57,7 @@ class AssetController extends AbstractRestAPIController
             [
                 'url' => $uploadUrl['absolute_slug'],
                 'status' => Asset::PUBLISH_STATUS,
-                'user_uuid' => auth()->user(),
+                'user_uuid' => auth()->userId(),
                 'app_id' => auth()->appId(),
             ]));
 
@@ -95,7 +95,7 @@ class AssetController extends AbstractRestAPIController
     {
         $models = $this->service->getCollectionWithPaginationByCondition($request,
             [
-                'user_uuid' => auth()->user(),
+                'user_uuid' => auth()->userId(),
                 'app_id' => auth()->appId()
             ]);
 
@@ -205,7 +205,7 @@ class AssetController extends AbstractRestAPIController
             $request->all(),
             [
                 'url' => $uploadUrl['absolute_slug'],
-                'user_uuid' => auth()->user(),
+                'user_uuid' => auth()->userId(),
                 'app_id' => auth()->appId(),
             ]));
 

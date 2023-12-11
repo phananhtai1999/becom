@@ -24,7 +24,7 @@ class MyCreditHistoryService extends AbstractService
     public function showMyCreditHistory($id)
     {
         return $this->findOneWhereOrFail([
-            ['user_uuid', auth()->user()],
+            ['user_uuid', auth()->userId()],
             ['app_id', auth()->appId()],
             ['uuid', $id]
         ]);
@@ -57,7 +57,7 @@ class MyCreditHistoryService extends AbstractService
 
             ])
             ->where([
-                ['user_uuid', auth()->user()],
+                ['user_uuid', auth()->userId()],
                 ['app_id', auth()->appId()]
             ])
             ->select('uuid', 'user_uuid', 'credit', 'campaign_uuid', DB::raw('NULL as campaign_uuid'), 'created_at');
@@ -75,7 +75,7 @@ class MyCreditHistoryService extends AbstractService
             ->whereDate('created_at', '<=', $endDate)
             ->whereNull('deleted_at')
             ->where([
-                ['user_uuid', auth()->user()],
+                ['user_uuid', auth()->userId()],
                 ['app_id', auth()->appId()]
             ])
             ->get();
@@ -96,7 +96,7 @@ class MyCreditHistoryService extends AbstractService
             ->whereDate('created_at', '<=', $endDate)
             ->whereNull('deleted_at')
             ->where([
-                ['user_uuid', auth()->user()],
+                ['user_uuid', auth()->userId()],
                 ['app_id', auth()->appId()]
             ])
             ->orderBy('label', 'ASC')
@@ -117,7 +117,7 @@ class MyCreditHistoryService extends AbstractService
             ->whereDate('created_at', '<=', $endDate)
             ->whereNull('deleted_at')
             ->where([
-                ['user_uuid', auth()->user()],
+                ['user_uuid', auth()->userId()],
                 ['app_id', auth()->appId()]
             ])
             ->orderBy('label', 'ASC')

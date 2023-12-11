@@ -71,9 +71,9 @@ class PaymentController extends AbstractRestAPIController
         try {
             $creditPackage = $this->creditPackageService->findOrFailById($request->get('credit_package_uuid'));
             if ($request->get('payment_method_uuid') == PaymentMethod::PAYPAL) {
-                $processResult = $this->paypalService->processTransaction($creditPackage, auth()->user(), $request->all());
+                $processResult = $this->paypalService->processTransaction($creditPackage, auth()->userId(), $request->all());
             } else {
-                $processResult = $this->stripeService->processTransaction($creditPackage, auth()->user(), $request->all());
+                $processResult = $this->stripeService->processTransaction($creditPackage, auth()->userId(), $request->all());
             }
 
             if ($processResult['status']) {
@@ -155,7 +155,7 @@ class PaymentController extends AbstractRestAPIController
     {
         $currentSubscriptionHistory = $this->subscriptionHistoryService->currentSubscriptionHistory();
         $userPlatformPackage = $this->userPlatformPackageService->findOneWhere([
-            'user_uuid' => auth()->user(),
+            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ]);
         try {

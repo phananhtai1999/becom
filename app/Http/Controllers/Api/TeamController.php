@@ -130,7 +130,7 @@ class TeamController extends Controller
 
     public function showMy($id)
     {
-        $model = $this->service->findOneWhereOrFail(['uuid' => $id, 'owner_uuid' => auth()->user(), 'app_id' => auth()->appId()]);
+        $model = $this->service->findOneWhereOrFail(['uuid' => $id, 'owner_uuid' => auth()->userId(), 'app_id' => auth()->appId()]);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -140,7 +140,7 @@ class TeamController extends Controller
     public function storeMy(MyTeamRequest $request)
     {
         $model = $this->service->create(array_merge($request->all(), [
-            'owner_uuid' => auth()->user(),
+            'owner_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ]));
 
@@ -191,7 +191,7 @@ class TeamController extends Controller
             if ($this->service->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
                 $businessUuid = $request->get("business_uuid");
             } else {
-                $businesses = $this->businessManagementService->findAllWhere([['owner_uuid', auth()->user()], ['app_id', auth()->appId()]]);
+                $businesses = $this->businessManagementService->findAllWhere([['owner_uuid', auth()->userId()], ['app_id', auth()->appId()]]);
                 if ($businesses->toArray()) {
                     $businessUuid = $businesses->first()->uuid;
                 } else {
@@ -269,7 +269,7 @@ class TeamController extends Controller
     public function joinTeam(JoinTeamRequest $request)
     {
         $model = $this->userTeamService->create(array_merge($request->all(), [
-            'user_uuid' => auth()->user(),
+            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ]));
 
@@ -404,8 +404,8 @@ class TeamController extends Controller
         if ($this->service->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             $model = $this->userTeamService->listTeamMemberOfAllTeam($request);
         } else {
-            $team_uuids = $this->service->findAllWhere(['owner_uuid' => auth()->user(), 'app_id' => auth()->appId()])->pluck('uuid');
-            $userTeam = $this->userTeamService->getUserTeamByUserAndAppId(auth()->user(), auth()->appId());
+            $team_uuids = $this->service->findAllWhere(['owner_uuid' => auth()->userId(), 'app_id' => auth()->appId()])->pluck('uuid');
+            $userTeam = $this->userTeamService->getUserTeamByUserAndAppId(auth()->userId(), auth()->appId());
             if ($userTeam) {
                 $model = $this->userTeamService->listTeamMember([$userTeam->team_uuid], $request);
             } elseif ($team_uuids) {
@@ -464,7 +464,7 @@ class TeamController extends Controller
     public function editMy(MyUpdateTeamRequest $request, $id)
     {
         $model = $this->myService->findOneWhereOrFail([
-            'owner_uuid' => auth()->user(),
+            'owner_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
             'uuid' => $id
         ]);
@@ -479,7 +479,7 @@ class TeamController extends Controller
     public function destroyMy($id)
     {
         $model = $this->myService->findOneWhereOrFail([
-            'owner_uuid' => auth()->user(),
+            'owner_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
             'uuid' => $id
         ]);
@@ -559,13 +559,13 @@ class TeamController extends Controller
     public function storeBusinessTeam(BusinessTeamRequest $request)
     {
         $teamModel = $this->service->create(array_merge($request->all(), [
-            'owner_uuid' => auth()->user(),
+            'owner_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ]));
         if ($this->service->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             $businessUuid = $request->get("business_uuid");
         } else {
-            $businesses = $this->businessManagementService->findAllWhere([['owner_uuid', auth()->user()], ['app_id', auth()->appId()]]);
+            $businesses = $this->businessManagementService->findAllWhere([['owner_uuid', auth()->userId()], ['app_id', auth()->appId()]]);
             if ($businesses->toArray()) {
                 $businessUuid = $businesses->first()->uuid;
             } else {
@@ -580,14 +580,14 @@ class TeamController extends Controller
                 $existingRecord = $this->userTeamService->findOneWhere([
                     'team_uuid' => $teamModel->uuid,
                     'user_uuid' => $userUuid,
-                    'app_id' => auth()->user()
+                    'app_id' => auth()->appId()
                 ]);
 
                 if (!$existingRecord) {
                     $this->userTeamService->create([
                         'team_uuid' => $teamModel->uuid,
                         'user_uuid' => $userUuid,
-                        'app_id' => auth()->user()
+                        'app_id' => auth()->appId()
                     ]);
                 }
             }

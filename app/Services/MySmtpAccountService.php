@@ -19,7 +19,7 @@ class MySmtpAccountService extends AbstractService
     public function findMySmtpAccountByKeyOrAbort($id)
     {
         return $this->findOneWhereOrFail([
-            ['user_uuid', auth()->user()],
+            ['user_uuid', auth()->userId()],
             ['app_id', auth()->appId()],
             ['uuid', $id]
         ]);

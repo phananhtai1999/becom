@@ -84,7 +84,7 @@ class DomainService extends AbstractService
 
         return $domainVerified->domain->update([
             'verified_at' => $domainVerified->verified_at,
-            'owner_uuid' => auth()->user(),
+            'owner_uuid' => auth()->userId(),
             'app_id' => auth()->appId()
         ]);
     }
@@ -105,7 +105,7 @@ class DomainService extends AbstractService
     public function checkDomainValidOrNot($domainUuid)
     {
         $business = (new BusinessManagementService())->findOneWhere([
-            ['owner_uuid', auth()->user()],
+            ['owner_uuid', auth()->userId()],
             ['app_id', auth()->appId()],
         ]);
         $domain = $this->findOneWhere([

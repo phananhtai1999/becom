@@ -170,7 +170,7 @@ class PaypalService extends AbstractService
                             'goBackUrl=' . $request['go_back_url'],
                             'subscriptionPlanUuid=' . $subscriptionPlan->uuid,
                             'subscriptionDate=' . $subscriptionDate,
-                            'userUuid=' . auth()->user(),
+                            'userUuid=' . auth()->userId(),
                             'expirationDate=' . $expirationDate,
                             'platformPackageUuid=' . $subscriptionPlan->platform_package_uuid,
                             'billingAddressUuid=' . $request['billing_address_uuid']
@@ -179,7 +179,7 @@ class PaypalService extends AbstractService
 //                            'goBackUrl' => $request['go_back_url'],
 //                            'subscriptionPlanUuid' => $subscriptionPlan->uuid,
 //                            'subscriptionDate' => $subscriptionDate,
-//                            'userUuid' => auth()->user(),
+//                            'userUuid' => auth()->userId(),
 //                            'expirationDate' => $expirationDate,
 //                            'platformPackageUuid' => $subscriptionPlan->platform_package_uuid,
 //                            'billingAddressUuid' => $request['billing_address_uuid'],
@@ -240,7 +240,7 @@ class PaypalService extends AbstractService
                     "return_url" => route('paypal.successPaymentSubscriptionAddOn', [
                         'goBackUrl=' . $request['go_back_url'],
                         'subscriptionDate=' . $subscriptionDate,
-                        'userUuid=' . auth()->user(),
+                        'userUuid=' . auth()->userId(),
                         'expirationDate=' . $expirationDate,
                         'addOnSubscriptionPlanUuid=' . $addOnSubscriptionPlan->uuid,
                         'billingAddressUuid=' . $request['billing_address_uuid']

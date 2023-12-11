@@ -19,7 +19,7 @@ class MyPositionService extends AbstractService
     public function showMyPosition($id)
     {
         return $this->findOneWhereOrFail([
-            ['user_uuid', auth()->user()],
+            ['user_uuid', auth()->userId()],
             ['app_id', auth()->appId()],
             ['uuid', $id]
         ]);
@@ -33,7 +33,7 @@ class MyPositionService extends AbstractService
     {
         return $this->model->where('uuid', $id)->where(function ($query) {
             $query->where([
-                ['user_uuid', auth()->user()],
+                ['user_uuid', auth()->userId()],
                 ['app_id', auth()->appId()]
             ])
                 ->orWhereNull('user_uuid');

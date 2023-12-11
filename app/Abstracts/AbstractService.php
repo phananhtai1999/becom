@@ -255,7 +255,7 @@ abstract class AbstractService
 
         return $this->modelQueryBuilderClass::searchQuery($indexRequest['search'], $indexRequest['search_by'])
             ->where([
-                ['user_uuid', auth()->user()],
+                ['user_uuid', auth()->userId()],
                 ['app_id', auth()->appId()],
             ])
             ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
@@ -264,7 +264,7 @@ abstract class AbstractService
     public function findOneWhereOrFailByUserUuidAndAppId($id)
     {
         return $this->model->where([
-            ['user_uuid', auth()->user()],
+            ['user_uuid', auth()->userId()],
             ['app_id', auth()->appId()],
             ['uuid', $id],
         ])->firstOrFail();

@@ -92,7 +92,7 @@ class AssetService extends AbstractService
     {
         $model = $this->findOneWhereOrFail([
             'uuid' => $id,
-            'user_uuid' => auth()->user(),
+            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ]);
         $model->delete();
@@ -104,7 +104,7 @@ class AssetService extends AbstractService
         COUNT(IF( status = 'pending', 1, NULL ) ) as pending,
         COUNT(IF( status = 'reject', 1, NULL ) ) as reject")
             ->where([
-                ['user_uuid', auth()->user()],
+                ['user_uuid', auth()->userId()],
                 ['app_id', auth()->appId()]
             ])
             ->whereDate('updated_at', '>=', $startDate)
@@ -119,7 +119,7 @@ class AssetService extends AbstractService
         COUNT(IF( status = 'pending', 1, NULL ) ) as pending,
         COUNT(IF( status = 'reject', 1, NULL ) ) as reject")
             ->where([
-                ['user_uuid', auth()->user()],
+                ['user_uuid', auth()->userId()],
                 ['app_id', auth()->appId()]
             ])
             ->whereDate('updated_at', '>=', $startDate)

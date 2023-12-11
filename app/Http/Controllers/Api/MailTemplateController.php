@@ -70,7 +70,7 @@ class MailTemplateController extends AbstractRestAPIController
         $request = app($this->storeRequest);
 
         if (empty($request->get('send_project_uuid'))) {
-            $userUuid = auth()->user();
+            $userUuid = auth()->userId();
         } else {
             $website = $this->sendProjectService->findOneById($request->get('send_project_uuid'));
             $userUuid = $website->user_uuid;
@@ -137,7 +137,7 @@ class MailTemplateController extends AbstractRestAPIController
     public function storeMyMailTemplate(MyMailTemplateRequest $request)
     {
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => auth()->user(),
+            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
             'publish_status' => MailTemplate::PUBLISHED_PUBLISH_STATUS
         ]));
@@ -218,7 +218,7 @@ class MailTemplateController extends AbstractRestAPIController
     public function storeUnpublishedMailTemplate(UnpublishedMailTemplateRequest $request)
     {
         if (empty($request->get('send_project_uuid'))) {
-            $userUuid = auth()->user();
+            $userUuid = auth()->userId();
         } else {
             $website = $this->sendProjectService->findOneById($request->get('send_project_uuid'));
             $userUuid = $website->user_uuid;

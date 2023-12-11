@@ -19,7 +19,7 @@ class MyWebsitePageService extends AbstractService
     public function showMyWebsitePageByUuid($id)
     {
         return $this->findOneWhereOrFail([
-            ['user_uuid', auth()->user()],
+            ['user_uuid', auth()->userId()],
             ['app_id', auth()->appId()],
             ['uuid', $id]
         ]);
@@ -51,7 +51,7 @@ class MyWebsitePageService extends AbstractService
             ->leftJoin('website_website_page', 'website_website_page.website_page_uuid', 'website_pages.uuid')
             ->whereNull('website_website_page.website_page_uuid')
             ->where([
-                ['website_pages.user_uuid', auth()->user()],
+                ['website_pages.user_uuid', auth()->userId()],
                 ['website_pages.app_id', auth()->appId()]
             ])->get()->pluck('uuid');
         $indexRequest = $this->getIndexRequest($request);

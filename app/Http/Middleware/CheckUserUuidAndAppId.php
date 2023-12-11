@@ -15,7 +15,7 @@ class CheckUserUuidAndAppId
      */
     public function handle(Request $request, Closure $next)
     {
-        if (auth()->appId() && auth()->user()) {
+        if (auth()->appId() && auth()->userId()) {
 
             return $next($request);
         }

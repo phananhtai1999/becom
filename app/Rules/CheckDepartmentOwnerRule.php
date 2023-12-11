@@ -29,7 +29,7 @@ class CheckDepartmentOwnerRule implements Rule
     public function passes($attribute, $value)
     {
         if (!(new ConfigService())->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
-            if (Department::findOrFail($value)->user_uuid != auth()->user()) {
+            if (Department::findOrFail($value)->user_uuid != auth()->userId()) {
 
                 return false;
             }

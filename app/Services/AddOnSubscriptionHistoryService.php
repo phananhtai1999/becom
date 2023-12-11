@@ -17,7 +17,7 @@ class AddOnSubscriptionHistoryService extends AbstractService
     {
 
         return $this->model->where([
-            'user_uuid' => auth()->user(),
+            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId()
         ])->orderBy('uuid', 'DESC')->get();
     }
@@ -26,7 +26,7 @@ class AddOnSubscriptionHistoryService extends AbstractService
     {
 
         return $this->model->where([
-            'user_uuid' => auth()->user(),
+            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId()
         ])->orderBy('uuid', 'DESC')->first();
     }
@@ -42,7 +42,7 @@ class AddOnSubscriptionHistoryService extends AbstractService
     public function getAddOnSubscriptionHistoryOfCurrentUser()
     {
         return $this->model->where([
-            'user_uuid' => auth()->user(),
+            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId()
         ])->first();
     }

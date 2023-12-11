@@ -28,7 +28,7 @@ class ResetPasswordTeamMemberRule implements Rule
         $userTeam = optional((new UserTeamService())->findOneWhere([['user_uuid', $this->userUuid]]))->team_uuid;
         $teamCurrentUser = (new TeamService())->findOneWhere([
             ['uuid', $userTeam],
-            ['owner_uuid', auth()->user()],
+            ['owner_uuid', auth()->userId()],
             ['app_id', auth()->appId()],
         ]);
 

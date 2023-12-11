@@ -297,13 +297,13 @@ class UserService extends AbstractService
     public function getCurrentUserRole(): string
     {
         if ($this->checkUserRoles([Role::ROLE_ROOT])) {
-            $char = 'r' . auth()->user();
+            $char = 'r' . auth()->userId();
         } elseif ($this->checkUserRoles([Role::ROLE_ADMIN])) {
-            $char = 'a' . auth()->user();
+            $char = 'a' . auth()->userId();
         } elseif ($this->checkUserRoles([Role::ROLE_EDITOR])) {
-            $char = 'e' . auth()->user();
+            $char = 'e' . auth()->userId();
         } else {
-            $char = 'u' . auth()->user();
+            $char = 'u' . auth()->userId();
         }
 
         return $char;

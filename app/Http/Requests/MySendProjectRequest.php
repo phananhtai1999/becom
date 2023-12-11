@@ -27,7 +27,7 @@ class MySendProjectRequest extends AbstractRequest
         return [
             'domain' => ['nullable', 'string', 'regex:/^(?!(www|http|https)\.)\w+(\.\w+)+$/', Rule::unique('send_projects')->where(function ($query) {
                 return $query->where([
-                    ['user_uuid', auth()->user()],
+                    ['user_uuid', auth()->userId()],
                     ['app_id', auth()->appId()]
                 ])
                     ->whereNull('deleted_at');
@@ -37,7 +37,7 @@ class MySendProjectRequest extends AbstractRequest
             'logo' => ['required', 'string'],
             'domain_uuid' => ['nullable', 'numeric', Rule::exists('domains', 'uuid')->where(function ($query) {
                 return $query->where([
-                    ['owner_uuid', $this->request->get('user_uuid') ?? auth()->user()],
+                    ['owner_uuid', $this->request->get('user_uuid') ?? auth()->userId()],
                     ['app_id', auth()->appId()]
                 ])
                     ->whereNull('deleted_at');

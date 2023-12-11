@@ -20,7 +20,7 @@ class MyContactListService extends AbstractService
     public function findMyContactListByKeyOrAbort($id)
     {
         return $this->findOneWhereOrFail([
-            ['user_uuid', auth()->user()],
+            ['user_uuid', auth()->userId()],
             ['app_id', auth()->appId()],
             ['uuid', $id]
         ]);
@@ -34,7 +34,7 @@ class MyContactListService extends AbstractService
     {
         $contactList = $this->findOneWhere([
             ['uuid', $id],
-            ['user_uuid', auth()->user()],
+            ['user_uuid', auth()->userId()],
             ['app_id', auth()->appId()],
         ]);
 
@@ -68,7 +68,7 @@ class MyContactListService extends AbstractService
             ->whereDate('created_at', '<=', $endDate)
             ->whereNull('deleted_at')
             ->where([
-                ['user_uuid', auth()->user()],
+                ['user_uuid', auth()->userId()],
                 ['app_id', auth()->appId()]
             ])
             ->get();

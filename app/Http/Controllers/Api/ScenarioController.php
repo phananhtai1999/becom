@@ -122,7 +122,7 @@ class ScenarioController extends AbstractRestAPIController
         //Insert data
         $scenario = $this->service->create([
             'name' => $request->get('name'),
-            'user_uuid' => auth()->user(),
+            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ]);
 
@@ -190,7 +190,7 @@ class ScenarioController extends AbstractRestAPIController
         //Insert data
         $scenario = $this->service->create([
             'name' => $request->get('name'),
-            'user_uuid' => auth()->user(),
+            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ]);
 

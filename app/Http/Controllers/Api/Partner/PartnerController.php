@@ -205,7 +205,7 @@ class PartnerController extends AbstractRestAPIController
     public function partnerDashboard()
     {
         $partner = $this->service->findOneWhereOrFail([
-            'user_uuid' => auth()->user(),
+            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ]);
         $referrals = $this->partnerUserService->referralsOfPartnerInMonth($partner->code)->count();
@@ -224,7 +224,7 @@ class PartnerController extends AbstractRestAPIController
     {
         //Email created customer_since
         $partner = $this->service->findOneWhereOrFail([
-            'user_uuid' => auth()->user(),
+            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ]);
 
@@ -235,7 +235,7 @@ class PartnerController extends AbstractRestAPIController
     public function partnerSubAffiliates()
     {
         $partner = $this->service->findOneWhereOrFail([
-            'user_uuid' => auth()->user(),
+            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ]);
 
@@ -268,7 +268,7 @@ class PartnerController extends AbstractRestAPIController
     public function partnerDetail(PartnerDetailRequest $request)
     {
         $partner = $this->service->findOneWhereOrFail([
-            'user_uuid' => auth()->user(),
+            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ]);
 
@@ -379,7 +379,7 @@ class PartnerController extends AbstractRestAPIController
     public function partnerRewards()
     {
         $partner = $this->service->findOneWhereOrFail([
-            'user_uuid' => auth()->user(),
+            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ]);
         $data = $this->userPaymentByDayService->getRewardsCommissionThisMonthByPartner($partner->code);

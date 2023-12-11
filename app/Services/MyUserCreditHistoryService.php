@@ -23,7 +23,7 @@ class MyUserCreditHistoryService extends AbstractService
     public function showMyUserCreditHistory($id)
     {
         return $this->findOneWhereOrFail([
-            ['user_uuid', auth()->user()],
+            ['user_uuid', auth()->userId()],
             ['app_id', auth()->appId()],
             ['uuid', $id]
         ]);
@@ -53,7 +53,7 @@ class MyUserCreditHistoryService extends AbstractService
         return QueryBuilder::for($this->model)
             ->select('uuid', 'user_uuid', 'credit', DB::raw('NULL as campaign_uuid'), 'add_by_uuid', 'created_at')
             ->where([
-                ['user_uuid', auth()->user()],
+                ['user_uuid', auth()->userId()],
                 ['app_id', auth()->appId()]
             ])
             ->unionAll($data)
@@ -80,7 +80,7 @@ class MyUserCreditHistoryService extends AbstractService
             ->whereDate('created_at', '<=', $endDate)
             ->whereNull('deleted_at')
             ->where([
-                ['user_uuid', auth()->user()],
+                ['user_uuid', auth()->userId()],
                 ['app_id', auth()->appId()]
             ])
             ->get();

@@ -235,9 +235,9 @@ class ContactService extends AbstractService
                     'dob' => $row['dob'],
                     'city' => $row['city'],
                     'country' => $row['country'],
-                    'user_uuid' => auth()->user(),
+                    'user_uuid' => auth()->userId(),
                     'app_id' => auth()->appId(),
-                    'status_uuid' => optional(app(StatusService::class)->selectStatusDefault(auth()->user()))->uuid
+                    'status_uuid' => optional(app(StatusService::class)->selectStatusDefault(auth()->userId()))->uuid
                 ];
                 $validator = Validator::make($data, $rules);
                 if ($validator->fails()) {
@@ -340,9 +340,9 @@ class ContactService extends AbstractService
                 'dob' => $content->dob,
                 'city' => $content->city,
                 'country' => $content->country,
-                'user_uuid' => auth()->user(),
+                'user_uuid' => auth()->userId(),
                 'app_id' => auth()->appId(),
-                'status_uuid' => optional(app(StatusService::class)->selectStatusDefault(auth()->user()))->uuid
+                'status_uuid' => optional(app(StatusService::class)->selectStatusDefault(auth()->userId()))->uuid
             ];
             $validator = Validator::make($data, $rules);
             if ($validator->fails()) {

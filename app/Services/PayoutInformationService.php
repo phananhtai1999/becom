@@ -15,7 +15,7 @@ class PayoutInformationService extends AbstractService
     public function getDefault()
     {
         return $this->model->where([
-            'user_uuid' => auth()->user(),
+            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
             'is_default' => true
         ])->first();
@@ -24,7 +24,7 @@ class PayoutInformationService extends AbstractService
     public function getMyPayoutInformation()
     {
         return $this->model->where([
-            'user_uuid' => auth()->user(),
+            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ])
             ->orderBy('is_default', 'DESC')->get();

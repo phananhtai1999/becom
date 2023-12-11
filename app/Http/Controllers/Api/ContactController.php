@@ -132,9 +132,9 @@ class ContactController extends AbstractRestAPIController
         $request = app($this->storeRequest);
 
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => $request->get('user_uuid') ?? auth()->user(),
+            'user_uuid' => $request->get('user_uuid') ?? auth()->userId(),
             'app_id' => auth()->appId(),
-            'status_uuid' => $request->get('status_uuid') ?: optional($this->statusService->selectStatusDefault($request->get('user_uuid') ?? auth()->user()))->uuid
+            'status_uuid' => $request->get('status_uuid') ?: optional($this->statusService->selectStatusDefault($request->get('user_uuid') ?? auth()->userId()))->uuid
         ]));
 
         //Add Pivot contact_company_position
@@ -162,7 +162,7 @@ class ContactController extends AbstractRestAPIController
         $model = $this->service->findOrFailById($id);
 
         $this->service->update($model, array_merge($request->except("points"), [
-            'user_uuid' => $request->get('user_uuid') ?? auth()->user(),
+            'user_uuid' => $request->get('user_uuid') ?? auth()->userId(),
             'app_id' => auth()->appId(),
         ]));
 
@@ -240,9 +240,9 @@ class ContactController extends AbstractRestAPIController
         }
 
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => auth()->user(),
+            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
-            'status_uuid' => $request->get('status_uuid') ?: optional($this->statusService->selectStatusDefault(auth()->user()))->uuid
+            'status_uuid' => $request->get('status_uuid') ?: optional($this->statusService->selectStatusDefault(auth()->userId()))->uuid
         ]));
 
         //Add Pivot contact_company_position
@@ -286,7 +286,7 @@ class ContactController extends AbstractRestAPIController
         $model = $this->myService->findMyContactByKeyOrAbort($id);
 
         $this->service->update($model, array_merge($request->except("points"), [
-            'user_uuid' => auth()->user(),
+            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ]));
 

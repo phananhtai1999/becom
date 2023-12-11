@@ -58,7 +58,7 @@ class CopyDefaultWebsiteRequest extends AbstractRequest
         }else{
             $validate['domain_uuid'] = ['nullable','required_unless:publish_status,'.Website::DRAFT_PUBLISH_STATUS, 'numeric', Rule::exists('domains', 'uuid')->where(function ($q) {
                 return $q->where([
-                    ['owner_uuid', auth()->user()],
+                    ['owner_uuid', auth()->userId()],
                     ['app_id', auth()->appId()]
                 ])
                     ->whereNull('deleted_at');

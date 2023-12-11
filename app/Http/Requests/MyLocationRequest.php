@@ -27,7 +27,7 @@ class MyLocationRequest extends FormRequest
         return [
             'name' => ['required', 'string', Rule::unique('locations', 'name')->where(function ($q) {
                 return $q->where([
-                    ['user_uuid', auth()->user()],
+                    ['user_uuid', auth()->userId()],
                     ['app_id', auth()->appId()]
                 ]);
             })->whereNull('deleted_at')],

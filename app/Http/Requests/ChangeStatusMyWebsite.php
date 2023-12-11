@@ -32,7 +32,7 @@ class ChangeStatusMyWebsite extends AbstractRequest
                 'min:1',
                 Rule::exists('websites', 'uuid')->where(function ($query) {
                     return $query->where([
-                        ['user_uuid', auth()->user()],
+                        ['user_uuid', auth()->userId()],
                         ['app_id', auth()->appId()],
                         ['publish_status', '<>', $this->request->get('publish_status')]
                     ]);

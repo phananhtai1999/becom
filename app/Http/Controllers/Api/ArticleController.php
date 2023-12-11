@@ -86,9 +86,9 @@ class ArticleController extends AbstractRestAPIController
 
         //Map type_label to content
         $content = $this->service->mapTypeLabelToContent($request->get('content'), $request->content_type);
-        $userTeam = $this->userTeamService->getUserTeamByUserAndAppId(auth()->user(), auth()->appId());
+        $userTeam = $this->userTeamService->getUserTeamByUserAndAppId(auth()->userId(), auth()->appId());
 
-        if($userTeam && !$userTeam['is_blocked'] && auth()->user() != $userTeam->team->owner_uuid) {
+        if($userTeam && !$userTeam['is_blocked'] && auth()->userId() != $userTeam->team->owner_uuid) {
             $user_uuid = $userTeam->team->owner_uuid;
             $model = $this->service->create(array_merge($request->except(['reject_reason']), [
                 'user_uuid' => $user_uuid,
@@ -99,7 +99,7 @@ class ArticleController extends AbstractRestAPIController
                 'description' => $request->keyword ? array_merge($request->keyword, $request->description ?? $request->keyword) : $request->description
             ]));
         } else {
-            $user_uuid = auth()->user();
+            $user_uuid = auth()->userId();
             $model = $this->service->create(array_merge($request->except(['reject_reason']), [
                 'user_uuid' => $user_uuid,
                 'app_id' => auth()->appId(),
@@ -188,7 +188,7 @@ class ArticleController extends AbstractRestAPIController
         $content = $this->service->mapTypeLabelToContent($request->content, $request->content_type);
 
         $model = $this->service->create(array_merge($request->except(['reject_reason']), [
-            'user_uuid' => auth()->user(),
+            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
             'content_for_user' => $request->content_for_user ?: Article::PUBLIC_CONTENT_FOR_USER,
             'content' => $content,
@@ -339,7 +339,7 @@ class ArticleController extends AbstractRestAPIController
         //Role editor limit by config days
         if (!$role && $config) {
             $models = $this->service->getCollectionWithPaginationByCondition($request, [
-                ['user_uuid', auth()->user()],
+                ['user_uuid', auth()->userId()],
                 ['app_id', auth()->appId()],
                 ['updated_at', '>=', Carbon::now()->subDays($config->value)]
             ]);
@@ -404,7 +404,7 @@ class ArticleController extends AbstractRestAPIController
         $content = $this->service->mapTypeLabelToContent($request->get('content'), $request->content_type);
 
         $model = $this->service->create(array_merge($request->except(['reject_reason']), [
-            'user_uuid' => auth()->user(),
+            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
             'content' => $content,
             'description' => $request->keyword ? array_merge($request->keyword, $request->description ?? $request->keyword) : $request->description

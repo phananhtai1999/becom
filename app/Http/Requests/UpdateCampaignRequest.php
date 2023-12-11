@@ -29,7 +29,7 @@ class UpdateCampaignRequest extends AbstractRequest
             'tracking_key' => ['string'],
             'mail_template_uuid' => ['numeric', 'min:1', Rule::exists('mail_templates', 'uuid')->where(function ($query) use ($sendType){
                 return $query->where([
-                    ['user_uuid', $this->request->get('user_uuid') ?? auth()->user()],
+                    ['user_uuid', $this->request->get('user_uuid') ?? auth()->userId()],
                     ['app_id', $this->request->get('user_uuid') ?? auth()->appId()],
                     ['type', $sendType],
                     ['publish_status', true]])->where(function ($q) {
@@ -46,7 +46,7 @@ class UpdateCampaignRequest extends AbstractRequest
                 if ($sendType == 'email') {
                     return $query->where([
                         ['send_project_uuid', $this->request->get('send_project_uuid')],
-                        ['user_uuid', $this->request->get('user_uuid') ?? auth()->user()],
+                        ['user_uuid', $this->request->get('user_uuid') ?? auth()->userId()],
                         ['app_id', $this->request->get('user_uuid') ?? auth()->appId()],
                         ['mail_mailer', 'smtp'],
                         ['status', 'work'],
@@ -55,14 +55,14 @@ class UpdateCampaignRequest extends AbstractRequest
                 } elseif ($sendType == 'sms') {
                     return $query->where([
                         ['send_project_uuid', $this->request->get('send_project_uuid')],
-                        ['user_uuid', $this->request->get('user_uuid') ?? auth()->user()],
+                        ['user_uuid', $this->request->get('user_uuid') ?? auth()->userId()],
                         ['app_id', $this->request->get('user_uuid') ?? auth()->appId()],                        ['status', 'work'],
                         ['publish', true],
                     ])->whereNull('deleted_at');
                 } else {
                     return $query->where([
                         ['send_project_uuid', $this->request->get('send_project_uuid')],
-                        ['user_uuid', $this->request->get('user_uuid') ?? auth()->user()],
+                        ['user_uuid', $this->request->get('user_uuid') ?? auth()->userId()],
                         ['app_id', $this->request->get('user_uuid') ?? auth()->appId()],                        ['mail_mailer', $sendType],
                         ['status', 'work'],
                         ['publish', true],
@@ -71,7 +71,7 @@ class UpdateCampaignRequest extends AbstractRequest
             })],
             'send_project_uuid' => ['numeric', 'min:1', Rule::exists('send_projects', 'uuid')->where(function ($query) {
                 return $query->where([
-                    ['user_uuid', $this->request->get('user_uuid') ?? auth()->user()],
+                    ['user_uuid', $this->request->get('user_uuid') ?? auth()->userId()],
                     ['app_id', auth()->appId()]
                 ])->whereNull('deleted_at');
             })],
@@ -85,7 +85,7 @@ class UpdateCampaignRequest extends AbstractRequest
             'contact_list' => ['array', 'min:1'],
             'contact_list.*' => ['numeric', 'min:1', Rule::exists('contact_lists', 'uuid')->where(function ($query) {
                 return $query->where([
-                    ['user_uuid', $this->request->get('user_uuid') ?? auth()->user()],
+                    ['user_uuid', $this->request->get('user_uuid') ?? auth()->userId()],
                     ['app_id', auth()->appId()]
                 ])->whereNull('deleted_at');
             })]

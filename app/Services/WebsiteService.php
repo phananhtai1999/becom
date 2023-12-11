@@ -46,7 +46,7 @@ class WebsiteService extends AbstractService
         return $this->model->where('uuid', $uuid)
             ->where(function ($query) {
                 return $query->where([
-                    ['user_uuid', auth()->user()],
+                    ['user_uuid', auth()->userId()],
                     ['app_id', auth()->appId()]
                 ])
                     ->orWhere(function ($q) {

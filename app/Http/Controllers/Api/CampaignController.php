@@ -229,7 +229,7 @@ class CampaignController extends AbstractRestAPIController
 
         if (empty($request->get('user_uuid'))) {
             $data = array_merge($request->all(), [
-                'user_uuid' => auth()->user(),
+                'user_uuid' => auth()->userId(),
                 'app_id' => auth()->appId(),
             ]);
         } else {
@@ -317,7 +317,7 @@ class CampaignController extends AbstractRestAPIController
     public function indexMyCampaign(IndexRequest $request)
     {
         $sortTotalCredit = explode(',', $request->sort);
-        $userTeam = $this->userTeamService->getUserTeamByUserAndAppId(auth()->user(), auth()->appId());
+        $userTeam = $this->userTeamService->getUserTeamByUserAndAppId(auth()->userId(), auth()->appId());
         //need function userteamcontaclist here
         if (($userTeam && !$userTeam['is_blocked']) && !empty(auth()->user()->userTeamContactLists)) {
             if ($sortTotalCredit[0] == 'number_credit_needed_to_start_campaign' || $sortTotalCredit[0] == '-number_credit_needed_to_start_campaign') {
@@ -344,7 +344,7 @@ class CampaignController extends AbstractRestAPIController
      */
     public function storeMyCampaign(MyCampaignRequest $request)
     {
-        $user = $this->userService->findOrFailById(auth()->user());
+        $user = $this->userService->findOrFailById(auth()->userId());
         $configSmtpAuto = $this->configService->findConfigByKey('smtp_auto');
 
         if ($request->get('type') === "scenario" && count($request->get('contact_list')) > 1) {
@@ -362,7 +362,7 @@ class CampaignController extends AbstractRestAPIController
         }
 
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => auth()->user(),
+            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ]));
 
@@ -404,7 +404,7 @@ class CampaignController extends AbstractRestAPIController
     {
         $model = $this->myService->findMyCampaignByKeyOrAbort($id);
 
-        $user = $this->userService->findOrFailById(auth()->user());
+        $user = $this->userService->findOrFailById(auth()->userId());
         $config = $this->configService->findConfigByKey('smtp_auto');
 
         if ($request->get('type') === "scenario" && count($request->get('contact_list')) > 1) {
@@ -448,7 +448,7 @@ class CampaignController extends AbstractRestAPIController
         }
 
         $this->service->update($model, array_merge($request->all(), [
-            'user_uuid' => auth()->user(),
+            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ]));
 

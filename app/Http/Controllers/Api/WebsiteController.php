@@ -76,7 +76,7 @@ class WebsiteController extends AbstractRestAPIController
     {
         $model = $this->myService->create(
             array_merge($request->all(), [
-                "user_uuid" => $request->get('user_uuid') ?? auth()->user(),
+                "user_uuid" => $request->get('user_uuid') ?? auth()->userId(),
                 "app_id" => auth()->appId(),
             ])
         );
@@ -216,7 +216,7 @@ class WebsiteController extends AbstractRestAPIController
     {
         $model = $this->myService->create(
             array_merge([
-                "user_uuid" => auth()->user(),
+                "user_uuid" => auth()->userId(),
                 "app_id" => auth()->appId(),
             ], $request->all())
         );
@@ -263,7 +263,7 @@ class WebsiteController extends AbstractRestAPIController
     public function showUnpublishedWebsite($id)
     {
         $model = $this->service->findOneWhereOrFail([
-            'user_uuid' => auth()->user(),
+            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
             'publish_status' => Article::PENDING_PUBLISH_STATUS,
             'uuid' => $id
@@ -365,13 +365,13 @@ class WebsiteController extends AbstractRestAPIController
         DB::beginTransaction();
         try {
             $headerWebsite = $this->sectionTemplateService->create(array_merge($copyWebsite->headerSection->toArray(), [
-                "user_uuid" => auth()->user(),
+                "user_uuid" => auth()->userId(),
                 "app_id" => auth()->appId(),
                 'publish_status' => $statusTemplate,
                 "is_default" => $isDefault
             ]));
             $footerWebsite = $this->sectionTemplateService->create(array_merge($copyWebsite->footerSection->toArray(), [
-                "user_uuid" => auth()->user(),
+                "user_uuid" => auth()->userId(),
                 "app_id" => auth()->appId(),
                 'publish_status' => $statusTemplate,
                 "is_default" => $isDefault
@@ -380,14 +380,14 @@ class WebsiteController extends AbstractRestAPIController
             $website = $this->service->create(array_merge($request->all(), [
                 'header_section_uuid' => $headerWebsite->uuid,
                 'footer_section_uuid' => $footerWebsite->uuid,
-                'user_uuid' => auth()->user(),
+                'user_uuid' => auth()->userId(),
                 'app_id' => auth()->appId(),
                 'publish_status' => $statusWebsite,
             ]));
 
             $websitePages = $copyWebsite->websitePages->map(function ($item) use ($statusTemplate, $isDefault) {
                 $websitePage = $this->websitePageService->create(array_merge($item->toArray(), [
-                    'user_uuid' => auth()->user(),
+                    'user_uuid' => auth()->userId(),
                     'app_id' => auth()->appId(),
                     'is_default' => $isDefault,
                     'publish_status' => $statusTemplate

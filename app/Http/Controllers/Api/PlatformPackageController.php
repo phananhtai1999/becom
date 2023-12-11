@@ -69,7 +69,7 @@ class PlatformPackageController extends AbstractRestAPIController
      */
     public function myPlatformPackage() {
         $myPlatformPackage = $this->userPlatformPackageService->findOneWhere([
-            'user_uuid' => auth()->user(),
+            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ]);
 

@@ -49,13 +49,13 @@ class FooterTemplateService extends AbstractService
     {
 //        $footerTemplate = $this->findOneWhere([
 //            'type' => $type,
-//            'active_by_uuid' => auth()->user(),
-//            'user_uuid' => auth()->user()
+//            'active_by_uuid' => auth()->userId(),
+//            'user_uuid' => auth()->userId()
 //        ]);
         $footerTemplate = $this->findOneWhere([
             ['type', $type],
-            ['active_by_uuid', auth()->user()],
-            ['user_uuid', auth()->user()],
+            ['active_by_uuid', auth()->userId()],
+            ['user_uuid', auth()->userId()],
             ['app_id', auth()->appId()],
             ['uuid', '<>', $uuid]
         ]);
