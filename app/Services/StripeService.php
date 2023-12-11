@@ -128,7 +128,7 @@ class StripeService extends AbstractService
                         'goBackUrl=' . $request['go_back_url'],
                         'subscriptionPlanUuid=' . $subscriptionPlan->uuid,
                         'subscriptionDate=' . $subscriptionDate,
-                        'userUuid=' . Auth::user()->getKey(),
+                        'userUuid=' . auth()->user(),
                         'expirationDate=' . $expirationDate,
                         'platformPackageUuid=' . $subscriptionPlan->platform_package_uuid,
                         'billingAddressUuid=' . $request['billing_address_uuid'],
@@ -137,7 +137,7 @@ class StripeService extends AbstractService
 //                        'goBackUrl' => $request['go_back_url'],
 //                        'subscriptionPlanUuid' => $subscriptionPlan->uuid,
 //                        'subscriptionDate' => $subscriptionDate,
-//                        'userUuid' => Auth::user()->getKey(),
+//                        'userUuid' => auth()->user(),
 //                        'expirationDate' => $expirationDate,
 //                        'platformPackageUuid' => $subscriptionPlan->platform_package_uuid,
 //                        'billingAddressUuid' => $request['billing_address_uuid'],
@@ -173,7 +173,7 @@ class StripeService extends AbstractService
                 'success_url' => route('stripe.successPaymentSubscriptionAddOn', [
                         'goBackUrl=' . $request['go_back_url'],
                         'subscriptionDate=' . $subscriptionDate,
-                        'userUuid=' . Auth::user()->getKey(),
+                        'userUuid=' . auth()->user(),
                         'expirationDate=' . $expirationDate,
                         'addOnSubscriptionPlanUuid=' . $addOnSubscriptionPlan->uuid,
                         'billingAddressUuid=' . $request['billing_address_uuid']

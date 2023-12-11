@@ -21,7 +21,7 @@ class UserAccessTokenService extends AbstractService
         return $this->create([
             'user_agent' => request()->userAgent(),
             'ip' => request()->ip(),
-            'user_uuid' => $user->getKey()
+            'user_uuid' => auth()->user()
         ]);
     }
 

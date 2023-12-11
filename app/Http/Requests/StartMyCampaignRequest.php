@@ -31,7 +31,7 @@ class StartMyCampaignRequest extends AbstractRequest
         $userTeamService = new UserTeamService();
         $userTeam = $userTeamService->getUserTeamByUserAndAppId(auth()->user(), auth()->appId());
         //need function userteamcontaclist here
-        if (($userTeam && !$userTeam['is_blocked']) && !empty($this->user()->userTeamContactLists)) {
+        if (($userTeam && !$userTeam['is_blocked']) && !empty(auth()->user()->userTeamContactLists)) {
             $campaignUuid = app(Campaign::class)->select('campaigns.*')
                 ->join('campaign_contact_list', 'campaigns.uuid', '=', 'campaign_contact_list.campaign_uuid')
                 ->WhereIn('campaign_contact_list.contact_list_uuid', auth()->user()->userTeamContactLists()->pluck('contact_list_uuid'))->get()->pluck('uuid');

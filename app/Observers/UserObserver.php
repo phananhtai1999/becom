@@ -30,7 +30,7 @@ class UserObserver
     public function created(User $user)
     {
         app(UserConfigService::class)->create([
-            'user_uuid' => $user->getKey(),
+            'user_uuid' => auth()->user(),
             'app_language' => app()->getLocale(),
             'user_language' => app()->getLocale(),
             'display_name_style' => 1,

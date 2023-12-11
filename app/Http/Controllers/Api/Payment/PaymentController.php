@@ -71,9 +71,9 @@ class PaymentController extends AbstractRestAPIController
         try {
             $creditPackage = $this->creditPackageService->findOrFailById($request->get('credit_package_uuid'));
             if ($request->get('payment_method_uuid') == PaymentMethod::PAYPAL) {
-                $processResult = $this->paypalService->processTransaction($creditPackage, Auth::user()->getKey(), $request->all());
+                $processResult = $this->paypalService->processTransaction($creditPackage, auth()->user(), $request->all());
             } else {
-                $processResult = $this->stripeService->processTransaction($creditPackage, Auth::user()->getKey(), $request->all());
+                $processResult = $this->stripeService->processTransaction($creditPackage, auth()->user(), $request->all());
             }
 
             if ($processResult['status']) {

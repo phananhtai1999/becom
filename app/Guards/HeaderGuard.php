@@ -2,6 +2,7 @@
 
 namespace App\Guards;
 
+use App\Models\User;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\Request;
@@ -9,13 +10,20 @@ use Illuminate\Http\Request;
 class HeaderGuard implements Guard
 {
     protected $request;
+    protected $user;
 
     public function __construct(Request $request)
     {
         $this->request = $request;
+        $this->user = new User(["uuid" => $this->userId()]);
     }
 
     public function user()
+    {
+        return $this->user;
+    }
+
+    public function userId()
     {
         // Get value 'x-user-id' to header
         return $this->request->header('x-user-id');

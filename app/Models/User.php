@@ -21,6 +21,11 @@ class User extends Authenticatable implements JWTSubject
     /**
      * @var string
      */
+    protected $table = "user_profiles";
+
+    /**
+     * @var string
+     */
     protected $primaryKey = 'uuid';
 
     /**
@@ -41,7 +46,8 @@ class User extends Authenticatable implements JWTSubject
         'cover_img',
         'credit',
         'can_add_smtp_account',
-        'can_remove_footer_template'
+        'can_remove_footer_template',
+        'uuid'
     ];
 
     /**
