@@ -77,7 +77,7 @@ class WebsiteController extends AbstractRestAPIController
         $model = $this->myService->create(
             array_merge($request->all(), [
                 "user_uuid" => $request->get('user_uuid') ?? auth()->userId(),
-                "app_id" => auth()->appId(),
+                'app_id' => auth()->appId(),
             ])
         );
 
@@ -111,9 +111,8 @@ class WebsiteController extends AbstractRestAPIController
     {
         $model = $this->myService->create(
             array_merge($request->all(), [
-                "user_uuid" => auth()
-                    ->user()
-                    ->getKey()
+                "user_uuid" => auth()->userId(),
+                'app_id' => auth()->appId()
             ])
         );
 
@@ -217,7 +216,7 @@ class WebsiteController extends AbstractRestAPIController
         $model = $this->myService->create(
             array_merge([
                 "user_uuid" => auth()->userId(),
-                "app_id" => auth()->appId(),
+                'app_id' => auth()->appId(),
             ], $request->all())
         );
 
@@ -366,13 +365,13 @@ class WebsiteController extends AbstractRestAPIController
         try {
             $headerWebsite = $this->sectionTemplateService->create(array_merge($copyWebsite->headerSection->toArray(), [
                 "user_uuid" => auth()->userId(),
-                "app_id" => auth()->appId(),
+                'app_id' => auth()->appId(),
                 'publish_status' => $statusTemplate,
                 "is_default" => $isDefault
             ]));
             $footerWebsite = $this->sectionTemplateService->create(array_merge($copyWebsite->footerSection->toArray(), [
                 "user_uuid" => auth()->userId(),
-                "app_id" => auth()->appId(),
+                'app_id' => auth()->appId(),
                 'publish_status' => $statusTemplate,
                 "is_default" => $isDefault
             ]));

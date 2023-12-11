@@ -272,14 +272,14 @@ class BusinessManagementController extends AbstractRestAPIController
                     $existingRecord = $this->userBusinessService->findOneWhere([
                         'business_uuid' => $businessUuid,
                         'user_uuid' => $userUuid,
-                        'app_id', auth()->appId(),
+                        'app_id' => auth()->appId(),
                     ]);
 
                     if (!$existingRecord) {
                         $this->userBusinessService->create([
                             'business_uuid' => $businessUuid,
                             'user_uuid' => $userUuid,
-                            'app_id', auth()->appId(),
+                            'app_id' => auth()->appId(),
                         ]);
                     }
                 }

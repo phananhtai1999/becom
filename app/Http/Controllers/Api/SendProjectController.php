@@ -76,7 +76,7 @@ class SendProjectController extends AbstractRestAPIController
 
         $model = $this->service->create(array_merge($request->all(), [
             'user_uuid' => $request->get('user_uuid') ?? auth()->userId(),
-            "app_id" => auth()->appId(),
+            'app_id' => auth()->appId(),
         ]));
 
         return $this->sendCreatedJsonResponse(
@@ -106,7 +106,7 @@ class SendProjectController extends AbstractRestAPIController
 
         $this->service->update($model, array_merge($data, [
             'user_uuid' => $request->get('user_uuid') ?? auth()->userId(),
-            "app_id" => auth()->appId(),
+            'app_id' => auth()->appId(),
             'domain_uuid' => $request->get('domain_uuid') ?? null
         ]));
 

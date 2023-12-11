@@ -84,7 +84,7 @@ class DomainController extends AbstractRestAPIController
 
         $model = $this->service->create(array_merge($request->except(['active_mailbox_status']), [
             'owner_uuid' => $request->get('owner_uuid') ?? auth()->userId(),
-            "app_id" => auth()->appId(),
+            'app_id' => auth()->appId(),
             'active_mailbox' => false,
         ]));
 

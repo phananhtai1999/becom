@@ -181,7 +181,8 @@ class FormController extends AbstractRestAPIController
                 "last_name" => $request->get('last_name'),
                 "email" => $request->get('email'),
                 "phone" => $request->get('phone'),
-                "user_uuid" => $form->user_uuid
+                "user_uuid" => $form->user_uuid,
+                'app_id' => auth()->appId(),
             ]);
 
             $contact->contactLists()->attach($form->contact_list_uuid);

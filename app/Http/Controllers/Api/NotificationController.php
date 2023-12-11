@@ -63,7 +63,7 @@ class NotificationController extends AbstractRestAPIController
         $models = $this->service->getCollectionByUserIdAndAppIdWithPagination($request);
         $statistical = $this->service->statisticalNotification([
             "user_uuid" => auth()->userId(),
-            "app_id" => auth()->appId()
+            'app_id' => auth()->appId()
         ]);
 
         $data = $this->myService->resourceCollectionToData($this->resourceCollectionClass, $models);
