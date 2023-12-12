@@ -620,8 +620,13 @@ class TeamController extends Controller
         }
         $teamModel = $this->myService->findOrFailById($id);
         $this->service->update($teamModel, $request->all());
-        //viết function cho chỗ này
-        $teamModel->users()->syncWithoutDetaching($request->get('team_member_uuids'));
+
+        $teamMemberUuids = $request->get('team_member_uuids');
+        $appId = auth()->appId();
+        $syncData = collect($teamMemberUuids)->mapWithKeys(function ($userUuid) use ($appId) {
+            return [$userUuid => ['app_id' => $appId]];
+        })->toArray();
+        $teamModel->users()->syncWithoutDetaching($syncData);
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $teamModel)
