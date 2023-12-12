@@ -24,7 +24,7 @@ class UserConfigRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'user_uuid' => ['required', 'numeric', 'min:1', 'exists:users,uuid'],
+            'user_uuid' => ['required', 'numeric', 'min:1', 'exists:user_profiles,uuid'],
             'app_language' => ['required', 'string'],
             'user_language' => ['required', 'string'],
             'display_name_style' => ['required', 'numeric', 'min:1'],

@@ -25,7 +25,7 @@ class VerifyActiveCodeRequest extends FormRequest
     {
         return [
             'active_code' => ['required', 'size:4'],
-            'email' => ['required', 'exists:users,email'],
+            'email' => ['required', 'exists:user_profiles,email'],
         ];
     }
 }

@@ -32,16 +32,16 @@ class UpdatePartnerRequest extends AbstractRequest
             'phone_number' => ['numeric'],
             'partner_category_uuid' => ['numeric', Rule::exists('partner_categories', 'uuid')->whereNull('deleted_at')],
             'answer' => ['nullable', 'string'],
-            'user_uuid' => ['nullable', 'numeric', Rule::exists('users', 'uuid')->whereNull('deleted_at'), Rule::unique('partners')->ignore($this->id, 'uuid')->whereNull('deleted_at')]
+            'user_uuid' => ['nullable', 'numeric', Rule::exists('user_profiles', 'uuid')->whereNull('deleted_at'), Rule::unique('partners')->ignore($this->id, 'uuid')->whereNull('deleted_at')]
         ];
 
         if (!$this->request->get('user_uuid')) {
             $validate['partner_email'][] = 'email:rfc,dns';
-            $validate['partner_email'][] = Rule::unique('users', 'email')->where(function ($query) {
+            $validate['partner_email'][] = Rule::unique('user_profiles', 'email')->where(function ($query) {
                 $query->where('email', $this->request->get('partner_email'));
             });
         }else{
-            $validate['partner_email'][] = Rule::exists('users', 'email')->where(function ($query) {
+            $validate['partner_email'][] = Rule::exists('user_profiles', 'email')->where(function ($query) {
                 $query->where('email', $this->request->get('partner_email'))
                     ->where('uuid', $this->request->get('user_uuid'));
             });

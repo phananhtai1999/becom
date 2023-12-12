@@ -24,7 +24,7 @@ class UpdateUserDetailRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'user_uuid' => ['numeric', 'min:1', 'exists:users,uuid'],
+            'user_uuid' => ['numeric', 'min:1', 'exists:user_profiles,uuid'],
             'about' => ['nullable', 'string'],
             'gender' => ['numeric', 'max:1'],
             'date_of_birth' => ['nullable', 'date_format:Y-m-d'],

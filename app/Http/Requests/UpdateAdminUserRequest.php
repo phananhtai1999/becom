@@ -26,8 +26,8 @@ class UpdateAdminUserRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'username' => ['nullable', 'string',"regex:/^(?!.*\.\.)[a-zA-Z0-9]*(?:\.[a-zA-Z0-9]+)*$/", 'unique:users,username,'.$this->id.',uuid,deleted_at,NULL'],
-            'email' => ['string', 'email:rfc,dns', 'unique:users,email,'.$this->id.',uuid,deleted_at,NULL'],
+            'username' => ['nullable', 'string',"regex:/^(?!.*\.\.)[a-zA-Z0-9]*(?:\.[a-zA-Z0-9]+)*$/", 'unique:user_profiles,username,'.$this->id.',uuid,deleted_at,NULL'],
+            'email' => ['string', 'email:rfc,dns', 'unique:user_profiles,email,'.$this->id.',uuid,deleted_at,NULL'],
             'password' => ['string', 'regex:/^\S*$/',
                 Password::min(8)
                     ->letters()

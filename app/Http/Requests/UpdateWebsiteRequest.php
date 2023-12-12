@@ -77,7 +77,7 @@ class UpdateWebsiteRequest extends FormRequest
             'tracking_ids' => ['nullable', 'array'],
             'tracking_ids.*' => ['nullable', 'string', 'max:300'],
             'publish_status' => ['numeric', Rule::in(Article::PENDING_PUBLISH_STATUS, Article::DRAFT_PUBLISH_STATUS, Article::PUBLISHED_PUBLISH_STATUS, Article::BLOCKED_PUBLISH_STATUS, Article::REJECT_PUBLISH_STATUS)],
-            'user_uuid' => ['numeric', Rule::exists('users', 'uuid')->whereNull('deleted_at')]
+            'user_uuid' => ['numeric', Rule::exists('user_profiles', 'uuid')->whereNull('deleted_at')]
         ];
     }
 }

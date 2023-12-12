@@ -24,7 +24,7 @@ class SendResetPasswordEmailRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'email' => ['required', 'max:255', 'exists:users' , 'email'],
+            'email' => ['required', 'max:255', 'exists:user_profiles' , 'email'],
         ];
     }
 }

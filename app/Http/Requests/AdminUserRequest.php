@@ -26,10 +26,10 @@ class AdminUserRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'username' => ['nullable', 'string', "regex:/^(?!.*\.\.)[a-zA-Z0-9]*(?:\.[a-zA-Z0-9]+)*$/", Rule::unique('users')->whereNull('deleted_at')],
+            'username' => ['nullable', 'string', "regex:/^(?!.*\.\.)[a-zA-Z0-9]*(?:\.[a-zA-Z0-9]+)*$/", Rule::unique('user_profiles')->whereNull('deleted_at')],
             'first_name' => ['nullable', 'string', "regex:/^[^(\|\]~`!@#$%^&*+=\-_{}\\\;:\"'?><,.\/’)\[]*$/"],
             'last_name' => ['nullable', 'string', "regex:/^[^(\|\]~`!@#$%^&*+=\-_{}\\\;:\"'?><,.\/’)\[]*$/"],
-            'email' => ['required', 'string', 'email:rfc,dns', Rule::unique('users')->whereNull('deleted_at')],
+            'email' => ['required', 'string', 'email:rfc,dns', Rule::unique('user_profiles')->whereNull('deleted_at')],
             'password' => ['required', 'string', 'regex:/^\S*$/',
                 Password::min(8)
                     ->letters()

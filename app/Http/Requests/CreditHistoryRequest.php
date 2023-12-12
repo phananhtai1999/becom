@@ -25,7 +25,7 @@ class CreditHistoryRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'user_uuid' => ['nullable', 'numeric', 'min:1', Rule::exists('users', 'uuid')->whereNull('deleted_at')],
+            'user_uuid' => ['nullable', 'numeric', 'min:1', Rule::exists('user_profiles', 'uuid')->whereNull('deleted_at')],
             'campaign_uuid' => ['required', 'numeric', 'min:1', Rule::exists('campaigns', 'uuid')->whereNull('deleted_at')],
             'credit' => ['required', 'numeric'],
             'type' => ['required', 'string', 'in:sms,email'],

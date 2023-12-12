@@ -24,7 +24,7 @@ class RefreshOtpRequest extends FormRequest
     public function rules()
     {
         return [
-            'email' => ['required', 'exists:users,email']
+            'email' => ['required', 'exists:user_profiles,email']
         ];
     }
 }

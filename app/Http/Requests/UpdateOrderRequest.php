@@ -25,7 +25,7 @@ class UpdateOrderRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'user_uuid' => ['numeric', 'min:1', Rule::exists('users', 'uuid')->whereNull('deleted_at')],
+            'user_uuid' => ['numeric', 'min:1', Rule::exists('user_profiles', 'uuid')->whereNull('deleted_at')],
             'payment_method_uuid' => ['numeric', 'min:1', Rule::exists('payment_methods', 'uuid')->whereNull('deleted_at')],
             'credit' => ['numeric'],
             'total_price' => ['numeric', 'min:1'],

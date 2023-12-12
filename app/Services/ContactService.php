@@ -817,13 +817,13 @@ class ContactService extends AbstractService
             if ($value[0] == $field) {
                 if ($value[1] == '=') {
                     $query->whereExists(function ($user) use ($value) {
-                        $user->from('users')
+                        $user->from('user_profiles')
                             ->whereRaw('contacts.user_uuid = users.uuid')
                             ->whereIn('users.username', array_slice($value, 3));
                     });
                 } elseif ($value[1] == '!=') {
                     $query->whereExists(function ($user) use ($value) {
-                        $user->from('users')
+                        $user->from('user_profiles')
                             ->whereRaw('contacts.user_uuid = users.uuid')
                             ->whereNotIn('users.username', array_slice($value, 3));
                     });
@@ -833,7 +833,7 @@ class ContactService extends AbstractService
                             for ($i = 4; $i <= count($value); $i++) {
                                 $query->orWhereExists(function ($query) use ($value, $i) {
                                     $query->select("users.uuid")
-                                        ->from('users')
+                                        ->from('user_profiles')
                                         ->whereRaw('contacts.user_uuid = users.uuid')
                                         ->where('users.username', 'like', '%' . $value[$i - 1] . '%');
                                 });
@@ -842,7 +842,7 @@ class ContactService extends AbstractService
                     } else {
                         $query->whereExists(function ($user) use ($value) {
                             $user->select("users.uuid")
-                                ->from('users')
+                                ->from('user_profiles')
                                 ->whereRaw('contacts.user_uuid = users.uuid')
                                 ->where('users.username', 'like', '%' . $value[3] . '%');
                         });

@@ -31,7 +31,7 @@ class UpdateStatusRequest extends AbstractRequest
                 ->where('user_uuid', $this->get('user_uuid', null))
                 ->ignore($this->id, 'uuid')
                 ->whereNull('deleted_at')],
-            'user_uuid' => ['nullable', 'numeric', Rule::exists('users', 'uuid')->whereNull('deleted_at')],
+            'user_uuid' => ['nullable', 'numeric', Rule::exists('user_profiles', 'uuid')->whereNull('deleted_at')],
         ];
     }
 }

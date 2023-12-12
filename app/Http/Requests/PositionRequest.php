@@ -28,7 +28,7 @@ class PositionRequest extends AbstractRequest
             'name' => ['required', 'array', 'min:1'],
             'name.en' => ['required', 'string'],
             'name.*' => ['required', 'string'],
-            'user_uuid' => ['nullable', 'numeric', Rule::exists('users','uuid')->whereNull('deleted_at')],
+            'user_uuid' => ['nullable', 'numeric', Rule::exists('user_profiles','uuid')->whereNull('deleted_at')],
         ];
     }
 }

@@ -24,7 +24,7 @@ class LoginRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'email' => ['required', 'string', 'exists:users,email'],
+            'email' => ['required', 'string', 'exists:user_profiles,email'],
             'password' =>['required', 'string']
         ];
     }

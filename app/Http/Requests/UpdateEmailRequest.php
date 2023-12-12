@@ -33,7 +33,7 @@ class UpdateEmailRequest extends AbstractRequest
             'job' => ['string'],
             'send_projects' => ['array', 'min:1'],
             'send_projects.*' => ['numeric', 'min:1', 'exists:send_projects,uuid'],
-            'user_uuid' => ['numeric', 'min:1', 'exists:users,uuid'],
+            'user_uuid' => ['numeric', 'min:1', 'exists:user_profiles,uuid'],
         ];
     }
 }

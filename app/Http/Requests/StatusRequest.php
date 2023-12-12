@@ -29,7 +29,7 @@ class StatusRequest extends AbstractRequest
             'name.en' => ['required', 'string'],
             'name.*' => ['required', 'string'],
             'points' => ['required', 'numeric', 'min:0', Rule::unique('status','points')->where('user_uuid', $this->get('user_uuid', null))],
-            'user_uuid' => ['nullable', 'numeric', Rule::exists('users','uuid')->whereNull('deleted_at')],
+            'user_uuid' => ['nullable', 'numeric', Rule::exists('user_profiles','uuid')->whereNull('deleted_at')],
         ];
     }
 }

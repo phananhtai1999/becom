@@ -33,10 +33,10 @@ class AddTeamMemberRequest extends FormRequest
         ];
         if ($this->request->get('type') == Team::ALREADY_EXISTS_ACCOUNT){
             $validate['user_uuids'] = ['required', 'array', 'min:1'];
-            $validate['user_uuids.*'] = ['required', 'integer', 'min:1', Rule::exists('users', 'uuid')->whereNull('deleted_at')];
+            $validate['user_uuids.*'] = ['required', 'integer', 'min:1', Rule::exists('user_profiles', 'uuid')->whereNull('deleted_at')];
         } elseif ($this->request->get('type') == Team::ACCOUNT_INVITE) {
             $validate = array_merge($validate, [
-                'username' => ['required', 'string', "regex:/^(?!.*\.\.)[a-zA-Z0-9]*(?:\.[a-zA-Z0-9]+)*$/", Rule::unique('users', 'username')->whereNull('deleted_at'), new InviteRule($this->request->get('domain'))],
+                'username' => ['required', 'string', "regex:/^(?!.*\.\.)[a-zA-Z0-9]*(?:\.[a-zA-Z0-9]+)*$/", Rule::unique('user_profiles', 'username')->whereNull('deleted_at'), new InviteRule($this->request->get('domain'))],
                 'first_name' => ['required', 'string', "regex:/^[^(\|\]~`!@#$%^&*+=\-_{}\\\;:\"'?><,.\/’)\[]*$/"],
                 'last_name' => ['required', 'string', "regex:/^[^(\|\]~`!@#$%^&*+=\-_{}\\\;:\"'?><,.\/’)\[]*$/"],
                 'domain' => ['required', 'string', 'regex:/^(?!(www|http|https)\.)\w+(\.\w+)+$/', Rule::exists('domains', 'name')->where(function ($query) {

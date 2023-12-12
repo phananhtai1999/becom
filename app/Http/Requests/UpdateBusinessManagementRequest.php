@@ -34,7 +34,7 @@ class UpdateBusinessManagementRequest extends AbstractRequest
             'products_services.services.*' => ['nullable', 'string'],
             'customers' => ['array'],
             'customers.*' => ['string'],
-            'owner_uuid' => ['numeric', Rule::exists('users', 'uuid')->whereNull('deleted_at')],
+            'owner_uuid' => ['numeric', Rule::exists('user_profiles', 'uuid')->whereNull('deleted_at')],
             'business_categories' => ['nullable', 'array', 'min:1'],
             'business_categories.*' => ['numeric', 'min:1', Rule::exists('business_categories', 'uuid')->whereNull('deleted_at')],
             'domain_uuid' => ['nullable', 'numeric', 'min:1', Rule::exists('domains', 'uuid')->where(function ($query) {

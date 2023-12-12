@@ -80,7 +80,7 @@ class CampaignRequest extends AbstractRequest
             })],
             'was_finished' => ['required', 'boolean'],
             'was_stopped_by_owner' => ['required', 'boolean'],
-            'user_uuid' => ['nullable', 'numeric', 'min:1', 'exists:users,uuid'],
+            'user_uuid' => ['nullable', 'numeric', 'min:1', 'exists:user_profiles,uuid'],
             'reply_to_email' => ['nullable', 'required_if:send_type,email', 'string', 'email:rfc,dns'],
             'reply_name' => ['nullable', 'required_if:send_type,email', 'string'],
             'send_from_email' => ['nullable', 'string', 'email:rfc,dns'],

@@ -32,7 +32,7 @@ class SendProjectRequest extends AbstractRequest
                 ])
                     ->whereNull('deleted_at');
             })],
-            'user_uuid' => ['nullable', 'numeric', Rule::exists('users', 'uuid')->whereNull('deleted_at')],
+            'user_uuid' => ['nullable', 'numeric', Rule::exists('user_profiles', 'uuid')->whereNull('deleted_at')],
             'domain_uuid' => ['nullable', 'numeric', Rule::exists('domains', 'uuid')->where(function ($query) {
                 return $query->where([
                     ['owner_uuid', $this->request->get('user_uuid') ?? auth()->userId()],

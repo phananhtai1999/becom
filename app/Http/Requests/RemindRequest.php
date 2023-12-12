@@ -35,7 +35,7 @@ class RemindRequest extends AbstractRequest
                     ['app_id', auth()->appId()]
                 ]);
             })->whereNull('deleted_at')],
-            'user_uuid' => ['nullable', 'numeric', Rule::exists('users','uuid')->whereNull('deleted_at')],
+            'user_uuid' => ['nullable', 'numeric', Rule::exists('user_profiles','uuid')->whereNull('deleted_at')],
         ];
     }
 }

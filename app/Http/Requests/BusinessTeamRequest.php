@@ -30,10 +30,10 @@ class BusinessTeamRequest extends FormRequest
             'name' => ['required', 'string'],
             'department_uuid' => ['integer', 'exists:departments,uuid'],
             'location_uuid' => ['integer', 'exists:locations,uuid'],
-            'leader_uuid' => ['required', 'integer', Rule::exists('users', 'uuid')->whereNull('deleted_at')],
+            'leader_uuid' => ['required', 'integer', Rule::exists('user_profiles', 'uuid')->whereNull('deleted_at')],
             'parent_team_uuid' => ['integer', Rule::exists('teams', 'uuid')->whereNull('deleted_at')],
             'team_member_uuids' => ['required', 'array', 'min:1'],
-            'team_member_uuids.*' => ['required', 'integer', 'min:1', Rule::exists('users', 'uuid')->whereNull('deleted_at')]
+            'team_member_uuids.*' => ['required', 'integer', 'min:1', Rule::exists('user_profiles', 'uuid')->whereNull('deleted_at')]
         ];
 
         if (auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN]))
