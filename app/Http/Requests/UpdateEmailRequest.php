@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateEmailRequest extends AbstractRequest
 {
@@ -33,7 +34,9 @@ class UpdateEmailRequest extends AbstractRequest
             'job' => ['string'],
             'send_projects' => ['array', 'min:1'],
             'send_projects.*' => ['numeric', 'min:1', 'exists:send_projects,uuid'],
-            'user_uuid' => ['numeric', 'min:1', 'exists:user_profiles,uuid'],
+            'user_uuid' => ['numeric', 'min:1', Rule::exists('user_profiles', 'uuid')->where(function ($q) {
+                return $q->where('app_id', auth()->appId());
+            })->whereNull('deleted_at')],
         ];
     }
 }

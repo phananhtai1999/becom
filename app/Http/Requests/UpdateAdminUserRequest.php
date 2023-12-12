@@ -26,8 +26,13 @@ class UpdateAdminUserRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'username' => ['nullable', 'string',"regex:/^(?!.*\.\.)[a-zA-Z0-9]*(?:\.[a-zA-Z0-9]+)*$/", 'unique:user_profiles,username,'.$this->id.',uuid,deleted_at,NULL'],
-            'email' => ['string', 'email:rfc,dns', 'unique:user_profiles,email,'.$this->id.',uuid,deleted_at,NULL'],
+//            'username' => ['nullable', 'string',"regex:/^(?!.*\.\.)[a-zA-Z0-9]*(?:\.[a-zA-Z0-9]+)*$/", 'unique:user_profiles,username,'.$this->id.',uuid,deleted_at,NULL'],
+            'username' => ['nullable', 'string', "regex:/^(?!.*\.\.)[a-zA-Z0-9]*(?:\.[a-zA-Z0-9]+)*$/", Rule::unique('user_profiles', 'username')->where(function ($q) {
+                return $q->where('app_id', auth()->appId());
+            })->ignore($this->id, 'uuid')->whereNull('deleted_at')],
+            'email' => ['string', 'email:rfc,dns', Rule::unique('user_profiles', 'email')->where(function ($q) {
+                return $q->where('app_id', auth()->appId());
+            })->ignore($this->id, 'uuid')->whereNull('deleted_at')],
             'password' => ['string', 'regex:/^\S*$/',
                 Password::min(8)
                     ->letters()
@@ -43,7 +48,7 @@ class UpdateAdminUserRequest extends AbstractRequest
             'cover_img' => ['nullable', 'string'],
             'can_add_smtp_account' => ['nullable', 'boolean'],
             'roles' => ['array', 'min:1'],
-            'roles.*' => ['numeric', 'min:1', Rule::exists('roles', 'uuid')->where(function ($q){
+            'roles.*' => ['numeric', 'min:1', Rule::exists('roles', 'uuid')->where(function ($q) {
                 return $q->where('name', '<>', 'root')->whereNull('deleted_at');
             })],
         ];

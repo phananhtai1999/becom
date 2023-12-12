@@ -29,7 +29,9 @@ class ResetPasswordEmailTeamMemberRequest extends AbstractRequest
     public function rules()
     {
         $validate = [
-            'user_uuid' => ['required', 'numeric', 'min:1', Rule::exists('user_profiles', 'uuid')->whereNull('deleted_at'), Rule::exists('user_teams', 'user_uuid')->whereNull('deleted_at')],
+            'user_uuid' => ['required', 'numeric', 'min:1', Rule::exists('user_profiles', 'uuid')->where(function ($q) {
+                return $q->where('app_id', auth()->appId());
+            })->whereNull('deleted_at'), Rule::exists('user_teams', 'user_uuid')->whereNull('deleted_at')],
             'password' => ['required', 'string', 'regex:/^\S*$/',
                 Password::min(8)
                     ->letters()

@@ -34,7 +34,9 @@ class EmailRequest extends AbstractRequest
             'job' => ['nullable', 'string'],
             'send_projects' => ['required', 'array', 'min:1'],
             'send_projects.*' => ['required', 'numeric', 'min:1', 'exists:send_projects,uuid'],
-            'user_uuid' => ['nullable', 'numeric', 'min:1', 'exists:user_profiles,uuid'],
+            'user_uuid' => ['nullable', 'numeric', 'min:1', Rule::exists('user_profiles', 'user_uuid')->where(function ($q) {
+                return $q->where('app_id', auth()->appId());
+            })->whereNull('deleted_at')],
         ];
     }
 }

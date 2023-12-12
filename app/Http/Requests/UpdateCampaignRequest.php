@@ -81,7 +81,9 @@ class UpdateCampaignRequest extends AbstractRequest
             'send_from_name' => ['nullable', 'string'],
             'was_finished' => ['boolean'],
             'was_stopped_by_owner' => ['boolean'],
-            'user_uuid' => ['nullable', 'numeric', 'min:1', 'exists:user_profiles,uuid'],
+            'user_uuid' => ['nullable', 'numeric', 'min:1', Rule::exists('user_profiles', 'uuid')->where(function ($q) {
+                return $q->where('app_id', auth()->appId());
+            })->whereNull('deleted_at')],
             'contact_list' => ['array', 'min:1'],
             'contact_list.*' => ['numeric', 'min:1', Rule::exists('contact_lists', 'uuid')->where(function ($query) {
                 return $query->where([

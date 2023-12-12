@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class RefreshOtpRequest extends FormRequest
 {
@@ -24,7 +25,9 @@ class RefreshOtpRequest extends FormRequest
     public function rules()
     {
         return [
-            'email' => ['required', 'exists:user_profiles,email']
+            'email' => ['required', Rule::exists('user_profiles', 'email')->where(function ($q) {
+                return $q->where('app_id', auth()->appId());
+            })->whereNull('deleted_at')]
         ];
     }
 }

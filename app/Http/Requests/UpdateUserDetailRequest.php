@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateUserDetailRequest extends AbstractRequest
 {
@@ -24,7 +25,9 @@ class UpdateUserDetailRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'user_uuid' => ['numeric', 'min:1', 'exists:user_profiles,uuid'],
+            'user_uuid' => ['numeric', 'min:1', Rule::exists('user_profiles', 'uuid')->where(function ($q) {
+                return $q->where('app_id', auth()->appId());
+            })->whereNull('deleted_at')],
             'about' => ['nullable', 'string'],
             'gender' => ['numeric', 'max:1'],
             'date_of_birth' => ['nullable', 'date_format:Y-m-d'],

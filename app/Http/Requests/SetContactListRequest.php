@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class SetContactListRequest extends FormRequest
 {
@@ -24,7 +25,9 @@ class SetContactListRequest extends FormRequest
     public function rules()
     {
         return [
-            'user_uuid' => ['required', 'integer', 'min:1', 'exists:user_profiles,uuid'],
+            'user_uuid' => ['required', 'integer', 'min:1', Rule::exists('user_profiles', 'uuid')->where(function ($q) {
+                return $q->where('app_id', auth()->appId());
+            })->whereNull('deleted_at')],
             'team_uuid' => ['required', 'integer', 'min:1', 'exists:teams,uuid'],
             'contact_list_uuids' => ['array'],
             'contact_list_uuids.*' => ['integer', 'exists:contact_lists,uuid'],

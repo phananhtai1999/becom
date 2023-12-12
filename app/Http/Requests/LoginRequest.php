@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
+use Illuminate\Validation\Rule;
 
 class LoginRequest extends AbstractRequest
 {
@@ -24,7 +25,9 @@ class LoginRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'email' => ['required', 'string', 'exists:user_profiles,email'],
+            'email' => ['required', 'string',  Rule::exists('user_profiles', 'email')->where(function ($q) {
+                return $q->where('app_id', auth()->appId());
+            })->whereNull('deleted_at')],
             'password' =>['required', 'string']
         ];
     }

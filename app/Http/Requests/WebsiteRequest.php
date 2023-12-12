@@ -77,7 +77,9 @@ class WebsiteRequest extends FormRequest
             'website_pages.*.ordering' => ['nullable', 'numeric', 'min:1'],
             'tracking_ids' => ['nullable', 'array'],
             'tracking_ids.*' => ['nullable', 'string', 'max:300'],
-            'user_uuid' => ['nullable', 'numeric', Rule::exists('user_profiles', 'uuid')->whereNull('deleted_at')],
+            'user_uuid' => ['nullable', 'numeric', Rule::exists('user_profiles', 'uuid')->where(function ($q) {
+                return $q->where('app_id', auth()->appId());
+            })->whereNull('deleted_at')],
             'publish_status' => ['required', 'numeric', Rule::in(Website::PUBLISHED_PUBLISH_STATUS, Website::DRAFT_PUBLISH_STATUS)],
             'is_active_news_page' => ['boolean'],
         ];
