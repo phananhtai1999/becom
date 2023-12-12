@@ -32,7 +32,7 @@ class AddBusinessMemberRequest extends FormRequest
         $validate = [
             'type' => ['required', Rule::in([UserBusiness::ALREADY_EXISTS_ACCOUNT, UserBusiness::ACCOUNT_INVITE])],
         ];
-        if ((new ConfigService())->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN]))
+        if (auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN]))
         {
             $validate['business_uuid'] = ['required', 'integer', Rule::exists('business_managements', 'uuid')->whereNull('deleted_at')];
         }

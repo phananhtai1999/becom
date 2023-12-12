@@ -247,7 +247,7 @@ class UserService extends AbstractService
             return false;
         }
 
-        return $this->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN, Role::ROLE_EDITOR]);
+        return auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN, Role::ROLE_EDITOR]);
     }
 
     /**
@@ -259,7 +259,7 @@ class UserService extends AbstractService
             return false;
         }
 
-        return $this->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN]);
+        return auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN]);
     }
 
     public function getUsersByRole($role)
@@ -296,11 +296,11 @@ class UserService extends AbstractService
      */
     public function getCurrentUserRole(): string
     {
-        if ($this->checkUserRoles([Role::ROLE_ROOT])) {
+        if (auth()->hasRole([Role::ROLE_ROOT])) {
             $char = 'r' . auth()->userId();
-        } elseif ($this->checkUserRoles([Role::ROLE_ADMIN])) {
+        } elseif (auth()->hasRole([Role::ROLE_ADMIN])) {
             $char = 'a' . auth()->userId();
-        } elseif ($this->checkUserRoles([Role::ROLE_EDITOR])) {
+        } elseif (auth()->hasRole([Role::ROLE_EDITOR])) {
             $char = 'e' . auth()->userId();
         } else {
             $char = 'u' . auth()->userId();

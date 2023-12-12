@@ -880,7 +880,7 @@ Route::group(['middleware' => ['apikey']], function () {
                 Route::post('/my/article', [ArticleController::class, 'storeMy'])->name('storeMy');
                 Route::get('/my/article/{id}', [ArticleController::class, 'showMy'])->name('showMy');
                 Route::put('/my/article/{id}', [ArticleController::class, 'editMy'])->name('editMy');
-                Route::delete('/my/article/{id}', [ArticleController::class, 'destroyMy'])->name('destroyMy');
+                Route::delete('/my/article/{id}', [ArticleController::class, 'deleteMy'])->name('deleteMy');
                 Route::post('my/article/change-status', [ArticleController::class, 'changeStatusMyArticle'])->name('changeStatusArticle');
             });
 
@@ -893,8 +893,6 @@ Route::group(['middleware' => ['apikey']], function () {
             });
 
             Route::post('/unpublished-article', [ArticleController::class, 'storeUnpublishedArticle'])->name('store-unpublished');
-            Route::get('my/articles', [ArticleController::class, 'indexMy'])->name('indexMy');
-            Route::delete('my/article/{id}', [ArticleController::class, 'deleteMy'])->name('indexMy');
 
             //article content public
             Route::get('/content/articles', [ArticleController::class, 'indexContent'])->name('article.indexContent');

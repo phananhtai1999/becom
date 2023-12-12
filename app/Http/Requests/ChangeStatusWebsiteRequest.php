@@ -48,7 +48,7 @@ class ChangeStatusWebsiteRequest extends FormRequest
         if ($this->request->get('publish_status') == Article::REJECT_PUBLISH_STATUS) {
             $validate['reject_reason'] = ['required', 'string'];
         }
-        if ((new ConfigService())->checkUserRoles([Role::ROLE_EDITOR])) {
+        if (auth()->hasRole([Role::ROLE_EDITOR])) {
             $validate['publish_status'] = ['required', 'numeric',
                 Rule::in(
                     Article::PENDING_PUBLISH_STATUS,

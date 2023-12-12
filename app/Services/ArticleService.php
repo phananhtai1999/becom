@@ -168,13 +168,13 @@ class ArticleService extends AbstractService
         //Check auth:api
         //get Article Content Public
         $publishStatus = [Article::PUBLISHED_PUBLISH_STATUS];
-        if ($this->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
+        if (auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             //Admin
             $contentForUSer = Article::ADMIN_CONTENT_FOR_USER;
         } elseif ($this->paidUser()) {
             //Payment
             $contentForUSer = Article::PAYMENT_CONTENT_FOR_USER;
-        } elseif ($this->checkUserRoles([Role::ROLE_EDITOR])) {
+        } elseif (auth()->hasRole([Role::ROLE_EDITOR])) {
             //Editor
             $contentForUSer = Article::EDITOR_CONTENT_FOR_USER;
         } else {
@@ -204,17 +204,17 @@ class ArticleService extends AbstractService
         //Check auth:api
         //get Article By Permission
         $publishStatus = [Article::PUBLISHED_PUBLISH_STATUS];
-        if ($this->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
+        if (auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             //Admin
             return $this->loadAllArticles($perPage, $columns, $pageName, $page, $search, $searchBy);
         } elseif ($this->paidUser()) {
             //Check current user role
-            if ($this->checkUserRoles([Role::ROLE_EDITOR])) {
+            if (auth()->hasRole([Role::ROLE_EDITOR])) {
                 $publishStatus = [Article::PENDING_PUBLISH_STATUS, Article::PUBLISHED_PUBLISH_STATUS, Article::BLOCKED_PUBLISH_STATUS, Article::REJECT_PUBLISH_STATUS];
             }
             //Payment
             $contentForUSer = Article::PAYMENT_CONTENT_FOR_USER;
-        } elseif ($this->checkUserRoles([Role::ROLE_EDITOR])) {
+        } elseif (auth()->hasRole([Role::ROLE_EDITOR])) {
             //Editor
             $publishStatus = [Article::PENDING_PUBLISH_STATUS, Article::PUBLISHED_PUBLISH_STATUS, Article::BLOCKED_PUBLISH_STATUS, Article::REJECT_PUBLISH_STATUS];
             $contentForUSer = Article::EDITOR_CONTENT_FOR_USER;

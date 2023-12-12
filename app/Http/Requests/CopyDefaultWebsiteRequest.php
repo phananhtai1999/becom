@@ -41,14 +41,14 @@ class CopyDefaultWebsiteRequest extends AbstractRequest
             'tracking_ids.*' => ['nullable', 'string', 'max:300'],
         ];
 
-        if((new ConfigService())->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN])){
+        if(auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN])){
             $validate['publish_status'] = ['required', 'numeric',
                 Rule::in(
                     Website::PUBLISHED_PUBLISH_STATUS,
                     Website::DRAFT_PUBLISH_STATUS
                 )
             ];
-        }elseif ((new ConfigService())->checkUserRoles([Role::ROLE_EDITOR])){
+        }elseif (auth()->hasRole([Role::ROLE_EDITOR])){
             $validate['publish_status'] = ['required', 'numeric',
                 Rule::in(
                     Website::PENDING_PUBLISH_STATUS,

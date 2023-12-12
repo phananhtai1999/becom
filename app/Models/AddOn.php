@@ -72,7 +72,7 @@ class AddOn extends Model
 
     public function inBusiness()
     {
-        if ((new ConfigService())->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
+        if (auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             $businessUuid = request()->get("business_uuid");
         } else {
             $businessUuid = auth()->user()->businessManagements->first()->uuid;

@@ -292,7 +292,7 @@ class WebsiteController extends AbstractRestAPIController
      */
     public function defaultWebsites(IndexRequest $request)
     {
-        if ($this->service->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
+        if (auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             $models = $this->service->getDefaultWebsiteForAdmin($request);
         } else {
             $models = $this->service->getCollectionWithPaginationByCondition($request, [
@@ -346,11 +346,11 @@ class WebsiteController extends AbstractRestAPIController
     {
         $copyWebsite = $this->service->showCopyWebsiteByUuid($id);
 
-        if ($this->service->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
+        if (auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             $statusTemplate = SectionTemplate::PUBLISHED_PUBLISH_STATUS;
             $statusWebsite = $request->get('publish_status');
             $isDefault = true;
-        } elseif ($this->service->checkUserRoles([Role::ROLE_EDITOR])) {
+        } elseif (auth()->hasRole([Role::ROLE_EDITOR])) {
             $statusTemplate = $request->get('publish_status') == Website::PENDING_PUBLISH_STATUS
                 ? SectionTemplate::PENDING_PUBLISH_STATUS : SectionTemplate::DRAFT_PUBLISH_STATUS;
             $statusWebsite = $request->get('publish_status');

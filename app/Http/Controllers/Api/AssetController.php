@@ -226,7 +226,7 @@ class AssetController extends AbstractRestAPIController
 
     public function indexPublishAssets(IndexRequest $request)
     {
-        if (empty(auth()->user()->partner) && !$this->service->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
+        if (empty(auth()->user()->partner) && !auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             return $this->sendJsonResponse(false, __('asset.failed_partner'), [], 403);
         }
         $models = $this->service->getCollectionWithPaginationByCondition($request,

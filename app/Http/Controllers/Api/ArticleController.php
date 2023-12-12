@@ -228,7 +228,7 @@ class ArticleController extends AbstractRestAPIController
             return $this->sendValidationFailedJsonResponse();
         }
         //Check current user role
-        $role = $this->service->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN]) ? $request->except('user_uuid') : $request->except(['user_uuid', 'publish_status']);
+        $role = auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN]) ? $request->except('user_uuid') : $request->except(['user_uuid', 'publish_status']);
         //Map type_label to content
         //Check content exist or not
         $checkContent = $request->content ? array_merge($model->getTranslations('content'), $request->content) : $model->getTranslations('content');
@@ -335,7 +335,7 @@ class ArticleController extends AbstractRestAPIController
 
     public function indexMy(IndexRequest $request)
     {
-        $role =  $this->service->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN, Role::ROLE_USER]);
+        $role =  auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN, Role::ROLE_USER]);
         $config = $this->configService->findConfigByKey('time_allowed_view_articles_of_editor');
         //Role editor limit by config days
         if (!$role && $config) {
@@ -361,7 +361,7 @@ class ArticleController extends AbstractRestAPIController
      */
     public function indexUnpublishedArticle(IndexRequest $request)
     {
-        $role =  $this->service->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN]);
+        $role =  auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN]);
         $config = $this->configService->findConfigByKey('time_allowed_view_articles_of_editor');
         //Role editor limit by config days
         if (!$role && $config) {

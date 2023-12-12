@@ -41,7 +41,7 @@ class ResetPasswordEmailTeamMemberRequest extends AbstractRequest
             'password_confirmation' => ['required', 'string', 'same:password']
         ];
 
-        if(!(new ConfigService())->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN])){
+        if(!auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN])){
             $validate['user_uuid'] = array_merge($validate['user_uuid'], [new ResetPasswordTeamMemberRule($this->request->get('user_uuid'))]);
         }
 
