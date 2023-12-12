@@ -108,14 +108,13 @@ Route::group(['as' => 'auth.'], function () {
     Route::post('/refresh-token', [AuthController::class, 'refreshToken'])->name('refresh-token');
 });
 
-Route::group(['as' => 'otp.'], function () {
-    Route::get('/otp', [AuthController::class, 'sendOtp'])->name('otp');
-    Route::post('/refresh-otp', [AuthController::class, 'refreshOtp'])->name('refreshOtp');
-    Route::post('/verify-active-code', [AuthController::class, 'verifyActiveCode'])->name('verifyActiveCode');
-});
-
 Route::group(['middleware' => ['apikey']], function () {
-    Route::group(['middleware' => ['user.appid'], 'as' => 'user_appid.'], function () {
+    Route::group(['middleware' => ['appid'], 'as' => 'appid.'], function () {
+        Route::group(['as' => 'otp.'], function () {
+            Route::get('/otp', [AuthController::class, 'sendOtp'])->name('otp');
+            Route::post('/refresh-otp', [AuthController::class, 'refreshOtp'])->name('refreshOtp');
+            Route::post('/verify-active-code', [AuthController::class, 'verifyActiveCode'])->name('verifyActiveCode');
+        });
         //Social API
         Route::get('/auth/url/{driver}', [AuthBySocialNetworkController::class, 'loginUrl'])->name('loginUrl');
         Route::get('/auth/callback/google', [AuthBySocialNetworkController::class, 'loginByGoogleCallback'])->name('loginByGoogleCallback');
@@ -127,7 +126,7 @@ Route::group(['middleware' => ['apikey']], function () {
         Route::post('/upload-video', [UploadController::class, 'uploadVideo'])->name('upload-video');
         Route::post('/upload-mailbox-file', [UploadController::class, 'uploadMailBoxFile'])->name('upload-mailbox-file');
 
-        Route::group(['as' => 'user.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'user.'], function () {
             Route::group(['middleware' => ['role:root'], 'as' => 'root.'], function () {
                 Route::get('root/users', [UserController::class, 'index'])->name('index');
                 Route::get('root/user/{id}', [UserController::class, 'show'])->name('show');
@@ -159,7 +158,7 @@ Route::group(['middleware' => ['apikey']], function () {
 
         Route::get('/user/show-by-username/{username}', [UserController::class, 'showByUserName'])->name('user.showByUserName');
 
-        Route::group(['as' => 'role.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'role.'], function () {
             Route::group(['middleware' => ['role:root'], 'as' => 'role.'], function () {
                 Route::post('/root/role', [RoleController::class, 'store'])->name('store');
                 Route::put('/root/role/{id}', [RoleController::class, 'edit'])->name('edit');
@@ -176,7 +175,7 @@ Route::group(['middleware' => ['apikey']], function () {
             Route::get('/public/roles', [RoleController::class, 'publicRoles'])->name('public-roles');
         });
 
-        Route::group(['as' => 'user-detail.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'user-detail.'], function () {
 
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('/user-details', [UserDetailController::class, 'index'])->name('index');
@@ -191,7 +190,7 @@ Route::group(['middleware' => ['apikey']], function () {
             });
         });
 
-        Route::group(['as' => 'user-config.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'user-config.'], function () {
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('/user-configs', [UserConfigController::class, 'index'])->name('index');
                 Route::post('/user-config', [UserConfigController::class, 'store'])->name('store');
@@ -216,7 +215,7 @@ Route::group(['middleware' => ['apikey']], function () {
         });
 
 //Load permission config
-        Route::group(['as' => 'config.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'config.'], function () {
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'config.root'], function () {
                 Route::get('configs', [ConfigController::class, 'indexAdmin'])->name('indexAdmin');
                 Route::get('/config/{id}', [ConfigController::class, 'showAdmin'])->name('showAdmin');
@@ -228,7 +227,7 @@ Route::group(['middleware' => ['apikey']], function () {
         Route::get('/configs/public', [ConfigController::class, 'loadPublicConfig'])->name('config.loadPublicConfig');
 
 //Website
-        Route::group(['as' => 'website.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'website.'], function () {
 
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('/send-projects', [SendProjectController::class, 'index'])->name('index');
@@ -254,7 +253,7 @@ Route::group(['middleware' => ['apikey']], function () {
 
 
 //SmtpAccount
-        Route::group(['as' => 'smtp-account.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'smtp-account.'], function () {
 
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('/all/smtp-accounts', [SmtpAccountController::class, 'index'])->name('index');
@@ -283,7 +282,7 @@ Route::group(['middleware' => ['apikey']], function () {
         });
 
 //MailTemplate
-        Route::group(['as' => 'mail-template.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'mail-template.'], function () {
 
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('/mail-templates', [MailTemplateController::class, 'index'])->name('index');
@@ -313,7 +312,7 @@ Route::group(['middleware' => ['apikey']], function () {
         });
 
 //Campaign
-        Route::group(['as' => 'campaign.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'campaign.'], function () {
 
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('/campaigns', [CampaignController::class, 'index'])->name('index');
@@ -347,7 +346,7 @@ Route::group(['middleware' => ['apikey']], function () {
         Route::get('/campaign-tracking/increment/total-open', [CampaignController::class, 'incrementCampaignTrackingTotalOpen'])->name('campaignTracking.incrementTotalOpen');
 
 //Email
-        Route::group(['as' => 'email.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'email.'], function () {
 
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('/emails', [EmailController::class, 'index'])->name('index');
@@ -367,7 +366,7 @@ Route::group(['middleware' => ['apikey']], function () {
         });
 
 //MailSendingHistory
-        Route::group(['as' => 'mail-sending-history.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'mail-sending-history.'], function () {
 
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('/mail-sending-histories', [MailSendingHistoryController::class, 'index'])->name('index');
@@ -384,7 +383,7 @@ Route::group(['middleware' => ['apikey']], function () {
         });
 
 //SmtpAccountEncryption
-        Route::group(['as' => 'smtp-account-encryption.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'smtp-account-encryption.'], function () {
             Route::get('/smtp-account-encryptions', [SmtpAccountEncryptionController::class, 'index'])->name('index');
             Route::post('/smtp-account-encryption', [SmtpAccountEncryptionController::class, 'store'])->name('store');
             Route::get('/smtp-account-encryption/{id}', [SmtpAccountEncryptionController::class, 'show'])->name('show');
@@ -393,7 +392,7 @@ Route::group(['middleware' => ['apikey']], function () {
         });
 
 //WebsiteVerification
-        Route::group(['as' => 'website-verification.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'website-verification.'], function () {
             Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
                 Route::get('/website-verifications', [WebsiteVerificationController::class, 'index'])->name('index');
                 Route::get('/website-verification/{id}', [WebsiteVerificationController::class, 'show'])->name('show');
@@ -402,7 +401,7 @@ Route::group(['middleware' => ['apikey']], function () {
         });
 
 //Contact
-        Route::group(['as' => 'contact.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'contact.'], function () {
 
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('/contacts', [ContactController::class, 'index'])->name('index');
@@ -429,7 +428,7 @@ Route::group(['middleware' => ['apikey']], function () {
         });
 
 //Contact List
-        Route::group(['as' => 'contact-list.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'contact-list.'], function () {
 
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('/contact-lists', [ContactListController::class, 'index'])->name('index');
@@ -452,7 +451,7 @@ Route::group(['middleware' => ['apikey']], function () {
         });
 
 //Credit History
-        Route::group(['as' => 'user-use-credit-history.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'user-use-credit-history.'], function () {
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('/credit-histories', [CreditHistoryController::class, 'index'])->name('index');
                 Route::post('/credit-history', [CreditHistoryController::class, 'store'])->name('store');
@@ -466,7 +465,7 @@ Route::group(['middleware' => ['apikey']], function () {
         });
 
 //Transaciton CreditHistory View
-        Route::group(['as' => 'credit-transaction-histories.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'credit-transaction-histories.'], function () {
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('/credit-transaction-histories', [CreditTransactionHistoryController::class, 'index'])->name('credit-transaction-history-view');
             });
@@ -477,7 +476,7 @@ Route::group(['middleware' => ['apikey']], function () {
         });
 
 //User Credit History
-        Route::group(['as' => 'user-credit-history.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'user-credit-history.'], function () {
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('/user-credit-histories', [UserCreditHistoryController::class, 'index'])->name('index');
                 Route::post('/user-credit-history', [UserCreditHistoryController::class, 'store'])->name('store');
@@ -498,7 +497,7 @@ Route::group(['middleware' => ['apikey']], function () {
         });
 
 // Import File
-        Route::group(['as' => 'import-file.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'import-file.'], function () {
             Route::post('/import-excel-or-csv-file', [ContactController::class, 'importExcelOrCsvFile'])->name('import-excel-or-csv-file');
             Route::post('/import-json-file', [ContactController::class, 'importJsonFile'])->name('import-json-file');
             Route::post('/download-template-excel', [ContactController::class, 'templateExcel'])->name('template-excel');
@@ -509,7 +508,7 @@ Route::group(['middleware' => ['apikey']], function () {
 // Mail Open Tracking
         Route::get('/mail-open-tracking/{id}', [MailSendingHistoryController::class, 'mailOpenTracking'])->name('mail-open-tracking');
 //Chart
-        Route::group(['as' => 'chart.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'chart.'], function () {
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('/user-chart', [UserController::class, 'userChart'])->name('user-chart');
                 Route::get('/email-chart', [MailSendingHistoryController::class, 'emailChart'])->name('email-chart');
@@ -537,7 +536,7 @@ Route::group(['middleware' => ['apikey']], function () {
             });
         });
 
-        Route::group(['middleware' => ['role:root,admin'], 'as' => 'payment-method.'], function () {
+        Route::group(['middleware' => ['userid', 'role:root,admin'], 'as' => 'payment-method.'], function () {
             Route::post('/payment-method', [PaymentMethodController::class, 'store'])->name('store');
             Route::put('/payment-method/{id}', [PaymentMethodController::class, 'edit'])->name('edit');
             Route::delete('/payment-method/{id}', [PaymentMethodController::class, 'destroy'])->name('destroy');
@@ -546,7 +545,7 @@ Route::group(['middleware' => ['apikey']], function () {
         Route::get('/payment-methods', [PaymentMethodController::class, 'index'])->name('payment-method.index');
         Route::get('/payment-method/{id}', [PaymentMethodController::class, 'show'])->name('payment-method.show');
 
-        Route::group(['as' => 'order.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'order.'], function () {
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('/orders', [OrderController::class, 'index'])->name('index');
                 Route::get('/order/{id}', [OrderController::class, 'show'])->name('show');
@@ -565,7 +564,7 @@ Route::group(['middleware' => ['apikey']], function () {
 
 
 //Scenario
-        Route::group(['as' => 'scenario.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'scenario.'], function () {
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('scenarios', [ScenarioController::class, 'index'])->name('index');
                 Route::post('scenario', [ScenarioController::class, 'storeScenario'])->name('storeScenario');
@@ -583,7 +582,7 @@ Route::group(['middleware' => ['apikey']], function () {
         });
 
 //Website_page_categories
-        Route::group(['as' => 'website_page_category.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'website_page_category.'], function () {
 
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::post('/website-page-category', [WebsitePageCategoryController::class, 'store'])->name('store');
@@ -599,7 +598,7 @@ Route::group(['middleware' => ['apikey']], function () {
         });
 
 //Website_pages
-        Route::group(['as' => 'website_page'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'website_page'], function () {
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('website-pages', [WebsitePageController::class, 'index'])->name('index');
                 Route::post('website-page', [WebsitePageController::class, 'store'])->name('store');
@@ -657,7 +656,7 @@ Route::group(['middleware' => ['apikey']], function () {
 
 //Platform Package
         Route::get('/platform-packages', [PlatformPackageController::class, 'index']);
-        Route::group(['as' => 'platformPackage.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'platformPackage.'], function () {
             Route::group(['middleware' => ['role:root'], 'as' => 'root.'], function () {
                 Route::post('/platform-package', [PlatformPackageController::class, 'store']);
                 Route::delete('/platform-package/{id}', [PlatformPackageController::class, 'destroy']);
@@ -671,7 +670,7 @@ Route::group(['middleware' => ['apikey']], function () {
         });
 
 //Cache config
-        Route::group(['as' => 'cacheConfig.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'cacheConfig.'], function () {
             Route::group(['middleware' => ['role:root'], 'as' => 'root.'], function () {
                 Route::put('/cache-platform-config/{membership_package_uuid}', [ConfigController::class, 'editCachePlatformConfig']);
                 Route::get('/cache-platform-config/{membership_package_uuid}', [ConfigController::class, 'getCachePlatformConfig']);
@@ -680,7 +679,7 @@ Route::group(['middleware' => ['apikey']], function () {
 
 
 //Credit Package
-        Route::group(['as' => 'creditPackage.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'creditPackage.'], function () {
             Route::group(['middleware' => ['role:root'], 'as' => 'root.'], function () {
                 Route::post('/credit-package', [CreditPackageController::class, 'store']);
                 Route::put('/credit-package/{id}', [CreditPackageController::class, 'edit']);
@@ -699,7 +698,7 @@ Route::group(['middleware' => ['apikey']], function () {
         });
 
 //add-on subscription plan
-        Route::group(['as' => 'addOnSubscriptionPlan.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'addOnSubscriptionPlan.'], function () {
             Route::group(['middleware' => ['role:root'], 'as' => 'root.'], function () {
                 Route::post('/add-on-subscription-plan', [AddOnSubscriptionPlanController::class, 'store']);
                 Route::delete('/add-on-subscription-plan/{id}', [AddOnSubscriptionPlanController::class, 'destroy']);
@@ -708,7 +707,7 @@ Route::group(['middleware' => ['apikey']], function () {
         });
         Route::get('/add-on-subscription-plans', [AddOnSubscriptionPlanController::class, 'index']);
 
-        Route::group(['as' => 'permission.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'permission.'], function () {
             Route::group(['middleware' => ['role:root'], 'as' => 'root.'], function () {
                 Route::post('/permission', [PermissionController::class, 'store']);
                 Route::get('/permission/{id}', [PermissionController::class, 'show']);
@@ -720,7 +719,7 @@ Route::group(['middleware' => ['apikey']], function () {
         });
 
 //Payment and subscription
-        Route::group(['as' => 'payment.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'payment.'], function () {
             Route::post('/top-up', [PaymentController::class, 'topUp']);
             Route::post('/upgrade-user', [PaymentController::class, 'upgradeUser']);
             Route::get('/top-up-history', [PaymentController::class, 'topUpHistory']);
@@ -728,7 +727,7 @@ Route::group(['middleware' => ['apikey']], function () {
             Route::get('/cancel-subscription', [PaymentController::class, 'cancelSubscription']);
         });
 
-        Route::group(['as' => 'stripe.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'stripe.'], function () {
             Route::post('/card-stripe', [StripeController::class, 'cardStripe'])->name('cardStripe');
             Route::get('/all-card-stripe', [StripeController::class, 'allCardStripe'])->name('allCardStripe');
             Route::post('/update-card-stripe/{id}', [StripeController::class, 'updateCard'])->name('updateCard');
@@ -747,7 +746,7 @@ Route::group(['middleware' => ['apikey']], function () {
         Route::get('/paypal/cancel-payment-subscription', [PaypalController::class, 'cancelPaymentSubscription'])->name('paypal.cancelPaymentSubscription');
 
 //Section Template
-        Route::group(['as' => 'section-template'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'section-template'], function () {
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('section-templates', [SectionTemplateController::class, 'index'])->name('index');
                 Route::post('section-template', [SectionTemplateController::class, 'store'])->name('store');
@@ -779,7 +778,7 @@ Route::group(['middleware' => ['apikey']], function () {
         });
 
 //Form
-        Route::group(['as' => 'form.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'form.'], function () {
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('/forms', [FormController::class, 'index'])->name('index');
                 Route::post('/form', [FormController::class, 'store'])->name('store');
@@ -812,7 +811,7 @@ Route::group(['middleware' => ['apikey']], function () {
 
 
 //Language
-        Route::group(['as' => 'language.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'language.'], function () {
 
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::post('/language', [LanguageController::class, 'store'])->name('store');
@@ -828,7 +827,7 @@ Route::group(['middleware' => ['apikey']], function () {
         Route::get('/language/{id}', [LanguageController::class, 'show'])->name('language.show');
 
 //Article Category
-        Route::group(['as' => 'article-category.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'article-category.'], function () {
             Route::group(['middleware' => ['role:root,admin,editor'], 'as' => 'author.'], function () {
                 Route::post('/article-category', [ArticleCategoryController::class, 'store'])->name('store');
                 Route::put('/article-category/{id}', [ArticleCategoryController::class, 'edit'])->name('edit');
@@ -852,7 +851,7 @@ Route::group(['middleware' => ['apikey']], function () {
         Route::get('public/article-category/{id}', [ArticleCategoryController::class, 'showPublic'])->name('article-categories-public.show');
 
 
-        Route::group(['as' => 'group.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'group.'], function () {
             Route::group(['middleware' => ['role:root'], 'as' => 'root.'], function () {
                 Route::post('/group', [GroupController::class, 'store'])->name('store');
                 Route::put('/group/{id}', [GroupController::class, 'edit'])->name('edit');
@@ -903,7 +902,7 @@ Route::group(['middleware' => ['apikey']], function () {
         Route::get('public/articles', [ArticleController::class, 'indexPublic'])->name('article-public.index');
         Route::get('public/article/{id}', [ArticleController::class, 'showPublic'])->name('article-public.show');
 
-        Route::group(['as' => 'status.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'status.'], function () {
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('/status', [StatusController::class, 'index'])->name('index');
                 Route::post('/status', [StatusController::class, 'store'])->name('store');
@@ -921,7 +920,7 @@ Route::group(['middleware' => ['apikey']], function () {
             });
         });
 
-        Route::group(['as' => 'company.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'company.'], function () {
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('/companies', [CompanyController::class, 'index'])->name('index');
                 Route::post('/company', [CompanyController::class, 'store'])->name('store');
@@ -939,7 +938,7 @@ Route::group(['middleware' => ['apikey']], function () {
             });
         });
 
-        Route::group(['as' => 'position.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'position.'], function () {
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('/positions', [PositionController::class, 'index'])->name('index');
                 Route::post('/position', [PositionController::class, 'store'])->name('store');
@@ -957,7 +956,7 @@ Route::group(['middleware' => ['apikey']], function () {
             });
         });
 
-        Route::group(['as' => 'department.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'department.'], function () {
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('/departments', [DepartmentController::class, 'index'])->name('index');
                 Route::post('/department', [DepartmentController::class, 'store'])->name('store');
@@ -979,7 +978,7 @@ Route::group(['middleware' => ['apikey']], function () {
             Route::post('location/add-department', [DepartmentController::class, 'addDepartmentForLocation'])->name('addDepartmentForLocation');
         });
 
-        Route::group(['as' => 'location.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'location.'], function () {
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('/locations', [LocationController::class, 'index'])->name('index');
                 Route::post('/location', [LocationController::class, 'store'])->name('store');
@@ -1000,7 +999,7 @@ Route::group(['middleware' => ['apikey']], function () {
 
         });
 
-        Route::group(['as' => 'note.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'note.'], function () {
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('/notes', [NoteController::class, 'index'])->name('index');
                 Route::post('/note', [NoteController::class, 'store'])->name('store');
@@ -1018,7 +1017,7 @@ Route::group(['middleware' => ['apikey']], function () {
             });
         });
 
-        Route::group(['as' => 'remind.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'remind.'], function () {
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('/reminds', [RemindController::class, 'index'])->name('index');
                 Route::post('/remind', [RemindController::class, 'store'])->name('store');
@@ -1036,7 +1035,7 @@ Route::group(['middleware' => ['apikey']], function () {
             });
         });
 
-        Route::group(['as' => 'activity_history.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'activity_history.'], function () {
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('/activity-histories', [ActivityHistoryController::class, 'index'])->name('index');
                 Route::post('/activity-history', [ActivityHistoryController::class, 'store'])->name('store');
@@ -1053,7 +1052,7 @@ Route::group(['middleware' => ['apikey']], function () {
         });
 
 //Website_page_categories
-        Route::group(['as' => 'section_category.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'section_category.'], function () {
 
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::post('/section-category', [SectionCategoryController::class, 'store'])->name('store');
@@ -1068,11 +1067,11 @@ Route::group(['middleware' => ['apikey']], function () {
 
         });
 
-        Route::group(['as' => 'api.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'api.'], function () {
             Route::get('/all-api', [Controller::class, 'allApi']);
         });
 
-        Route::group(['as' => 'footer_template.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'footer_template.'], function () {
 
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('/footer-templates', [FooterTemplateController::class, 'index'])->name('index');
@@ -1093,7 +1092,7 @@ Route::group(['middleware' => ['apikey']], function () {
 
         });
 
-        Route::group(['as' => 'country.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'country.'], function () {
             Route::post('/country', [CountryController::class, 'store'])->name('store');
             Route::put('/country/{id}', [CountryController::class, 'edit'])->name('edit');
             Route::delete('/country/{id}', [CountryController::class, 'destroy'])->name('destroy');
@@ -1101,7 +1100,7 @@ Route::group(['middleware' => ['apikey']], function () {
         Route::get('/country/{id}', [CountryController::class, 'show'])->name('show');
         Route::get('/countries', [CountryController::class, 'index'])->name('index');
 
-        Route::group(['as' => 'billingAddress.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'billingAddress.'], function () {
             Route::get('/billing-addresses', [BillingAddressController::class, 'index'])->name('index');
             Route::get('my/billing-addresses', [BillingAddressController::class, 'myIndex'])->name('myIndex');
             Route::post('/billing-address', [BillingAddressController::class, 'store'])->name('store');
@@ -1111,7 +1110,7 @@ Route::group(['middleware' => ['apikey']], function () {
             Route::post('/set-default/{id}', [BillingAddressController::class, 'setDefault'])->name('setDefault');
         });
 
-        Route::group(['as' => 'team.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'team.'], function () {
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('/teams', [TeamController::class, 'index'])->name('index');
                 Route::post('/team', [TeamController::class, 'store'])->name('store');
@@ -1160,7 +1159,7 @@ Route::group(['middleware' => ['apikey']], function () {
             });
         });
 
-        Route::group(['as' => 'addOn.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'addOn.'], function () {
             Route::group(['middleware' => ['role:root'], 'as' => 'root.'], function () {
                 Route::post('/add-on', [AddOnController::class, 'store'])->name('store');
                 Route::get('/publish-add-on/{id}', [AddOnController::class, 'publishAddOn'])->name('publish');
@@ -1182,7 +1181,7 @@ Route::group(['middleware' => ['apikey']], function () {
         Route::post('/platform-packages/renew-by-stripe', [PaymentController::class, 'renewByStripe'])->name('renewByStripe');
         Route::post('/platform-packages/renew-by-paypal', [PaymentController::class, 'renewByPaypal'])->name('renewByPaypal');
 
-        Route::group(['as' => 'notification.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'notification.'], function () {
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('/notifications', [NotificationController::class, 'index'])->name('index');
                 Route::delete('/notification/{id}', [NotificationController::class, 'destroy'])->name('destroy');
@@ -1197,7 +1196,7 @@ Route::group(['middleware' => ['apikey']], function () {
             Route::get('get-notification-categories', [NotificationController::class, 'getNotificationCategories']);
         });
 
-        Route::group(['as' => 'user-tracking.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'user-tracking.'], function () {
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('/user-trackings', [UserTrackingController::class, 'index'])->name('index');
                 Route::get('/user-tracking/{id}', [UserTrackingController::class, 'show'])->name('show');
@@ -1210,7 +1209,7 @@ Route::group(['middleware' => ['apikey']], function () {
         });
 
 //Article Category
-        Route::group(['as' => 'business-category.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'business-category.'], function () {
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'business-category.'], function () {
                 Route::post('/business-category', [BusinessCategoryController::class, 'store'])->name('store');
                 Route::put('/business-category/{id}', [BusinessCategoryController::class, 'edit'])->name('edit');
@@ -1224,7 +1223,7 @@ Route::group(['middleware' => ['apikey']], function () {
         Route::get('public/business-categories', [BusinessCategoryController::class, 'indexPublic'])->name('business-categories-public.index');
         Route::get('public/business-category/{id}', [BusinessCategoryController::class, 'showPublic'])->name('business-categories-public.show');
 
-        Route::group(['as' => 'purpose.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'purpose.'], function () {
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::post('/purpose', [PurposeController::class, 'store'])->name('store');
                 Route::put('/purpose/{id}', [PurposeController::class, 'edit'])->name('edit');
@@ -1241,7 +1240,7 @@ Route::group(['middleware' => ['apikey']], function () {
         });
 
 //Contact Unsubscribe
-        Route::group(['as' => 'contact-unsubscribe.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'contact-unsubscribe.'], function () {
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('/contact-unsubscribes', [ContactUnsubscribeController::class, 'index'])->name('index');
             });
@@ -1254,7 +1253,7 @@ Route::group(['middleware' => ['apikey']], function () {
         Route::post('unsubscribe', [UnsubscribeController::class, 'storeUnsubscribe'])->name('storeUnsubscribe');
 
 //Partner_categories
-        Route::group(['as' => 'partner_category.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'partner_category.'], function () {
 
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('/partner-categories', [PartnerCategoryController::class, 'index'])->name('index');
@@ -1267,7 +1266,7 @@ Route::group(['middleware' => ['apikey']], function () {
         Route::get('public/partner-categories', [PartnerCategoryController::class, 'index'])->name('index');
 
 //Partners
-        Route::group(['as' => 'partner.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'partner.'], function () {
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('/partners', [PartnerController::class, 'index'])->name('index');
                 Route::get('/partner/{id}', [PartnerController::class, 'show'])->name('show');
@@ -1297,7 +1296,7 @@ Route::group(['middleware' => ['apikey']], function () {
         Route::post('register-partner', [PartnerController::class, 'registerPartner'])->name('registerPartner');
 
 //Partner Level
-        Route::group(['as' => 'partner_level.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'partner_level.'], function () {
 
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('/partner-levels', [PartnerLevelController::class, 'index'])->name('index');
@@ -1310,7 +1309,7 @@ Route::group(['middleware' => ['apikey']], function () {
         Route::get('public/partner-levels', [PartnerLevelController::class, 'index'])->name('index');
 
 //Partner Tracking
-        Route::group(['as' => 'partner-tracking.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'partner-tracking.'], function () {
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('/partner-trackings', [PartnerTrackingController::class, 'index'])->name('index');
                 Route::post('/partner-tracking', [PartnerTrackingController::class, 'store'])->name('store');
@@ -1321,7 +1320,7 @@ Route::group(['middleware' => ['apikey']], function () {
         });
         Route::get('tracking-invite-partner', [PartnerTrackingController::class, 'trackingInvitePartner']);
 
-        Route::group(['as' => 'business-management.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'business-management.'], function () {
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('/business-managements', [BusinessManagementController::class, 'index'])->name('index');
                 Route::post('/business-management', [BusinessManagementController::class, 'store'])->name('store');
@@ -1346,7 +1345,7 @@ Route::group(['middleware' => ['apikey']], function () {
             });
         });
 
-        Route::group(['as' => 'domain.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'domain.'], function () {
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('/domains', [DomainController::class, 'index'])->name('index');
                 Route::post('/domain', [DomainController::class, 'store'])->name('store');
@@ -1370,7 +1369,7 @@ Route::group(['middleware' => ['apikey']], function () {
         });
 
 //DomainVerification
-        Route::group(['as' => 'domain-verification.'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'domain-verification.'], function () {
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('/domain-verifications', [DomainVerificationController::class, 'index'])->name('index');
                 Route::get('/domain-verification/{id}', [DomainVerificationController::class, 'show'])->name('show');
@@ -1383,13 +1382,13 @@ Route::group(['middleware' => ['apikey']], function () {
         });
 
 //invoice
-        Route::group(['as' => 'invoice'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'invoice'], function () {
             Route::get('/invoice/{id}', [InvoiceController::class, 'show'])->name('show');
             Route::get('/download-invoice/{id}', [InvoiceController::class, 'download'])->name('download');
         });
 
 //invoice
-        Route::group(['as' => 'partner-payout'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'partner-payout'], function () {
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('/partner-payouts', [PartnerPayoutController::class, 'index'])->name('index');
                 Route::get('/partner-payout/{id}', [PartnerPayoutController::class, 'show'])->name('show');
@@ -1404,7 +1403,7 @@ Route::group(['middleware' => ['apikey']], function () {
 
         });
 
-        Route::group(['as' => 'website'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'website'], function () {
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('/websites', [WebsiteController::class, 'index'])->name('index');
                 Route::get('website/{id}', [WebsiteController::class, 'show'])->name('show');
@@ -1440,7 +1439,7 @@ Route::group(['middleware' => ['apikey']], function () {
         Route::get('public/website/{id}', [WebsiteController::class, 'show'])->name('website.show');
         Route::get('public/website', [WebsiteController::class, 'publicWebsiteByDomainAndPublishStatus'])->name('website.public');
 
-        Route::group(['as' => 'asset'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'asset'], function () {
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('/assets', [AssetController::class, 'index']);
                 Route::post('asset/{id}', [AssetController::class, 'edit']);
@@ -1465,7 +1464,7 @@ Route::group(['middleware' => ['apikey']], function () {
         Route::get('generate-video', [AssetController::class, 'generateForVideo']);
         Route::get('generate-image', [AssetController::class, 'generateForImage']);
 
-        Route::group(['as' => 'asset-group'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'asset-group'], function () {
             Route::group(['middleware' => ['role:root,admin,editor'], 'as' => 'admin.'], function () {
                 Route::get('/asset-groups', [AssetGroupController::class, 'index']);
                 Route::get('asset-group/{id}', [AssetGroupController::class, 'show']);
@@ -1475,7 +1474,7 @@ Route::group(['middleware' => ['apikey']], function () {
             });
         });
 
-        Route::group(['as' => 'asset-size'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'asset-size'], function () {
             Route::group(['middleware' => ['role:root,admin,editor'], 'as' => 'admin.'], function () {
                 Route::get('/asset-sizes', [AssetSizeController::class, 'index']);
                 Route::get('asset-size/{id}', [AssetSizeController::class, 'show']);
@@ -1485,7 +1484,7 @@ Route::group(['middleware' => ['apikey']], function () {
             });
         });
 
-        Route::group(['as' => 'bank-information'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'bank-information'], function () {
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::post('bank-information', [BankInformationController::class, 'store']);
                 Route::put('bank-information/{id}', [BankInformationController::class, 'edit']);
@@ -1495,7 +1494,7 @@ Route::group(['middleware' => ['apikey']], function () {
             Route::get('bank-information/{id}', [BankInformationController::class, 'show']);
         });
 
-        Route::group(['as' => 'payout-method'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'payout-method'], function () {
             Route::get('/payout-methods', [PayoutMethodController::class, 'index']);
             Route::get('payout-method/{id}', [PayoutMethodController::class, 'show']);
             Route::post('payout-method', [PayoutMethodController::class, 'store']);
@@ -1506,7 +1505,7 @@ Route::group(['middleware' => ['apikey']], function () {
             Route::post('payout-method/set-default/{id}', [PayoutMethodController::class, 'setDefault']);
         });
 
-        Route::group(['as' => 'single-purpose'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'single-purpose'], function () {
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'author.'], function () {
                 Route::post('single-purpose', [SinglePurposeController::class, 'store']);
                 Route::put('single-purpose/{id}', [SinglePurposeController::class, 'edit']);
@@ -1519,7 +1518,7 @@ Route::group(['middleware' => ['apikey']], function () {
             Route::get('single-purposes', [SinglePurposeController::class, 'index']);
         });
 
-        Route::group(['as' => 'paragraph-type'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'paragraph-type'], function () {
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'author.'], function () {
                 Route::post('paragraph-type', [ParagraphTypeController::class, 'store']);
                 Route::put('paragraph-type/{id}', [ParagraphTypeController::class, 'edit']);
@@ -1532,7 +1531,7 @@ Route::group(['middleware' => ['apikey']], function () {
             Route::get('paragraph-types', [ParagraphTypeController::class, 'index']);
         });
 
-        Route::group(['as' => 'article-series'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'article-series'], function () {
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'author.'], function () {
                 Route::post('article-serie', [ArticleSeriesController::class, 'store']);
                 Route::put('article-serie/{id}', [ArticleSeriesController::class, 'edit']);

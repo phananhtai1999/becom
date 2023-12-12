@@ -2,11 +2,12 @@
 
 namespace App\Http\Middleware;
 
+use App\Abstracts\AbstractRestAPIController;
 use Closure;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class CheckUserUuidAndAppId
+class CheckUserId extends AbstractRestAPIController
 {
     /**
      * @param Request $request
@@ -15,15 +16,11 @@ class CheckUserUuidAndAppId
      */
     public function handle(Request $request, Closure $next)
     {
-        if (auth()->appId() && auth()->userId()) {
+        if (auth()->userId()) {
 
             return $next($request);
         }
 
-        return response()->json([
-            'status' => false,
-            'locale' => app()->getLocale(),
-            'message' => __('messages.unauthorized')
-        ], 403);
+        return $this->sendUnAuthorizedJsonResponse();
     }
 }

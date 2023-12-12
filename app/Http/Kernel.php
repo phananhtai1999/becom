@@ -69,6 +69,7 @@ class Kernel extends HttpKernel
         'role' => \App\Http\Middleware\CheckCurrentRole::class,
         'footerTemplate' => CheckCanRemoveFooterTemplate::class,
         'apikey' => \App\Http\Middleware\CheckApiKey::class,
-        'user.appid' => \App\Http\Middleware\CheckUserUuidAndAppId::class,
+        'appid' => \App\Http\Middleware\CheckAppId::class,
+        'userid' => \App\Http\Middleware\CheckUserId::class,
     ];
 }
