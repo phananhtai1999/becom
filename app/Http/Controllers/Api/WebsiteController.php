@@ -295,7 +295,7 @@ class WebsiteController extends AbstractRestAPIController
             $models = $this->service->getDefaultWebsiteForAdmin($request);
         } else {
             $models = $this->service->getCollectionWithPaginationByCondition($request, [
-                'domain_uuid' => null,
+                'is_default' => true,
                 'publish_status' => Website::PUBLISHED_PUBLISH_STATUS,
             ]);
         }
