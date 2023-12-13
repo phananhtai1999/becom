@@ -28,8 +28,8 @@ class checkTeamOwnerRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        if (!(new ConfigService())->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
-            if (Team::findOrFail($value)->owner_uuid != auth()->user()) {
+        if (!auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
+            if (Team::findOrFail($value)->owner_uuid != auth()->userId()) {
 
                 return false;
             }

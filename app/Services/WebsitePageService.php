@@ -42,7 +42,7 @@ class WebsitePageService extends AbstractService
         COUNT(IF( publish_status = 2, 1, NULL ) ) as pending,
         COUNT(IF( publish_status = 3, 1, NULL ) ) as reject")
             ->where([
-                ['user_uuid', auth()->user()],
+                ['user_uuid', auth()->userId()],
                 ['app_id', auth()->appId()]
             ])
             ->whereDate('updated_at', '>=', $startDate)
@@ -57,7 +57,7 @@ class WebsitePageService extends AbstractService
         COUNT(IF( publish_status = 2, 1, NULL ) ) as pending,
         COUNT(IF( publish_status = 3, 1, NULL ) ) as reject")
             ->where([
-                ['user_uuid', auth()->user()],
+                ['user_uuid', auth()->userId()],
                 ['app_id', auth()->appId()]
             ])
             ->whereDate('updated_at', '>=', $startDate)
@@ -134,7 +134,7 @@ class WebsitePageService extends AbstractService
             ->whereNull('website_website_page.website_page_uuid')
             ->where(function ($query) {
                 return $query->where([
-                    ['website_pages.user_uuid', auth()->user()],
+                    ['website_pages.user_uuid', auth()->userId()],
                     ['website_pages.app_id', auth()->appId()]
                 ])
                     ->orWhere('website_pages.is_default', true);

@@ -27,14 +27,14 @@ class StatusMyScenarioRequest extends AbstractRequest
         return [
             'scenario_uuid' => ['required', 'numeric', 'min:1', Rule::exists('scenarios', 'uuid')->where(function ($query) {
                 return $query->where([
-                    ['user_uuid', auth()->user()],
+                    ['user_uuid', auth()->userId()],
                     ['app_id', auth()->appId()]
                 ])->whereNull('deleted_at');
             })],
             'status' => ['required', 'in:running,stopped', Rule::unique('scenarios', 'status')->where(function ($query) {
                 return $query
                     ->where([
-                        ['user_uuid', auth()->user()],
+                        ['user_uuid', auth()->userId()],
                         ['app_id', auth()->appId()],
                         ['uuid', $this->request->get('scenario_uuid')],
                     ])

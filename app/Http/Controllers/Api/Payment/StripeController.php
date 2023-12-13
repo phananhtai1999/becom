@@ -92,7 +92,7 @@ class StripeController extends AbstractRestAPIController
     {
         $subscriptionHistory = $this->subscriptionHistoryService->findOneWhere([
             'payment_method_uuid' => PaymentMethod::STRIPE,
-             'user_uuid' => auth()->user(),
+             'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ]);
         if (empty($subscriptionHistory)) {

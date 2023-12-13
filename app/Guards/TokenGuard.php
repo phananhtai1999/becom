@@ -66,7 +66,7 @@ class TokenGuard implements StatefulGuard
      */
     public function check(): bool
     {
-        if (empty($this->user()) && !empty($this->getToken())) {
+        if (empty(auth()->user()) && !empty($this->getToken())) {
             return $this->isTrueToken();
         }
 
@@ -78,7 +78,7 @@ class TokenGuard implements StatefulGuard
      */
     public function guest(): bool
     {
-        if (!empty($this->user()) && !empty($this->getToken())) {
+        if (!empty(auth()->user()) && !empty($this->getToken())) {
             return !$this->isTrueToken();
         }
 
@@ -99,7 +99,7 @@ class TokenGuard implements StatefulGuard
 
     public function id()
     {
-        $user = $this->user();
+        $user = auth()->user();
 
         if (!empty($user)) {
             return $user->getAuthIdentifier();

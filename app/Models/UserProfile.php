@@ -34,6 +34,7 @@ class UserProfile extends AbstractModel
         'can_add_smtp_account',
         'can_remove_footer_template',
         'app_id',
+        'user_uuid',
     ];
 
     /**

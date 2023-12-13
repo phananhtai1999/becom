@@ -25,7 +25,9 @@ class OrderRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'user_uuid' => ['required', 'numeric', 'min:1', Rule::exists('users', 'uuid')->whereNull('deleted_at')],
+            'user_uuid' => ['required', 'numeric', 'min:1', Rule::exists('user_profiles', 'uuid')->where(function ($q) {
+                return $q->where('app_id', auth()->appId());
+            })->whereNull('deleted_at')],
             'payment_method_uuid' => ['required', 'numeric', 'min:1', Rule::exists('payment_methods', 'uuid')->whereNull('deleted_at')],
             'credit' => ['required', 'numeric'],
             'total_price' => ['required', 'numeric', 'min:1'],

@@ -38,13 +38,13 @@ class BillingAddressController extends AbstractRestAPIController
         $default = $this->service->defaultBillingAddress();
         if (!$default) {
             $model = $this->service->create(array_merge($request->all(), [
-                'user_uuid' => auth()->user(),
+                'user_uuid' => auth()->userId(),
                 'app_id' => auth()->appId(),
                 'is_default' => true
             ]));
         } else {
             $model = $this->service->create(array_merge($request->all(), [
-                'user_uuid' => auth()->user(),
+                'user_uuid' => auth()->userId(),
                 'app_id' => auth()->appId(),
             ]));
         }
@@ -65,7 +65,7 @@ class BillingAddressController extends AbstractRestAPIController
         if ($billingAddress->billing_address != $request->get('billing_address')) {
             $this->service->destroyByUserIdAndAppId($billingAddress->uuid);
             $billingAddress = $this->service->create(array_merge($billingAddress->toArray(), [
-                'user_uuid' => auth()->user(),
+                'user_uuid' => auth()->userId(),
                 'app_id' => auth()->appId(),
             ], $request->all()));
         } else {
@@ -80,7 +80,7 @@ class BillingAddressController extends AbstractRestAPIController
     public function myIndex()
     {
         $models = $this->service->findAllWhere([
-            'user_uuid' => auth()->user(),
+            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId()
         ]);
 

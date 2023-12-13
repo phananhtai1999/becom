@@ -26,7 +26,7 @@ class MyContactService extends AbstractService
     public function findMyContactByKeyOrAbort($id)
     {
         return $this->findOneWhereOrFail([
-            ['user_uuid', auth()->user()],
+            ['user_uuid', auth()->userId()],
             ['app_id', auth()->appId()],
             ['uuid', $id]
         ]);
@@ -55,7 +55,7 @@ class MyContactService extends AbstractService
             ->whereDate('created_at', '<=', $endDate)
             ->whereNull('deleted_at')
             ->where([
-                ['user_uuid', auth()->user()],
+                ['user_uuid', auth()->userId()],
                 ['app_id', auth()->appId()]
             ])
             ->get();
@@ -76,7 +76,7 @@ class MyContactService extends AbstractService
             ->whereDate('created_at', '<=', $endDate)
             ->whereNull('deleted_at')
             ->where([
-                ['user_uuid', auth()->user()],
+                ['user_uuid', auth()->userId()],
                 ['app_id', auth()->appId()]
             ])
             ->orderBy('label', 'ASC')
@@ -97,7 +97,7 @@ class MyContactService extends AbstractService
             ->whereDate('created_at', '<=', $endDate)
             ->whereNull('deleted_at')
             ->where([
-                ['user_uuid', auth()->user()],
+                ['user_uuid', auth()->userId()],
                 ['app_id', auth()->appId()]
             ])
             ->orderBy('label', 'ASC')
@@ -114,7 +114,7 @@ class MyContactService extends AbstractService
      */
     public function createQueryGetIncrease($startDate, $endDate, $dateFormat, $type)
     {
-        $currentUser = auth()->user();
+        $currentUser = auth()->userId();
         $string = $type === "month" ? "-01" : "";
         $todaySmtpAccountTableSubQuery = $yesterdaySmtpAccountTableSubQuery = "(SELECT date_format(created_at, '{$dateFormat}') as date_field, COUNT(uuid) as createContact
                   from contacts
@@ -286,7 +286,7 @@ class MyContactService extends AbstractService
             ->join('contact_contact_list', 'contact_contact_list.contact_uuid', '=', 'contacts.uuid')
             ->join('contact_lists', 'contact_contact_list.contact_list_uuid', '=', 'contact_lists.uuid')
             ->where([
-                ['contact_lists.user_uuid', auth()->user()],
+                ['contact_lists.user_uuid', auth()->userId()],
                 ['contact_lists.app_id', auth()->appId()]
             ])
             ->when($contactListUuid, function ($query, $contactListUuid) {
@@ -320,7 +320,7 @@ class MyContactService extends AbstractService
 //where date(updated_at) >= '2022-11-21' AND date(updated_at) <= '2022-11-24'
 //GROUP By label) yest On yest.label = today.label - INTERVAL 1 day;
         $queryContactList = !empty($contactListUuid) ? "and cl.uuid = '{$contactListUuid}'" : "";
-        $currentUser = auth()->user();
+        $currentUser = auth()->userId();
         $string = $type === "month" ? "-01" : "";
         $todayPointsContactTableSubQuery = $yesterdayPointsContactTableSubQuery = "(SELECT date_format(c.updated_at, '{$dateFormat}') as label, sum(c.points) as points
                   from contacts c, contact_contact_list ccl, contact_lists cl
@@ -440,7 +440,7 @@ class MyContactService extends AbstractService
         $modelKeyName = $this->model->getKeyName();
 
         return QueryBuilder::for($this->model->where([
-            ['user_uuid', auth()->user()],
+            ['user_uuid', auth()->userId()],
             ['app_id', auth()->appId()]
         ]))
             ->allowedFields([
@@ -648,13 +648,13 @@ class MyContactService extends AbstractService
             if ($value[0] == $field) {
                 if ($value[1] == '=') {
                     $query->whereExists(function ($user) use ($value) {
-                        $user->from('users')
+                        $user->from('user_profiles')
                             ->whereRaw('contacts.user_uuid = users.uuid')
                             ->whereIn('users.username', array_slice($value, 3));
                     });
                 } elseif ($value[1] == '!=') {
                     $query->whereExists(function ($user) use ($value) {
-                        $user->from('users')
+                        $user->from('user_profiles')
                             ->whereRaw('contacts.user_uuid = users.uuid')
                             ->whereNotIn('users.username', array_slice($value, 3));
                     });
@@ -664,7 +664,7 @@ class MyContactService extends AbstractService
                             for ($i = 4; $i <= count($value); $i++) {
                                 $query->orWhereExists(function ($query) use ($value, $i) {
                                     $query->select("users.uuid")
-                                        ->from('users')
+                                        ->from('user_profiles')
                                         ->whereRaw('contacts.user_uuid = users.uuid')
                                         ->where('users.username', 'like', '%' . $value[$i - 1] . '%');
                                 });
@@ -673,7 +673,7 @@ class MyContactService extends AbstractService
                     } else {
                         $query->whereExists(function ($user) use ($value) {
                             $user->select("users.uuid")
-                                ->from('users')
+                                ->from('user_profiles')
                                 ->whereRaw('contacts.user_uuid = users.uuid')
                                 ->where('users.username', 'like', '%' . $value[3] . '%');
                         });

@@ -47,7 +47,7 @@ class SectionTemplateService extends AbstractService
         COUNT(IF( publish_status = 2, 1, NULL ) ) as pending,
         COUNT(IF( publish_status = 3, 1, NULL ) ) as reject")
             ->where([
-                ['user_uuid', auth()->user()],
+                ['user_uuid', auth()->userId()],
                 ['app_id', auth()->appId()]
             ])
             ->whereDate('updated_at', '>=', $startDate)
@@ -62,7 +62,7 @@ class SectionTemplateService extends AbstractService
         COUNT(IF( publish_status = 2, 1, NULL ) ) as pending,
         COUNT(IF( publish_status = 3, 1, NULL ) ) as reject")
             ->where([
-                ['user_uuid', auth()->user()],
+                ['user_uuid', auth()->userId()],
                 ['app_id', auth()->appId()]
             ])
             ->whereDate('updated_at', '>=', $startDate)
@@ -137,7 +137,7 @@ class SectionTemplateService extends AbstractService
         return $this->model->doesntHave('headerWebsite')->doesntHave('footerWebsite')
             ->where(function ($query) {
                 return $query->where([
-                    ['user_uuid', auth()->user()],
+                    ['user_uuid', auth()->userId()],
                     ['app_id', auth()->appId()]
                 ])
                     ->orWhere('is_default', true);

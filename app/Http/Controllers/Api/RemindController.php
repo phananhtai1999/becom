@@ -57,7 +57,7 @@ class RemindController extends AbstractRestAPIController
         $request = app($this->storeRequest);
 
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => $request->get('user_uuid') ?? auth()->user(),
+            'user_uuid' => $request->get('user_uuid') ?? auth()->userId(),
             'app_id' => auth()->appId(),
         ]));
 
@@ -84,7 +84,7 @@ class RemindController extends AbstractRestAPIController
         $model = $this->service->findOrFailById($id);
 
         $this->service->update($model, array_merge($request->all(), [
-            'user_uuid' => $request->get('user_uuid') ?? auth()->user(),
+            'user_uuid' => $request->get('user_uuid') ?? auth()->userId(),
             'app_id' => auth()->appId(),
         ]));
 
@@ -125,7 +125,7 @@ class RemindController extends AbstractRestAPIController
 //            return $this->sendJsonResponse(false, 'You need to upgrade platform package', [], 403);
 //        }
         $model = $this->service->create(array_merge($request->all(), [
-           'user_uuid' => auth()->user(),
+           'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ]));
 
@@ -162,7 +162,7 @@ class RemindController extends AbstractRestAPIController
         $model = $this->myService->showMyRemind($id);
 
         $this->service->update($model, array_merge($request->all(), [
-           'user_uuid' => auth()->user(),
+           'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ]));
 

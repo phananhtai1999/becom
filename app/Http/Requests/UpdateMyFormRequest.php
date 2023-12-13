@@ -30,7 +30,7 @@ class UpdateMyFormRequest extends AbstractRequest
             'template_json' => ['string'],
             'contact_list_uuid' => ['numeric', 'min:1', Rule::exists('contact_lists', 'uuid')->where(function ($query) {
                 return $query->where([
-                    ['user_uuid', auth()->user()],
+                    ['user_uuid', auth()->userId()],
                     ['app_id', auth()->appId()]
                 ])->whereNull('deleted_at');
             })],

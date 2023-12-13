@@ -175,7 +175,7 @@ class AddOnController extends AbstractRestAPIController
 
     public function myAddOn() {
         $myAddOn = $this->userAddOnService->findAllWhere([
-            'user_uuid' => auth()->user(),
+            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId()
         ]);
 
@@ -197,12 +197,12 @@ class AddOnController extends AbstractRestAPIController
     {
         $addOnSubscriptionHistory = $this->addOnSubscriptionHistoryService->findOneWhere([
             'add_on_subscription_plan_uuid' => $id,
-            'user_uuid' => auth()->user(),
+            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ]);
         $userAddOn = $this->userAddOnService->findOneWhere([
             'add_on_subscription_plan_uuid' => $id,
-            'user_uuid' => auth()->user(),
+            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ]);
         try {

@@ -17,7 +17,7 @@ class MyFormQueryBuilder extends AbstractQueryBuilder
     public static function baseQuery()
     {
         return Form::where([
-            ['user_uuid', auth()->user()],
+            ['user_uuid', auth()->userId()],
             ['app_id', auth()->appId()]
         ]);
     }

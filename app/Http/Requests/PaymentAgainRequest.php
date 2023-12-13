@@ -33,7 +33,7 @@ class PaymentAgainRequest extends FormRequest
 
                     return $query->where([
                         ['status', Order::ORDER_PENDING_REQUEST_STATUS],
-                        ['user_uuid', auth()->user()],
+                        ['user_uuid', auth()->userId()],
                         ['app_id', auth()->appId()],
                     ])
                         ->whereNull('deleted_at');

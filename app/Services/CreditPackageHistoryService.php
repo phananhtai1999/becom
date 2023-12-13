@@ -27,7 +27,7 @@ class CreditPackageHistoryService extends AbstractService
     {
 
         return $this->model->where([
-            'user_uuid' => auth()->user(),
+            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ])->orderBy('uuid', 'DESC')->get();
     }
@@ -38,7 +38,7 @@ class CreditPackageHistoryService extends AbstractService
     public function getCreditPackageHistoryOfCurrentUser()
     {
         return $this->model->where([
-            ['user_uuid', auth()->user()],
+            ['user_uuid', auth()->userId()],
             ['app_id', auth()->appId()],
         ])->first();
     }

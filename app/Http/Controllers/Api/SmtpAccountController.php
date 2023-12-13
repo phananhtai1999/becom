@@ -114,7 +114,7 @@ class SmtpAccountController extends AbstractRestAPIController
             $website = $this->sendProjectService->findOneById($request->get('send_project_uuid'));
             $userUuid = $website->user_uuid;
         } else {
-            $userUuid = auth()->user();
+            $userUuid = auth()->userId();
         }
 
         if (!$this->service->checkMailUserNameUnique($request->get('mail_username'), $userUuid)) {
@@ -211,12 +211,12 @@ class SmtpAccountController extends AbstractRestAPIController
      */
     public function storeMySmtpAccount(MySmtpAccountRequest $request)
     {
-        $user = $this->userService->findOrFailById(auth()->user());
+        $user = $this->userService->findOrFailById(auth()->userId());
         $config = $this->configService->findConfigByKey('smtp_auto');
 
         if ($user->can_add_smtp_account == 1 || $config->value == 0) {
             $model = $this->service->create(array_merge($request->except(['status', 'publish']), [
-                'user_uuid' => auth()->user(),
+                'user_uuid' => auth()->userId(),
                 'app_id' => auth()->appId(),
             ]));
 

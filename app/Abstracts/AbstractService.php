@@ -3,9 +3,6 @@
 namespace App\Abstracts;
 
 use App\Models\Config;
-use Firebase\JWT\JWT;
-use Firebase\JWT\Key;
-use Firebase\JWT\SignatureInvalidException;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -255,7 +252,7 @@ abstract class AbstractService
 
         return $this->modelQueryBuilderClass::searchQuery($indexRequest['search'], $indexRequest['search_by'])
             ->where([
-                ['user_uuid', auth()->user()],
+                ['user_uuid', auth()->userId()],
                 ['app_id', auth()->appId()],
             ])
             ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
@@ -264,7 +261,7 @@ abstract class AbstractService
     public function findOneWhereOrFailByUserUuidAndAppId($id)
     {
         return $this->model->where([
-            ['user_uuid', auth()->user()],
+            ['user_uuid', auth()->userId()],
             ['app_id', auth()->appId()],
             ['uuid', $id],
         ])->firstOrFail();
@@ -275,22 +272,5 @@ abstract class AbstractService
         $model = $this->findOneWhereOrFailByUserUuidAndAppId($id);
 
         return $model->delete();
-    }
-
-    public function checkUserRoles($allowedRoles)
-    {
-        try {
-            $decodedToken = JWT::decode(auth()->token(), new Key(config('api_base.token_key'), 'HS256'));
-            $currentRoles = optional($decodedToken->data)->roles;
-            foreach ($currentRoles as $currentRole) {
-                if (in_array($currentRole, $allowedRoles)) {
-                    return true;
-                }
-            }
-
-            return false;
-        } catch (SignatureInvalidException|\InvalidArgumentException|\ErrorException|\TypeError|\UnexpectedValueException $exception) {
-            return false;
-        }
     }
 }

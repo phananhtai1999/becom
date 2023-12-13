@@ -38,43 +38,45 @@ class UpdateContactRequest extends AbstractRequest
             'contact_list' => ['nullable', 'array', 'min:1'],
             'contact_list.*' => ['numeric', 'min:1', Rule::exists('contact_lists', 'uuid')->where(function ($query) {
                 return $query->where([
-                    ['user_uuid', $this->request->get('user_uuid') ?? auth()->user()],
+                    ['user_uuid', $this->request->get('user_uuid') ?? auth()->userId()],
                     ['app_id', auth()->appId()]
                 ]);
             })->whereNull('deleted_at')],
             'remind' => ['nullable', 'array', 'min:1'],
             'remind.*' => ['numeric', 'min:1', Rule::exists('reminds', 'uuid')->where(function ($query) {
                 return $query->where([
-                    ['user_uuid', $this->request->get('user_uuid') ?? auth()->user()],
+                    ['user_uuid', $this->request->get('user_uuid') ?? auth()->userId()],
                     ['app_id', auth()->appId()]
                 ]);
             })->whereNull('deleted_at')],
             'contact_company_position' => ['nullable', 'array', 'min:1'],
             'contact_company_position.*.company_uuid' => ['numeric', Rule::exists('companies', 'uuid')->where(function ($query) {
                 return $query->where([
-                    ['user_uuid', $this->request->get('user_uuid') ?? auth()->user()],
+                    ['user_uuid', $this->request->get('user_uuid') ?? auth()->userId()],
                     ['app_id', auth()->appId()]
                 ])
                     ->orWhereNull('user_uuid');
             })->whereNull('deleted_at')],
             'contact_company_position.*.position_uuid' => ['nullable', 'numeric', Rule::exists('positions', 'uuid')->where(function ($query) {
                 return $query->where([
-                    ['user_uuid', $this->request->get('user_uuid') ?? auth()->user()],
+                    ['user_uuid', $this->request->get('user_uuid') ?? auth()->userId()],
                     ['app_id', auth()->appId()]
                 ])
                     ->orWhereNull('user_uuid');
             })->whereNull('deleted_at')],
             'contact_company_position.*.department_uuid' => ['nullable', 'numeric', Rule::exists('departments', 'uuid')->where(function ($query) {
                 return $query->where([
-                    ['user_uuid', $this->request->get('user_uuid') ?? auth()->user()],
+                    ['user_uuid', $this->request->get('user_uuid') ?? auth()->userId()],
                     ['app_id', auth()->appId()]
                 ])
                     ->orWhereNull('user_uuid');
             })->whereNull('deleted_at')],
-            'user_uuid' => ['numeric', 'min:1', Rule::exists('users', 'uuid')->whereNull('deleted_at')],
+            'user_uuid' => ['numeric', 'min:1', Rule::exists('user_profiles', 'uuid')->where(function ($q) {
+                return $q->where('app_id', auth()->appId());
+            })->whereNull('deleted_at')],
             'status_uuid' => ['nullable', 'numeric', 'min:1', Rule::exists('status', 'uuid')->where(function ($query) {
                 return $query->where([
-                    ['user_uuid', $this->request->get('user_uuid') ?? auth()->user()],
+                    ['user_uuid', $this->request->get('user_uuid') ?? auth()->userId()],
                     ['app_id', auth()->appId()]
                 ])
                     ->orWhereNull('user_uuid');

@@ -25,6 +25,7 @@ class MailTemplateFactory extends Factory {
 			'design' => "{}",
 			'send_project_uuid' => optional(SendProject::inRandomOrder()->first())->uuid,
             "user_uuid" => User::inRandomOrder()->first()->uuid,
+            'app_id' => $this->faker->sentence(3),
             "publish_status" => true,
             "type" => $optionType[array_rand($optionType)],
 		];

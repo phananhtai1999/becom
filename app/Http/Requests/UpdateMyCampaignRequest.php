@@ -29,7 +29,7 @@ class UpdateMyCampaignRequest extends AbstractRequest
             'tracking_key' => ['string'],
             'mail_template_uuid' => ['numeric', 'min:1', Rule::exists('mail_templates', 'uuid')->where(function ($query) use ($sendType) {
                 return $query->where([
-                    ['user_uuid', auth()->user()],
+                    ['user_uuid', auth()->userId()],
                     ['app_id', auth()->appId()],
                     ['type', $sendType],
                     ['publish_status', true]])->where(function ($q) {
@@ -46,7 +46,7 @@ class UpdateMyCampaignRequest extends AbstractRequest
                 if ($sendType == 'email') {
                     return $query->where([
                         ['send_project_uuid', $this->request->get('send_project_uuid')],
-                        ['user_uuid', auth()->user()],
+                        ['user_uuid', auth()->userId()],
                         ['app_id', auth()->appId()],
                         ['mail_mailer', 'smtp'],
                         ['status', 'work'],
@@ -55,7 +55,7 @@ class UpdateMyCampaignRequest extends AbstractRequest
                 } elseif ($sendType == 'sms') {
                     return $query->where([
                         ['send_project_uuid', $this->request->get('send_project_uuid')],
-                        ['user_uuid', auth()->user()],
+                        ['user_uuid', auth()->userId()],
                         ['app_id', auth()->appId()],
                         ['status', 'work'],
                         ['publish', true],
@@ -63,7 +63,7 @@ class UpdateMyCampaignRequest extends AbstractRequest
                 } else {
                     return $query->where([
                         ['send_project_uuid', $this->request->get('send_project_uuid')],
-                        ['user_uuid', auth()->user()],
+                        ['user_uuid', auth()->userId()],
                         ['app_id', auth()->appId()],
                         ['mail_mailer', $sendType],
                         ['status', 'work'],
@@ -74,7 +74,7 @@ class UpdateMyCampaignRequest extends AbstractRequest
             'send_project_uuid' => ['numeric', 'min:1', Rule::exists('send_projects', 'uuid')->where(function ($query) {
 
                 return $query->where([
-                    ['user_uuid', auth()->user()],
+                    ['user_uuid', auth()->userId()],
                     ['app_id', auth()->appId()]
                 ])->whereNull('deleted_at');
             })],
@@ -88,7 +88,7 @@ class UpdateMyCampaignRequest extends AbstractRequest
             'contact_list.*' => ['numeric', 'min:1', Rule::exists('contact_lists', 'uuid')->where(function ($query) {
 
                 return $query->where([
-                    ['user_uuid', auth()->user()],
+                    ['user_uuid', auth()->userId()],
                     ['app_id', auth()->appId()]
                 ])->whereNull('deleted_at');
             })]

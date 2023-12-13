@@ -32,7 +32,7 @@ class ChangeStatusAssetRequest extends AbstractRequest
         ];
 
         //Check role editor
-        if (!(new ConfigService())->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN]))
+        if (!auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN]))
         {
             $validate['status'] = ['required', Rule::in(Asset::PENDING_STATUS, Asset::DRAFT_STATUS)];
         }

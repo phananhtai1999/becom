@@ -36,7 +36,7 @@ class EditScenarioRequest extends AbstractRequest
             'nodes.*.id' => ['required', 'string'],
             'nodes.*.campaign_uuid' => ['required', 'numeric', 'min:1', Rule::exists('campaigns', 'uuid')->where(function ($q) {
                 return $q->where([
-                    ['user_uuid', auth()->user()],
+                    ['user_uuid', auth()->userId()],
                     ['app_id', auth()->appId()],
                     ['type', '<>', 'birthday']
                 ]);

@@ -50,7 +50,7 @@ class SendEmailScheduleLogService extends AbstractService
             ->whereDate('send_email_schedule_logs.updated_at', '>=', $startDate)
             ->whereDate('send_email_schedule_logs.updated_at', '<=', $endDate)
              ->where([
-                 'campaigns.user_uuid' => auth()->user(),
+                 'campaigns.user_uuid' => auth()->userId(),
                  'campaigns.app_id' => auth()->appId(),
                  'send_email_schedule_logs.is_running' => true
              ])->count();

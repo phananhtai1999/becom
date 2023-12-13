@@ -3,20 +3,19 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
-use Laravel\Sanctum\HasApiTokens;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
+    /**
+     * @var string
+     */
+    protected $table = "user_profiles";
 
     /**
      * @var string
@@ -41,7 +40,9 @@ class User extends Authenticatable implements JWTSubject
         'cover_img',
         'credit',
         'can_add_smtp_account',
-        'can_remove_footer_template'
+        'can_remove_footer_template',
+        'uuid',
+        'app_id'
     ];
 
     /**
@@ -101,7 +102,7 @@ class User extends Authenticatable implements JWTSubject
      */
     public function getFullNameAttribute()
     {
-        return $this->first_name . ' '. $this->last_name;
+        return $this->first_name . ' ' . $this->last_name;
     }
 
     /**
@@ -141,7 +142,7 @@ class User extends Authenticatable implements JWTSubject
      */
     public function userDetails()
     {
-        return $this->hasOne(UserDetail::class, 'user_uuid', 'uuid');
+        return $this->hasOne(UserDetail::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
     }
 
     /**
@@ -149,7 +150,7 @@ class User extends Authenticatable implements JWTSubject
      */
     public function userConfig()
     {
-        return $this->hasOne(UserConfig::class, 'user_uuid', 'uuid');
+        return $this->hasOne(UserConfig::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
     }
 
     /**
@@ -157,7 +158,7 @@ class User extends Authenticatable implements JWTSubject
      */
     public function userAccessTokens()
     {
-        return $this->hasMany(UserAccessToken::class, 'user_uuid', 'uuid');
+        return $this->hasMany(UserAccessToken::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
     }
 
     /**
@@ -165,7 +166,7 @@ class User extends Authenticatable implements JWTSubject
      */
     public function sendProjects()
     {
-        return $this->hasMany(SendProject::class, 'user_uuid', 'uuid');
+        return $this->hasMany(SendProject::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
     }
 
     /**
@@ -173,7 +174,7 @@ class User extends Authenticatable implements JWTSubject
      */
     public function contacts()
     {
-        return $this->hasMany(Contact::class, 'user_uuid', 'uuid');
+        return $this->hasMany(Contact::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
     }
 
     /**
@@ -181,7 +182,7 @@ class User extends Authenticatable implements JWTSubject
      */
     public function contactLists()
     {
-        return $this->hasMany(ContactList::class, 'user_uuid', 'uuid');
+        return $this->hasMany(ContactList::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
     }
 
     /**
@@ -189,7 +190,7 @@ class User extends Authenticatable implements JWTSubject
      */
     public function userCreditHistories()
     {
-        return $this->hasMany(UserCreditHistory::class, 'user_uuid', 'uuid');
+        return $this->hasMany(UserCreditHistory::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
     }
 
     /**
@@ -197,7 +198,7 @@ class User extends Authenticatable implements JWTSubject
      */
     public function creditTransactionHistories()
     {
-        return $this->hasMany(CreditTransactionHistory::class, 'user_uuid', 'uuid');
+        return $this->hasMany(CreditTransactionHistory::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
     }
 
     /**
@@ -233,22 +234,22 @@ class User extends Authenticatable implements JWTSubject
      */
     public function userPlatformPackage()
     {
-        return $this->hasOne(UserPlatformPackage::class, 'user_uuid', 'uuid');
+        return $this->hasOne(UserPlatformPackage::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
     }
 
     public function userAddOns()
     {
-        return $this->hasMany(UserAddOn::class, 'user_uuid', 'uuid');
+        return $this->hasMany(UserAddOn::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
     }
 
     public function userTeams()
     {
-        return $this->hasMany(UserTeam::class, 'user_uuid', 'uuid');
+        return $this->hasMany(UserTeam::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
     }
 
     public function teams()
     {
-        return $this->belongsToMany(Team::class, 'user_teams', 'user_uuid', 'team_uuid')->withTimestamps();
+        return $this->belongsToMany(Team::class, 'user_teams', 'user_uuid', 'team_uuid')->withTimestamps()->where('app_id', auth()->appId());
     }
 
     /**
@@ -272,7 +273,7 @@ class User extends Authenticatable implements JWTSubject
      */
     public function reminds()
     {
-        return $this->hasMany(Remind::class, 'user_uuid', 'uuid');
+        return $this->hasMany(Remind::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
     }
 
     /**
@@ -280,7 +281,7 @@ class User extends Authenticatable implements JWTSubject
      */
     public function notes()
     {
-        return $this->hasMany(Note::class, 'user_uuid', 'uuid');
+        return $this->hasMany(Note::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
     }
 
     /**
@@ -288,7 +289,7 @@ class User extends Authenticatable implements JWTSubject
      */
     public function positions()
     {
-        return $this->hasMany(Position::class, 'user_uuid', 'uuid');
+        return $this->hasMany(Position::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
     }
 
     /**
@@ -296,7 +297,7 @@ class User extends Authenticatable implements JWTSubject
      */
     public function companies()
     {
-        return $this->hasMany(Company::class, 'user_uuid', 'uuid');
+        return $this->hasMany(Company::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
     }
 
     /**
@@ -304,7 +305,7 @@ class User extends Authenticatable implements JWTSubject
      */
     public function status()
     {
-        return $this->hasMany(Status::class, 'user_uuid', 'uuid');
+        return $this->hasMany(Status::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
     }
 
     /**
@@ -312,7 +313,7 @@ class User extends Authenticatable implements JWTSubject
      */
     public function partner()
     {
-        return $this->hasOne(Partner::class, 'user_uuid', 'uuid');
+        return $this->hasOne(Partner::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
     }
 
     /**
@@ -320,7 +321,7 @@ class User extends Authenticatable implements JWTSubject
      */
     public function businessManagements()
     {
-        return $this->hasMany(BusinessManagement::class, 'owner_uuid', 'uuid');
+        return $this->hasMany(BusinessManagement::class, 'owner_uuid', 'uuid')->where('app_id', auth()->appId());
     }
 
     /**
@@ -328,31 +329,32 @@ class User extends Authenticatable implements JWTSubject
      */
     public function domains()
     {
-        return $this->hasMany(Domain::class, 'owner_uuid', 'uuid');
+        return $this->hasMany(Domain::class, 'owner_uuid', 'uuid')->where('app_id', auth()->appId());
     }
 
     public function userTeam()
     {
-        return $this->hasOne(UserTeam::class, 'user_uuid', 'uuid');
+        return $this->hasOne(UserTeam::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
     }
 
     public function partnerUser()
     {
-        return $this->hasOne(PartnerUser::class, 'user_uuid', 'uuid');
+        return $this->hasOne(PartnerUser::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
     }
 
     public function invite()
     {
-        return $this->hasOne(Invite::class, 'user_uuid', 'uuid');
+        return $this->hasOne(Invite::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
     }
 
-    public function userTeamContactLists() {
-        return $this->belongsToMany(ContactList::class, 'user_team_contact_lists', 'user_uuid', 'contact_list_uuid')->withTimestamps('created_at');
+    public function userTeamContactLists()
+    {
+        return $this->belongsToMany(ContactList::class, 'user_team_contact_lists', 'user_uuid', 'contact_list_uuid')->withTimestamps('created_at')->where('app_id', auth()->appId());
     }
 
     public function userTrackings()
     {
-        return $this->hasMany(UserTracking::class, 'user_uuid', 'uuid');
+        return $this->hasMany(UserTracking::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
     }
 
     /**
@@ -360,6 +362,6 @@ class User extends Authenticatable implements JWTSubject
      */
     public function articleSeries()
     {
-        return $this->hasMany(ArticleSeries::class, 'assigned_ids', 'uuid');
+        return $this->hasMany(ArticleSeries::class, 'assigned_ids', 'uuid')->where('app_id', auth()->appId());
     }
 }

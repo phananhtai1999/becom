@@ -16,7 +16,7 @@ class UserPlatformPackageService extends AbstractService
     public function checkPurchasedPlatform($platformPackageUuid)
     {
         return $this->model->where([
-           'user_uuid' => auth()->user(),
+           'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
             'platform_package_uuid' => $platformPackageUuid,
         ])->first();

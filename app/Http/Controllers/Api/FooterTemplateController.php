@@ -71,7 +71,7 @@ class FooterTemplateController extends AbstractRestAPIController
     {
         $request = app($this->storeRequest);
         $model = $this->service->create(array_merge($request->except('active_by_uuid'), [
-            'user_uuid' => auth()->user(),
+            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
             'is_default' => false,
             'publish_status' => FooterTemplate::PUBLISHED_PUBLISH_STATUS
@@ -92,7 +92,7 @@ class FooterTemplateController extends AbstractRestAPIController
         $model = $this->service->findOrFailById($id);
 
         if ($request->get('is_default')) {
-            if ($model->user_uuid != auth()->user()) {
+            if ($model->user_uuid != auth()->userId()) {
                 return $this->sendValidationFailedJsonResponse();
             }
             $this->service->changeIsDefaultFooterTemplateByType($request->get('type') ?? $model->type,
@@ -147,7 +147,7 @@ class FooterTemplateController extends AbstractRestAPIController
             return $this->sendJsonResponse(false, 'You need to buy platform/add-on', ['data' => $this->getPlatformByPermission(config('api.footer.create'))], 403);
         }
         $model = $this->service->create(array_merge($request->except('active_by_uuid'), [
-            'user_uuid' => auth()->user(),
+            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
             'is_default' => false,
             'publish_status' => FooterTemplate::PUBLISHED_PUBLISH_STATUS,
@@ -205,7 +205,7 @@ class FooterTemplateController extends AbstractRestAPIController
         if (!Gate::allows('permission', config('api.footer.remove'))) {
             return $this->sendJsonResponse(false, 'You need to buy platform/add-on', ['data' => $this->getPlatformByPermission(config('api.footer.remove'))], 403);
         }
-        $user = auth()->user();
+        $user = auth()->userId();
         $this->userService->update($user, [
            'can_remove_footer_template' => $request->get('can_remove_footer_template')
         ]);

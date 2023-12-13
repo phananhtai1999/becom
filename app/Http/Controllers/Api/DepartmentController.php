@@ -75,7 +75,7 @@ class DepartmentController extends AbstractRestAPIController
         }
 
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => $request->get('user_uuid') ?? auth()->user(),
+            'user_uuid' => $request->get('user_uuid') ?? auth()->userId(),
             'app_id' => $request->get('user_uuid') ?? auth()->appId(),
         ]));
 
@@ -102,7 +102,7 @@ class DepartmentController extends AbstractRestAPIController
         }
 
         $this->service->update($model, array_merge($request->all(), [
-            'user_uuid' => $request->get('user_uuid') ?? auth()->user(),
+            'user_uuid' => $request->get('user_uuid') ?? auth()->userId(),
             'app_id' => $request->get('user_uuid') ?? auth()->appId(),
         ]));
 
@@ -123,7 +123,7 @@ class DepartmentController extends AbstractRestAPIController
         }
 
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => auth()->user(),
+            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ]));
 
@@ -160,7 +160,7 @@ class DepartmentController extends AbstractRestAPIController
         }
 
         $this->service->update($model, array_merge($request->all(), [
-            'user_uuid' => auth()->user(),
+            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ]));
 

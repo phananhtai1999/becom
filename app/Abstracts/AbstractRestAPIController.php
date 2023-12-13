@@ -177,7 +177,7 @@ class AbstractRestAPIController extends BaseController
      * @return bool
      */
     public function checkTeamOwner($teamId) {
-        if (Team::findOrFail($teamId)->owner_uuid != auth()->user()) {
+        if (Team::findOrFail($teamId)->owner_uuid != auth()->userId()) {
 
             return false;
         }
@@ -241,12 +241,12 @@ class AbstractRestAPIController extends BaseController
     }
 
     public function getUserUuid() {
-        $userTeam = UserTeam::where(['user_uuid' => auth()->user(), 'app_id' => auth()->appId()])->first();
+        $userTeam = UserTeam::where(['user_uuid' => auth()->userId(), 'app_id' => auth()->appId()])->first();
 
         if(($userTeam && !$userTeam['is_blocked'])) {
             $user_uuid = $userTeam->team->owner_uuid;
         } else {
-            $user_uuid = auth()->user();
+            $user_uuid = auth()->userId();
         }
 
         return $user_uuid;

@@ -81,7 +81,7 @@ class UserService extends AbstractService
      */
     public function totalBannedAndActive($startDate, $endDate)
     {
-        return DB::table('users')->selectRaw("count(uuid) - count(banned_at) as active, count(banned_at) as banned")
+        return DB::table('user_profiles')->selectRaw("count(uuid) - count(banned_at) as active, count(banned_at) as banned")
             ->whereDate('created_at', '>=', $startDate)
             ->whereDate('created_at', '<=', $endDate)
             ->whereNull('deleted_at')
@@ -96,7 +96,7 @@ class UserService extends AbstractService
      */
     public function queryUser($startDate, $endDate, $dateTime)
     {
-        return DB::table('users')->selectRaw("DATE_FORMAT(created_at, '{$dateTime}') as label, count(uuid) - count(banned_at) as active, count(banned_at) as banned")
+        return DB::table('user_profiles')->selectRaw("DATE_FORMAT(created_at, '{$dateTime}') as label, count(uuid) - count(banned_at) as active, count(banned_at) as banned")
             ->whereDate('created_at', '>=', $startDate)
             ->whereDate('created_at', '<=', $endDate)
             ->whereNull('deleted_at')
@@ -116,7 +116,7 @@ class UserService extends AbstractService
     {
         $string = $type === "month" ? "-01" : "";
         $todayUserTableSubQuery = $yesterdayUserTableSubQuery = "(SELECT date_format(created_at, '{$dateFormat}') as date_field, COUNT(uuid) as createUser
-                  from users
+                  from user_profiles
                   where date(created_at) >= '{$startDate}' and date(created_at) <= '{$endDate}' and deleted_at is NULL
                   GROUP By date_field)";
 
@@ -247,7 +247,7 @@ class UserService extends AbstractService
             return false;
         }
 
-        return $this->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN, Role::ROLE_EDITOR]);
+        return auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN, Role::ROLE_EDITOR]);
     }
 
     /**
@@ -259,7 +259,7 @@ class UserService extends AbstractService
             return false;
         }
 
-        return $this->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN]);
+        return auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN]);
     }
 
     public function getUsersByRole($role)
@@ -296,14 +296,14 @@ class UserService extends AbstractService
      */
     public function getCurrentUserRole(): string
     {
-        if ($this->checkUserRoles([Role::ROLE_ROOT])) {
-            $char = 'r' . auth()->user();
-        } elseif ($this->checkUserRoles([Role::ROLE_ADMIN])) {
-            $char = 'a' . auth()->user();
-        } elseif ($this->checkUserRoles([Role::ROLE_EDITOR])) {
-            $char = 'e' . auth()->user();
+        if (auth()->hasRole([Role::ROLE_ROOT])) {
+            $char = 'r' . auth()->userId();
+        } elseif (auth()->hasRole([Role::ROLE_ADMIN])) {
+            $char = 'a' . auth()->userId();
+        } elseif (auth()->hasRole([Role::ROLE_EDITOR])) {
+            $char = 'e' . auth()->userId();
         } else {
-            $char = 'u' . auth()->user();
+            $char = 'u' . auth()->userId();
         }
 
         return $char;

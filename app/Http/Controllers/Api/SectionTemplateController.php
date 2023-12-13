@@ -60,7 +60,7 @@ class SectionTemplateController extends AbstractRestAPIController
 
         $model = $this->service->create(array_merge($request->all(), [
             'publish_status' => SectionTemplate::PUBLISHED_PUBLISH_STATUS,
-           'user_uuid' => auth()->user(),
+           'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ]));
 
@@ -93,7 +93,7 @@ class SectionTemplateController extends AbstractRestAPIController
     {
         $model = $this->service->create(array_merge($request->all(), [
             'publish_status' => SectionTemplate::PUBLISHED_PUBLISH_STATUS,
-           'user_uuid' => auth()->user(),
+           'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
             'is_default' => false
         ]));
@@ -175,7 +175,7 @@ class SectionTemplateController extends AbstractRestAPIController
     public function storeUnpublishedSectionTemplate(UnpublishedSectionTemplateRequest $request)
     {
         $model = $this->service->create(array_merge($request->all(), [
-           'user_uuid' => auth()->user(),
+           'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ]));
 

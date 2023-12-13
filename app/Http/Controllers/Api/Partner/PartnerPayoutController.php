@@ -62,7 +62,7 @@ class PartnerPayoutController extends AbstractRestAPIController
     {
         $amountWantWithdrawn = $request->get('amount');
         $partner = $this->partnerService->findOneWhereOrFail([
-            'user_uuid' => auth()->user(),
+            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ]);
         $amountCanWithdrawn = $partner->unpaid_earnings;
@@ -87,7 +87,7 @@ class PartnerPayoutController extends AbstractRestAPIController
             $this->service->update($partnerPayout, [
                 'status' => $status,
                 'time' => Carbon::now(),
-                'by_user_uuid' => auth()->user(),
+                'by_user_uuid' => auth()->userId(),
                 'app_id' => auth()->appId(),
             ]);
         }

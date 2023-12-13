@@ -62,8 +62,8 @@ class NotificationController extends AbstractRestAPIController
 
         $models = $this->service->getCollectionByUserIdAndAppIdWithPagination($request);
         $statistical = $this->service->statisticalNotification([
-            "user_uuid" => auth()->user(),
-            "app_id" => auth()->appId()
+            "user_uuid" => auth()->userId(),
+            'app_id' => auth()->appId()
         ]);
 
         $data = $this->myService->resourceCollectionToData($this->resourceCollectionClass, $models);
@@ -83,7 +83,7 @@ class NotificationController extends AbstractRestAPIController
     {
         $model = $this->myService->findOneWhereOrFail([
             'uuid' => $id,
-            'user_uuid' => auth()->user(),
+            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ]);
 

@@ -79,7 +79,7 @@ class ContactListController extends AbstractRestAPIController
                 if (is_array($import)) {
                     if (empty($request->user_uuid)) {
                         $data = array_merge($request->all(), [
-                            'user_uuid' => auth()->user(),
+                            'user_uuid' => auth()->userId(),
                             'app_id' => auth()->appId(),
                         ]);
                     } else {
@@ -114,7 +114,7 @@ class ContactListController extends AbstractRestAPIController
 
         if (empty($request->user_uuid)) {
             $data = array_merge($request->all(), [
-                'user_uuid' => auth()->user(),
+                'user_uuid' => auth()->userId(),
                 'app_id' => auth()->appId(),
             ]);
         } else {
@@ -208,8 +208,8 @@ class ContactListController extends AbstractRestAPIController
      */
     public function storeMyContactListAndImportFile(MyContactListRequest $request)
     {
-        $userUuid = auth()->user();
-        $userTeam = $this->userTeamService->getUserTeamByUserAndAppId(auth()->user(), auth()->appId());
+        $userUuid = auth()->userId();
+        $userTeam = $this->userTeamService->getUserTeamByUserAndAppId(auth()->userId(), auth()->appId());
         if ($userTeam) {
             $userUuid = $userTeam->team->owner_uuid;
         }
@@ -228,8 +228,8 @@ class ContactListController extends AbstractRestAPIController
                         'app_id' => auth()->appId(),
                     ]));
                     //need function userteamcontaclist here
-                    if ($userUuid != auth()->user()) {
-                        $user = $this->userService->findOrFailById(auth()->user());
+                    if ($userUuid != auth()->userId()) {
+                        $user = $this->userService->findOrFailById(auth()->userId());
                         $user->userTeamContactLists()->attach($model->uuid);
                     }
                     $model->contacts()->attach(array_merge($request->get('contact', []), $import['data']));
@@ -261,9 +261,9 @@ class ContactListController extends AbstractRestAPIController
             'app_id' => auth()->appId(),
         ]));
         $model->contacts()->attach($request->get('contact', []));
-        if ($userUuid != auth()->user()) {
+        if ($userUuid != auth()->userId()) {
             //need function userteamcontaclist here
-            $user = $this->userService->findOrFailById(auth()->user());
+            $user = $this->userService->findOrFailById(auth()->userId());
             $user->userTeamContactLists()->attach($model->uuid);
         }
 
@@ -306,7 +306,7 @@ class ContactListController extends AbstractRestAPIController
                 }
                 if (is_array($import)) {
                     $this->service->update($model, array_merge($request->all(), [
-                        'user_uuid' => auth()->user(),
+                        'user_uuid' => auth()->userId(),
                         'app_id' => auth()->appId(),
                     ]));
                     $contactUuid = $this->service->findContactKeyByContactList($model);
@@ -337,7 +337,7 @@ class ContactListController extends AbstractRestAPIController
         }
 
         $this->service->update($model, array_merge($request->all(), [
-            'user_uuid' => auth()->user(),
+            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ]));
         $contactUuid = $this->service->findContactKeyByContactList($model);
@@ -395,10 +395,10 @@ class ContactListController extends AbstractRestAPIController
      */
     public function indexMyContactList(IndexRequest $request)
     {
-        $userTeam = $this->userTeamService->getUserTeamByUserAndAppId(auth()->user(), auth()->appId());
+        $userTeam = $this->userTeamService->getUserTeamByUserAndAppId(auth()->userId(), auth()->appId());
         //need function userteamcontaclist here
-        if (($userTeam && !$userTeam['is_blocked']) && !empty($this->user()->userTeamContactLists)) {
-            $contactLists = $this->myService->myContactLists($request, $this->user()->userTeamContactLists()->pluck('contact_list_uuid'));
+        if (($userTeam && !$userTeam['is_blocked']) && !empty(auth()->user()->userTeamContactLists)) {
+            $contactLists = $this->myService->myContactLists($request, auth()->user()->userTeamContactLists()->pluck('contact_list_uuid'));
         } else {
             $contactLists = $this->myService->myContactLists($request);
         }

@@ -36,7 +36,7 @@ class UpdateWebsiteRequest extends FormRequest
             'header_section_uuid' => ['nullable', 'required_unless:publish_status,' . Website::DRAFT_PUBLISH_STATUS, 'numeric', Rule::exists('section_templates', 'uuid')->where(function ($query) {
                 return $query->where(function ($q) {
                     $q->where([
-                        ['user_uuid', auth()->user()],
+                        ['user_uuid', auth()->userId()],
                         ['app_id', auth()->appId()]
                     ])
                         ->orWhere('is_default', true);
@@ -46,7 +46,7 @@ class UpdateWebsiteRequest extends FormRequest
             'footer_section_uuid' => ['nullable', 'required_unless:publish_status,' . Website::DRAFT_PUBLISH_STATUS, 'numeric', Rule::exists('section_templates', 'uuid')->where(function ($query) {
                 return $query->where(function ($q) {
                     $q->where([
-                        ['user_uuid', auth()->user()],
+                        ['user_uuid', auth()->userId()],
                         ['app_id', auth()->appId()]
                     ])
                         ->orWhere('is_default', true);
@@ -57,7 +57,7 @@ class UpdateWebsiteRequest extends FormRequest
             'logo' => ['nullable', 'string'],
             'domain_uuid' => ['nullable', 'numeric', Rule::exists('domains', 'uuid')->where(function ($q) {
                 return $q->where([
-                    ['owner_uuid', auth()->user()],
+                    ['owner_uuid', auth()->userId()],
                     ['app_id', auth()->appId()]
                 ])
                     ->whereNull('deleted_at');
@@ -66,7 +66,7 @@ class UpdateWebsiteRequest extends FormRequest
             'website_pages.*.uuid' => ['nullable', 'required_unless:publish_status,' . Website::DRAFT_PUBLISH_STATUS, 'numeric', Rule::exists('website_pages', 'uuid')->where(function ($query) {
                 return $query->where(function ($q) {
                     $q->where([
-                        ['user_uuid', auth()->user()],
+                        ['user_uuid', auth()->userId()],
                         ['app_id', auth()->appId()]
                     ])
                         ->orWhere('is_default', true);
@@ -77,7 +77,9 @@ class UpdateWebsiteRequest extends FormRequest
             'tracking_ids' => ['nullable', 'array'],
             'tracking_ids.*' => ['nullable', 'string', 'max:300'],
             'publish_status' => ['numeric', Rule::in(Article::PENDING_PUBLISH_STATUS, Article::DRAFT_PUBLISH_STATUS, Article::PUBLISHED_PUBLISH_STATUS, Article::BLOCKED_PUBLISH_STATUS, Article::REJECT_PUBLISH_STATUS)],
-            'user_uuid' => ['numeric', Rule::exists('users', 'uuid')->whereNull('deleted_at')]
+            'user_uuid' => ['numeric', Rule::exists('user_profiles', 'uuid')->where(function ($q) {
+                return $q->where('app_id', auth()->appId());
+            })->whereNull('deleted_at')]
         ];
     }
 }

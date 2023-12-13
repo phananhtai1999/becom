@@ -39,7 +39,7 @@ class ConfigService extends AbstractService
             return $this->loadPublicConfig();
         }
         //Check auth:api
-        if ($this->checkUserRoles([Role::ROLE_ROOT])) {
+        if (auth()->hasRole([Role::ROLE_ROOT])) {
             return $this->loadAllConfig();
         } else {
             return $this->model->whereIn('status', [Config::CONFIG_PRIVATE_STATUS, Config::CONFIG_PUBLIC_STATUS])

@@ -76,8 +76,8 @@ class WebsiteController extends AbstractRestAPIController
     {
         $model = $this->myService->create(
             array_merge($request->all(), [
-                "user_uuid" => $request->get('user_uuid') ?? auth()->user(),
-                "app_id" => auth()->appId(),
+                "user_uuid" => $request->get('user_uuid') ?? auth()->userId(),
+                'app_id' => auth()->appId(),
             ])
         );
 
@@ -111,9 +111,8 @@ class WebsiteController extends AbstractRestAPIController
     {
         $model = $this->myService->create(
             array_merge($request->all(), [
-                "user_uuid" => auth()
-                    ->user()
-                    ->getKey()
+                "user_uuid" => auth()->userId(),
+                'app_id' => auth()->appId()
             ])
         );
 
@@ -216,8 +215,8 @@ class WebsiteController extends AbstractRestAPIController
     {
         $model = $this->myService->create(
             array_merge([
-                "user_uuid" => auth()->user(),
-                "app_id" => auth()->appId(),
+                "user_uuid" => auth()->userId(),
+                'app_id' => auth()->appId(),
             ], $request->all())
         );
 
@@ -263,7 +262,7 @@ class WebsiteController extends AbstractRestAPIController
     public function showUnpublishedWebsite($id)
     {
         $model = $this->service->findOneWhereOrFail([
-            'user_uuid' => auth()->user(),
+            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
             'publish_status' => Article::PENDING_PUBLISH_STATUS,
             'uuid' => $id
@@ -293,7 +292,7 @@ class WebsiteController extends AbstractRestAPIController
      */
     public function defaultWebsites(IndexRequest $request)
     {
-        if ($this->service->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
+        if (auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             $models = $this->service->getDefaultWebsiteForAdmin($request);
         } else {
             $models = $this->service->getCollectionWithPaginationByCondition($request, [
@@ -347,11 +346,11 @@ class WebsiteController extends AbstractRestAPIController
     {
         $copyWebsite = $this->service->showCopyWebsiteByUuid($id);
 
-        if ($this->service->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
+        if (auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             $statusTemplate = SectionTemplate::PUBLISHED_PUBLISH_STATUS;
             $statusWebsite = $request->get('publish_status');
             $isDefault = true;
-        } elseif ($this->service->checkUserRoles([Role::ROLE_EDITOR])) {
+        } elseif (auth()->hasRole([Role::ROLE_EDITOR])) {
             $statusTemplate = $request->get('publish_status') == Website::PENDING_PUBLISH_STATUS
                 ? SectionTemplate::PENDING_PUBLISH_STATUS : SectionTemplate::DRAFT_PUBLISH_STATUS;
             $statusWebsite = $request->get('publish_status');
@@ -365,14 +364,14 @@ class WebsiteController extends AbstractRestAPIController
         DB::beginTransaction();
         try {
             $headerWebsite = $this->sectionTemplateService->create(array_merge($copyWebsite->headerSection->toArray(), [
-                "user_uuid" => auth()->user(),
-                "app_id" => auth()->appId(),
+                "user_uuid" => auth()->userId(),
+                'app_id' => auth()->appId(),
                 'publish_status' => $statusTemplate,
                 "is_default" => $isDefault
             ]));
             $footerWebsite = $this->sectionTemplateService->create(array_merge($copyWebsite->footerSection->toArray(), [
-                "user_uuid" => auth()->user(),
-                "app_id" => auth()->appId(),
+                "user_uuid" => auth()->userId(),
+                'app_id' => auth()->appId(),
                 'publish_status' => $statusTemplate,
                 "is_default" => $isDefault
             ]));
@@ -380,14 +379,14 @@ class WebsiteController extends AbstractRestAPIController
             $website = $this->service->create(array_merge($request->all(), [
                 'header_section_uuid' => $headerWebsite->uuid,
                 'footer_section_uuid' => $footerWebsite->uuid,
-                'user_uuid' => auth()->user(),
+                'user_uuid' => auth()->userId(),
                 'app_id' => auth()->appId(),
                 'publish_status' => $statusWebsite,
             ]));
 
             $websitePages = $copyWebsite->websitePages->map(function ($item) use ($statusTemplate, $isDefault) {
                 $websitePage = $this->websitePageService->create(array_merge($item->toArray(), [
-                    'user_uuid' => auth()->user(),
+                    'user_uuid' => auth()->userId(),
                     'app_id' => auth()->appId(),
                     'is_default' => $isDefault,
                     'publish_status' => $statusTemplate

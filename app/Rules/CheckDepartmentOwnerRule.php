@@ -4,7 +4,6 @@ namespace App\Rules;
 
 use App\Models\Department;
 use App\Models\Role;
-use App\Services\ConfigService;
 use Illuminate\Contracts\Validation\Rule;
 
 class CheckDepartmentOwnerRule implements Rule
@@ -28,8 +27,8 @@ class CheckDepartmentOwnerRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        if (!(new ConfigService())->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
-            if (Department::findOrFail($value)->user_uuid != auth()->user()) {
+        if (!auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
+            if (Department::findOrFail($value)->user_uuid != auth()->userId()) {
 
                 return false;
             }

@@ -83,8 +83,8 @@ class DomainController extends AbstractRestAPIController
         $request = app($this->storeRequest);
 
         $model = $this->service->create(array_merge($request->except(['active_mailbox_status']), [
-            'owner_uuid' => $request->get('owner_uuid') ?? auth()->user(),
-            "app_id" => auth()->appId(),
+            'owner_uuid' => $request->get('owner_uuid') ?? auth()->userId(),
+            'app_id' => auth()->appId(),
             'active_mailbox' => false,
         ]));
 
@@ -122,7 +122,7 @@ class DomainController extends AbstractRestAPIController
     public function storeMyDomain(MyDomainRequest $request)
     {
         $model = $this->service->create(array_merge($request->except(['active_mailbox_status']), [
-              'owner_uuid' => auth()->user(),
+            'owner_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
             'active_mailbox' => false,
         ]));
@@ -155,7 +155,7 @@ class DomainController extends AbstractRestAPIController
         $model = $this->myService->showMyDomain($id);
 
         $this->service->update($model, array_merge($request->except(['active_mailbox', 'active_mailbox_status']), [
-              'owner_uuid' => auth()->user(),
+            'owner_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ]));
 
@@ -244,7 +244,7 @@ class DomainController extends AbstractRestAPIController
     public function myDomainVerifiedAndActiveMailbox(IndexRequest $request)
     {
         $models = $this->service->getCollectionWithPaginationByCondition($request, [
-            ['owner_uuid', auth()->user()],
+            ['owner_uuid', auth()->userId()],
             ['app_id', auth()->appId()],
             ['verified_at', '<>', null],
             ['active_mailbox', true]

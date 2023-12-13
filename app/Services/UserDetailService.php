@@ -19,7 +19,7 @@ class UserDetailService extends AbstractService
     {
         return $this->model
             ->where([
-                ['user_uuid', auth()->user()],
+                ['user_uuid', auth()->userId()],
                 ['app_id', auth()->appId()]
             ])
             ->first();

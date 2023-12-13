@@ -45,13 +45,13 @@ class UserDetailController extends AbstractRestAPIController
 
         if (empty($model)) {
             $model = $this->service->create(array_merge($request->all(), [
-               'user_uuid' => auth()->user(),
-            'app_id' => auth()->appId(),
+                'user_uuid' => auth()->userId(),
+                'app_id' => auth()->appId(),
             ]));
         } else {
             $this->service->update($model, array_merge($request->all(), [
-               'user_uuid' => auth()->user(),
-            'app_id' => auth()->appId(),
+                'user_uuid' => auth()->userId(),
+                'app_id' => auth()->appId(),
             ]));
         }
 

@@ -33,7 +33,7 @@ class OrderController extends AbstractRestAPIController
      * @param MyOrderService $myService
      */
     public function __construct(
-        OrderService $service,
+        OrderService   $service,
         MyOrderService $myService
     )
     {
@@ -68,8 +68,8 @@ class OrderController extends AbstractRestAPIController
         $request = app($this->editRequest);
         $model = $this->myService->showMyOrder($id);
         $this->service->update($model, array_merge($request->all(), [
-             'user_uuid' => auth()->user(),
-            'app_id' => auth()->appId(),,
+            'user_uuid' => auth()->userId(),
+            'app_id' => auth()->appId(),
         ]));
 
         return $this->sendOkJsonResponse(

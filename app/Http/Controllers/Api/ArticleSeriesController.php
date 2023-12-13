@@ -87,7 +87,7 @@ class ArticleSeriesController extends AbstractRestAPIController
     {
         $models = $this->service->getCollectionWithPaginationByCondition($request,
             [
-                'assigned_ids' => auth()->user(),
+                'assigned_ids' => auth()->userId(),
                 'app_id' => auth()->appId()
             ]);
 

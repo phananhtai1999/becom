@@ -13,7 +13,7 @@ class CheckIsCanUseSectionTemplate
     public static function IsCanUseSectionTemplate($uuid, $websiteUuid = null)
     {
         return function ($attribute, $value, $fail) use ($uuid, $websiteUuid) {
-            if ((new ConfigService())->checkUserRoles([Role::ROLE_ROOT, Role::ROLE_ADMIN])){
+            if (auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN])){
                 $uuidsSectionTemplatesCanUsed = (new SectionTemplateService())->getCanUseUuidsSectionTemplates()->toArray();
             }else{
                 $uuidsSectionTemplatesCanUsed = (new MySectionTemplateService())->getCanUseUuidsSectionTemplates()->toArray();

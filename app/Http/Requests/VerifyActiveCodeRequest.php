@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class VerifyActiveCodeRequest extends FormRequest
 {
@@ -25,7 +26,9 @@ class VerifyActiveCodeRequest extends FormRequest
     {
         return [
             'active_code' => ['required', 'size:4'],
-            'email' => ['required', 'exists:users,email'],
+            'email' => ['required', Rule::exists('user_profiles','email')->where(function ($q) {
+                return $q->where('app_id', auth()->appId());
+            })->whereNull('deleted_at')],
         ];
     }
 }

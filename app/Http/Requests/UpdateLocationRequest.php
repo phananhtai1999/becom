@@ -27,7 +27,7 @@ class UpdateLocationRequest extends FormRequest
         return [
             'name' => ['string', Rule::unique('locations', 'name')
                 ->where([
-                    ['user_uuid', auth()->user()],
+                    ['user_uuid', auth()->userId()],
                     ['app_id', auth()->appId()]
                 ])
                 ->whereNull('deleted_at')],
