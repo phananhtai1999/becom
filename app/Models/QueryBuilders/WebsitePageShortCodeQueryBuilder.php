@@ -30,18 +30,18 @@ class WebsitePageShortCodeQueryBuilder extends AbstractQueryBuilder
         return static::for(static::baseQuery())
             ->allowedFields([
                 $modelKeyName,
-                'type',
+                'status',
                 'key',
-                'parent_uuid',
+                'parent_uuids',
                 'name',
                 'short_code',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
                 $modelKeyName,
-                'type',
+                'status',
                 'key',
-                'parent_uuid',
+                'parent_uuids',
                 'name',
                 'short_code',
             ])
@@ -50,15 +50,16 @@ class WebsitePageShortCodeQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__' . $modelKeyName, $modelKeyName),
                 'name',
                 AllowedFilter::exact('exact__name', 'name'),
-                'type',
-                AllowedFilter::exact('exact__type', 'type'),
+                'status',
+                AllowedFilter::exact('exact__status', 'status'),
                 'key',
                 AllowedFilter::exact('exact__key', 'key'),
-                'parent_uuid',
-                AllowedFilter::exact('exact__parent_uuid', 'parent_uuid'),
+                'parent_uuids',
+                AllowedFilter::exact('exact__parent_uuids', 'parent_uuids'),
                 'short_code',
                 AllowedFilter::exact('exact__short_code', 'short_code'),
                 AllowedFilter::scope('short_code_root'),
+                AllowedFilter::scope('parent_short_code'),
 
             ]);
     }

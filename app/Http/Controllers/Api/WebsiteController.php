@@ -78,6 +78,7 @@ class WebsiteController extends AbstractRestAPIController
             array_merge($request->all(), [
                 "user_uuid" => $request->get('user_uuid') ?? auth()->userId(),
                 'app_id' => auth()->appId(),
+                'is_default' => true,
             ])
         );
 
@@ -113,6 +114,7 @@ class WebsiteController extends AbstractRestAPIController
             array_merge($request->all(), [
                 "user_uuid" => auth()->userId(),
                 'app_id' => auth()->appId()
+                'is_default' => false,
             ])
         );
 
@@ -217,6 +219,7 @@ class WebsiteController extends AbstractRestAPIController
             array_merge([
                 "user_uuid" => auth()->userId(),
                 'app_id' => auth()->appId(),
+                'is_default' => true,
             ], $request->all())
         );
 
@@ -296,7 +299,7 @@ class WebsiteController extends AbstractRestAPIController
             $models = $this->service->getDefaultWebsiteForAdmin($request);
         } else {
             $models = $this->service->getCollectionWithPaginationByCondition($request, [
-                'domain_uuid' => null,
+                'is_default' => true,
                 'publish_status' => Website::PUBLISHED_PUBLISH_STATUS,
             ]);
         }

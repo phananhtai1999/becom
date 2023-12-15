@@ -624,6 +624,7 @@ Route::group(['middleware' => ['apikey']], function () {
             Route::put('short-code-group/{id}', [ShortCodeGroupController::class, 'edit'])->name('edit');
             Route::delete('/short-code-group/{id}', [ShortCodeGroupController::class, 'destroy'])->name('destroy');
             Route::post('/mapping-short-code', [ShortCodeGroupController::class, 'mappingShortcode'])->name('mappingShortcode');
+    Route::post('/unmapping-short-code', [ShortCodeGroupController::class, 'unmappingShortcode'])->name('unmappingShortcode');
 
 
             Route::group(['middleware' => ['role:root,admin,editor']], function () {
@@ -633,8 +634,8 @@ Route::group(['middleware' => ['apikey']], function () {
                 Route::put('/unpublished-website-page/{id}', [WebsitePageController::class, 'editUnpublishedWebsitePage'])->name('edit-unpublished');
             });
 
-            Route::get('shortcode-supports', [WebsitePageShortCodeController::class, 'configShortcode'])->name('index-config-shortcode');
-            Route::get('shortcode-supportsss', [WebsitePageShortCodeController::class, 'getShortcode'])->name('getShortcode');
+    Route::get('shortcode-supports', [WebsitePageShortCodeController::class, 'configShortcode'])->name('index-config-shortcode');
+    Route::get('toggle-shortcode/{id}', [WebsitePageShortCodeController::class, 'toggleStatus'])->name('toggleStatus');
 
             Route::group(['as' => 'my.'], function () {
                 Route::get('my/website-pages', [WebsitePageController::class, 'indexMy'])->name('indexMyWebsitePage');
@@ -956,6 +957,7 @@ Route::group(['middleware' => ['apikey']], function () {
             });
         });
 
+        Route::delete('/department/{id}', [DepartmentController::class, 'destroy'])->name('destroy');
         Route::group(['middleware' => ['userid'], 'as' => 'department.'], function () {
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('/departments', [DepartmentController::class, 'index'])->name('index');

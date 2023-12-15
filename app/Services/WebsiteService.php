@@ -33,7 +33,7 @@ class WebsiteService extends AbstractService
         $indexRequest = $this->getIndexRequest($request);
 
         return $this->modelQueryBuilderClass::searchQuery($indexRequest['search'], $indexRequest['search_by'])
-            ->where('domain_uuid', null)
+            ->where('is_default', true)
             ->where(function ($q) {
                 return $q->where('publish_status', Website::PUBLISHED_PUBLISH_STATUS)
                     ->orWhere('publish_status', Website::BLOCKED_PUBLISH_STATUS);
@@ -51,7 +51,7 @@ class WebsiteService extends AbstractService
                 ])
                     ->orWhere(function ($q) {
                         return $q->where([
-                            'domain_uuid' => null,
+                            'is_default' => true,
                             'publish_status' => Website::PUBLISHED_PUBLISH_STATUS,
                         ]);
                     });

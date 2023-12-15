@@ -18,9 +18,9 @@ class WebsitePageShortCodeResource extends JsonResource
 
         $data = [
             'uuid' => $this->uuid,
-            'type' => $this->type,
+            'status' => $this->status,
             'key' => $this->key,
-            'parent_uuid' => $this->parent_uuid,
+            'parent_uuids' => $this->parent_uuids,
             'name' => $this->name,
             'short_code' => $this->short_code,
             'created_at' => $this->created_at,
@@ -29,11 +29,11 @@ class WebsitePageShortCodeResource extends JsonResource
         ];
 
         if (\in_array('website_page_short_code__children_short_code', $expand)) {
-            $data['children_short_code'] = self::collection($this->childrenWebsitePageShortCode);
+            $data['children_short_code'] = self::collection($this->childrenWebsitePageShortCode());
         }
 
         if (\in_array('website_page_short_code__parent_short_code', $expand)) {
-            $data['parent_short_code'] = new WebsitePageShortCodeResource($this->parentWebsitePageShortCode);
+            $data['parent_short_code'] = self::collection($this->parentWebsitePageShortCode());
         }
 
         return $data;

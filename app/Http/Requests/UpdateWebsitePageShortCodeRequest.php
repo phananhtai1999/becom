@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateWebsitePageShortCodeRequest extends FormRequest
 {
@@ -24,7 +25,12 @@ class UpdateWebsitePageShortCodeRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'key' => ['string', Rule::unique('website_page_short_codes', 'key')],
+            'name' => ['string'],
+            'description' => ['string'],
+            'parent_uuids' => ['array'],
+            'parent_uuids*' => ['integer', 'exists:website_page_short_codes,uuid'],
+            'short_code' => ['string'],
         ];
     }
 }

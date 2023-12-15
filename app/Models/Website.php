@@ -45,12 +45,14 @@ class Website extends AbstractModel
         'tracking_ids',
         'is_active_news_page',
         'app_id',
+        'is_default',
     ];
 
     /**
      * @var string[]
      */
     protected $casts = [
+        'is_default' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
