@@ -16,7 +16,6 @@ use App\Http\Controllers\Api\BusinessCategoryController;
 use App\Http\Controllers\Api\BusinessManagementController;
 use App\Http\Controllers\Api\CampaignController;
 use App\Http\Controllers\Api\CompanyController;
-use App\Http\Controllers\Api\ConfigController;
 use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\ContactListController;
 use App\Http\Controllers\Api\ContactUnsubscribeController;
@@ -31,7 +30,6 @@ use App\Http\Controllers\Api\EditorChartController;
 use App\Http\Controllers\Api\EmailController;
 use App\Http\Controllers\Api\FooterTemplateController;
 use App\Http\Controllers\Api\FormController;
-use App\Http\Controllers\Api\GroupController;
 use App\Http\Controllers\Api\InvoiceController;
 use App\Http\Controllers\Api\LanguageController;
 use App\Http\Controllers\Api\LocationController;
@@ -204,27 +202,6 @@ Route::group(['middleware' => ['apikey']], function () {
                 Route::put('/my/user-config/upsert', [UserConfigController::class, 'upsertMyUserConfig'])->name('upsertMyUserConfig');
             });
         });
-
-        Route::group(['middleware' => ['role:root'], 'as' => 'config.root'], function () {
-            Route::get('/root/configs', [ConfigController::class, 'index'])->name('index');
-            Route::post('/root/config', [ConfigController::class, 'store'])->name('store');
-            Route::put('/root/config/upsert', [ConfigController::class, 'upsertConfig'])->name('upsertConfig');
-            Route::get('/root/config/{id}', [ConfigController::class, 'show'])->name('show');
-            Route::put('/root/config/{id}', [ConfigController::class, 'edit'])->name('edit');
-            Route::post('test-smtp-account-config/{id}', [ConfigController::class, 'testSmtpAccount'])->name('testSmtpAccount');
-        });
-
-//Load permission config
-        Route::group(['middleware' => ['userid'], 'as' => 'config.'], function () {
-            Route::group(['middleware' => ['role:root,admin'], 'as' => 'config.root'], function () {
-                Route::get('configs', [ConfigController::class, 'indexAdmin'])->name('indexAdmin');
-                Route::get('/config/{id}', [ConfigController::class, 'showAdmin'])->name('showAdmin');
-            });
-            Route::get('/configs/permission', [ConfigController::class, 'loadConfigPermission'])->name('config.loadConfigPermission');
-            Route::get('/configs/mailbox', [ConfigController::class, 'loadConfigMailbox'])->name('config.mailbox');
-        });
-//Load public config
-        Route::get('/configs/public', [ConfigController::class, 'loadPublicConfig'])->name('config.loadPublicConfig');
 
 //Website
         Route::group(['middleware' => ['userid'], 'as' => 'website.'], function () {
@@ -670,15 +647,6 @@ Route::group(['middleware' => ['apikey']], function () {
             Route::get('/my-platform-package', [PlatformPackageController::class, 'myPlatformPackage']);
         });
 
-//Cache config
-        Route::group(['middleware' => ['userid'], 'as' => 'cacheConfig.'], function () {
-            Route::group(['middleware' => ['role:root'], 'as' => 'root.'], function () {
-                Route::put('/cache-platform-config/{membership_package_uuid}', [ConfigController::class, 'editCachePlatformConfig']);
-                Route::get('/cache-platform-config/{membership_package_uuid}', [ConfigController::class, 'getCachePlatformConfig']);
-            });
-        });
-
-
 //Credit Package
         Route::group(['middleware' => ['userid'], 'as' => 'creditPackage.'], function () {
             Route::group(['middleware' => ['role:root'], 'as' => 'root.'], function () {
@@ -850,20 +818,6 @@ Route::group(['middleware' => ['apikey']], function () {
         });
         Route::get('public/article-categories', [ArticleCategoryController::class, 'indexPublic'])->name('article-categories-public.index');
         Route::get('public/article-category/{id}', [ArticleCategoryController::class, 'showPublic'])->name('article-categories-public.show');
-
-
-        Route::group(['middleware' => ['userid'], 'as' => 'group.'], function () {
-            Route::group(['middleware' => ['role:root'], 'as' => 'root.'], function () {
-                Route::post('/group', [GroupController::class, 'store'])->name('store');
-                Route::put('/group/{id}', [GroupController::class, 'edit'])->name('edit');
-                Route::delete('/group/{id}', [GroupController::class, 'destroy'])->name('destroy');
-            });
-
-            Route::group(['middleware' => ['role:root,admin'], 'as' => 'root.'], function () {
-                Route::get('/groups', [GroupController::class, 'index'])->name('index');
-                Route::get('/group/{id}', [GroupController::class, 'show'])->name('show');
-            });
-        });
 
 //Article
         Route::group(['as' => 'article.'], function () {
