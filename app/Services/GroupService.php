@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Abstracts\AbstractService;
-use App\Models\Group;
+use Techup\ApiConfig\Models\Group;
 use App\Models\QueryBuilders\GroupQueryBuilder;
 use App\Models\QueryBuilders\LocationQueryBuilder;
 

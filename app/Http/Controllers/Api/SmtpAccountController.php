@@ -20,7 +20,7 @@ use App\Http\Resources\SmtpAccountResourceCollection;
 use App\Http\Resources\SmtpAccountResource;
 use App\Mail\SendEmails;
 use App\Models\MailTemplate;
-use App\Services\ConfigService;
+use Techup\ApiConfig\Services\ConfigService;
 use App\Services\MySmtpAccountService;
 use App\Services\SmtpAccountService;
 use App\Services\UserService;

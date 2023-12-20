@@ -5,7 +5,7 @@ namespace App\Listeners;
 use App\Events\SendNextByScenarioCampaignEvent;
 use App\Notifications\BaseNotification;
 use App\Services\CampaignService;
-use App\Services\ConfigService;
+use Techup\ApiConfig\Services\ConfigService;
 use App\Services\ContactService;
 use App\Services\CreditHistoryService;
 use App\Services\EmailService;

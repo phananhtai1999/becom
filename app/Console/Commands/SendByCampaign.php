@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Events\SendByCampaignEvent;
 use App\Services\CampaignService;
-use App\Services\ConfigService;
+use Techup\ApiConfig\Services\ConfigService;
 use App\Services\ContactService;
 use App\Services\EmailService;
 use App\Services\MailSendingHistoryService;

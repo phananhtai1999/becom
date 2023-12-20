@@ -3,7 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Models\Role;
-use App\Services\ConfigService;
+use Techup\ApiConfig\Services\ConfigService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 

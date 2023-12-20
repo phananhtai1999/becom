@@ -11,7 +11,7 @@ use App\Rules\CheckUniqueSlugWebsitePageRule;
 use App\Rules\CheckWebsiteDomainRule;
 use App\Rules\CheckWebsitePagesRule;
 use App\Rules\UniqueWebsitePage;
-use App\Services\ConfigService;
+use Techup\ApiConfig\Services\ConfigService;
 use Illuminate\Validation\Rule;
 
 class CopyDefaultWebsiteRequest extends AbstractRequest

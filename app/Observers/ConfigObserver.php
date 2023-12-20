@@ -2,7 +2,7 @@
 
 namespace App\Observers;
 
-use App\Models\Config;
+use Techup\ApiConfig\Models\Config;
 use Illuminate\Support\Facades\Cache;
 
 class ConfigObserver

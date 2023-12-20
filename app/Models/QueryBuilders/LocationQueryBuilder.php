@@ -3,7 +3,7 @@
 namespace App\Models\QueryBuilders;
 
 use App\Abstracts\AbstractQueryBuilder;
-use App\Models\Group;
+use Techup\ApiConfig\Models\Group;
 use App\Models\Location;
 use App\Models\SearchQueryBuilders\SearchQueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;

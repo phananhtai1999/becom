@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use App\Abstracts\AbstractRequest;
 use App\Models\Asset;
 use App\Models\Role;
-use App\Services\ConfigService;
+use Techup\ApiConfig\Services\ConfigService;
 use Illuminate\Validation\Rule;
 
 class ChangeStatusAssetRequest extends AbstractRequest

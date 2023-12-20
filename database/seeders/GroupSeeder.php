@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Group;
+use Techup\ApiConfig\Models\Group;
 use Illuminate\Database\Seeder;
 
 class GroupSeeder extends Seeder

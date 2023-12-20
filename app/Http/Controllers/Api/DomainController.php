@@ -17,7 +17,7 @@ use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Resources\DomainVerificationResource;
 use App\Services\BusinessManagementService;
-use App\Services\ConfigService;
+use Techup\ApiConfig\Services\ConfigService;
 use App\Services\DomainService;
 use App\Services\DomainVerificationService;
 use App\Services\MyDomainService;

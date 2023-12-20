@@ -36,7 +36,7 @@ use App\Services\CampaignLinkTrackingService;
 use App\Services\CampaignScenarioService;
 use App\Services\CampaignService;
 use App\Services\CampaignTrackingService;
-use App\Services\ConfigService;
+use Techup\ApiConfig\Services\ConfigService;
 use App\Services\ContactService;
 use App\Services\EmailService;
 use App\Services\MailSendingHistoryService;

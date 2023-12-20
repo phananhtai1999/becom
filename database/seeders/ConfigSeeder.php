@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\Config;
-use App\Models\Group;
+use Techup\ApiConfig\Models\Config;
+use Techup\ApiConfig\Models\Group;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Cache;
 

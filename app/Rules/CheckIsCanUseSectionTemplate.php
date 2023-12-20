@@ -3,7 +3,7 @@
 namespace App\Rules;
 
 use App\Models\Role;
-use App\Services\ConfigService;
+use Techup\ApiConfig\Services\ConfigService;
 use App\Services\MySectionTemplateService;
 use App\Services\MyWebsiteService;
 use App\Services\SectionTemplateService;

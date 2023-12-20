@@ -3,7 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Abstracts\AbstractJsonResource;
-use App\Services\ConfigService;
+use Techup\ApiConfig\Services\ConfigService;
 
 class ConfigResource extends AbstractJsonResource
 {

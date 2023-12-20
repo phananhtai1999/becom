@@ -3,7 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
-use App\Models\Config;
+use Techup\ApiConfig\Models\Config;
 use Illuminate\Validation\Rule;
 
 class UpdateConfigRequest extends AbstractRequest

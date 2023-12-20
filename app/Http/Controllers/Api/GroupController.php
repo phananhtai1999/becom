@@ -13,7 +13,7 @@ use App\Http\Controllers\Traits\RestEditTrait;
 use App\Http\Controllers\Traits\RestStoreTrait;
 use App\Http\Resources\GroupResource;
 use App\Http\Resources\GroupResourceCollection;
-use App\Services\GroupService;
+use Techup\ApiConfig\Services\GroupService;
 
 class GroupController extends AbstractRestAPIController
 {

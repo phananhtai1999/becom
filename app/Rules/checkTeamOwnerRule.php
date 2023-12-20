@@ -4,7 +4,7 @@ namespace App\Rules;
 
 use App\Models\Role;
 use App\Models\Team;
-use App\Services\ConfigService;
+use Techup\ApiConfig\Services\ConfigService;
 use Illuminate\Contracts\Validation\Rule;
 
 class checkTeamOwnerRule implements Rule

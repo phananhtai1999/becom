@@ -19,7 +19,7 @@ use App\Models\PaymentMethod;
 use App\Services\AddOnService;
 use App\Services\AddOnSubscriptionHistoryService;
 use App\Services\AddOnSubscriptionPlanService;
-use App\Services\ConfigService;
+use Techup\ApiConfig\Services\ConfigService;
 use App\Services\PaymentService;
 use App\Services\PaypalService;
 use App\Services\StripeService;

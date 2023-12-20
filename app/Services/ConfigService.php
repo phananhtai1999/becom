@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Abstracts\AbstractService;
-use App\Models\Config;
+use Techup\ApiConfig\Models\Config;
 use App\Models\QueryBuilders\ConfigQueryBuilder;
 use App\Models\Role;
 

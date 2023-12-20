@@ -4,7 +4,7 @@ namespace App\Listeners;
 
 use App\Events\SendEmailRecoveryPasswordEvent;
 use App\Mail\SendRecoveryPasswordEmailToUser;
-use App\Services\ConfigService;
+use Techup\ApiConfig\Services\ConfigService;
 use App\Services\SmtpAccountService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
