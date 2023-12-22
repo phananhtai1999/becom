@@ -214,9 +214,10 @@ class WebsitePageService extends AbstractService
         $replaceArticleService = new ReplaceArticleService();
         $replaceCategoryService = new ReplaceCategoryService();
         $category = $article->articleCategory;
+        $websitePage->template = $replaceArticleService->replaceListArticleSpecific($websitePage->template, $websitePage);
+
         $searchReplaceMap = $replaceArticleService->searchReplaceMapForArticle($article);
         $websitePage->template = Str::replace(array_keys($searchReplaceMap), $searchReplaceMap, $websitePage->template);
-        $websitePage->template = $replaceArticleService->replaceListArticleSpecific($websitePage->template, $websitePage);
         $websitePage->template = $replaceArticleService->replaceRedirectTag($article, $websitePage, $websitePage->template);
         $replaceCategoryService->replaceCategoryInArticle($websitePage->template, $category);
 
