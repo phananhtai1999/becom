@@ -31,7 +31,10 @@ use App\Services\WebsitePageService;
 use App\Services\WebsitePageShortCodeService;
 use App\Services\WebsiteService;
 use Carbon\Carbon;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 
 class WebsitePageController extends AbstractRestAPIController
 {
@@ -102,6 +105,51 @@ class WebsitePageController extends AbstractRestAPIController
                 $article = $this->articleService->getLastArticle();
             }
             $websitePage = $this->service->renderContent($websitePage, $article);
+            $response = $this->sendOkJsonResponse(['data' => $websitePage]);
+        } elseif ($websitePage->type == WebsitePage::ARTICLE_CATEGORY_TYPE) {
+            if ($request->get('article_category_slug')) {
+                $articleCategory = $this->articleCategoryService->findOneWhereOrFail(['slug' => $request->get('article_category_slug')]);
+            } elseif ($request->get('article_category_uuid')) {
+                $articleCategory = $this->articleCategoryService->findOrFailById($request->get('article_category_uuid'));
+            } else {
+                $articleCategory = $this->articleCategoryService->getLastArticleCategory();
+            }
+            $websitePage = $this->service->renderContentForArticleCategory($websitePage, $articleCategory);
+            $response = $this->sendOkJsonResponse(['data' => $websitePage]);
+        } elseif ($websitePage->type == WebsitePage::HOME_ARTICLES_TYPE) {
+            $websitePage = $this->service->renderContentForHomeArticles($websitePage);
+            $response = $this->sendOkJsonResponse(['data' => $websitePage]);
+        } elseif ($websitePage->type == WebsitePage::PRODUCT_DETAIL_TYPE) {
+            $client = new Client();
+            $res = $client->get('localhost::9000/api/data-product-detail/1', [
+                'auth' => ['user', 'pass']
+            ]);
+            $websitePage = $this->service->renderContentForProductDetail($websitePage);
+            $response = $this->sendOkJsonResponse(['data' => $websitePage]);
+        }
+
+        return $response;
+    }
+
+    public function getProductWebsitePage(ShowWebsitePageRequest $request, $id)
+    {
+        $websitePage = $this->myService->findOneWhereOrFail($request->publish_status ?
+            [['publish_status', $request->publish_status], ['uuid', $id]]
+            : [['uuid', $id]]);
+        $response = $this->sendOkJsonResponse(['data' => $websitePage]);
+        if ($websitePage->type == WebsitePage::PRODUCT_DETAIL_TYPE) {
+            $headers = [
+                "x-user-id" => Auth()->user()->getKey(),
+                "x-app-id" => "123",
+                "x-api-key" => "test",
+            ];
+
+            $client = new Client([
+                'headers' => $headers
+            ]);
+            $res = $client->get('http://localhost:9000/api/data-product-detail/1');
+            $productDetailData = json_decode($res->getBody()->getContents(), true);
+            $websitePage = $this->service->renderContentForProductDetail($websitePage, $productDetailData);
             $response = $this->sendOkJsonResponse(['data' => $websitePage]);
         } elseif ($websitePage->type == WebsitePage::ARTICLE_CATEGORY_TYPE) {
             if ($request->get('article_category_slug')) {
