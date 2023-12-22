@@ -119,13 +119,6 @@ class WebsitePageController extends AbstractRestAPIController
         } elseif ($websitePage->type == WebsitePage::HOME_ARTICLES_TYPE) {
             $websitePage = $this->service->renderContentForHomeArticles($websitePage);
             $response = $this->sendOkJsonResponse(['data' => $websitePage]);
-        } elseif ($websitePage->type == WebsitePage::PRODUCT_DETAIL_TYPE) {
-            $client = new Client();
-            $res = $client->get('localhost::9000/api/data-product-detail/1', [
-                'auth' => ['user', 'pass']
-            ]);
-            $websitePage = $this->service->renderContentForProductDetail($websitePage);
-            $response = $this->sendOkJsonResponse(['data' => $websitePage]);
         }
 
         return $response;
@@ -140,21 +133,21 @@ class WebsitePageController extends AbstractRestAPIController
         if ($websitePage->type == WebsitePage::PRODUCT_DETAIL_TYPE) {
             $headers = [
                 "x-user-id" => Auth()->user()->getKey(),
-                "x-app-id" => "123",
-                "x-api-key" => "test",
+                "x-app-id" => config('shop.x_app_id'),
+                "x-api-key" => config('shop.x_api_key'),
             ];
 
             $client = new Client([
                 'headers' => $headers
             ]);
-            $res = $client->get('http://localhost:9000/api/data-product-detail/1');
+            $res = $client->get(config('shop.shop_url') . 'data-product-detail/' . $request->product_uuid);
             $productDetailData = json_decode($res->getBody()->getContents(), true);
             $websitePage = $this->service->renderContentForProductDetail($websitePage, $productDetailData);
             $response = $this->sendOkJsonResponse(['data' => $websitePage]);
-        } elseif ($websitePage->type == WebsitePage::ARTICLE_CATEGORY_TYPE) {
-            if ($request->get('article_category_slug')) {
+        } elseif ($websitePage->type == WebsitePage::PRODUCT_CATEGORY_TYPE) {
+            if ($request->get('product_category_slug')) {
                 $articleCategory = $this->articleCategoryService->findOneWhereOrFail(['slug' => $request->get('article_category_slug')]);
-            } elseif ($request->get('article_category_uuid')) {
+            } elseif ($request->get('product_category_uuid')) {
                 $articleCategory = $this->articleCategoryService->findOrFailById($request->get('article_category_uuid'));
             } else {
                 $articleCategory = $this->articleCategoryService->getLastArticleCategory();

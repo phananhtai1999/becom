@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\ShortCode;
 use App\Models\ShortCodeGroup;
 use App\Models\WebsitePageShortCode;
 use Illuminate\Database\Seeder;
@@ -47,10 +48,43 @@ class ShortCodeSeeder extends Seeder
                 'short_code_groups' => [ShortCodeGroup::HOME_ARTICLES]
             ],
             [
+                'name' => 'product list',
+                'key' => 'product_list',
+                'short_code' => 'product_list',
+                'short_code_groups' => [ShortCodeGroup::HOME_PRODUCTS]
+            ],
+            [
+                'name' => 'specific product list',
+                'key' => 'specific_product_list',
+                'short_code' => 'specific_product_list',
+                'short_code_groups' => [ShortCodeGroup::PRODUCT_CATEGORY, ShortCodeGroup::PRODUCT_DETAIL]
+            ],
+            [
+                'name' => 'product category list',
+                'key' => 'product_category_list',
+                'short_code' => 'product_category_list',
+                'short_code_groups' => [ShortCodeGroup::HOME_PRODUCTS]
+            ],
+            [
+                'name' => 'children product category list',
+                'key' => 'children_product_category_list',
+                'short_code' => 'children_product_category_list',
+                'short_code_groups' => [ShortCodeGroup::HOME_PRODUCTS]
+            ],
+            [
+                'name' => 'grand children product category',
+                'key' => 'grand_children_product_category_list',
+                'short_code' => 'grand_children_product_category_list',
+                'short_code_groups' => [ShortCodeGroup::HOME_PRODUCTS]
+            ],
+            [
                 'name' => 'count',
                 'key' => 'count',
                 'short_code' => 'count_element',
-                'short_code_groups' => [ShortCodeGroup::ARTICLE_CATEGORY, ShortCodeGroup::HOME_ARTICLES, ShortCodeGroup::ARTICLE_DETAIL]
+                'short_code_groups' => [
+                    ShortCodeGroup::ARTICLE_CATEGORY, ShortCodeGroup::HOME_ARTICLES, ShortCodeGroup::ARTICLE_DETAIL,
+                    ShortCodeGroup::PRODUCT_CATEGORY, ShortCodeGroup::HOME_PRODUCTS, ShortCodeGroup::PRODUCT_DETAIL,
+                ]
             ],
         ];
         $elements = [
@@ -76,12 +110,39 @@ class ShortCodeSeeder extends Seeder
                 'key' => 'grand_children_category',
                 'short_code' => 'grand_children_category_element',
             ],
+            'product' => [
+                'name' => 'product element',
+                'key' => 'product',
+                'short_code' => 'product_element',
+                'short_code_groups' => [ShortCodeGroup::PRODUCT_DETAIL]
+            ],
+            'product_category' => [
+                'name' => 'product category element',
+                'key' => 'product_category_element',
+                'short_code' => 'product_category_element',
+                'short_code_groups' => [ShortCodeGroup::PRODUCT_CATEGORY]
+            ],
+            'children_product_category' => [
+                'name' => 'children product category',
+                'key' => 'children_product_category_element',
+                'short_code' => 'children_product_category_element',
+            ],
+            'grand_children_product_category' => [
+                'name' => 'grand children product category',
+                'key' => 'grand_children_product_category_element',
+                'short_code' => 'grand_children_product_category_element',
+            ],
         ];
         $filters = [
             'article_filter' => [
                 'name' => 'filter article',
                 'key' => 'filter_article',
                 'short_code' => 'data-filter-article-by-category',
+            ],
+            'product_filter' => [
+                'name' => 'filter product',
+                'key' => 'filter_product',
+                'short_code' => 'data-filter-product-by-category',
             ],
         ];
 
@@ -90,6 +151,11 @@ class ShortCodeSeeder extends Seeder
                 'name' => 'data article specific',
                 'key' => 'data_article_specific',
                 'short_code' => 'data-article-specific',
+            ],
+            'product' => [
+                'name' => 'data product specific',
+                'key' => 'data_product_specific',
+                'short_code' => 'data-product-specific',
             ],
         ];
         $sorts = [
@@ -115,50 +181,112 @@ class ShortCodeSeeder extends Seeder
                 'key' => 'grand_children_category_sort',
                 'short_code' => 'grand-children-category-sort',
             ],
+            'product_sort' =>
+                [
+                    'name' => 'sort for product',
+                    'key' => 'product_sort',
+                    'short_code' => 'product-sort',
+                ],
+            'product_category_sort' =>
+                [
+                    'name' => 'sort for product category',
+                    'key' => 'product_category_sort',
+                    'short_code' => 'product-category-sort',
+                ],
+            'children_product_category_sort' => [
+                'name' => 'sort for children product category',
+                'key' => 'children_category_sort',
+                'short_code' => 'children-product-category-sort',
+            ],
+            'grand_children_product_category_sort' => [
+                'name' => 'sort for grand children product category',
+                'key' => 'grand_children_product_category_sort',
+                'short_code' => 'grand-children-product-category-sort',
+            ],
         ];
         $sortOrders = [
-                'article_sort_order' => [
-                    'name' => 'sort order for article',
-                    'key' => 'article_sort_order',
-                    'short_code' => 'article-sort-order',
-                ],
-                'category_sort_order' => [
-                    'name' => 'sort order for category',
-                    'key' => 'category_sort_order',
-                    'short_code' => 'category-sort-order',
-                ],
-                'children_category_sort_order' => [
-                    'name' => 'sort order for children category',
-                    'key' => 'children_category_sort_order',
-                    'short_code' => 'children-category-sort-order',
-                ],
-                'grand_children_category_sort_order' => [
-                    'name' => 'sort order for grand children category',
-                    'key' => 'grand_children_category_sort_order',
-                    'short_code' => 'grand-children-category-sort-order',
-                ],
+            'article_sort_order' => [
+                'name' => 'sort order for article',
+                'key' => 'article_sort_order',
+                'short_code' => 'article-sort-order',
+            ],
+            'category_sort_order' => [
+                'name' => 'sort order for category',
+                'key' => 'category_sort_order',
+                'short_code' => 'category-sort-order',
+            ],
+            'children_category_sort_order' => [
+                'name' => 'sort order for children category',
+                'key' => 'children_category_sort_order',
+                'short_code' => 'children-category-sort-order',
+            ],
+            'grand_children_category_sort_order' => [
+                'name' => 'sort order for grand children category',
+                'key' => 'grand_children_category_sort_order',
+                'short_code' => 'grand-children-category-sort-order',
+            ],
+            'product_sort_order' => [
+                'name' => 'sort order for product',
+                'key' => 'product_sort_order',
+                'short_code' => 'product-sort-order',
+            ],
+            'product_category_sort_order' => [
+                'name' => 'sort order for product category',
+                'key' => 'product_category_sort_order',
+                'short_code' => 'product-category-sort-order',
+            ],
+            'children_product_category_sort_order' => [
+                'name' => 'sort order for product children category',
+                'key' => 'children_product_category_sort_order',
+                'short_code' => 'children-product-category-sort-order',
+            ],
+            'grand_children_product_category_sort_order' => [
+                'name' => 'sort order for grand children product category',
+                'key' => 'grand_children_product_category_sort_order',
+                'short_code' => 'grand-children-product-category-sort-order',
+            ],
         ];
         $counts = [
-                'article_count' => [
-                    'name' => 'count for article',
-                    'key' => 'article_count',
-                    'short_code' => 'data-article-count',
-                ],
-                'category_count' => [
-                    'name' => 'count for category',
-                    'key' => 'category_count',
-                    'short_code' => 'data-category-count',
-                ],
-                'children_category_count' => [
-                    'name' => 'count for children category',
-                    'key' => 'children_category_count',
-                    'short_code' => 'data-children-category-count',
-                ],
-                'grand_children_category_count' => [
-                    'name' => 'count for grand children category ',
-                    'key' => 'grand_children_category_count',
-                    'short_code' => 'data-grand-children-category-count',
-                ],
+            'article_count' => [
+                'name' => 'count for article',
+                'key' => 'article_count',
+                'short_code' => 'data-article-count',
+            ],
+            'category_count' => [
+                'name' => 'count for category',
+                'key' => 'category_count',
+                'short_code' => 'data-category-count',
+            ],
+            'children_category_count' => [
+                'name' => 'count for children category',
+                'key' => 'children_category_count',
+                'short_code' => 'data-children-category-count',
+            ],
+            'grand_children_category_count' => [
+                'name' => 'count for grand children category ',
+                'key' => 'grand_children_category_count',
+                'short_code' => 'data-grand-children-category-count',
+            ],
+            'product_count' => [
+                'name' => 'count for product',
+                'key' => 'product_count',
+                'short_code' => 'data-product-count',
+            ],
+            'product_category_count' => [
+                'name' => 'count for product category',
+                'key' => 'product_category_count',
+                'short_code' => 'data-product-category-count',
+            ],
+            'children_product_category_count' => [
+                'name' => 'count for children product category',
+                'key' => 'children_product_category_count',
+                'short_code' => 'data-children-product-category-count',
+            ],
+            'grand_children_product_category_count' => [
+                'name' => 'count for grand children product category ',
+                'key' => 'grand_children_product_category_count',
+                'short_code' => 'data-grand-children-product-category-count',
+            ],
         ];
         $shortCodes = [
             'article' => [
@@ -580,6 +708,422 @@ class ShortCodeSeeder extends Seeder
                     'short_code' => 'asc',
                 ]
             ],
+
+            //Product here
+            'product' => [
+                [
+                    'name' => 'uuid',
+                    'key' => 'product.uuid',
+                    'short_code' => 'product.uuid',
+                ],
+                [
+                    'name' => 'user uuid',
+                    'key' => 'product.user_uuid',
+                    'short_code' => 'product.user_uuid',
+                ],
+                [
+                    'name' => 'app id',
+                    'key' => 'product.app_id',
+                    'short_code' => 'product.app_id',
+                ],
+                [
+                    'name' => 'brand uuid',
+                    'key' => 'product.brand_uuid',
+                    'short_code' => 'product.brand_uuid',
+                ],
+                [
+                    'name' => 'product dimension uuid',
+                    'key' => 'product.product_dimension_uuid',
+                    'short_code' => 'product.product_dimension_uuid',
+                ],
+                [
+                    'name' => 'slug',
+                    'key' => 'product.slug',
+                    'short_code' => 'product.slug',
+                ],
+                [
+                    'name' => 'condition',
+                    'key' => 'product.condition',
+                    'short_code' => 'product.condition',
+                ],
+                [
+                    'name' => 'description',
+                    'key' => 'product.description',
+                    'short_code' => 'product.description',
+                ],
+                [
+                    'name' => 'price',
+                    'key' => 'product.price',
+                    'short_code' => 'product.price',
+                ],
+                [
+                    'name' => 'price before discount',
+                    'key' => 'product.price_before_discount',
+                    'short_code' => 'product.price_before_discount',
+                ],
+                [
+                    'name' => 'image',
+                    'key' => 'product.image',
+                    'short_code' => 'product.image',
+                ],
+                [
+                    'name' => 'images',
+                    'key' => 'product.images',
+                    'short_code' => 'product.images',
+                ],
+                [
+                    'name' => 'stock',
+                    'key' => 'product.stock',
+                    'short_code' => 'product.stock',
+                ],
+                [
+                    'name' => 'availability',
+                    'key' => 'product.availability',
+                    'short_code' => 'product.availability',
+                ],
+                [
+                    'name' => 'availability date',
+                    'key' => 'product.availability_date',
+                    'short_code' => 'product.availability_date',
+                ],
+                [
+                    'name' => 'expiration date',
+                    'key' => 'product.expiration_date',
+                    'short_code' => 'product.expiration_date',
+                ],
+                [
+                    'name' => 'gtin',
+                    'key' => 'product.gtin',
+                    'short_code' => 'product.gtin',
+                ],
+                [
+                    'name' => 'mpn',
+                    'key' => 'product.mpn',
+                    'short_code' => 'product.mpn',
+                ],
+            ],
+            'product_category' => [
+                [
+                    'name' => 'uuid',
+                    'key' => 'product_category.uuid',
+                    'short_code' => 'product_category.image',
+                ],
+                [
+                    'name' => 'image',
+                    'key' => 'product_category.image',
+                    'short_code' => 'product_category.image',
+                ],
+                [
+                    'name' => 'slug',
+                    'key' => 'product_category.slug',
+                    'short_code' => 'product_category.slug',
+                ],
+                [
+                    'name' => 'parent uuid',
+                    'key' => 'product_category.parent_uuid',
+                    'short_code' => 'product_category.parent_uuid',
+                ],
+                [
+                    'name' => 'title',
+                    'key' => 'product_category.title',
+                    'short_code' => 'product_category.title',
+                ],
+            ],
+            'children_product_category' => [
+                [
+                    'name' => 'uuid',
+                    'key' => 'children_product_category.uuid',
+                    'short_code' => 'children_product_category.uuid',
+                ],
+                [
+                    'name' => 'image',
+                    'key' => 'children_product_category.image',
+                    'short_code' => 'children_product_category.image',
+                ],
+                [
+                    'name' => 'slug',
+                    'key' => 'children_product_category.slug',
+                    'short_code' => 'children_product_category.slug',
+                ],
+                [
+                    'name' => 'parent uuid',
+                    'key' => 'children_product_category.parent_uuid',
+                    'short_code' => 'children_product_category.parent_uuid',
+                ],
+                [
+                    'name' => 'title',
+                    'key' => 'children_product_category.title',
+                    'short_code' => 'children_product_category.title',
+                ],
+            ],
+            'grand_children_product_category' => [
+                [
+                    'name' => 'uuid',
+                    'key' => 'grand_children_product_category.uuid',
+                    'short_code' => 'grand_children_product_category.uuid',
+                ],
+                [
+                    'name' => 'image',
+                    'key' => 'grand_children_product_category.image',
+                    'short_code' => 'grand_children_product_category.image',
+                ],
+                [
+                    'name' => 'slug',
+                    'key' => 'grand_children_product_category.slug',
+                    'short_code' => 'grand_children_product_category.slug',
+                ],
+                [
+                    'name' => 'parent uuid',
+                    'key' => 'grand_children_product_category.parent_uuid',
+                    'short_code' => 'grand_children_product_category.parent_uuid',
+                ],
+                [
+                    'name' => 'title',
+                    'key' => 'grand_children_product_category.title',
+                    'short_code' => 'grand_children_product_category.title',
+                ],
+            ],
+            'product-sort' => [
+                [
+                    'name' => 'sort by uuid',
+                    'key' => 'product.uuid',
+                    'short_code' => 'uuid',
+                ],
+                [
+                    'name' => 'sort by slug',
+                    'key' => 'product.slug',
+                    'short_code' => 'slug',
+                ],
+                [
+                    'name' => 'sort by parent uuid',
+                    'key' => 'product.parent_uuid',
+                    'short_code' => 'parent_uuid',
+                ],
+                [
+                    'name' => 'sort by title',
+                    'key' => 'product.title',
+                    'short_code' => 'title',
+                ],
+                [
+                    'name' => 'sort by brand uuid',
+                    'key' => 'product.brand_uuid',
+                    'short_code' => 'brand_uuid',
+                ],
+                [
+                    'name' => 'sort by product dimension uuid',
+                    'key' => 'product.product_dimension_uuid',
+                    'short_code' => 'product_dimension_uuid',
+                ],
+                [
+                    'name' => 'sort by condition',
+                    'key' => 'product.condition',
+                    'short_code' => 'condition',
+                ],
+                [
+                    'name' => 'sort by description',
+                    'key' => 'product.description',
+                    'short_code' => 'description',
+                ],
+                [
+                    'name' => 'sort by price',
+                    'key' => 'product.price',
+                    'short_code' => 'price',
+                ],
+                [
+                    'name' => 'sort by price before discount',
+                    'key' => 'product.price_before_discount',
+                    'short_code' => 'price_before_discount',
+                ],
+                [
+                    'name' => 'sort by image',
+                    'key' => 'product.image',
+                    'short_code' => 'image',
+                ],
+                [
+                    'name' => 'sort by images',
+                    'key' => 'product.images',
+                    'short_code' => 'images',
+                ],
+                [
+                    'name' => 'sort by stock',
+                    'key' => 'product.stock',
+                    'short_code' => 'stock',
+                ],
+                [
+                    'name' => 'sort by availability',
+                    'key' => 'product.availability',
+                    'short_code' => 'availability',
+                ],
+                [
+                    'name' => 'sort by availability date',
+                    'key' => 'product.availability_date',
+                    'short_code' => 'availability_date',
+                ],
+                [
+                    'name' => 'sort by expiration date',
+                    'key' => 'product.expiration_date',
+                    'short_code' => 'expiration_date',
+                ],
+                [
+                    'name' => 'sort by gtin',
+                    'key' => 'product.gtin',
+                    'short_code' => 'gtin',
+                ],
+                [
+                    'name' => 'sort by mpn',
+                    'key' => 'product.mpn',
+                    'short_code' => 'mpn',
+                ],
+                [
+                    'name' => 'sort by created at',
+                    'key' => 'product.created_at',
+                    'short_code' => 'created_at',
+                ],
+            ],
+            'product-category-sort' => [
+                [
+                    'name' => 'sort by uuid',
+                    'key' => 'product_category_sort.uuid',
+                    'short_code' => 'uuid',
+                ],
+                [
+                    'name' => 'sort by slug',
+                    'key' => 'product_category_sort.slug',
+                    'short_code' => 'slug',
+                ],
+                [
+                    'name' => 'sort by parent_uuid',
+                    'key' => 'product_category_sort.parent_uuid',
+                    'short_code' => 'parent_uuid',
+                ],
+                [
+                    'name' => 'sort by image',
+                    'key' => 'product_category_sort.image',
+                    'short_code' => 'image',
+                ],
+                [
+                    'name' => 'sort by title',
+                    'key' => 'product_category_sort.title',
+                    'short_code' => 'title',
+                ],
+                [
+                    'name' => 'sort by created at',
+                    'key' => 'product_category_sort.created_at',
+                    'short_code' => 'created_at',
+                ],
+            ],
+            'children-product=category-sort' => [
+                [
+                    'name' => 'sort by uuid',
+                    'key' => 'children_product_category_sort.uuid',
+                    'short_code' => 'uuid',
+                ],
+                [
+                    'name' => 'sort by slug',
+                    'key' => 'children_product_category_sort.slug',
+                    'short_code' => 'slug',
+                ],
+                [
+                    'name' => 'sort by image',
+                    'key' => 'children_product_category_sort.image',
+                    'short_code' => 'image',
+                ],
+                [
+                    'name' => 'sort by title',
+                    'key' => 'children_product_category_sort.title',
+                    'short_code' => 'title',
+                ],
+                [
+                    'name' => 'sort by parent uuid',
+                    'key' => 'children_product_category_sort.parent_uuid',
+                    'short_code' => 'parent_uuid',
+                ],
+                [
+                    'name' => 'sort by created at',
+                    'key' => 'children_product_category_sort.created_at',
+                    'short_code' => 'created_at',
+                ],
+            ],
+            'grand-children-product-category-sort' => [
+                [
+                    'name' => 'sort by uuid',
+                    'key' => 'grand_children_product_category_sort.uuid',
+                    'short_code' => 'uuid',
+                ],
+                [
+                    'name' => 'sort by slug',
+                    'key' => 'grand_children_product_category_sort.slug',
+                    'short_code' => 'slug',
+                ],
+                [
+                    'name' => 'sort by title',
+                    'key' => 'grand_children_product_category_sort.title',
+                    'short_code' => 'title',
+                ],
+                [
+                    'name' => 'sort by image',
+                    'key' => 'grand_children_product_category_sort.image',
+                    'short_code' => 'image',
+                ],
+                [
+                    'name' => 'sort by parent uuid',
+                    'key' => 'grand_children_product_category_sort.parent_uuid',
+                    'short_code' => 'parent_uuid',
+                ],
+                [
+                    'name' => 'sort by created at',
+                    'key' => 'grand_children_product_category_sort.created_at',
+                    'short_code' => 'created_at',
+                ],
+            ],
+            'product-sort-order' => [
+                [
+                    'name' => 'sort order by desc for product',
+                    'key' => 'product_sort_order.desc',
+                    'short_code' => 'desc',
+                ],
+                [
+                    'name' => 'sort order by asc for product',
+                    'key' => 'product_sort_order.asc',
+                    'short_code' => 'asc',
+                ]
+            ],
+            'product-category-sort-order' => [
+                [
+                    'name' => 'sort order by desc for category',
+                    'key' => 'product_category_sort_order.desc',
+                    'short_code' => 'desc',
+                ],
+                [
+                    'name' => 'sort order by asc for category',
+                    'key' => 'product_category_sort_order.asc',
+                    'short_code' => 'asc',
+                ]
+            ],
+            'children-product-category-sort-order' => [
+                [
+                    'name' => 'sort order by desc for children category',
+                    'key' => 'children_product_category_sort_order.desc',
+                    'short_code' => 'desc',
+                ],
+                [
+                    'name' => 'sort order by asc for children category',
+                    'key' => 'children_product_category_sort_order.asc',
+                    'short_code' => 'asc',
+                ]
+            ],
+            'grand-children-product-category-sort-order' => [
+                [
+                    'name' => 'sort order by desc for grand children category',
+                    'key' => 'grand_children_product_category_sort_order.desc',
+                    'short_code' => 'desc',
+                ],
+                [
+                    'name' => 'sort order by asc for children category',
+                    'key' => 'grand_children_product_category_sort_order.asc',
+                    'short_code' => 'asc',
+                ]
+            ],
         ];
 
         //create parent first
@@ -596,19 +1140,31 @@ class ShortCodeSeeder extends Seeder
         $grandChildrenCategoryList = WebsitePageShortCode::where(['key' => 'grand_children_category_list'])->first();
         $specificArticleList = WebsitePageShortCode::where(['key' => 'specific_article_list'])->first();
 
+        $productList = WebsitePageShortCode::where(['key' => 'product_list'])->first();
+        $productCategoryList = WebsitePageShortCode::where(['key' => 'category_list'])->first();
+        $childrenProductCategoryList = WebsitePageShortCode::where(['key' => 'children_category_list'])->first();
+        $grandChildrenProductCategoryList = WebsitePageShortCode::where(['key' => 'grand_children_category_list'])->first();
+        $specificProductList = WebsitePageShortCode::where(['key' => 'specific_product_list'])->first();
+
         //create sort (order by)
         foreach ($sorts as $key => $sort) {
             if ($key == 'article_sort') {
-                $parentSort = WebsitePageShortCode::where(['key' => 'article_list'])->first();
                 WebsitePageShortCode::updateOrCreate(['key' => $sort['key']], array_merge(['parent_uuids' => [$articleList->uuid]], $sort));
             } elseif ($key == 'category_sort') {
-                $parentSort = WebsitePageShortCode::where(['key' => 'category_list'])->first();
                 WebsitePageShortCode::updateOrCreate(['key' => $sort['key']], array_merge(['parent_uuids' => [$categoryList->uuid]], $sort));
             } elseif ($key == 'children_category_sort') {
-                $parentSort = WebsitePageShortCode::where(['key' => 'children_category_list'])->first();
                 WebsitePageShortCode::updateOrCreate(['key' => $sort['key']], array_merge(['parent_uuids' => [$childrenCategoryList->uuid]], $sort));
             } elseif ($key == 'grand_children_category_sort') {
-                $parentSort = WebsitePageShortCode::where(['key' => 'grand_children_category_list'])->first();
+                WebsitePageShortCode::updateOrCreate(['key' => $sort['key']], array_merge(['parent_uuids' => [$grandChildrenCategoryList->uuid]], $sort));
+            }
+            //sort of product
+            elseif ($key == 'product_sort') {
+                WebsitePageShortCode::updateOrCreate(['key' => $sort['key']], array_merge(['parent_uuids' => [$productList->uuid]], $sort));
+            } elseif ($key == 'product_category_sort') {
+                WebsitePageShortCode::updateOrCreate(['key' => $sort['key']], array_merge(['parent_uuids' => [$categoryList->uuid]], $sort));
+            } elseif ($key == 'children_product_category_sort') {
+                WebsitePageShortCode::updateOrCreate(['key' => $sort['key']], array_merge(['parent_uuids' => [$childrenCategoryList->uuid]], $sort));
+            } elseif ($key == 'grand_children_product_category_sort') {
                 WebsitePageShortCode::updateOrCreate(['key' => $sort['key']], array_merge(['parent_uuids' => [$grandChildrenCategoryList->uuid]], $sort));
             }
         }
@@ -616,12 +1172,16 @@ class ShortCodeSeeder extends Seeder
         foreach ($filters as $key => $filter) {
             if ($key == 'article_filter') {
                 WebsitePageShortCode::updateOrCreate(['key' => $filter['key']], array_merge(['parent_uuids' => [$articleList->uuid]], $filter));
+            } elseif ($key == 'product_filter') {
+                WebsitePageShortCode::updateOrCreate(['key' => $filter['key']], array_merge(['parent_uuids' => [$productList->uuid]], $filter));
             }
         }
 
         foreach ($specifics as $key => $specific) {
             if ($key == 'article') {
                 WebsitePageShortCode::updateOrCreate(['key' => $specific['key']], array_merge(['parent_uuids' => [$specificArticleList->uuid]], $specific));
+            } elseif ($key == 'product') {
+                WebsitePageShortCode::updateOrCreate(['key' => $specific['key']], array_merge(['parent_uuids' => [$specificProductList->uuid]], $specific));
             }
         }
 
@@ -647,9 +1207,34 @@ class ShortCodeSeeder extends Seeder
                 $parent = WebsitePageShortCode::where(['key' => 'grand_children_category_list'])->first();
                 WebsitePageShortCode::updateOrCreate(['key' => $element['key']], array_merge(['parent_uuids' => [$parent->uuid]], $element));
             }
+            //element product
+            elseif ($key == 'product') {
+                $shortCodeGroups = $element['short_code_groups'];
+                unset($element['short_code_groups']);
+
+                $productElement = WebsitePageShortCode::updateOrCreate(['key' => $element['key']], array_merge(['parent_uuids' => [$productList->uuid, $specificProductList->uuid]], $element));
+                $shortCodeGroupUuid = ShortCodeGroup::whereIn('key', $shortCodeGroups)->get()->pluck('uuid')->toArray();
+                $productElement->shortCodeGroups()->syncWithoutDetaching($shortCodeGroupUuid);
+            } elseif ($key == 'product_category') {
+                $shortCodeGroups = $element['short_code_groups'];
+                unset($element['short_code_groups']);
+                $parent = WebsitePageShortCode::where(['key' => 'product_category_list'])->first();
+                $productCategoryElement = WebsitePageShortCode::updateOrCreate(['key' => $element['key']], array_merge(['parent_uuids' => [$parent->uuid]], $element));
+                $shortCodeGroupUuid = ShortCodeGroup::whereIn('key', $shortCodeGroups)->get()->pluck('uuid')->toArray();
+                $productCategoryElement->shortCodeGroups()->syncWithoutDetaching($shortCodeGroupUuid);
+            } elseif ($key == 'children_product_category') {
+                $parent = WebsitePageShortCode::where(['key' => 'children_product_category_list'])->first();
+                $childrenProductCategoryElement = WebsitePageShortCode::updateOrCreate(['key' => $element['key']], array_merge(['parent_uuids' => [$parent->uuid]], $element));
+            } elseif ($key == 'grand_children_product_category') {
+                $parent = WebsitePageShortCode::where(['key' => 'grand_children_product_category_list'])->first();
+                WebsitePageShortCode::updateOrCreate(['key' => $element['key']], array_merge(['parent_uuids' => [$parent->uuid]], $element));
+            }
         }
         $articleList->update(['parent_uuids' => [$categoryElement->uuid, $childrenCategoryElement->uuid]]);
         $childrenCategoryList->update(['parent_uuids' => [$categoryElement->uuid]]);
+
+        $productList->update(['parent_uuids' => [$productCategoryElement->uuid, $childrenProductCategoryElement->uuid]]);
+        $childrenProductCategoryList->update(['parent_uuids' => [$productCategoryElement->uuid]]);
 
         //create sort order (asc or desc)
         foreach ($sortOrders as $key => $sortOrder) {
@@ -665,6 +1250,16 @@ class ShortCodeSeeder extends Seeder
             } elseif ($key == 'grand_children_category_sort_order') {
                 $parentSort = WebsitePageShortCode::where(['key' => 'grand_children_category_list'])->first();
                 WebsitePageShortCode::updateOrCreate(['key' => $sortOrder['key']], array_merge(['parent_uuids' => [$parentSort->uuid]], $sortOrder));
+            }
+            //Sort of product
+            elseif ($key == 'product_sort_order') {
+                WebsitePageShortCode::updateOrCreate(['key' => $sortOrder['key']], array_merge(['parent_uuids' => [$productList->uuid]], $sortOrder));
+            } elseif ($key == 'product_category_sort_order') {
+                WebsitePageShortCode::updateOrCreate(['key' => $sortOrder['key']], array_merge(['parent_uuids' => [$productCategoryList->uuid]], $sortOrder));
+            } elseif ($key == 'children_product_category_sort_order') {
+                WebsitePageShortCode::updateOrCreate(['key' => $sortOrder['key']], array_merge(['parent_uuids' => [$childrenProductCategoryList->uuid]], $sortOrder));
+            } elseif ($key == 'grand_children_product_category_sort_order') {
+                WebsitePageShortCode::updateOrCreate(['key' => $sortOrder['key']], array_merge(['parent_uuids' => [$grandChildrenProductCategoryList->uuid]], $sortOrder));
             }
         }
 
@@ -682,6 +1277,16 @@ class ShortCodeSeeder extends Seeder
             } elseif ($key == 'grand_children_category_count') {
                 $parentCount = WebsitePageShortCode::where(['key' => 'grand_children_category_list'])->first();
                 WebsitePageShortCode::updateOrCreate(['key' => $count['key']], array_merge(['parent_uuids' => [$parentCount->uuid]], $count));
+            }
+            //count of product
+            elseif ($key == 'product_count') {
+                WebsitePageShortCode::updateOrCreate(['key' => $count['key']], array_merge(['parent_uuids' => [$productList->uuid]], $count));
+            } elseif ($key == 'product_category_count') {
+                WebsitePageShortCode::updateOrCreate(['key' => $count['key']], array_merge(['parent_uuids' => [$productCategoryList->uuid]], $count));
+            } elseif ($key == 'product_children_category_count') {
+                WebsitePageShortCode::updateOrCreate(['key' => $count['key']], array_merge(['parent_uuids' => [$childrenProductCategoryList->uuid]], $count));
+            } elseif ($key == 'grand_children_product_category_count') {
+                WebsitePageShortCode::updateOrCreate(['key' => $count['key']], array_merge(['parent_uuids' => [$grandChildrenProductCategoryList->uuid]], $count));
             }
         }
 
@@ -745,6 +1350,69 @@ class ShortCodeSeeder extends Seeder
             } elseif ($key == 'grand-children-category-sort-order') {
                 foreach ($shortCode as $grandChildrenSortOrder) {
                     $parent = WebsitePageShortCode::where(['key' => 'grand_children_category_sort_order'])->first();
+                    WebsitePageShortCode::updateOrCreate(['key' => $grandChildrenSortOrder['key']], array_merge(['parent_uuids' => [$parent->uuid]], $grandChildrenSortOrder));
+                }
+            }
+
+            //short code of product
+            elseif ($key == 'product') {
+                foreach ($shortCode as $productShortCode) {
+                    $parent = WebsitePageShortCode::where(['key' => 'product'])->first();
+                    WebsitePageShortCode::updateOrCreate(['key' => $productShortCode['key']], array_merge(['parent_uuids' => [$parent->uuid]], $productShortCode));
+                }
+            } elseif ($key == 'product_category') {
+                foreach ($shortCode as $categoryShortCode) {
+                    $parent = WebsitePageShortCode::where(['key' => 'product_category_element'])->first();
+                    WebsitePageShortCode::updateOrCreate(['key' => $categoryShortCode['key']], array_merge(['parent_uuids' => [$parent->uuid]], $categoryShortCode));
+                }
+            } elseif ($key == 'children_product_category') {
+                foreach ($shortCode as $childrenCategory) {
+                    $parent = WebsitePageShortCode::where(['key' => 'children_product_category_element'])->first();
+                    WebsitePageShortCode::updateOrCreate(['key' => $childrenCategory['key']], array_merge(['parent_uuids' => [$parent->uuid]], $childrenCategory));
+                }
+            } elseif ($key == 'grand_children_product_category') {
+                foreach ($shortCode as $grandChildren) {
+                    $parent = WebsitePageShortCode::where(['key' => 'grand_children_product_category_element'])->first();
+                    WebsitePageShortCode::updateOrCreate(['key' => $grandChildren['key']], array_merge(['parent_uuids' => [$parent->uuid]], $grandChildren));
+                }
+            } elseif ($key == 'product-sort') {
+                foreach ($shortCode as $productSort) {
+                    $parent = WebsitePageShortCode::where(['key' => 'product_sort'])->first();
+                    WebsitePageShortCode::updateOrCreate(['key' => $productSort['key']], array_merge(['parent_uuids' => [$parent->uuid]], $productSort));
+                }
+            } elseif ($key == 'product-category-sort') {
+                foreach ($shortCode as $categorySort) {
+                    $parent = WebsitePageShortCode::where(['key' => 'product_category_sort'])->first();
+                    WebsitePageShortCode::updateOrCreate(['key' => $categorySort['key']], array_merge(['parent_uuids' => [$parent->uuid]], $categorySort));
+                }
+            } elseif ($key == 'children-product-category-sort') {
+                foreach ($shortCode as $childrenCategorySort) {
+                    $parent = WebsitePageShortCode::where(['key' => 'children_product_category_sort'])->first();
+                    WebsitePageShortCode::updateOrCreate(['key' => $childrenCategorySort['key']], array_merge(['parent_uuids' => [$parent->uuid]], $childrenCategorySort));
+                }
+            } elseif ($key == 'grand-children-product-category-sort') {
+                foreach ($shortCode as $grandChildrenSort) {
+                    $parent = WebsitePageShortCode::where(['key' => 'grand_children_product_category_sort'])->first();
+                    WebsitePageShortCode::updateOrCreate(['key' => $grandChildrenSort['key']], array_merge(['parent_uuids' => [$parent->uuid]], $grandChildrenSort));
+                }
+            } elseif ($key == 'product-sort-order') {
+                foreach ($shortCode as $productSortOrder) {
+                    $parent = WebsitePageShortCode::where(['key' => 'product_sort_order'])->first();
+                    WebsitePageShortCode::updateOrCreate(['key' => $productSortOrder['key']], array_merge(['parent_uuids' => [$parent->uuid]], $productSortOrder));
+                }
+            } elseif ($key == 'product-category-sort-order') {
+                foreach ($shortCode as $categorySortOrder) {
+                    $parent = WebsitePageShortCode::where(['key' => 'product_category_sort_order'])->first();
+                    WebsitePageShortCode::updateOrCreate(['key' => $categorySortOrder['key']], array_merge(['parent_uuids' => [$parent->uuid]], $categorySortOrder));
+                }
+            } elseif ($key == 'children-product-category-sort-order') {
+                foreach ($shortCode as $childrenCategorySortOrder) {
+                    $parent = WebsitePageShortCode::where(['key' => 'children_product_category_sort_order'])->first();
+                    WebsitePageShortCode::updateOrCreate(['key' => $childrenCategorySortOrder['key']], array_merge(['parent_uuids' => [$parent->uuid]], $childrenCategorySortOrder));
+                }
+            } elseif ($key == 'grand-children-product-category-sort-order') {
+                foreach ($shortCode as $grandChildrenSortOrder) {
+                    $parent = WebsitePageShortCode::where(['key' => 'grand_children_product_category_sort_order'])->first();
                     WebsitePageShortCode::updateOrCreate(['key' => $grandChildrenSortOrder['key']], array_merge(['parent_uuids' => [$parent->uuid]], $grandChildrenSortOrder));
                 }
             }
