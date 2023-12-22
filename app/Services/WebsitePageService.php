@@ -214,9 +214,10 @@ class WebsitePageService extends AbstractService
         $replaceArticleService = new ReplaceArticleService();
         $replaceCategoryService = new ReplaceCategoryService();
         $category = $article->articleCategory;
+        $websitePage->template = $replaceArticleService->replaceListArticleSpecific($websitePage->template, $websitePage);
+
         $searchReplaceMap = $replaceArticleService->searchReplaceMapForArticle($article);
         $websitePage->template = Str::replace(array_keys($searchReplaceMap), $searchReplaceMap, $websitePage->template);
-        $websitePage->template = $replaceArticleService->replaceListArticleSpecific($websitePage->template, $websitePage);
         $websitePage->template = $replaceArticleService->replaceRedirectTag($article, $websitePage, $websitePage->template);
         $replaceCategoryService->replaceCategoryInArticle($websitePage->template, $category);
 
@@ -245,6 +246,21 @@ class WebsitePageService extends AbstractService
         $replaceCategoryService = new ReplaceCategoryService();
         $websitePage->template = $replaceCategoryService->replaceListCategory($websitePage->template);
         $websitePage->template = $replaceArticleService->replaceListArticleForPageHome($websitePage->template, $websitePage);
+
+        return $websitePage;
+    }
+
+    public function renderContentForProductDetail($websitePage, $productDetailData)
+    {
+        $replaceProductService = new ReplaceProductService();
+        $replaceProductCategoryService = new ReplaceProductCategoryService();
+        $product = $productDetailData['product'];
+        $category = $productDetailData['category'];
+        $searchReplaceMap = $replaceProductService->searchReplaceMapForProduct($product);
+
+        $websitePage->template = Str::replace(array_keys($searchReplaceMap), $searchReplaceMap, $websitePage->template);
+//        $websitePage->template = $replaceProductService->replaceListProductSpecific($websitePage->template, $websitePage);
+        $replaceProductCategoryService->replaceCategoryInProduct($websitePage->template, $category);
 
         return $websitePage;
     }
