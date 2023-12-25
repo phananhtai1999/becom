@@ -68,7 +68,8 @@ class StatusController extends AbstractRestAPIController
         }
 
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => $request->get('user_uuid') ?? auth()->user()->getkey()
+            'user_uuid' => $request->get('user_uuid') ?? auth()->userId(),
+            'app_id' => auth()->appId(),
         ]));
 
         return $this->sendCreatedJsonResponse(
@@ -94,7 +95,8 @@ class StatusController extends AbstractRestAPIController
         }
 
         $this->service->update($model, array_merge($request->all(), [
-            'user_uuid' => $request->get('user_uuid') ?? auth()->user()->getkey()
+            'user_uuid' => $request->get('user_uuid') ?? auth()->userId(),
+            'app_id' => auth()->appId(),
         ]));
 
         return $this->sendOkJsonResponse(
@@ -114,7 +116,8 @@ class StatusController extends AbstractRestAPIController
         }
 
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => auth()->user()->getkey(),
+            'user_uuid' => auth()->userId(),
+            'app_id' => auth()->appId(),
         ]));
 
         return $this->sendCreatedJsonResponse(
@@ -150,7 +153,8 @@ class StatusController extends AbstractRestAPIController
         }
 
         $this->service->update($model, array_merge($request->all(), [
-            'user_uuid' => auth()->user()->getkey(),
+            'user_uuid' => auth()->userId(),
+            'app_id' => auth()->appId(),
         ]));
 
         return $this->sendOkJsonResponse(

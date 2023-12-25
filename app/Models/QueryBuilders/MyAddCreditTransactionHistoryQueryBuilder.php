@@ -17,7 +17,8 @@ class MyAddCreditTransactionHistoryQueryBuilder extends AbstractQueryBuilder
     public static function baseQuery()
     {
         return CreditTransactionHistory::where([
-            ['user_uuid', auth()->user()->getkey()],
+            ['user_uuid', auth()->userId()],
+            ['app_id', auth()->appId()],
             ['campaign_uuid', null],
             ['credit', '!=', '0']
         ]);

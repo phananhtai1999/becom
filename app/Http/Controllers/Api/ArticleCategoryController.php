@@ -137,7 +137,8 @@ class ArticleCategoryController extends AbstractRestAPIController
             return $this->sendValidationFailedJsonResponse();
         }
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => auth()->user()->getKey(),
+            'user_uuid' => auth()->userId(),
+            'app_id' => auth()->appId(),
             'description' => $request->keyword ? array_merge($request->keyword, $request->description ?? $request->keyword) : $request->description
         ]));
 

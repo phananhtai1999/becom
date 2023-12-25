@@ -6,7 +6,7 @@ use App\Events\SendAccountForNewPartnerEvent;
 use App\Events\SendEmailRecoveryPasswordEvent;
 use App\Mail\SendAccountForNewPartner;
 use App\Mail\SendRecoveryPasswordEmailToUser;
-use App\Services\ConfigService;
+use Techup\ApiConfig\Services\ConfigService;
 use App\Services\PasswordResetService;
 use App\Services\SmtpAccountService;
 use App\Services\UserService;

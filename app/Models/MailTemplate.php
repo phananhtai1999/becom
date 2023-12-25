@@ -42,7 +42,8 @@ class MailTemplate extends AbstractModel
         'publish_status',
         'reject_reason',
         'type',
-        'image'
+        'image',
+        'app_id',
     ];
 
     /**

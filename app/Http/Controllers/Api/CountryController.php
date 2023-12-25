@@ -14,7 +14,7 @@ use App\Http\Requests\IndexRequest;
 use App\Http\Requests\UpdateCountryRequest;
 use App\Http\Resources\CountryResource;
 use App\Http\Resources\CountryResourceCollection;
-use App\Services\ConfigService;
+use Techup\ApiConfig\Services\ConfigService;
 use App\Services\CountryService;
 
 class CountryController extends AbstractRestAPIController

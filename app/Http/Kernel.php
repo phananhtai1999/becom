@@ -67,6 +67,9 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'language' => \App\Http\Middleware\Localization::class, // Change language
         'role' => \App\Http\Middleware\CheckCurrentRole::class,
-        'footerTemplate' => CheckCanRemoveFooterTemplate::class
+        'footerTemplate' => CheckCanRemoveFooterTemplate::class,
+        'apikey' => \App\Http\Middleware\CheckApiKey::class,
+        'appid' => \App\Http\Middleware\CheckAppId::class,
+        'userid' => \App\Http\Middleware\CheckUserId::class,
     ];
 }

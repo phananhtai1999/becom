@@ -30,7 +30,8 @@ class CampaignRequest extends AbstractRequest
             'mail_template_uuid' => ['required', 'numeric', 'min:1', Rule::exists('mail_templates', 'uuid')->where(function ($query) use ($sendType) {
 
                 return $query->where([
-                    ['user_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey()],
+                    ['user_uuid', $this->request->get('user_uuid') ?? auth()->userId()],
+                    ['app_id', auth()->appId()],
                     ['type', $sendType],
                     ['publish_status', true]])->where(function ($q) {
                     $q->where('send_project_uuid', $this->request->get('send_project_uuid'))
@@ -46,7 +47,8 @@ class CampaignRequest extends AbstractRequest
                 if ($sendType == 'email') {
                     return $query->where([
                         ['send_project_uuid', $this->request->get('send_project_uuid')],
-                        ['user_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey()],
+                        ['user_uuid', $this->request->get('user_uuid') ?? auth()->userId()],
+                        ['app_id', auth()->appId()],
                         ['mail_mailer', 'smtp'],
                         ['status', 'work'],
                         ['publish', true],
@@ -54,14 +56,16 @@ class CampaignRequest extends AbstractRequest
                 } elseif ($sendType == 'sms') {
                     return $query->where([
                         ['send_project_uuid', $this->request->get('send_project_uuid')],
-                        ['user_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey()],
+                        ['user_uuid', $this->request->get('user_uuid') ?? auth()->userId()],
+                        ['app_id', auth()->appId()],
                         ['status', 'work'],
                         ['publish', true],
                     ])->whereNull('deleted_at');
                 } else {
                     return $query->where([
                         ['send_project_uuid', $this->request->get('send_project_uuid')],
-                        ['user_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey()],
+                        ['user_uuid', $this->request->get('user_uuid') ?? auth()->userId()],
+                        ['app_id', auth()->appId()],
                         ['mail_mailer', $sendType],
                         ['status', 'work'],
                         ['publish', true],
@@ -69,18 +73,26 @@ class CampaignRequest extends AbstractRequest
                 }
             })],
             'send_project_uuid' => ['required', 'numeric', 'min:1', Rule::exists('send_projects', 'uuid')->where(function ($query) {
-                return $query->where('user_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey())->whereNull('deleted_at');
+                return $query->where([
+                    ['user_uuid', $this->request->get('user_uuid') ?? auth()->userId()],
+                    ['app_id', auth()->appId()]
+                ])->whereNull('deleted_at');
             })],
             'was_finished' => ['required', 'boolean'],
             'was_stopped_by_owner' => ['required', 'boolean'],
-            'user_uuid' => ['nullable', 'numeric', 'min:1', 'exists:users,uuid'],
+            'user_uuid' => ['nullable', 'numeric', 'min:1',  Rule::exists('user_profiles', 'uuid')->where(function ($q) {
+                return $q->where('app_id', auth()->appId());
+            })->whereNull('deleted_at')],
             'reply_to_email' => ['nullable', 'required_if:send_type,email', 'string', 'email:rfc,dns'],
             'reply_name' => ['nullable', 'required_if:send_type,email', 'string'],
             'send_from_email' => ['nullable', 'string', 'email:rfc,dns'],
             'send_from_name' => ['nullable', 'string'],
             'contact_list' => ['required', 'array', 'min:1'],
             'contact_list.*' => ['required', 'numeric', 'min:1', Rule::exists('contact_lists', 'uuid')->where(function ($query) {
-                return $query->where('user_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey())->whereNull('deleted_at');
+                return $query->where([
+                    ['user_uuid', $this->request->get('user_uuid') ?? auth()->userId()],
+                    ['app_id', auth()->appId()]
+                ])->whereNull('deleted_at');
             })]
         ];
         return $validate;

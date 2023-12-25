@@ -14,11 +14,15 @@ class BusinessManagementService extends AbstractService
 
     /**
      * @param $userUuid
+     * @param $appId
      * @return mixed
      */
-    public function checkBusinessManagementOfUser($userUuid)
+    public function checkBusinessManagementOfUser($userUuid, $appId)
     {
-        return $this->model->where('owner_uuid', $userUuid)->first();
+        return $this->model->where([
+            ['owner_uuid', $userUuid],
+            ['app_id', $appId]
+        ])->first();
     }
 
     /**

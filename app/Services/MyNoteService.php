@@ -19,7 +19,8 @@ class MyNoteService extends AbstractService
     public function showMyNote($id)
     {
         return  $this->findOneWhereOrFail([
-            ['user_uuid', auth()->user()->getkey()],
+            ['user_uuid', auth()->userId()],
+            ['app_id', auth()->appId()],
             ['uuid', $id]
         ]);
     }

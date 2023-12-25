@@ -27,7 +27,9 @@ class InviteUserRequest extends FormRequest
         return [
             'team_uuid' => ['required', 'exists:teams,uuid'],
             'type' => ['required', Rule::in(['link', 'account'])],
-            'email' => ['required', 'string', 'email:rfc,dns', 'unique:users,email', 'unique:invites,email'],
+            'email' => ['required', 'string', 'email:rfc,dns',  Rule::unique('user_profiles', 'email')->where(function ($q) {
+                return $q->where('app_id', auth()->appId());
+            })->whereNull('deleted_at'), 'unique:invites,email'],
             'first_name' => ['required', 'string'],
             'last_name' => ['required', 'string'],
         ];

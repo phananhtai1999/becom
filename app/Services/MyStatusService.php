@@ -18,8 +18,9 @@ class MyStatusService extends AbstractService
      */
     public function showMyStatus($id)
     {
-        return  $this->findOneWhereOrFail([
-            ['user_uuid', auth()->user()->getkey()],
+        return $this->findOneWhereOrFail([
+            ['user_uuid', auth()->userId()],
+            ['app_id', auth()->appId()],
             ['uuid', $id]
         ]);
     }
@@ -31,7 +32,10 @@ class MyStatusService extends AbstractService
     public function showMyAndPublicStatus($id)
     {
         return $this->model->where('uuid', $id)->where(function ($query) {
-            $query->where('user_uuid', auth()->user()->getkey())
+            $query->where([
+                ['user_uuid', auth()->userId()],
+                ['app_id', auth()->appId()]
+            ])
                 ->orWhereNull('user_uuid');
         })->firstOrFail();
     }
@@ -61,6 +65,9 @@ class MyStatusService extends AbstractService
      */
     public function firstMyStatus()
     {
-        return $this->model->select(['uuid', 'name', 'points', 'user_uuid'])->where('user_uuid', auth()->user()->getkey())->orderBy('points')->first();
+        return $this->model->select(['uuid', 'name', 'points', 'user_uuid'])->where([
+            ['user_uuid', auth()->userId()],
+            ['app_id', auth()->appId()]
+        ])->orderBy('points')->first();
     }
 }

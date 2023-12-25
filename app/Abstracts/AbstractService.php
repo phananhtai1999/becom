@@ -2,7 +2,7 @@
 
 namespace App\Abstracts;
 
-use App\Models\Config;
+use Techup\ApiConfig\Models\Config;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -244,5 +244,33 @@ abstract class AbstractService
         }
 
         return false;
+    }
+
+    public function getCollectionByUserIdAndAppIdWithPagination($request)
+    {
+        $indexRequest = $this->getIndexRequest($request);
+
+        return $this->modelQueryBuilderClass::searchQuery($indexRequest['search'], $indexRequest['search_by'])
+            ->where([
+                ['user_uuid', auth()->userId()],
+                ['app_id', auth()->appId()],
+            ])
+            ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
+    }
+
+    public function findOneWhereOrFailByUserUuidAndAppId($id)
+    {
+        return $this->model->where([
+            ['user_uuid', auth()->userId()],
+            ['app_id', auth()->appId()],
+            ['uuid', $id],
+        ])->firstOrFail();
+    }
+
+    public function destroyByUserIdAndAppId($id)
+    {
+        $model = $this->findOneWhereOrFailByUserUuidAndAppId($id);
+
+        return $model->delete();
     }
 }

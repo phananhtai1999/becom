@@ -128,7 +128,10 @@ class ArticleService extends AbstractService
                     $query->whereIn('article_category_uuid', $articleCategoryPublicByUuids)
                         ->orWhereNull('article_category_uuid');
                 })
-                ->where('user_uuid', auth()->user()->getkey())
+                ->where([
+                    ['user_uuid', auth()->userId()],
+                    ['app_id', auth()->appId()]
+                ])
                 ->where('updated_at', '>=', Carbon::now()->subDays($config->value))
                 ->paginate($perPage, $columns, $pageName, $page);
         } else {
@@ -139,7 +142,10 @@ class ArticleService extends AbstractService
                     $query->whereIn('article_category_uuid', $articleCategoryPublicByUuids)
                         ->orWhereNull('article_category_uuid');
                 })
-                ->where('user_uuid', auth()->user()->getkey())
+                ->where([
+                    ['user_uuid', auth()->userId()],
+                    ['app_id', auth()->appId()]
+                ])
                 ->paginate($perPage, $columns, $pageName, $page);
         }
     }
@@ -162,13 +168,13 @@ class ArticleService extends AbstractService
         //Check auth:api
         //get Article Content Public
         $publishStatus = [Article::PUBLISHED_PUBLISH_STATUS];
-        if (auth()->user()->roles->whereIn('slug', ["admin", "root"])->count()) {
+        if (auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             //Admin
             $contentForUSer = Article::ADMIN_CONTENT_FOR_USER;
         } elseif ($this->paidUser()) {
             //Payment
             $contentForUSer = Article::PAYMENT_CONTENT_FOR_USER;
-        } elseif (auth()->user()->roles->whereIn('slug', ["editor"])->count()) {
+        } elseif (auth()->hasRole([Role::ROLE_EDITOR])) {
             //Editor
             $contentForUSer = Article::EDITOR_CONTENT_FOR_USER;
         } else {
@@ -198,17 +204,17 @@ class ArticleService extends AbstractService
         //Check auth:api
         //get Article By Permission
         $publishStatus = [Article::PUBLISHED_PUBLISH_STATUS];
-        if (auth()->user()->roles->whereIn('slug', ["admin", "root"])->count()) {
+        if (auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             //Admin
             return $this->loadAllArticles($perPage, $columns, $pageName, $page, $search, $searchBy);
         } elseif ($this->paidUser()) {
             //Check current user role
-            if (auth()->user()->roles->whereIn('slug', ["editor"])->count()) {
+            if (auth()->hasRole([Role::ROLE_EDITOR])) {
                 $publishStatus = [Article::PENDING_PUBLISH_STATUS, Article::PUBLISHED_PUBLISH_STATUS, Article::BLOCKED_PUBLISH_STATUS, Article::REJECT_PUBLISH_STATUS];
             }
             //Payment
             $contentForUSer = Article::PAYMENT_CONTENT_FOR_USER;
-        } elseif (auth()->user()->roles->whereIn('slug', ["editor"])->count()) {
+        } elseif (auth()->hasRole([Role::ROLE_EDITOR])) {
             //Editor
             $publishStatus = [Article::PENDING_PUBLISH_STATUS, Article::PUBLISHED_PUBLISH_STATUS, Article::BLOCKED_PUBLISH_STATUS, Article::REJECT_PUBLISH_STATUS];
             $contentForUSer = Article::EDITOR_CONTENT_FOR_USER;
@@ -257,7 +263,10 @@ class ArticleService extends AbstractService
         return $this->model->selectRaw("COUNT(IF( publish_status = 1, 1, NULL ) ) as approve,
         COUNT(IF( publish_status = 3, 1, NULL ) ) as pending,
         COUNT(IF( publish_status = 4, 1, NULL ) ) as reject")
-            ->where('user_uuid', auth()->user()->getKey())
+            ->where([
+                ['user_uuid', auth()->userId()],
+                ['app_id', auth()->appId()]
+            ])
             ->whereDate('updated_at', '>=', $startDate)
             ->whereDate('updated_at', '<=', $endDate)
             ->first()->setAppends([])->toArray();
@@ -269,7 +278,10 @@ class ArticleService extends AbstractService
         COUNT(IF( publish_status = 1, 1, NULL ) ) as approve,
         COUNT(IF( publish_status = 3, 1, NULL ) ) as pending,
         COUNT(IF( publish_status = 4, 1, NULL ) ) as reject")
-            ->where('user_uuid', auth()->user()->getKey())
+            ->where([
+                ['user_uuid', auth()->userId()],
+                ['app_id', auth()->appId()]
+            ])
             ->whereDate('updated_at', '>=', $startDate)
             ->whereDate('updated_at', '<=', $endDate)
             ->groupBy('label')

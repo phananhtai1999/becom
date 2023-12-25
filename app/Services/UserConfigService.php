@@ -18,7 +18,10 @@ class UserConfigService extends AbstractService
     public function myUserConfig()
     {
         return $this->model
-            ->where('user_uuid', auth()->user()->getKey())
+            ->where([
+                ['user_uuid', auth()->userId()],
+                ['app_id', auth()->appId()]
+            ])
             ->first();
     }
 }

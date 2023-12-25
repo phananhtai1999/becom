@@ -18,7 +18,10 @@ class MyUserTrackingQueryBuilder extends AbstractQueryBuilder
      */
     public static function baseQuery()
     {
-        return UserTracking::where('user_uuid', auth()->user()->getKey());
+        return UserTracking::where([
+            ['user_uuid', auth()->userId()],
+            ['app_id', auth()->appId()]
+        ]);
     }
 
     /**

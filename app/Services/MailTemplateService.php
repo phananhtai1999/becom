@@ -52,16 +52,16 @@ class MailTemplateService extends AbstractService
 
     public function moveBusinessCategoryOfMailTemplates($mailTemplates, $goBusinessCategoryUuid)
     {
-        foreach ($mailTemplates as $mailTemplate){
+        foreach ($mailTemplates as $mailTemplate) {
             $this->update($mailTemplate, [
-               'business_category_uuid' => $goBusinessCategoryUuid
+                'business_category_uuid' => $goBusinessCategoryUuid
             ]);
         }
     }
 
     public function movePurposeOfMailTemplates($mailTemplates, $goPurposeUuid)
     {
-        foreach ($mailTemplates as $mailTemplate){
+        foreach ($mailTemplates as $mailTemplate) {
             $this->update($mailTemplate, [
                 'purpose_uuid' => $goPurposeUuid
             ]);
@@ -75,9 +75,12 @@ class MailTemplateService extends AbstractService
         COUNT(IF( publish_status = 3, 1, NULL ) ) as reject")
             ->whereDate('updated_at', '>=', $startDate)
             ->whereDate('updated_at', '<=', $endDate)
-            ->where('user_uuid', auth()->user()->getKey())
+            ->where([
+                ['user_uuid', auth()->userId()],
+                ['app_id', auth()->appId()]
+            ])
             ->when($type, function ($q, $type) {
-              $q->where('type', $type);
+                $q->where('type', $type);
             })
             ->first()->toArray();
     }
@@ -90,7 +93,10 @@ class MailTemplateService extends AbstractService
         COUNT(IF( publish_status = 3, 1, NULL ) ) as reject")
             ->whereDate('updated_at', '>=', $startDate)
             ->whereDate('updated_at', '<=', $endDate)
-            ->where('user_uuid', auth()->user()->getKey())
+            ->where([
+                ['user_uuid', auth()->userId()],
+                ['app_id', auth()->appId()]
+            ])
             ->when($type, function ($q, $type) {
                 $q->where('type', $type);
             })
@@ -107,7 +113,7 @@ class MailTemplateService extends AbstractService
         $times = [];
         $result = [];
 
-        if ($groupBy == "hour"){
+        if ($groupBy == "hour") {
             $dateFormat = "%Y-%m-%d %H:00:00";
 
             $endDate = $endDate->endOfDay();
@@ -117,7 +123,7 @@ class MailTemplateService extends AbstractService
             }
         }
 
-        if ($groupBy == "date"){
+        if ($groupBy == "date") {
             $dateFormat = "%Y-%m-%d";
             while ($currentDate <= $endDate) {
                 $times[] = $currentDate->format('Y-m-d');
@@ -125,7 +131,7 @@ class MailTemplateService extends AbstractService
             }
         }
 
-        if ($groupBy == "month"){
+        if ($groupBy == "month") {
             $dateFormat = "%Y-%m";
             while ($currentDate <= $endDate) {
                 $times[] = $currentDate->format('Y-m');
@@ -135,19 +141,19 @@ class MailTemplateService extends AbstractService
 
         $charts = $this->getMailTemplatesChartByDateFormat($dateFormat, $startDate, $endDate, $type)->keyBy('label');
 
-        foreach ($times as $time){
-            $mailByTime = $charts->first(function($item, $key) use ($time){
+        foreach ($times as $time) {
+            $mailByTime = $charts->first(function ($item, $key) use ($time) {
                 return $key == $time;
             });
 
-            if($mailByTime){
+            if ($mailByTime) {
                 $result[] = $mailByTime->toArray();
-            }else{
+            } else {
                 $result [] = [
                     'label' => $time,
-                    'approve'  => 0,
-                    'pending'  => 0,
-                    'reject'  => 0,
+                    'approve' => 0,
+                    'pending' => 0,
+                    'reject' => 0,
                 ];
             }
         }

@@ -27,7 +27,9 @@ class UpdateUserTrackingRequest extends AbstractRequest
         return [
             'ip' => ['string'],
             'location' => ['string'],
-            'user_uuid' => ['numeric', 'exists:users,uuid'],
+            'user_uuid' => ['numeric', Rule::exists('user_profiles', 'uuid')->where(function ($q) {
+                return $q->where('app_id', auth()->appId());
+            })->whereNull('deleted_at')],
             'postal_code' => ['string'],
         ];
     }

@@ -204,7 +204,10 @@ class PartnerController extends AbstractRestAPIController
 
     public function partnerDashboard()
     {
-        $partner = $this->service->findOneWhereOrFail(['user_uuid' => auth()->user()->getKey()]);
+        $partner = $this->service->findOneWhereOrFail([
+            'user_uuid' => auth()->userId(),
+            'app_id' => auth()->appId(),
+        ]);
         $referrals = $this->partnerUserService->referralsOfPartnerInMonth($partner->code)->count();
         $clicks = $this->partnerTrackingService->trackingClicksOfPartnerInMonth($partner->uuid)->count();
         $customers = $this->partnerUserService->numberCustomerPartnerByMonthCurrent($partner->code)->count();
@@ -220,7 +223,10 @@ class PartnerController extends AbstractRestAPIController
     public function partnerReferrals(PartnerReferralsRequest $request)
     {
         //Email created customer_since
-        $partner = $this->service->findOneWhereOrFail(['user_uuid' => auth()->user()->getKey()]);
+        $partner = $this->service->findOneWhereOrFail([
+            'user_uuid' => auth()->userId(),
+            'app_id' => auth()->appId(),
+        ]);
 
         return $this->sendOkJsonResponse(["data" => $this->partnerUserService->referrerStatisticsOfPartnerbyType($partner->code, $request->get('type'))]);
 
@@ -228,7 +234,10 @@ class PartnerController extends AbstractRestAPIController
 
     public function partnerSubAffiliates()
     {
-        $partner = $this->service->findOneWhereOrFail(['user_uuid' => auth()->user()->getKey()]);
+        $partner = $this->service->findOneWhereOrFail([
+            'user_uuid' => auth()->userId(),
+            'app_id' => auth()->appId(),
+        ]);
 
         return $this->sendOkJsonResponse(["data" => $this->partnerUserService->subAffiliatesStatisticsOfPartner($partner->code)]);
 
@@ -258,7 +267,10 @@ class PartnerController extends AbstractRestAPIController
 
     public function partnerDetail(PartnerDetailRequest $request)
     {
-        $partner = $this->service->findOneWhereOrFail(['user_uuid' => auth()->user()->getKey()]);
+        $partner = $this->service->findOneWhereOrFail([
+            'user_uuid' => auth()->userId(),
+            'app_id' => auth()->appId(),
+        ]);
 
         $groupsData = $labels = $lists = [];
         if (!$request->get('type') || $request->get('type') === 'day'){
@@ -366,7 +378,10 @@ class PartnerController extends AbstractRestAPIController
 
     public function partnerRewards()
     {
-        $partner = $this->service->findOneWhereOrFail(['user_uuid' => auth()->user()->getKey()]);
+        $partner = $this->service->findOneWhereOrFail([
+            'user_uuid' => auth()->userId(),
+            'app_id' => auth()->appId(),
+        ]);
         $data = $this->userPaymentByDayService->getRewardsCommissionThisMonthByPartner($partner->code);
 
         return $this->sendOkJsonResponse(["data" => $data]);

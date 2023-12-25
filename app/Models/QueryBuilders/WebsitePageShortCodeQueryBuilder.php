@@ -32,7 +32,7 @@ class WebsitePageShortCodeQueryBuilder extends AbstractQueryBuilder
                 $modelKeyName,
                 'status',
                 'key',
-                'parent_uuid',
+                'parent_uuids',
                 'name',
                 'short_code',
             ])
@@ -41,7 +41,7 @@ class WebsitePageShortCodeQueryBuilder extends AbstractQueryBuilder
                 $modelKeyName,
                 'status',
                 'key',
-                'parent_uuid',
+                'parent_uuids',
                 'name',
                 'short_code',
             ])
@@ -54,11 +54,12 @@ class WebsitePageShortCodeQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__status', 'status'),
                 'key',
                 AllowedFilter::exact('exact__key', 'key'),
-                'parent_uuid',
-                AllowedFilter::exact('exact__parent_uuid', 'parent_uuid'),
+                'parent_uuids',
+                AllowedFilter::exact('exact__parent_uuids', 'parent_uuids'),
                 'short_code',
                 AllowedFilter::exact('exact__short_code', 'short_code'),
                 AllowedFilter::scope('short_code_root'),
+                AllowedFilter::scope('parent_short_code'),
 
             ]);
     }

@@ -19,7 +19,7 @@ use App\Models\PaymentMethod;
 use App\Services\AddOnService;
 use App\Services\AddOnSubscriptionHistoryService;
 use App\Services\AddOnSubscriptionPlanService;
-use App\Services\ConfigService;
+use Techup\ApiConfig\Services\ConfigService;
 use App\Services\PaymentService;
 use App\Services\PaypalService;
 use App\Services\StripeService;
@@ -174,7 +174,10 @@ class AddOnController extends AbstractRestAPIController
     }
 
     public function myAddOn() {
-        $myAddOn = $this->userAddOnService->findAllWhere(['user_uuid' => auth()->user()->getKey()]);
+        $myAddOn = $this->userAddOnService->findAllWhere([
+            'user_uuid' => auth()->userId(),
+            'app_id' => auth()->appId()
+        ]);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData($this->userAddOnResourceCollectionClass, $myAddOn)
@@ -194,11 +197,13 @@ class AddOnController extends AbstractRestAPIController
     {
         $addOnSubscriptionHistory = $this->addOnSubscriptionHistoryService->findOneWhere([
             'add_on_subscription_plan_uuid' => $id,
-            'user_uuid' => auth()->user()->getKey(),
+            'user_uuid' => auth()->userId(),
+            'app_id' => auth()->appId(),
         ]);
         $userAddOn = $this->userAddOnService->findOneWhere([
             'add_on_subscription_plan_uuid' => $id,
-            'user_uuid' => auth()->user()->getKey(),
+            'user_uuid' => auth()->userId(),
+            'app_id' => auth()->appId(),
         ]);
         try {
             if ($addOnSubscriptionHistory->payment_method_uuid == PaymentMethod::PAYPAL) {

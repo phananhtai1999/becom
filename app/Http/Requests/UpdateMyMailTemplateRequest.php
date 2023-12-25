@@ -30,7 +30,10 @@ class UpdateMyMailTemplateRequest extends AbstractRequest
             'subject' => ['string'],
             'body' => ['string'],
             'send_project_uuid' => ['nullable', 'numeric', 'min:1', Rule::exists('send_projects', 'uuid')->where(function ($query) {
-                return $query->where('user_uuid', auth()->user()->getkey())->whereNull('deleted_at');
+                return $query->where([
+                    ['user_uuid', auth()->userId()],
+                    ['app_id', auth()->appId()]
+                ])->whereNull('deleted_at');
             })],
             'business_category_uuid' => ['numeric', 'min:1', Rule::exists('business_categories', 'uuid')->where(function ($q) {
                 return $q->where('publish_status', BusinessCategory::PUBLISHED_PUBLISH_STATUS)->whereNull('deleted_at');

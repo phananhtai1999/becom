@@ -6,6 +6,7 @@ use App\Models\AddOn;
 use App\Models\Permission;
 use App\Models\PlatformPackage;
 use App\Models\Team;
+use App\Models\UserTeam;
 use Aws\Exception\CredentialsException;
 use Aws\S3\Exception\S3Exception;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -18,8 +19,6 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class AbstractRestAPIController extends BaseController
@@ -178,7 +177,7 @@ class AbstractRestAPIController extends BaseController
      * @return bool
      */
     public function checkTeamOwner($teamId) {
-        if (Team::findOrFail($teamId)->owner_uuid != auth()->user()->getKey()) {
+        if (Team::findOrFail($teamId)->owner_uuid != auth()->userId()) {
 
             return false;
         }
@@ -242,10 +241,12 @@ class AbstractRestAPIController extends BaseController
     }
 
     public function getUserUuid() {
-        if(($this->user()->userTeam && !$this->user()->userTeam['is_blocked'])) {
-            $user_uuid = auth()->user()->userTeam->team->owner_uuid;
+        $userTeam = UserTeam::where(['user_uuid' => auth()->userId(), 'app_id' => auth()->appId()])->first();
+
+        if(($userTeam && !$userTeam['is_blocked'])) {
+            $user_uuid = $userTeam->team->owner_uuid;
         } else {
-            $user_uuid = auth()->user()->getkey();
+            $user_uuid = auth()->userId();
         }
 
         return $user_uuid;

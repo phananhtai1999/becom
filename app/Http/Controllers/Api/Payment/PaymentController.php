@@ -13,7 +13,7 @@ use App\Http\Resources\SubscriptionHistoryResourceCollection;
 use App\Http\Resources\SubscriptionPlanResourceCollection;
 use App\Models\PaymentMethod;
 use App\Models\UserCreditHistory;
-use App\Services\ConfigService;
+use Techup\ApiConfig\Services\ConfigService;
 use App\Services\CreditPackageHistoryService;
 use App\Services\PaymentService;
 use App\Services\SubscriptionHistoryService;
@@ -71,9 +71,9 @@ class PaymentController extends AbstractRestAPIController
         try {
             $creditPackage = $this->creditPackageService->findOrFailById($request->get('credit_package_uuid'));
             if ($request->get('payment_method_uuid') == PaymentMethod::PAYPAL) {
-                $processResult = $this->paypalService->processTransaction($creditPackage, Auth::user()->getKey(), $request->all());
+                $processResult = $this->paypalService->processTransaction($creditPackage, auth()->userId(), $request->all());
             } else {
-                $processResult = $this->stripeService->processTransaction($creditPackage, Auth::user()->getKey(), $request->all());
+                $processResult = $this->stripeService->processTransaction($creditPackage, auth()->userId(), $request->all());
             }
 
             if ($processResult['status']) {
@@ -154,7 +154,10 @@ class PaymentController extends AbstractRestAPIController
     public function cancelSubscription()
     {
         $currentSubscriptionHistory = $this->subscriptionHistoryService->currentSubscriptionHistory();
-        $userPlatformPackage = $this->userPlatformPackageService->findOneWhere(['user_uuid' => auth()->user()->getKey()]);
+        $userPlatformPackage = $this->userPlatformPackageService->findOneWhere([
+            'user_uuid' => auth()->userId(),
+            'app_id' => auth()->appId(),
+        ]);
         try {
             if ($currentSubscriptionHistory->payment_method_uuid == PaymentMethod::PAYPAL) {
                 $this->paypalService->cancelSubscription($currentSubscriptionHistory->logs['id']);

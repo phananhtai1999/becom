@@ -33,7 +33,7 @@ class WebsitePageShortCode extends Model
         'uuid',
         'status',
         'key',
-        'parent_uuid',
+        'parent_uuids',
         'name',
         'short_code',
     ];
@@ -42,28 +42,34 @@ class WebsitePageShortCode extends Model
      * @var string[]
      */
     protected $casts = [
+        'parent_uuids' => 'array',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
     ];
 
-    /**
-     * @return BelongsTo
-     */
+
     public function parentWebsitePageShortCode()
     {
-        return $this->belongsTo(__CLASS__, 'parent_uuid');
+        return WebsitePageShortCode::whereIn('uuid', $this->parent_uuids ?? [])->where('status', true)->get();
     }
 
     public function childrenWebsitePageShortCode()
     {
-        return $this->hasMany(__CLASS__, 'parent_uuid');
+        return WebsitePageShortCode::whereJsonContains('parent_uuids', $this->uuid)->where('status', true)->get();
     }
 
     public function scopeShortCodeRoot(Builder $query, $check)
     {
         if ($check) {
-            return $query->whereNull('parent_uuid');
+            return $query->whereNull('parent_uuids');
+        }
+    }
+
+    public function scopeParentShortCode(Builder $query, $parent)
+    {
+        if ($parent) {
+            return $query->whereJsonContains('parent_uuids', $parent);
         }
     }
 

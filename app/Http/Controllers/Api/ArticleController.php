@@ -17,10 +17,13 @@ use App\Http\Resources\ArticleResource;
 use App\Http\Resources\ArticleResourceCollection;
 use App\Models\Article;
 use App\Models\Role;
+use App\Models\UserTeam;
 use App\Services\ArticleSeriesService;
 use App\Services\ArticleService;
-use App\Services\ConfigService;
+use Techup\ApiConfig\Services\ConfigService;
 use App\Services\LanguageService;
+use App\Services\TeamService;
+use App\Services\UserTeamService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 
@@ -53,12 +56,14 @@ class ArticleController extends AbstractRestAPIController
         ArticleService       $service,
         LanguageService      $languageService,
         ArticleSeriesService $articleSeriesService,
-        ConfigService        $configService
+        ConfigService        $configService,
+        UserTeamService $userTeamService
     )
     {
         $this->service = $service;
         $this->configService = $configService;
         $this->articleSeriesService = $articleSeriesService;
+        $this->userTeamService = $userTeamService;
         $this->resourceCollectionClass = ArticleResourceCollection::class;
         $this->resourceClass = ArticleResource::class;
         $this->storeRequest = ArticleRequest::class;
@@ -81,20 +86,23 @@ class ArticleController extends AbstractRestAPIController
 
         //Map type_label to content
         $content = $this->service->mapTypeLabelToContent($request->get('content'), $request->content_type);
+        $userTeam = $this->userTeamService->getUserTeamByUserAndAppId(auth()->userId(), auth()->appId());
 
-        if($this->user()->userTeam && !$this->user()->userTeam['is_blocked'] && $this->user()->getKey != auth()->user()->userTeam->team->owner_uuid) {
-            $user_uuid = auth()->user()->userTeam->team->owner_uuid;
+        if($userTeam && !$userTeam['is_blocked'] && auth()->userId() != $userTeam->team->owner_uuid) {
+            $user_uuid = $userTeam->team->owner_uuid;
             $model = $this->service->create(array_merge($request->except(['reject_reason']), [
                 'user_uuid' => $user_uuid,
+                'app_id' => auth()->appId(),
                 'content_for_user' => $request->content_for_user ?: Article::PUBLIC_CONTENT_FOR_USER,
                 'content' => $content,
                 'publish_status' => Article::PENDING_PUBLISH_STATUS,
                 'description' => $request->keyword ? array_merge($request->keyword, $request->description ?? $request->keyword) : $request->description
             ]));
         } else {
-            $user_uuid = auth()->user()->getkey();
+            $user_uuid = auth()->userId();
             $model = $this->service->create(array_merge($request->except(['reject_reason']), [
                 'user_uuid' => $user_uuid,
+                'app_id' => auth()->appId(),
                 'content_for_user' => $request->content_for_user ?: Article::PUBLIC_CONTENT_FOR_USER,
                 'content' => $content,
                 'description' => $request->keyword ? array_merge($request->keyword, $request->description ?? $request->keyword) : $request->description
@@ -114,6 +122,7 @@ class ArticleController extends AbstractRestAPIController
         $user_uuid = $this->getUserUuid();
         $model = $this->service->findOneWhereOrFail([
             ['user_uuid', $user_uuid],
+            ['app_id', auth()->appId()],
             ['uuid', $id]
         ]);
 
@@ -135,6 +144,7 @@ class ArticleController extends AbstractRestAPIController
         $user_uuid = $this->getUserUuid();
         $model = $this->service->findOneWhereOrFail([
             ['user_uuid', $user_uuid],
+            ['app_id', auth()->appId()],
             ['uuid', $id]
         ]);
         if ($model->content_type != $request->content_type) {
@@ -151,6 +161,7 @@ class ArticleController extends AbstractRestAPIController
         $this->service->update($model, array_merge($request->all(), [
             'content' => $content,
             'user_uuid' => $user_uuid,
+            'app_id' => auth()->appId(),
             'description' => $description
         ]));
 
@@ -178,7 +189,8 @@ class ArticleController extends AbstractRestAPIController
         $content = $this->service->mapTypeLabelToContent($request->content, $request->content_type);
 
         $model = $this->service->create(array_merge($request->except(['reject_reason']), [
-            'user_uuid' => auth()->user()->getKey(),
+            'user_uuid' => auth()->userId(),
+            'app_id' => auth()->appId(),
             'content_for_user' => $request->content_for_user ?: Article::PUBLIC_CONTENT_FOR_USER,
             'content' => $content,
             'description' => $request->keyword ? array_merge($request->keyword, $request->description ?? $request->keyword) : $request->description
@@ -216,7 +228,7 @@ class ArticleController extends AbstractRestAPIController
             return $this->sendValidationFailedJsonResponse();
         }
         //Check current user role
-        $role = auth()->user()->roles->whereIn('slug', ["admin", "root"])->count() ? $request->except('user_uuid') : $request->except(['user_uuid', 'publish_status']);
+        $role = auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN]) ? $request->except('user_uuid') : $request->except(['user_uuid', 'publish_status']);
         //Map type_label to content
         //Check content exist or not
         $checkContent = $request->content ? array_merge($model->getTranslations('content'), $request->content) : $model->getTranslations('content');
@@ -323,18 +335,19 @@ class ArticleController extends AbstractRestAPIController
 
     public function indexMy(IndexRequest $request)
     {
-        $role = auth()->user()->roles->whereIn('slug', [Role::ROLE_EDITOR])->count();
+        $role =  auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN, Role::ROLE_USER]);
         $config = $this->configService->findConfigByKey('time_allowed_view_articles_of_editor');
         //Role editor limit by config days
-        if ($role && $config) {
+        if (!$role && $config) {
             $models = $this->service->getCollectionWithPaginationByCondition($request, [
-                ['user_uuid', auth()->user()->getKey()],
+                ['user_uuid', auth()->userId()],
+                ['app_id', auth()->appId()],
                 ['updated_at', '>=', Carbon::now()->subDays($config->value)]
             ]);
         } else {
             $user_uuid = $this->getUserUuid();
             $models = $this->service->getCollectionWithPaginationByCondition($request,
-                ['user_uuid' => $user_uuid]);
+                ['user_uuid' => $user_uuid, 'app_id' => auth()->appId()]);
         }
 
         return $this->sendOkJsonResponse(
@@ -348,7 +361,7 @@ class ArticleController extends AbstractRestAPIController
      */
     public function indexUnpublishedArticle(IndexRequest $request)
     {
-        $role = auth()->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->count();
+        $role =  auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN]);
         $config = $this->configService->findConfigByKey('time_allowed_view_articles_of_editor');
         //Role editor limit by config days
         if (!$role && $config) {
@@ -392,7 +405,8 @@ class ArticleController extends AbstractRestAPIController
         $content = $this->service->mapTypeLabelToContent($request->get('content'), $request->content_type);
 
         $model = $this->service->create(array_merge($request->except(['reject_reason']), [
-            'user_uuid' => auth()->user()->getKey(),
+            'user_uuid' => auth()->userId(),
+            'app_id' => auth()->appId(),
             'content' => $content,
             'description' => $request->keyword ? array_merge($request->keyword, $request->description ?? $request->keyword) : $request->description
         ]));
@@ -479,6 +493,7 @@ class ArticleController extends AbstractRestAPIController
             $user_uuid = $this->getUserUuid();
             $model = $this->service->findOneWhere([
                 ['user_uuid', $user_uuid],
+                ['app_id', auth()->appId()],
                 ['uuid', $articleUuid]
             ]);
             if ($model) {
@@ -505,6 +520,7 @@ class ArticleController extends AbstractRestAPIController
         $user_uuid = $this->getUserUuid();
         $model = $this->service->findOneWhereOrFail([
             ['user_uuid', $user_uuid],
+            ['app_id', auth()->appId()],
             ['uuid', $id]
         ]);
 

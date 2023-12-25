@@ -16,7 +16,10 @@ class MyBusinessManagementQueryBuilder extends AbstractQueryBuilder
      */
     public static function baseQuery()
     {
-        return BusinessManagement::where('owner_uuid', auth()->user()->getkey());
+        return BusinessManagement::where([
+                    ['owner_uuid', auth()->userId()],
+                    ['app_id', auth()->appId()]
+                ]);
     }
 
     /**

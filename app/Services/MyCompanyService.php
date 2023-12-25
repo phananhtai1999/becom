@@ -18,8 +18,9 @@ class MyCompanyService extends AbstractService
      */
     public function showMyCompany($id)
     {
-        return  $this->findOneWhereOrFail([
-            ['user_uuid', auth()->user()->getkey()],
+        return $this->findOneWhereOrFail([
+            ['user_uuid', auth()->userId()],
+            ['app_id', auth()->appId()],
             ['uuid', $id]
         ]);
     }
@@ -31,8 +32,14 @@ class MyCompanyService extends AbstractService
     public function showMyAndPublicCompany($id)
     {
         return $this->model->where('uuid', $id)->where(function ($query) {
-            $query->where('user_uuid', auth()->user()->getkey())
-                ->orWhereNull('user_uuid');
+            $query->where([
+                ['user_uuid', auth()->userId()],
+                ['app_id', auth()->appId()]
+            ])
+                ->orWhere([
+                    ['user_uuid', null],
+                    ['app_id', auth()->appId()]
+                ]);
         })->firstOrFail();
     }
 

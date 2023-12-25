@@ -28,6 +28,7 @@ class WebsiteResource extends AbstractJsonResource
             'tracking_ids' => $this->tracking_ids,
             'logo' => $this->logo,
             'description' => $this->description,
+            'is_default' => $this->is_default,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
         ];

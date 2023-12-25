@@ -3,7 +3,9 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
+use App\Models\Role;
 use App\Rules\ResetPasswordTeamMemberRule;
+use Techup\ApiConfig\Services\ConfigService;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
@@ -27,7 +29,9 @@ class ResetPasswordEmailTeamMemberRequest extends AbstractRequest
     public function rules()
     {
         $validate = [
-            'user_uuid' => ['required', 'numeric', 'min:1', Rule::exists('users', 'uuid')->whereNull('deleted_at'), Rule::exists('user_teams', 'user_uuid')->whereNull('deleted_at')],
+            'user_uuid' => ['required', 'numeric', 'min:1', Rule::exists('user_profiles', 'uuid')->where(function ($q) {
+                return $q->where('app_id', auth()->appId());
+            })->whereNull('deleted_at'), Rule::exists('user_teams', 'user_uuid')->whereNull('deleted_at')],
             'password' => ['required', 'string', 'regex:/^\S*$/',
                 Password::min(8)
                     ->letters()
@@ -39,7 +43,7 @@ class ResetPasswordEmailTeamMemberRequest extends AbstractRequest
             'password_confirmation' => ['required', 'string', 'same:password']
         ];
 
-        if($this->user()->roles->whereNotIn('slug', ["admin", "root"])->count()){
+        if(!auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN])){
             $validate['user_uuid'] = array_merge($validate['user_uuid'], [new ResetPasswordTeamMemberRule($this->request->get('user_uuid'))]);
         }
 

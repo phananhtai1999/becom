@@ -36,6 +36,7 @@ class BillingAddress extends Model
         'zipcode',
         'type',
         'is_default',
+        'app_id',
     ];
 
     /**

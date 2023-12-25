@@ -17,6 +17,7 @@ class ContactListFactory extends Factory
         return [
             'name' => $this->faker->sentence(3),
             "user_uuid" => User::inRandomOrder()->first()->uuid,
+            'app_id' => $this->faker->sentence(3),
         ];
     }
 }

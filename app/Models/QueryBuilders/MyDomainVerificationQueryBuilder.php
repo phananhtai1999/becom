@@ -18,7 +18,10 @@ class MyDomainVerificationQueryBuilder extends AbstractQueryBuilder
     {
         return DomainVerification::select('domain_verifications.*')
             ->join('domains', 'domains.uuid', '=', 'domain_verifications.domain_uuid')
-            ->where('domains.owner_uuid', auth()->user()->getkey());
+            ->where(
+                ['domains.owner_uuid', auth()->userId()],
+                ['domains.app_id', auth()->appId()]
+            );
     }
 
     /**

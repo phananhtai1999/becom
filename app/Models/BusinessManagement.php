@@ -34,6 +34,7 @@ class BusinessManagement extends AbstractModel
         'domain_uuid',
         'avatar',
         'slogan',
+        'app_id',
     ];
 
     /**

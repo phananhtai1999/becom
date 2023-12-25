@@ -41,7 +41,7 @@ class PositionController extends AbstractRestAPIController
     public function __construct(
         PositionService   $service,
         MyPositionService $myService,
-        LanguageService $languageService
+        LanguageService   $languageService
     )
     {
         $this->service = $service;
@@ -69,7 +69,8 @@ class PositionController extends AbstractRestAPIController
         }
 
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => $request->get('user_uuid') ?? auth()->user()->getkey()
+            'user_uuid' => $request->get('user_uuid') ?? auth()->userId(),
+            'app_id' => auth()->appId(),
         ]));
 
         return $this->sendCreatedJsonResponse(
@@ -95,7 +96,8 @@ class PositionController extends AbstractRestAPIController
         }
 
         $this->service->update($model, array_merge($request->all(), [
-            'user_uuid' => $request->get('user_uuid') ?? auth()->user()->getkey()
+            'user_uuid' => $request->get('user_uuid') ?? auth()->userId(),
+            'app_id' => auth()->appId(),
         ]));
 
         return $this->sendOkJsonResponse(
@@ -115,7 +117,8 @@ class PositionController extends AbstractRestAPIController
         }
 
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => auth()->user()->getkey(),
+            'user_uuid' => auth()->userId(),
+            'app_id' => auth()->appId(),
         ]));
 
         return $this->sendCreatedJsonResponse(
@@ -151,7 +154,8 @@ class PositionController extends AbstractRestAPIController
         }
 
         $this->service->update($model, array_merge($request->all(), [
-            'user_uuid' => auth()->user()->getkey(),
+            'user_uuid' => auth()->userId(),
+            'app_id' => auth()->appId(),
         ]));
 
         return $this->sendOkJsonResponse(

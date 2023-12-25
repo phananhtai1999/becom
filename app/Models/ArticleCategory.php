@@ -79,6 +79,7 @@ class ArticleCategory extends AbstractModel
         'keyword',
         'description',
         'feature_image',
+        'app_id',
     ];
 
     /**

@@ -11,6 +11,7 @@ use App\Rules\CheckUniqueSlugWebsitePageRule;
 use App\Rules\CheckWebsiteDomainRule;
 use App\Rules\CheckWebsitePagesRule;
 use App\Rules\UniqueWebsitePage;
+use Techup\ApiConfig\Services\ConfigService;
 use Illuminate\Validation\Rule;
 
 class CopyDefaultWebsiteRequest extends AbstractRequest
@@ -40,14 +41,14 @@ class CopyDefaultWebsiteRequest extends AbstractRequest
             'tracking_ids.*' => ['nullable', 'string', 'max:300'],
         ];
 
-        if($this->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->count()){
+        if(auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN])){
             $validate['publish_status'] = ['required', 'numeric',
                 Rule::in(
                     Website::PUBLISHED_PUBLISH_STATUS,
                     Website::DRAFT_PUBLISH_STATUS
                 )
             ];
-        }elseif ($this->user()->roles->whereIn('slug', [Role::ROLE_EDITOR])->count()){
+        }elseif (auth()->hasRole([Role::ROLE_EDITOR])){
             $validate['publish_status'] = ['required', 'numeric',
                 Rule::in(
                     Website::PENDING_PUBLISH_STATUS,
@@ -56,7 +57,10 @@ class CopyDefaultWebsiteRequest extends AbstractRequest
             ];
         }else{
             $validate['domain_uuid'] = ['nullable','required_unless:publish_status,'.Website::DRAFT_PUBLISH_STATUS, 'numeric', Rule::exists('domains', 'uuid')->where(function ($q) {
-                return $q->where('owner_uuid', auth()->user()->getKey())
+                return $q->where([
+                    ['owner_uuid', auth()->userId()],
+                    ['app_id', auth()->appId()]
+                ])
                     ->whereNull('deleted_at');
             }), CheckWebsiteDomainRule::uniqueDomain($this->id)];
             $validate['publish_status'] = ['required', 'numeric',

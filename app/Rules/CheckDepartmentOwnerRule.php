@@ -27,8 +27,8 @@ class CheckDepartmentOwnerRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        if (auth()->user()->roles->whereNotIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->first()) {
-            if (Department::findOrFail($value)->user_uuid != auth()->user()->getKey()) {
+        if (!auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
+            if (Department::findOrFail($value)->user_uuid != auth()->userId()) {
 
                 return false;
             }

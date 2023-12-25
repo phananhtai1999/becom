@@ -5,6 +5,7 @@ namespace App\Rules;
 use App\Models\Location;
 use App\Models\Role;
 use App\Models\Team;
+use Techup\ApiConfig\Services\ConfigService;
 use Illuminate\Contracts\Validation\Rule;
 
 class CheckLocationOwnerRule implements Rule
@@ -28,8 +29,8 @@ class CheckLocationOwnerRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        if (auth()->user()->roles->whereNotIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->first()) {
-            if (Location::findOrFail($value)->user_uuid != auth()->user()->getKey()) {
+        if (!auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
+            if (Location::findOrFail($value)->user_uuid != auth()->userId()) {
 
                 return false;
             }

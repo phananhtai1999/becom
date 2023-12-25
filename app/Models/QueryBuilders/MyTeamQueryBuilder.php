@@ -17,7 +17,10 @@ class MyTeamQueryBuilder extends AbstractQueryBuilder
      */
     public static function baseQuery()
     {
-        return Team::where('owner_uuid', auth()->user()->getkey());
+        return Team::where([
+                    ['owner_uuid', auth()->userId()],
+                    ['app_id', auth()->appId()]
+                ]);
     }
 
     /**

@@ -17,7 +17,7 @@ use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Resources\DomainVerificationResource;
 use App\Services\BusinessManagementService;
-use App\Services\ConfigService;
+use Techup\ApiConfig\Services\ConfigService;
 use App\Services\DomainService;
 use App\Services\DomainVerificationService;
 use App\Services\MyDomainService;
@@ -83,7 +83,8 @@ class DomainController extends AbstractRestAPIController
         $request = app($this->storeRequest);
 
         $model = $this->service->create(array_merge($request->except(['active_mailbox_status']), [
-            'owner_uuid' => $request->get('owner_uuid') ?? auth()->user()->getKey(),
+            'owner_uuid' => $request->get('owner_uuid') ?? auth()->userId(),
+            'app_id' => auth()->appId(),
             'active_mailbox' => false,
         ]));
 
@@ -121,7 +122,8 @@ class DomainController extends AbstractRestAPIController
     public function storeMyDomain(MyDomainRequest $request)
     {
         $model = $this->service->create(array_merge($request->except(['active_mailbox_status']), [
-            'owner_uuid' => auth()->user()->getkey(),
+            'owner_uuid' => auth()->userId(),
+            'app_id' => auth()->appId(),
             'active_mailbox' => false,
         ]));
 
@@ -153,7 +155,8 @@ class DomainController extends AbstractRestAPIController
         $model = $this->myService->showMyDomain($id);
 
         $this->service->update($model, array_merge($request->except(['active_mailbox', 'active_mailbox_status']), [
-            'owner_uuid' => auth()->user()->getkey(),
+            'owner_uuid' => auth()->userId(),
+            'app_id' => auth()->appId(),
         ]));
 
         return $this->sendOkJsonResponse(
@@ -241,7 +244,8 @@ class DomainController extends AbstractRestAPIController
     public function myDomainVerifiedAndActiveMailbox(IndexRequest $request)
     {
         $models = $this->service->getCollectionWithPaginationByCondition($request, [
-            ['owner_uuid', auth()->user()->getKey()],
+            ['owner_uuid', auth()->userId()],
+            ['app_id', auth()->appId()],
             ['verified_at', '<>', null],
             ['active_mailbox', true]
         ]);

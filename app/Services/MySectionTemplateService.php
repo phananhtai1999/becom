@@ -19,7 +19,8 @@ class MySectionTemplateService extends AbstractService
     public function showMySectionTemplateByUuid($id)
     {
         return $this->findOneWhereOrFail([
-            ['user_uuid', auth()->user()->getkey()],
+            ['user_uuid', auth()->userId()],
+            ['app_id', auth()->appId()],
             ['uuid', $id]
         ]);
     }
@@ -38,7 +39,10 @@ class MySectionTemplateService extends AbstractService
     public function getCanUseUuidsSectionTemplates()
     {
         return $this->model->doesntHave('headerWebsite')->doesntHave('footerWebsite')
-            ->where('user_uuid', auth()->user()->getKey())->get()->pluck('uuid');
+            ->where([
+                ['user_uuid', auth()->userId()],
+                ['app_id', auth()->appId()]
+            ])->get()->pluck('uuid');
     }
 
     public function getIsCanUseSectionTemplates($request)

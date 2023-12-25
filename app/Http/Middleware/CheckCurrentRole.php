@@ -2,11 +2,15 @@
 
 namespace App\Http\Middleware;
 
+use App\Abstracts\AbstractRestAPIController;
 use Closure;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+use Firebase\JWT\SignatureInvalidException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class CheckCurrentRole
+class CheckCurrentRole extends AbstractRestAPIController
 {
     /**
      * Handle an incoming request.
@@ -18,18 +22,19 @@ class CheckCurrentRole
      */
     public function handle(Request $request, Closure $next, $role)
     {
-        $currentRoles = auth()->user()->roles;
-        $allowedRoles = array_slice(func_get_args(), 2);
-        foreach ($currentRoles as $currentRole) {
-            if( in_array($currentRole->slug, $allowedRoles) ) {
-                return $next($request);
+        try {
+            $decodedToken = JWT::decode(auth()->token(), new Key(config('api_base.token_key'), 'HS256'));
+            $currentRoles = optional($decodedToken->data)->roles;
+            $allowedRoles = array_slice(func_get_args(), 2);
+            foreach ($currentRoles as $currentRole) {
+                if (in_array($currentRole, $allowedRoles)) {
+                    return $next($request);
+                }
             }
-        }
 
-        return response()->json([
-            'status' => false,
-            'locale' => app()->getLocale(),
-            'message' => __('messages.unauthorized')
-        ], 403);
+            return $this->sendUnAuthorizedJsonResponse();
+        } catch (SignatureInvalidException|\InvalidArgumentException|\ErrorException|\TypeError|\UnexpectedValueException $exception) {
+            return $this->sendInternalServerErrorJsonResponse();
+        }
     }
 }

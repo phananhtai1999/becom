@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Models\Role;
+use Techup\ApiConfig\Services\ConfigService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -39,7 +40,7 @@ class GetBusinessMemberRequest extends FormRequest
             'search_by.*' => ['nullable', 'string'],
             'exclude_team_uuid' => ['integer', 'exists:teams,uuid']
         ];
-        if (auth()->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->count()) {
+        if (auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             $validates['business_uuid'] = ['required', 'integer', Rule::exists('business_managements', 'uuid')->whereNull('deleted_at')];
         }
 

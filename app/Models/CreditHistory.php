@@ -29,6 +29,7 @@ class CreditHistory extends AbstractModel
         'scenario_uuid',
         'credit',
         'type',
+        'app_id',
     ];
 
     /**

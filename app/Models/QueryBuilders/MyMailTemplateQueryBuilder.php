@@ -16,7 +16,10 @@ class MyMailTemplateQueryBuilder extends AbstractQueryBuilder
      */
     public static function baseQuery()
     {
-        return MailTemplate::where('user_uuid', auth()->user()->getKey());
+        return MailTemplate::where([
+            ['user_uuid', auth()->userId()],
+            ['app_id', auth()->appId()]
+        ]);
     }
 
     /**

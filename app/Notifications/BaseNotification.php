@@ -3,7 +3,7 @@
 namespace App\Notifications;
 
 use App\Events\ActivityHistoryOfSendByCampaignEvent;
-use App\Services\ConfigService;
+use Techup\ApiConfig\Services\ConfigService;
 use App\Services\ContactService;
 use App\Services\CreditHistoryService;
 use App\Services\FooterTemplateService;

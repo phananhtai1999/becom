@@ -27,7 +27,8 @@ class UserAddOn extends Model
         'user_uuid',
         'add_on_subscription_plan_uuid',
         'expiration_date',
-        'auto_renew'
+        'auto_renew',
+        'app_id',
     ];
 
     /**

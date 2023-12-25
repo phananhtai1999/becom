@@ -33,7 +33,8 @@ class SendProject extends AbstractModel
         'name',
         'description',
         'logo',
-        'domain_uuid'
+        'domain_uuid',
+        'app_id',
     ];
 
     /**

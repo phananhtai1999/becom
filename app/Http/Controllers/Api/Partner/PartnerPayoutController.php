@@ -61,7 +61,10 @@ class PartnerPayoutController extends AbstractRestAPIController
     public function withdrawal(MyPartnerPayoutRequest $request)
     {
         $amountWantWithdrawn = $request->get('amount');
-        $partner = $this->partnerService->findOneWhereOrFail(['user_uuid' => auth()->user()->getKey()]);
+        $partner = $this->partnerService->findOneWhereOrFail([
+            'user_uuid' => auth()->userId(),
+            'app_id' => auth()->appId(),
+        ]);
         $amountCanWithdrawn = $partner->unpaid_earnings;
 
         if ($amountWantWithdrawn > $amountCanWithdrawn) {
@@ -84,7 +87,8 @@ class PartnerPayoutController extends AbstractRestAPIController
             $this->service->update($partnerPayout, [
                 'status' => $status,
                 'time' => Carbon::now(),
-                'by_user_uuid' => auth()->user()->getKey()
+                'by_user_uuid' => auth()->userId(),
+                'app_id' => auth()->appId(),
             ]);
         }
 

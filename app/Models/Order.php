@@ -37,6 +37,7 @@ class Order extends AbstractModel
         'total_price',
         'status',
         'note',
+        'app_id',
     ];
 
     /**

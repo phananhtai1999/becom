@@ -26,7 +26,8 @@ class PartnerUser extends AbstractModel
         'user_uuid',
         'partner_code',
         'registered_from_partner_code',
-        'partnered_at'
+        'partnered_at',
+        'app_id',
     ];
 
     /**

@@ -47,13 +47,15 @@ class UserConfigController extends AbstractRestAPIController
             $request = app(MyUserConfigRequest::class);
 
             $model = $this->service->create(array_merge($request->all(), [
-                'user_uuid' => auth()->user()->getkey()
+                'user_uuid' => auth()->userId(),
+                'app_id' => auth()->appId(),
             ]));
         } else {
             $request = app(UpdateMyUserConfigRequest::class);
 
             $this->service->update($model, array_merge($request->all(), [
-                'user_uuid' => auth()->user()->getkey()
+                'user_uuid' => auth()->userId(),
+                'app_id' => auth()->appId(),
             ]));
         }
 

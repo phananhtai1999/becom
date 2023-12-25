@@ -81,7 +81,8 @@ class CheckoutController extends AbstractRestAPIController
         $order = $this->orderService->create([
             'status' => Order::ORDER_PENDING_REQUEST_STATUS,
             'credit' => $credit,
-            'user_uuid' => auth()->user()->getkey(),
+            'user_uuid' => auth()->userId(),
+            'app_id' => auth()->appId(),
             'payment_method_uuid' => $paymentMethod,
             'total_price' => $totalPriceOrder,
             'note' => $request->get('note'),

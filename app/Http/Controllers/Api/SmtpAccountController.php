@@ -20,7 +20,7 @@ use App\Http\Resources\SmtpAccountResourceCollection;
 use App\Http\Resources\SmtpAccountResource;
 use App\Mail\SendEmails;
 use App\Models\MailTemplate;
-use App\Services\ConfigService;
+use Techup\ApiConfig\Services\ConfigService;
 use App\Services\MySmtpAccountService;
 use App\Services\SmtpAccountService;
 use App\Services\UserService;
@@ -63,11 +63,11 @@ class SmtpAccountController extends AbstractRestAPIController
      * @param SendProjectService $sendProjectService
      */
     public function __construct(
-        SmtpAccountService $service,
+        SmtpAccountService   $service,
         MySmtpAccountService $myService,
-        UserService $userService,
-        ConfigService $configService,
-        SendProjectService $sendProjectService
+        UserService          $userService,
+        ConfigService        $configService,
+        SendProjectService   $sendProjectService
     )
     {
         $this->service = $service;
@@ -113,16 +113,17 @@ class SmtpAccountController extends AbstractRestAPIController
         if ($request->get('send_project_uuid')) {
             $website = $this->sendProjectService->findOneById($request->get('send_project_uuid'));
             $userUuid = $website->user_uuid;
-        }else{
-            $userUuid = auth()->user()->getKey();
+        } else {
+            $userUuid = auth()->userId();
         }
 
         if (!$this->service->checkMailUserNameUnique($request->get('mail_username'), $userUuid)) {
             return $this->sendValidationFailedJsonResponse(["errors" => ["mail_username" => __('messages.mail_username_already_taken')]]);
         }
 
-        $model = $this->service->create(array_merge($request->except(['status','publish']), [
+        $model = $this->service->create(array_merge($request->except(['status', 'publish']), [
             'user_uuid' => $userUuid,
+            'app_id' => auth()->appId(),
         ]));
 
         //Test smtp account khi tạo 1 smtp
@@ -153,7 +154,7 @@ class SmtpAccountController extends AbstractRestAPIController
                 return $this->sendValidationFailedJsonResponse(["errors" => ["mail_username" => __('messages.mail_username_already_taken')]]);
             }
             $data = $request->except(['status', 'user_uuid']);
-        }else {
+        } else {
             if (!$this->service->checkExistsSmtpAccountInTables($id)) {
                 $website = $this->sendProjectService->findOneById($request->get('send_project_uuid'));
                 if (!$this->service->checkMailUserNameUnique($request->get('mail_username'), $website->user_uuid)) {
@@ -176,7 +177,7 @@ class SmtpAccountController extends AbstractRestAPIController
                     'status' => 'error',
                     'publish' => false
                 ]);
-            }else{
+            } else {
                 $this->service->update($model, [
                     'status' => 'work',
                 ]);
@@ -210,13 +211,13 @@ class SmtpAccountController extends AbstractRestAPIController
      */
     public function storeMySmtpAccount(MySmtpAccountRequest $request)
     {
-        $user = $this->userService->findOrFailById(auth()->user()->getkey());
+        $user = $this->userService->findOrFailById(auth()->userId());
         $config = $this->configService->findConfigByKey('smtp_auto');
 
-        if($user->can_add_smtp_account == 1 || $config->value == 0)
-        {
+        if ($user->can_add_smtp_account == 1 || $config->value == 0) {
             $model = $this->service->create(array_merge($request->except(['status', 'publish']), [
-                'user_uuid' => auth()->user()->getkey(),
+                'user_uuid' => auth()->userId(),
+                'app_id' => auth()->appId(),
             ]));
 
             //Test smtp account khi tạo 1 smtp
@@ -258,13 +259,12 @@ class SmtpAccountController extends AbstractRestAPIController
         $model = $this->myService->findMySmtpAccountByKeyOrAbort($id);
         $config = $this->configService->findConfigByKey('smtp_auto');
 
-        if($model->user->can_add_smtp_account == 1 || $config->value == 0)
-        {
+        if ($model->user->can_add_smtp_account == 1 || $config->value == 0) {
             if (empty($request->get('send_project_uuid')) || $model->send_project_uuid == $request->get('send_project_uuid') ||
                 !$this->service->checkExistsSmtpAccountInTables($id)) {
 
-                $data = $request->except(['user_uuid','status','publish']);
-            }else {
+                $data = $request->except(['user_uuid', 'status', 'publish']);
+            } else {
                 return $this->sendValidationFailedJsonResponse(["errors" => ["send_project_uuid" => __('messages.website_uuid_not_changed')]]);
             }
 
@@ -278,7 +278,7 @@ class SmtpAccountController extends AbstractRestAPIController
                         'status' => 'error',
                         'publish' => false
                     ]);
-                }else{
+                } else {
                     $this->service->update($model, [
                         'status' => 'work',
                         'publish' => true
@@ -326,7 +326,7 @@ class SmtpAccountController extends AbstractRestAPIController
             Mail::to(auth()->user()->email)->send(new SendEmails($subject, $body));
 
             return $this->sendOkJsonResponse(['message' => __('messages.sent_mail_success')]);
-        }catch (\Exception $e){
+        } catch (\Exception $e) {
             return $this->sendValidationFailedJsonResponse(["smtp_account" => $e->getMessage()]);
         }
 
@@ -351,7 +351,7 @@ class SmtpAccountController extends AbstractRestAPIController
             Mail::to(auth()->user()->email)->send(new SendEmails($subject, $body));
 
             return $this->sendOkJsonResponse(['message' => __('messages.sent_mail_success')]);
-        }catch (\Exception $e){
+        } catch (\Exception $e) {
             return $this->sendValidationFailedJsonResponse(["smtp_account" => $e->getMessage()]);
         }
 

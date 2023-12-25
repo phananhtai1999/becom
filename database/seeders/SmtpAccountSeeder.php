@@ -20,26 +20,26 @@ class SmtpAccountSeeder extends Seeder
     {
         $smtpAccounts = [
             [
-                "mail_username"=> "phongphunguyen7575a@gmail.com",
-                "mail_password"=> "ktwpnxofevcqnsze",
-                "mail_from_address"=> "phongphunguyen7575a@gmail.com",
+                "mail_username" => "phongphunguyen7575a@gmail.com",
+                "mail_password" => "ktwpnxofevcqnsze",
+                "mail_from_address" => "phongphunguyen7575a@gmail.com",
             ],
             [
-                "mail_username"=> "phongphunguyen7575b@gmail.com",
-                "mail_password"=> "cnneowuovtkbvagi",
-                "mail_from_address"=> "phongphunguyen7575b@gmail.com",
+                "mail_username" => "phongphunguyen7575b@gmail.com",
+                "mail_password" => "cnneowuovtkbvagi",
+                "mail_from_address" => "phongphunguyen7575b@gmail.com",
             ],
         ];
 
         $smtpAccountsAdminRanDom = [
             [
-                "mail_mailer"=> "smtp",
+                "mail_mailer" => "smtp",
             ],
             [
-                "mail_mailer"=> "telegram",
+                "mail_mailer" => "telegram",
             ],
             [
-                "mail_mailer"=> "viber",
+                "mail_mailer" => "viber",
             ],
         ];
 
@@ -49,12 +49,14 @@ class SmtpAccountSeeder extends Seeder
         foreach ($smtpAccountsAdminRanDom as $smtpAccount) {
             $smtpAdmin = SmtpAccount::where([
                 ['mail_mailer', $smtpAccount['mail_mailer']],
-                ['user_uuid', $admin->uuid]
+                ['user_uuid', $admin->uuid],
+                ['app_id', $admin->app_id],
             ])->first();
             if (!$smtpAdmin) {
                 SmtpAccount::factory()->create([
-                    "mail_mailer"=> $smtpAccount['mail_mailer'],
-                    "user_uuid"=> $admin->uuid,
+                    "mail_mailer" => $smtpAccount['mail_mailer'],
+                    "user_uuid" => $admin->uuid,
+                    'app_id', $admin->app_id,
                     'send_project_uuid' => null
                 ]);
             }
@@ -68,18 +70,19 @@ class SmtpAccountSeeder extends Seeder
             ])->first();
             if (!$smtp) {
                 SmtpAccount::factory()->create([
-                    "mail_mailer"=> "smtp",
-                    "mail_host"=> "smtp.gmail.com",
-                    "mail_port"=> 465,
-                    "mail_username"=> $smtpAccount['mail_username'],
-                    "mail_password"=> $smtpAccount['mail_password'],
-                    "smtp_mail_encryption_uuid"=> SmtpAccountEncryption::where('name', 'SSL')->first()->uuid,
-                    "mail_from_address"=> $smtpAccount['mail_from_address'],
-                    "secret_key"=> "smtp",
-                    "user_uuid"=> $user->uuid,
+                    "mail_mailer" => "smtp",
+                    "mail_host" => "smtp.gmail.com",
+                    "mail_port" => 465,
+                    "mail_username" => $smtpAccount['mail_username'],
+                    "mail_password" => $smtpAccount['mail_password'],
+                    "smtp_mail_encryption_uuid" => SmtpAccountEncryption::where('name', 'SSL')->first()->uuid,
+                    "mail_from_address" => $smtpAccount['mail_from_address'],
+                    "secret_key" => "smtp",
+                    "user_uuid" => $user->uuid,
+                    'app_id' => $admin->app_id,
                     'send_project_uuid' => $mailTemplate->send_project_uuid
                 ]);
-            }else{
+            } else {
                 $smtp->update([
                     'send_project_uuid' => $mailTemplate->send_project_uuid
                 ]);

@@ -17,7 +17,7 @@ use App\Models\Notification;
 use App\Models\Scenario;
 use App\Services\CampaignScenarioService;
 use App\Services\CampaignService;
-use App\Services\ConfigService;
+use Techup\ApiConfig\Services\ConfigService;
 use App\Services\ContactService;
 use App\Services\MailSendingHistoryService;
 use App\Services\MyScenarioService;
@@ -122,7 +122,8 @@ class ScenarioController extends AbstractRestAPIController
         //Insert data
         $scenario = $this->service->create([
             'name' => $request->get('name'),
-            'user_uuid' => auth()->user()->getKey()
+            'user_uuid' => auth()->userId(),
+            'app_id' => auth()->appId(),
         ]);
 
         $typeByNodeId = [];
@@ -189,7 +190,8 @@ class ScenarioController extends AbstractRestAPIController
         //Insert data
         $scenario = $this->service->create([
             'name' => $request->get('name'),
-            'user_uuid' => auth()->user()->getKey()
+            'user_uuid' => auth()->userId(),
+            'app_id' => auth()->appId(),
         ]);
 
         $typeByNodeId = [];

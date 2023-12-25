@@ -12,7 +12,8 @@ class CheckWebsiteDomainRule
             //Do not allow domain to belong to many websites
             $website = (new MyWebsiteService())->findOneWhere([
                 ['domain_uuid', $value],
-                ['user_uuid', auth()->user()->getKey()],
+                ['user_uuid', auth()->userId()],
+                ['app_id', auth()->appId()],
                 ['uuid', '!=', $uuid],
             ]);
             if ($website) {

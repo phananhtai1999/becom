@@ -34,7 +34,10 @@ class AddOnService extends AbstractService
             $excludeAddOn = $teamExclude->addOns()->pluck('uuid')->toArray();
         }
         $userAddOns = UserAddOn::select(['user_uuid', 'add_on_subscription_plan_uuid'])
-            ->where(['user_uuid' => $business->owner_uuid])
+            ->where([
+                'user_uuid' => $business->owner_uuid,
+                'app_id' => auth()->appId()
+            ])
             ->distinct()->get();
         $addOnUuids = [];
         foreach ($userAddOns as $userAddOn) {

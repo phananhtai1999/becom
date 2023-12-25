@@ -124,25 +124,21 @@ class WebsitePageController extends AbstractRestAPIController
 
     public function getWebsitePageWithReplace(GetWebsitePagesRequest $request)
     {
-        if (!$request->get('domain')) {
-            $website = $this->websiteService->findOrFailById($request->get('website_uuid'));
-            $domain = $website->domain->name;
-        } else {
-            $domain = $request->get('domain');
-        }
-
         if ($request->get('website_page_slug')) {
-            $websitePage = $this->service->getWebsitePageByDomainAndWebsitePageSlug($domain, $request->get('website_page_slug'));
+            $websitePage = $this->service->getWebsitePageByDomainAndWebsitePageSlug($request->get('domain'), $request->get('website_page_slug'));
         } else {
-            $websitePage = $this->service->getWebsitePageByDomainAndWebsitePageUuid($domain, $request->get('website_page_uuid'));
-
+            $websitePage = $this->service->getWebsitePageByWebsiteAndWebsitePageUuid($request->get('website_uuid'), $request->get('website_page_uuid'));
         }
 
         if (!$request->get('article_slug') && !$request->get('article_uuid')
             && !$request->get('article_category_slug') && !$request->get('article_category_uuid')) {
             $websitePage = $this->service->renderContentForHomeArticles($websitePage);
         } else {
-            $newsWebsitePages = $this->service->getNewsWebsitePagesByDomain($domain);
+            if (!$request->get('domain')) {
+                $newsWebsitePages = $this->service->getNewsWebsitePagesByWebsite($request->get('website_uuid'));
+            } else {
+                $newsWebsitePages = $this->service->getNewsWebsitePagesByDomain($request->get('domain'));
+            }
             if (($request->get('article_uuid') || $request->get('article_slug'))
                 && ($request->get('article_category_uuid') || $request->get('article_category_slug'))) {
                 $websitePage = $newsWebsitePages->where('type', WebsitePage::ARTICLE_DETAIL_TYPE)->first();
@@ -185,7 +181,8 @@ class WebsitePageController extends AbstractRestAPIController
 
         $model = $this->service->create(array_merge($request->all(), [
             'publish_status' => WebsitePage::PUBLISHED_PUBLISH_STATUS,
-            'user_uuid' => auth()->user()->getKey(),
+            'user_uuid' => auth()->userId(),
+            'app_id' => auth()->appId(),
             'description' => $request->keyword ? array_merge($request->keyword, $request->description ?? $request->keyword) : $request->description
         ]));
 
@@ -238,7 +235,8 @@ class WebsitePageController extends AbstractRestAPIController
         }
 
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => auth()->user()->getkey(),
+            'user_uuid' => auth()->userId(),
+            'app_id' => auth()->appId(),
             'is_default' => false,
             'description' => $request->keyword ? array_merge($request->keyword, $request->description ?? $request->keyword) : $request->description
         ]));
@@ -339,7 +337,8 @@ class WebsitePageController extends AbstractRestAPIController
             return $this->sendValidationFailedJsonResponse();
         }
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => auth()->user()->getKey(),
+            'user_uuid' => auth()->userId(),
+            'app_id' => auth()->appId(),
             'description' => $request->keyword ? array_merge($request->keyword, $request->description ?? $request->keyword) : $request->description
         ]));
 

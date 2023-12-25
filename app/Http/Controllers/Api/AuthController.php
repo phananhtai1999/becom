@@ -18,7 +18,7 @@ use App\Models\Invite;
 use App\Models\PasswordReset;
 use App\Models\PlatformPackage;
 use App\Models\User;
-use App\Services\ConfigService;
+use Techup\ApiConfig\Services\ConfigService;
 use App\Services\InviteService;
 use App\Services\OtpService;
 use App\Services\PartnerService;

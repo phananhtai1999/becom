@@ -51,9 +51,9 @@ class CreditHistoryController extends AbstractRestAPIController
      * @param MyUserCreditHistoryService $myAddCreditHistoryService
      */
     public function __construct(
-        CreditHistoryService $service,
-        MyCreditHistoryService $myService,
-        UserCreditHistoryService $userCreditHistoryService,
+        CreditHistoryService       $service,
+        MyCreditHistoryService     $myService,
+        UserCreditHistoryService   $userCreditHistoryService,
         MyUserCreditHistoryService $myAddCreditHistoryService
     )
     {
@@ -77,7 +77,8 @@ class CreditHistoryController extends AbstractRestAPIController
 
         if (empty($request->user_uuid)) {
             $data = array_merge($request->all(), [
-                'user_uuid' => auth()->user()->getkey(),
+                'user_uuid' => auth()->userId(),
+                'app_id' => auth()->appId(),
             ]);
         } else {
             $data = $request->all();

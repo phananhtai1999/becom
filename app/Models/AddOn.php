@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Techup\ApiConfig\Services\ConfigService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -49,7 +50,8 @@ class AddOn extends Model
         'deleted_at' => 'datetime',
     ];
 
-    public function permissions() {
+    public function permissions()
+    {
         return $this->belongsToMany(Permission::class, 'add_on_permissions', 'add_on_uuid', 'permission_uuid');
     }
 
@@ -58,19 +60,22 @@ class AddOn extends Model
         return $this->hasMany(AddOnSubscriptionPlan::class, 'add_on_uuid', 'uuid');
     }
 
-    public function teams() {
-        return $this->belongsToMany(Team::class, 'team_add_on', 'add_on_uuid','team_uuid')->withTimestamps();
+    public function teams()
+    {
+        return $this->belongsToMany(Team::class, 'team_add_on', 'add_on_uuid', 'team_uuid')->withTimestamps();
     }
 
-    public function userTeams() {
-        return $this->belongsToMany(UserTeam::class, 'user_team_add_on', 'add_on_uuid','user_team_uuid')->withTimestamps();
+    public function userTeams()
+    {
+        return $this->belongsToMany(UserTeam::class, 'user_team_add_on', 'add_on_uuid', 'user_team_uuid')->withTimestamps();
     }
 
-    public function inBusiness() {
-        if (auth()->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->count()) {
+    public function inBusiness()
+    {
+        if (auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             $businessUuid = request()->get("business_uuid");
         } else {
-            $businessUuid= auth()->user()->businessManagements->first()->uuid;
+            $businessUuid = auth()->user()->businessManagements->first()->uuid;
         }
         $userUuidInBusiness = BusinessManagement::findOrFail($businessUuid)->userBusiness->pluck('user_uuid')->toArray();
 

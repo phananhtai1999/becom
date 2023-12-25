@@ -14,7 +14,7 @@ use App\Http\Resources\PlatformPackageResourceCollection;
 use App\Http\Resources\UserPlatformPackageResource;
 use App\Models\PlatformPackage;
 use App\Models\UserPlatformPackage;
-use App\Services\ConfigService;
+use Techup\ApiConfig\Services\ConfigService;
 use App\Services\PaypalService;
 use App\Services\PlatformPackageService;
 use App\Services\StripeService;
@@ -68,7 +68,10 @@ class PlatformPackageController extends AbstractRestAPIController
      * @return JsonResponse
      */
     public function myPlatformPackage() {
-        $myPlatformPackage = $this->userPlatformPackageService->findOneWhere(['user_uuid' => auth()->user()->getKey()]);
+        $myPlatformPackage = $this->userPlatformPackageService->findOneWhere([
+            'user_uuid' => auth()->userId(),
+            'app_id' => auth()->appId(),
+        ]);
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->userPlatformResourceClass, $myPlatformPackage)

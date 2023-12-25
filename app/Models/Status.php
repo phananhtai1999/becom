@@ -35,7 +35,8 @@ class Status extends AbstractModel
     protected $fillable = [
         'name',
         'user_uuid',
-        'points'
+        'points',
+        'app_id',
     ];
 
     /**

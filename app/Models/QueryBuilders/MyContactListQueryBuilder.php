@@ -18,7 +18,10 @@ class MyContactListQueryBuilder extends AbstractQueryBuilder
      */
     public static function baseQuery()
     {
-        return ContactList::where('user_uuid', auth()->user()->getKey());
+        return ContactList::where([
+            ['user_uuid', auth()->userId()],
+            ['app_id', auth()->appId()]
+        ]);
     }
 
     /**

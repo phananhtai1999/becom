@@ -19,7 +19,8 @@ class MyBusinessManagementService extends AbstractService
     public function showMyBusinessManagement($id)
     {
         return  $this->findOneWhereOrFail([
-            ['owner_uuid', auth()->user()->getkey()],
+            ['owner_uuid', auth()->userId()],
+            ['app_id', auth()->appId()],
             ['uuid', $id]
         ]);
     }

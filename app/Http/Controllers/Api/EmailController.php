@@ -35,7 +35,7 @@ class EmailController extends AbstractRestAPIController
      * @param MyEmailService $myService
      */
     public function __construct(
-        EmailService $service,
+        EmailService   $service,
         MyEmailService $myService
     )
     {
@@ -57,11 +57,12 @@ class EmailController extends AbstractRestAPIController
     {
         $request = app($this->storeRequest);
 
-        if(empty($request->get('user_uuid'))){
+        if (empty($request->get('user_uuid'))) {
             $data = array_merge($request->all(), [
-                'user_uuid' => auth()->user()->getkey(),
+                'user_uuid' => auth()->userId(),
+                'app_id' => auth()->appId(),
             ]);
-        }else{
+        } else {
             $data = $request->all();
         }
 
@@ -70,7 +71,7 @@ class EmailController extends AbstractRestAPIController
         $model->sendProjects()->attach($request->get('send_project'));
 
         return $this->sendCreatedJsonResponse(
-          $this->service->resourceToData($this->resourceClass, $model)
+            $this->service->resourceToData($this->resourceClass, $model)
         );
     }
 
@@ -122,7 +123,8 @@ class EmailController extends AbstractRestAPIController
     public function storeMyEmail(MyEmailRequest $request)
     {
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => auth()->user()->getkey(),
+            'user_uuid' => auth()->userId(),
+            'app_id' => auth()->appId(),
         ]));
 
         $model->sendProjects()->attach($request->get('send_project'));
@@ -155,7 +157,8 @@ class EmailController extends AbstractRestAPIController
         $model = $this->myService->findMyEmailByKeyOrAbort($id);
 
         $this->service->update($model, array_merge($request->all(), [
-            'user_uuid' => auth()->user()->getkey(),
+            'user_uuid' => auth()->userId(),
+            'app_id' => auth()->appId(),
         ]));
 
         $model->sendProjects()->sync($request->get('send_project') ?? $model->sendProjects);

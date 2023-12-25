@@ -16,7 +16,10 @@ class MyNoteQueryBuilder extends AbstractQueryBuilder
      */
     public static function baseQuery()
     {
-        return Note::where('user_uuid', auth()->user()->getkey());
+        return Note::where([
+            ['user_uuid', auth()->userId()],
+            ['app_id', auth()->appId()]
+        ]);
     }
 
     /**

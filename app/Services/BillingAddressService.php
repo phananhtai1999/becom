@@ -14,6 +14,6 @@ class BillingAddressService extends AbstractService
 
     public function defaultBillingAddress()
     {
-        return $this->model->where(['user_uuid' => auth()->user()->getkey(), 'is_default' => true])->first();
+        return $this->model->where(['user_uuid' => auth()->userId(), 'is_default' => true])->first();
     }
 }

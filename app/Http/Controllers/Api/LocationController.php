@@ -3,16 +3,15 @@
 namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Traits\RestDestroyByUserIdAndAppIdTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
+use App\Http\Controllers\Traits\RestEditByUserIdAndAppIdTrait;
 use App\Http\Controllers\Traits\RestEditTrait;
-use App\Http\Controllers\Traits\RestIndexMyTrait;
+use App\Http\Controllers\Traits\RestIndexByUserIdAndAppIdTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
-use App\Http\Controllers\Traits\RestMyDestroyTrait;
-use App\Http\Controllers\Traits\RestMyEditTrait;
-use App\Http\Controllers\Traits\RestMyShowTrait;
-use App\Http\Controllers\Traits\RestMyStoreTrait;
+use App\Http\Controllers\Traits\RestShowByUserIdAndAppIdTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
+use App\Http\Controllers\Traits\RestStoreByUserIdAndAppIdTrait;
 use App\Http\Controllers\Traits\RestStoreTrait;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\LocationRequest;
@@ -27,7 +26,7 @@ use App\Services\TeamService;
 class LocationController extends AbstractRestAPIController
 {
     use RestIndexTrait, RestShowTrait, RestEditTrait, RestStoreTrait, RestDestroyTrait,
-        RestIndexMyTrait, RestMyStoreTrait, RestMyShowTrait, RestMyDestroyTrait, RestMyEditTrait;
+        RestIndexByUserIdAndAppIdTrait, RestStoreByUserIdAndAppIdTrait, RestShowByUserIdAndAppIdTrait, RestDestroyByUserIdAndAppIdTrait, RestEditByUserIdAndAppIdTrait;
 
     /**
      * @param LocationService $service

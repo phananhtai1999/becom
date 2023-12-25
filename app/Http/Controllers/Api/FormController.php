@@ -76,7 +76,7 @@ class FormController extends AbstractRestAPIController
             $contactList = $this->contactListService->findOneById($request->get('contact_list_uuid'));
             $userUuid = $contactList->user_uuid;
         }else{
-            $userUuid = auth()->user()->getKey();
+            $userUuid = auth()->userId();
         }
 
         $model = $this->service->create(array_merge($request->all(), [
@@ -143,7 +143,8 @@ class FormController extends AbstractRestAPIController
     {
         $model = $this->myService->create( array_merge($request->all(), [
             'publish_status' => Form::PUBLISHED_PUBLISH_STATUS,
-            'user_uuid' => auth()->user()->getKey()
+             'user_uuid' => auth()->userId(),
+            'app_id' => auth()->appId(),
         ]));
 
         return $this->sendCreatedJsonResponse(
@@ -180,7 +181,8 @@ class FormController extends AbstractRestAPIController
                 "last_name" => $request->get('last_name'),
                 "email" => $request->get('email'),
                 "phone" => $request->get('phone'),
-                "user_uuid" => $form->user_uuid
+                "user_uuid" => $form->user_uuid,
+                'app_id' => auth()->appId(),
             ]);
 
             $contact->contactLists()->attach($form->contact_list_uuid);
@@ -226,7 +228,7 @@ class FormController extends AbstractRestAPIController
             $contactList = $this->contactListService->findOneById($request->get('contact_list_uuid'));
             $userUuid = $contactList->user_uuid;
         }else{
-            $userUuid = auth()->user()->getKey();
+            $userUuid = auth()->userId();
         }
 
         $model = $this->service->create(array_merge($request->all(), [

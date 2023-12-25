@@ -42,7 +42,7 @@ use App\Listeners\SendNextByScenarioCampaignListener;
 use App\Listeners\SubscriptionAddOnSuccessListener;
 use App\Listeners\SubscriptionSuccessListener;
 use App\Listeners\UpdateContactByStatusListener;
-use App\Models\Config;
+use Techup\ApiConfig\Models\Config;
 use App\Models\Contact;
 use App\Models\Role;
 use App\Models\Status;

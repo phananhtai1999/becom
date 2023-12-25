@@ -39,7 +39,8 @@ class FooterTemplate extends AbstractModel
         'publish_status',
         'is_default',
         'active_by_uuid',
-        'type'
+        'type',
+        'app_id',
     ];
 
     /**

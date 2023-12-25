@@ -28,10 +28,15 @@ class DomainRequest extends AbstractRequest
             'name' => ['required', 'string', 'regex:/^(?!(www|http|https)\.)\w+(\.\w+)+$/'],
             'verified_at' => ['nullable', 'date'],
             'business_uuid' => ['nullable', 'numeric', Rule::exists('business_managements', 'uuid')->where(function ($query) {
-                return $query->where('owner_uuid', $this->request->get('owner_uuid') ?? auth()->user()->getKey());
+                return $query->where([
+                    ['owner_uuid', $this->request->get('owner_uuid') ?? auth()->userId()],
+                    ['app_id', auth()->appId()]
+                ]);
             })
                 ->whereNull('deleted_at')],
-            'owner_uuid' => ['nullable', 'numeric', Rule::exists('users', 'uuid')->whereNull('deleted_at')],
+            'owner_uuid' => ['nullable', 'numeric', Rule::exists('user_profiles', 'uuid')->where(function ($q) {
+                return $q->where('app_id', auth()->appId());
+            })->whereNull('deleted_at')],
         ];
     }
 }

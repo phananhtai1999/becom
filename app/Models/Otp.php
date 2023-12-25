@@ -28,6 +28,7 @@ class Otp extends Model
         'refresh_time',
         'refresh_count',
         'wrong_count',
+        'app_id',
     ];
 
     /**

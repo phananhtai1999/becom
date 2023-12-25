@@ -75,7 +75,8 @@ class SendProjectController extends AbstractRestAPIController
         $request = app($this->storeRequest);
 
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => $request->get('user_uuid') ?? auth()->user()->getkey(),
+            'user_uuid' => $request->get('user_uuid') ?? auth()->userId(),
+            'app_id' => auth()->appId(),
         ]));
 
         return $this->sendCreatedJsonResponse(
@@ -104,7 +105,8 @@ class SendProjectController extends AbstractRestAPIController
         }
 
         $this->service->update($model, array_merge($data, [
-            'user_uuid' => $request->get('user_uuid') ?? auth()->user()->getkey(),
+            'user_uuid' => $request->get('user_uuid') ?? auth()->userId(),
+            'app_id' => auth()->appId(),
             'domain_uuid' => $request->get('domain_uuid') ?? null
         ]));
 
@@ -136,7 +138,8 @@ class SendProjectController extends AbstractRestAPIController
     public function storeMySendProject(MySendProjectRequest $request)
     {
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => auth()->user()->getkey(),
+            'user_uuid' => auth()->userId(),
+            'app_id' => auth()->appId(),
         ]));
 
         return $this->sendCreatedJsonResponse(
@@ -167,7 +170,8 @@ class SendProjectController extends AbstractRestAPIController
         $model = $this->myService->showMyWebsite($id);
 
         $this->service->update($model, array_merge($request->all(), [
-            'user_uuid' => auth()->user()->getkey(),
+            'user_uuid' => auth()->userId(),
+            'app_id' => auth()->appId(),
         ]));
 
         return $this->sendOkJsonResponse(

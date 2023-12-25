@@ -23,8 +23,9 @@ class MyCreditHistoryService extends AbstractService
      */
     public function showMyCreditHistory($id)
     {
-        return  $this->findOneWhereOrFail([
-            ['user_uuid', auth()->user()->getkey()],
+        return $this->findOneWhereOrFail([
+            ['user_uuid', auth()->userId()],
+            ['app_id', auth()->appId()],
             ['uuid', $id]
         ]);
     }
@@ -55,7 +56,10 @@ class MyCreditHistoryService extends AbstractService
                 AllowedFilter::exact('add_by_uuid'),
 
             ])
-            ->where('user_uuid', auth()->user()->getkey())
+            ->where([
+                ['user_uuid', auth()->userId()],
+                ['app_id', auth()->appId()]
+            ])
             ->select('uuid', 'user_uuid', 'credit', 'campaign_uuid', DB::raw('NULL as campaign_uuid'), 'created_at');
     }
 
@@ -70,7 +74,10 @@ class MyCreditHistoryService extends AbstractService
             ->whereDate('created_at', '>=', $startDate)
             ->whereDate('created_at', '<=', $endDate)
             ->whereNull('deleted_at')
-            ->where('user_uuid', auth()->user()->getkey())
+            ->where([
+                ['user_uuid', auth()->userId()],
+                ['app_id', auth()->appId()]
+            ])
             ->get();
 
         return !empty($totalMyCreditUsed['0']->sum) ? $totalMyCreditUsed['0']->sum : 0;
@@ -88,7 +95,10 @@ class MyCreditHistoryService extends AbstractService
             ->whereDate('created_at', '>=', $startDate)
             ->whereDate('created_at', '<=', $endDate)
             ->whereNull('deleted_at')
-            ->where('user_uuid',auth()->user()->getkey())
+            ->where([
+                ['user_uuid', auth()->userId()],
+                ['app_id', auth()->appId()]
+            ])
             ->orderBy('label', 'ASC')
             ->groupby('label')
             ->get()->toArray();
@@ -106,7 +116,10 @@ class MyCreditHistoryService extends AbstractService
             ->whereDate('created_at', '>=', $startDate)
             ->whereDate('created_at', '<=', $endDate)
             ->whereNull('deleted_at')
-            ->where('user_uuid',auth()->user()->getkey())
+            ->where([
+                ['user_uuid', auth()->userId()],
+                ['app_id', auth()->appId()]
+            ])
             ->orderBy('label', 'ASC')
             ->groupby('label')
             ->get()->toArray();

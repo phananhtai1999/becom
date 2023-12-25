@@ -4,7 +4,7 @@ namespace App\Listeners;
 
 use App\Events\CalculateCreditWhenStopScenarioEvent;
 use App\Services\CampaignScenarioService;
-use App\Services\ConfigService;
+use Techup\ApiConfig\Services\ConfigService;
 use App\Services\ContactService;
 use App\Services\CreditHistoryService;
 use App\Services\MailSendingHistoryService;

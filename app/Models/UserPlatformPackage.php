@@ -28,7 +28,8 @@ class UserPlatformPackage extends Model
         'platform_package_uuid',
         'subscription_plan_uuid',
         'expiration_date',
-        'auto_renew'
+        'auto_renew',
+        'app_id',
     ];
 
     /**

@@ -16,7 +16,10 @@ class MyCreditHistoryQueryBuilder extends AbstractQueryBuilder
      */
     public static function baseQuery()
     {
-        return CreditHistory::where('user_uuid', auth()->user()->getkey());
+        return CreditHistory::where([
+            ['user_uuid', auth()->userId()],
+            ['app_id', auth()->appId()]
+        ]);
     }
 
     /**

@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Article;
 use App\Models\Role;
 use App\Services\ArticleService;
-use App\Services\ConfigService;
+use Techup\ApiConfig\Services\ConfigService;
 use App\Services\UserService;
 use Carbon\Carbon;
 use Illuminate\Console\Command;

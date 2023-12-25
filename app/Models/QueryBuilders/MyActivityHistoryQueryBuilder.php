@@ -19,7 +19,10 @@ class MyActivityHistoryQueryBuilder extends AbstractQueryBuilder
     {
         return ActivityHistory::select('activity_histories.*')
             ->join('contacts', 'contacts.uuid', '=', 'activity_histories.contact_uuid')
-            ->where('contacts.user_uuid', auth()->user()->getkey());
+            ->where([
+                ['contacts.user_uuid', auth()->userId()],
+                ['contacts.app_id', auth()->appId()],
+            ]);
     }
 
     /**
