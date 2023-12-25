@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use App\Abstracts\AbstractRequest;
 use App\Models\Role;
 use App\Rules\ResetPasswordTeamMemberRule;
-use App\Services\ConfigService;
+use Techup\ApiConfig\Services\ConfigService;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 

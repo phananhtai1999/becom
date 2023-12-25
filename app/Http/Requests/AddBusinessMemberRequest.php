@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use App\Models\Role;
 use App\Models\UserBusiness;
 use App\Rules\InviteRule;
-use App\Services\ConfigService;
+use Techup\ApiConfig\Services\ConfigService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;

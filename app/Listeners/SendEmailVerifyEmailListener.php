@@ -4,7 +4,7 @@ namespace App\Listeners;
 
 use App\Events\SendEmailVerifyEmailEvent;
 use App\Mail\SendVerifyEmailToUser;
-use App\Services\ConfigService;
+use Techup\ApiConfig\Services\ConfigService;
 use App\Services\SmtpAccountService;
 use App\Services\UserService;
 use Illuminate\Support\Facades\Mail;

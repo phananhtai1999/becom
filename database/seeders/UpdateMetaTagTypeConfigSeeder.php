@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Config;
+use Techup\ApiConfig\Models\Config;
 use Illuminate\Database\Seeder;
 
 class UpdateMetaTagTypeConfigSeeder extends Seeder

@@ -20,7 +20,7 @@ use App\Models\Role;
 use App\Models\UserTeam;
 use App\Services\ArticleSeriesService;
 use App\Services\ArticleService;
-use App\Services\ConfigService;
+use Techup\ApiConfig\Services\ConfigService;
 use App\Services\LanguageService;
 use App\Services\TeamService;
 use App\Services\UserTeamService;

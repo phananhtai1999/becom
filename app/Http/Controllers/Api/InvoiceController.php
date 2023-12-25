@@ -7,7 +7,7 @@ use App\Abstracts\AbstractService;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Resources\InvoiceResource;
-use App\Services\ConfigService;
+use Techup\ApiConfig\Services\ConfigService;
 use App\Services\InvoiceService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;

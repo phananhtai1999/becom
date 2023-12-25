@@ -2,7 +2,7 @@
 
 namespace App\Abstracts;
 
-use App\Models\Config;
+use Techup\ApiConfig\Models\Config;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;

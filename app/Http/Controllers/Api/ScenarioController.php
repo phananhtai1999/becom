@@ -17,7 +17,7 @@ use App\Models\Notification;
 use App\Models\Scenario;
 use App\Services\CampaignScenarioService;
 use App\Services\CampaignService;
-use App\Services\ConfigService;
+use Techup\ApiConfig\Services\ConfigService;
 use App\Services\ContactService;
 use App\Services\MailSendingHistoryService;
 use App\Services\MyScenarioService;

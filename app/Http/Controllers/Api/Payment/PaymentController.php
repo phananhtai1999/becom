@@ -13,7 +13,7 @@ use App\Http\Resources\SubscriptionHistoryResourceCollection;
 use App\Http\Resources\SubscriptionPlanResourceCollection;
 use App\Models\PaymentMethod;
 use App\Models\UserCreditHistory;
-use App\Services\ConfigService;
+use Techup\ApiConfig\Services\ConfigService;
 use App\Services\CreditPackageHistoryService;
 use App\Services\PaymentService;
 use App\Services\SubscriptionHistoryService;

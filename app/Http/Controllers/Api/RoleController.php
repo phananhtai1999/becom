@@ -13,7 +13,7 @@ use App\Http\Controllers\Traits\RestEditTrait;
 use App\Http\Controllers\Traits\RestStoreTrait;
 use App\Http\Requests\UpdateRoleRequest;
 use App\Http\Resources\RoleResourceCollection;
-use App\Models\Config;
+use Techup\ApiConfig\Models\Config;
 use App\Models\Role;
 use App\Services\RoleService;
 
