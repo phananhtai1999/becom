@@ -264,4 +264,21 @@ class WebsitePageService extends AbstractService
 
         return $websitePage;
     }
+
+    public function renderContentForProductCategory($websitePage, $productCategoryData)
+    {
+        $replaceChildrenProductCategoryService = new ReplaceChildrenProductCategoryService();
+        $replaceProductCategoryService = new ReplaceProductCategoryService();
+        $category = $productCategoryData['category'];
+
+        $websitePage->template = $replaceChildrenProductCategoryService->replaceChildrenProductCategory($websitePage->template, $category);
+
+        $searchProductCategoryReplaceMap = $replaceProductCategoryService->searchReplaceMapForCategory($category);
+        $websitePage->template = str_replace(array_keys($searchProductCategoryReplaceMap), $searchProductCategoryReplaceMap, $websitePage->template);
+        $replaceProductService = new ReplaceProductService();
+        $websitePage->template = $replaceProductService->replaceListProductSpecific($websitePage->template, $websitePage);
+        $websitePage->template = $replaceProductService->replaceListProduct($websitePage->template, $category, $websitePage);
+
+        return $websitePage;
+    }
 }

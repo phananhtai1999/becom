@@ -4,27 +4,26 @@ namespace App\Services;
 
 use App\Models\Article;
 
-class ReplaceProductService
+class ReplaceProductService extends ShopService
 {
-    public function replaceListArticle($template, $articleCategory, $websitePage)
+    public function replaceListProduct($template, $productCategory, $websitePage)
     {
-        $pattern = '/data-article-count="(\d+)"/';
-        preg_match_all($pattern, $template, $articleCount);
-        $articleCount = isset($articleCount[1]) ? array_sum($articleCount[1]) : 10;
-        preg_match('/article-sort="(.*?)"/', $template, $sortName);
-        preg_match('/article-sort-order="(.*?)"/', $template, $sortOrder);
-        $articlesData = Article::where('article_category_uuid', $articleCategory->uuid)->orderBy($sortName[1] ?? 'created_at', $sortOrder[1] ?? 'DESC')->paginate($articleCount);
-        $pattern = '/<article.*?>(.*?)<\/article>/s';
+        $pattern = '/data-product-count="(\d+)"/';
+        preg_match_all($pattern, $template, $productCount);
+        $productCount = isset($productCount[1]) ? array_sum($productCount[1]) : 10;
+        preg_match('/product-sort="(.*?)"/', $template, $sortName);
+        preg_match('/product-sort-order="(.*?)"/', $template, $sortOrder);
+        $productsData = $this->getListProductByCategoryUuid($productCategory['uuid'], $sortName[1] ?? 'created_at', $sortOrder[1] ?? 'desc', $productCount ?? 10);
+        $productsData = $productsData['data'];
+        $pattern = '/<product.*?>(.*?)<\/product>/s';
 
-        return preg_replace_callback($pattern, function ($matches) use ($articlesData, $websitePage) {
-            $articleData = $articlesData->shift();
-            if (!$articleData) {
+        return preg_replace_callback($pattern, function ($matches) use ($productsData, $websitePage) {
+            $productData = $productsData->shift();
+            if (!$productData) {
                 return $matches[0];
             }
 
-            $matches[0] = $this->replaceRedirectTag($articleData, $websitePage, $matches[0]);
-
-            $searchReplaceMap = $this->searchReplaceMapForArticle($articleData);
+            $searchReplaceMap = $this->searchReplaceMapForproduct($productData);
 
             return str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $matches[0]);
         }, $template);
@@ -61,12 +60,13 @@ class ReplaceProductService
         $pattern = '/<product.*?>(.*?)<\/product>/s';
 
         return preg_replace_callback($pattern, function ($matches) use ($websitePage) {
-            preg_match('/data-product-specific="(.*?)"/', $matches[0], $articleUuid);
-            $article = Article::find($articleUuid);
-            if (!$article) {
+            preg_match('/data-product-specific="(.*?)"/', $matches[0], $productUuid);
+            $productData = $this->getProductByUuid($productUuid);
+            $product = $productData['data'];
+            if (!$product) {
                 return $matches[0];
             }
-            $searchReplaceMap = $this->searchReplaceMapForProduct($article);
+            $searchReplaceMap = $this->searchReplaceMapForProduct($product);
 
             return str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $matches[0]);
         }, $specificProductList);

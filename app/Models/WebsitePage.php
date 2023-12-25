@@ -28,6 +28,7 @@ class WebsitePage extends AbstractModel
     const ARTICLE_CATEGORY_TYPE = 'news.article_category';
     const HOME_ARTICLES_TYPE = 'news.home_articles';
     const PRODUCT_DETAIL_TYPE = 'product.product_detail';
+    const PRODUCT_CATEGORY_TYPE = 'product.product_category';
 
     /**
      * @var string
