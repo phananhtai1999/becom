@@ -42,6 +42,7 @@ class ShopService
     public function getListProductByCategoryData($categorySlug) {
         $client = $this->createRequest();
         $res = $client->get(config('shop.shop_url') . 'data-product-category', ['query' => ['product_category_slug' => $categorySlug]]);
+
         return json_decode($res->getBody()->getContents(), true);
     }
 
@@ -67,18 +68,21 @@ class ShopService
             'sorted_by' => $sortOrder,
             'sort' => $sortName
         ]]);
+
         return json_decode($res->getBody()->getContents(), true);
     }
 
     public function getProductByUuid($productUuid) {
         $client = $this->createRequest();
         $res = $client->get(config('shop.shop_url') . 'product/' . $productUuid);
+
         return json_decode($res->getBody()->getContents(), true);
     }
 
-    public function getProductByCategoryUuids($categoryUuids) {
+    public function getProductByParentCategoryUuid($categoryUuid) {
         $client = $this->createRequest();
-        $res = $client->get(config('shop.shop_url') . 'product-by-categories', ['query' => ['product_category_uuids' => $categoryUuids]]);
+        $res = $client->get(config('shop.shop_url') . 'product-by-parent-category/' . $categoryUuid);
+
         return json_decode($res->getBody()->getContents(), true);
     }
 

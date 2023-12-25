@@ -25,12 +25,8 @@ class ReplaceChildrenProductCategoryService extends ShopService
             if (!$childrenCategoryData) {
                 return $childMatches[0];
             }
-//            $childrenCategoriesUuid = $this->getChildrenByCategoryUuid($childrenCategoryData['uuid']);
-//            $childrenCategoryUuids = array_map(function ($item) {
-//                return $item['uuid'];
-//            }, $childrenCategoriesUuid['data']);
 //
-//            $product = $this->getProductByCategoryUuids(array_merge($childrenCategoryUuids, [$childrenCategoryData['uuid']]));
+//            $product = $this->getProductByParentCategoryUuid($childrenCategoryData['uuid']);
 //            if ($product) {
 //                $replaceProduct = new ReplaceProductService();
 //                $searchReplaceProductMap = $replaceProduct->searchReplaceMapForProduct($product['data']);

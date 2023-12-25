@@ -10,7 +10,7 @@ class ReplaceProductService extends ShopService
     {
         $pattern = '/data-product-count="(\d+)"/';
         preg_match_all($pattern, $template, $productCount);
-        $productCount = isset($productCount[1]) ? array_sum($productCount[1]) : 10;
+        $productCount = !empty($productCount[1]) ? array_sum($productCount[1]) : 10;
         preg_match('/product-sort="(.*?)"/', $template, $sortName);
         preg_match('/product-sort-order="(.*?)"/', $template, $sortOrder);
         $productsData = $this->getListProductByCategoryUuid($productCategory['uuid'], $sortName[1] ?? 'created_at', $sortOrder[1] ?? 'desc', $productCount ?? 10);
