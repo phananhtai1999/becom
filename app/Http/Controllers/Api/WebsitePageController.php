@@ -27,6 +27,7 @@ use App\Services\ArticleService;
 use App\Services\DomainService;
 use App\Services\LanguageService;
 use App\Services\MyWebsitePageService;
+use App\Services\ShopService;
 use App\Services\WebsitePageService;
 use App\Services\WebsitePageShortCodeService;
 use App\Services\WebsiteService;
@@ -62,7 +63,8 @@ class WebsitePageController extends AbstractRestAPIController
         ArticleService         $articleService,
         ArticleCategoryService $articleCategoryService,
         DomainService          $domainService,
-        WebsiteService         $websiteService
+        WebsiteService         $websiteService,
+        ShopService $shopService
     )
     {
         $this->service = $service;
@@ -72,6 +74,7 @@ class WebsitePageController extends AbstractRestAPIController
         $this->articleCategoryService = $articleCategoryService;
         $this->domainService = $domainService;
         $this->websiteService = $websiteService;
+        $this->shopService = $shopService;
         $this->resourceCollectionClass = WebsitePageResourceCollection::class;
         $this->resourceClass = WebsitePageResource::class;
         $this->indexRequest = IndexRequest::class;
@@ -131,28 +134,12 @@ class WebsitePageController extends AbstractRestAPIController
             : [['uuid', $id]]);
         $response = $this->sendOkJsonResponse(['data' => $websitePage]);
         if ($websitePage->type == WebsitePage::PRODUCT_DETAIL_TYPE) {
-            $headers = [
-                "x-user-id" => Auth()->user()->getKey(),
-                "x-app-id" => config('shop.x_app_id'),
-                "x-api-key" => config('shop.x_api_key'),
-            ];
-
-            $client = new Client([
-                'headers' => $headers
-            ]);
-            $res = $client->get(config('shop.shop_url') . 'data-product-detail/' . $request->product_uuid);
-            $productDetailData = json_decode($res->getBody()->getContents(), true);
+            $productDetailData = $this->shopService->getProductDetailData($request->product_uuid);
             $websitePage = $this->service->renderContentForProductDetail($websitePage, $productDetailData);
             $response = $this->sendOkJsonResponse(['data' => $websitePage]);
         } elseif ($websitePage->type == WebsitePage::PRODUCT_CATEGORY_TYPE) {
-            if ($request->get('product_category_slug')) {
-                $articleCategory = $this->articleCategoryService->findOneWhereOrFail(['slug' => $request->get('article_category_slug')]);
-            } elseif ($request->get('product_category_uuid')) {
-                $articleCategory = $this->articleCategoryService->findOrFailById($request->get('article_category_uuid'));
-            } else {
-                $articleCategory = $this->articleCategoryService->getLastArticleCategory();
-            }
-            $websitePage = $this->service->renderContentForArticleCategory($websitePage, $articleCategory);
+            $productCategoryData = $this->shopService->getProductCategoryData($request->get('product_category_slug'));
+            $websitePage = $this->service->renderContentForProductCategory($websitePage, $productCategoryData);
             $response = $this->sendOkJsonResponse(['data' => $websitePage]);
         } elseif ($websitePage->type == WebsitePage::HOME_ARTICLES_TYPE) {
             $websitePage = $this->service->renderContentForHomeArticles($websitePage);

@@ -31,7 +31,7 @@ class ReplaceArticleService
     }
 
     public function replaceListArticleSpecific($template, $websitePage) {
-        preg_match('/<specific_article_list.*?>(.*?)<\/specific_article_list>/s', $template, $specificArticleList);
+        preg_match('/<specific-article-list.*?>(.*?)<\/specific-article-list>/s', $template, $specificArticleList);
         if (!$specificArticleList) {
             return $template;
         }
