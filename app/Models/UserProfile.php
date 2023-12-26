@@ -6,6 +6,7 @@ use App\Abstracts\AbstractModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
+use Techup\ApiConfig\Models\Config;
 
 class UserProfile extends AbstractModel
 {
