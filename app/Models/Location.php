@@ -35,4 +35,9 @@ class Location extends Model
     {
         return $this->belongsTo(User::class, 'user_uuid', 'uuid');
     }
+
+    public function sendProjects()
+    {
+        return $this->belongsToMany(Location::class, 'location_send_project', 'location_uuid', 'send_project_uuid')->withTimestamps();
+    }
 }
