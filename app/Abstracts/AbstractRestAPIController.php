@@ -5,6 +5,7 @@ namespace App\Abstracts;
 use App\Models\AddOn;
 use App\Models\Permission;
 use App\Models\PlatformPackage;
+use App\Models\Role;
 use App\Models\Team;
 use Aws\Exception\CredentialsException;
 use Aws\S3\Exception\S3Exception;
@@ -262,5 +263,19 @@ class AbstractRestAPIController extends BaseController
 
     public function removeTeamPermissionCache($userUuid) {
         Cache::forget('team_permission_' . $userUuid);
+    }
+
+    public function checkExistBusiness() {
+        if (!$this->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->first()) {
+            $businesses = $this->user()->businessManagements;
+            if (!$businesses->toArray()) {
+
+                return false;
+            }
+
+            return true;
+        }
+
+        return true;
     }
 }

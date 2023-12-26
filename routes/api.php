@@ -249,6 +249,15 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website.'], function () {
     Route::post('/send-project-verification/html-tag', [SendProjectController::class, 'verifyByHtmlTag'])->name('verifyByHtmlTag');
     Route::post('/send-project-verification/html-file', [SendProjectController::class, 'verifyByHtmlFile'])->name('verifyByHtmlFile');
     Route::get('/verification-download/{token}', [SendProjectController::class, 'downloadHtmlFile'])->name('downloadHtmlFile');
+
+    Route::get('/assign-for-team', [SendProjectController::class, 'assignForTeam'])->name('assignForTeam');
+    Route::get('/unassign-for-team', [SendProjectController::class, 'unassignForTeam'])->name('unassignForTeam');
+
+    Route::get('/assign-for-department', [SendProjectController::class, 'assignForDepartment'])->name('assignForDepartment');
+    Route::get('/unassign-for-department', [SendProjectController::class, 'unassignForDepartment'])->name('unassignForDepartment');
+
+    Route::get('/assign-for-location', [SendProjectController::class, 'assignForLocation'])->name('assignForLocation');
+    Route::get('/unassign-for-location', [SendProjectController::class, 'unassignForLocation'])->name('unassignForLocation');
 });
 
 

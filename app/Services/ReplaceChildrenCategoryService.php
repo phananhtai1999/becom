@@ -16,7 +16,7 @@ class ReplaceChildrenCategoryService
         preg_match('/children-category-sort="(.*?)"/', $categoryTemplates, $sortName);
         preg_match('/children-category-sort-order="(.*?)"/', $categoryTemplates, $sortOrder);
         $childrenCategoriesData = ArticleCategory::where('parent_uuid', $categoryData->uuid)->orderBy($sortName[1] ?? 'created_at', $sortOrder[1] ?? 'DESC')->paginate($childrenCategoryCount);
-        return preg_replace_callback('/<children_category.*?>(.*?)<\/children_category>/s', function ($childMatches) use ($childrenCategoriesData) {
+        return preg_replace_callback('/<children-category-element.*?>(.*?)<\/children-category-element>/s', function ($childMatches) use ($childrenCategoriesData) {
             $childrenCategoryData = $childrenCategoriesData->shift();
             if (!$childrenCategoryData) {
                 return $childMatches[0];
@@ -46,7 +46,7 @@ class ReplaceChildrenCategoryService
         preg_match('/grand-children-category-sort-order="(.*?)"/', $matches, $sortOrder);
         $grandChildrenCategoriesData = ArticleCategory::where('parent_uuid', $childrenCategoryData->uuid)->orderBy($sortName[1] ?? 'created_at', $sortOrder[1] ?? 'DESC')->paginate($grandChildrenCategoryCount);
 
-        return preg_replace_callback('/<grand_children_category.*?>(.*?)<\/grand_children_category>/s', function ($grandChildMatches) use ($grandChildrenCategoriesData) {
+        return preg_replace_callback('/<grand-children-category-element.*?>(.*?)<\/grand-children-category-element>/s', function ($grandChildMatches) use ($grandChildrenCategoriesData) {
             $grandChildrenCategoryData = $grandChildrenCategoriesData->shift();
             $grandChildSearchReplaceMap = $this->searchReplaceMapForGrandChildrenCategory($grandChildrenCategoryData);
             return str_replace(array_keys($grandChildSearchReplaceMap), $grandChildSearchReplaceMap, $grandChildMatches[0]);

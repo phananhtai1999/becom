@@ -6,6 +6,9 @@ use App\Abstracts\AbstractRestAPIController;
 use App\Http\Controllers\Traits\RestIndexMyTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
+use App\Http\Requests\AssignProjectForDepartmentRequest;
+use App\Http\Requests\AssignProjectForLocationRequest;
+use App\Http\Requests\AssignProjectForTeamRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MySendProjectRequest;
 use App\Http\Requests\UpdateMySendProjectRequest;
@@ -16,6 +19,7 @@ use App\Http\Requests\WebsiteVerificationRequest;
 use App\Http\Resources\SendProjectResourceCollection;
 use App\Http\Resources\SendProjectResource;
 use App\Http\Resources\WebsiteVerificationResource;
+use App\Models\Role;
 use App\Services\FileVerificationService;
 use App\Services\MySendProjectService;
 use App\Services\SendProjectService;
@@ -275,5 +279,77 @@ class SendProjectController extends AbstractRestAPIController
         ];
 
         return response()->make($contentFile, 200, $headers);
+    }
+
+    public function assignForTeam(AssignProjectForTeamRequest $request)
+    {
+        if (!$this->checkExistBusiness()) {
+
+            return $this->sendJsonResponse(false, 'You do not have access', [], 403);
+        }
+        $sendProject = $this->service->findOrFailById($request->get('send_project_uuid'));
+        $sendProject->teams()->syncWithoutDetaching($request->get('team_uuids', []));
+
+        return $this->sendOkJsonResponse();
+    }
+
+    public function unassignForTeam(AssignProjectForTeamRequest $request)
+    {
+        if (!$this->checkExistBusiness()) {
+
+            return $this->sendJsonResponse(false, 'You do not have access', [], 403);
+        }
+        $sendProject = $this->service->findOrFailById($request->get('send_project_uuid'));
+        $sendProject->teams()->detach($request->get('team_uuids', []));
+
+        return $this->sendOkJsonResponse();
+    }
+
+    public function assignForDepartment(AssignProjectForDepartmentRequest $request)
+    {
+        if (!$this->checkExistBusiness()) {
+
+            return $this->sendJsonResponse(false, 'You do not have access', [], 403);
+        }
+        $sendProject = $this->service->findOrFailById($request->get('send_project_uuid'));
+        $sendProject->departments()->syncWithoutDetaching($request->get('department_uuids', []));
+
+        return $this->sendOkJsonResponse();
+    }
+
+    public function unassignForDepartment(AssignProjectForDepartmentRequest $request)
+    {
+        if (!$this->checkExistBusiness()) {
+
+            return $this->sendJsonResponse(false, 'You do not have access', [], 403);
+        }
+        $sendProject = $this->service->findOrFailById($request->get('send_project_uuid'));
+        $sendProject->departments()->detach($request->get('department_uuids', []));
+
+        return $this->sendOkJsonResponse();
+    }
+
+    public function assignForLocation(AssignProjectForLocationRequest $request)
+    {
+        if (!$this->checkExistBusiness()) {
+
+            return $this->sendJsonResponse(false, 'You do not have access', [], 403);
+        }
+        $sendProject = $this->service->findOrFailById($request->get('send_project_uuid'));
+        $sendProject->locations()->syncWithoutDetaching($request->get('location_uuids', []));
+
+        return $this->sendOkJsonResponse();
+    }
+
+    public function unassignForLocation(AssignProjectForLocationRequest $request)
+    {
+        if (!$this->checkExistBusiness()) {
+
+            return $this->sendJsonResponse(false, 'You do not have access', [], 403);
+        }
+        $sendProject = $this->service->findOrFailById($request->get('send_project_uuid'));
+        $sendProject->locations()->detach($request->get('location_uuids', []));
+
+        return $this->sendOkJsonResponse();
     }
 }

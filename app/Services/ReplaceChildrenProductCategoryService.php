@@ -20,7 +20,7 @@ class ReplaceChildrenProductCategoryService extends ShopService
 
         $childrenCategoriesData = $childrenCategoriesData['data'];
 
-        return preg_replace_callback('/<children_category.*?>(.*?)<\/children_category>/s', function ($childMatches) use ($childrenCategoriesData) {
+        return preg_replace_callback('/<children-product-category-element.*?>(.*?)<\/children-product-category-element>/s', function ($childMatches) use ($childrenCategoriesData) {
             $childrenCategoryData = array_shift($childrenCategoriesData);
             if (!$childrenCategoryData) {
                 return $childMatches[0];
@@ -51,7 +51,7 @@ class ReplaceChildrenProductCategoryService extends ShopService
         $grandChildrenCategoriesData = $this->getChildrenByCategoryUuid($childrenCategoryData['uuid'], $sortName[1] ?? 'created_at', $sortOrder[1] ?? 'desc', $childrenCategoryCount ?? 10);
         $grandChildrenCategoriesData = $grandChildrenCategoriesData['data'];
 
-        return preg_replace_callback('/<grand_children_category.*?>(.*?)<\/grand_children_category>/s', function ($grandChildMatches) use ($grandChildrenCategoriesData) {
+        return preg_replace_callback('/<grand-children-product-category-element.*?>(.*?)<\/grand-children-product-category-element>/s', function ($grandChildMatches) use ($grandChildrenCategoriesData) {
             $grandChildrenCategoryData = $grandChildrenCategoriesData->shift();
             $grandChildSearchReplaceMap = $this->searchReplaceMapForGrandChildrenCategory($grandChildrenCategoryData);
             return str_replace(array_keys($grandChildSearchReplaceMap), $grandChildSearchReplaceMap, $grandChildMatches[0]);
