@@ -7,11 +7,11 @@ use App\Mail\SendEmails;
 use App\Models\QueryBuilders\SmtpAccountQueryBuilder;
 use App\Models\SmtpAccount;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Swift_SmtpTransport;
 use Swift_Mailer;
 use Illuminate\Support\Facades\Mail;
+use Techup\ApiConfig\Models\Config;
 
 class SmtpAccountService extends AbstractService
 {
@@ -337,7 +337,7 @@ class SmtpAccountService extends AbstractService
      * @return void
      */
     public function sendEmailNotificationSystem($user, $mail, $email = null) {
-        $smtpAccount = \App\Models\Config::where(['key' => 'smtp_account'])->first();
+        $smtpAccount = Config::where(['key' => 'smtp_account'])->first();
         $this->setSwiftSmtpAccountForSendEmail($smtpAccount->value);
 
         Mail::to($user->email ?? $email)->send($mail);
