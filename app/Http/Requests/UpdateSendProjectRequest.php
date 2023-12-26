@@ -34,6 +34,10 @@ class UpdateSendProjectRequest extends AbstractRequest
                 return $query->where('owner_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey())
                     ->whereNull('deleted_at');
             })],
+            'business_uuid' => ['numeric', Rule::exists('business_managements', 'uuid')->where(function ($query) {
+                return $query->where('owner_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey())
+                    ->whereNull('deleted_at');
+            })],
             'name' => ['string'],
             'description' => ['string'],
             'logo' => ['string'],

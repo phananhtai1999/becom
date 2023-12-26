@@ -34,7 +34,8 @@ class MySendProjectQueryBuilder extends AbstractQueryBuilder
                 'name',
                 'description',
                 'logo',
-                'domain_uuid'
+                'domain_uuid',
+                'business_uuid',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -44,7 +45,8 @@ class MySendProjectQueryBuilder extends AbstractQueryBuilder
                 'name',
                 'description',
                 'logo',
-                'domain_uuid'
+                'domain_uuid'.
+                'business_uuid',
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -59,6 +61,8 @@ class MySendProjectQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__description', 'description'),
                 'logo',
                 AllowedFilter::exact('exact__logo', 'logo'),
+                'business_uuid',
+                AllowedFilter::exact('exact__business_uuid', 'business_uuid'),
                 'domain_uuid',
                 AllowedFilter::exact('exact__domain_uuid', 'domain_uuid'),
                 'user.username',

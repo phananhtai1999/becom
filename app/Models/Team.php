@@ -104,4 +104,9 @@ class Team extends AbstractModel
             return $query->whereNull('parent_team_uuid');
         }
     }
+
+    public function sendProjects()
+    {
+        return $this->belongsToMany(SendProject::class, 'team_send_project', 'team_uuid', 'send_project_uuid')->withTimestamps();
+    }
 }

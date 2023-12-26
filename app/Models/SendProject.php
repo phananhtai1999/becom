@@ -33,7 +33,8 @@ class SendProject extends AbstractModel
         'name',
         'description',
         'logo',
-        'domain_uuid'
+        'domain_uuid',
+        'business_uuid'
     ];
 
     /**
@@ -125,5 +126,28 @@ class SendProject extends AbstractModel
     public function domains()
     {
         return $this->belongsTo(Domain::class, 'domain_uuid', 'uuid');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function business()
+    {
+        return $this->belongsTo(BusinessManagement::class, 'business_uuid', 'uuid');
+    }
+
+    public function teams()
+    {
+        return $this->belongsToMany(Team::class, 'team_send_project', 'send_project_uuid', 'team_uuid')->withTimestamps();
+    }
+
+    public function departments()
+    {
+        return $this->belongsToMany(Department::class, 'department_send_project', 'send_project_uuid', 'department_uuid')->withTimestamps();
+    }
+
+    public function locations()
+    {
+        return $this->belongsToMany(Location::class, 'location_send_project', 'send_project_uuid', 'location_uuid')->withTimestamps();
     }
 }

@@ -24,6 +24,7 @@ class SendProjectResource extends AbstractJsonResource
             'domain' => $this->domain,
             'user_uuid' => $this->user_uuid,
             'domain_uuid' => $this->domain_uuid,
+            'business_uuid' => $this->business_uuid,
             'name' => $this->name,
             'description' => $this->description,
             'logo' => $this->logo,
@@ -39,6 +40,10 @@ class SendProjectResource extends AbstractJsonResource
 
         if (\in_array('send_project__domain', $expand)) {
             $data['domains'] = new DomainResource($this->domains);
+        }
+
+        if (\in_array('send_project__business', $expand)) {
+            $data['business'] = new BusinessManagementResource($this->business);
         }
 
         return $data;
