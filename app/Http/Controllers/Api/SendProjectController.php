@@ -6,6 +6,7 @@ use App\Abstracts\AbstractRestAPIController;
 use App\Http\Controllers\Traits\RestIndexMyTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
+use App\Http\Requests\AddChildrenProjectRequest;
 use App\Http\Requests\AssignProjectForDepartmentRequest;
 use App\Http\Requests\AssignProjectForLocationRequest;
 use App\Http\Requests\AssignProjectForTeamRequest;
@@ -139,8 +140,13 @@ class SendProjectController extends AbstractRestAPIController
      */
     public function storeMySendProject(MySendProjectRequest $request)
     {
+        $business = $this->getBusiness();
+        if (!$business) {
+            return $this->sendJsonResponse(false, 'Does not have business', [], 403);
+        }
         $model = $this->service->create(array_merge($request->all(), [
             'user_uuid' => auth()->user()->getkey(),
+            'business_uuid' => $business->uuid
         ]));
 
         return $this->sendCreatedJsonResponse(
@@ -349,6 +355,16 @@ class SendProjectController extends AbstractRestAPIController
         }
         $sendProject = $this->service->findOrFailById($request->get('send_project_uuid'));
         $sendProject->locations()->detach($request->get('location_uuids', []));
+
+        return $this->sendOkJsonResponse();
+    }
+
+    public function addChildrenForSendProject(AddChildrenProjectRequest $request)
+    {
+        foreach ($request->get('children_send_project_uuids') as $childProject) {
+            $childTeam = $this->service->findOrFailById($childProject);
+            $childTeam->update(['parent_uuid' => $request->get('send_project_uuid')]);
+        }
 
         return $this->sendOkJsonResponse();
     }

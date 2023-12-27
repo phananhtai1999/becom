@@ -258,6 +258,8 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website.'], function () {
 
     Route::get('/assign-for-location', [SendProjectController::class, 'assignForLocation'])->name('assignForLocation');
     Route::get('/unassign-for-location', [SendProjectController::class, 'unassignForLocation'])->name('unassignForLocation');
+
+    Route::get('add-children-project', [SendProjectController::class, 'addChildrenForSendProject'])->name('addChildrenForSendProject');
 });
 
 

@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
+use App\Models\Role;
 use Illuminate\Validation\Rule;
 
 class MySendProjectRequest extends AbstractRequest
@@ -36,11 +37,8 @@ class MySendProjectRequest extends AbstractRequest
                 return $query->where('owner_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey())
                     ->whereNull('deleted_at');
             })],
-            'business_uuid' => ['required', 'numeric', Rule::exists('business_managements', 'uuid')->where(function ($query) {
-                return $query->where('owner_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey())
-                    ->whereNull('deleted_at');
-            })],
             'parent_uuid' => ['numeric', 'exists:send_projects,uuid'],
         ];
+
     }
 }
