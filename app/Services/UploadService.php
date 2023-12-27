@@ -6,6 +6,7 @@ use App\Abstracts\AbstractService;
 use Techup\ApiConfig\Models\Config;
 use App\Models\Role;
 use Illuminate\Support\Facades\Storage;
+use Techup\ApiConfig\Services\ConfigService;
 
 class UploadService extends AbstractService
 {
