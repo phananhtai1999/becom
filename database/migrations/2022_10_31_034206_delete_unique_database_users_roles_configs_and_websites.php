@@ -21,9 +21,6 @@ class DeleteUniqueDatabaseUsersRolesConfigsAndWebsites extends Migration
             $table->dropUnique(['name']);
             $table->dropUnique(['slug']);
         });
-        Schema::table('configs', function (Blueprint $table) {
-            $table->dropUnique(['key']);
-        });
         Schema::table('websites', function (Blueprint $table) {
             $table->dropUnique(['domain']);
         });

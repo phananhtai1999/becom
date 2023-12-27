@@ -7,6 +7,7 @@ use App\Models\Article;
 use App\Models\QueryBuilders\ArticleQueryBuilder;
 use App\Models\Role;
 use Carbon\Carbon;
+use Techup\ApiConfig\Services\ConfigService;
 
 class ArticleService extends AbstractService
 {
