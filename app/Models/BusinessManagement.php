@@ -115,6 +115,10 @@ class BusinessManagement extends AbstractModel
         return $this->hasMany(UserBusiness::class, 'business_uuid', 'uuid');
     }
 
+    public function sendProjects() {
+        return $this->hasMany(SendProject::class, 'business_uuid', 'uuid');
+    }
+
     public function teams() {
         return $this->belongsToMany(Team::class, 'business_team', 'business_uuid','team_uuid')->withTimestamps();
     }

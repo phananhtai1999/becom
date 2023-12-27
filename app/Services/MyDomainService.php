@@ -86,6 +86,7 @@ class MyDomainService extends AbstractService
 
         return $this->model->create([
             'name' => $domain,
+            'active_mailbox' => false,
             'owner_uuid' => null,
             'business_uuid' => $business->uuid,
             'verified_at' => null

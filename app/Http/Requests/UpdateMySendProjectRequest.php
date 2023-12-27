@@ -40,6 +40,7 @@ class UpdateMySendProjectRequest extends AbstractRequest
                 return $query->where('owner_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey())
                     ->whereNull('deleted_at');
             })],
+            'parent_uuid' => ['numeric', 'exists:send_projects,uuid'],
         ];
     }
 }

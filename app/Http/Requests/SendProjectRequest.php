@@ -41,6 +41,7 @@ class SendProjectRequest extends AbstractRequest
             'name' => ['required', 'string'],
             'description' => ['required', 'string'],
             'logo' => ['required', 'string'],
+            'parent_uuid' => ['numeric', 'exists:send_projects,uuid'],
         ];
     }
 }
