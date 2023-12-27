@@ -32,6 +32,7 @@ use App\Services\BusinessManagementService;
 use App\Services\DomainService;
 use App\Services\MyBusinessManagementService;
 use App\Services\MyDomainService;
+use App\Services\SendProjectService;
 use App\Services\UserAddOnService;
 use App\Services\UserBusinessService;
 use App\Services\UserService;
@@ -75,10 +76,11 @@ class BusinessManagementController extends AbstractRestAPIController
         MyBusinessManagementService $myService,
         DomainService               $domainService,
         MyDomainService             $myDomainService,
-        UserBusinessService $userBusinessService,
-        UserService $userService,
-        UserAddOnService $userAddOnService,
-        AddOnService $addOnService
+        UserBusinessService         $userBusinessService,
+        UserService                 $userService,
+        UserAddOnService            $userAddOnService,
+        AddOnService                $addOnService,
+        SendProjectService          $sendProjectService
     )
     {
         $this->service = $service;
@@ -86,6 +88,7 @@ class BusinessManagementController extends AbstractRestAPIController
         $this->domainService = $domainService;
         $this->myDomainService = $myDomainService;
         $this->userBusinessService = $userBusinessService;
+        $this->sendProjectService = $sendProjectService;
         $this->resourceCollectionClass = BusinessManagementResourceCollection::class;
         $this->resourceClass = BusinessManagementResource::class;
         $this->userBusinessResourceClass = UserBusinessResource::class;
@@ -121,8 +124,16 @@ class BusinessManagementController extends AbstractRestAPIController
         $domain = $this->domainService->updateOrCreateDomainByBusiness($request->domain, $model);
         //Set Domain Default for Business
         $this->service->setDomainDefault($model, $domain->uuid);
-
         $model->businessCategories()->attach($request->get('business_categories', []));
+        $this->sendProjectService->create([
+            'domain' => $request->get('domain'),
+            'business_uuid' => $model->uuid,
+            'user_uuid' =>  $request->get('owner_uuid') ?? auth()->user()->getKey(),
+            'name' => $request->get('name'),
+            'logo' => $request->get('avatar'),
+            'description' => $request->get('introduce'),
+            'domain_uuid' => $domain->uuid,
+        ]);
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -185,6 +196,15 @@ class BusinessManagementController extends AbstractRestAPIController
         $this->service->setDomainDefault($model, $domain->uuid);
 
         $model->businessCategories()->attach($request->get('business_categories', []));
+        $this->sendProjectService->create([
+            'domain' => $request->get('domain'),
+            'business_uuid' => $model->uuid,
+            'user_uuid' => auth()->user()->getKey(),
+            'name' => $request->get('name'),
+            'logo' => $request->get('avatar'),
+            'description' => $request->get('introduce'),
+            'domain_uuid' => $domain->uuid,
+        ]);
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -250,11 +270,11 @@ class BusinessManagementController extends AbstractRestAPIController
     public function addBusinessMember(AddBusinessMemberRequest $request)
     {
         DB::beginTransaction();
-        try{
+        try {
             if ($this->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->count()) {
                 $businessUuid = $request->get("business_uuid");
             } else {
-                $businesses= $this->user()->businessManagements;
+                $businesses = $this->user()->businessManagements;
                 if ($businesses->toArray()) {
                     $businessUuid = $businesses->first()->uuid;
                 } else {
@@ -262,7 +282,7 @@ class BusinessManagementController extends AbstractRestAPIController
                     return $this->sendJsonResponse(false, 'Does not have business', [], 403);
                 }
             }
-            if($request->get('type') == UserBusiness::ALREADY_EXISTS_ACCOUNT){
+            if ($request->get('type') == UserBusiness::ALREADY_EXISTS_ACCOUNT) {
                 foreach ($request->get('user_uuids') as $userUuid) {
                     $existingRecord = $this->userBusinessService->findOneWhere([
                         'business_uuid' => $businessUuid,
@@ -278,7 +298,7 @@ class BusinessManagementController extends AbstractRestAPIController
                 }
                 DB::commit();
                 return $this->sendCreatedJsonResponse();
-            }elseif($request->get('type') == UserBusiness::ACCOUNT_INVITE){
+            } elseif ($request->get('type') == UserBusiness::ACCOUNT_INVITE) {
                 $passwordRandom = $this->generateRandomString(10);
                 $email = $request->get('username') . '@' . $request->get('domain');
                 $user = $this->userService->create([
@@ -301,7 +321,7 @@ class BusinessManagementController extends AbstractRestAPIController
                 return $this->sendCreatedJsonResponse();
             }
 
-        } catch (ConnectionException $exception){
+        } catch (ConnectionException $exception) {
             DB::rollBack();
             return $this->sendInternalServerErrorJsonResponse();
         }
@@ -313,7 +333,7 @@ class BusinessManagementController extends AbstractRestAPIController
         if ($this->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->count()) {
             $businessUuid = $request->get("business_uuid");
         } else {
-            $businesses= $this->user()->businessManagements;
+            $businesses = $this->user()->businessManagements;
             if ($businesses->toArray()) {
                 $businessUuid = $businesses->first()->uuid;
             } else {
@@ -333,7 +353,7 @@ class BusinessManagementController extends AbstractRestAPIController
         if ($this->user()->roles->whereIn('slug', [Role::ROLE_ROOT, Role::ROLE_ADMIN])->count()) {
             $businessUuid = $request->get("business_uuid");
         } else {
-            $businesses= $this->user()->businessManagements;
+            $businesses = $this->user()->businessManagements;
             if ($businesses->toArray()) {
                 $businessUuid = $businesses->first()->uuid;
             } else {

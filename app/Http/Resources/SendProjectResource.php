@@ -28,6 +28,7 @@ class SendProjectResource extends AbstractJsonResource
             'name' => $this->name,
             'description' => $this->description,
             'logo' => $this->logo,
+            'parent_uuid' => $this->parent_uuid,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
@@ -44,6 +45,14 @@ class SendProjectResource extends AbstractJsonResource
 
         if (\in_array('send_project__business', $expand)) {
             $data['business'] = new BusinessManagementResource($this->business);
+        }
+
+        if (\in_array('send_project__parent_send_project', $expand)) {
+            $data['parent_send_project'] = new SendProjectResource($this->parentSendProject);
+        }
+
+        if (\in_array('send_project__children_send_project', $expand)) {
+            $data['children_send_project'] = self::collection($this->childrenSendProject);
         }
 
         return $data;

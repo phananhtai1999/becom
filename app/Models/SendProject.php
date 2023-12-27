@@ -8,6 +8,7 @@ use App\Http\Controllers\Traits\ModelFilterFieldTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SendProject extends AbstractModel
@@ -34,6 +35,7 @@ class SendProject extends AbstractModel
         'description',
         'logo',
         'domain_uuid',
+        'parent_uuid',
         'business_uuid'
     ];
 
@@ -149,5 +151,21 @@ class SendProject extends AbstractModel
     public function locations()
     {
         return $this->belongsToMany(Location::class, 'location_send_project', 'send_project_uuid', 'location_uuid')->withTimestamps();
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function parentSendProject()
+    {
+        return $this->belongsTo(__CLASS__, 'parent_uuid');
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function childrenSendProject()
+    {
+        return $this->hasMany(__CLASS__, 'parent_uuid');
     }
 }
