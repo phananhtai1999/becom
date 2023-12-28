@@ -45,9 +45,12 @@ use App\Models\Team;
 use App\Services\AddOnService;
 use App\Services\BusinessTeamService;
 use App\Services\ContactListService;
+use App\Services\DepartmentService;
 use App\Services\InviteService;
+use App\Services\LocationService;
 use App\Services\MyTeamService;
 use App\Services\PermissionService;
+use App\Services\SendProjectService;
 use App\Services\SmtpAccountService;
 use App\Services\TeamService;
 use App\Services\UserBusinessService;
@@ -74,7 +77,10 @@ class TeamController extends Controller
         ContactListService  $contactListService,
         MyTeamService       $myService,
         UserBusinessService $userBusinessService,
-        AddOnService        $addOnService
+        AddOnService        $addOnService,
+        DepartmentService $departmentService,
+        LocationService $locationService,
+        SendProjectService $sendProjectService
     )
     {
         $this->service = $service;
@@ -87,6 +93,9 @@ class TeamController extends Controller
         $this->contactListService = $contactListService;
         $this->userBusinessService = $userBusinessService;
         $this->addOnService = $addOnService;
+        $this->departmentService = $departmentService;
+        $this->locationService = $locationService;
+        $this->sendProjectService = $sendProjectService;
         $this->resourceCollectionClass = TeamResourceCollection::class;
         $this->addOnResourceCollectionClass = AddOnResourceCollection::class;
         $this->userTeamResourceClass = UserTeamResource::class;
@@ -737,5 +746,17 @@ class TeamController extends Controller
         }
 
         return $this->sendOkJsonResponse();
+    }
+
+    public function getAssignableForProject(IndexRequest $request, $id) {
+        $departments = $this->departmentService->getByProject($id);
+        $locations = $this->locationService->getByProject($id);
+        $locationUuids = $locations->pluck('uuid')->toArray();
+        $departmentUuids = $departments->pluck('uuid')->toArray();
+        $teams = $this->service->getTeamsAssignable($locationUuids, $departmentUuids, $id, $request);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $teams)
+        );
     }
 }

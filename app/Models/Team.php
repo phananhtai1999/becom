@@ -73,7 +73,7 @@ class Team extends AbstractModel
 
     public function location()
     {
-        return $this->belongsTo(Location::class, 'location_uuid');
+        return $this->belongsTo(Location::class, 'location_uuid', 'uuid');
     }
 
 

@@ -38,6 +38,6 @@ class Location extends Model
 
     public function sendProjects()
     {
-        return $this->belongsToMany(Location::class, 'location_send_project', 'location_uuid', 'send_project_uuid')->withTimestamps();
+        return $this->belongsToMany(SendProject::class, 'location_send_project', 'location_uuid', 'send_project_uuid')->withTimestamps();
     }
 }
