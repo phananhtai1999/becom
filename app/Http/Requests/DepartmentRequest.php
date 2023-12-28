@@ -29,7 +29,7 @@ class DepartmentRequest extends AbstractRequest
             'name.en' => ['required', 'string'],
             'name.*' => ['required', 'string'],
             'user_uuid' => ['nullable', 'numeric', Rule::exists('users','uuid')->whereNull('deleted_at')],
-            'business_uuid' => ['integer', 'exists:businesses,uuid'],
+            'business_uuid' => ['integer', 'exists:business_managements,uuid'],
         ];
     }
 }

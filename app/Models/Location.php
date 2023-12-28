@@ -18,6 +18,7 @@ class Location extends Model
         'name',
         'user_uuid',
         'address',
+        'business_uuid'
     ];
 
     protected $casts = [
