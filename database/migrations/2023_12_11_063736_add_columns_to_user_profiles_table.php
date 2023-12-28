@@ -13,7 +13,7 @@ class AddColumnsToUserProfilesTable extends Migration
      */
     public function up()
     {
-        Schema::table('user_profiles', function (Blueprint $table) {
+        Schema::table('becom_user_profiles', function (Blueprint $table) {
             $table->string('username')->nullable();
             $table->string('first_name')->nullable();
             $table->string('last_name')->nullable();
@@ -29,7 +29,7 @@ class AddColumnsToUserProfilesTable extends Migration
      */
     public function down()
     {
-        Schema::table('user_profiles', function (Blueprint $table) {
+        Schema::table('becom_user_profiles', function (Blueprint $table) {
             $table->dropColumn(['username', 'first_name', 'last_name', 'email', 'password']);
         });
     }
