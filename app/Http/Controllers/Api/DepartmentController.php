@@ -17,9 +17,11 @@ use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\UpdateMyDepartmentRequest;
 use App\Http\Resources\DepartmentResource;
 use App\Http\Resources\DepartmentResourceCollection;
+use App\Services\BusinessManagementService;
 use App\Services\DepartmentService;
 use App\Services\LanguageService;
 use App\Services\MyDepartmentService;
+use App\Services\SendProjectService;
 use App\Services\TeamService;
 use Illuminate\Http\JsonResponse;
 
@@ -46,13 +48,15 @@ class DepartmentController extends AbstractRestAPIController
         DepartmentService   $service,
         MyDepartmentService $myService,
         LanguageService $languageService,
-        TeamService $teamService
+        TeamService $teamService,
+        SendProjectService $sendProjectService
     )
     {
         $this->service = $service;
         $this->myService = $myService;
         $this->languageService = $languageService;
         $this->teamService = $teamService;
+        $this->sendProjectService = $sendProjectService;
         $this->resourceCollectionClass = DepartmentResourceCollection::class;
         $this->resourceClass = DepartmentResource::class;
         $this->storeRequest = DepartmentRequest::class;
@@ -217,5 +221,19 @@ class DepartmentController extends AbstractRestAPIController
         }
 
         return $this->sendOkJsonResponse();
+    }
+
+    /**
+     * @param IndexRequest $request
+     * @param $id
+     * @return JsonResponse
+     */
+    public function getAssignableForProject(IndexRequest $request, $id) {
+        $sendProject = $this->sendProjectService->findOrFailById($id);
+        $departments = $this->service->getLocationsAssignable($sendProject->business->uuid, $id, $request);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $departments)
+        );
     }
 }

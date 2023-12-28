@@ -35,6 +35,10 @@ class Location extends Model
     {
         return $this->belongsTo(User::class, 'user_uuid', 'uuid');
     }
+    public function business()
+    {
+        return $this->belongsTo(BusinessManagement::class, 'business_uuid', 'uuid');
+    }
 
     public function sendProjects()
     {

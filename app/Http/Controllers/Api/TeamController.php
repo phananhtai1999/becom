@@ -748,6 +748,11 @@ class TeamController extends Controller
         return $this->sendOkJsonResponse();
     }
 
+    /**
+     * @param IndexRequest $request
+     * @param $id
+     * @return JsonResponse
+     */
     public function getAssignableForProject(IndexRequest $request, $id) {
         $departments = $this->departmentService->getByProject($id);
         $locations = $this->locationService->getByProject($id);
