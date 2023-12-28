@@ -13,9 +13,9 @@ class ChangeUsersToUserProfilesTable extends Migration
      */
     public function up()
     {
-        Schema::rename('users', 'user_profiles');
+        Schema::rename('users', 'becom_user_profiles');
 
-        Schema::table('user_profiles', function (Blueprint $table) {
+        Schema::table('becom_user_profiles', function (Blueprint $table) {
             $table->dropColumn(['username', 'first_name', 'last_name', 'email', 'password']);
             $table->string('app_id')->nullable();
             $table->string('user_uuid');
@@ -29,7 +29,7 @@ class ChangeUsersToUserProfilesTable extends Migration
      */
     public function down()
     {
-        Schema::rename('user_profiles', 'users');
+        Schema::rename('becom_user_profiles', 'users');
 
         Schema::table('users', function (Blueprint $table) {
             $table->string('username')->nullable();
