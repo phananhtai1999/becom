@@ -18,4 +18,24 @@ class LocationService extends AbstractService
             $query->where('send_projects.uuid', $id);
         })->get();
     }
+
+    public function getLocationsAssignable($businessUuid, $projectUuid, $request)
+    {
+        $indexRequest = $this->getIndexRequest($request);
+        $locationRemoves = $this->getLocationsAssignedProject($projectUuid);
+        $locationRemoveUuids = $locationRemoves->pluck('uuid')->toArray();
+
+        return LocationQueryBuilder::searchQuery($indexRequest['search'], $indexRequest['search_by'])
+            ->whereNotIn('uuid', $locationRemoveUuids)
+            ->where('business_uuid', $businessUuid)
+            ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
+    }
+
+    public function getLocationsAssignedProject($projectUuid)
+    {
+
+        return $this->model->whereHas('sendProjects', function ($q) use ($projectUuid) {
+            $q->where('send_projects.uuid', $projectUuid);
+        })->get();
+    }
 }

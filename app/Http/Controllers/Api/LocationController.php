@@ -21,7 +21,9 @@ use App\Http\Requests\UpdateLocationRequest;
 use App\Http\Requests\MyLocationRequest;
 use App\Http\Resources\LocationResource;
 use App\Http\Resources\LocationResourceCollection;
+use App\Services\BusinessManagementService;
 use App\Services\LocationService;
+use App\Services\SendProjectService;
 use App\Services\TeamService;
 
 class LocationController extends AbstractRestAPIController
@@ -33,11 +35,18 @@ class LocationController extends AbstractRestAPIController
      * @param LocationService $service
      * @param TeamService $teamService
      */
-    public function __construct(LocationService $service, TeamService $teamService)
+    public function __construct(
+        LocationService $service,
+        TeamService $teamService,
+        SendProjectService $sendProjectService,
+        BusinessManagementService $businessManagementService
+    )
     {
         $this->service = $service;
         $this->teamService = $teamService;
         $this->myService = $service;
+        $this->sendProjectService = $sendProjectService;
+        $this->businessManagementService = $businessManagementService;
         $this->resourceCollectionClass = LocationResourceCollection::class;
         $this->resourceClass = LocationResource::class;
         $this->storeRequest = LocationRequest::class;
@@ -62,5 +71,14 @@ class LocationController extends AbstractRestAPIController
         }
 
         return $this->sendOkJsonResponse();
+    }
+
+    public function getAssignableForProject(IndexRequest $request, $id) {
+        $sendProject = $this->sendProjectService->findOrFailById($id);
+        $locations = $this->service->getLocationsAssignable($sendProject->business->uuid, $id, $request);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $locations)
+        );
     }
 }

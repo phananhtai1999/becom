@@ -262,6 +262,8 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website.'], function () {
     Route::get('add-children-project', [SendProjectController::class, 'addChildrenForSendProject'])->name('addChildrenForSendProject');
 
     Route::get('/send-project/{id}/assignable-teams', [TeamController::class, 'getAssignableForProject'])->name('getAssignableForProject');
+    Route::get('/send-project/{id}/assignable-locations', [LocationController::class, 'getAssignableForProject'])->name('getAssignableForProject');
+    Route::get('/send-project/{id}/assignable-departments', [DepartmentController::class, 'getAssignableForProject'])->name('getAssignableForProject');
 });
 
 
