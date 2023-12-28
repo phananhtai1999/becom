@@ -36,4 +36,30 @@ class TeamService extends AbstractService
             ->whereIn('uuid', $teamUuids)
             ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
     }
+
+    public function getTeamsAssignable($locationUuids, $departmentUuids, $projectUuid, $request)
+    {
+        $indexRequest = $this->getIndexRequest($request);
+        $teamRemoves = $this->getTeamsAssignedProject($projectUuid);
+        $teamRemoveUuids = $teamRemoves->pluck('uuid')->toArray();
+
+        return TeamQueryBuilder::searchQuery($indexRequest['search'], $indexRequest['search_by'])
+            ->whereNotIn('uuid', $teamRemoveUuids)
+            ->where(function ($query) use ($locationUuids, $departmentUuids) {
+                $query->whereHas('location', function ($q) use ($locationUuids) {
+                    $q->whereIn('uuid', $locationUuids);
+                })
+                    ->orWhereHas('department', function ($q) use ($departmentUuids) {
+                        $q->whereIn('uuid', $departmentUuids);
+                    });
+            })
+            ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
+    }
+
+    public function getTeamsAssignedProject($projectUuid) {
+
+        return $this->model->whereHas('sendProjects', function ($q) use ($projectUuid) {
+            $q->where('send_projects.uuid', $projectUuid);
+        })->get();
+    }
 }

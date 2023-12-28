@@ -260,6 +260,8 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website.'], function () {
     Route::get('/unassign-for-location', [SendProjectController::class, 'unassignForLocation'])->name('unassignForLocation');
 
     Route::get('add-children-project', [SendProjectController::class, 'addChildrenForSendProject'])->name('addChildrenForSendProject');
+
+    Route::get('/send-project/{id}/assignable-teams', [TeamController::class, 'getAssignableForProject'])->name('getAssignableForProject');
 });
 
 

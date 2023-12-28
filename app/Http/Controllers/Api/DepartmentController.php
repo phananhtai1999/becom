@@ -100,9 +100,7 @@ class DepartmentController extends AbstractRestAPIController
             return $this->sendValidationFailedJsonResponse();
         }
 
-        $this->service->update($model, array_merge($request->all(), [
-            'user_uuid' => $request->get('user_uuid') ?? auth()->user()->getkey()
-        ]));
+        $this->service->update($model, $request->all());
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
