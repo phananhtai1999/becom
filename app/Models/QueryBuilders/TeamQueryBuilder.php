@@ -57,7 +57,7 @@ class TeamQueryBuilder extends AbstractQueryBuilder
                 'location_uuid',
                 AllowedFilter::exact('exact__location_uuid', 'location_uuid'),
                 'sendProjects.uuid',
-                AllowedFilter::exact('exact__sendProjects.uuid', 'sendProjects.uuid'),
+                AllowedFilter::exact('exact__send_project.uuid', 'sendProjects.uuid'),
                 AllowedFilter::scope('from__created_at'),
                 AllowedFilter::scope('to__created_at'),
                 'updated_at',

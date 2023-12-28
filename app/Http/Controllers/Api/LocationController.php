@@ -25,6 +25,7 @@ use App\Services\BusinessManagementService;
 use App\Services\LocationService;
 use App\Services\SendProjectService;
 use App\Services\TeamService;
+use Illuminate\Http\JsonResponse;
 
 class LocationController extends AbstractRestAPIController
 {
@@ -79,6 +80,27 @@ class LocationController extends AbstractRestAPIController
 
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData($this->resourceCollectionClass, $locations)
+        );
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function storeMy()
+    {
+        $request = app($this->storeMyRequest);
+
+        $business = $this->getBusiness();
+        if (!$business) {
+            return $this->sendJsonResponse(false, 'Does not have business', [], 403);
+        }
+        $model = $this->service->create(array_merge($request->all(), [
+            'user_uuid' => auth()->user()->getkey(),
+            'business_uuid' => $business->uuid
+        ]));
+
+        return $this->sendCreatedJsonResponse(
+            $this->myService->resourceToData($this->resourceClass, $model)
         );
     }
 }

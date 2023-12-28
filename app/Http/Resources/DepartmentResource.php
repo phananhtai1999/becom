@@ -21,6 +21,7 @@ class DepartmentResource extends AbstractJsonResource
             'name' => $this->name,
             'names' => $this->names,
             'user_uuid' => $this->user_uuid,
+            'business_uuid' => $this->business_uuid,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at

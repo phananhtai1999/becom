@@ -121,9 +121,13 @@ class DepartmentController extends AbstractRestAPIController
         if (!$this->languageService->checkLanguages($request->name)) {
             return $this->sendValidationFailedJsonResponse();
         }
-
+        $business = $this->getBusiness();
+        if (!$business) {
+            return $this->sendJsonResponse(false, 'Does not have business', [], 403);
+        }
         $model = $this->service->create(array_merge($request->all(), [
             'user_uuid' => auth()->user()->getkey(),
+            'business_uuid' => $business->uuid
         ]));
 
         return $this->sendCreatedJsonResponse(
