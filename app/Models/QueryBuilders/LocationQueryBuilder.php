@@ -52,6 +52,8 @@ class LocationQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__address', 'address'),
                 'teams.uuid',
                 AllowedFilter::exact('exact__teams.uuid', 'teams.uuid'),
+                'sendProjects.uuid',
+                AllowedFilter::exact('exact__sendProjects.uuid', 'sendProjects.uuid'),
             ]);
     }
 

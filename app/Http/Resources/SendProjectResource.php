@@ -55,6 +55,18 @@ class SendProjectResource extends AbstractJsonResource
             $data['children_send_project'] = self::collection($this->childrenSendProject);
         }
 
+        if (\in_array('send_project__teams', $expand)) {
+            $data['teams'] =  TeamResource::collection($this->teams);
+        }
+
+        if (\in_array('send_project__departments', $expand)) {
+            $data['departments'] =  DepartmentResource::collection($this->departments);
+        }
+
+        if (\in_array('send_project__locations', $expand)) {
+            $data['locations'] =  LocationResource::collection($this->locations);
+        }
+
         return $data;
     }
 }

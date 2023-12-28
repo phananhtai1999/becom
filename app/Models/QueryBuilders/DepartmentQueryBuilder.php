@@ -59,6 +59,8 @@ class DepartmentQueryBuilder extends AbstractQueryBuilder
                 'user.roles.name',
                 AllowedFilter::exact('exact__user.roles.name', 'user.roles.name'),
                 AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
+                'sendProjects.uuid',
+                AllowedFilter::exact('exact__sendProjects.uuid', 'sendProjects.uuid'),
                 AllowedFilter::callback("user_uuid", function (Builder $query, $value) {
                     if ($value === 'null') {
                         $query->whereNull('user_uuid');
