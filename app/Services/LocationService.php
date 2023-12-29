@@ -38,4 +38,11 @@ class LocationService extends AbstractService
             $q->where('send_projects.uuid', $projectUuid);
         })->get();
     }
+
+    public function getByTeam($id)
+    {
+        return $this->model->whereHas('teams', function ($query) use ($id) {
+            $query->where('teams.uuid', $id);
+        })->get();
+    }
 }

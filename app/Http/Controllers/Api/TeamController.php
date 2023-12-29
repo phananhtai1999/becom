@@ -84,7 +84,7 @@ class TeamController extends Controller
     )
     {
         $this->service = $service;
-        $this->myService = $myService;
+        $this->myService = $service;
         $this->smtpAccountService = $smtpAccountService;
         $this->userTeamService = $userTeamService;
         $this->userService = $userService;
