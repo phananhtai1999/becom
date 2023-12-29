@@ -29,7 +29,6 @@ class SendProject extends AbstractModel
      * @var string[]
      */
     protected $fillable = [
-        'domain',
         'user_uuid',
         'name',
         'description',

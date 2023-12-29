@@ -8,6 +8,7 @@ use App\Http\Controllers\Traits\RestIndexMyTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Requests\AcceptPublishWebsitePageRequest;
 use App\Http\Requests\ConfigShortcodeRequest;
+use App\Http\Requests\GetInfoByDomainUrlRequest;
 use App\Http\Requests\GetWebsitePagesRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyWebsitePageRequest;
@@ -478,5 +479,29 @@ class WebsitePageController extends AbstractRestAPIController
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
         );
+    }
+
+    /**
+     * @param GetInfoByDomainUrlRequest $request
+     * @return JsonResponse
+     */
+    public function getInfoByDomainUrl(GetInfoByDomainUrlRequest $request)
+    {
+        if ($request->get('article_category_slug')){
+            $articleCategory = $this->articleCategoryService->findOneWhere(['slug' => $request->get('article_category_slug')]);
+        }
+        if ($request->get('article_slug')){
+            $article = $this->articleService->findOneWhere(['slug' => $request->get('article_slug')]);
+        }
+        if ($request->get('website_page_slug')){
+            $websitePage = $this->service->getWebsitePageByDomainAndWebsitePageSlug($request->get('domain'), $request->get('website_page_slug'));
+        }
+        $data = [
+            'article_category' => $articleCategory ?? null,
+            'article' => $article ?? null,
+            'website_page' => $websitePage ?? null
+        ];
+
+        return $this->sendOkJsonResponse(['data' => $data]);
     }
 }

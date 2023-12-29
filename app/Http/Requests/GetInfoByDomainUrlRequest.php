@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests;
 
-use App\Abstracts\AbstractRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
-class VerifyDomainWebsiteVerificationRequest extends AbstractRequest
+class GetInfoByDomainUrlRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,7 +24,10 @@ class VerifyDomainWebsiteVerificationRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'domain_uuid' => ['required','url','exists:send_projects,domain_uuid', 'exists:domains,uuid']
+            'domain' => ['required', 'exists:domains,name'],
+            'website_page_slug' => ['exists:website_pages,slug'],
+            'article_slug' => ['exists:articles,slug'],
+            'article_category_slug' => ['exists:article_categories,slug']
         ];
     }
 }

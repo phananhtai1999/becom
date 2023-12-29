@@ -213,11 +213,7 @@ class SendProjectController extends AbstractRestAPIController
      */
     public function verifyByDnsRecord(WebsiteVerificationRequest $request)
     {
-
-        $website = $this->service->findOneWhereOrFail([
-            'domain' => $request->get('domain')
-        ]);
-
+        $website = $this->service->findOrFailById($request->get('domain_uuid'));
         $websiteVerify = $this->websiteVerificationService->verifyByDnsRecord($website->getKey());
 
         return $this->sendOkJsonResponse(
@@ -232,9 +228,7 @@ class SendProjectController extends AbstractRestAPIController
      */
     public function verifyByHtmlTag(VerifyDomainWebsiteVerificationRequest $request)
     {
-        $website = $this->service->findOneWhereOrFail([
-            'domain' => $request->get('domain')
-        ]);
+        $website = $this->service->findOrFailById($request->get('domain_uuid'));
 
         $websiteVerify = $this->websiteVerificationService->verifyByHtmlTag($website->getKey());
 
@@ -256,9 +250,7 @@ class SendProjectController extends AbstractRestAPIController
      */
     public function verifyByHtmlFile(VerifyDomainWebsiteVerificationRequest $request)
     {
-        $website = $this->service->findOneWhereOrFail([
-            'domain' => $request->get('domain')
-        ]);
+        $website = $this->service->findOrFailById($request->get('domain_uuid'));
 
         $websiteVerify = $this->websiteVerificationService->verifyByHtmlFile($website->getKey());
 

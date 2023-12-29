@@ -25,10 +25,6 @@ class SendProjectRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'domain' => ['nullable', 'string', 'regex:/^(?!(www|http|https)\.)\w+(\.\w+)+$/', Rule::unique('send_projects')->where(function ($query) {
-                return $query->where('user_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey())
-                    ->whereNull('deleted_at');
-            })],
             'user_uuid' => ['nullable', 'numeric', Rule::exists('users', 'uuid')->whereNull('deleted_at')],
             'domain_uuid' => ['nullable', 'numeric', Rule::exists('domains', 'uuid')->where(function ($query) {
                 return $query->where('owner_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey())
