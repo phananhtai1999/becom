@@ -168,4 +168,16 @@ class SendProject extends AbstractModel
     {
         return $this->hasMany(__CLASS__, 'parent_uuid');
     }
+
+    /**
+     * @param Builder $query
+     * @param $check
+     * @return Builder|void
+     */
+    public function scopeSendProjectRoot(Builder $query, $check)
+    {
+        if ($check) {
+            return $query->whereNull('parent_uuid');
+        }
+    }
 }

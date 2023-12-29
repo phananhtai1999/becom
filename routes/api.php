@@ -1176,6 +1176,9 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'team.'], function () {
         Route::put('/my/team/{id}', [TeamController::class, 'editMy'])->name('editMy');
         Route::delete('/my/team/{id}', [TeamController::class, 'destroyMy'])->name('destroyMy');
     });
+
+    Route::get('/team/{id}/assignable-projects', [SendProjectController::class, 'getAssignableForTeam'])->name('getAssignableForTeam');
+
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'addOn.'], function () {

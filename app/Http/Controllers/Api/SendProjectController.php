@@ -21,7 +21,9 @@ use App\Http\Resources\SendProjectResourceCollection;
 use App\Http\Resources\SendProjectResource;
 use App\Http\Resources\WebsiteVerificationResource;
 use App\Models\Role;
+use App\Services\DepartmentService;
 use App\Services\FileVerificationService;
+use App\Services\LocationService;
 use App\Services\MySendProjectService;
 use App\Services\SendProjectService;
 use App\Services\WebsiteVerificationService;
@@ -56,11 +58,15 @@ class SendProjectController extends AbstractRestAPIController
         SendProjectService         $service,
         WebsiteVerificationService $websiteVerificationService,
         FileVerificationService    $fileVerificationService,
-        MySendProjectService       $myService
+        MySendProjectService       $myService,
+        DepartmentService $departmentService,
+        LocationService $locationService
     )
     {
         $this->service = $service;
-        $this->myService = $myService;
+        $this->myService = $service;
+        $this->departmentService = $departmentService;
+        $this->locationService = $locationService;
         $this->resourceCollectionClass = SendProjectResourceCollection::class;
         $this->resourceClass = SendProjectResource::class;
         $this->storeRequest = SendProjectRequest::class;
@@ -367,5 +373,22 @@ class SendProjectController extends AbstractRestAPIController
         }
 
         return $this->sendOkJsonResponse();
+    }
+
+    /**
+     * @param IndexRequest $request
+     * @param $id
+     * @return JsonResponse
+     */
+    public function getAssignableForTeam(IndexRequest $request, $id) {
+        $departments = $this->departmentService->getByTeam($id);
+        $locations = $this->locationService->getByTeam($id);
+        $locationUuids = $locations->pluck('uuid')->toArray();
+        $departmentUuids = $departments->pluck('uuid')->toArray();
+        $projects = $this->service->getProjectAssignableForTeam($locationUuids, $departmentUuids, $id, $request);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $projects)
+        );
     }
 }

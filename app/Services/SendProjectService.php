@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Abstracts\AbstractService;
 use App\Models\QueryBuilders\SendProjectQueryBuilder;
+use App\Models\QueryBuilders\TeamQueryBuilder;
 use App\Models\SendProject;
 
 class SendProjectService extends AbstractService
@@ -29,5 +30,31 @@ class SendProjectService extends AbstractService
         }
 
         return false;
+    }
+
+    public function getProjectAssignableForTeam($locationUuids, $departmentUuids, $teamUuid, $request)
+    {
+        $indexRequest = $this->getIndexRequest($request);
+        $projectRemoves = $this->getProjectAssignedTeam($teamUuid);
+        $projectRemoveUuids = $projectRemoves->pluck('uuid')->toArray();
+
+        return SendProjectQueryBuilder::searchQuery($indexRequest['search'], $indexRequest['search_by'])
+            ->whereNotIn('uuid', $projectRemoveUuids)
+            ->where(function ($query) use ($locationUuids, $departmentUuids) {
+                $query->whereHas('locations', function ($q) use ($locationUuids) {
+                    $q->whereIn('locations.uuid', $locationUuids);
+                })
+                    ->orWhereHas('departments', function ($q) use ($departmentUuids) {
+                        $q->whereIn('departments.uuid', $departmentUuids);
+                    });
+            })
+            ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
+    }
+
+    public function getProjectAssignedTeam($teamUuid) {
+
+        return $this->model->whereHas('teams', function ($q) use ($teamUuid) {
+            $q->where('teams.uuid', $teamUuid);
+        })->get();
     }
 }

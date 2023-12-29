@@ -39,6 +39,10 @@ class DepartmentResource extends AbstractJsonResource
             $data['teams'] = TeamResource::collection($this->teams);
         }
 
+        if (\in_array('department__send_projects', $expand)) {
+            $data['send_projects'] = SendProjectResource::collection($this->sendProjects);
+        }
+
         return $data;
     }
 }

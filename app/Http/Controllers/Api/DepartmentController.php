@@ -53,7 +53,7 @@ class DepartmentController extends AbstractRestAPIController
     )
     {
         $this->service = $service;
-        $this->myService = $myService;
+        $this->myService = $service;
         $this->languageService = $languageService;
         $this->teamService = $teamService;
         $this->sendProjectService = $sendProjectService;
