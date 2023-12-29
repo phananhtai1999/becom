@@ -74,6 +74,7 @@ class MySendProjectQueryBuilder extends AbstractQueryBuilder
                 'user.email',
                 AllowedFilter::exact('exact__user.email', 'user.email'),
                 AllowedFilter::scope('domain_is_null'),
+                AllowedFilter::scope('send_project_root'),
             ]);
     }
 
