@@ -29,7 +29,6 @@ class SendProjectQueryBuilder extends AbstractQueryBuilder
         return static::for(static::baseQuery())
             ->allowedFields([
                 $modelKeyName,
-                'domain',
                 'user_uuid',
                 'name',
                 'description',
@@ -41,7 +40,6 @@ class SendProjectQueryBuilder extends AbstractQueryBuilder
             ->defaultSort('-created_at')
             ->allowedSorts([
                 $modelKeyName,
-                'domain',
                 'user_uuid',
                 'name',
                 'description',
@@ -53,8 +51,6 @@ class SendProjectQueryBuilder extends AbstractQueryBuilder
             ->allowedFilters([
                 $modelKeyName,
                 AllowedFilter::exact('exact__' . $modelKeyName, $modelKeyName),
-                'domain',
-                AllowedFilter::exact('exact__domain', 'domain'),
                 'user_uuid',
                 AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
                 'name',

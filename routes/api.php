@@ -665,6 +665,8 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'website_page'], function ()
     Route::get('/get-product-website-page/{id}', [WebsitePageController::class, 'getProductWebsitePage'])->name('getProductWebsitePage');
     Route::get('/website-pages-default', [WebsitePageController::class, 'getWebsitePagesDefault'])->name('getWebsitePagesDefault');
     Route::get('/website-page-default/{id}', [WebsitePageController::class, 'showWebsitePagesDefault'])->name('showWebsitePagesDefault');
+
+    Route::get('/get-info-by-domain-url', [WebsitePageController::class, 'getInfoByDomainUrl'])->name('getInfoByDomainUrl');
 });
 
 Route::get('get-website-page', [WebsitePageController::class, 'getWebsitePageWithReplace'])->name('edit');

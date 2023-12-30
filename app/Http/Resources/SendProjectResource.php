@@ -21,7 +21,6 @@ class SendProjectResource extends AbstractJsonResource
 
         $data = [
             'uuid' => $this->uuid,
-            'domain' => $this->domain,
             'user_uuid' => $this->user_uuid,
             'domain_uuid' => $this->domain_uuid,
             'business_uuid' => $this->business_uuid,
