@@ -15,7 +15,7 @@ class UserProfile extends AbstractModel
     /**
      * @var string
      */
-    protected $table = "user_profiles";
+    protected $table = "becom_user_profiles";
 
     /**
      * @var string
