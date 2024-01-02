@@ -15,7 +15,7 @@ use App\Http\Resources\WebsitePageCategoryResource;
 use App\Http\Resources\WebsitePageCategoryResourceCollection;
 use App\Models\Language;
 use App\Models\WebsitePageCategory;
-use App\Services\LanguageService;
+use Techup\ApiConfig\Services\LanguageService;
 use App\Services\WebsitePageCategoryService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

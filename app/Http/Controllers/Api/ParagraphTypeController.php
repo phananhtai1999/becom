@@ -11,7 +11,7 @@ use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Resources\ParagraphTypeResource;
 use App\Http\Resources\ParagraphTypeResourceCollection;
-use App\Services\LanguageService;
+use Techup\ApiConfig\Services\LanguageService;
 use App\Services\ParagraphTypeService;
 
 class ParagraphTypeController extends AbstractRestAPIController
