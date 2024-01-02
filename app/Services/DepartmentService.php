@@ -45,4 +45,14 @@ class DepartmentService extends AbstractService
             $query->where('teams.uuid', $id);
         })->get();
     }
+
+    public function getIndexMyWithDefault($request)
+    {
+        $indexRequest = $this->getIndexRequest($request);
+
+        return $this->modelQueryBuilderClass::searchQuery($indexRequest['search'], $indexRequest['search_by'])
+            ->where('user_uuid', auth()->user()->getKey())
+            ->orWhere('is_default', true)
+            ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
+    }
 }

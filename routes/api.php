@@ -997,6 +997,7 @@ Route::group(['middleware' => ['auth:api'], 'as' => 'department.'], function () 
     Route::post('department/remove-team', [DepartmentController::class, 'removeTeam'])->name('removeTeam');
     Route::post('business/add-department', [DepartmentController::class, 'addDepartmentForBusiness'])->name('addDepartmentForBusiness');
     Route::post('location/add-department', [DepartmentController::class, 'addDepartmentForLocation'])->name('addDepartmentForLocation');
+    Route::get('toggle-default-department', [DepartmentController::class, 'toggleDefaultDepartment'])->name('toggleDefaultDepartment');
 });
 
 Route::group(['middleware' => ['auth:api'], 'as' => 'location.'], function () {
