@@ -29,6 +29,7 @@ use App\Models\Team;
 use App\Models\UserBusiness;
 use App\Services\AddOnService;
 use App\Services\BusinessManagementService;
+use App\Services\CstoreService;
 use App\Services\DomainService;
 use App\Services\MyBusinessManagementService;
 use App\Services\MyDomainService;
@@ -39,6 +40,7 @@ use App\Services\UserService;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Techup\Mailbox\Facades\Mailbox;
 
 class BusinessManagementController extends AbstractRestAPIController
@@ -66,6 +68,11 @@ class BusinessManagementController extends AbstractRestAPIController
     protected $userService;
 
     /**
+     * @var CstoreService
+     */
+    protected $cstoreService;
+
+    /**
      * @param BusinessManagementService $service
      * @param MyBusinessManagementService $myService
      * @param DomainService $domainService
@@ -80,7 +87,8 @@ class BusinessManagementController extends AbstractRestAPIController
         UserService                 $userService,
         UserAddOnService            $userAddOnService,
         AddOnService                $addOnService,
-        SendProjectService          $sendProjectService
+        SendProjectService          $sendProjectService,
+        CstoreService               $cstoreService
     )
     {
         $this->service = $service;
@@ -100,6 +108,7 @@ class BusinessManagementController extends AbstractRestAPIController
         $this->userService = $userService;
         $this->userAddOnService = $userAddOnService;
         $this->addOnService = $addOnService;
+        $this->cstoreService = $cstoreService;
     }
 
     /**
@@ -205,6 +214,10 @@ class BusinessManagementController extends AbstractRestAPIController
             'description' => $request->get('introduce'),
             'domain_uuid' => $domain->uuid,
         ]);
+
+        if($this->cstoreService->storeS3Config($request)){
+            $this->cstoreService->storeFolderByType($request->get('name'), $model->uuid, config('foldertypecstore.BUSINESS'));
+        }
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)

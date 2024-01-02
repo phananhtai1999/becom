@@ -22,6 +22,7 @@ use App\Http\Requests\MyLocationRequest;
 use App\Http\Resources\LocationResource;
 use App\Http\Resources\LocationResourceCollection;
 use App\Services\BusinessManagementService;
+use App\Services\CstoreService;
 use App\Services\LocationService;
 use App\Services\SendProjectService;
 use App\Services\TeamService;
@@ -33,6 +34,11 @@ class LocationController extends AbstractRestAPIController
         RestIndexMyTrait, RestMyStoreTrait, RestMyShowTrait, RestMyDestroyTrait, RestMyEditTrait;
 
     /**
+     * @var CstoreService
+     */
+    protected $cstoreService;
+
+    /**
      * @param LocationService $service
      * @param TeamService $teamService
      */
@@ -40,7 +46,8 @@ class LocationController extends AbstractRestAPIController
         LocationService $service,
         TeamService $teamService,
         SendProjectService $sendProjectService,
-        BusinessManagementService $businessManagementService
+        BusinessManagementService $businessManagementService,
+        CstoreService $cstoreService
     )
     {
         $this->service = $service;
@@ -55,6 +62,7 @@ class LocationController extends AbstractRestAPIController
         $this->editRequest = UpdateLocationRequest::class;
         $this->editMyRequest = UpdateLocationRequest::class;
         $this->indexRequest = IndexRequest::class;
+        $this->cstoreService = $cstoreService;
     }
 
 
@@ -98,6 +106,8 @@ class LocationController extends AbstractRestAPIController
             'user_uuid' => auth()->user()->getkey(),
             'business_uuid' => $business->uuid
         ]));
+
+        $this->cstoreService->storeFolderByType($request->get('name'), $model->uuid, config('foldertypecstore.LOCATION'), $business->uuid);
 
         return $this->sendCreatedJsonResponse(
             $this->myService->resourceToData($this->resourceClass, $model)

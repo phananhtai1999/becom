@@ -3,6 +3,7 @@
 namespace App\Abstracts;
 
 use App\Models\Config;
+use GuzzleHttp\Client;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -244,5 +245,20 @@ abstract class AbstractService
         }
 
         return false;
+    }
+
+    protected function header()
+    {
+        return [
+            "x-user-id" => Auth()->user()->getKey(),
+            "x-app-id" => config('shop.x_app_id'),
+            "x-api-key" => config('shop.x_api_key'),
+        ];
+    }
+
+    protected function createRequest() {
+        return new Client([
+            'headers' => $this->header()
+        ]);
     }
 }

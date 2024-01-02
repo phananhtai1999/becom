@@ -10,22 +10,8 @@ use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Support\Str;
 
-class ShopService
+class ShopService extends AbstractService
 {
-    protected function header()
-    {
-        return [
-            "x-user-id" => Auth()->user()->getKey(),
-            "x-app-id" => config('shop.x_app_id'),
-            "x-api-key" => config('shop.x_api_key'),
-        ];
-    }
-
-    protected function createRequest() {
-        return new Client([
-            'headers' => $this->header()
-        ]);
-    }
 
     public function getProductDetailData($productUuid) {
         $client = $this->createRequest();

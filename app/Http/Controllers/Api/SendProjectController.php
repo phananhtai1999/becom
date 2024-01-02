@@ -22,6 +22,7 @@ use App\Http\Resources\SendProjectResource;
 use App\Http\Resources\WebsiteVerificationResource;
 use App\Models\Role;
 use App\Services\DepartmentService;
+use App\Services\CstoreService;
 use App\Services\FileVerificationService;
 use App\Services\LocationService;
 use App\Services\MySendProjectService;
@@ -47,6 +48,10 @@ class SendProjectController extends AbstractRestAPIController
      * @var FileVerificationService
      */
     protected $fileVerificationService;
+    /**
+     * @var CstoreService
+     */
+    protected $cstoreService;
 
     /**
      * @param SendProjectService $service
@@ -60,7 +65,8 @@ class SendProjectController extends AbstractRestAPIController
         FileVerificationService    $fileVerificationService,
         MySendProjectService       $myService,
         DepartmentService $departmentService,
-        LocationService $locationService
+        LocationService $locationService,
+        CstoreService $cstoreService
     )
     {
         $this->service = $service;
@@ -74,6 +80,7 @@ class SendProjectController extends AbstractRestAPIController
         $this->indexRequest = IndexRequest::class;
         $this->websiteVerificationService = $websiteVerificationService;
         $this->fileVerificationService = $fileVerificationService;
+        $this->cstoreService = $cstoreService;
     }
 
     /**
@@ -154,6 +161,8 @@ class SendProjectController extends AbstractRestAPIController
             'user_uuid' => auth()->user()->getkey(),
             'business_uuid' => $business->uuid
         ]));
+
+        $this->cstoreService->storeFolderByType($request->get('name'), $model->uuid, config('foldertypecstore.PROJECT'), $business->uuid);
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
