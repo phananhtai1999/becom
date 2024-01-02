@@ -154,6 +154,7 @@ class DepartmentController extends AbstractRestAPIController
         $model = $this->service->create(array_merge($request->all(), [
             'user_uuid' => auth()->user()->getkey()
         ]));
+        $this->cstoreService->storeFolderByType($model->name, $model->uuid, config('foldertypecstore.DEPARTMENT'), $request->get('location_uuid'));
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
