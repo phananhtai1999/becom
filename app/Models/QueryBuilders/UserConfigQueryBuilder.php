@@ -32,7 +32,8 @@ class UserConfigQueryBuilder extends AbstractQueryBuilder
                 'app_language',
                 'user_language',
                 'display_name_style',
-                'user_uuid'
+                'user_uuid',
+                'default_department'
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -40,7 +41,8 @@ class UserConfigQueryBuilder extends AbstractQueryBuilder
                 'app_language',
                 'user_language',
                 'display_name_style',
-                'user_uuid'
+                'user_uuid',
+                'default_department'
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -53,6 +55,8 @@ class UserConfigQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__user_language', 'user_language'),
                 'display_name_style',
                 AllowedFilter::exact('exact__display_name_style', 'display_name_style'),
+                'default_department',
+                AllowedFilter::exact('exact__default_department', 'default_department'),
 
             ]);
     }

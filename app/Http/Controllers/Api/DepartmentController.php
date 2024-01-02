@@ -17,12 +17,14 @@ use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\UpdateMyDepartmentRequest;
 use App\Http\Resources\DepartmentResource;
 use App\Http\Resources\DepartmentResourceCollection;
+use App\Models\UserConfig;
 use App\Services\BusinessManagementService;
 use App\Services\DepartmentService;
 use App\Services\LanguageService;
 use App\Services\MyDepartmentService;
 use App\Services\SendProjectService;
 use App\Services\TeamService;
+use App\Services\UserConfigService;
 use Illuminate\Http\JsonResponse;
 
 class DepartmentController extends AbstractRestAPIController
@@ -49,7 +51,8 @@ class DepartmentController extends AbstractRestAPIController
         MyDepartmentService $myService,
         LanguageService $languageService,
         TeamService $teamService,
-        SendProjectService $sendProjectService
+        SendProjectService $sendProjectService,
+        UserConfigService $userConfigService
     )
     {
         $this->service = $service;
@@ -57,6 +60,7 @@ class DepartmentController extends AbstractRestAPIController
         $this->languageService = $languageService;
         $this->teamService = $teamService;
         $this->sendProjectService = $sendProjectService;
+        $this->userConfigService = $userConfigService;
         $this->resourceCollectionClass = DepartmentResourceCollection::class;
         $this->resourceClass = DepartmentResource::class;
         $this->storeRequest = DepartmentRequest::class;
@@ -79,7 +83,8 @@ class DepartmentController extends AbstractRestAPIController
         }
 
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => $request->get('user_uuid') ?? auth()->user()->getkey()
+            'user_uuid' => $request->get('user_uuid') ?? auth()->user()->getkey(),
+            'is_default' => true
         ]));
 
         return $this->sendCreatedJsonResponse(
@@ -108,6 +113,20 @@ class DepartmentController extends AbstractRestAPIController
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    public function indexMy(IndexRequest $request)
+    {
+        $userConfig = $this->userConfigService->findOneWhereOrFail(['user_uuid' => auth()->user()->getKey()]);
+        if ($userConfig->default_department) {
+            $models = $this->service->getIndexMyWithDefault($request);
+        } else {
+            $models = $this->service->getCollectionWithPaginationByCondition($request, ['user_uuid' => auth()->user()->getKey()]);
+        }
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
         );
     }
 
@@ -239,5 +258,13 @@ class DepartmentController extends AbstractRestAPIController
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData($this->resourceCollectionClass, $departments)
         );
+    }
+
+    public function toggleDefaultDepartment(): JsonResponse
+    {
+        $userConfig = $this->userConfigService->findOneWhereOrFail(['user_uuid' => auth()->user()->getKey()]);
+        $userConfig->update(['default_department' => !$userConfig->default_department]);
+
+        return $this->sendOkJsonResponse();
     }
 }

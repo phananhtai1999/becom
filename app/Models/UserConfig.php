@@ -28,7 +28,8 @@ class UserConfig extends AbstractModel
         'app_language',
         'user_language',
         'display_name_style',
-        'user_uuid'
+        'user_uuid',
+        'default_department',
     ];
 
     /**
