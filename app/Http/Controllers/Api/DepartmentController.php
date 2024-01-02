@@ -18,7 +18,7 @@ use App\Http\Requests\UpdateMyDepartmentRequest;
 use App\Http\Resources\DepartmentResource;
 use App\Http\Resources\DepartmentResourceCollection;
 use App\Services\DepartmentService;
-use App\Services\LanguageService;
+use Techup\ApiConfig\Services\LanguageService;
 use App\Services\MyDepartmentService;
 use App\Services\TeamService;
 use Illuminate\Http\JsonResponse;

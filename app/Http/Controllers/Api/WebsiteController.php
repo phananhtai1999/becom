@@ -113,7 +113,7 @@ class WebsiteController extends AbstractRestAPIController
         $model = $this->myService->create(
             array_merge($request->all(), [
                 "user_uuid" => auth()->userId(),
-                'app_id' => auth()->appId()
+                'app_id' => auth()->appId(),
                 'is_default' => false,
             ])
         );

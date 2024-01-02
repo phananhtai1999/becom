@@ -14,7 +14,7 @@ use App\Http\Requests\Purpose\UpdatePurposeRequest;
 use App\Http\Resources\PurposeResource;
 use App\Http\Resources\PurposeResourceCollection;
 use App\Models\Purpose;
-use App\Services\LanguageService;
+use Techup\ApiConfig\Services\LanguageService;
 use App\Services\MailTemplateService;
 use App\Services\PurposeService;
 use Illuminate\Http\JsonResponse;

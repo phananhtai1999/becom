@@ -11,7 +11,7 @@ use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Resources\SinglePurposeResource;
 use App\Http\Resources\SinglePurposeResourceCollection;
-use App\Services\LanguageService;
+use Techup\ApiConfig\Services\LanguageService;
 use App\Services\SinglePurposeService;
 
 class SinglePurposeController extends AbstractRestAPIController

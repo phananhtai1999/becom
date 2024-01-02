@@ -13,7 +13,7 @@ use App\Http\Requests\UpdateWebsitePageCategoryRequest;
 use App\Http\Requests\WebsitePageCategoryRequest;
 use App\Http\Resources\PartnerCategoryResource;
 use App\Http\Resources\PartnerCategoryResourceCollection;
-use App\Services\LanguageService;
+use Techup\ApiConfig\Services\LanguageService;
 use App\Services\PartnerCategoryService;
 use Illuminate\Http\JsonResponse;
 

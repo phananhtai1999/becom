@@ -15,7 +15,7 @@ use App\Http\Resources\BusinessCategoryResource;
 use App\Http\Resources\BusinessCategoryResourceCollection;
 use App\Models\BusinessCategory;
 use App\Services\BusinessCategoryService;
-use App\Services\LanguageService;
+use Techup\ApiConfig\Services\LanguageService;
 use App\Services\MailTemplateService;
 use Illuminate\Http\JsonResponse;
 

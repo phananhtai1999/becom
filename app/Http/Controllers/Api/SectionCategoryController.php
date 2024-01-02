@@ -13,7 +13,7 @@ use App\Http\Requests\WebsitePageCategoryRequest;
 use App\Http\Resources\SectionCategoryResource;
 use App\Http\Resources\SectionCategoryResourceCollection;
 use App\Models\Language;
-use App\Services\LanguageService;
+use Techup\ApiConfig\Services\LanguageService;
 use App\Services\SectionCategoryService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

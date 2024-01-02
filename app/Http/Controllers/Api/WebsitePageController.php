@@ -25,7 +25,7 @@ use App\Models\WebsitePage;
 use App\Services\ArticleCategoryService;
 use App\Services\ArticleService;
 use App\Services\DomainService;
-use App\Services\LanguageService;
+use Techup\ApiConfig\Services\LanguageService;
 use App\Services\MyWebsitePageService;
 use App\Services\WebsitePageService;
 use App\Services\WebsitePageShortCodeService;
