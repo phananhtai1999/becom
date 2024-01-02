@@ -755,10 +755,8 @@ class TeamController extends Controller
      */
     public function getAssignableForProject(IndexRequest $request, $id) {
         $departments = $this->departmentService->getByProject($id);
-        $locations = $this->locationService->getByProject($id);
-        $locationUuids = $locations->pluck('uuid')->toArray();
         $departmentUuids = $departments->pluck('uuid')->toArray();
-        $teams = $this->service->getTeamsAssignable($locationUuids, $departmentUuids, $id, $request);
+        $teams = $this->service->getTeamsAssignable($departmentUuids, $id, $request);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData($this->resourceCollectionClass, $teams)

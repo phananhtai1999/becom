@@ -119,6 +119,10 @@ class BusinessManagement extends AbstractModel
         return $this->hasMany(SendProject::class, 'business_uuid', 'uuid');
     }
 
+    public function locations() {
+        return $this->hasMany(Location::class, 'business_uuid', 'uuid');
+    }
+
     public function teams() {
         return $this->belongsToMany(Team::class, 'business_team', 'business_uuid','team_uuid')->withTimestamps();
     }

@@ -19,7 +19,7 @@ class DepartmentService extends AbstractService
         })->get();
     }
 
-    public function getLocationsAssignable($businessUuid, $projectUuid, $request)
+    public function getDepartmentsAssignable($locationUuids, $projectUuid, $request)
     {
         $indexRequest = $this->getIndexRequest($request);
         $departmentRemoves = $this->getDepartmentsAssignedProject($projectUuid);
@@ -27,7 +27,7 @@ class DepartmentService extends AbstractService
 
         return DepartmentQueryBuilder::searchQuery($indexRequest['search'], $indexRequest['search_by'])
             ->whereNotIn('uuid', $departmentRemoveUuids)
-            ->where('business_uuid', $businessUuid)
+            ->whereIn('location_uuid', $locationUuids)
             ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
     }
 

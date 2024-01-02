@@ -145,8 +145,7 @@ class DepartmentController extends AbstractRestAPIController
             return $this->sendJsonResponse(false, 'Does not have business', [], 403);
         }
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => auth()->user()->getkey(),
-            'business_uuid' => $business->uuid
+            'user_uuid' => auth()->user()->getkey()
         ]));
 
         return $this->sendCreatedJsonResponse(
@@ -253,7 +252,9 @@ class DepartmentController extends AbstractRestAPIController
      */
     public function getAssignableForProject(IndexRequest $request, $id) {
         $sendProject = $this->sendProjectService->findOrFailById($id);
-        $departments = $this->service->getLocationsAssignable($sendProject->business->uuid, $id, $request);
+        $locationUuids = $sendProject->business->locations->pluck('uuid');
+        $locationUuids = $locationUuids->toArray() ?? [];
+        $departments = $this->service->getDepartmentsAssignable($locationUuids, $id, $request);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData($this->resourceCollectionClass, $departments)
