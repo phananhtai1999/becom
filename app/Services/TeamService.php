@@ -18,10 +18,12 @@ class TeamService extends AbstractService
         $indexRequest = $this->getIndexRequest($request);
         if ($request->get('sort') == 'num_of_team_member') {
             $result = TeamQueryBuilder::searchQuery($indexRequest['search'], $indexRequest['search_by'])
+                ->where('user_uuid', auth()->user()->getKey())
                 ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page'])
                 ->sortBy('num_of_team_member');
         } elseif ($request->get('sort') == '-num_of_team_member') {
             $result = TeamQueryBuilder::searchQuery($indexRequest['search'], $indexRequest['search_by'])
+                ->where('user_uuid', auth()->user()->getKey())
                 ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page'])
                 ->sortByDesc('num_of_team_member');
         }
@@ -37,7 +39,7 @@ class TeamService extends AbstractService
             ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
     }
 
-    public function getTeamsAssignable($locationUuids, $departmentUuids, $projectUuid, $request)
+    public function getTeamsAssignable($departmentUuids, $projectUuid, $request)
     {
         $indexRequest = $this->getIndexRequest($request);
         $teamRemoves = $this->getTeamsAssignedProject($projectUuid);
@@ -45,11 +47,8 @@ class TeamService extends AbstractService
 
         return TeamQueryBuilder::searchQuery($indexRequest['search'], $indexRequest['search_by'])
             ->whereNotIn('uuid', $teamRemoveUuids)
-            ->where(function ($query) use ($locationUuids, $departmentUuids) {
-                $query->whereHas('location', function ($q) use ($locationUuids) {
-                    $q->whereIn('uuid', $locationUuids);
-                })
-                    ->orWhereHas('department', function ($q) use ($departmentUuids) {
+            ->where(function ($query) use ($departmentUuids) {
+                $query->whereHas('department', function ($q) use ($departmentUuids) {
                         $q->whereIn('uuid', $departmentUuids);
                     });
             })
