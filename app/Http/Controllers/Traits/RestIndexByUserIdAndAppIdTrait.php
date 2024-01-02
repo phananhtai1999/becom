@@ -11,9 +11,9 @@ trait RestIndexByUserIdAndAppIdTrait
      */
     public function indexMy()
     {
-        app($this->indexRequest);
+        $request = app($this->indexRequest);
 
-        $models = $this->service->getCollectionByUserIdAndAppIdWithPagination();
+        $models = $this->service->getCollectionByUserIdAndAppIdWithPagination($request);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
