@@ -31,7 +31,6 @@ use App\Http\Controllers\Api\EmailController;
 use App\Http\Controllers\Api\FooterTemplateController;
 use App\Http\Controllers\Api\FormController;
 use App\Http\Controllers\Api\InvoiceController;
-use App\Http\Controllers\Api\LanguageController;
 use App\Http\Controllers\Api\LocationController;
 use App\Http\Controllers\Api\MailOpenTrackingController;
 use App\Http\Controllers\Api\MailSendingHistoryController;
@@ -64,7 +63,7 @@ use App\Http\Controllers\Api\SmtpAccountEncryptionController;
 use App\Http\Controllers\Api\StatusController;
 use App\Http\Controllers\Api\SubscriptionPlanController;
 use App\Http\Controllers\Api\TeamController;
-use App\Http\Controllers\Api\SupportMultipleLanguagesController;
+
 use App\Http\Controllers\Api\UnsubscribeController;
 use App\Http\Controllers\Api\UploadController;
 use App\Http\Controllers\Api\User\UserConfigController;
@@ -480,8 +479,7 @@ Route::group(['middleware' => ['apikey']], function () {
             Route::post('/download-template-excel', [ContactController::class, 'templateExcel'])->name('template-excel');
         });
 
-// Set Cookie-Change Lang
-        Route::get('/support-multiple-languages', [SupportMultipleLanguagesController::class, 'setCookie'])->name('set-cookie');
+
 // Mail Open Tracking
         Route::get('/mail-open-tracking/{id}', [MailSendingHistoryController::class, 'mailOpenTracking'])->name('mail-open-tracking');
 //Chart
@@ -780,21 +778,7 @@ Route::group(['middleware' => ['apikey']], function () {
 
 
 //Language
-        Route::group(['middleware' => ['userid'], 'as' => 'language.'], function () {
-
-            Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
-                Route::post('/language', [LanguageController::class, 'store'])->name('store');
-                Route::put('/language/{id}', [LanguageController::class, 'edit'])->name('edit');
-                Route::delete('/language/{id}', [LanguageController::class, 'destroy'])->name('destroy');
-                Route::get('/show-translates-json', [LanguageController::class, 'showTranslates']);
-                Route::post('/save-translates-json', [LanguageController::class, 'saveTranslates']);
-            });
-        });
-
-        Route::get('/languages-support', [LanguageController::class, 'languageSupport'])->name('language.languageSupport');
-        Route::get('/languages', [LanguageController::class, 'index'])->name('language.index');
-        Route::get('/language/{id}', [LanguageController::class, 'show'])->name('language.show');
-
+  
 //Article Category
         Route::group(['middleware' => ['userid'], 'as' => 'article-category.'], function () {
             Route::group(['middleware' => ['role:root,admin,editor'], 'as' => 'author.'], function () {

@@ -15,7 +15,7 @@ use App\Http\Resources\ArticleCategoryResourceCollection;
 use App\Models\ArticleCategory;
 use App\Services\ArticleCategoryService;
 use App\Services\ArticleService;
-use App\Services\LanguageService;
+use Techup\ApiConfig\Services\LanguageService;
 use Illuminate\Http\JsonResponse;
 
 class ArticleCategoryController extends AbstractRestAPIController

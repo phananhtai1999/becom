@@ -11,7 +11,7 @@ use App\Http\Requests\PartnerLevelRequest;
 use App\Http\Requests\UpdatePartnerLevelRequest;
 use App\Http\Resources\PartnerLevelResource;
 use App\Http\Resources\PartnerLevelResourceCollection;
-use App\Services\LanguageService;
+use Techup\ApiConfig\Services\LanguageService;
 use App\Services\PartnerLevelService;
 use Illuminate\Http\JsonResponse;
 

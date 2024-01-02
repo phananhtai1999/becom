@@ -21,7 +21,7 @@ use App\Models\UserTeam;
 use App\Services\ArticleSeriesService;
 use App\Services\ArticleService;
 use Techup\ApiConfig\Services\ConfigService;
-use App\Services\LanguageService;
+use Techup\ApiConfig\Services\LanguageService;
 use App\Services\TeamService;
 use App\Services\UserTeamService;
 use Carbon\Carbon;

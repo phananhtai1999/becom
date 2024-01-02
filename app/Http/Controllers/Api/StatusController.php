@@ -14,7 +14,7 @@ use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Resources\StatusResource;
 use App\Http\Resources\StatusResourceCollection;
-use App\Services\LanguageService;
+use Techup\ApiConfig\Services\LanguageService;
 use App\Services\MyStatusService;
 use App\Services\StatusService;
 

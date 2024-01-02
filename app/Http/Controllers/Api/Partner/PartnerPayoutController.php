@@ -18,7 +18,7 @@ use App\Http\Resources\PartnerCategoryResource;
 use App\Http\Resources\PartnerCategoryResourceCollection;
 use App\Http\Resources\PartnerPayoutResource;
 use App\Http\Resources\PartnerPayoutResourceCollection;
-use App\Services\LanguageService;
+use Techup\ApiConfig\Services\LanguageService;
 use App\Services\MyPartnerPayoutService;
 use App\Services\PartnerCategoryService;
 use App\Services\PartnerPayoutService;

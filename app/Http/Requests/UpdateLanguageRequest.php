@@ -3,7 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
-use App\Services\LanguageService;
+use Techup\ApiConfig\Services\LanguageService;
 use Illuminate\Validation\Rule;
 
 class UpdateLanguageRequest extends AbstractRequest

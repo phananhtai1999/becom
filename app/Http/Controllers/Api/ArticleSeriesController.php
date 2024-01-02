@@ -12,7 +12,7 @@ use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Resources\ArticleSeriesResource;
 use App\Http\Resources\ArticleSeriesResourceCollection;
 use App\Services\ArticleSeriesService;
-use App\Services\LanguageService;
+use Techup\ApiConfig\Services\LanguageService;
 
 class ArticleSeriesController extends AbstractRestAPIController
 {

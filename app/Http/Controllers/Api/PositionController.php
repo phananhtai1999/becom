@@ -14,7 +14,7 @@ use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Resources\PositionResource;
 use App\Http\Resources\PositionResourceCollection;
-use App\Services\LanguageService;
+use Techup\ApiConfig\Services\LanguageService;
 use App\Services\MyPositionService;
 use App\Services\MyStatusService;
 use App\Services\PositionService;
