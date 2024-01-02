@@ -101,6 +101,17 @@ class SendProjectController extends AbstractRestAPIController
         );
     }
 
+    public function indexMy(IndexRequest $request)
+    {
+        $teams = auth()->user()->teams->pluck('uuid');
+        $teams = $teams->toArray() ?? [];
+        $models = $this->service->getMyProjectWithTeams($request, $teams);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+        );
+    }
+
     /**
      * @param $id
      * @return JsonResponse

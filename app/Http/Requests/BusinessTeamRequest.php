@@ -28,7 +28,6 @@ class BusinessTeamRequest extends FormRequest
         $validates = [
             'name' => ['required', 'string'],
             'department_uuid' => ['integer', 'exists:departments,uuid'],
-            'location_uuid' => ['integer', 'exists:locations,uuid'],
             'leader_uuid' => ['required', 'integer', Rule::exists('users', 'uuid')->whereNull('deleted_at')],
             'parent_team_uuid' => ['integer', Rule::exists('teams', 'uuid')->whereNull('deleted_at')],
             'team_member_uuids' => ['required', 'array', 'min:1'],

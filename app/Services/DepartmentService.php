@@ -19,7 +19,7 @@ class DepartmentService extends AbstractService
         })->get();
     }
 
-    public function getLocationsAssignable($businessUuid, $projectUuid, $request)
+    public function getDepartmentsAssignable($locationUuids, $projectUuid, $request)
     {
         $indexRequest = $this->getIndexRequest($request);
         $departmentRemoves = $this->getDepartmentsAssignedProject($projectUuid);
@@ -27,7 +27,7 @@ class DepartmentService extends AbstractService
 
         return DepartmentQueryBuilder::searchQuery($indexRequest['search'], $indexRequest['search_by'])
             ->whereNotIn('uuid', $departmentRemoveUuids)
-            ->where('business_uuid', $businessUuid)
+            ->whereIn('location_uuid', $locationUuids)
             ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
     }
 
@@ -44,5 +44,15 @@ class DepartmentService extends AbstractService
         return $this->model->whereHas('teams', function ($query) use ($id) {
             $query->where('teams.uuid', $id);
         })->get();
+    }
+
+    public function getIndexMyWithDefault($request)
+    {
+        $indexRequest = $this->getIndexRequest($request);
+
+        return $this->modelQueryBuilderClass::searchQuery($indexRequest['search'], $indexRequest['search_by'])
+            ->where('user_uuid', auth()->user()->getKey())
+            ->orWhere('is_default', true)
+            ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
     }
 }

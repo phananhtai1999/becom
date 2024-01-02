@@ -17,6 +17,7 @@ use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\UpdateMyDepartmentRequest;
 use App\Http\Resources\DepartmentResource;
 use App\Http\Resources\DepartmentResourceCollection;
+use App\Models\UserConfig;
 use App\Services\BusinessManagementService;
 use App\Services\CstoreService;
 use App\Services\DepartmentService;
@@ -24,6 +25,7 @@ use App\Services\LanguageService;
 use App\Services\MyDepartmentService;
 use App\Services\SendProjectService;
 use App\Services\TeamService;
+use App\Services\UserConfigService;
 use Illuminate\Http\JsonResponse;
 
 class DepartmentController extends AbstractRestAPIController
@@ -55,6 +57,7 @@ class DepartmentController extends AbstractRestAPIController
         LanguageService $languageService,
         TeamService $teamService,
         SendProjectService $sendProjectService,
+        UserConfigService $userConfigService,
         CstoreService $cstoreService
     )
     {
@@ -63,6 +66,7 @@ class DepartmentController extends AbstractRestAPIController
         $this->languageService = $languageService;
         $this->teamService = $teamService;
         $this->sendProjectService = $sendProjectService;
+        $this->userConfigService = $userConfigService;
         $this->resourceCollectionClass = DepartmentResourceCollection::class;
         $this->resourceClass = DepartmentResource::class;
         $this->storeRequest = DepartmentRequest::class;
@@ -86,7 +90,8 @@ class DepartmentController extends AbstractRestAPIController
         }
 
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => $request->get('user_uuid') ?? auth()->user()->getkey()
+            'user_uuid' => $request->get('user_uuid') ?? auth()->user()->getkey(),
+            'is_default' => true
         ]));
 
         return $this->sendCreatedJsonResponse(
@@ -118,6 +123,20 @@ class DepartmentController extends AbstractRestAPIController
         );
     }
 
+    public function indexMy(IndexRequest $request)
+    {
+        $userConfig = $this->userConfigService->findOneWhereOrFail(['user_uuid' => auth()->user()->getKey()]);
+        if ($userConfig->default_department) {
+            $models = $this->service->getIndexMyWithDefault($request);
+        } else {
+            $models = $this->service->getCollectionWithPaginationByCondition($request, ['user_uuid' => auth()->user()->getKey()]);
+        }
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+        );
+    }
+
     /**
      * @param MyDepartmentRequest $request
      * @return JsonResponse
@@ -133,8 +152,7 @@ class DepartmentController extends AbstractRestAPIController
             return $this->sendJsonResponse(false, 'Does not have business', [], 403);
         }
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => auth()->user()->getkey(),
-            'business_uuid' => $business->uuid
+            'user_uuid' => auth()->user()->getkey()
         ]));
 
         return $this->sendCreatedJsonResponse(
@@ -242,10 +260,20 @@ class DepartmentController extends AbstractRestAPIController
      */
     public function getAssignableForProject(IndexRequest $request, $id) {
         $sendProject = $this->sendProjectService->findOrFailById($id);
-        $departments = $this->service->getLocationsAssignable($sendProject->business->uuid, $id, $request);
+        $locationUuids = $sendProject->business->locations->pluck('uuid');
+        $locationUuids = $locationUuids->toArray() ?? [];
+        $departments = $this->service->getDepartmentsAssignable($locationUuids, $id, $request);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData($this->resourceCollectionClass, $departments)
         );
+    }
+
+    public function toggleDefaultDepartment(): JsonResponse
+    {
+        $userConfig = $this->userConfigService->findOneWhereOrFail(['user_uuid' => auth()->user()->getKey()]);
+        $userConfig->update(['default_department' => !$userConfig->default_department]);
+
+        return $this->sendOkJsonResponse();
     }
 }
