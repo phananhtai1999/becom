@@ -19,6 +19,7 @@ use App\Http\Resources\DepartmentResource;
 use App\Http\Resources\DepartmentResourceCollection;
 use App\Models\UserConfig;
 use App\Services\BusinessManagementService;
+use App\Services\CstoreService;
 use App\Services\DepartmentService;
 use App\Services\LanguageService;
 use App\Services\MyDepartmentService;
@@ -40,6 +41,10 @@ class DepartmentController extends AbstractRestAPIController
      * @var LanguageService
      */
     protected $languageService;
+    /**
+     * @var CstoreService
+     */
+    protected $cstoreService;
 
     /**
      * @param DepartmentService $service
@@ -52,7 +57,8 @@ class DepartmentController extends AbstractRestAPIController
         LanguageService $languageService,
         TeamService $teamService,
         SendProjectService $sendProjectService,
-        UserConfigService $userConfigService
+        UserConfigService $userConfigService,
+        CstoreService $cstoreService
     )
     {
         $this->service = $service;
@@ -66,6 +72,7 @@ class DepartmentController extends AbstractRestAPIController
         $this->storeRequest = DepartmentRequest::class;
         $this->editRequest = UpdateDepartmentRequest::class;
         $this->indexRequest = IndexRequest::class;
+        $this->cstoreService = $cstoreService;
     }
 
     /**
@@ -147,6 +154,7 @@ class DepartmentController extends AbstractRestAPIController
         $model = $this->service->create(array_merge($request->all(), [
             'user_uuid' => auth()->user()->getkey()
         ]));
+        $this->cstoreService->storeFolderByType($model->name, $model->uuid, config('foldertypecstore.DEPARTMENT'), $request->get('location_uuid'));
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -224,6 +232,7 @@ class DepartmentController extends AbstractRestAPIController
         foreach ($request->get('department_uuids') as $departmentUuid) {
             $department = $this->service->findOrFailById($departmentUuid);
             $department->update(['location_uuid' => $request->get('location_uuid')]);
+            $this->cstoreService->storeFolderByType($department->name, $department->uuid, config('foldertypecstore.DEPARTMENT'), $request->get('location_uuid'));
         }
 
         return $this->sendOkJsonResponse();

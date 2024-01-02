@@ -45,6 +45,7 @@ use App\Models\Team;
 use App\Services\AddOnService;
 use App\Services\BusinessTeamService;
 use App\Services\ContactListService;
+use App\Services\CstoreService;
 use App\Services\DepartmentService;
 use App\Services\InviteService;
 use App\Services\LocationService;
@@ -67,6 +68,11 @@ class TeamController extends Controller
 {
     use RestShowTrait, RestDestroyTrait, RestEditTrait, RestStoreTrait;
 
+    /**
+     * @var CstoreService
+     */
+    protected $cstoreService;
+
     public function __construct(
         TeamService         $service,
         UserTeamService     $userTeamService,
@@ -80,7 +86,8 @@ class TeamController extends Controller
         AddOnService        $addOnService,
         DepartmentService $departmentService,
         LocationService $locationService,
-        SendProjectService $sendProjectService
+        SendProjectService $sendProjectService,
+        CstoreService $cstoreService
     )
     {
         $this->service = $service;
@@ -106,6 +113,7 @@ class TeamController extends Controller
         $this->storeRequest = TeamRequest::class;
         $this->editRequest = UpdateTeamRequest::class;
         $this->indexRequest = IndexRequest::class;
+        $this->cstoreService = $cstoreService;
     }
 
     public function index(IndexRequest $request)
@@ -149,6 +157,15 @@ class TeamController extends Controller
             'owner_uuid' => auth()->user()->getkey(),
         ]));
 
+        if($request->get('parent_team_uuid')){
+            $parentUuid = $request->get('parent_team_uuid');
+            $parentType = config('foldertypecstore.TEAM');
+        }else{
+            $parentUuid = $request->get('department_uuid');
+            $parentType = config('foldertypecstore.DEPARTMENT');
+        }
+        $this->cstoreService->storeFolderByType($model->name, $model->uuid, config('foldertypecstore.TEAM'), $parentUuid, $parentType);
+
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
         );
@@ -177,6 +194,7 @@ class TeamController extends Controller
             $this->userTeamService->create(array_merge($request->all(), [
                 'user_uuid' => $user->uuid,
             ]));
+            $this->cstoreService->storeFolderByType($request->get('username'), $user->uuid, config('foldertypecstore.USER'), $request->get('team_uuid'));
             $this->smtpAccountService->sendEmailNotificationSystem($user, new SendInviteToTeamByAccount($user, $password));
         }
 
@@ -224,6 +242,9 @@ class TeamController extends Controller
                     'business_uuid' => $businessUuid,
                     'user_uuid' => $user->uuid
                 ]);
+
+                $this->cstoreService->storeFolderByType($request->get('username'), $user->uuid, config('foldertypecstore.USER'), $request->get('team_uuid'));
+
                 Mailbox::postEmailAccountcreate($user->uuid, $email, $passwordRandom);
                 DB::commit();
 
@@ -269,6 +290,9 @@ class TeamController extends Controller
         $model = $this->userTeamService->create(array_merge($request->all(), [
             'user_uuid' => auth()->user()->getkey(),
         ]));
+
+        $this->cstoreService->storeFolderByType(auth()->user()->username, auth()->user()->getkey(), config('foldertypecstore.USER'), $request->get('team_uuid'));
+
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->userTeamResourceClass, $model)
@@ -673,6 +697,9 @@ class TeamController extends Controller
         foreach ($request->get('child_team_uuids') as $childTeamUuid) {
             $childTeam = $this->service->findOrFailById($childTeamUuid);
             $childTeam->update(['parent_team_uuid' => $request->get('team_uuid')]);
+            $this->cstoreService->storeFolderByType(
+                $childTeam->name, $childTeam->uuid, config('foldertypecstore.TEAM'),
+                $request->get('team_uuid'), config('foldertypecstore.TEAM'));
         }
 
         return $this->sendOkJsonResponse();
@@ -743,6 +770,7 @@ class TeamController extends Controller
         foreach ($request->get('team_uuids') as $childTeamUuid) {
             $childTeam = $this->service->findOrFailById($childTeamUuid);
             $childTeam->update(['department_uuid' => $request->get('department_uuid')]);
+            $this->cstoreService->storeFolderByType($childTeam->name, $childTeam->uuid, config('foldertypecstore.TEAM'), $request->get('department_uuid'));
         }
 
         return $this->sendOkJsonResponse();
