@@ -15,6 +15,7 @@ use App\Http\Controllers\Traits\RestStoreByUserIdAndAppIdTrait;
 use App\Http\Controllers\Traits\RestStoreTrait;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\LocationRequest;
+use App\Http\Requests\OptionDeleteBusinuessRequest;
 use App\Http\Requests\RemoveTeamFromLocationRequest;
 use App\Http\Requests\UpdateLocationRequest;
 use App\Http\Requests\MyLocationRequest;
@@ -30,7 +31,7 @@ use Illuminate\Http\JsonResponse;
 class LocationController extends AbstractRestAPIController
 {
     use RestIndexTrait, RestShowTrait, RestEditTrait, RestStoreTrait, RestDestroyTrait,
-        RestIndexByUserIdAndAppIdTrait, RestStoreByUserIdAndAppIdTrait, RestShowByUserIdAndAppIdTrait, RestDestroyByUserIdAndAppIdTrait, RestEditByUserIdAndAppIdTrait;
+        RestIndexByUserIdAndAppIdTrait, RestStoreByUserIdAndAppIdTrait, RestShowByUserIdAndAppIdTrait, RestEditByUserIdAndAppIdTrait;
 
     /**
      * @var CstoreService
@@ -111,5 +112,18 @@ class LocationController extends AbstractRestAPIController
         return $this->sendCreatedJsonResponse(
             $this->myService->resourceToData($this->resourceClass, $model)
         );
+    }
+
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
+    public function destroyMy($id, OptionDeleteBusinuessRequest $request)
+    {
+        $this->service->destroyByUserIdAndAppId($id);
+        $this->cstoreService->deleteFolderType($id, config('foldertypecstore.LOCATION'),
+            $request->get('option', 'keep'));
+
+        return $this->sendOkJsonResponse();
     }
 }

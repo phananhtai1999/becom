@@ -15,6 +15,7 @@ use App\Http\Requests\IndexRequest;
 use App\Http\Requests\InviteUserRequest;
 use App\Http\Requests\JoinTeamRequest;
 use App\Http\Requests\MyUpdateTeamRequest;
+use App\Http\Requests\OptionDeleteBusinuessRequest;
 use App\Http\Requests\removeTeamMemberRequest;
 use App\Http\Requests\ResetPasswordEmailTeamMemberRequest;
 use App\Http\Requests\SetAddOnForMemberRequest;
@@ -283,6 +284,8 @@ class TeamController extends Controller
                                 'app_id' => auth()->appId()
                             ]);
                         }
+                        $this->cstoreService->storeFolderByType("user_{$userUuid}", $userUuid, config('foldertypecstore.USER'),$request->get('team_uuid'), config('foldertypecstore.TEAM'));
+
                     }
                 }
                 DB::commit();
@@ -511,7 +514,7 @@ class TeamController extends Controller
         );
     }
 
-    public function destroyMy($id)
+    public function destroyMy($id, OptionDeleteBusinuessRequest $request)
     {
         $model = $this->myService->findOneWhereOrFail([
             'owner_uuid' => auth()->userId(),
@@ -520,6 +523,8 @@ class TeamController extends Controller
         ]);
 
         $this->destroy($model->uuid);
+        $this->cstoreService->deleteFolderType($id, config('foldertypecstore.TEAM'),
+            $request->get('option', 'keep'));
 
         return $this->sendOkJsonResponse();
     }
@@ -543,6 +548,8 @@ class TeamController extends Controller
         $user->userTeamContactLists()->detach();
         $this->userTeamService->destroy($model->uuid);
         $this->removeTeamPermissionCache($model->user_uuid);
+        $this->cstoreService->deleteFolderType($model->user_uuid, config('foldertypecstore.USER'),
+            $request->get('option', 'destroy'));
 
         return $this->sendOkJsonResponse();
     }

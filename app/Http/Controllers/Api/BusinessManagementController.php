@@ -13,6 +13,7 @@ use App\Http\Requests\GetAddOnOfBusinessRequest;
 use App\Http\Requests\GetBusinessMemberRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyBusinessManagementRequest;
+use App\Http\Requests\OptionDeleteBusinuessRequest;
 use App\Http\Requests\RemoveBusinessMemberRequest;
 use App\Http\Requests\UpdateBusinessManagementRequest;
 use App\Http\Requests\UpdateMyBusinessManagementRequest;
@@ -274,9 +275,11 @@ class BusinessManagementController extends AbstractRestAPIController
      * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroyMyBusinessManagement($id)
+    public function destroyMyBusinessManagement($id,OptionDeleteBusinuessRequest $request)
     {
         $this->myService->deleteMyBusinessManagement($id);
+        $this->cstoreService->deleteFolderType($id, config('foldertypecstore.BUSINESS'),
+            $request->get('option', 'keep'));
 
         return $this->sendOkJsonResponse();
     }

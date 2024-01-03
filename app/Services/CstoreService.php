@@ -49,4 +49,23 @@ class CstoreService extends AbstractService
             return false;
         }
     }
+
+    public function deleteFolderType($uuid, $type, $option)
+    {
+        try{
+            $client = $this->createRequest();
+            $client->post(config('shop.cstore_url') . 'delete-folder-type', [
+                'json' => [
+                    "owner_uuid" => $uuid,
+                    "owner_type" => $type,
+                    "option" => $option
+                ]
+            ]);
+
+            return true;
+        }catch (\Exception $e){
+            Log::error($e->getMessage());
+            return false;
+        }
+    }
 }

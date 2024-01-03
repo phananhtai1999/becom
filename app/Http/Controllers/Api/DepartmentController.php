@@ -10,6 +10,7 @@ use App\Http\Requests\AddDepartmentForLocationRequest;
 use App\Http\Requests\DepartmentRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyDepartmentRequest;
+use App\Http\Requests\OptionDeleteBusinuessRequest;
 use App\Http\Requests\RemoveTeamFromDepartmentRequest;
 use App\Http\Requests\UpdateDepartmentRequest;
 use App\Http\Controllers\Traits\RestIndexTrait;
@@ -207,9 +208,11 @@ class DepartmentController extends AbstractRestAPIController
      * @param $id
      * @return JsonResponse
      */
-    public function destroyMyDepartment($id)
+    public function destroyMyDepartment($id, OptionDeleteBusinuessRequest $request)
     {
         $this->myService->deleteMyDepartment($id);
+        $this->cstoreService->deleteFolderType($id, config('foldertypecstore.DEPARTMENT'),
+            $request->get('option', 'keep'));
 
         return $this->sendOkJsonResponse();
     }
