@@ -29,6 +29,42 @@ class ReplaceProductService extends ShopService
         }, $template);
     }
 
+    public function replaceListProductForPageHome($template, $websitePage) {
+
+        //get number article need to parse
+        $pattern = '/data-product-count="(\d+)"/';
+        preg_match_all($pattern, $template, $matches);
+        $numbers = array_map('intval', $matches[1]);
+        $articleCount = array_sum($numbers);
+        $articleCount = isset($articleCount) ? (int)$articleCount : 10;
+
+        //get orderby
+        preg_match('/product-sort="(.*?)"/', $template, $sortName);
+        preg_match('/product-sort-order="(.*?)"/', $template, $sortOrder);
+        preg_match('/data-filter-product-by-category="(.*?)"/', $template, $sortFilterByCategory);
+        if ($sortFilterByCategory) {
+            $productsData = $this->getListProductByCategoryUuid($sortFilterByCategory, $sortName[1] ?? 'created_at', $sortOrder[1] ?? 'desc', $productCount ?? 10);
+        } else {
+            $productsData = $this->getListProductByCategoryUuid(null, $sortName[1] ?? 'created_at', $sortOrder[1] ?? 'desc', $productCount ?? 10);
+        }
+        $productsData = $productsData['data']['data'];
+        $pattern = '/<product-element.*?>(.*?)<\/product-element>/s';
+        return preg_replace_callback($pattern, function ($matches) use ($productsData, $websitePage) {
+            $productData = array_shift($productsData);
+dd($productData);
+            if (!$productData) {
+                return $matches[0];
+            }
+            //replace slug
+            $category = $productData['category'];
+            $replaceProductCategoryService = new ReplaceProductCategoryService();
+            $replaceProductCategoryService->replaceCategoryInProduct($matches[0], $category);
+
+            $searchReplaceMap = $this->searchReplaceMapForProduct($productData);
+            return str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $matches[0]);
+        }, $template);
+    }
+
     public function searchReplaceMapForProduct($product)
     {
         return [

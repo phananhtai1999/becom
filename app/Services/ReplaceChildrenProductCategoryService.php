@@ -17,24 +17,22 @@ class ReplaceChildrenProductCategoryService extends ShopService
         preg_match('/children-product-category-sort-order="(.*?)"/', $categoryTemplates, $sortOrder);
 
         $childrenCategoriesData = $this->getChildrenByCategoryUuid($categoryData['uuid'], $sortName[1] ?? 'created_at', $sortOrder[1] ?? 'desc', $childrenCategoryCount ?? 10);
+        $childrenCategoriesData = $childrenCategoriesData['data']['data'];
 
-        $childrenCategoriesData = $childrenCategoriesData['data'];
-
-        return preg_replace_callback('/<children-product-category-element.*?>(.*?)<\/children-product-category-element>/s', function ($childMatches) use ($childrenCategoriesData) {
+        return preg_replace_callback('/<children_category.*?>(.*?)<\/children_category>/s', function ($childMatches) use ($childrenCategoriesData) {
             $childrenCategoryData = array_shift($childrenCategoriesData);
             if (!$childrenCategoryData) {
                 return $childMatches[0];
             }
-//
-//            $product = $this->getProductByParentCategoryUuid($childrenCategoryData['uuid']);
-//            if ($product) {
-//                $replaceProduct = new ReplaceProductService();
-//                $searchReplaceProductMap = $replaceProduct->searchReplaceMapForProduct($product['data']);
-//                $childMatches[0] = Str::replace(array_keys($searchReplaceProductMap), $searchReplaceProductMap, $childMatches[0]);
-//            }
+
+            if ($childrenCategoryData['product']) {
+                $replaceProduct = new ReplaceProductService();
+                $searchReplaceProductMap = $replaceProduct->searchReplaceMapForProduct($childrenCategoryData['product']);
+                $childMatches[0] = Str::replace(array_keys($searchReplaceProductMap), $searchReplaceProductMap, $childMatches[0]);
+            }
             $childSearchReplaceMap = $this->searchReplaceMapForChildrenCategory($childrenCategoryData);
             $childMatches[0] = str_replace(array_keys($childMatches), $childSearchReplaceMap, $childMatches[0]);
-            $childMatches[0] = $this->replaceGrandChildrenCategory($childMatches[0], $childrenCategoryData);
+//            $childMatches[0] = $this->replaceGrandChildrenCategory($childMatches[0], $childrenCategoryData);
 
             return $childMatches[0];
         }, $categoryTemplates);

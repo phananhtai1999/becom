@@ -48,7 +48,7 @@ class ShopService
 
     public function getChildrenByCategoryUuid($categoryUuid, $sortName = 'created_at', $sortOrder = 'desc', $childrenCategoryCount = 10) {
         $client = $this->createRequest();
-        $res = $client->get(config('shop.shop_url') . 'children-category/'. $categoryUuid, [
+        $res = $client->get(config('shop.shop_url') . 'children-category', [
             'query' => [
                 'product_category_uuid' => $categoryUuid,
                 'per_page' => $childrenCategoryCount,
@@ -63,7 +63,7 @@ class ShopService
     public function getListProductByCategoryUuid($categoryUuid, $sortName = 'created_at', $sortOrder = 'desc', $childrenCategoryCount = 10) {
         $client = $this->createRequest();
         $res = $client->get(config('shop.shop_url') . 'products-by-category', ['query' => [
-            'product_category_uuid' => $categoryUuid,
+            'product_category_uuid' => 1,
             'per_page' => $childrenCategoryCount,
             'sorted_by' => $sortOrder,
             'sort' => $sortName

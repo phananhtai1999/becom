@@ -142,8 +142,8 @@ class WebsitePageController extends AbstractRestAPIController
             $productCategoryData = $this->shopService->getProductCategoryData($request->get('product_category_slug'));
             $websitePage = $this->service->renderContentForProductCategory($websitePage, $productCategoryData);
             $response = $this->sendOkJsonResponse(['data' => $websitePage]);
-        } elseif ($websitePage->type == WebsitePage::HOME_ARTICLES_TYPE) {
-            $websitePage = $this->service->renderContentForHomeArticles($websitePage);
+        } elseif ($websitePage->type == WebsitePage::HOME_PRODUCT_TYPE) {
+            $websitePage = $this->service->renderContentForHomeProducts($websitePage);
             $response = $this->sendOkJsonResponse(['data' => $websitePage]);
         }
 
