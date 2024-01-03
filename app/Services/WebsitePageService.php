@@ -290,4 +290,15 @@ class WebsitePageService extends AbstractService
 
         return $websitePage;
     }
+
+    public function renderContentForHomeProducts($websitePage)
+    {
+        $replaceProductService = new ReplaceProductService();
+        $replaceProductCategoryService = new ReplaceProductCategoryService();
+        $websitePage->template = $replaceProductCategoryService->replaceListProductCategory($websitePage->template);
+
+        $websitePage->template = $replaceProductService->replaceListProductForPageHome($websitePage->template, $websitePage);
+
+        return $websitePage;
+    }
 }
