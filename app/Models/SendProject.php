@@ -8,6 +8,7 @@ use App\Http\Controllers\Traits\ModelFilterFieldTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SendProject extends AbstractModel
@@ -28,13 +29,14 @@ class SendProject extends AbstractModel
      * @var string[]
      */
     protected $fillable = [
-        'domain',
         'user_uuid',
         'name',
         'description',
         'logo',
         'domain_uuid',
         'app_id',
+        'parent_uuid',
+        'business_uuid'
     ];
 
     /**
@@ -126,5 +128,56 @@ class SendProject extends AbstractModel
     public function domains()
     {
         return $this->belongsTo(Domain::class, 'domain_uuid', 'uuid');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function business()
+    {
+        return $this->belongsTo(BusinessManagement::class, 'business_uuid', 'uuid');
+    }
+
+    public function teams()
+    {
+        return $this->belongsToMany(Team::class, 'team_send_project', 'send_project_uuid', 'team_uuid')->withTimestamps();
+    }
+
+    public function departments()
+    {
+        return $this->belongsToMany(Department::class, 'department_send_project', 'send_project_uuid', 'department_uuid')->withTimestamps();
+    }
+
+    public function locations()
+    {
+        return $this->belongsToMany(Location::class, 'location_send_project', 'send_project_uuid', 'location_uuid')->withTimestamps();
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function parentSendProject()
+    {
+        return $this->belongsTo(__CLASS__, 'parent_uuid');
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function childrenSendProject()
+    {
+        return $this->hasMany(__CLASS__, 'parent_uuid');
+    }
+
+    /**
+     * @param Builder $query
+     * @param $check
+     * @return Builder|void
+     */
+    public function scopeSendProjectRoot(Builder $query, $check)
+    {
+        if ($check) {
+            return $query->whereNull('parent_uuid');
+        }
     }
 }

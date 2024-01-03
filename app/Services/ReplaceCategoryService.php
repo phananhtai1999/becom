@@ -16,7 +16,7 @@ class ReplaceCategoryService extends ReplaceChildrenCategoryService
         preg_match('/category-sort="(.*?)"/', $template, $sortName);
         preg_match('/category-sort-order="(.*?)"/', $template, $sortOrder);
         $categoriesData = ArticleCategory::where('parent_uuid', null)->orderBy($sortName[1] ?? 'created_at', $sortOrder[1] ?? 'DESC')->paginate($categoryCount);
-        return preg_replace_callback('/<category.*?>(.*?)<\/category>/s', function ($matches) use ($categoriesData) {
+        return preg_replace_callback('/<category-element.*?>(.*?)<\/category-element>/s', function ($matches) use ($categoriesData) {
             $categoryData = $categoriesData->shift();
 
             if (!$categoryData) {

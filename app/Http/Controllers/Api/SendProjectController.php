@@ -6,6 +6,10 @@ use App\Abstracts\AbstractRestAPIController;
 use App\Http\Controllers\Traits\RestIndexMyTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
+use App\Http\Requests\AddChildrenProjectRequest;
+use App\Http\Requests\AssignProjectForDepartmentRequest;
+use App\Http\Requests\AssignProjectForLocationRequest;
+use App\Http\Requests\AssignProjectForTeamRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MySendProjectRequest;
 use App\Http\Requests\UpdateMySendProjectRequest;
@@ -16,7 +20,11 @@ use App\Http\Requests\WebsiteVerificationRequest;
 use App\Http\Resources\SendProjectResourceCollection;
 use App\Http\Resources\SendProjectResource;
 use App\Http\Resources\WebsiteVerificationResource;
+use App\Models\Role;
+use App\Services\DepartmentService;
+use App\Services\CstoreService;
 use App\Services\FileVerificationService;
+use App\Services\LocationService;
 use App\Services\MySendProjectService;
 use App\Services\SendProjectService;
 use App\Services\WebsiteVerificationService;
@@ -40,6 +48,10 @@ class SendProjectController extends AbstractRestAPIController
      * @var FileVerificationService
      */
     protected $fileVerificationService;
+    /**
+     * @var CstoreService
+     */
+    protected $cstoreService;
 
     /**
      * @param SendProjectService $service
@@ -51,11 +63,16 @@ class SendProjectController extends AbstractRestAPIController
         SendProjectService         $service,
         WebsiteVerificationService $websiteVerificationService,
         FileVerificationService    $fileVerificationService,
-        MySendProjectService       $myService
+        MySendProjectService       $myService,
+        DepartmentService $departmentService,
+        LocationService $locationService,
+        CstoreService $cstoreService
     )
     {
         $this->service = $service;
-        $this->myService = $myService;
+        $this->myService = $service;
+        $this->departmentService = $departmentService;
+        $this->locationService = $locationService;
         $this->resourceCollectionClass = SendProjectResourceCollection::class;
         $this->resourceClass = SendProjectResource::class;
         $this->storeRequest = SendProjectRequest::class;
@@ -63,6 +80,7 @@ class SendProjectController extends AbstractRestAPIController
         $this->indexRequest = IndexRequest::class;
         $this->websiteVerificationService = $websiteVerificationService;
         $this->fileVerificationService = $fileVerificationService;
+        $this->cstoreService = $cstoreService;
     }
 
     /**
@@ -81,6 +99,17 @@ class SendProjectController extends AbstractRestAPIController
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    public function indexMy(IndexRequest $request)
+    {
+        $teams = auth()->user()->teams->pluck('uuid');
+        $teams = $teams->toArray() ?? [];
+        $models = $this->service->getMyProjectWithTeams($request, $teams);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
         );
     }
 
@@ -137,10 +166,17 @@ class SendProjectController extends AbstractRestAPIController
      */
     public function storeMySendProject(MySendProjectRequest $request)
     {
+        $business = $this->getBusiness();
+        if (!$business) {
+            return $this->sendJsonResponse(false, 'Does not have business', [], 403);
+        }
         $model = $this->service->create(array_merge($request->all(), [
             'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
+            'business_uuid' => $business->uuid
         ]));
+
+        $this->cstoreService->storeFolderByType($request->get('name'), $model->uuid, config('foldertypecstore.PROJECT'), $business->uuid);
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -201,11 +237,7 @@ class SendProjectController extends AbstractRestAPIController
      */
     public function verifyByDnsRecord(WebsiteVerificationRequest $request)
     {
-
-        $website = $this->service->findOneWhereOrFail([
-            'domain' => $request->get('domain')
-        ]);
-
+        $website = $this->service->findOrFailById($request->get('domain_uuid'));
         $websiteVerify = $this->websiteVerificationService->verifyByDnsRecord($website->getKey());
 
         return $this->sendOkJsonResponse(
@@ -220,9 +252,7 @@ class SendProjectController extends AbstractRestAPIController
      */
     public function verifyByHtmlTag(VerifyDomainWebsiteVerificationRequest $request)
     {
-        $website = $this->service->findOneWhereOrFail([
-            'domain' => $request->get('domain')
-        ]);
+        $website = $this->service->findOrFailById($request->get('domain_uuid'));
 
         $websiteVerify = $this->websiteVerificationService->verifyByHtmlTag($website->getKey());
 
@@ -244,9 +274,7 @@ class SendProjectController extends AbstractRestAPIController
      */
     public function verifyByHtmlFile(VerifyDomainWebsiteVerificationRequest $request)
     {
-        $website = $this->service->findOneWhereOrFail([
-            'domain' => $request->get('domain')
-        ]);
+        $website = $this->service->findOrFailById($request->get('domain_uuid'));
 
         $websiteVerify = $this->websiteVerificationService->verifyByHtmlFile($website->getKey());
 
@@ -279,5 +307,104 @@ class SendProjectController extends AbstractRestAPIController
         ];
 
         return response()->make($contentFile, 200, $headers);
+    }
+
+    public function assignForTeam(AssignProjectForTeamRequest $request)
+    {
+        if (!$this->checkExistBusiness()) {
+
+            return $this->sendJsonResponse(false, 'You do not have access', [], 403);
+        }
+        $sendProject = $this->service->findOrFailById($request->get('send_project_uuid'));
+        $sendProject->teams()->syncWithoutDetaching($request->get('team_uuids', []));
+
+        return $this->sendOkJsonResponse();
+    }
+
+    public function unassignForTeam(AssignProjectForTeamRequest $request)
+    {
+        if (!$this->checkExistBusiness()) {
+
+            return $this->sendJsonResponse(false, 'You do not have access', [], 403);
+        }
+        $sendProject = $this->service->findOrFailById($request->get('send_project_uuid'));
+        $sendProject->teams()->detach($request->get('team_uuids', []));
+
+        return $this->sendOkJsonResponse();
+    }
+
+    public function assignForDepartment(AssignProjectForDepartmentRequest $request)
+    {
+        if (!$this->checkExistBusiness()) {
+
+            return $this->sendJsonResponse(false, 'You do not have access', [], 403);
+        }
+        $sendProject = $this->service->findOrFailById($request->get('send_project_uuid'));
+        $sendProject->departments()->syncWithoutDetaching($request->get('department_uuids', []));
+
+        return $this->sendOkJsonResponse();
+    }
+
+    public function unassignForDepartment(AssignProjectForDepartmentRequest $request)
+    {
+        if (!$this->checkExistBusiness()) {
+
+            return $this->sendJsonResponse(false, 'You do not have access', [], 403);
+        }
+        $sendProject = $this->service->findOrFailById($request->get('send_project_uuid'));
+        $sendProject->departments()->detach($request->get('department_uuids', []));
+
+        return $this->sendOkJsonResponse();
+    }
+
+    public function assignForLocation(AssignProjectForLocationRequest $request)
+    {
+        if (!$this->checkExistBusiness()) {
+
+            return $this->sendJsonResponse(false, 'You do not have access', [], 403);
+        }
+        $sendProject = $this->service->findOrFailById($request->get('send_project_uuid'));
+        $sendProject->locations()->syncWithoutDetaching($request->get('location_uuids', []));
+
+        return $this->sendOkJsonResponse();
+    }
+
+    public function unassignForLocation(AssignProjectForLocationRequest $request)
+    {
+        if (!$this->checkExistBusiness()) {
+
+            return $this->sendJsonResponse(false, 'You do not have access', [], 403);
+        }
+        $sendProject = $this->service->findOrFailById($request->get('send_project_uuid'));
+        $sendProject->locations()->detach($request->get('location_uuids', []));
+
+        return $this->sendOkJsonResponse();
+    }
+
+    public function addChildrenForSendProject(AddChildrenProjectRequest $request)
+    {
+        foreach ($request->get('children_send_project_uuids') as $childProject) {
+            $childTeam = $this->service->findOrFailById($childProject);
+            $childTeam->update(['parent_uuid' => $request->get('send_project_uuid')]);
+        }
+
+        return $this->sendOkJsonResponse();
+    }
+
+    /**
+     * @param IndexRequest $request
+     * @param $id
+     * @return JsonResponse
+     */
+    public function getAssignableForTeam(IndexRequest $request, $id) {
+        $departments = $this->departmentService->getByTeam($id);
+        $locations = $this->locationService->getByTeam($id);
+        $locationUuids = $locations->pluck('uuid')->toArray();
+        $departmentUuids = $departments->pluck('uuid')->toArray();
+        $projects = $this->service->getProjectAssignableForTeam($locationUuids, $departmentUuids, $id, $request);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $projects)
+        );
     }
 }

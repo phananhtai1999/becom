@@ -54,6 +54,10 @@ class TeamResource extends JsonResource
             $data['team_member'] = UserTeamResource::collection($this->userTeam);
         }
 
+        if (\in_array('team__send_projects', $expand)) {
+            $data['send_projects'] = SendProjectResource::collection($this->sendProjects);
+        }
+
         return $data;
     }
 }

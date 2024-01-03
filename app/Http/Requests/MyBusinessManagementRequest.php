@@ -45,6 +45,10 @@ class MyBusinessManagementRequest extends AbstractRequest
             'domain' => ['required', 'string', 'regex:/^(?!(www|http|https)\.)\w+(\.\w+)+$/'],
             'avatar' => ['required', 'string'],
             'slogan' => ['required', 'string'],
+            'access_key' => ['required', 'string'],
+            'secret_access_key' => ['required', 'string'],
+            'default_region' => ['required', 'string'],
+            'bucket' => ['required', 'string'],
         ];
 
         if (is_array($this->request->get('products_services'))) {

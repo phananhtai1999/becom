@@ -24,7 +24,7 @@ class WebsiteVerificationRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'domain' => ['required', 'string','regex:/^(?!(www|http|https)\.)\w+(\.\w+)+$/', 'exists:send_projects,domain']
+            'domain_uuid' => ['required','url','exists:send_projects,domain_uuid', 'exists:domains,uuid']
         ];
     }
 }

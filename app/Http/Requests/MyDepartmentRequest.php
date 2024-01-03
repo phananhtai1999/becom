@@ -28,7 +28,7 @@ class MyDepartmentRequest extends AbstractRequest
             'name' => ['required', 'array', 'min:1'],
             'name.en' => ['required', 'string'],
             'name.*' => ['required', 'string'],
-            'business_uuid' => ['integer', 'exists:businesses,uuid'],
+            'location_uuid' => ['required', 'integer', 'exists:locations,uuid'],
         ];
     }
 }

@@ -226,405 +226,428 @@ Route::group(['middleware' => ['apikey']], function () {
             Route::post('/send-project-verification/html-file', [SendProjectController::class, 'verifyByHtmlFile'])->name('verifyByHtmlFile');
             Route::get('/verification-download/{token}', [SendProjectController::class, 'downloadHtmlFile'])->name('downloadHtmlFile');
         });
+        Route::post('/send-project-verification/dns-record', [SendProjectController::class, 'verifyByDnsRecord'])->name('verifyByDnsRecord');
+        Route::post('/send-project-verification/html-tag', [SendProjectController::class, 'verifyByHtmlTag'])->name('verifyByHtmlTag');
+        Route::post('/send-project-verification/html-file', [SendProjectController::class, 'verifyByHtmlFile'])->name('verifyByHtmlFile');
+        Route::get('/verification-download/{token}', [SendProjectController::class, 'downloadHtmlFile'])->name('downloadHtmlFile');
+
+        Route::get('/assign-for-team', [SendProjectController::class, 'assignForTeam'])->name('assignForTeam');
+        Route::get('/unassign-for-team', [SendProjectController::class, 'unassignForTeam'])->name('unassignForTeam');
+
+        Route::get('/assign-for-department', [SendProjectController::class, 'assignForDepartment'])->name('assignForDepartment');
+        Route::get('/unassign-for-department', [SendProjectController::class, 'unassignForDepartment'])->name('unassignForDepartment');
+
+        Route::get('/assign-for-location', [SendProjectController::class, 'assignForLocation'])->name('assignForLocation');
+        Route::get('/unassign-for-location', [SendProjectController::class, 'unassignForLocation'])->name('unassignForLocation');
+
+        Route::get('add-children-project', [SendProjectController::class, 'addChildrenForSendProject'])->name('addChildrenForSendProject');
+
+        Route::get('/send-project/{id}/assignable-teams', [TeamController::class, 'getAssignableForProject'])->name('getAssignableForProject');
+        Route::get('/send-project/{id}/assignable-locations', [LocationController::class, 'getAssignableForProject'])->name('getAssignableForProject');
+        Route::get('/send-project/{id}/assignable-departments', [DepartmentController::class, 'getAssignableForProject'])->name('getAssignableForProject');
+    });
 
 
 //SmtpAccount
-        Route::group(['middleware' => ['userid'], 'as' => 'smtp-account.'], function () {
+    Route::group(['middleware' => ['userid'], 'as' => 'smtp-account.'], function () {
 
-            Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
-                Route::get('/all/smtp-accounts', [SmtpAccountController::class, 'index'])->name('index');
-                Route::post('/smtp-account', [SmtpAccountController::class, 'store'])->name('store');
-                Route::get('/smtp-account/{id}', [SmtpAccountController::class, 'show'])->name('show');
-                Route::put('/smtp-account/{id}', [SmtpAccountController::class, 'edit'])->name('edit');
-                Route::delete('/smtp-account/{id}', [SmtpAccountController::class, 'destroy'])->name('destroy');
-                Route::get('/get-mail-mailer-type/smtp-account', [SmtpAccountController::class, 'getMailMailerSmtpAccount'])->name('get-mail-mailer-smtp-account');
-                Route::get('/smtp-accounts', [SmtpAccountController::class, 'indexWithoutDefault'])->name('index-without-default');
-                Route::get('/smtp-accounts-default', [SmtpAccountController::class, 'getDefault'])->name('getDefault');
-            });
-
-            Route::group(['as' => 'my.'], function () {
-                Route::get('/my/smtp-accounts', [SmtpAccountController::class, 'indexMy'])->name('index');
-                Route::post('/my/smtp-account', [SmtpAccountController::class, 'storeMySmtpAccount'])->name('store');
-                Route::get('/my/smtp-account/{id}', [SmtpAccountController::class, 'showMySmtpAccount'])->name('show');
-                Route::put('/my/smtp-account/{id}', [SmtpAccountController::class, 'editMySmtpAccount'])->name('edit');
-                Route::delete('/my/smtp-account/{id}', [SmtpAccountController::class, 'destroyMySmtpAccount'])->name('destroy');
-            });
-
-            //This API will use smtp_account from smtp_account_uuid to send emails.
-            Route::post('/email/send', [SmtpAccountController::class, 'sendEmail'])->name('sendEmail');
-
-            //This API will use smtp_account from smtp_account_uuid and mail_template from mail_template_uuid to send emails.
-            Route::post('/email/send-template', [SmtpAccountController::class, 'sendTemplate'])->name('sendTemplate');
+        Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
+            Route::get('/all/smtp-accounts', [SmtpAccountController::class, 'index'])->name('index');
+            Route::post('/smtp-account', [SmtpAccountController::class, 'store'])->name('store');
+            Route::get('/smtp-account/{id}', [SmtpAccountController::class, 'show'])->name('show');
+            Route::put('/smtp-account/{id}', [SmtpAccountController::class, 'edit'])->name('edit');
+            Route::delete('/smtp-account/{id}', [SmtpAccountController::class, 'destroy'])->name('destroy');
+            Route::get('/get-mail-mailer-type/smtp-account', [SmtpAccountController::class, 'getMailMailerSmtpAccount'])->name('get-mail-mailer-smtp-account');
+            Route::get('/smtp-accounts', [SmtpAccountController::class, 'indexWithoutDefault'])->name('index-without-default');
+            Route::get('/smtp-accounts-default', [SmtpAccountController::class, 'getDefault'])->name('getDefault');
         });
+
+        Route::group(['as' => 'my.'], function () {
+            Route::get('/my/smtp-accounts', [SmtpAccountController::class, 'indexMy'])->name('index');
+            Route::post('/my/smtp-account', [SmtpAccountController::class, 'storeMySmtpAccount'])->name('store');
+            Route::get('/my/smtp-account/{id}', [SmtpAccountController::class, 'showMySmtpAccount'])->name('show');
+            Route::put('/my/smtp-account/{id}', [SmtpAccountController::class, 'editMySmtpAccount'])->name('edit');
+            Route::delete('/my/smtp-account/{id}', [SmtpAccountController::class, 'destroyMySmtpAccount'])->name('destroy');
+        });
+
+        //This API will use smtp_account from smtp_account_uuid to send emails.
+        Route::post('/email/send', [SmtpAccountController::class, 'sendEmail'])->name('sendEmail');
+
+        //This API will use smtp_account from smtp_account_uuid and mail_template from mail_template_uuid to send emails.
+        Route::post('/email/send-template', [SmtpAccountController::class, 'sendTemplate'])->name('sendTemplate');
+    });
 
 //MailTemplate
-        Route::group(['middleware' => ['userid'], 'as' => 'mail-template.'], function () {
+    Route::group(['middleware' => ['userid'], 'as' => 'mail-template.'], function () {
 
-            Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
-                Route::get('/mail-templates', [MailTemplateController::class, 'index'])->name('index');
-                Route::get('/mail-template/{id}', [MailTemplateController::class, 'show'])->name('show');
-                Route::post('/mail-template', [MailTemplateController::class, 'store'])->name('store');
-                Route::put('/mail-template/{id}', [MailTemplateController::class, 'edit'])->name('edit');
-                Route::delete('/mail-template/{id}', [MailTemplateController::class, 'destroy'])->name('destroy');
-                Route::post('/change-status', [MailTemplateController::class, 'changeStatusMailtemplate'])->name('accept-publish');
-            });
-
-            Route::group(['middleware' => ['role:root,admin,editor']], function () {
-                Route::get('/unpublished-mail-templates', [MailTemplateController::class, 'indexUnpublishedMailTemplate'])->name('index-unpublished');
-                Route::get('/unpublished-mail-template/{id}', [MailTemplateController::class, 'showUnpublishedMailTemplate'])->name('show-unpublished');
-                Route::post('/unpublished-mail-template', [MailTemplateController::class, 'storeUnpublishedMailTemplate'])->name('store-unpublished');
-                Route::put('/unpublished-mail-template/{id}', [MailTemplateController::class, 'editUnpublishedMailTemplate'])->name('edit-unpublished');
-            });
-
-            Route::group(['as' => 'my.'], function () {
-                Route::get('/my/mail-templates', [MailTemplateController::class, 'indexMy'])->name('index');
-                Route::post('/my/mail-template', [MailTemplateController::class, 'storeMyMailTemplate'])->name('store');
-                Route::get('/my/mail-template/{id}', [MailTemplateController::class, 'showMyMailTemplate'])->name('show');
-                Route::put('/my/mail-template/{id}', [MailTemplateController::class, 'editMyMailTemplate'])->name('edit');
-                Route::delete('/my/mail-template/{id}', [MailTemplateController::class, 'destroyMyMailTemplate'])->name('destroy');
-            });
-
-            Route::get('/mail-templates-default', [MailTemplateController::class, 'getMailTemplatesDefault'])->name('getMailTemplatesDefault');
+        Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
+            Route::get('/mail-templates', [MailTemplateController::class, 'index'])->name('index');
+            Route::get('/mail-template/{id}', [MailTemplateController::class, 'show'])->name('show');
+            Route::post('/mail-template', [MailTemplateController::class, 'store'])->name('store');
+            Route::put('/mail-template/{id}', [MailTemplateController::class, 'edit'])->name('edit');
+            Route::delete('/mail-template/{id}', [MailTemplateController::class, 'destroy'])->name('destroy');
+            Route::post('/change-status', [MailTemplateController::class, 'changeStatusMailtemplate'])->name('accept-publish');
         });
+
+        Route::group(['middleware' => ['role:root,admin,editor']], function () {
+            Route::get('/unpublished-mail-templates', [MailTemplateController::class, 'indexUnpublishedMailTemplate'])->name('index-unpublished');
+            Route::get('/unpublished-mail-template/{id}', [MailTemplateController::class, 'showUnpublishedMailTemplate'])->name('show-unpublished');
+            Route::post('/unpublished-mail-template', [MailTemplateController::class, 'storeUnpublishedMailTemplate'])->name('store-unpublished');
+            Route::put('/unpublished-mail-template/{id}', [MailTemplateController::class, 'editUnpublishedMailTemplate'])->name('edit-unpublished');
+        });
+
+        Route::group(['as' => 'my.'], function () {
+            Route::get('/my/mail-templates', [MailTemplateController::class, 'indexMy'])->name('index');
+            Route::post('/my/mail-template', [MailTemplateController::class, 'storeMyMailTemplate'])->name('store');
+            Route::get('/my/mail-template/{id}', [MailTemplateController::class, 'showMyMailTemplate'])->name('show');
+            Route::put('/my/mail-template/{id}', [MailTemplateController::class, 'editMyMailTemplate'])->name('edit');
+            Route::delete('/my/mail-template/{id}', [MailTemplateController::class, 'destroyMyMailTemplate'])->name('destroy');
+        });
+
+        Route::get('/mail-templates-default', [MailTemplateController::class, 'getMailTemplatesDefault'])->name('getMailTemplatesDefault');
+    });
 
 //Campaign
-        Route::group(['middleware' => ['userid'], 'as' => 'campaign.'], function () {
+    Route::group(['middleware' => ['userid'], 'as' => 'campaign.'], function () {
 
-            Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
-                Route::get('/campaigns', [CampaignController::class, 'index'])->name('index');
-                Route::post('/campaign', [CampaignController::class, 'store'])->name('store');
-                Route::get('/campaign/{id}', [CampaignController::class, 'show'])->name('show');
-                Route::put('/campaign/{id}', [CampaignController::class, 'edit'])->name('edit');
-                Route::delete('/campaign/{id}', [CampaignController::class, 'destroy'])->name('destroy');
-                Route::post('/emails/send-campaign', [CampaignController::class, 'sendEmailsByCampaign'])->name('sendEmailsByCampaign');
-                Route::post('/test-send-campaign', [CampaignController::class, 'testSendEmailByCampaign'])->name('testSendEmailByCampaign');
-                Route::post('/emails/status-campaign', [CampaignController::class, 'statusCampaign'])->name('statusCampaign');
-            });
-
-            Route::group(['as' => 'my.'], function () {
-                Route::get('/my/campaigns', [CampaignController::class, 'indexMyCampaign'])->name('index');
-                Route::post('/my/campaign', [CampaignController::class, 'storeMyCampaign'])->name('store');
-                Route::get('/my/campaign/{id}', [CampaignController::class, 'showMyCampaign'])->name('show');
-                Route::put('/my/campaign/{id}', [CampaignController::class, 'editMyCampaign'])->name('edit');
-                Route::delete('/my/campaign/{id}', [CampaignController::class, 'destroyMyCampaign'])->name('destroy');
-                Route::post('/my/emails/send-campaign', [CampaignController::class, 'sendEmailByMyCampaign'])->name('sendEmailByMyCampaign');
-                Route::post('my/test-send-campaign/', [CampaignController::class, 'testSendEmailByMyCampaign'])->name('testSendEmailByCampaign');
-                Route::post('my/emails/status-campaign', [CampaignController::class, 'statusMyCampaign'])->name('statusMyCampaign');
-            });
-
-            //Upsert-campaign-link-tracking
-            Route::get('/upsert-campaign-link-tracking', [CampaignController::class, 'upsertCampaignLinkTrackingTotalClick'])->name('upsert-campaign-link-tracking');
-            //Load-campaign-tracking analytic
-            Route::get('/campaign-tracking/analytic', [CampaignController::class, 'loadAnalyticData'])->name('loadAnalyticData');
+        Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
+            Route::get('/campaigns', [CampaignController::class, 'index'])->name('index');
+            Route::post('/campaign', [CampaignController::class, 'store'])->name('store');
+            Route::get('/campaign/{id}', [CampaignController::class, 'show'])->name('show');
+            Route::put('/campaign/{id}', [CampaignController::class, 'edit'])->name('edit');
+            Route::delete('/campaign/{id}', [CampaignController::class, 'destroy'])->name('destroy');
+            Route::post('/emails/send-campaign', [CampaignController::class, 'sendEmailsByCampaign'])->name('sendEmailsByCampaign');
+            Route::post('/test-send-campaign', [CampaignController::class, 'testSendEmailByCampaign'])->name('testSendEmailByCampaign');
+            Route::post('/emails/status-campaign', [CampaignController::class, 'statusCampaign'])->name('statusCampaign');
         });
+
+        Route::group(['as' => 'my.'], function () {
+            Route::get('/my/campaigns', [CampaignController::class, 'indexMyCampaign'])->name('index');
+            Route::post('/my/campaign', [CampaignController::class, 'storeMyCampaign'])->name('store');
+            Route::get('/my/campaign/{id}', [CampaignController::class, 'showMyCampaign'])->name('show');
+            Route::put('/my/campaign/{id}', [CampaignController::class, 'editMyCampaign'])->name('edit');
+            Route::delete('/my/campaign/{id}', [CampaignController::class, 'destroyMyCampaign'])->name('destroy');
+            Route::post('/my/emails/send-campaign', [CampaignController::class, 'sendEmailByMyCampaign'])->name('sendEmailByMyCampaign');
+            Route::post('my/test-send-campaign/', [CampaignController::class, 'testSendEmailByMyCampaign'])->name('testSendEmailByCampaign');
+            Route::post('my/emails/status-campaign', [CampaignController::class, 'statusMyCampaign'])->name('statusMyCampaign');
+        });
+
+        //Upsert-campaign-link-tracking
+        Route::get('/upsert-campaign-link-tracking', [CampaignController::class, 'upsertCampaignLinkTrackingTotalClick'])->name('upsert-campaign-link-tracking');
+        //Load-campaign-tracking analytic
+        Route::get('/campaign-tracking/analytic', [CampaignController::class, 'loadAnalyticData'])->name('loadAnalyticData');
+    });
 
 //Create Increment Campaign total open
-        Route::get('/campaign-tracking/increment/total-open', [CampaignController::class, 'incrementCampaignTrackingTotalOpen'])->name('campaignTracking.incrementTotalOpen');
+    Route::get('/campaign-tracking/increment/total-open', [CampaignController::class, 'incrementCampaignTrackingTotalOpen'])->name('campaignTracking.incrementTotalOpen');
 
 //Email
-        Route::group(['middleware' => ['userid'], 'as' => 'email.'], function () {
+    Route::group(['middleware' => ['userid'], 'as' => 'email.'], function () {
 
-            Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
-                Route::get('/emails', [EmailController::class, 'index'])->name('index');
-                Route::post('/email', [EmailController::class, 'store'])->name('store');
-                Route::get('/email/{id}', [EmailController::class, 'show'])->name('show');
-                Route::put('/email/{id}', [EmailController::class, 'edit'])->name('edit');
-                Route::delete('/email/{id}', [EmailController::class, 'destroy'])->name('destroy');
-            });
-
-            Route::group(['as' => 'my.'], function () {
-                Route::get('/my/emails', [EmailController::class, 'indexMyEmail'])->name('index');
-                Route::post('/my/email', [EmailController::class, 'storeMyEmail'])->name('store');
-                Route::get('/my/email/{id}', [EmailController::class, 'showMyEmail'])->name('show');
-                Route::put('/my/email/{id}', [EmailController::class, 'editMyEmail'])->name('edit');
-                Route::delete('/my/email/{id}', [EmailController::class, 'destroyMyEmail'])->name('destroy');
-            });
+        Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
+            Route::get('/emails', [EmailController::class, 'index'])->name('index');
+            Route::post('/email', [EmailController::class, 'store'])->name('store');
+            Route::get('/email/{id}', [EmailController::class, 'show'])->name('show');
+            Route::put('/email/{id}', [EmailController::class, 'edit'])->name('edit');
+            Route::delete('/email/{id}', [EmailController::class, 'destroy'])->name('destroy');
         });
+
+        Route::group(['as' => 'my.'], function () {
+            Route::get('/my/emails', [EmailController::class, 'indexMyEmail'])->name('index');
+            Route::post('/my/email', [EmailController::class, 'storeMyEmail'])->name('store');
+            Route::get('/my/email/{id}', [EmailController::class, 'showMyEmail'])->name('show');
+            Route::put('/my/email/{id}', [EmailController::class, 'editMyEmail'])->name('edit');
+            Route::delete('/my/email/{id}', [EmailController::class, 'destroyMyEmail'])->name('destroy');
+        });
+    });
 
 //MailSendingHistory
-        Route::group(['middleware' => ['userid'], 'as' => 'mail-sending-history.'], function () {
+    Route::group(['middleware' => ['userid'], 'as' => 'mail-sending-history.'], function () {
 
-            Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
-                Route::get('/mail-sending-histories', [MailSendingHistoryController::class, 'index'])->name('index');
-                Route::post('/mail-sending-history', [MailSendingHistoryController::class, 'store'])->name('store');
-                Route::get('/mail-sending-history/{id}', [MailSendingHistoryController::class, 'show'])->name('show');
-                Route::put('/mail-sending-history/{id}', [MailSendingHistoryController::class, 'edit'])->name('edit');
-                Route::delete('/mail-sending-history/{id}', [MailSendingHistoryController::class, 'destroy'])->name('destroy');
-            });
-
-            Route::group(['as' => 'my.'], function () {
-                Route::get('/my/mail-sending-histories', [MailSendingHistoryController::class, 'indexMy'])->name('index');
-                Route::get('/my/mail-sending-history/{id}', [MailSendingHistoryController::class, 'showMyMailSendingHistory'])->name('show');
-            });
+        Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
+            Route::get('/mail-sending-histories', [MailSendingHistoryController::class, 'index'])->name('index');
+            Route::post('/mail-sending-history', [MailSendingHistoryController::class, 'store'])->name('store');
+            Route::get('/mail-sending-history/{id}', [MailSendingHistoryController::class, 'show'])->name('show');
+            Route::put('/mail-sending-history/{id}', [MailSendingHistoryController::class, 'edit'])->name('edit');
+            Route::delete('/mail-sending-history/{id}', [MailSendingHistoryController::class, 'destroy'])->name('destroy');
         });
+
+        Route::group(['as' => 'my.'], function () {
+            Route::get('/my/mail-sending-histories', [MailSendingHistoryController::class, 'indexMy'])->name('index');
+            Route::get('/my/mail-sending-history/{id}', [MailSendingHistoryController::class, 'showMyMailSendingHistory'])->name('show');
+        });
+    });
 
 //SmtpAccountEncryption
-        Route::group(['middleware' => ['userid'], 'as' => 'smtp-account-encryption.'], function () {
-            Route::get('/smtp-account-encryptions', [SmtpAccountEncryptionController::class, 'index'])->name('index');
-            Route::post('/smtp-account-encryption', [SmtpAccountEncryptionController::class, 'store'])->name('store');
-            Route::get('/smtp-account-encryption/{id}', [SmtpAccountEncryptionController::class, 'show'])->name('show');
-            Route::put('/smtp-account-encryption/{id}', [SmtpAccountEncryptionController::class, 'edit'])->name('edit');
-            Route::delete('/smtp-account-encryption/{id}', [SmtpAccountEncryptionController::class, 'destroy'])->name('destroy');
-        });
+    Route::group(['middleware' => ['userid'], 'as' => 'smtp-account-encryption.'], function () {
+        Route::get('/smtp-account-encryptions', [SmtpAccountEncryptionController::class, 'index'])->name('index');
+        Route::post('/smtp-account-encryption', [SmtpAccountEncryptionController::class, 'store'])->name('store');
+        Route::get('/smtp-account-encryption/{id}', [SmtpAccountEncryptionController::class, 'show'])->name('show');
+        Route::put('/smtp-account-encryption/{id}', [SmtpAccountEncryptionController::class, 'edit'])->name('edit');
+        Route::delete('/smtp-account-encryption/{id}', [SmtpAccountEncryptionController::class, 'destroy'])->name('destroy');
+    });
 
 //WebsiteVerification
-        Route::group(['middleware' => ['userid'], 'as' => 'website-verification.'], function () {
-            Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
-                Route::get('/website-verifications', [WebsiteVerificationController::class, 'index'])->name('index');
-                Route::get('/website-verification/{id}', [WebsiteVerificationController::class, 'show'])->name('show');
-                Route::delete('/website-verification/{id}', [WebsiteVerificationController::class, 'destroy'])->name('destroy');
-            });
+    Route::group(['middleware' => ['userid'], 'as' => 'website-verification.'], function () {
+        Route::group(['middleware' => ['role:admin'], 'as' => 'admin.'], function () {
+            Route::get('/website-verifications', [WebsiteVerificationController::class, 'index'])->name('index');
+            Route::get('/website-verification/{id}', [WebsiteVerificationController::class, 'show'])->name('show');
+            Route::delete('/website-verification/{id}', [WebsiteVerificationController::class, 'destroy'])->name('destroy');
         });
+    });
 
 //Contact
-        Route::group(['middleware' => ['userid'], 'as' => 'contact.'], function () {
+    Route::group(['middleware' => ['userid'], 'as' => 'contact.'], function () {
 
-            Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
-                Route::get('/contacts', [ContactController::class, 'index'])->name('index');
-                Route::post('/contact', [ContactController::class, 'store'])->name('store');
-                Route::get('/contact/{id}', [ContactController::class, 'show'])->name('show');
-                Route::put('/contact/{id}', [ContactController::class, 'edit'])->name('edit');
-                Route::delete('/contact/{id}', [ContactController::class, 'destroy'])->name('destroy');
-                Route::get('/custom-filter-default', [ContactController::class, 'customFilterDefault'])->name('custom-filter-default');
-                Route::get('/select-all-contact', [ContactController::class, 'selectAllContact'])->name('select-all-contact');
-            });
-
-            Route::group(['as' => 'my.'], function () {
-                Route::get('/my/contacts', [ContactController::class, 'indexMyContact'])->name('index');
-                Route::post('/my/contact', [ContactController::class, 'storeMyContact'])->name('store');
-                Route::get('/my/contact/{id}', [ContactController::class, 'showMyContact'])->name('show');
-                Route::put('/my/contact/{id}', [ContactController::class, 'editMyContact'])->name('edit');
-                Route::delete('/my/contact/{id}', [ContactController::class, 'destroyMyContact'])->name('destroy');
-                Route::get('/my/select-all-contact', [ContactController::class, 'selectAllMyContact'])->name('select-all-contact');
-            });
-
-            Route::group(['middleware' => ['role:root,admin,editor'], 'as' => 'editor.'], function () {
-                Route::get('/dynamic-content-contact', [ContactController::class, 'dynamicContentContact'])->name('dynamic-content-contact');
-            });
+        Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
+            Route::get('/contacts', [ContactController::class, 'index'])->name('index');
+            Route::post('/contact', [ContactController::class, 'store'])->name('store');
+            Route::get('/contact/{id}', [ContactController::class, 'show'])->name('show');
+            Route::put('/contact/{id}', [ContactController::class, 'edit'])->name('edit');
+            Route::delete('/contact/{id}', [ContactController::class, 'destroy'])->name('destroy');
+            Route::get('/custom-filter-default', [ContactController::class, 'customFilterDefault'])->name('custom-filter-default');
+            Route::get('/select-all-contact', [ContactController::class, 'selectAllContact'])->name('select-all-contact');
         });
+
+        Route::group(['as' => 'my.'], function () {
+            Route::get('/my/contacts', [ContactController::class, 'indexMyContact'])->name('index');
+            Route::post('/my/contact', [ContactController::class, 'storeMyContact'])->name('store');
+            Route::get('/my/contact/{id}', [ContactController::class, 'showMyContact'])->name('show');
+            Route::put('/my/contact/{id}', [ContactController::class, 'editMyContact'])->name('edit');
+            Route::delete('/my/contact/{id}', [ContactController::class, 'destroyMyContact'])->name('destroy');
+            Route::get('/my/select-all-contact', [ContactController::class, 'selectAllMyContact'])->name('select-all-contact');
+        });
+
+        Route::group(['middleware' => ['role:root,admin,editor'], 'as' => 'editor.'], function () {
+            Route::get('/dynamic-content-contact', [ContactController::class, 'dynamicContentContact'])->name('dynamic-content-contact');
+        });
+    });
 
 //Contact List
-        Route::group(['middleware' => ['userid'], 'as' => 'contact-list.'], function () {
+    Route::group(['middleware' => ['userid'], 'as' => 'contact-list.'], function () {
 
-            Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
-                Route::get('/contact-lists', [ContactListController::class, 'index'])->name('index');
-                Route::post('/contact-list', [ContactListController::class, 'storeAndImportFile'])->name('store-and-importFile');
-                Route::get('/contact-list/{id}', [ContactListController::class, 'show'])->name('show');
-                Route::put('/contact-list/{id}', [ContactListController::class, 'edit'])->name('edit');
-                Route::delete('/contact-list/{id}', [ContactListController::class, 'destroy'])->name('destroy');
-                Route::delete('/contact-list/remove-contact/{id}/{contact_id}', [ContactListController::class, 'removeContactFromContactList'])->name('remove-contact');
-            });
-
-            Route::group(['as' => 'my.'], function () {
-                Route::get('/my/contact-lists', [ContactListController::class, 'indexMyContactList'])->name('index');
-                Route::post('/my/contact-list', [ContactListController::class, 'storeMyContactListAndImportFile'])->name('store-my-contact-list-and-import-file');
-                Route::get('/my/contact-list/{id}', [ContactListController::class, 'showMyContactList'])->name('show');
-                Route::put('/my/contact-list/{id}', [ContactListController::class, 'editMyContactList'])->name('edit');
-                Route::delete('/my/contact-list/{id}', [ContactListController::class, 'destroyMyContactList'])->name('destroy');
-                Route::delete('/my/contact-list/remove-contact/{id}/{contact_id}', [ContactListController::class, 'removeMyContactFromContactList'])->name('remove-contact');
-
-            });
+        Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
+            Route::get('/contact-lists', [ContactListController::class, 'index'])->name('index');
+            Route::post('/contact-list', [ContactListController::class, 'storeAndImportFile'])->name('store-and-importFile');
+            Route::get('/contact-list/{id}', [ContactListController::class, 'show'])->name('show');
+            Route::put('/contact-list/{id}', [ContactListController::class, 'edit'])->name('edit');
+            Route::delete('/contact-list/{id}', [ContactListController::class, 'destroy'])->name('destroy');
+            Route::delete('/contact-list/remove-contact/{id}/{contact_id}', [ContactListController::class, 'removeContactFromContactList'])->name('remove-contact');
         });
+
+        Route::group(['as' => 'my.'], function () {
+            Route::get('/my/contact-lists', [ContactListController::class, 'indexMyContactList'])->name('index');
+            Route::post('/my/contact-list', [ContactListController::class, 'storeMyContactListAndImportFile'])->name('store-my-contact-list-and-import-file');
+            Route::get('/my/contact-list/{id}', [ContactListController::class, 'showMyContactList'])->name('show');
+            Route::put('/my/contact-list/{id}', [ContactListController::class, 'editMyContactList'])->name('edit');
+            Route::delete('/my/contact-list/{id}', [ContactListController::class, 'destroyMyContactList'])->name('destroy');
+            Route::delete('/my/contact-list/remove-contact/{id}/{contact_id}', [ContactListController::class, 'removeMyContactFromContactList'])->name('remove-contact');
+
+        });
+    });
 
 //Credit History
-        Route::group(['middleware' => ['userid'], 'as' => 'user-use-credit-history.'], function () {
-            Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
-                Route::get('/credit-histories', [CreditHistoryController::class, 'index'])->name('index');
-                Route::post('/credit-history', [CreditHistoryController::class, 'store'])->name('store');
-                Route::get('/credit-history/{id}', [CreditHistoryController::class, 'show'])->name('show');
-            });
-
-            Route::group(['as' => 'my.'], function () {
-                Route::get('/my/credit-histories', [CreditHistoryController::class, 'indexMy'])->name('index');
-                Route::get('/my/credit-history/{id}', [CreditHistoryController::class, 'showMyCreditHistory'])->name('show');
-            });
+    Route::group(['middleware' => ['userid'], 'as' => 'user-use-credit-history.'], function () {
+        Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
+            Route::get('/credit-histories', [CreditHistoryController::class, 'index'])->name('index');
+            Route::post('/credit-history', [CreditHistoryController::class, 'store'])->name('store');
+            Route::get('/credit-history/{id}', [CreditHistoryController::class, 'show'])->name('show');
         });
+
+        Route::group(['as' => 'my.'], function () {
+            Route::get('/my/credit-histories', [CreditHistoryController::class, 'indexMy'])->name('index');
+            Route::get('/my/credit-history/{id}', [CreditHistoryController::class, 'showMyCreditHistory'])->name('show');
+        });
+    });
 
 //Transaciton CreditHistory View
-        Route::group(['middleware' => ['userid'], 'as' => 'credit-transaction-histories.'], function () {
-            Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
-                Route::get('/credit-transaction-histories', [CreditTransactionHistoryController::class, 'index'])->name('credit-transaction-history-view');
-            });
-
-            Route::group(['as' => 'my.'], function () {
-                Route::get('/my/credit-transaction-histories', [CreditTransactionHistoryController::class, 'indexMyCreditTransactionHistoryView'])->name('credit-transaction-history-view');
-            });
+    Route::group(['middleware' => ['userid'], 'as' => 'credit-transaction-histories.'], function () {
+        Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
+            Route::get('/credit-transaction-histories', [CreditTransactionHistoryController::class, 'index'])->name('credit-transaction-history-view');
         });
+
+        Route::group(['as' => 'my.'], function () {
+            Route::get('/my/credit-transaction-histories', [CreditTransactionHistoryController::class, 'indexMyCreditTransactionHistoryView'])->name('credit-transaction-history-view');
+        });
+    });
 
 //User Credit History
-        Route::group(['middleware' => ['userid'], 'as' => 'user-credit-history.'], function () {
-            Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
-                Route::get('/user-credit-histories', [UserCreditHistoryController::class, 'index'])->name('index');
-                Route::post('/user-credit-history', [UserCreditHistoryController::class, 'store'])->name('store');
-                Route::get('/user-credit-history/{id}', [UserCreditHistoryController::class, 'show'])->name('show');
-                Route::put('/user-credit-history/{id}', [UserCreditHistoryController::class, 'edit'])->name('edit');
-                Route::delete('/user-credit-history/{id}', [UserCreditHistoryController::class, 'destroy'])->name('destroy');
-            });
-
-            Route::group(['as' => 'my.'], function () {
-                Route::get('/my/user-credit-histories', [UserCreditHistoryController::class, 'indexMy'])->name('index');
-                Route::get('/my/user-credit-history/{id}', [UserCreditHistoryController::class, 'showMyUserCreditHistory'])->name('show');
-            });
+    Route::group(['middleware' => ['userid'], 'as' => 'user-credit-history.'], function () {
+        Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
+            Route::get('/user-credit-histories', [UserCreditHistoryController::class, 'index'])->name('index');
+            Route::post('/user-credit-history', [UserCreditHistoryController::class, 'store'])->name('store');
+            Route::get('/user-credit-history/{id}', [UserCreditHistoryController::class, 'show'])->name('show');
+            Route::put('/user-credit-history/{id}', [UserCreditHistoryController::class, 'edit'])->name('edit');
+            Route::delete('/user-credit-history/{id}', [UserCreditHistoryController::class, 'destroy'])->name('destroy');
         });
 
-        Route::group(['as' => 'mail-open-tracking.'], function () {
-            Route::get('/mail-open-tracking/report-campaigns', [MailOpenTrackingController::class, 'reportAnalyticDataCampaigns'])->name('reportAnalyticDataCampaigns');
-            Route::get('/mail-open-tracking/report-campaign/{id}', [MailOpenTrackingController::class, 'reportAnalyticDataCampaign'])->name('reportAnalyticDataCampaign');
+        Route::group(['as' => 'my.'], function () {
+            Route::get('/my/user-credit-histories', [UserCreditHistoryController::class, 'indexMy'])->name('index');
+            Route::get('/my/user-credit-history/{id}', [UserCreditHistoryController::class, 'showMyUserCreditHistory'])->name('show');
         });
+    });
+
+    Route::group(['as' => 'mail-open-tracking.'], function () {
+        Route::get('/mail-open-tracking/report-campaigns', [MailOpenTrackingController::class, 'reportAnalyticDataCampaigns'])->name('reportAnalyticDataCampaigns');
+        Route::get('/mail-open-tracking/report-campaign/{id}', [MailOpenTrackingController::class, 'reportAnalyticDataCampaign'])->name('reportAnalyticDataCampaign');
+    });
 
 // Import File
-        Route::group(['middleware' => ['userid'], 'as' => 'import-file.'], function () {
-            Route::post('/import-excel-or-csv-file', [ContactController::class, 'importExcelOrCsvFile'])->name('import-excel-or-csv-file');
-            Route::post('/import-json-file', [ContactController::class, 'importJsonFile'])->name('import-json-file');
-            Route::post('/download-template-excel', [ContactController::class, 'templateExcel'])->name('template-excel');
-        });
+    Route::group(['middleware' => ['userid'], 'as' => 'import-file.'], function () {
+        Route::post('/import-excel-or-csv-file', [ContactController::class, 'importExcelOrCsvFile'])->name('import-excel-or-csv-file');
+        Route::post('/import-json-file', [ContactController::class, 'importJsonFile'])->name('import-json-file');
+        Route::post('/download-template-excel', [ContactController::class, 'templateExcel'])->name('template-excel');
+    });
 
 
 // Mail Open Tracking
-        Route::get('/mail-open-tracking/{id}', [MailSendingHistoryController::class, 'mailOpenTracking'])->name('mail-open-tracking');
+    Route::get('/mail-open-tracking/{id}', [MailSendingHistoryController::class, 'mailOpenTracking'])->name('mail-open-tracking');
 //Chart
-        Route::group(['middleware' => ['userid'], 'as' => 'chart.'], function () {
-            Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
-                Route::get('/user-chart', [UserController::class, 'userChart'])->name('user-chart');
-                Route::get('/email-chart', [MailSendingHistoryController::class, 'emailChart'])->name('email-chart');
-                Route::get('/campaign-chart', [CampaignController::class, 'campaignChart'])->name('campaign-chart');
-                Route::get('/credit-chart', [CreditHistoryController::class, 'creditChart'])->name('credit-chart');
-                Route::get('/smtp-account-chart', [SmtpAccountController::class, 'smtpAccountChart'])->name('smtpAccountChart');
-                Route::get('/point-contact-chart', [ContactController::class, 'pointsContactChart'])->name('pointsContactChart');
-            });
-
-            Route::group(['middleware' => ['role:root,admin,editor'], 'as' => 'editor.'], function () {
-                Route::get('editor/mail-template-chart', [MailTemplateController::class, 'editorMailTemplateChart'])->name('editorMailTemplateChart');
-                Route::get('editor/asset-chart', [AssetController::class, 'editorAssetChart'])->name('editorAssetChart');
-                Route::get('editor/article-chart', [ArticleController::class, 'editorArticleChart'])->name('editorArticleChart');
-                Route::get('editor/website-chart', [EditorChartController::class, 'editorWebsiteChart'])->name('editorWebsiteChart');
-                Route::get('editor/all-chart', [EditorChartController::class, 'editorAllChart'])->name('editorAllChart');
-            });
-
-
-            Route::group(['as' => 'my.'], function () {
-                Route::get('/my/credit-chart', [CreditHistoryController::class, 'myCreditChart'])->name('myCreditChart');
-                Route::get('/my/campaign-chart', [CampaignController::class, 'myCampaignChart'])->name('my-campaign-chart');
-                Route::get('/my/email-chart', [MailSendingHistoryController::class, 'myEmailChart'])->name('email-chart');
-                Route::get('/my/contact-chart', [ContactController::class, 'myContactChart'])->name('myContactChart');
-                Route::get('/my/point-contact-chart', [ContactController::class, 'myPointsContactChart'])->name('myPointsContactChart');
-            });
+    Route::group(['middleware' => ['userid'], 'as' => 'chart.'], function () {
+        Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
+            Route::get('/user-chart', [UserController::class, 'userChart'])->name('user-chart');
+            Route::get('/email-chart', [MailSendingHistoryController::class, 'emailChart'])->name('email-chart');
+            Route::get('/campaign-chart', [CampaignController::class, 'campaignChart'])->name('campaign-chart');
+            Route::get('/credit-chart', [CreditHistoryController::class, 'creditChart'])->name('credit-chart');
+            Route::get('/smtp-account-chart', [SmtpAccountController::class, 'smtpAccountChart'])->name('smtpAccountChart');
+            Route::get('/point-contact-chart', [ContactController::class, 'pointsContactChart'])->name('pointsContactChart');
         });
 
-        Route::group(['middleware' => ['userid', 'role:root,admin'], 'as' => 'payment-method.'], function () {
-            Route::post('/payment-method', [PaymentMethodController::class, 'store'])->name('store');
-            Route::put('/payment-method/{id}', [PaymentMethodController::class, 'edit'])->name('edit');
-            Route::delete('/payment-method/{id}', [PaymentMethodController::class, 'destroy'])->name('destroy');
+        Route::group(['middleware' => ['role:root,admin,editor'], 'as' => 'editor.'], function () {
+            Route::get('editor/mail-template-chart', [MailTemplateController::class, 'editorMailTemplateChart'])->name('editorMailTemplateChart');
+            Route::get('editor/asset-chart', [AssetController::class, 'editorAssetChart'])->name('editorAssetChart');
+            Route::get('editor/article-chart', [ArticleController::class, 'editorArticleChart'])->name('editorArticleChart');
+            Route::get('editor/website-chart', [EditorChartController::class, 'editorWebsiteChart'])->name('editorWebsiteChart');
+            Route::get('editor/all-chart', [EditorChartController::class, 'editorAllChart'])->name('editorAllChart');
         });
 
-        Route::get('/payment-methods', [PaymentMethodController::class, 'index'])->name('payment-method.index');
-        Route::get('/payment-method/{id}', [PaymentMethodController::class, 'show'])->name('payment-method.show');
 
-        Route::group(['middleware' => ['userid'], 'as' => 'order.'], function () {
-            Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
-                Route::get('/orders', [OrderController::class, 'index'])->name('index');
-                Route::get('/order/{id}', [OrderController::class, 'show'])->name('show');
-                Route::post('/order', [OrderController::class, 'store'])->name('store');
-                Route::put('/order/{id}', [OrderController::class, 'edit'])->name('edit');
-                Route::delete('/order/{id}', [OrderController::class, 'destroy'])->name('destroy');
-            });
-
-            Route::group(['as' => 'my.'], function () {
-                Route::get('/my/orders', [OrderController::class, 'indexMy'])->name('index');
-                Route::get('/my/order/{id}', [OrderController::class, 'showMyOrder'])->name('show');
-                Route::put('/my/order/{id}', [OrderController::class, 'editMyOrder'])->name('edit');
-                Route::delete('/my/order/{id}', [OrderController::class, 'destroyMyOrder'])->name('destroy');
-            });
+        Route::group(['as' => 'my.'], function () {
+            Route::get('/my/credit-chart', [CreditHistoryController::class, 'myCreditChart'])->name('myCreditChart');
+            Route::get('/my/campaign-chart', [CampaignController::class, 'myCampaignChart'])->name('my-campaign-chart');
+            Route::get('/my/email-chart', [MailSendingHistoryController::class, 'myEmailChart'])->name('email-chart');
+            Route::get('/my/contact-chart', [ContactController::class, 'myContactChart'])->name('myContactChart');
+            Route::get('/my/point-contact-chart', [ContactController::class, 'myPointsContactChart'])->name('myPointsContactChart');
         });
+    });
+
+    Route::group(['middleware' => ['userid', 'role:root,admin'], 'as' => 'payment-method.'], function () {
+        Route::post('/payment-method', [PaymentMethodController::class, 'store'])->name('store');
+        Route::put('/payment-method/{id}', [PaymentMethodController::class, 'edit'])->name('edit');
+        Route::delete('/payment-method/{id}', [PaymentMethodController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::get('/payment-methods', [PaymentMethodController::class, 'index'])->name('payment-method.index');
+    Route::get('/payment-method/{id}', [PaymentMethodController::class, 'show'])->name('payment-method.show');
+
+    Route::group(['middleware' => ['userid'], 'as' => 'order.'], function () {
+        Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
+            Route::get('/orders', [OrderController::class, 'index'])->name('index');
+            Route::get('/order/{id}', [OrderController::class, 'show'])->name('show');
+            Route::post('/order', [OrderController::class, 'store'])->name('store');
+            Route::put('/order/{id}', [OrderController::class, 'edit'])->name('edit');
+            Route::delete('/order/{id}', [OrderController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::group(['as' => 'my.'], function () {
+            Route::get('/my/orders', [OrderController::class, 'indexMy'])->name('index');
+            Route::get('/my/order/{id}', [OrderController::class, 'showMyOrder'])->name('show');
+            Route::put('/my/order/{id}', [OrderController::class, 'editMyOrder'])->name('edit');
+            Route::delete('/my/order/{id}', [OrderController::class, 'destroyMyOrder'])->name('destroy');
+        });
+    });
 
 
 //Scenario
-        Route::group(['middleware' => ['userid'], 'as' => 'scenario.'], function () {
-            Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
-                Route::get('scenarios', [ScenarioController::class, 'index'])->name('index');
-                Route::post('scenario', [ScenarioController::class, 'storeScenario'])->name('storeScenario');
-                Route::get('scenario/{id}', [ScenarioController::class, 'show'])->name('showMyScenario');
-                Route::put('scenario/{id}', [ScenarioController::class, 'editMyScenario'])->name('editMyScenario');
-            });
-            Route::group(['as' => 'my.'], function () {
-                Route::get('my/scenarios', [ScenarioController::class, 'indexMy'])->name('indexMy');
-                Route::post('my/scenario', [ScenarioController::class, 'storeMyScenario'])->name('storeMyScenario');
-                Route::get('my/scenario/{id}', [ScenarioController::class, 'showMyScenario'])->name('showMyScenario');
-                Route::put('my/scenario/{id}', [ScenarioController::class, 'editMyScenario'])->name('editMyScenario');
-                Route::delete('my/scenario/{id}', [ScenarioController::class, 'deleteMyScenario'])->name('editMyScenario');
-                Route::post('my/emails/status-scenario', [ScenarioController::class, 'statusMyScenario'])->name('statusMyScenario');
-            });
+    Route::group(['middleware' => ['userid'], 'as' => 'scenario.'], function () {
+        Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
+            Route::get('scenarios', [ScenarioController::class, 'index'])->name('index');
+            Route::post('scenario', [ScenarioController::class, 'storeScenario'])->name('storeScenario');
+            Route::get('scenario/{id}', [ScenarioController::class, 'show'])->name('showMyScenario');
+            Route::put('scenario/{id}', [ScenarioController::class, 'editMyScenario'])->name('editMyScenario');
         });
+        Route::group(['as' => 'my.'], function () {
+            Route::get('my/scenarios', [ScenarioController::class, 'indexMy'])->name('indexMy');
+            Route::post('my/scenario', [ScenarioController::class, 'storeMyScenario'])->name('storeMyScenario');
+            Route::get('my/scenario/{id}', [ScenarioController::class, 'showMyScenario'])->name('showMyScenario');
+            Route::put('my/scenario/{id}', [ScenarioController::class, 'editMyScenario'])->name('editMyScenario');
+            Route::delete('my/scenario/{id}', [ScenarioController::class, 'deleteMyScenario'])->name('editMyScenario');
+            Route::post('my/emails/status-scenario', [ScenarioController::class, 'statusMyScenario'])->name('statusMyScenario');
+        });
+    });
 
 //Website_page_categories
-        Route::group(['middleware' => ['userid'], 'as' => 'website_page_category.'], function () {
+    Route::group(['middleware' => ['userid'], 'as' => 'website_page_category.'], function () {
 
-            Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
-                Route::post('/website-page-category', [WebsitePageCategoryController::class, 'store'])->name('store');
-                Route::put('/website-page-category/{id}', [WebsitePageCategoryController::class, 'edit'])->name('edit');
-                Route::delete('/website-page-category/{id}', [WebsitePageCategoryController::class, 'destroy'])->name('destroy');
-            });
-
-            Route::group(['as' => 'my.'], function () {
-                Route::get('/website-page-categories', [WebsitePageCategoryController::class, 'index'])->name('index');
-                Route::get('/website-page-category/{id}', [WebsitePageCategoryController::class, 'show'])->name('show');
-            });
-
+        Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
+            Route::post('/website-page-category', [WebsitePageCategoryController::class, 'store'])->name('store');
+            Route::put('/website-page-category/{id}', [WebsitePageCategoryController::class, 'edit'])->name('edit');
+            Route::delete('/website-page-category/{id}', [WebsitePageCategoryController::class, 'destroy'])->name('destroy');
         });
+
+        Route::group(['as' => 'my.'], function () {
+            Route::get('/website-page-categories', [WebsitePageCategoryController::class, 'index'])->name('index');
+            Route::get('/website-page-category/{id}', [WebsitePageCategoryController::class, 'show'])->name('show');
+        });
+
+    });
 
 //Website_pages
-        Route::group(['middleware' => ['userid'], 'as' => 'website_page'], function () {
-            Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
-                Route::get('website-pages', [WebsitePageController::class, 'index'])->name('index');
-                Route::post('website-page', [WebsitePageController::class, 'store'])->name('store');
-                Route::get('website-page/{id}', [WebsitePageController::class, 'show'])->name('show');
-                Route::put('website-page/{id}', [WebsitePageController::class, 'edit'])->name('edit');
-                Route::delete('/website-page/{id}', [WebsitePageController::class, 'destroy'])->name('destroy');
-                Route::post('website-page/change-status', [WebsitePageController::class, 'changeStatusWebsitePage'])->name('changeStatusWebsitePage');
-                Route::get("accepted-website-pages", [WebsitePageController::class, 'listAcceptedWebsitePages'])->name('listAcceptedWebsitePages');
+    Route::group(['middleware' => ['userid'], 'as' => 'website_page'], function () {
+        Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
+            Route::get('website-pages', [WebsitePageController::class, 'index'])->name('index');
+            Route::post('website-page', [WebsitePageController::class, 'store'])->name('store');
+            Route::get('website-page/{id}', [WebsitePageController::class, 'show'])->name('show');
+            Route::put('website-page/{id}', [WebsitePageController::class, 'edit'])->name('edit');
+            Route::delete('/website-page/{id}', [WebsitePageController::class, 'destroy'])->name('destroy');
+            Route::post('website-page/change-status', [WebsitePageController::class, 'changeStatusWebsitePage'])->name('changeStatusWebsitePage');
+            Route::get("accepted-website-pages", [WebsitePageController::class, 'listAcceptedWebsitePages'])->name('listAcceptedWebsitePages');
 
-            });
-
-            //short code
-            Route::get('short-codes', [WebsitePageShortCodeController::class, 'index'])->name('index');
-            Route::post('short-code', [WebsitePageShortCodeController::class, 'store'])->name('store');
-            Route::get('short-code/{id}', [WebsitePageShortCodeController::class, 'show'])->name('show');
-            Route::put('short-code/{id}', [WebsitePageShortCodeController::class, 'edit'])->name('edit');
-            Route::delete('/short-code/{id}', [WebsitePageShortCodeController::class, 'destroy'])->name('destroy');
-
-            //Short code group
-            Route::get('short-code-groups', [ShortCodeGroupController::class, 'index'])->name('index');
-            Route::post('short-code-group', [ShortCodeGroupController::class, 'store'])->name('store');
-            Route::get('short-code-group/{id}', [ShortCodeGroupController::class, 'show'])->name('show');
-            Route::put('short-code-group/{id}', [ShortCodeGroupController::class, 'edit'])->name('edit');
-            Route::delete('/short-code-group/{id}', [ShortCodeGroupController::class, 'destroy'])->name('destroy');
-            Route::post('/mapping-short-code', [ShortCodeGroupController::class, 'mappingShortcode'])->name('mappingShortcode');
-    Route::post('/unmapping-short-code', [ShortCodeGroupController::class, 'unmappingShortcode'])->name('unmappingShortcode');
-
-
-            Route::group(['middleware' => ['role:root,admin,editor']], function () {
-                Route::get('/unpublished-website-pages', [WebsitePageController::class, 'indexUnpublishedWebsitePage'])->name('index-unpublished');
-                Route::get('/unpublished-website-page/{id}', [WebsitePageController::class, 'showUnpublishedWebsitePage'])->name('show-unpublished');
-                Route::post('/unpublished-website-page', [WebsitePageController::class, 'storeUnpublishedWebsitePage'])->name('store-unpublished');
-                Route::put('/unpublished-website-page/{id}', [WebsitePageController::class, 'editUnpublishedWebsitePage'])->name('edit-unpublished');
-            });
-
-    Route::get('shortcode-supports', [WebsitePageShortCodeController::class, 'configShortcode'])->name('index-config-shortcode');
-    Route::get('toggle-shortcode/{id}', [WebsitePageShortCodeController::class, 'toggleStatus'])->name('toggleStatus');
-
-            Route::group(['as' => 'my.'], function () {
-                Route::get('my/website-pages', [WebsitePageController::class, 'indexMy'])->name('indexMyWebsitePage');
-                Route::post('my/website-page', [WebsitePageController::class, 'storeMyWebsitePage'])->name('storeMyWebsitePage');
-                Route::get('my/website-page/{id}', [WebsitePageController::class, 'showMyWebsitePage'])->name('showMyWebsitePage');
-                Route::put('my/website-page/{id}', [WebsitePageController::class, 'editMyWebsitePage'])->name('editMyWebsitePage');
-                Route::delete('my/website-page/{id}', [WebsitePageController::class, 'destroyMyWebsitePage'])->name('destroyMyWebsitePage');
-                Route::get("my/accepted-website-pages", [WebsitePageController::class, 'listMyAcceptedWebsitePages'])->name('listMyAcceptedWebsitePages');
-            });
-
-            Route::get('/get-website-page/{id}', [WebsitePageController::class, 'getWebsitePage'])->name('getWebsitePage');
-            Route::get('/website-pages-default', [WebsitePageController::class, 'getWebsitePagesDefault'])->name('getWebsitePagesDefault');
-            Route::get('/website-page-default/{id}', [WebsitePageController::class, 'showWebsitePagesDefault'])->name('showWebsitePagesDefault');
         });
+
+        //short code
+        Route::get('short-codes', [WebsitePageShortCodeController::class, 'index'])->name('index');
+        Route::post('short-code', [WebsitePageShortCodeController::class, 'store'])->name('store');
+        Route::get('short-code/{id}', [WebsitePageShortCodeController::class, 'show'])->name('show');
+        Route::put('short-code/{id}', [WebsitePageShortCodeController::class, 'edit'])->name('edit');
+        Route::delete('/short-code/{id}', [WebsitePageShortCodeController::class, 'destroy'])->name('destroy');
+
+        //Short code group
+        Route::get('short-code-groups', [ShortCodeGroupController::class, 'index'])->name('index');
+        Route::post('short-code-group', [ShortCodeGroupController::class, 'store'])->name('store');
+        Route::get('short-code-group/{id}', [ShortCodeGroupController::class, 'show'])->name('show');
+        Route::put('short-code-group/{id}', [ShortCodeGroupController::class, 'edit'])->name('edit');
+        Route::delete('/short-code-group/{id}', [ShortCodeGroupController::class, 'destroy'])->name('destroy');
+        Route::post('/mapping-short-code', [ShortCodeGroupController::class, 'mappingShortcode'])->name('mappingShortcode');
+        Route::post('/unmapping-short-code', [ShortCodeGroupController::class, 'unmappingShortcode'])->name('unmappingShortcode');
+
+
+        Route::group(['middleware' => ['role:root,admin,editor']], function () {
+            Route::get('/unpublished-website-pages', [WebsitePageController::class, 'indexUnpublishedWebsitePage'])->name('index-unpublished');
+            Route::get('/unpublished-website-page/{id}', [WebsitePageController::class, 'showUnpublishedWebsitePage'])->name('show-unpublished');
+            Route::post('/unpublished-website-page', [WebsitePageController::class, 'storeUnpublishedWebsitePage'])->name('store-unpublished');
+            Route::put('/unpublished-website-page/{id}', [WebsitePageController::class, 'editUnpublishedWebsitePage'])->name('edit-unpublished');
+        });
+
+        Route::get('shortcode-supports', [WebsitePageShortCodeController::class, 'configShortcode'])->name('index-config-shortcode');
+        Route::get('toggle-shortcode/{id}', [WebsitePageShortCodeController::class, 'toggleStatus'])->name('toggleStatus');
+
+        Route::group(['as' => 'my.'], function () {
+            Route::get('my/website-pages', [WebsitePageController::class, 'indexMy'])->name('indexMyWebsitePage');
+            Route::post('my/website-page', [WebsitePageController::class, 'storeMyWebsitePage'])->name('storeMyWebsitePage');
+            Route::get('my/website-page/{id}', [WebsitePageController::class, 'showMyWebsitePage'])->name('showMyWebsitePage');
+            Route::put('my/website-page/{id}', [WebsitePageController::class, 'editMyWebsitePage'])->name('editMyWebsitePage');
+            Route::delete('my/website-page/{id}', [WebsitePageController::class, 'destroyMyWebsitePage'])->name('destroyMyWebsitePage');
+            Route::get("my/accepted-website-pages", [WebsitePageController::class, 'listMyAcceptedWebsitePages'])->name('listMyAcceptedWebsitePages');
+        });
+
+        Route::get('/get-website-page/{id}', [WebsitePageController::class, 'getWebsitePage'])->name('getWebsitePage');
+        Route::get('/get-product-website-page/{id}', [WebsitePageController::class, 'getProductWebsitePage'])->name('getProductWebsitePage');
+        Route::get('/website-pages-default', [WebsitePageController::class, 'getWebsitePagesDefault'])->name('getWebsitePagesDefault');
+        Route::get('/website-page-default/{id}', [WebsitePageController::class, 'showWebsitePagesDefault'])->name('showWebsitePagesDefault');
+
+        Route::get('/get-info-by-domain-url', [WebsitePageController::class, 'getInfoByDomainUrl'])->name('getInfoByDomainUrl');
+    });
 
         Route::get('get-website-page', [WebsitePageController::class, 'getWebsitePageWithReplace'])->name('edit');
         Route::get('public/website-page/{id}', [WebsitePageController::class, 'show'])->name('website_page_public.show');
@@ -778,7 +801,7 @@ Route::group(['middleware' => ['apikey']], function () {
 
 
 //Language
-  
+
 //Article Category
         Route::group(['middleware' => ['userid'], 'as' => 'article-category.'], function () {
             Route::group(['middleware' => ['role:root,admin,editor'], 'as' => 'author.'], function () {
@@ -916,7 +939,9 @@ Route::group(['middleware' => ['apikey']], function () {
             Route::post('department/remove-team', [DepartmentController::class, 'removeTeam'])->name('removeTeam');
             Route::post('business/add-department', [DepartmentController::class, 'addDepartmentForBusiness'])->name('addDepartmentForBusiness');
             Route::post('location/add-department', [DepartmentController::class, 'addDepartmentForLocation'])->name('addDepartmentForLocation');
+            Route::get('toggle-default-department', [DepartmentController::class, 'toggleDefaultDepartment'])->name('toggleDefaultDepartment');
         });
+});
 
         Route::group(['middleware' => ['userid'], 'as' => 'location.'], function () {
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
@@ -1097,6 +1122,8 @@ Route::group(['middleware' => ['apikey']], function () {
                 Route::put('/my/team/{id}', [TeamController::class, 'editMy'])->name('editMy');
                 Route::delete('/my/team/{id}', [TeamController::class, 'destroyMy'])->name('destroyMy');
             });
+            Route::get('/team/{id}/assignable-projects', [SendProjectController::class, 'getAssignableForTeam'])->name('getAssignableForTeam');
+
         });
 
         Route::group(['middleware' => ['userid'], 'as' => 'addOn.'], function () {
@@ -1484,5 +1511,5 @@ Route::group(['middleware' => ['apikey']], function () {
                 Route::get('assigned/article-series', [ArticleSeriesController::class, 'indexMyAssigned']);
             });
         });
+        });
     });
-});

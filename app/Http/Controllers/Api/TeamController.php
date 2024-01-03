@@ -46,9 +46,13 @@ use App\Services\AddOnService;
 use App\Services\BusinessManagementService;
 use App\Services\BusinessTeamService;
 use App\Services\ContactListService;
+use App\Services\CstoreService;
+use App\Services\DepartmentService;
 use App\Services\InviteService;
+use App\Services\LocationService;
 use App\Services\MyTeamService;
 use App\Services\PermissionService;
+use App\Services\SendProjectService;
 use App\Services\SmtpAccountService;
 use App\Services\TeamService;
 use App\Services\UserBusinessService;
@@ -65,6 +69,11 @@ class TeamController extends Controller
 {
     use RestShowTrait, RestDestroyTrait, RestEditTrait, RestStoreTrait;
 
+    /**
+     * @var CstoreService
+     */
+    protected $cstoreService;
+
     public function __construct(
         TeamService               $service,
         UserTeamService           $userTeamService,
@@ -76,11 +85,15 @@ class TeamController extends Controller
         ContactListService        $contactListService,
         MyTeamService             $myService,
         UserBusinessService       $userBusinessService,
-        AddOnService              $addOnService
+        AddOnService              $addOnService,
+        DepartmentService $departmentService,
+        LocationService $locationService,
+        SendProjectService $sendProjectService,
+        CstoreService $cstoreService
     )
     {
         $this->service = $service;
-        $this->myService = $myService;
+        $this->myService = $service;
         $this->smtpAccountService = $smtpAccountService;
         $this->userTeamService = $userTeamService;
         $this->userService = $userService;
@@ -90,6 +103,9 @@ class TeamController extends Controller
         $this->contactListService = $contactListService;
         $this->userBusinessService = $userBusinessService;
         $this->addOnService = $addOnService;
+        $this->departmentService = $departmentService;
+        $this->locationService = $locationService;
+        $this->sendProjectService = $sendProjectService;
         $this->resourceCollectionClass = TeamResourceCollection::class;
         $this->addOnResourceCollectionClass = AddOnResourceCollection::class;
         $this->userTeamResourceClass = UserTeamResource::class;
@@ -100,6 +116,7 @@ class TeamController extends Controller
         $this->storeRequest = TeamRequest::class;
         $this->editRequest = UpdateTeamRequest::class;
         $this->indexRequest = IndexRequest::class;
+        $this->cstoreService = $cstoreService;
     }
 
     public function index(IndexRequest $request)
@@ -144,6 +161,15 @@ class TeamController extends Controller
             'app_id' => auth()->appId(),
         ]));
 
+        if($request->get('parent_team_uuid')){
+            $parentUuid = $request->get('parent_team_uuid');
+            $parentType = config('foldertypecstore.TEAM');
+        }else{
+            $parentUuid = $request->get('department_uuid');
+            $parentType = config('foldertypecstore.DEPARTMENT');
+        }
+        $this->cstoreService->storeFolderByType($model->name, $model->uuid, config('foldertypecstore.TEAM'), $parentUuid, $parentType);
+
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
         );
@@ -173,6 +199,7 @@ class TeamController extends Controller
                 'user_uuid' => $user->uuid,
                 'app_id' => auth()->appId()
             ]));
+            $this->cstoreService->storeFolderByType($request->get('username'), $user->uuid, config('foldertypecstore.USER'), $request->get('team_uuid'));
             $this->smtpAccountService->sendEmailNotificationSystem($user, new SendInviteToTeamByAccount($user, $password));
         }
 
@@ -223,6 +250,9 @@ class TeamController extends Controller
                     'app_id' => auth()->appId()
                 ]);
 //                Mailbox::postEmailAccountcreate($user->uuid, $email, $passwordRandom);
+
+                $this->cstoreService->storeFolderByType($request->get('username'), $user->uuid, config('foldertypecstore.USER'), $request->get('team_uuid'));
+
                 DB::commit();
 
                 return $this->sendCreatedJsonResponse();
@@ -272,6 +302,9 @@ class TeamController extends Controller
             'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ]));
+
+        $this->cstoreService->storeFolderByType(auth()->user()->username, auth()->user()->getkey(), config('foldertypecstore.USER'), $request->get('team_uuid'));
+
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->userTeamResourceClass, $model)
@@ -372,7 +405,6 @@ class TeamController extends Controller
             return $this->sendBadRequestJsonResponse(['message' => 'This user is not in the team']);
         }
 
-        $this->contactListService->
         $user->userTeamContactLists()->sync($request->get('contact_list_uuids', []));
 
         return $this->sendCreatedJsonResponse(
@@ -701,6 +733,9 @@ class TeamController extends Controller
         foreach ($request->get('child_team_uuids') as $childTeamUuid) {
             $childTeam = $this->service->findOrFailById($childTeamUuid);
             $childTeam->update(['parent_team_uuid' => $request->get('team_uuid')]);
+            $this->cstoreService->storeFolderByType(
+                $childTeam->name, $childTeam->uuid, config('foldertypecstore.TEAM'),
+                $request->get('team_uuid'), config('foldertypecstore.TEAM'));
         }
 
         return $this->sendOkJsonResponse();
@@ -771,8 +806,24 @@ class TeamController extends Controller
         foreach ($request->get('team_uuids') as $childTeamUuid) {
             $childTeam = $this->service->findOrFailById($childTeamUuid);
             $childTeam->update(['department_uuid' => $request->get('department_uuid')]);
+            $this->cstoreService->storeFolderByType($childTeam->name, $childTeam->uuid, config('foldertypecstore.TEAM'), $request->get('department_uuid'));
         }
 
         return $this->sendOkJsonResponse();
+    }
+
+    /**
+     * @param IndexRequest $request
+     * @param $id
+     * @return JsonResponse
+     */
+    public function getAssignableForProject(IndexRequest $request, $id) {
+        $departments = $this->departmentService->getByProject($id);
+        $departmentUuids = $departments->pluck('uuid')->toArray();
+        $teams = $this->service->getTeamsAssignable($departmentUuids, $id, $request);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $teams)
+        );
     }
 }

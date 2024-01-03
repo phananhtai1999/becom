@@ -14,7 +14,7 @@ class ReplaceArticleService
         preg_match('/article-sort="(.*?)"/', $template, $sortName);
         preg_match('/article-sort-order="(.*?)"/', $template, $sortOrder);
         $articlesData = Article::where('article_category_uuid', $articleCategory->uuid)->orderBy($sortName[1] ?? 'created_at', $sortOrder[1] ?? 'DESC')->paginate($articleCount);
-        $pattern = '/<article.*?>(.*?)<\/article>/s';
+        $pattern = '/<article-element.*?>(.*?)<\/article-element>/s';
 
         return preg_replace_callback($pattern, function ($matches) use ($articlesData, $websitePage) {
             $articleData = $articlesData->shift();
@@ -31,11 +31,11 @@ class ReplaceArticleService
     }
 
     public function replaceListArticleSpecific($template, $websitePage) {
-        preg_match('/<specific_article_list.*?>(.*?)<\/specific_article_list>/s', $template, $specificArticleList);
+        preg_match('/<specific-article-list.*?>(.*?)<\/specific-article-list>/s', $template, $specificArticleList);
         if (!$specificArticleList) {
             return $template;
         }
-        $pattern = '/<article.*?>(.*?)<\/article>/s';
+        $pattern = '/<article-element.*?>(.*?)<\/article-element>/s';
 
         return preg_replace_callback($pattern, function ($matches) use ($websitePage) {
             preg_match('/data-article-specific="(.*?)"/', $matches[0], $articleUuid);
@@ -69,7 +69,7 @@ class ReplaceArticleService
         } else {
             $articlesData = Article::orderBy($sortName[1] ?? 'created_at', $sortOrder[1] ?? 'DESC')->paginate($articleCount);
         }
-        $pattern = '/<article.*?>(.*?)<\/article>/s';
+        $pattern = '/<article-element.*?>(.*?)<\/article-element>/s';
         return preg_replace_callback($pattern, function ($matches) use ($articlesData, $websitePage) {
             $articlesData = $articlesData->shift();
             if (!$articlesData) {

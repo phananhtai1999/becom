@@ -34,6 +34,7 @@ class Department extends AbstractModel
         'location_uuid',
         'user_uuid',
         'app_id',
+        'is_default',
     ];
 
     /**
@@ -95,6 +96,11 @@ class Department extends AbstractModel
     public function teams()
     {
         return $this->hasMany(Team::class, 'department_uuid', 'uuid');
+    }
+
+    public function sendProjects()
+    {
+        return $this->belongsToMany(SendProject::class, 'department_send_project', 'department_uuid', 'send_project_uuid')->withTimestamps();
     }
 
 }
