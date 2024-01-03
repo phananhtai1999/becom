@@ -278,9 +278,9 @@ abstract class AbstractService
     protected function header()
     {
         return [
-            "x-user-id" => Auth()->user()->getKey(),
-            "x-app-id" => config('shop.x_app_id'),
-            "x-api-key" => config('shop.x_api_key'),
+            "x-user-id" => auth()->userId(),
+            "x-app-id" => auth()->appId(),
+            "x-api-key" => auth()->apiKey(),
         ];
     }
 
