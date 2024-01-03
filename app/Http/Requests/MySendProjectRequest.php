@@ -42,6 +42,7 @@ class MySendProjectRequest extends AbstractRequest
                 ])
                     ->whereNull('deleted_at');
             })],
+            'parent_uuid' => ['numeric', 'exists:send_projects,uuid'],
         ];
     }
 }

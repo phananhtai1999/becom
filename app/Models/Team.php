@@ -74,7 +74,7 @@ class Team extends AbstractModel
 
     public function location()
     {
-        return $this->belongsTo(Location::class, 'location_uuid');
+        return $this->belongsTo(Location::class, 'location_uuid', 'uuid');
     }
 
 
@@ -104,5 +104,10 @@ class Team extends AbstractModel
         if ($check) {
             return $query->whereNull('parent_team_uuid');
         }
+    }
+
+    public function sendProjects()
+    {
+        return $this->belongsToMany(SendProject::class, 'team_send_project', 'team_uuid', 'send_project_uuid')->withTimestamps();
     }
 }

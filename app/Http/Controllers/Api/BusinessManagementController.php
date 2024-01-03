@@ -29,15 +29,18 @@ use App\Models\Team;
 use App\Models\UserBusiness;
 use App\Services\AddOnService;
 use App\Services\BusinessManagementService;
+use App\Services\CstoreService;
 use App\Services\DomainService;
 use App\Services\MyBusinessManagementService;
 use App\Services\MyDomainService;
+use App\Services\SendProjectService;
 use App\Services\UserAddOnService;
 use App\Services\UserBusinessService;
 use App\Services\UserService;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Techup\Mailbox\Facades\Mailbox;
 
 class BusinessManagementController extends AbstractRestAPIController
@@ -65,6 +68,11 @@ class BusinessManagementController extends AbstractRestAPIController
     protected $userService;
 
     /**
+     * @var CstoreService
+     */
+    protected $cstoreService;
+
+    /**
      * @param BusinessManagementService $service
      * @param MyBusinessManagementService $myService
      * @param DomainService $domainService
@@ -79,7 +87,9 @@ class BusinessManagementController extends AbstractRestAPIController
         UserBusinessService $userBusinessService,
         UserService $userService,
         UserAddOnService $userAddOnService,
-        AddOnService $addOnService
+        AddOnService $addOnService,
+        SendProjectService          $sendProjectService,
+        CstoreService               $cstoreService
     )
     {
         $this->service = $service;
@@ -88,6 +98,7 @@ class BusinessManagementController extends AbstractRestAPIController
         $this->myDomainService = $myDomainService;
         $this->userBusinessService = $userBusinessService;
         $this->businessManagementService = $businessManagementService;
+        $this->sendProjectService = $sendProjectService;
         $this->resourceCollectionClass = BusinessManagementResourceCollection::class;
         $this->resourceClass = BusinessManagementResource::class;
         $this->userBusinessResourceClass = UserBusinessResource::class;
@@ -99,6 +110,7 @@ class BusinessManagementController extends AbstractRestAPIController
         $this->userService = $userService;
         $this->userAddOnService = $userAddOnService;
         $this->addOnService = $addOnService;
+        $this->cstoreService = $cstoreService;
     }
 
     /**
@@ -124,8 +136,16 @@ class BusinessManagementController extends AbstractRestAPIController
         $domain = $this->domainService->updateOrCreateDomainByBusiness($request->domain, $model);
         //Set Domain Default for Business
         $this->service->setDomainDefault($model, $domain->uuid);
-
         $model->businessCategories()->attach($request->get('business_categories', []));
+        $this->sendProjectService->create([
+            'domain' => $request->get('domain'),
+            'business_uuid' => $model->uuid,
+            'user_uuid' =>  $request->get('owner_uuid') ?? auth()->user()->getKey(),
+            'name' => $request->get('name'),
+            'logo' => $request->get('avatar'),
+            'description' => $request->get('introduce'),
+            'domain_uuid' => $domain->uuid,
+        ]);
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -189,6 +209,19 @@ class BusinessManagementController extends AbstractRestAPIController
         $this->service->setDomainDefault($model, $domain->uuid);
 
         $model->businessCategories()->attach($request->get('business_categories', []));
+        $this->sendProjectService->create([
+            'domain' => $request->get('domain'),
+            'business_uuid' => $model->uuid,
+            'user_uuid' => auth()->user()->getKey(),
+            'name' => $request->get('name'),
+            'logo' => $request->get('avatar'),
+            'description' => $request->get('introduce'),
+            'domain_uuid' => $domain->uuid,
+        ]);
+
+        if($this->cstoreService->storeS3Config($request)){
+            $this->cstoreService->storeFolderByType($request->get('name'), $model->uuid, config('foldertypecstore.BUSINESS'));
+        }
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -267,7 +300,7 @@ class BusinessManagementController extends AbstractRestAPIController
                     return $this->sendJsonResponse(false, 'Does not have business', [], 403);
                 }
             }
-            if($request->get('type') == UserBusiness::ALREADY_EXISTS_ACCOUNT){
+            if ($request->get('type') == UserBusiness::ALREADY_EXISTS_ACCOUNT) {
                 foreach ($request->get('user_uuids') as $userUuid) {
                     $existingRecord = $this->userBusinessService->findOneWhere([
                         'business_uuid' => $businessUuid,
@@ -285,7 +318,7 @@ class BusinessManagementController extends AbstractRestAPIController
                 }
                 DB::commit();
                 return $this->sendCreatedJsonResponse();
-            }elseif($request->get('type') == UserBusiness::ACCOUNT_INVITE){
+            } elseif ($request->get('type') == UserBusiness::ACCOUNT_INVITE) {
                 $passwordRandom = $this->generateRandomString(10);
                 $email = $request->get('username') . '@' . $request->get('domain');
                 $user = $this->userService->create([
@@ -308,7 +341,7 @@ class BusinessManagementController extends AbstractRestAPIController
                 return $this->sendCreatedJsonResponse();
             }
 
-        } catch (ConnectionException $exception){
+        } catch (ConnectionException $exception) {
             DB::rollBack();
             return $this->sendInternalServerErrorJsonResponse();
         }

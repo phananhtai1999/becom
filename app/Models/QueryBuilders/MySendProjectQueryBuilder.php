@@ -32,28 +32,28 @@ class MySendProjectQueryBuilder extends AbstractQueryBuilder
         return static::for(static::baseQuery())
             ->allowedFields([
                 $modelKeyName,
-                'domain',
                 'user_uuid',
                 'name',
                 'description',
                 'logo',
-                'domain_uuid'
+                'domain_uuid',
+                'parent_uuid',
+                'business_uuid',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
                 $modelKeyName,
-                'domain',
                 'user_uuid',
                 'name',
                 'description',
                 'logo',
-                'domain_uuid'
+                'domain_uuid',
+                'parent_uuid',
+                'business_uuid',
             ])
             ->allowedFilters([
                 $modelKeyName,
                 AllowedFilter::exact('exact__' . $modelKeyName, $modelKeyName),
-                'domain',
-                AllowedFilter::exact('exact__domain', 'domain'),
                 'user_uuid',
                 AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
                 'name',
@@ -62,13 +62,18 @@ class MySendProjectQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__description', 'description'),
                 'logo',
                 AllowedFilter::exact('exact__logo', 'logo'),
+                'business_uuid',
+                AllowedFilter::exact('exact__business_uuid', 'business_uuid'),
                 'domain_uuid',
                 AllowedFilter::exact('exact__domain_uuid', 'domain_uuid'),
+                'parent_uuid',
+                AllowedFilter::exact('exact__parent_uuid', 'parent_uuid'),
                 'user.username',
                 AllowedFilter::exact('exact__user.username', 'user.username'),
                 'user.email',
                 AllowedFilter::exact('exact__user.email', 'user.email'),
                 AllowedFilter::scope('domain_is_null'),
+                AllowedFilter::scope('send_project_root'),
             ]);
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Abstracts;
 
+use GuzzleHttp\Client;
 use Techup\ApiConfig\Models\Config;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Builder;
@@ -272,5 +273,20 @@ abstract class AbstractService
         $model = $this->findOneWhereOrFailByUserUuidAndAppId($id);
 
         return $model->delete();
+    }
+
+    protected function header()
+    {
+        return [
+            "x-user-id" => Auth()->user()->getKey(),
+            "x-app-id" => config('shop.x_app_id'),
+            "x-api-key" => config('shop.x_api_key'),
+        ];
+    }
+
+    protected function createRequest() {
+        return new Client([
+            'headers' => $this->header()
+        ]);
     }
 }

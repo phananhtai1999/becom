@@ -19,6 +19,7 @@ class Location extends Model
         'user_uuid',
         'address',
         'app_id',
+        'business_uuid'
     ];
 
     protected $casts = [
@@ -35,5 +36,14 @@ class Location extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_uuid', 'uuid');
+    }
+    public function business()
+    {
+        return $this->belongsTo(BusinessManagement::class, 'business_uuid', 'uuid');
+    }
+
+    public function sendProjects()
+    {
+        return $this->belongsToMany(SendProject::class, 'location_send_project', 'location_uuid', 'send_project_uuid')->withTimestamps();
     }
 }

@@ -8,6 +8,7 @@ use App\Http\Controllers\Traits\RestIndexMyTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Requests\AcceptPublishWebsitePageRequest;
 use App\Http\Requests\ConfigShortcodeRequest;
+use App\Http\Requests\GetInfoByDomainUrlRequest;
 use App\Http\Requests\GetWebsitePagesRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyWebsitePageRequest;
@@ -27,11 +28,15 @@ use App\Services\ArticleService;
 use App\Services\DomainService;
 use Techup\ApiConfig\Services\LanguageService;
 use App\Services\MyWebsitePageService;
+use App\Services\ShopService;
 use App\Services\WebsitePageService;
 use App\Services\WebsitePageShortCodeService;
 use App\Services\WebsiteService;
 use Carbon\Carbon;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 
 class WebsitePageController extends AbstractRestAPIController
 {
@@ -59,7 +64,8 @@ class WebsitePageController extends AbstractRestAPIController
         ArticleService         $articleService,
         ArticleCategoryService $articleCategoryService,
         DomainService          $domainService,
-        WebsiteService         $websiteService
+        WebsiteService         $websiteService,
+        ShopService $shopService
     )
     {
         $this->service = $service;
@@ -69,6 +75,7 @@ class WebsitePageController extends AbstractRestAPIController
         $this->articleCategoryService = $articleCategoryService;
         $this->domainService = $domainService;
         $this->websiteService = $websiteService;
+        $this->shopService = $shopService;
         $this->resourceCollectionClass = WebsitePageResourceCollection::class;
         $this->resourceClass = WebsitePageResource::class;
         $this->indexRequest = IndexRequest::class;
@@ -112,6 +119,28 @@ class WebsitePageController extends AbstractRestAPIController
                 $articleCategory = $this->articleCategoryService->getLastArticleCategory();
             }
             $websitePage = $this->service->renderContentForArticleCategory($websitePage, $articleCategory);
+            $response = $this->sendOkJsonResponse(['data' => $websitePage]);
+        } elseif ($websitePage->type == WebsitePage::HOME_ARTICLES_TYPE) {
+            $websitePage = $this->service->renderContentForHomeArticles($websitePage);
+            $response = $this->sendOkJsonResponse(['data' => $websitePage]);
+        }
+
+        return $response;
+    }
+
+    public function getProductWebsitePage(ShowWebsitePageRequest $request, $id)
+    {
+        $websitePage = $this->myService->findOneWhereOrFail($request->publish_status ?
+            [['publish_status', $request->publish_status], ['uuid', $id]]
+            : [['uuid', $id]]);
+        $response = $this->sendOkJsonResponse(['data' => $websitePage]);
+        if ($websitePage->type == WebsitePage::PRODUCT_DETAIL_TYPE) {
+            $productDetailData = $this->shopService->getProductDetailData($request->product_uuid);
+            $websitePage = $this->service->renderContentForProductDetail($websitePage, $productDetailData);
+            $response = $this->sendOkJsonResponse(['data' => $websitePage]);
+        } elseif ($websitePage->type == WebsitePage::PRODUCT_CATEGORY_TYPE) {
+            $productCategoryData = $this->shopService->getProductCategoryData($request->get('product_category_slug'));
+            $websitePage = $this->service->renderContentForProductCategory($websitePage, $productCategoryData);
             $response = $this->sendOkJsonResponse(['data' => $websitePage]);
         } elseif ($websitePage->type == WebsitePage::HOME_ARTICLES_TYPE) {
             $websitePage = $this->service->renderContentForHomeArticles($websitePage);
@@ -453,5 +482,29 @@ class WebsitePageController extends AbstractRestAPIController
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
         );
+    }
+
+    /**
+     * @param GetInfoByDomainUrlRequest $request
+     * @return JsonResponse
+     */
+    public function getInfoByDomainUrl(GetInfoByDomainUrlRequest $request)
+    {
+        if ($request->get('article_category_slug')){
+            $articleCategory = $this->articleCategoryService->findOneWhere(['slug' => $request->get('article_category_slug')]);
+        }
+        if ($request->get('article_slug')){
+            $article = $this->articleService->findOneWhere(['slug' => $request->get('article_slug')]);
+        }
+        if ($request->get('website_page_slug')){
+            $websitePage = $this->service->getWebsitePageByDomainAndWebsitePageSlug($request->get('domain'), $request->get('website_page_slug'));
+        }
+        $data = [
+            'article_category' => $articleCategory ?? null,
+            'article' => $article ?? null,
+            'website_page' => $websitePage ?? null
+        ];
+
+        return $this->sendOkJsonResponse(['data' => $data]);
     }
 }

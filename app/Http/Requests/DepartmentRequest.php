@@ -31,7 +31,7 @@ class DepartmentRequest extends AbstractRequest
             'user_uuid' => ['nullable', 'numeric', Rule::exists('user_profiles','uuid')->where(function ($q) {
                 return $q->where('app_id', auth()->appId());
             })->whereNull('deleted_at')],
-            'business_uuid' => ['integer', 'exists:businesses,uuid'],
+            'location_uuid' => ['integer', 'exists:locations,uuid'],
         ];
     }
 }

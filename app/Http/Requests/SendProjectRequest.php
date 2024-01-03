@@ -25,13 +25,6 @@ class SendProjectRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'domain' => ['nullable', 'string', 'regex:/^(?!(www|http|https)\.)\w+(\.\w+)+$/', Rule::unique('send_projects')->where(function ($query) {
-                return $query->where([
-                    ['user_uuid', $this->request->get('user_uuid') ?? auth()->userId()],
-                    ['app_id', auth()->appId()]
-                ])
-                    ->whereNull('deleted_at');
-            })],
             'user_uuid' => ['nullable', 'numeric', Rule::exists('user_profiles', 'uuid')->where(function ($q) {
                 return $q->where('app_id', auth()->appId());
             })->whereNull('deleted_at')],
@@ -42,9 +35,14 @@ class SendProjectRequest extends AbstractRequest
                 ])
                     ->whereNull('deleted_at');
             })],
+            'business_uuid' => ['required', 'numeric', Rule::exists('business_managements', 'uuid')->where(function ($query) {
+                return $query->where('owner_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey())
+                    ->whereNull('deleted_at');
+            })],
             'name' => ['required', 'string'],
             'description' => ['required', 'string'],
             'logo' => ['required', 'string'],
+            'parent_uuid' => ['numeric', 'exists:send_projects,uuid'],
         ];
     }
 }

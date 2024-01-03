@@ -31,6 +31,21 @@ class ShortCodeGroupSeeder extends Seeder
                 'name' => 'Article category page group',
                 'description' => 'This is group include short code in page article category'
             ],
+            [
+                'key' => ShortCodeGroup::HOME_PRODUCTS,
+                'name' => 'Home page group',
+                'description' => 'This is group include short code in page home'
+            ],
+            [
+                'key' => ShortCodeGroup::PRODUCT_DETAIL,
+                'name' => 'product detail page group',
+                'description' => 'This is group include short code in page product detail'
+            ],
+            [
+                'key' => ShortCodeGroup::PRODUCT_CATEGORY,
+                'name' => 'product category page group',
+                'description' => 'This is group include short code in page product category'
+            ],
         ];
 
         foreach ($shortCodeGroups as $shortCodeGroup) {

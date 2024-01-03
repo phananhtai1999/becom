@@ -33,7 +33,6 @@ class MyTeamRequest extends FormRequest
                 ]);
             })->whereNull('deleted_at')],
             'department_uuid' => ['integer', 'exists:departments,uuid'],
-            'location_uuid' => ['integer', 'exists:locations,uuid'],
         ];
     }
 }

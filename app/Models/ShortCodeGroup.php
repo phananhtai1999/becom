@@ -13,6 +13,10 @@ class ShortCodeGroup extends Model
     const ARTICLE_DETAIL = 'article_detail';
     const ARTICLE_CATEGORY = 'article_category';
     const HOME_ARTICLES = 'home_articles';
+
+    const PRODUCT_DETAIL = 'product_detail';
+    const PRODUCT_CATEGORY = 'product_category';
+    const HOME_PRODUCTS = 'home_products';
     /**
      * @var string
      */

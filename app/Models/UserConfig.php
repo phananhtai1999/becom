@@ -30,6 +30,7 @@ class UserConfig extends AbstractModel
         'display_name_style',
         'user_uuid',
         'app_id',
+        'default_department',
     ];
 
     /**

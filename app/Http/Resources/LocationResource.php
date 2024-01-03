@@ -21,6 +21,7 @@ class LocationResource extends JsonResource
             'name' => $this->name,
             'user_uuid' => $this->user_uuid,
             'address' => $this->address,
+            'business_uuid' => $this->business_uuid,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'deleted_at' => $this->deleted_at,
@@ -31,6 +32,10 @@ class LocationResource extends JsonResource
 
         if (\in_array('location__teams', $expand)) {
             $data['teams'] = TeamResource::collection($this->teams);
+        }
+
+        if (\in_array('location__send_projects', $expand)) {
+            $data['send_projects'] = SendProjectResource::collection($this->sendProjects);
         }
 
         return $data;

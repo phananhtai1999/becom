@@ -21,6 +21,8 @@ class DepartmentResource extends AbstractJsonResource
             'name' => $this->name,
             'names' => $this->names,
             'user_uuid' => $this->user_uuid,
+            'is_default' => $this->is_default,
+            'business_uuid' => $this->business_uuid,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
@@ -36,6 +38,10 @@ class DepartmentResource extends AbstractJsonResource
 
         if (\in_array('department__teams', $expand)) {
             $data['teams'] = TeamResource::collection($this->teams);
+        }
+
+        if (\in_array('department__send_projects', $expand)) {
+            $data['send_projects'] = SendProjectResource::collection($this->sendProjects);
         }
 
         return $data;

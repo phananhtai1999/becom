@@ -20,8 +20,12 @@ use App\Http\Requests\UpdateLocationRequest;
 use App\Http\Requests\MyLocationRequest;
 use App\Http\Resources\LocationResource;
 use App\Http\Resources\LocationResourceCollection;
+use App\Services\BusinessManagementService;
+use App\Services\CstoreService;
 use App\Services\LocationService;
+use App\Services\SendProjectService;
 use App\Services\TeamService;
+use Illuminate\Http\JsonResponse;
 
 class LocationController extends AbstractRestAPIController
 {
@@ -29,14 +33,27 @@ class LocationController extends AbstractRestAPIController
         RestIndexByUserIdAndAppIdTrait, RestStoreByUserIdAndAppIdTrait, RestShowByUserIdAndAppIdTrait, RestDestroyByUserIdAndAppIdTrait, RestEditByUserIdAndAppIdTrait;
 
     /**
+     * @var CstoreService
+     */
+    protected $cstoreService;
+
+    /**
      * @param LocationService $service
      * @param TeamService $teamService
      */
-    public function __construct(LocationService $service, TeamService $teamService)
+    public function __construct(
+        LocationService $service,
+        TeamService $teamService,
+        SendProjectService $sendProjectService,
+        BusinessManagementService $businessManagementService,
+        CstoreService $cstoreService
+    )
     {
         $this->service = $service;
         $this->teamService = $teamService;
         $this->myService = $service;
+        $this->sendProjectService = $sendProjectService;
+        $this->businessManagementService = $businessManagementService;
         $this->resourceCollectionClass = LocationResourceCollection::class;
         $this->resourceClass = LocationResource::class;
         $this->storeRequest = LocationRequest::class;
@@ -44,6 +61,7 @@ class LocationController extends AbstractRestAPIController
         $this->editRequest = UpdateLocationRequest::class;
         $this->editMyRequest = UpdateLocationRequest::class;
         $this->indexRequest = IndexRequest::class;
+        $this->cstoreService = $cstoreService;
     }
 
 
@@ -61,5 +79,37 @@ class LocationController extends AbstractRestAPIController
         }
 
         return $this->sendOkJsonResponse();
+    }
+
+    public function getAssignableForProject(IndexRequest $request, $id) {
+        $sendProject = $this->sendProjectService->findOrFailById($id);
+        $locations = $this->service->getLocationsAssignable($sendProject->business->uuid, $id, $request);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $locations)
+        );
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function storeMy()
+    {
+        $request = app($this->storeMyRequest);
+
+        $business = $this->getBusiness();
+        if (!$business) {
+            return $this->sendJsonResponse(false, 'Does not have business', [], 403);
+        }
+        $model = $this->service->create(array_merge($request->all(), [
+            'user_uuid' => auth()->user()->getkey(),
+            'business_uuid' => $business->uuid
+        ]));
+
+        $this->cstoreService->storeFolderByType($request->get('name'), $model->uuid, config('foldertypecstore.LOCATION'), $business->uuid);
+
+        return $this->sendCreatedJsonResponse(
+            $this->myService->resourceToData($this->resourceClass, $model)
+        );
     }
 }

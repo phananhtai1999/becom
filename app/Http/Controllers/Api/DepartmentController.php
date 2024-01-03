@@ -17,10 +17,15 @@ use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\UpdateMyDepartmentRequest;
 use App\Http\Resources\DepartmentResource;
 use App\Http\Resources\DepartmentResourceCollection;
+use App\Models\UserConfig;
+use App\Services\BusinessManagementService;
+use App\Services\CstoreService;
 use App\Services\DepartmentService;
 use Techup\ApiConfig\Services\LanguageService;
 use App\Services\MyDepartmentService;
+use App\Services\SendProjectService;
 use App\Services\TeamService;
+use App\Services\UserConfigService;
 use Illuminate\Http\JsonResponse;
 
 class DepartmentController extends AbstractRestAPIController
@@ -36,6 +41,10 @@ class DepartmentController extends AbstractRestAPIController
      * @var LanguageService
      */
     protected $languageService;
+    /**
+     * @var CstoreService
+     */
+    protected $cstoreService;
 
     /**
      * @param DepartmentService $service
@@ -46,18 +55,24 @@ class DepartmentController extends AbstractRestAPIController
         DepartmentService   $service,
         MyDepartmentService $myService,
         LanguageService     $languageService,
-        TeamService         $teamService
+        TeamService         $teamService,
+        SendProjectService $sendProjectService,
+        UserConfigService $userConfigService,
+        CstoreService $cstoreService
     )
     {
         $this->service = $service;
-        $this->myService = $myService;
+        $this->myService = $service;
         $this->languageService = $languageService;
         $this->teamService = $teamService;
+        $this->sendProjectService = $sendProjectService;
+        $this->userConfigService = $userConfigService;
         $this->resourceCollectionClass = DepartmentResourceCollection::class;
         $this->resourceClass = DepartmentResource::class;
         $this->storeRequest = DepartmentRequest::class;
         $this->editRequest = UpdateDepartmentRequest::class;
         $this->indexRequest = IndexRequest::class;
+        $this->cstoreService = $cstoreService;
     }
 
     /**
@@ -75,6 +90,7 @@ class DepartmentController extends AbstractRestAPIController
         }
 
         $model = $this->service->create(array_merge($request->all(), [
+            'is_default' => true,
             'user_uuid' => $request->get('user_uuid') ?? auth()->userId(),
             'app_id' => $request->get('user_uuid') ?? auth()->appId(),
         ]));
@@ -111,6 +127,20 @@ class DepartmentController extends AbstractRestAPIController
         );
     }
 
+    public function indexMy(IndexRequest $request)
+    {
+        $userConfig = $this->userConfigService->findOneWhereOrFail(['user_uuid' => auth()->user()->getKey()]);
+        if ($userConfig->default_department) {
+            $models = $this->service->getIndexMyWithDefault($request);
+        } else {
+            $models = $this->service->getCollectionWithPaginationByCondition($request, ['user_uuid' => auth()->user()->getKey()]);
+        }
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+        );
+    }
+
     /**
      * @param MyDepartmentRequest $request
      * @return JsonResponse
@@ -121,11 +151,15 @@ class DepartmentController extends AbstractRestAPIController
         if (!$this->languageService->checkLanguages($request->name)) {
             return $this->sendValidationFailedJsonResponse();
         }
-
+        $business = $this->getBusiness();
+        if (!$business) {
+            return $this->sendJsonResponse(false, 'Does not have business', [], 403);
+        }
         $model = $this->service->create(array_merge($request->all(), [
             'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ]));
+        $this->cstoreService->storeFolderByType($model->name, $model->uuid, config('foldertypecstore.DEPARTMENT'), $request->get('location_uuid'));
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -204,6 +238,7 @@ class DepartmentController extends AbstractRestAPIController
         foreach ($request->get('department_uuids') as $departmentUuid) {
             $department = $this->service->findOrFailById($departmentUuid);
             $department->update(['location_uuid' => $request->get('location_uuid')]);
+            $this->cstoreService->storeFolderByType($department->name, $department->uuid, config('foldertypecstore.DEPARTMENT'), $request->get('location_uuid'));
         }
 
         return $this->sendOkJsonResponse();
@@ -221,6 +256,30 @@ class DepartmentController extends AbstractRestAPIController
                 $team->update(['department_uuid' => null]);
             }
         }
+
+        return $this->sendOkJsonResponse();
+    }
+
+    /**
+     * @param IndexRequest $request
+     * @param $id
+     * @return JsonResponse
+     */
+    public function getAssignableForProject(IndexRequest $request, $id) {
+        $sendProject = $this->sendProjectService->findOrFailById($id);
+        $locationUuids = $sendProject->business->locations->pluck('uuid');
+        $locationUuids = $locationUuids->toArray() ?? [];
+        $departments = $this->service->getDepartmentsAssignable($locationUuids, $id, $request);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $departments)
+        );
+    }
+
+    public function toggleDefaultDepartment(): JsonResponse
+    {
+        $userConfig = $this->userConfigService->findOneWhereOrFail(['user_uuid' => auth()->user()->getKey()]);
+        $userConfig->update(['default_department' => !$userConfig->default_department]);
 
         return $this->sendOkJsonResponse();
     }
