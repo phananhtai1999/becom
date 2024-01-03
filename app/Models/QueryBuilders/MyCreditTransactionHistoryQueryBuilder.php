@@ -20,7 +20,9 @@ class MyCreditTransactionHistoryQueryBuilder extends AbstractQueryBuilder
             ->join('campaigns', 'campaigns.uuid', '=', 'transactions.campaign_uuid')
             ->where([
                 ['transactions.user_uuid', auth()->userId()],
+                ['transactions.app_id', auth()->appId()],
                 ['campaigns.user_uuid', auth()->userId()],
+                ['campaigns.app_id', auth()->appId()],
                 ['transactions.credit', '!=', '0']
             ]);
     }
