@@ -75,14 +75,10 @@ class CreditHistoryController extends AbstractRestAPIController
     {
         $request = app($this->storeRequest);
 
-        if (empty($request->user_uuid)) {
-            $data = array_merge($request->all(), [
-                'user_uuid' => auth()->userId(),
-                'app_id' => auth()->appId(),
-            ]);
-        } else {
-            $data = $request->all();
-        }
+        $data = array_merge($request->all(), [
+            'user_uuid' => $request->user_uuid ?: auth()->userId(),
+            'app_id' => auth()->appId(),
+        ]);
 
         $model = $this->service->create($data);
 
