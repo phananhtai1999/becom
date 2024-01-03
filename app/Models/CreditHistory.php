@@ -39,7 +39,6 @@ class CreditHistory extends AbstractModel
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
-        'user_uuid' => 'integer',
         'scenario_uuid' => 'integer',
         'campaign_uuid' => 'integer',
     ];

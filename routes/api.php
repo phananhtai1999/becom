@@ -1511,5 +1511,4 @@ Route::group(['middleware' => ['apikey']], function () {
                 Route::get('assigned/article-series', [ArticleSeriesController::class, 'indexMyAssigned']);
             });
         });
-        });
-    });
+ 
