@@ -22,6 +22,7 @@ class DepartmentResource extends AbstractJsonResource
             'names' => $this->names,
             'user_uuid' => $this->user_uuid,
             'is_default' => $this->is_default,
+            'manager_uuid' => $this->manager_uuid,
             'business_uuid' => $this->business_uuid,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
@@ -30,6 +31,10 @@ class DepartmentResource extends AbstractJsonResource
 
         if (\in_array('department__user', $expand)) {
             $data['user'] = new UserResource($this->user);
+        }
+
+        if (\in_array('department__manager', $expand)) {
+            $data['manager'] = new UserResource($this->manager);
         }
 
         if (\in_array('department__user_role', $expand)) {

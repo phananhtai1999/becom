@@ -15,6 +15,7 @@ use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyBusinessManagementRequest;
 use App\Http\Requests\OptionDeleteBusinuessRequest;
 use App\Http\Requests\RemoveBusinessMemberRequest;
+use App\Http\Requests\SetManagerRequest;
 use App\Http\Requests\UpdateBusinessManagementRequest;
 use App\Http\Requests\UpdateMyBusinessManagementRequest;
 use App\Http\Resources\AddOnResourceCollection;
@@ -30,8 +31,10 @@ use App\Models\Team;
 use App\Models\UserBusiness;
 use App\Services\AddOnService;
 use App\Services\BusinessManagementService;
+use App\Services\DepartmentService;
 use App\Services\CstoreService;
 use App\Services\DomainService;
+use App\Services\LocationService;
 use App\Services\MyBusinessManagementService;
 use App\Services\MyDomainService;
 use App\Services\SendProjectService;
@@ -90,7 +93,9 @@ class BusinessManagementController extends AbstractRestAPIController
         UserAddOnService $userAddOnService,
         AddOnService $addOnService,
         SendProjectService          $sendProjectService,
-        CstoreService               $cstoreService
+        CstoreService               $cstoreService,
+        DepartmentService $departmentService,
+        LocationService $locationService
     )
     {
         $this->service = $service;
@@ -100,6 +105,8 @@ class BusinessManagementController extends AbstractRestAPIController
         $this->userBusinessService = $userBusinessService;
         $this->businessManagementService = $businessManagementService;
         $this->sendProjectService = $sendProjectService;
+        $this->departmentService = $departmentService;
+        $this->locationService = $locationService;
         $this->resourceCollectionClass = BusinessManagementResourceCollection::class;
         $this->resourceClass = BusinessManagementResource::class;
         $this->userBusinessResourceClass = UserBusinessResource::class;
@@ -429,5 +436,23 @@ class BusinessManagementController extends AbstractRestAPIController
         $userBusiness->delete();
 
         return $this->sendCreatedJsonResponse();
+    }
+
+    public function setManager(SetManagerRequest $request) {
+        if ($request->get('entity') == 'department') {
+            if (!$this->checkDepartmentOwner($request->get('entity_uuid'))) {
+                return $this->sendBadRequestJsonResponse(['message' => 'You are not owner to set']);
+            }
+            $department = $this->departmentService->findOrFailById($request->get('entity_uuid'));
+            $department->update(['manager_uuid' => $request->get('user_uuid')]);
+        } elseif ($request->get('entity') == 'location') {
+            if (!$this->checkLocationOwner($request->get('entity_uuid'))) {
+                return $this->sendBadRequestJsonResponse(['message' => 'You are not owner to set']);
+            }
+            $location = $this->locationService->findOrFailById($request->get('entity_uuid'));
+            $location->update(['manager_uuid' => $request->get('user_uuid')]);
+        }
+
+        return $this->sendOkJsonResponse();
     }
 }

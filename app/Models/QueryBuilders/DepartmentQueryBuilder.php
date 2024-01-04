@@ -34,6 +34,7 @@ class DepartmentQueryBuilder extends AbstractQueryBuilder
                 'business_uuid',
                 'location_uuid',
                 'is_default',
+                'manager_uuid',
                 'user_uuid'
             ])
             ->defaultSort('-created_at')
@@ -43,6 +44,7 @@ class DepartmentQueryBuilder extends AbstractQueryBuilder
                 'business_uuid',
                 'location_uuid',
                 'is_default',
+                'manager_uuid',
                 'user_uuid'
             ])
             ->allowedFilters([
@@ -60,6 +62,8 @@ class DepartmentQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__teams.uuid', 'teams.uuid'),
                 'is_default',
                 AllowedFilter::exact('exact__is_default', 'is_default'),
+                'manager_uuid',
+                AllowedFilter::exact('exact__manager_uuid', 'manager_uuid'),
                 'user.roles.name',
                 AllowedFilter::exact('exact__user.roles.name', 'user.roles.name'),
                 AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
