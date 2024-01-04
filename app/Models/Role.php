@@ -17,6 +17,7 @@ class Role extends AbstractModel
     const ROLE_ADMIN = 'admin';
     const ROLE_EDITOR = 'editor';
     const ROLE_USER = 'user';
+    const ROLE_USER_MANAGER = 'user_manager';
 
     /**
      * @var string

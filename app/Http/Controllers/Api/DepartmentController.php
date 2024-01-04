@@ -130,11 +130,11 @@ class DepartmentController extends AbstractRestAPIController
 
     public function indexMy(IndexRequest $request)
     {
-        $userConfig = $this->userConfigService->findOneWhereOrFail(['user_uuid' => auth()->user()->getKey()]);
+        $userConfig = $this->userConfigService->findOneWhereOrFail(['user_uuid' => auth()->userId()]);
         if ($userConfig->default_department) {
-            $models = $this->service->getIndexMyWithDefault($request);
+            $models = $this->service->getIndexMyWithDefault($request, true);
         } else {
-            $models = $this->service->getCollectionWithPaginationByCondition($request, ['user_uuid' => auth()->user()->getKey()]);
+            $models = $this->service->getIndexMyWithDefault($request, false);
         }
 
         return $this->sendOkJsonResponse(
