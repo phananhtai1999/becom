@@ -25,6 +25,7 @@ use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Resources\UserBusinessResource;
 use App\Http\Resources\UserBusinessResourceCollection;
+use App\Models\BusinessManagement;
 use App\Models\PlatformPackage;
 use App\Models\Role;
 use App\Models\Team;
@@ -439,13 +440,13 @@ class BusinessManagementController extends AbstractRestAPIController
     }
 
     public function setManager(SetManagerRequest $request) {
-        if ($request->get('entity') == 'department') {
+        if ($request->get('entity') == BusinessManagement::DEPARTMENT_ENTITY) {
             if (!$this->checkDepartmentOwner($request->get('entity_uuid'))) {
                 return $this->sendBadRequestJsonResponse(['message' => 'You are not owner to set']);
             }
             $department = $this->departmentService->findOrFailById($request->get('entity_uuid'));
             $department->update(['manager_uuid' => $request->get('user_uuid')]);
-        } elseif ($request->get('entity') == 'location') {
+        } elseif ($request->get('entity') == BusinessManagement::LOCATION_ENTITY) {
             if (!$this->checkLocationOwner($request->get('entity_uuid'))) {
                 return $this->sendBadRequestJsonResponse(['message' => 'You are not owner to set']);
             }

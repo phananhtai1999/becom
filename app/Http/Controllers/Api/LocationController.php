@@ -126,4 +126,15 @@ class LocationController extends AbstractRestAPIController
 
         return $this->sendOkJsonResponse();
     }
+
+    public function indexMy()
+    {
+        $request = app($this->indexRequest);
+
+        $models = $this->service->getMyIndex($request);
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+        );
+    }
 }

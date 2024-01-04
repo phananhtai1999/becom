@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\BusinessManagement;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -25,7 +26,7 @@ class SetManagerRequest extends FormRequest
     public function rules()
     {
         $validates = [
-            'entity' => ['required', Rule::in(['department', 'location'])],
+            'entity' => ['required', Rule::in([BusinessManagement::DEPARTMENT_ENTITY, BusinessManagement::LOCATION_ENTITY])],
             'user_uuid' => ['required', 'numeric', 'min:1', Rule::exists('users', 'uuid')->whereNull('deleted_at')],
             'entity_uuid' => ['required']
         ];

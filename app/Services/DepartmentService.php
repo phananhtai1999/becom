@@ -46,13 +46,21 @@ class DepartmentService extends AbstractService
         })->get();
     }
 
-    public function getIndexMyWithDefault($request)
+    public function getIndexMyWithDefault($request, $isDefault)
     {
         $indexRequest = $this->getIndexRequest($request);
+        if ($isDefault) {
+            return $this->modelQueryBuilderClass::searchQuery($indexRequest['search'], $indexRequest['search_by'])
+                ->where('user_uuid', auth()->userId())
+                ->orwhere('manager_uuid', auth()->userId())
+                ->orWhere('is_default', $isDefault)
+                ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
+        } else {
+            return $this->modelQueryBuilderClass::searchQuery($indexRequest['search'], $indexRequest['search_by'])
+                ->where('user_uuid', auth()->userId())
+                ->orwhere('manager_uuid', auth()->userId())
+                ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
+        }
 
-        return $this->modelQueryBuilderClass::searchQuery($indexRequest['search'], $indexRequest['search_by'])
-            ->where('user_uuid', auth()->user()->getKey())
-            ->orWhere('is_default', true)
-            ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
     }
 }

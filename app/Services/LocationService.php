@@ -45,4 +45,17 @@ class LocationService extends AbstractService
             $query->where('teams.uuid', $id);
         })->get();
     }
+
+    public function getMyIndex($request)
+    {
+        $indexRequest = $this->getIndexRequest($request);
+
+        return $this->modelQueryBuilderClass::searchQuery($indexRequest['search'], $indexRequest['search_by'])
+            ->where([
+                ['user_uuid', auth()->userId()],
+                ['app_id', auth()->appId()],
+            ])
+            ->orwhere('manager_uuid', auth()->userId())
+            ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
+    }
 }
