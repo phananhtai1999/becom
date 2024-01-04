@@ -33,6 +33,7 @@ class LocationQueryBuilder extends AbstractQueryBuilder
                 'name',
                 'user_uuid',
                 'address',
+                'manager_uuid',
                 'business_uuid'
             ])
             ->defaultSort('-created_at')
@@ -41,6 +42,7 @@ class LocationQueryBuilder extends AbstractQueryBuilder
                 'name',
                 'user_uuid',
                 'address',
+                'manager_uuid',
                 'business_uuid'
             ])
             ->allowedFilters([
@@ -54,6 +56,8 @@ class LocationQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__address', 'address'),
                 'business_uuid',
                 AllowedFilter::exact('exact__business_uuid', 'business_uuid'),
+                'manager_uuid',
+                AllowedFilter::exact('exact__manager_uuid', 'manager_uuid'),
                 'teams.uuid',
                 AllowedFilter::exact('exact__teams.uuid', 'teams.uuid'),
                 'sendProjects.uuid',

@@ -1310,6 +1310,8 @@ Route::group(['middleware' => ['apikey']], function () {
                 Route::put('/my/business-management/{id}', [BusinessManagementController::class, 'editMyBusinessManagement'])->name('edit');
                 Route::delete('/my/business-management/{id}', [BusinessManagementController::class, 'destroyMyBusinessManagement'])->name('destroy');
             });
+
+            Route::post('/set-manager', [BusinessManagementController::class, 'setManager'])->name('setManager');
         });
 
         Route::group(['middleware' => ['userid'], 'as' => 'domain.'], function () {
@@ -1511,4 +1513,3 @@ Route::group(['middleware' => ['apikey']], function () {
                 Route::get('assigned/article-series', [ArticleSeriesController::class, 'indexMyAssigned']);
             });
         });
- 

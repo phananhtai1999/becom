@@ -19,6 +19,7 @@ class Location extends Model
         'user_uuid',
         'address',
         'app_id',
+        'manager_uuid',
         'business_uuid'
     ];
 
@@ -37,6 +38,12 @@ class Location extends Model
     {
         return $this->belongsTo(User::class, 'user_uuid', 'uuid');
     }
+
+    public function manager()
+    {
+        return $this->belongsTo(User::class, 'manager_uuid', 'uuid');
+    }
+
     public function business()
     {
         return $this->belongsTo(BusinessManagement::class, 'business_uuid', 'uuid');

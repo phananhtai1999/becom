@@ -3,6 +3,8 @@
 namespace App\Abstracts;
 
 use App\Models\AddOn;
+use App\Models\Department;
+use App\Models\Location;
 use App\Models\Permission;
 use App\Models\PlatformPackage;
 use App\Models\Role;
@@ -181,7 +183,27 @@ class AbstractRestAPIController extends BaseController
      */
     public function checkTeamOwner($teamId)
     {
-        if (Team::findOrFail($teamId)->owner_uuid != auth()->user()->getKey()) {
+        if (Team::findOrFail($teamId)->owner_uuid != auth()->userId()) {
+
+            return false;
+        }
+
+        return true;
+    }
+
+    public function checkDepartmentOwner($departmentUuid): bool
+    {
+        if (Department::findOrFail($departmentUuid)->user_uuid != auth()->userId()) {
+
+            return false;
+        }
+
+        return true;
+    }
+
+    public function checkLocationOwner($locationUuid): bool
+    {
+        if (Location::findOrFail($locationUuid)->user_uuid != auth()->userId()) {
 
             return false;
         }

@@ -34,6 +34,7 @@ class Department extends AbstractModel
         'location_uuid',
         'user_uuid',
         'app_id',
+        'manager_uuid',
         'is_default',
     ];
 
@@ -73,6 +74,11 @@ class Department extends AbstractModel
     public function user()
     {
         return $this->belongsTo(User::class, 'user_uuid', 'uuid');
+    }
+
+    public function manager()
+    {
+        return $this->belongsTo(User::class, 'manager_uuid', 'uuid');
     }
 
     public function business()
