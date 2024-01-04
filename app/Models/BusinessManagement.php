@@ -12,6 +12,9 @@ class BusinessManagement extends AbstractModel
 {
     use HasFactory, SoftDeletes;
 
+    const DEPARTMENT_ENTITY = 'department';
+    const LOCATION_ENTITY = 'location';
+
     /**
      * @var string
      */
