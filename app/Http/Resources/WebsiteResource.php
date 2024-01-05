@@ -21,6 +21,7 @@ class WebsiteResource extends AbstractJsonResource
             'title' => $this->title,
             'domain_uuid' => $this->domain_uuid,
             'is_active_news_page' => $this->is_active_news_page,
+            'is_active_product_page' => $this->is_active_product_page,
             'header_section_uuid' => $this->header_section_uuid,
             'footer_section_uuid' => $this->footer_section_uuid,
             'user_uuid' => $this->user_uuid,

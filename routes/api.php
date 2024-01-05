@@ -1383,6 +1383,7 @@ Route::group(['middleware' => ['apikey']], function () {
                 Route::put('website/{id}', [WebsiteController::class, 'edit'])->name('edit');
             });
             Route::post('toggle-news-page/{id}', [WebsiteController::class, 'toggleNewsPage'])->name('toggleNewsPage');
+            Route::post('toggle-product-page/{id}', [WebsiteController::class, 'toggleProductPage'])->name('toggleProductPage');
 
             Route::group(['as' => 'my.'], function () {
                 Route::get('my/websites', [WebsiteController::class, 'indexMy'])->name('index');

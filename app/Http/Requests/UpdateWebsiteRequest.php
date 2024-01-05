@@ -80,6 +80,8 @@ class UpdateWebsiteRequest extends FormRequest
             'user_uuid' => ['numeric', Rule::exists('user_profiles', 'uuid')->where(function ($q) {
                 return $q->where('app_id', auth()->appId());
             })->whereNull('deleted_at')]
+            'is_active_news_page' => ['boolean'],
+            'is_active_product_page' => ['boolean'],
         ];
     }
 }
