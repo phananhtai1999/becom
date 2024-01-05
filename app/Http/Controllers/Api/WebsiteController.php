@@ -35,6 +35,7 @@ use App\Services\SectionTemplateService;
 use App\Services\WebsitePageService;
 use App\Services\WebsiteService;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Techup\SiteController\Facades\SiteController;
 
@@ -278,7 +279,7 @@ class WebsiteController extends AbstractRestAPIController
 
     /**
      * @param ChangeStatusWebsiteRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      * @throws \Exception
      */
     public function changeStatusWebsite(ChangeStatusWebsiteRequest $request)
@@ -290,7 +291,7 @@ class WebsiteController extends AbstractRestAPIController
 
     /**
      * @param ChangeStatusWebsiteRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      * @throws \Exception
      */
     public function defaultWebsites(IndexRequest $request)
@@ -414,10 +415,20 @@ class WebsiteController extends AbstractRestAPIController
         }
     }
 
-    public function toggleNewsPage($id)
+    public function toggleNewsPage($id): JsonResponse
     {
         $website = $this->service->findOrFailById($id);
         $website->update(['is_active_news_page' => !$website->is_active_news_page]);
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $website)
+        );
+    }
+
+    public function toggleProductPage($id): JsonResponse
+    {
+        $website = $this->service->findOrFailById($id);
+        $website->update(['is_active_product_page' => !$website->is_active_product_page]);
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $website)

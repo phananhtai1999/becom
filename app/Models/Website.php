@@ -45,6 +45,7 @@ class Website extends AbstractModel
         'tracking_ids',
         'is_active_news_page',
         'app_id',
+        'is_active_product_page',
         'is_default',
     ];
 
@@ -53,6 +54,8 @@ class Website extends AbstractModel
      */
     protected $casts = [
         'is_default' => 'boolean',
+        'is_active_news_page' => 'boolean',
+        'is_active_product_page' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
