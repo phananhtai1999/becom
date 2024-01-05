@@ -223,12 +223,12 @@ class WebsitePageService extends AbstractService
         $replaceArticleService = new ReplaceArticleService();
         $replaceCategoryService = new ReplaceCategoryService();
         $category = $article->articleCategory;
-        $websitePage->template = $replaceArticleService->replaceListArticleSpecific($websitePage->template, $websitePage);
+        $websitePage->html_template = $replaceArticleService->replaceListArticleSpecific($websitePage->html_template, $websitePage);
 
         $searchReplaceMap = $replaceArticleService->searchReplaceMapForArticle($article);
-        $websitePage->template = Str::replace(array_keys($searchReplaceMap), $searchReplaceMap, $websitePage->template);
-        $websitePage->template = $replaceArticleService->replaceRedirectTag($article, $websitePage, $websitePage->template);
-        $replaceCategoryService->replaceCategoryInArticle($websitePage->template, $category);
+        $websitePage->html_template = Str::replace(array_keys($searchReplaceMap), $searchReplaceMap, $websitePage->html_template);
+        $websitePage->html_template = $replaceArticleService->replaceRedirectTag($article, $websitePage, $websitePage->html_template);
+        $replaceCategoryService->replaceCategoryInArticle($websitePage->html_template, $category);
 
         return $websitePage;
     }
@@ -237,14 +237,14 @@ class WebsitePageService extends AbstractService
     {
         $replaceChildrenCategoryService = new ReplaceChildrenCategoryService();
         $replaceCategoryService = new ReplaceCategoryService();
-        $websitePage->template = $replaceChildrenCategoryService->replaceChildrenCategory($websitePage->template, $articleCategory);
+        $websitePage->html_template = $replaceChildrenCategoryService->replaceChildrenCategory($websitePage->html_template, $articleCategory);
 
         $searchArticleReplaceMap = $replaceCategoryService->searchReplaceMapForCategory($articleCategory);
-        $websitePage->template = str_replace(array_keys($searchArticleReplaceMap), $searchArticleReplaceMap, $websitePage->template);
+        $websitePage->html_template = str_replace(array_keys($searchArticleReplaceMap), $searchArticleReplaceMap, $websitePage->html_template);
 
         $replaceArticleService = new ReplaceArticleService();
-        $websitePage->template = $replaceArticleService->replaceListArticleSpecific($websitePage->template, $websitePage);
-        $websitePage->template = $replaceArticleService->replaceListArticle($websitePage->template, $articleCategory, $websitePage);
+        $websitePage->html_template = $replaceArticleService->replaceListArticleSpecific($websitePage->html_template, $websitePage);
+        $websitePage->html_template = $replaceArticleService->replaceListArticle($websitePage->html_template, $articleCategory, $websitePage);
 
         return $websitePage;
     }
@@ -253,8 +253,8 @@ class WebsitePageService extends AbstractService
     {
         $replaceArticleService = new ReplaceArticleService();
         $replaceCategoryService = new ReplaceCategoryService();
-        $websitePage->template = $replaceCategoryService->replaceListCategory($websitePage->template);
-        $websitePage->template = $replaceArticleService->replaceListArticleForPageHome($websitePage->template, $websitePage);
+        $websitePage->html_template = $replaceCategoryService->replaceListCategory($websitePage->html_template);
+        $websitePage->html_template = $replaceArticleService->replaceListArticleForPageHome($websitePage->html_template, $websitePage);
 
         return $websitePage;
     }
@@ -267,9 +267,9 @@ class WebsitePageService extends AbstractService
         $category = $productDetailData['category'];
         $searchReplaceMap = $replaceProductService->searchReplaceMapForProduct($product);
 
-        $websitePage->template = Str::replace(array_keys($searchReplaceMap), $searchReplaceMap, $websitePage->template);
-//        $websitePage->template = $replaceProductService->replaceListProductSpecific($websitePage->template, $websitePage);
-        $replaceProductCategoryService->replaceCategoryInProduct($websitePage->template, $category);
+        $websitePage->html_template = Str::replace(array_keys($searchReplaceMap), $searchReplaceMap, $websitePage->html_template);
+        $websitePage->html_template = $replaceProductService->replaceListProductSpecific($websitePage->html_template, $websitePage);
+        $replaceProductCategoryService->replaceCategoryInProduct($websitePage->html_template, $category);
 
         return $websitePage;
     }
@@ -280,13 +280,13 @@ class WebsitePageService extends AbstractService
         $replaceProductCategoryService = new ReplaceProductCategoryService();
         $category = $productCategoryData['category'];
 
-        $websitePage->template = $replaceChildrenProductCategoryService->replaceChildrenProductCategory($websitePage->template, $category);
+        $websitePage->html_template = $replaceChildrenProductCategoryService->replaceChildrenProductCategory($websitePage->html_template, $category);
 
         $searchProductCategoryReplaceMap = $replaceProductCategoryService->searchReplaceMapForCategory($category);
-        $websitePage->template = str_replace(array_keys($searchProductCategoryReplaceMap), $searchProductCategoryReplaceMap, $websitePage->template);
+        $websitePage->html_template = str_replace(array_keys($searchProductCategoryReplaceMap), $searchProductCategoryReplaceMap, $websitePage->html_template);
         $replaceProductService = new ReplaceProductService();
-        $websitePage->template = $replaceProductService->replaceListProductSpecific($websitePage->template, $websitePage);
-        $websitePage->template = $replaceProductService->replaceListProduct($websitePage->template, $category, $websitePage);
+        $websitePage->html_template = $replaceProductService->replaceListProductSpecific($websitePage->html_template, $websitePage);
+        $websitePage->html_template = $replaceProductService->replaceListProduct($websitePage->html_template, $category, $websitePage);
 
         return $websitePage;
     }
@@ -295,9 +295,9 @@ class WebsitePageService extends AbstractService
     {
         $replaceProductService = new ReplaceProductService();
         $replaceProductCategoryService = new ReplaceProductCategoryService();
-        $websitePage->template = $replaceProductCategoryService->replaceListProductCategory($websitePage->template);
+        $websitePage->html_template = $replaceProductCategoryService->replaceListProductCategory($websitePage->html_template);
 
-        $websitePage->template = $replaceProductService->replaceListProductForPageHome($websitePage->template, $websitePage);
+        $websitePage->html_template = $replaceProductService->replaceListProductForPageHome($websitePage->html_template, $websitePage);
 
         return $websitePage;
     }

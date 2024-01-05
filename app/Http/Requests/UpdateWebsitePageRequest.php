@@ -30,7 +30,9 @@ class UpdateWebsitePageRequest extends AbstractRequest
         return [
             'title' => ['string'],
             'slug' => ['string'],
-            'template' => ['string'],
+            'html_template' => ['string'],
+            'css_template' => ['string'],
+            'js_template' => ['string'],
             'template_json' => ['string'],
             'website_page_category_uuid' => ['numeric', Rule::exists('website_page_categories','uuid')->whereNull('deleted_at')],
             'type' => ['string', Rule::in(WebsitePage::STATIC_TYPE,WebsitePage::ARTICLE_DETAIL_TYPE, WebsitePage::ARTICLE_CATEGORY_TYPE, WebsitePage::HOME_ARTICLES_TYPE)],

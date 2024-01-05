@@ -35,8 +35,7 @@ class ReplaceProductService extends ShopService
         $pattern = '/data-product-count="(\d+)"/';
         preg_match_all($pattern, $template, $matches);
         $numbers = array_map('intval', $matches[1]);
-        $articleCount = array_sum($numbers);
-        $articleCount = isset($articleCount) ? (int)$articleCount : 10;
+        $productCount = array_sum($numbers);
 
         //get orderby
         preg_match('/product-sort="(.*?)"/', $template, $sortName);
@@ -51,11 +50,11 @@ class ReplaceProductService extends ShopService
         $pattern = '/<product-element.*?>(.*?)<\/product-element>/s';
         return preg_replace_callback($pattern, function ($matches) use ($productsData, $websitePage) {
             $productData = array_shift($productsData);
-dd($productData);
+
             if (!$productData) {
                 return $matches[0];
             }
-            //replace slug
+
             $category = $productData['category'];
             $replaceProductCategoryService = new ReplaceProductCategoryService();
             $replaceProductCategoryService->replaceCategoryInProduct($matches[0], $category);
