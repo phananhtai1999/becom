@@ -48,7 +48,9 @@ class WebsitePage extends AbstractModel
      */
     protected $fillable = [
         'title',
-        'template',
+        'html_template',
+        'css_template',
+        'js_template',
         'template_json',
         'user_uuid',
         'type',
