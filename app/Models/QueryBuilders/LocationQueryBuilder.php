@@ -25,7 +25,7 @@ class LocationQueryBuilder extends AbstractQueryBuilder
      */
     public static function initialQuery()
     {
-        $modelKeyName = (new Group())->getKeyName();
+        $modelKeyName = (new Location())->getKeyName();
 
         return static::for(static::baseQuery())
             ->allowedFields([
