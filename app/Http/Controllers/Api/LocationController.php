@@ -103,7 +103,8 @@ class LocationController extends AbstractRestAPIController
             return $this->sendJsonResponse(false, 'Does not have business', [], 403);
         }
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => auth()->user()->getkey(),
+            'user_uuid' => auth()->userId(),
+            'app_id' => auth()->appId(),
             'business_uuid' => $business->uuid
         ]));
 

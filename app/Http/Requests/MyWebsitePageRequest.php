@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
+use App\Models\WebsitePage;
 use Illuminate\Validation\Rule;
 
 class MyWebsitePageRequest extends AbstractRequest
@@ -27,7 +28,9 @@ class MyWebsitePageRequest extends AbstractRequest
         return [
             'title' => ['required', 'string'],
             'slug' => ['nullable', 'string'],
-            'template' => ['required', 'string'],
+            'html_template' => ['required', 'string'],
+            'css_template' => ['required', 'string'],
+            'js_template' => ['required', 'string'],
             'template_json' => ['required', 'string'],
             'website_page_category_uuid' => ['required', 'numeric', Rule::exists('website_page_categories','uuid')->whereNull('deleted_at')],
             'publish_status' => ['required', 'numeric', 'min:1', 'max:2'],
