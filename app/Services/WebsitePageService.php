@@ -260,10 +260,12 @@ class WebsitePageService extends AbstractService
     }
 
 
-    public function renderContentForNewsHome($websitePage)
+    public function renderContentForNewsHeader($websitePage)
     {
         $replaceCategoryService = new ReplaceCategoryService();
-        $websitePage->template = $replaceCategoryService->replaceListCategoryMenu($websitePage->template);
+        $websitePage->html_template = $replaceCategoryService->replaceListCategoryMenu($websitePage->html_template);
+
+        return $websitePage;
     }
 
     public function renderContentForProductDetail($websitePage, $productDetailData)
@@ -305,6 +307,14 @@ class WebsitePageService extends AbstractService
         $websitePage->html_template = $replaceProductCategoryService->replaceListProductCategory($websitePage->html_template);
 
         $websitePage->html_template = $replaceProductService->replaceListProductForPageHome($websitePage->html_template, $websitePage);
+
+        return $websitePage;
+    }
+
+    public function renderContentForProductHeader($websitePage)
+    {
+        $replaceProductCategoryService = new ReplaceProductCategoryService();
+        $websitePage->template = $replaceProductCategoryService->replaceListProductCategoryMenu($websitePage->template);
 
         return $websitePage;
     }
