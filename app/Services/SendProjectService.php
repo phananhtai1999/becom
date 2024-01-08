@@ -65,7 +65,7 @@ class SendProjectService extends AbstractService
 
         return SendProjectQueryBuilder::searchQuery($indexRequest['search'], $indexRequest['search_by'])
             ->where(function ($query) use ($teams) {
-                $query->where('user_uuid', auth()->user()->getKey())
+                $query->where('user_uuid', auth()->userId())
                     ->orWhereHas('teams', function ($q) use ($teams) {
                         $q->whereIn('teams.uuid', $teams);
                     });
