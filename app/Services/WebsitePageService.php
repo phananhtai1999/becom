@@ -259,6 +259,13 @@ class WebsitePageService extends AbstractService
         return $websitePage;
     }
 
+
+    public function renderContentForNewsHome($websitePage)
+    {
+        $replaceCategoryService = new ReplaceCategoryService();
+        $websitePage->template = $replaceCategoryService->replaceListCategoryMenu($websitePage->template);
+    }
+
     public function renderContentForProductDetail($websitePage, $productDetailData)
     {
         $replaceProductService = new ReplaceProductService();

@@ -25,6 +25,8 @@ class MyWebsitePageRequest extends AbstractRequest
      */
     public function rules()
     {
+        $website = new WebsitePage();
+
         return [
             'title' => ['required', 'string'],
             'slug' => ['nullable', 'string'],
@@ -32,6 +34,9 @@ class MyWebsitePageRequest extends AbstractRequest
             'css_template' => ['required', 'string'],
             'js_template' => ['required', 'string'],
             'template_json' => ['required', 'string'],
+            'type' => ['required', 'string', Rule::in(
+                $website->getTypeWebsitePage()
+            )],
             'website_page_category_uuid' => ['required', 'numeric', Rule::exists('website_page_categories','uuid')->whereNull('deleted_at')],
             'publish_status' => ['required', 'numeric', 'min:1', 'max:2'],
             'display_type' => ['required', 'string', 'in:page,in_page'],

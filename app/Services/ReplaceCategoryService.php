@@ -9,12 +9,10 @@ use Illuminate\Support\Str;
 class ReplaceCategoryService extends ReplaceChildrenCategoryService
 {
     public function replaceListCategory($template) {
-        preg_match('/data-category-count="(\d+)"/', $template, $categoryCount);
-        $categoryCount = isset($categoryCount[1]) ? (int)$categoryCount[1] : 10;
-
-        //get orderby
-        preg_match('/category-sort="(.*?)"/', $template, $sortName);
-        preg_match('/category-sort-order="(.*?)"/', $template, $sortOrder);
+        $categoryCount = $this->searchCategoryCount($template);
+        $sortName = $this->searchCategorySort($template);
+        $sortOrder = $this->searchCategorySortOrder($template);
+        
         $categoriesData = ArticleCategory::where('parent_uuid', null)->orderBy($sortName[1] ?? 'created_at', $sortOrder[1] ?? 'DESC')->paginate($categoryCount);
         return preg_replace_callback('/<category-element.*?>(.*?)<\/category-element>/s', function ($matches) use ($categoriesData) {
             $categoryData = $categoriesData->shift();
@@ -40,11 +38,57 @@ class ReplaceCategoryService extends ReplaceChildrenCategoryService
         }, $template);
     }
 
+
+    public function replaceListCategoryMenu($template)
+    {
+        $categoryCount = $this->searchCategoryCount($template);
+        $sortName = $this->searchCategorySort($template);
+        $sortOrder = $this->searchCategorySortOrder($template);
+
+        $categoriesData = ArticleCategory::where('parent_uuid', null)->orderBy($sortName[1] ?? 'created_at', $sortOrder[1] ?? 'DESC')->paginate($categoryCount);
+        return preg_replace_callback('/<category-element.*?>(.*?)<\/category-element>/s', function ($matches) use ($categoriesData) {
+            $categoryData = $categoriesData->shift();
+
+            if (!$categoryData) {
+                return $matches[0];
+            }
+
+            $searchReplaceMap = $this->searchReplaceMapForCategory($categoryData);
+            $matches[0] = str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $matches[0]);
+            $matches[0] = $this->replacechildrenCategory($matches[0], $categoryData);
+
+            return $matches[0];
+        }, $template);
+    }
+
     public function replaceCategoryInArticle($articleTemplate, $category) {
         $searchReplaceMap = $this->searchReplaceMapForCategory($category);
 
         return str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $articleTemplate);
     }
+
+
+    public function searchCategoryCount($template): int
+    {
+        preg_match('/data-category-count="(\d+)"/', $template, $categoryCount);
+
+        return isset($categoryCount[1]) ? (int)$categoryCount[1] : 10;
+    }
+
+    public function searchCategorySort($template)
+    {
+        preg_match('/category-sort="(.*?)"/', $template, $sortName);
+
+        return $sortName;
+    }
+
+    public function searchCategorySortOrder($template)
+    {
+        preg_match('/category-sort-order="(.*?)"/', $template, $sortOrder);
+
+        return $sortOrder;
+    }
+
 
     public function searchReplaceMapForCategory($articleCategory = null)
     {

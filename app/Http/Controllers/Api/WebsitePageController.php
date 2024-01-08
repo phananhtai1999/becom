@@ -123,6 +123,9 @@ class WebsitePageController extends AbstractRestAPIController
         } elseif ($websitePage->type == WebsitePage::HOME_ARTICLES_TYPE) {
             $websitePage = $this->service->renderContentForHomeArticles($websitePage);
             $response = $this->sendOkJsonResponse(['data' => $websitePage]);
+        } elseif ($websitePage->type == WebsitePage::NEWS_HEADER_TYPE) {
+            $websitePage = $this->service->renderContentForNewsHome($websitePage);
+            $response = $this->sendOkJsonResponse(['data' => $websitePage]);
         }
 
         return $response;
