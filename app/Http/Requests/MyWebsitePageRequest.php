@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
+use App\Models\WebsitePage;
 use Illuminate\Validation\Rule;
 
 class MyWebsitePageRequest extends AbstractRequest

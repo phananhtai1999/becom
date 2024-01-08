@@ -12,8 +12,8 @@ class ReplaceCategoryService extends ReplaceChildrenCategoryService
         $categoryCount = $this->searchCategoryCount($template);
         $sortName = $this->searchCategorySort($template);
         $sortOrder = $this->searchCategorySortOrder($template);
-        
-        $categoriesData = ArticleCategory::where('parent_uuid', null)->orderBy($sortName[1] ?? 'created_at', $sortOrder[1] ?? 'DESC')->paginate($categoryCount);
+
+        $categoriesData = ArticleCategory::where('parent_uuid', null)->orderBy($sortName, $sortOrder)->paginate($categoryCount);
         return preg_replace_callback('/<category-element.*?>(.*?)<\/category-element>/s', function ($matches) use ($categoriesData) {
             $categoryData = $categoriesData->shift();
 
@@ -45,17 +45,16 @@ class ReplaceCategoryService extends ReplaceChildrenCategoryService
         $sortName = $this->searchCategorySort($template);
         $sortOrder = $this->searchCategorySortOrder($template);
 
-        $categoriesData = ArticleCategory::where('parent_uuid', null)->orderBy($sortName[1] ?? 'created_at', $sortOrder[1] ?? 'DESC')->paginate($categoryCount);
+        $categoriesData = ArticleCategory::where('parent_uuid', null)->orderBy($sortName, $sortOrder)->paginate($categoryCount);
+
         return preg_replace_callback('/<category-element.*?>(.*?)<\/category-element>/s', function ($matches) use ($categoriesData) {
             $categoryData = $categoriesData->shift();
-
             if (!$categoryData) {
                 return $matches[0];
             }
 
             $searchReplaceMap = $this->searchReplaceMapForCategory($categoryData);
             $matches[0] = str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $matches[0]);
-            $matches[0] = $this->replacechildrenCategory($matches[0], $categoryData);
 
             return $matches[0];
         }, $template);
@@ -79,14 +78,14 @@ class ReplaceCategoryService extends ReplaceChildrenCategoryService
     {
         preg_match('/category-sort="(.*?)"/', $template, $sortName);
 
-        return $sortName;
+        return $sortName[1] ?? 'created_at';
     }
 
     public function searchCategorySortOrder($template)
     {
         preg_match('/category-sort-order="(.*?)"/', $template, $sortOrder);
 
-        return $sortOrder;
+        return $sortOrder[1] ?? 'DESC';
     }
 
 

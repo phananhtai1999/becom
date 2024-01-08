@@ -124,7 +124,7 @@ class WebsitePageController extends AbstractRestAPIController
             $websitePage = $this->service->renderContentForHomeArticles($websitePage);
             $response = $this->sendOkJsonResponse(['data' => $websitePage]);
         } elseif ($websitePage->type == WebsitePage::NEWS_HEADER_TYPE) {
-            $websitePage = $this->service->renderContentForNewsHome($websitePage);
+            $websitePage = $this->service->renderContentForNewsHeader($websitePage);
             $response = $this->sendOkJsonResponse(['data' => $websitePage]);
         }
 
@@ -145,8 +145,11 @@ class WebsitePageController extends AbstractRestAPIController
             $productCategoryData = $this->shopService->getProductCategoryData($request->get('product_category_slug'));
             $websitePage = $this->service->renderContentForProductCategory($websitePage, $productCategoryData);
             $response = $this->sendOkJsonResponse(['data' => $websitePage]);
-        } elseif ($websitePage->type == WebsitePage::HOME_PRODUCT_TYPE) {
+        } elseif ($websitePage->type == WebsitePage::HOME_PRODUCTS_TYPE) {
             $websitePage = $this->service->renderContentForHomeProducts($websitePage);
+            $response = $this->sendOkJsonResponse(['data' => $websitePage]);
+        } elseif ($websitePage->type == WebsitePage::PRODUCT_HEADER_TYPE) {
+            $websitePage = $this->service->renderContentForProductHeader($websitePage);
             $response = $this->sendOkJsonResponse(['data' => $websitePage]);
         }
 

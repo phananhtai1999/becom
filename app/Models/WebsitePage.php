@@ -32,6 +32,7 @@ class WebsitePage extends AbstractModel
     const PRODUCT_DETAIL_TYPE = 'product.product_detail';
     const PRODUCT_CATEGORY_TYPE = 'product.product_category';
     const HOME_PRODUCTS_TYPE = 'product.home_products';
+    const PRODUCT_HEADER_TYPE = 'product.header';
 
 
     /**
@@ -142,7 +143,8 @@ class WebsitePage extends AbstractModel
             self::NEWS_HEADER_TYPE,
             self::PRODUCT_DETAIL_TYPE,
             self::PRODUCT_CATEGORY_TYPE,
-            self::HOME_PRODUCTS_TYPE
+            self::HOME_PRODUCTS_TYPE,
+            self::PRODUCT_HEADER_TYPE
         ];
     }
 }
