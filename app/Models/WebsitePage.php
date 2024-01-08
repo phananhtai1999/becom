@@ -27,9 +27,12 @@ class WebsitePage extends AbstractModel
     const ARTICLE_DETAIL_TYPE = 'news.article_detail';
     const ARTICLE_CATEGORY_TYPE = 'news.article_category';
     const HOME_ARTICLES_TYPE = 'news.home_articles';
+    const NEWS_HEADER_TYPE = 'news.header';
+
     const PRODUCT_DETAIL_TYPE = 'product.product_detail';
     const PRODUCT_CATEGORY_TYPE = 'product.product_category';
-    const HOME_PRODUCT_TYPE = 'product.home_products';
+    const HOME_PRODUCTS_TYPE = 'product.home_products';
+
 
     /**
      * @var string
@@ -127,5 +130,19 @@ class WebsitePage extends AbstractModel
     public function getDescriptionsAttribute()
     {
         return $this->description ? $this->getTranslations('description') : $this->description;
+    }
+
+    public function getTypeWebsitePage() {
+        return [
+            self::STATIC_TYPE,
+            self::ARTICLE_DETAIL_TYPE,
+            self::ARTICLE_CATEGORY_TYPE,
+            self::HOME_ARTICLES_TYPE,
+            self::HOME_ARTICLES_TYPE,
+            self::NEWS_HEADER_TYPE,
+            self::PRODUCT_DETAIL_TYPE,
+            self::PRODUCT_CATEGORY_TYPE,
+            self::HOME_PRODUCTS_TYPE
+        ];
     }
 }
