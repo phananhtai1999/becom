@@ -281,7 +281,7 @@ class DepartmentController extends AbstractRestAPIController
 
     public function toggleDefaultDepartment(): JsonResponse
     {
-        $userConfig = $this->userConfigService->findOneWhereOrFail(['user_uuid' => auth()->user()->getKey()]);
+        $userConfig = $this->userConfigService->findOneWhereOrFail(['user_uuid' => auth()->userId()]);
         $userConfig->update(['default_department' => !$userConfig->default_department]);
 
         return $this->sendOkJsonResponse();

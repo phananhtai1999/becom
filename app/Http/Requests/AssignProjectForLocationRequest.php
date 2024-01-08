@@ -26,7 +26,7 @@ class AssignProjectForLocationRequest extends FormRequest
     {
         return [
             'send_project_uuid'  => ['required', 'numeric', Rule::exists('send_projects', 'uuid')->where(function ($query) {
-                return $query->where('user_uuid', auth()->user()->getKey())
+                return $query->where('user_uuid', auth()->userId())
                     ->whereNull('deleted_at');
             })],
             'location_uuids' => ['required', 'array'],

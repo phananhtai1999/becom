@@ -136,9 +136,9 @@ class TeamController extends Controller
     public function indexMy(IndexRequest $request)
     {
         if ($request->get('sort') == 'num_of_team_member' || $request->get('sort') == '-num_of_team_member') {
-            $models = $this->myService->sortByNumOfTeamMember($request);
+            $models = $this->service->sortByNumOfTeamMemberForMy($request);
         } else {
-            $models = $this->myService->getCollectionWithPagination();
+            $models = $this->service->getCollectionWithPaginationByCondition($request, ['owner_uuid' => auth()->userId()]);
         }
 
         return $this->sendOkJsonResponse(
@@ -306,7 +306,7 @@ class TeamController extends Controller
             'app_id' => auth()->appId(),
         ]));
 
-        $this->cstoreService->storeFolderByType(auth()->user()->username, auth()->user()->getkey(), config('foldertypecstore.USER'), $request->get('team_uuid'));
+        $this->cstoreService->storeFolderByType(auth()->user()->username, auth()->userId(), config('foldertypecstore.USER'), $request->get('team_uuid'));
 
 
         return $this->sendCreatedJsonResponse(

@@ -18,12 +18,29 @@ class TeamService extends AbstractService
         $indexRequest = $this->getIndexRequest($request);
         if ($request->get('sort') == 'num_of_team_member') {
             $result = TeamQueryBuilder::searchQuery($indexRequest['search'], $indexRequest['search_by'])
-                ->where('user_uuid', auth()->user()->getKey())
                 ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page'])
                 ->sortBy('num_of_team_member');
         } elseif ($request->get('sort') == '-num_of_team_member') {
             $result = TeamQueryBuilder::searchQuery($indexRequest['search'], $indexRequest['search_by'])
-                ->where('user_uuid', auth()->user()->getKey())
+                ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page'])
+                ->sortByDesc('num_of_team_member');
+        }
+
+        return $this->collectionPagination($result, $indexRequest['per_page'], $indexRequest['page']);
+    }
+
+
+    public function sortByNumOfTeamMemberForMy($request)
+    {
+        $indexRequest = $this->getIndexRequest($request);
+        if ($request->get('sort') == 'num_of_team_member') {
+            $result = TeamQueryBuilder::searchQuery($indexRequest['search'], $indexRequest['search_by'])
+                ->where('owner_uuid', auth()->userId())
+                ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page'])
+                ->sortBy('num_of_team_member');
+        } elseif ($request->get('sort') == '-num_of_team_member') {
+            $result = TeamQueryBuilder::searchQuery($indexRequest['search'], $indexRequest['search_by'])
+                ->where('owner_uuid', auth()->userId())
                 ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page'])
                 ->sortByDesc('num_of_team_member');
         }

@@ -36,7 +36,7 @@ class SendProjectRequest extends AbstractRequest
                     ->whereNull('deleted_at');
             })],
             'business_uuid' => ['required', 'numeric', Rule::exists('business_managements', 'uuid')->where(function ($query) {
-                return $query->where('owner_uuid', $this->request->get('user_uuid') ?? auth()->user()->getKey())
+                return $query->where('owner_uuid', $this->request->get('user_uuid') ?? auth()->userId())
                     ->whereNull('deleted_at');
             })],
             'name' => ['required', 'string'],

@@ -149,7 +149,7 @@ class BusinessManagementController extends AbstractRestAPIController
         $this->sendProjectService->create([
             'domain' => $request->get('domain'),
             'business_uuid' => $model->uuid,
-            'user_uuid' =>  $request->get('owner_uuid') ?? auth()->user()->getKey(),
+            'user_uuid' =>  $request->get('owner_uuid') ?? auth()->userId(),
             'name' => $request->get('name'),
             'logo' => $request->get('avatar'),
             'description' => $request->get('introduce'),
@@ -221,7 +221,7 @@ class BusinessManagementController extends AbstractRestAPIController
         $this->sendProjectService->create([
             'domain' => $request->get('domain'),
             'business_uuid' => $model->uuid,
-            'user_uuid' => auth()->user()->getKey(),
+            'user_uuid' => auth()->userId(),
             'name' => $request->get('name'),
             'logo' => $request->get('avatar'),
             'description' => $request->get('introduce'),
