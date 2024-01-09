@@ -108,9 +108,8 @@ class ArticleCategory extends AbstractModel
     /**
      * @return BelongsTo
      */
-    public function user()
-    {
-        return $this->belongsTo(User::class, 'user_uuid', 'uuid');
+    public function user() {
+        return $this->belongsTo(UserProfile::class, 'user_uuid', 'user_uuid');
     }
 
     /**

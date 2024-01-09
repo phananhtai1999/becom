@@ -48,7 +48,8 @@ class BillingAddress extends Model
         'deleted_at' => 'datetime',
     ];
 
-    public function user() {
-        return $this->belongsTo(User::class, 'user_uuid', 'uuid');
+    public function user()
+    {
+        return $this->belongsTo(UserProfile::class, 'user_uuid', 'user_uuid');
     }
 }

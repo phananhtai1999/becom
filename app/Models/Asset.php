@@ -58,6 +58,6 @@ class Asset extends Model
 
     public function user()
     {
-        return $this->hasOne(User::class, 'uuid', 'user_uuid');
+        return $this->belongsTo(UserProfile::class, 'user_uuid', 'user_uuid');
     }
 }

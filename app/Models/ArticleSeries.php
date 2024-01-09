@@ -227,7 +227,7 @@ class ArticleSeries extends AbstractModel
      */
     public function user()
     {
-        return $this->belongsTo(User::class, 'assigned_ids', 'uuid');
+        return $this->belongsTo(UserProfile::class, 'assigned_ids', 'user_uuid');
     }
 
     /**

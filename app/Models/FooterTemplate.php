@@ -61,7 +61,7 @@ class FooterTemplate extends AbstractModel
      */
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_uuid', 'uuid');
+        return $this->belongsTo(UserProfile::class, 'user_uuid', 'user_uuid');
     }
 
     /**
@@ -69,7 +69,8 @@ class FooterTemplate extends AbstractModel
      */
     public function activeBy()
     {
-        return $this->belongsTo(User::class, 'active_by_uuid', 'uuid');
+        return $this->belongsTo(UserProfile::class, 'active_by_uuid', 'user_uuid');
+
     }
 
     public function scopeGetFooterByRole(Builder $query, $role)

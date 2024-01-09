@@ -54,7 +54,8 @@ class Team extends AbstractModel
     ];
     public function owner()
     {
-        return $this->belongsTo(User::class, 'owner_uuid', 'uuid');
+        return $this->belongsTo(UserProfile::class, 'owner_uuid', 'user_uuid');
+
     }
 
     public function childrenTeam()

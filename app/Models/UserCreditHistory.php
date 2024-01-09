@@ -45,7 +45,7 @@ class UserCreditHistory extends AbstractModel
      */
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_uuid', 'uuid');
+        return $this->belongsTo(UserProfile::class, 'user_uuid', 'user_uuid');
     }
 
     /**
@@ -53,6 +53,6 @@ class UserCreditHistory extends AbstractModel
      */
     public function add_by()
     {
-        return $this->belongsTo(User::class, 'add_by_uuid', 'uuid');
+        return $this->belongsTo(UserProfile::class, 'add_by_uuid', 'user_uuid');
     }
 }
