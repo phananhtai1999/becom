@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Abstracts;
-
+use Techup\ApiConfig\Services\ConfigService;
 use GuzzleHttp\Client;
 use Techup\ApiConfig\Models\Config;
 use Illuminate\Contracts\Foundation\Application;
@@ -235,16 +235,7 @@ abstract class AbstractService
 
     public function getConfigByKeyInCache($key)
     {
-        $configs = Cache::rememberForever('config', function () {
-            return Config::all();
-        });
-        foreach ($configs as $config) {
-            if ($config->key == $key) {
-                return $config;
-            }
-        }
-
-        return false;
+        return app(ConfigService::class)->findConfigByKey($key);
     }
 
     public function getCollectionByUserIdAndAppIdWithPagination($request)

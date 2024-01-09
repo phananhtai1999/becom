@@ -13,10 +13,10 @@ class Role extends AbstractModel
 {
     use HasFactory, SoftDeletes, HasSlug;
 
-    const ROLE_ROOT = 'root';
-    const ROLE_ADMIN = 'admin';
-    const ROLE_EDITOR = 'editor';
-    const ROLE_USER = 'user';
+    const ROLE_ROOT = 'app_system';
+    const ROLE_ADMIN = 'app_admin';
+    const ROLE_EDITOR = 'app_editor';
+    const ROLE_USER = 'app_user';
     const ROLE_USER_MANAGER = 'user_manager';
 
     /**
