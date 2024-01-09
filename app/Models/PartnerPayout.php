@@ -51,7 +51,7 @@ class PartnerPayout extends AbstractModel
      */
     public function byUser()
     {
-        return $this->belongsTo(User::class, 'by_user_uuid', 'uuid');
+        return $this->belongsTo(UserProfile::class, 'by_user_uuid', 'user_uuid');
     }
 
     public function partner()

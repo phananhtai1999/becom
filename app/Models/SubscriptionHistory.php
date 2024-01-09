@@ -52,7 +52,7 @@ class SubscriptionHistory extends Model
         return $this->belongsTo(PaymentMethod::class, 'payment_method_uuid', 'uuid');
     }
     public function user() {
-        return $this->belongsTo(User::class, 'user_uuid', 'uuid');
+        return $this->belongsTo(UserProfile::class, 'user_uuid', 'user_uuid');
     }
     public function invoice() {
         return $this->hasOne(Invoice::class, 'uuid', 'invoice_uuid');

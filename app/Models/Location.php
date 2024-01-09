@@ -36,12 +36,12 @@ class Location extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_uuid', 'uuid');
+        return $this->belongsTo(\Techup\ApiBase\Models\UserProfile::class, 'user_uuid', 'user_uuid');
     }
 
     public function manager()
     {
-        return $this->belongsTo(User::class, 'manager_uuid', 'uuid');
+        return $this->belongsTo(\Techup\ApiBase\Models\UserProfile::class, 'manager_uuid', 'user_uuid');
     }
 
     public function business()

@@ -34,6 +34,10 @@ class UserResource extends AbstractJsonResource
             'cover_img_absolute' => $this->cover_img_absolute,
             'platform_package' => $this->platform_package,
             'team' => $this->team,
+            'app_id' => $this->app_id,
+            'user_uuid' => $this->user_uuid,
+            'email_verified_at' => $this->email_verified_at,
+            'email_verification_code' => $this->email_verification_code,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at

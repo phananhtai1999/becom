@@ -56,7 +56,7 @@ class BusinessManagement extends AbstractModel
      */
     public function user()
     {
-        return $this->belongsTo(User::class, 'owner_uuid', 'uuid');
+        return $this->belongsTo(UserProfile::class, 'user_uuid', 'user_uuid');
     }
 
     /**
