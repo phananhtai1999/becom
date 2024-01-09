@@ -189,7 +189,7 @@ class SendProjectController extends AbstractRestAPIController
      */
     public function showMySendProject($id)
     {
-        $model = $this->myService->showMyWebsite($id);
+        $model = $this->service->showMyWebsite($id);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -203,7 +203,7 @@ class SendProjectController extends AbstractRestAPIController
      */
     public function editMySendProject(UpdateMySendProjectRequest $request, $id)
     {
-        $model = $this->myService->showMyWebsite($id);
+        $model = $this->service->showMyWebsite($id);
 
         $this->service->update($model, array_merge($request->all(), [
             'user_uuid' => auth()->userId(),
@@ -222,7 +222,7 @@ class SendProjectController extends AbstractRestAPIController
     public function destroyMySendProject($id)
     {
         if (!$this->service->checkExistsWebisteInTables($id)) {
-            $this->myService->deleteMyWebsite($id);
+            $this->service->deleteMyWebsite($id);
 
             return $this->sendOkJsonResponse();
         }

@@ -72,4 +72,24 @@ class SendProjectService extends AbstractService
             })
             ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
     }
+
+    public function showMyWebsite($id)
+    {
+        return $this->findOneWhereOrFail([
+            ['user_uuid', auth()->userId()],
+            ['app_id', auth()->appId()],
+            ['uuid', $id]
+        ]);
+    }
+
+    /**
+     * @param $id
+     * @return mixed
+     */
+    public function deleteMyWebsite($id)
+    {
+        $website = $this->showMyWebsite($id);
+
+        return $this->destroy($website->getKey());
+    }
 }
