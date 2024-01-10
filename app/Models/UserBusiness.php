@@ -44,7 +44,7 @@ class UserBusiness extends Model
 
     public function user()
     {
-        return $this->hasOne(User::class, 'uuid', 'user_uuid');
+        return $this->hasOne(UserProfile::class, 'user_uuid', 'user_uuid');
     }
 
     public function business()

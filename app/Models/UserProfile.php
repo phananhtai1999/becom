@@ -84,4 +84,9 @@ class UserProfile extends \Techup\ApiBase\Models\UserProfile
     {
         return !empty($this->cover_img) ? Storage::disk('s3')->url($this->cover_img) : null;
     }
+
+    public function teams()
+    {
+        return $this->belongsToMany(Team::class, 'user_teams', 'user_uuid', 'team_uuid')->withTimestamps()->where('user_teams.app_id', auth()->appId());
+    }
 }
