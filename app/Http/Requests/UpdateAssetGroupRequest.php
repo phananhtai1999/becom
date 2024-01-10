@@ -2,9 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Abstracts\AbstractRequest;
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateAssetGroupRequest extends FormRequest
+class UpdateAssetGroupRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.

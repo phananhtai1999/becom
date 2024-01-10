@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Abstracts\AbstractRequest;
 
-class removeTeamMemberRequest extends FormRequest
+class removeTeamMemberRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.

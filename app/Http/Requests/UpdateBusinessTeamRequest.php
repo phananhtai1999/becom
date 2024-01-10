@@ -2,11 +2,12 @@
 
 namespace App\Http\Requests;
 
+use App\Abstracts\AbstractRequest;
 use App\Models\Role;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class UpdateBusinessTeamRequest extends FormRequest
+class UpdateBusinessTeamRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.

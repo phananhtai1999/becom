@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Abstracts\AbstractRequest;
 use App\Models\Role;
 use App\Models\UserBusiness;
 use App\Rules\InviteRule;
@@ -10,7 +11,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
-class AddBusinessMemberRequest extends FormRequest
+class AddBusinessMemberRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -40,7 +41,7 @@ class AddBusinessMemberRequest extends FormRequest
             $validate['user_uuids'] = ['required', 'array', 'min:1'];
             $validate['user_uuids.*'] = ['required', 'integer', 'min:1', Rule::exists('user_profiles', 'uuid')->where(function ($q) {
                 return $q->where('app_id', auth()->appId());
-            })->whereNull('deleted_at')];
+            })];
         } elseif ($this->request->get('type') == UserBusiness::ACCOUNT_INVITE) {
             $validate = array_merge($validate, [
                 'username' => ['required', 'string', "regex:/^(?!.*\.\.)[a-zA-Z0-9]*(?:\.[a-zA-Z0-9]+)*$/", Rule::unique('user_profiles', 'username')->where(function ($q) {

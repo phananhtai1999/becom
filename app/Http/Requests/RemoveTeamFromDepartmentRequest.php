@@ -2,10 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\Abstracts\AbstractRequest;
 use App\Rules\CheckDepartmentOwnerRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class RemoveTeamFromDepartmentRequest extends FormRequest
+class RemoveTeamFromDepartmentRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.

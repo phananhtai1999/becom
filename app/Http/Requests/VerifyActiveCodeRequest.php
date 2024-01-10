@@ -2,10 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\Abstracts\AbstractRequest;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class VerifyActiveCodeRequest extends FormRequest
+class VerifyActiveCodeRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.

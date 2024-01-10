@@ -2,9 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Abstracts\AbstractRequest;
 use Illuminate\Foundation\Http\FormRequest;
 
-class AddChildrenProjectRequest extends FormRequest
+class AddChildrenProjectRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.

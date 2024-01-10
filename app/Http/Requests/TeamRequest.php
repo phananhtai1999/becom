@@ -2,10 +2,10 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Abstracts\AbstractRequest;
 use Illuminate\Validation\Rule;
 
-class TeamRequest extends FormRequest
+class TeamRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.

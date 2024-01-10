@@ -2,13 +2,14 @@
 
 namespace App\Http\Requests;
 
+use App\Abstracts\AbstractRequest;
 use App\Models\Team;
 use App\Rules\InviteRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
-class AddTeamMemberRequest extends FormRequest
+class AddTeamMemberRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.

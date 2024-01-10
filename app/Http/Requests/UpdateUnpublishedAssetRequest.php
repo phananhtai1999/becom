@@ -2,11 +2,12 @@
 
 namespace App\Http\Requests;
 
+use App\Abstracts\AbstractRequest;
 use App\Models\Asset;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class UpdateUnpublishedAssetRequest extends FormRequest
+class UpdateUnpublishedAssetRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.

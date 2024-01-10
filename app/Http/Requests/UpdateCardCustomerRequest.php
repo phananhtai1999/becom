@@ -2,11 +2,12 @@
 
 namespace App\Http\Requests;
 
+use App\Abstracts\AbstractRequest;
 use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class UpdateCardCustomerRequest extends FormRequest
+class UpdateCardCustomerRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.
