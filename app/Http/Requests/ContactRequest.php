@@ -71,7 +71,7 @@ class ContactRequest extends AbstractRequest
                 ])
                     ->orWhereNull('user_uuid');
             })->whereNull('deleted_at')],
-            'user_uuid' => ['nullable', 'numeric', 'min:1', Rule::exists('becom_user_profiles', 'user_uuid')->where(function ($q) {
+            'user_uuid' => ['nullable', 'string', 'min:1', Rule::exists('becom_user_profiles', 'user_uuid')->where(function ($q) {
                 return $q->where('app_id', auth()->appId());
             })->whereNull('deleted_at')],
             'status_uuid' => ['nullable', 'numeric', 'min:1', Rule::exists('status', 'uuid')->where(function ($query) {

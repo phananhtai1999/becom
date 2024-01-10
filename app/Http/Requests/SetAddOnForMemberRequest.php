@@ -28,7 +28,7 @@ class SetAddOnForMemberRequest extends AbstractRequest
         return [
             'team_uuid'=> ['required', 'integer', 'exists:teams,uuid'],
             'user_uuids'=> ['required', 'array'],
-            'user_uuids.*' => ['required', 'integer', 'min:1', 'distinct',Rule::exists('becom_user_profiles', 'user_uuid')->where(function ($q) {
+            'user_uuids.*' => ['required', 'string', 'min:1', 'distinct',Rule::exists('becom_user_profiles', 'user_uuid')->where(function ($q) {
                 return $q->where('app_id', auth()->appId());
             })->whereNull('deleted_at'), Rule::exists('user_teams', 'user_uuid')
             ->where('team_uuid', $this->request->get('team_uuid'))->whereNull('deleted_at')],

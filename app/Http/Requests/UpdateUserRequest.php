@@ -26,7 +26,7 @@ class UpdateUserRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'username' => ['nullable', 'string', "regex:/^(?!.*\.\.)[a-zA-Z0-9]*(?:\.[a-zA-Z0-9]+)*$/", Rule::unique('user_profiles','username')->where(function ($q) {
+            'username' => ['nullable', 'string', "regex:/^(?!.*\.\.)[a-zA-Z0-9]*(?:\.[a-zA-Z0-9]+)*$/", Rule::unique('becom_user_profiles','username')->where(function ($q) {
                 return $q->where('app_id', auth()->appId());
             })->ignore($this->id, 'uuid')->whereNull('deleted_at')],
             'email' => ['string', 'email:rfc,dns', Rule::unique('user_profiles','email')->where(function ($q) {

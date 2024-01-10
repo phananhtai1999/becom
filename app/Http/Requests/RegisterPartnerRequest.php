@@ -32,7 +32,7 @@ class RegisterPartnerRequest extends AbstractRequest
             'phone_number' => ['required', 'numeric'],
             'partner_category_uuid' => ['required', 'numeric', Rule::exists('partner_categories', 'uuid')->whereNull('deleted_at')],
             'answer' => ['nullable', 'string'],
-            'user_uuid' => ['nullable', 'numeric', Rule::exists('becom_user_profiles', 'user_uuid')->where(function ($q) {
+            'user_uuid' => ['nullable', 'string', Rule::exists('becom_user_profiles', 'user_uuid')->where(function ($q) {
                 return $q->where('app_id', auth()->appId());
             })->whereNull('deleted_at'), Rule::unique('partners')->whereNull('deleted_at')]
         ];
