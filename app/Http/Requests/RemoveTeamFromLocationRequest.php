@@ -2,10 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\Abstracts\AbstractRequest;
 use App\Rules\CheckLocationOwnerRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class RemoveTeamFromLocationRequest extends FormRequest
+class RemoveTeamFromLocationRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.

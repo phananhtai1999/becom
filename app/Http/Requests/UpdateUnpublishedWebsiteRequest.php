@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Abstracts\AbstractRequest;
 use App\Models\Article;
 use App\Models\SectionTemplate;
 use App\Models\Website;
@@ -12,7 +13,7 @@ use App\Rules\CheckWebsitePagesRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class UpdateUnpublishedWebsiteRequest extends FormRequest
+class UpdateUnpublishedWebsiteRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.

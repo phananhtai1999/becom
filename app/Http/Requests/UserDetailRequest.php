@@ -25,7 +25,7 @@ class UserDetailRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'user_uuid' => ['required', 'numeric', 'min:1', Rule::exists('user_profiles', 'uuid')->where(function ($q) {
+            'user_uuid' => ['required', 'numeric', 'min:1', Rule::exists('becom_user_profiles', 'user_uuid')->where(function ($q) {
                 return $q->where('app_id', auth()->appId());
             })->whereNull('deleted_at')],
             'about' => ['nullable', 'string'],

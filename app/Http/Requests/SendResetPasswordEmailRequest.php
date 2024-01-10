@@ -25,7 +25,7 @@ class SendResetPasswordEmailRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'email' => ['required', 'max:255', Rule::exists('user_profiles','email')->where(function ($q) {
+            'email' => ['required', 'max:255', Rule::exists('becom_user_profiles','email')->where(function ($q) {
                 return $q->where('app_id', auth()->appId());
             })->whereNull('deleted_at') , 'email'],
         ];

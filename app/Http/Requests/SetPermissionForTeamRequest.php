@@ -2,10 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\Abstracts\AbstractRequest;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class SetPermissionForTeamRequest extends FormRequest
+class SetPermissionForTeamRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,7 +26,7 @@ class SetPermissionForTeamRequest extends FormRequest
     public function rules()
     {
         return [
-            'user_uuid' => ['required', 'integer', 'min:1', Rule::exists('user_profiles')->where(function ($q) {
+            'user_uuid' => ['required', 'integer', 'min:1', Rule::exists('becom_user_profiles')->where(function ($q) {
                 return $q->where('app_id', auth()->appId());
             })->whereNull('deleted_at')],
             'team_uuid' => ['required', 'integer', 'min:1', 'exists:teams,uuid']

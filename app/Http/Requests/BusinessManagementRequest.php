@@ -34,7 +34,7 @@ class BusinessManagementRequest extends AbstractRequest
             'products_services.services.*' => ['nullable', 'string'],
             'customers' => ['required', 'array'],
             'customers.*' => ['string'],
-            'owner_uuid' => ['nullable', 'numeric', Rule::exists('user_profiles', 'uuid')->where(function ($q) {
+            'owner_uuid' => ['nullable', 'numeric', Rule::exists('becom_user_profiles', 'user_uuid')->where(function ($q) {
                 return $q->where('app_id', auth()->appId());
             })->whereNull('deleted_at')],
             'business_categories' => ['nullable', 'array', 'min:1'],

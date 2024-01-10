@@ -2,11 +2,12 @@
 
 namespace App\Http\Requests;
 
+use App\Abstracts\AbstractRequest;
 use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class PaymentRequest extends FormRequest
+class PaymentRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -29,5 +30,5 @@ class PaymentRequest extends FormRequest
             'credit_package_uuid' => ['required', 'exists:credit_packages,uuid'],
         ];
     }
-    
+
 }

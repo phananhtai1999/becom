@@ -2,12 +2,13 @@
 
 namespace App\Http\Requests;
 
+use App\Abstracts\AbstractRequest;
 use App\Models\Role;
 use Techup\ApiConfig\Services\ConfigService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class RemoveBusinessMemberRequest extends FormRequest
+class RemoveBusinessMemberRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.

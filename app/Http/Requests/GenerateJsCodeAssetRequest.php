@@ -2,10 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\Abstracts\AbstractRequest;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Cache;
 
-class GenerateJsCodeAssetRequest extends FormRequest
+class GenerateJsCodeAssetRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.

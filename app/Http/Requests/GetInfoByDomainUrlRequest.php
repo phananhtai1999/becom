@@ -2,9 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Abstracts\AbstractRequest;
 use Illuminate\Foundation\Http\FormRequest;
 
-class GetInfoByDomainUrlRequest extends FormRequest
+class GetInfoByDomainUrlRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.

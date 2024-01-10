@@ -2,13 +2,14 @@
 
 namespace App\Http\Requests;
 
+use App\Abstracts\AbstractRequest;
 use App\Models\Team;
 use App\Rules\InviteRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
-class AddTeamMemberRequest extends FormRequest
+class AddTeamMemberRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -33,12 +34,12 @@ class AddTeamMemberRequest extends FormRequest
         ];
         if ($this->request->get('type') == Team::ALREADY_EXISTS_ACCOUNT){
             $validate['user_uuids'] = ['required', 'array', 'min:1'];
-            $validate['user_uuids.*'] = ['required', 'integer', 'min:1', Rule::exists('user_profiles', 'uuid')->where(function ($q) {
+            $validate['user_uuids.*'] = ['required', 'integer', 'min:1', Rule::exists('becom_user_profiles', 'user_uuid')->where(function ($q) {
                 return $q->where('app_id', auth()->appId());
             })->whereNull('deleted_at')];
         } elseif ($this->request->get('type') == Team::ACCOUNT_INVITE) {
             $validate = array_merge($validate, [
-                'username' => ['required', 'string', "regex:/^(?!.*\.\.)[a-zA-Z0-9]*(?:\.[a-zA-Z0-9]+)*$/", Rule::unique('user_profiles', 'username')->where(function ($q) {
+                'username' => ['required', 'string', "regex:/^(?!.*\.\.)[a-zA-Z0-9]*(?:\.[a-zA-Z0-9]+)*$/", Rule::unique('becom_user_profiles', 'username')->where(function ($q) {
                     return $q->where('app_id', auth()->appId());
                 })->whereNull('deleted_at'), new InviteRule($this->request->get('domain'))],
                 'first_name' => ['required', 'string', "regex:/^[^(\|\]~`!@#$%^&*+=\-_{}\\\;:\"'?><,.\/’)\[]*$/"],

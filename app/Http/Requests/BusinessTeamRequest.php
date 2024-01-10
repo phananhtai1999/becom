@@ -2,12 +2,13 @@
 
 namespace App\Http\Requests;
 
+use App\Abstracts\AbstractRequest;
 use App\Models\Role;
 use Techup\ApiConfig\Services\ConfigService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class BusinessTeamRequest extends FormRequest
+class BusinessTeamRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -30,12 +31,12 @@ class BusinessTeamRequest extends FormRequest
             'name' => ['required', 'string'],
             'department_uuid' => ['integer', 'exists:departments,uuid'],
             'location_uuid' => ['integer', 'exists:locations,uuid'],
-            'leader_uuid' => ['required', 'integer', Rule::exists('user_profiles', 'uuid')->where(function ($q) {
+            'leader_uuid' => ['required', 'integer', Rule::exists('becom_user_profiles', 'user_uuid')->where(function ($q) {
                 return $q->where('app_id', auth()->appId());
             })->whereNull('deleted_at')],
             'parent_team_uuid' => ['integer', Rule::exists('teams', 'uuid')->whereNull('deleted_at')],
             'team_member_uuids' => ['required', 'array', 'min:1'],
-            'team_member_uuids.*' => ['required', 'integer', 'min:1', Rule::exists('user_profiles', 'uuid')->where(function ($q) {
+            'team_member_uuids.*' => ['required', 'integer', 'min:1', Rule::exists('becom_user_profiles', 'user_uuid')->where(function ($q) {
                 return $q->where('app_id', auth()->appId());
             })->whereNull('deleted_at')]
         ];

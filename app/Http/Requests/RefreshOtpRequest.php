@@ -2,10 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\Abstracts\AbstractRequest;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class RefreshOtpRequest extends FormRequest
+class RefreshOtpRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,7 +26,7 @@ class RefreshOtpRequest extends FormRequest
     public function rules()
     {
         return [
-            'email' => ['required', Rule::exists('user_profiles', 'email')->where(function ($q) {
+            'email' => ['required', Rule::exists('becom_user_profiles', 'email')->where(function ($q) {
                 return $q->where('app_id', auth()->appId());
             })->whereNull('deleted_at')]
         ];
