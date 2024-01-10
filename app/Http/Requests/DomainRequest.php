@@ -34,7 +34,7 @@ class DomainRequest extends AbstractRequest
                 ]);
             })
                 ->whereNull('deleted_at')],
-            'owner_uuid' => ['nullable', 'numeric', Rule::exists('user_profiles', 'uuid')->where(function ($q) {
+            'owner_uuid' => ['nullable', 'numeric', Rule::exists('becom_user_profiles', 'user_uuid')->where(function ($q) {
                 return $q->where('app_id', auth()->appId());
             })->whereNull('deleted_at')],
         ];

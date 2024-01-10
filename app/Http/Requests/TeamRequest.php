@@ -26,7 +26,7 @@ class TeamRequest extends AbstractRequest
     {
         return [
             'name' => ['required', 'string'],
-            'owner_uuid' => ['required', Rule::exists('user_profiles', 'uuid')->where(function ($q) {
+            'owner_uuid' => ['required', Rule::exists('becom_user_profiles', 'user_uuid')->where(function ($q) {
                 return $q->where('app_id', auth()->appId());
             })->whereNull('deleted_at')],
             'parent_team_uuid' => ['nullable', 'numeric', Rule::exists('teams', 'uuid')->whereNull('deleted_at')],

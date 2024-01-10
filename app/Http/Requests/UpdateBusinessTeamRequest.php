@@ -29,12 +29,12 @@ class UpdateBusinessTeamRequest extends AbstractRequest
         return [
             'name' => ['string'],
             'department_uuid' => ['integer', 'exists:departments,uuid'],
-            'leader_uuid' => ['integer', Rule::exists('user_profiles', 'uuid')->where(function ($q) {
+            'leader_uuid' => ['integer', Rule::exists('becom_user_profiles', 'user_uuid')->where(function ($q) {
                 return $q->where('app_id', auth()->appId());
             })->whereNull('deleted_at')],
             'parent_team_uuid' => ['integer', Rule::exists('teams', 'uuid')->whereNull('deleted_at')],
             'team_member_uuids' => ['array', 'min:1'],
-            'team_member_uuids.*' => ['integer', 'min:1', Rule::exists('user_profiles', 'uuid')->where(function ($q) {
+            'team_member_uuids.*' => ['integer', 'min:1', Rule::exists('becom_user_profiles', 'user_uuid')->where(function ($q) {
                 return $q->where('app_id', auth()->appId());
             })->whereNull('deleted_at')]
         ];

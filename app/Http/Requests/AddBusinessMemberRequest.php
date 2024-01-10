@@ -39,12 +39,12 @@ class AddBusinessMemberRequest extends AbstractRequest
         }
         if ($this->request->get('type') == UserBusiness::ALREADY_EXISTS_ACCOUNT){
             $validate['user_uuids'] = ['required', 'array', 'min:1'];
-            $validate['user_uuids.*'] = ['required', 'integer', 'min:1', Rule::exists('user_profiles', 'uuid')->where(function ($q) {
+            $validate['user_uuids.*'] = ['required', 'integer', 'min:1', Rule::exists('becom_user_profiles', 'user_uuid')->where(function ($q) {
                 return $q->where('app_id', auth()->appId());
             })];
         } elseif ($this->request->get('type') == UserBusiness::ACCOUNT_INVITE) {
             $validate = array_merge($validate, [
-                'username' => ['required', 'string', "regex:/^(?!.*\.\.)[a-zA-Z0-9]*(?:\.[a-zA-Z0-9]+)*$/", Rule::unique('user_profiles', 'username')->where(function ($q) {
+                'username' => ['required', 'string', "regex:/^(?!.*\.\.)[a-zA-Z0-9]*(?:\.[a-zA-Z0-9]+)*$/", Rule::unique('becom_user_profiles', 'username')->where(function ($q) {
                     return $q->where('app_id', auth()->appId());
                 })->whereNull('deleted_at'), new InviteRule($this->request->get('domain'))],
                 'first_name' => ['required', 'string', "regex:/^[^(\|\]~`!@#$%^&*+=\-_{}\\\;:\"'?><,.\/’)\[]*$/"],

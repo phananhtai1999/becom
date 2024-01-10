@@ -78,9 +78,9 @@ class UpdateWebsiteRequest extends AbstractRequest
             'tracking_ids' => ['nullable', 'array'],
             'tracking_ids.*' => ['nullable', 'string', 'max:300'],
             'publish_status' => ['numeric', Rule::in(Article::PENDING_PUBLISH_STATUS, Article::DRAFT_PUBLISH_STATUS, Article::PUBLISHED_PUBLISH_STATUS, Article::BLOCKED_PUBLISH_STATUS, Article::REJECT_PUBLISH_STATUS)],
-            'user_uuid' => ['numeric', Rule::exists('user_profiles', 'uuid')->where(function ($q) {
+            'user_uuid' => ['numeric', Rule::exists('becom_user_profiles', 'user_uuid')->where(function ($q) {
                 return $q->where('app_id', auth()->appId());
-            })->whereNull('deleted_at')]
+            })->whereNull('deleted_at')],
             'is_active_news_page' => ['boolean'],
             'is_active_product_page' => ['boolean'],
         ];

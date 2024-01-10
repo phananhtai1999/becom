@@ -78,7 +78,7 @@ class WebsiteRequest extends AbstractRequest
             'website_pages.*.ordering' => ['nullable', 'numeric', 'min:1'],
             'tracking_ids' => ['nullable', 'array'],
             'tracking_ids.*' => ['nullable', 'string', 'max:300'],
-            'user_uuid' => ['nullable', 'numeric', Rule::exists('user_profiles', 'uuid')->where(function ($q) {
+            'user_uuid' => ['nullable', 'numeric', Rule::exists('becom_user_profiles', 'user_uuid')->where(function ($q) {
                 return $q->where('app_id', auth()->appId());
             })->whereNull('deleted_at')],
             'publish_status' => ['required', 'numeric', Rule::in(Website::PUBLISHED_PUBLISH_STATUS, Website::DRAFT_PUBLISH_STATUS)],

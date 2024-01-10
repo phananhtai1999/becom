@@ -26,7 +26,7 @@ class RefreshOtpRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'email' => ['required', Rule::exists('user_profiles', 'email')->where(function ($q) {
+            'email' => ['required', Rule::exists('becom_user_profiles', 'email')->where(function ($q) {
                 return $q->where('app_id', auth()->appId());
             })->whereNull('deleted_at')]
         ];
