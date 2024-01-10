@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Abstracts\AbstractService;
 use App\Models\CampaignScenario;
 use Carbon\Carbon;
-use Techup\ApiConfig\Services\ConfigService;
+use App\Services\ConfigService;
 
 class CampaignScenarioService extends AbstractService
 {
