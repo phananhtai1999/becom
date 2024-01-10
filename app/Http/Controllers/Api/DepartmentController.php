@@ -173,7 +173,7 @@ class DepartmentController extends AbstractRestAPIController
      */
     public function showMyDepartment($id)
     {
-        $model = $this->myService->showMyAndPublicDepartment($id);
+        $model = $this->service->showMyAndPublicDepartment($id);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -187,7 +187,7 @@ class DepartmentController extends AbstractRestAPIController
      */
     public function editMyDepartment(UpdateMyDepartmentRequest $request, $id)
     {
-        $model = $this->myService->showMyDepartment($id);
+        $model = $this->service->showMyDepartment($id);
 
         //Allowed language
         if ($request->name && !$this->languageService->checkLanguages($request->name)) {
@@ -210,7 +210,7 @@ class DepartmentController extends AbstractRestAPIController
      */
     public function destroyMyDepartment($id, OptionDeleteBusinuessRequest $request)
     {
-        $this->myService->deleteMyDepartment($id);
+        $this->service->deleteMyDepartment($id);
         $this->cstoreService->deleteFolderType($id, config('foldertypecstore.DEPARTMENT'),
             $request->get('option', 'keep'));
 
