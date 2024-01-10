@@ -27,9 +27,6 @@ class UpdateAdminUserRequest extends AbstractRequest
     {
         return [
 //            'username' => ['nullable', 'string',"regex:/^(?!.*\.\.)[a-zA-Z0-9]*(?:\.[a-zA-Z0-9]+)*$/", 'unique:user_profiles,username,'.$this->id.',uuid,deleted_at,NULL'],
-            'username' => ['nullable', 'string', "regex:/^(?!.*\.\.)[a-zA-Z0-9]*(?:\.[a-zA-Z0-9]+)*$/", Rule::unique('becom_user_profiles', 'username')->where(function ($q) {
-                return $q->where('app_id', auth()->appId());
-            })->ignore($this->id, 'uuid')->whereNull('deleted_at')],
             'email' => ['string', 'email:rfc,dns', Rule::unique('becom_user_profiles', 'email')->where(function ($q) {
                 return $q->where('app_id', auth()->appId());
             })->ignore($this->id, 'uuid')->whereNull('deleted_at')],

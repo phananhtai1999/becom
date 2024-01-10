@@ -39,7 +39,7 @@ class AddTeamMemberRequest extends AbstractRequest
             })->whereNull('deleted_at')];
         } elseif ($this->request->get('type') == Team::ACCOUNT_INVITE) {
             $validate = array_merge($validate, [
-                'username' => ['required', 'string', "regex:/^(?!.*\.\.)[a-zA-Z0-9]*(?:\.[a-zA-Z0-9]+)*$/", Rule::unique('becom_user_profiles', 'username')->where(function ($q) {
+                'email' => ['required', 'string', "regex:/^(?!.*\.\.)[a-zA-Z0-9]*(?:\.[a-zA-Z0-9]+)*$/", Rule::unique('becom_user_profiles', 'email')->where(function ($q) {
                     return $q->where('app_id', auth()->appId());
                 })->whereNull('deleted_at'), new InviteRule($this->request->get('domain'))],
                 'first_name' => ['required', 'string', "regex:/^[^(\|\]~`!@#$%^&*+=\-_{}\\\;:\"'?><,.\/’)\[]*$/"],

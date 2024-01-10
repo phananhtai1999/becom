@@ -36,6 +36,9 @@ class UserProfile extends \Techup\ApiBase\Models\UserProfile
         'can_remove_footer_template',
         'app_id',
         'user_uuid',
+        'first_name',
+        'last_name',
+        'email'
     ];
 
     /**
