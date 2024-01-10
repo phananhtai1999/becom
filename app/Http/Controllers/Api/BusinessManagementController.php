@@ -336,7 +336,6 @@ class BusinessManagementController extends AbstractRestAPIController
                     'email' => $email,
                     'first_name' => $request->get('first_name'),
                     'last_name' => $request->get('last_name'),
-                    'username' => $request->get('username'),
                     'can_add_smtp_account' => 0,
                     'password' => Hash::make($request->get('password'))
                 ]);

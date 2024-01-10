@@ -252,7 +252,7 @@ class TeamController extends Controller
                 ]);
 //                Mailbox::postEmailAccountcreate($user->uuid, $email, $passwordRandom);
 
-                $this->cstoreService->storeFolderByType($request->get('username'), $user->uuid, config('foldertypecstore.USER'), $request->get('team_uuid'));
+                $this->cstoreService->storeFolderByType($request->get('email'), $user->uuid, config('foldertypecstore.USER'), $request->get('team_uuid'));
 
                 DB::commit();
 
@@ -306,7 +306,7 @@ class TeamController extends Controller
             'app_id' => auth()->appId(),
         ]));
 
-        $this->cstoreService->storeFolderByType(auth()->user()->username, auth()->userId(), config('foldertypecstore.USER'), $request->get('team_uuid'));
+        $this->cstoreService->storeFolderByType(auth()->user()->email, auth()->userId(), config('foldertypecstore.USER'), $request->get('team_uuid'));
 
 
         return $this->sendCreatedJsonResponse(
