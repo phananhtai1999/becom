@@ -28,7 +28,7 @@ class SetManagerRequest extends AbstractRequest
     {
         $validates = [
             'entity' => ['required', Rule::in([BusinessManagement::DEPARTMENT_ENTITY, BusinessManagement::LOCATION_ENTITY])],
-            'user_uuid' => ['required', 'numeric', 'min:1', Rule::exists('users', 'uuid')->whereNull('deleted_at')],
+            'user_uuid' => ['required', 'string', 'min:1', Rule::exists('becom_user_profiles', 'user_uuid')->whereNull('deleted_at')],
             'entity_uuid' => ['required']
         ];
         if ($this->request->get('entity') == 'department') {
