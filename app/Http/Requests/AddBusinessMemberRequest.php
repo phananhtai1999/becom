@@ -39,7 +39,7 @@ class AddBusinessMemberRequest extends AbstractRequest
         }
         if ($this->request->get('type') == UserBusiness::ALREADY_EXISTS_ACCOUNT){
             $validate['user_uuids'] = ['required', 'array', 'min:1'];
-            $validate['user_uuids.*'] = ['required', 'integer', 'min:1', Rule::exists('becom_user_profiles', 'user_uuid')->where(function ($q) {
+            $validate['user_uuids.*'] = ['required', 'string', 'min:1', Rule::exists('becom_user_profiles', 'user_uuid')->where(function ($q) {
                 return $q->where('app_id', auth()->appId());
             })];
         } elseif ($this->request->get('type') == UserBusiness::ACCOUNT_INVITE) {

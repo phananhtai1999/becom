@@ -32,7 +32,7 @@ class UpdatePartnerRequest extends AbstractRequest
             'phone_number' => ['numeric'],
             'partner_category_uuid' => ['numeric', Rule::exists('partner_categories', 'uuid')->whereNull('deleted_at')],
             'answer' => ['nullable', 'string'],
-            'user_uuid' => ['nullable', 'numeric', Rule::exists('becom_user_profiles', 'user_uuid')->where(function ($q) {
+            'user_uuid' => ['nullable', 'string', Rule::exists('becom_user_profiles', 'user_uuid')->where(function ($q) {
                 return $q->where('app_id', auth()->appId());
             })->whereNull('deleted_at'), Rule::unique('partners')->ignore($this->id, 'uuid')->whereNull('deleted_at')]
         ];

@@ -26,12 +26,12 @@ class RegisterRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'username' => ['nullable', 'string', "regex:/^(?!.*\.\.)[a-zA-Z0-9]*(?:\.[a-zA-Z0-9]+)*$/", Rule::unique('user_profiles')->where(function ($q) {
+            'username' => ['nullable', 'string', "regex:/^(?!.*\.\.)[a-zA-Z0-9]*(?:\.[a-zA-Z0-9]+)*$/", Rule::unique('becom_user_profiles')->where(function ($q) {
                 return $q->where('app_id', auth()->appId());
             })->whereNull('deleted_at')],
             'first_name' => ['required', 'string', "regex:/^[^(\|\]~`!@#$%^&*+=\-_{}\\\;:\"'?><,.\/’)\[]*$/"],
             'last_name' => ['required', 'string', "regex:/^[^(\|\]~`!@#$%^&*+=\-_{}\\\;:\"'?><,.\/’)\[]*$/"],
-            'email' => ['required', 'string', 'email:rfc,dns', Rule::unique('user_profiles')->where(function ($q) {
+            'email' => ['required', 'string', 'email:rfc,dns', Rule::unique('becom_user_profiles')->where(function ($q) {
                 return $q->where('app_id', auth()->appId());
             })->whereNull('deleted_at')],
             'password' => ['required', 'string', 'regex:/^\S*$/',

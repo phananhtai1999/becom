@@ -80,7 +80,7 @@ class CampaignRequest extends AbstractRequest
             })],
             'was_finished' => ['required', 'boolean'],
             'was_stopped_by_owner' => ['required', 'boolean'],
-            'user_uuid' => ['nullable', 'numeric', 'min:1',  Rule::exists('becom_user_profiles', 'user_uuid')->where(function ($q) {
+            'user_uuid' => ['nullable', 'string', 'min:1',  Rule::exists('becom_user_profiles', 'user_uuid')->where(function ($q) {
                 return $q->where('app_id', auth()->appId());
             })->whereNull('deleted_at')],
             'reply_to_email' => ['nullable', 'required_if:send_type,email', 'string', 'email:rfc,dns'],

@@ -25,7 +25,7 @@ class LoginRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'email' => ['required', 'string',  Rule::exists('user_profiles', 'email')->where(function ($q) {
+            'email' => ['required', 'string',  Rule::exists('becom_user_profiles', 'email')->where(function ($q) {
                 return $q->where('app_id', auth()->appId());
             })->whereNull('deleted_at')],
             'password' =>['required', 'string']

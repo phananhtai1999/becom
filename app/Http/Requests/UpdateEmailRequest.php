@@ -34,7 +34,7 @@ class UpdateEmailRequest extends AbstractRequest
             'job' => ['string'],
             'send_projects' => ['array', 'min:1'],
             'send_projects.*' => ['numeric', 'min:1', 'exists:send_projects,uuid'],
-            'user_uuid' => ['numeric', 'min:1', Rule::exists('becom_user_profiles', 'user_uuid')->where(function ($q) {
+            'user_uuid' => ['string', 'min:1', Rule::exists('becom_user_profiles', 'user_uuid')->where(function ($q) {
                 return $q->where('app_id', auth()->appId());
             })->whereNull('deleted_at')],
         ];

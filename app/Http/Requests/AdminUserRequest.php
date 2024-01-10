@@ -31,7 +31,7 @@ class AdminUserRequest extends AbstractRequest
             })->whereNull('deleted_at')],
             'first_name' => ['nullable', 'string', "regex:/^[^(\|\]~`!@#$%^&*+=\-_{}\\\;:\"'?><,.\/’)\[]*$/"],
             'last_name' => ['nullable', 'string', "regex:/^[^(\|\]~`!@#$%^&*+=\-_{}\\\;:\"'?><,.\/’)\[]*$/"],
-            'email' => ['required', 'string', 'email:rfc,dns', Rule::unique('user_profiles', 'email')->where(function ($q) {
+            'email' => ['required', 'string', 'email:rfc,dns', Rule::unique('becom_user_profiles', 'email')->where(function ($q) {
                 return $q->where('app_id', auth()->appId());
             })->whereNull('deleted_at')],
             'password' => ['required', 'string', 'regex:/^\S*$/',
