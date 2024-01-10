@@ -648,33 +648,33 @@ class MyContactService extends AbstractService
             if ($value[0] == $field) {
                 if ($value[1] == '=') {
                     $query->whereExists(function ($user) use ($value) {
-                        $user->from('user_profiles')
-                            ->whereRaw('contacts.user_uuid = users.uuid')
+                        $user->from('becom_user_profiles')
+                            ->whereRaw('contacts.user_uuid = becom_user_profiles.user_uuid')
                             ->whereIn('users.username', array_slice($value, 3));
                     });
                 } elseif ($value[1] == '!=') {
                     $query->whereExists(function ($user) use ($value) {
-                        $user->from('user_profiles')
-                            ->whereRaw('contacts.user_uuid = users.uuid')
-                            ->whereNotIn('users.username', array_slice($value, 3));
+                        $user->from('becom_user_profiles')
+                            ->whereRaw('contacts.user_uuid = becom_user_profiles.user_uuid')
+                            ->whereNotIn('becom_user_profiles.username', array_slice($value, 3));
                     });
                 } elseif ($value[1] == 'like') {
                     if (count($value) > 4) {
                         $query->where(function ($query) use ($value) {
                             for ($i = 4; $i <= count($value); $i++) {
                                 $query->orWhereExists(function ($query) use ($value, $i) {
-                                    $query->select("users.uuid")
-                                        ->from('user_profiles')
-                                        ->whereRaw('contacts.user_uuid = users.uuid')
+                                    $query->select("becom_user_profiles.user_uuid")
+                                        ->from('becom_user_profiles')
+                                        ->whereRaw('contacts.user_uuid = becom_user_profiles.user_uuid')
                                         ->where('users.username', 'like', '%' . $value[$i - 1] . '%');
                                 });
                             }
                         });
                     } else {
                         $query->whereExists(function ($user) use ($value) {
-                            $user->select("users.uuid")
-                                ->from('user_profiles')
-                                ->whereRaw('contacts.user_uuid = users.uuid')
+                            $user->select("becom_user_profiles.user_uuid")
+                                ->from('becom_user_profiles')
+                                ->whereRaw('contacts.user_uuid = becom_user_profiles.user_uuid')
                                 ->where('users.username', 'like', '%' . $value[3] . '%');
                         });
                     }
