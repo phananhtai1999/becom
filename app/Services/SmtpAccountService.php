@@ -91,7 +91,7 @@ class SmtpAccountService extends AbstractService
     public function getRandomSmtpAccountAdmin($sendTypeCampaign)
     {
         return $this->model->select('smtp_accounts.*')
-            ->join('user_profiles', 'users.uuid', '=', 'smtp_accounts.user_uuid')
+            ->join('becom_user_profiles', 'becom_user_profiles.user_uuid', '=', 'smtp_accounts.user_uuid')
             ->join('role_user', 'role_user.user_uuid', '=', 'users.uuid')
             ->where(function ($query) use ($sendTypeCampaign) {
                 if ($sendTypeCampaign == 'email') {

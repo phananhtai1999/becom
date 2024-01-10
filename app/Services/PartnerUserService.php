@@ -64,7 +64,7 @@ class PartnerUserService extends AbstractService
     public function referrerStatisticsOfPartnerbyType($partnerCode, $type = null)
     {
 
-        $referredUsers = $this->model->join('user_profiles', 'users.uuid', '=', 'partner_user.user_uuid')
+        $referredUsers = $this->model->join('becom_user_profiles', 'becom_user_profiles.user_uuid', '=', 'partner_user.user_uuid')
             ->where('partner_user.registered_from_partner_code', $partnerCode)
             ->selectRaw('users.uuid as user_uuid, users.email, users.created_at, null as customer_since, null as last_payment')
             ->get()->keyBy('user_uuid')->toArray();
