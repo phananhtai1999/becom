@@ -11,8 +11,8 @@ use App\Http\Requests\RefreshTokenRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\SendResetPasswordEmailRequest;
 use App\Http\Requests\VerifyActiveCodeRequest;
-use App\Http\Resources\UserResource;
 use App\Http\Requests\LoginRequest;
+use App\Http\Resources\UserResource;
 use App\Mail\SendActiveCode;
 use App\Models\Invite;
 use App\Models\PasswordReset;
@@ -156,7 +156,7 @@ class AuthController extends AbstractRestAPIController
     /**
      * @return JsonResponse
      */
-    public function me(): JsonResponse
+    public function myProfile(): JsonResponse
     {
         /** @var User $user */
         $user = auth()->user();

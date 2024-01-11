@@ -32,7 +32,7 @@ class LocationResource extends JsonResource
         }
 
         if (\in_array('location__manager', $expand)) {
-            $data['manager_uuid'] = new UserResource($this->manager);
+            $data['manager'] = new UserResource($this->manager);
         }
 
         if (\in_array('location__teams', $expand)) {
