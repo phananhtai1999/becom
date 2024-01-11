@@ -243,8 +243,8 @@ Route::group(['middleware' => ['apikey']], function () {
         Route::get('add-children-project', [SendProjectController::class, 'addChildrenForSendProject'])->name('addChildrenForSendProject');
 
         Route::get('/send-project/{id}/assignable-teams', [TeamController::class, 'getAssignableForProject'])->name('getAssignableForProject');
-        Route::get('/send-project/{id}/assignable-locations', [LocationController::class, 'getAssignableForProject'])->name('getAssignableForProject');
-        Route::get('/send-project/{id}/assignable-departments', [DepartmentController::class, 'getAssignableForProject'])->name('getAssignableForProject');
+        Route::get('/send-project/{id}/assignable-locations', [LocationController::class, 'getAssignableForProject'])->name('getAssignableForLocaltion');
+        Route::get('/send-project/{id}/assignable-departments', [DepartmentController::class, 'getAssignableForProject'])->name('getAssignableForDepartment');
     });
 
 
@@ -571,7 +571,7 @@ Route::group(['middleware' => ['apikey']], function () {
             Route::post('my/scenario', [ScenarioController::class, 'storeMyScenario'])->name('storeMyScenario');
             Route::get('my/scenario/{id}', [ScenarioController::class, 'showMyScenario'])->name('showMyScenario');
             Route::put('my/scenario/{id}', [ScenarioController::class, 'editMyScenario'])->name('editMyScenario');
-            Route::delete('my/scenario/{id}', [ScenarioController::class, 'deleteMyScenario'])->name('editMyScenario');
+            Route::delete('my/scenario/{id}', [ScenarioController::class, 'deleteMyScenario'])->name('deleteMyScenario');
             Route::post('my/emails/status-scenario', [ScenarioController::class, 'statusMyScenario'])->name('statusMyScenario');
         });
     });
@@ -613,13 +613,13 @@ Route::group(['middleware' => ['apikey']], function () {
         Route::delete('/short-code/{id}', [WebsitePageShortCodeController::class, 'destroy'])->name('destroy');
 
         //Short code group
-        Route::get('short-code-groups', [ShortCodeGroupController::class, 'index'])->name('index');
-        Route::post('short-code-group', [ShortCodeGroupController::class, 'store'])->name('store');
-        Route::get('short-code-group/{id}', [ShortCodeGroupController::class, 'show'])->name('show');
-        Route::put('short-code-group/{id}', [ShortCodeGroupController::class, 'edit'])->name('edit');
-        Route::delete('/short-code-group/{id}', [ShortCodeGroupController::class, 'destroy'])->name('destroy');
-        Route::post('/mapping-short-code', [ShortCodeGroupController::class, 'mappingShortcode'])->name('mappingShortcode');
-        Route::post('/unmapping-short-code', [ShortCodeGroupController::class, 'unmappingShortcode'])->name('unmappingShortcode');
+        Route::get('short-code-groups', [ShortCodeGroupController::class, 'index'])->name('short-code-group.index');
+        Route::post('short-code-group', [ShortCodeGroupController::class, 'store'])->name('short-code-group.store');
+        Route::get('short-code-group/{id}', [ShortCodeGroupController::class, 'show'])->name('short-code-group.show');
+        Route::put('short-code-group/{id}', [ShortCodeGroupController::class, 'edit'])->name('short-code-group.edit');
+        Route::delete('/short-code-group/{id}', [ShortCodeGroupController::class, 'destroy'])->name('short-code-group.destroy');
+        Route::post('/mapping-short-code', [ShortCodeGroupController::class, 'mappingShortcode'])->name('short-code-group.mappingShortcode');
+        Route::post('/unmapping-short-code', [ShortCodeGroupController::class, 'unmappingShortcode'])->name('short-code-group.unmappingShortcode');
 
 
         Route::group(['middleware' => ['role:root,admin,editor']], function () {
@@ -1062,8 +1062,8 @@ Route::group(['middleware' => ['apikey']], function () {
             Route::put('/country/{id}', [CountryController::class, 'edit'])->name('edit');
             Route::delete('/country/{id}', [CountryController::class, 'destroy'])->name('destroy');
         });
-        Route::get('/country/{id}', [CountryController::class, 'show'])->name('show');
-        Route::get('/countries', [CountryController::class, 'index'])->name('index');
+        Route::get('/country/{id}', [CountryController::class, 'show'])->name('country.show');
+        Route::get('/countries', [CountryController::class, 'index'])->name('countries.index');
 
         Route::group(['middleware' => ['userid'], 'as' => 'billingAddress.'], function () {
             Route::get('/billing-addresses', [BillingAddressController::class, 'index'])->name('index');
@@ -1140,7 +1140,8 @@ Route::group(['middleware' => ['apikey']], function () {
             Route::post('/payment-add-on', [AddOnController::class, 'paymentAddOn'])->name('paymentAddOn');
             Route::put('/cancel-add-on/{id}', [AddOnController::class, 'cancelAddOnSubscription'])->name('cancelAddOnSubscription');
         });
-        Route::get('/add-ons', [AddOnController::class, 'index'])->name('index');
+
+        Route::get('/add-ons', [AddOnController::class, 'index'])->name('add-ons.index');
         Route::get('/paypal/success-payment-subscription-add-on', [PaypalController::class, 'successPaymentSubscriptionAddOn'])->name('paypal.successPaymentSubscriptionAddOn');
         Route::get('/paypal/cancel-payment-subscription-add-on', [PaypalController::class, 'cancelPaymentSubscriptionAddOn'])->name('paypal.cancelPaymentSubscriptionAddOn');
 
@@ -1159,7 +1160,7 @@ Route::group(['middleware' => ['apikey']], function () {
                 Route::delete('my/notification/{id}', [NotificationController::class, 'destroyMy'])->name('destroyMy');
             });
             Route::post('/read-notifications', [NotificationController::class, 'readNotifications'])->name('index');
-            Route::post('/unread-notifications', [NotificationController::class, 'unreadNotifications'])->name('index');
+            Route::post('/unread-notifications', [NotificationController::class, 'unreadNotifications'])->name('unread-notifications.index');
             Route::get('get-notification-categories', [NotificationController::class, 'getNotificationCategories']);
         });
 
@@ -1197,8 +1198,8 @@ Route::group(['middleware' => ['apikey']], function () {
 //        Route::delete('/purpose/{id}', [PurposeController::class, 'destroy'])->name('destroy');
                 Route::get('/purposes', [PurposeController::class, 'index'])->name('index');
                 Route::get('/purpose/{id}', [PurposeController::class, 'show'])->name('show');
-                Route::put('/purpose/change-status/{id}', [PurposeController::class, 'changeStatus'])->name('edit');
-                Route::post('/delete-purpose/{id}', [PurposeController::class, 'destroyPurpose'])->name('edit');
+                Route::put('/purpose/change-status/{id}', [PurposeController::class, 'changeStatus'])->name('purpose.status');
+                Route::post('/delete-purpose/{id}', [PurposeController::class, 'destroyPurpose'])->name('delete');
             });
 
             Route::get('public/purposes', [PurposeController::class, 'indexPublic'])->name('index');
@@ -1230,7 +1231,7 @@ Route::group(['middleware' => ['apikey']], function () {
                 Route::delete('/partner-category/{id}', [PartnerCategoryController::class, 'destroy'])->name('destroy');
             });
         });
-        Route::get('public/partner-categories', [PartnerCategoryController::class, 'index'])->name('index');
+        Route::get('public/partner-categories', [PartnerCategoryController::class, 'index'])->name('partner-categories.public.index');
 
 //Partners
         Route::group(['middleware' => ['userid'], 'as' => 'partner.'], function () {
@@ -1273,7 +1274,7 @@ Route::group(['middleware' => ['apikey']], function () {
                 Route::delete('/partner-level/{id}', [PartnerLevelController::class, 'destroy'])->name('destroy');
             });
         });
-        Route::get('public/partner-levels', [PartnerLevelController::class, 'index'])->name('index');
+        Route::get('public/partner-levels', [PartnerLevelController::class, 'index'])->name('partner-levels.index');
 
 //Partner Tracking
         Route::group(['middleware' => ['userid'], 'as' => 'partner-tracking.'], function () {
@@ -1372,13 +1373,13 @@ Route::group(['middleware' => ['apikey']], function () {
 
         });
 
-        Route::group(['middleware' => ['userid'], 'as' => 'website'], function () {
+        Route::group(['middleware' => ['userid'], 'as' => 'website.'], function () {
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
                 Route::get('/websites', [WebsiteController::class, 'index'])->name('index');
                 Route::get('website/{id}', [WebsiteController::class, 'show'])->name('show');
                 Route::delete('website/{id}', [WebsiteController::class, 'destroy'])->name('destroy');
                 Route::post('websites/change-status', [WebsiteController::class, 'changeStatus'])->name('changeStatus');
-                Route::post('websites/change-status-default', [WebsiteController::class, 'changeStatusDefaultWebsite'])->name('changeStatus');
+                Route::post('websites/change-status-default', [WebsiteController::class, 'changeStatusDefaultWebsite'])->name('changeStatusDefault');
                 Route::post('website', [WebsiteController::class, 'store'])->name('store');
                 Route::put('website/{id}', [WebsiteController::class, 'edit'])->name('edit');
             });
@@ -1427,9 +1428,9 @@ Route::group(['middleware' => ['apikey']], function () {
                 Route::post('asset/change-status/{id}', [AssetController::class, 'changeStatusAsset']);
             });
             Route::get('my/assets', [AssetController::class, 'indexMy']);
-            Route::get('/publish-assets', [AssetController::class, 'indexPublishAssets']);
-            Route::post('generate-js-code', [AssetController::class, 'generateJsCode']);
-            Route::get('asset/{id}', [AssetController::class, 'show']);
+            Route::get('/publish-assets', [AssetController::class, 'indexPublishAssets'])->name('publish-assets');
+            Route::post('generate-js-code', [AssetController::class, 'generateJsCode'])->name('generateJsCode');
+            Route::get('asset/{id}', [AssetController::class, 'show'])->name('show');
         });
         Route::get('generate-video', [AssetController::class, 'generateForVideo']);
         Route::get('generate-image', [AssetController::class, 'generateForImage']);
@@ -1461,18 +1462,18 @@ Route::group(['middleware' => ['apikey']], function () {
                 Route::delete('bank-information/{id}', [BankInformationController::class, 'destroy']);
             });
             Route::get('/bank-informations', [BankInformationController::class, 'index']);
-            Route::get('bank-information/{id}', [BankInformationController::class, 'show']);
+            Route::get('bank-information/{id}', [BankInformationController::class, 'show'])->name("show");
         });
 
         Route::group(['middleware' => ['userid'], 'as' => 'payout-method'], function () {
-            Route::get('/payout-methods', [PayoutMethodController::class, 'index']);
-            Route::get('payout-method/{id}', [PayoutMethodController::class, 'show']);
-            Route::post('payout-method', [PayoutMethodController::class, 'store']);
-            Route::put('payout-method/{id}', [PayoutMethodController::class, 'edit']);
-            Route::delete('payout-method/{id}', [PayoutMethodController::class, 'destroy']);
+            Route::get('/payout-methods', [PayoutMethodController::class, 'index'])->name('index');
+            Route::get('payout-method/{id}', [PayoutMethodController::class, 'show'])->name('show');
+            Route::post('payout-method', [PayoutMethodController::class, 'store'])->name('store');
+            Route::put('payout-method/{id}', [PayoutMethodController::class, 'edit'])->name('edit');
+            Route::delete('payout-method/{id}', [PayoutMethodController::class, 'destroy'])->name('destroy');
 
             Route::get('my/payout-methods', [PayoutMethodController::class, 'myIndex']);
-            Route::post('payout-method/set-default/{id}', [PayoutMethodController::class, 'setDefault']);
+            Route::post('payout-method/set-default/{id}', [PayoutMethodController::class, 'setDefault'])->name('set-default');
         });
 
         Route::group(['middleware' => ['userid'], 'as' => 'single-purpose'], function () {
