@@ -604,20 +604,22 @@ class TeamController extends Controller
 
     public function storeBusinessTeam(BusinessTeamRequest $request)
     {
+        $department = $this->departmentService->findOrFailById($request->get('department_uuid'));
+        $location = $this->locationService->findOrFailById($department->uuid);
         $teamModel = $this->service->create(array_merge($request->all(), [
             'owner_uuid' => auth()->userId(),
+            'location_uuid' => $location->uuid,
             'app_id' => auth()->appId(),
         ]));
         if (auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             $businessUuid = $request->get("business_uuid");
         } else {
-            $businesses = $this->businessManagementService->findAllWhere([['owner_uuid', auth()->userId()], ['app_id', auth()->appId()]]);
-            if ($businesses->toArray()) {
-                $businessUuid = $businesses->first()->uuid;
-            } else {
+            $businesses = $this->getBusiness();
+            if (!$businesses) {
 
-                return $this->sendJsonResponse(false, 'Does not have business', [], 403);
+                return $this->sendJsonResponse(false, 'You do not have access', [], 403);
             }
+            $businessUuid = $businesses->uuid;
         }
         //add team member with user uuid
         $teamModel->business()->attach([$businessUuid]);
@@ -657,8 +659,12 @@ class TeamController extends Controller
                 return $this->sendJsonResponse(false, 'You are not owner of team to edit', [], 403);
             }
         }
+        $department = $this->departmentService->findOrFailById($request->get('department_uuid'));
+        $location = $this->locationService->findOrFailById($department->uuid);
         $teamModel = $this->myService->findOrFailById($id);
-        $this->service->update($teamModel, $request->all());
+        $this->service->update($teamModel, array_merge($request->all(), [
+            'location_uuid' => $location->uuid,
+        ]));
 
         $teamMemberUuids = $request->get('team_member_uuids');
         $appId = auth()->appId();

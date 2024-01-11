@@ -34,7 +34,7 @@ class UserBusinessResource extends JsonResource
             $data['user'] = new UserResource($this->user);
         }
         if (\in_array('user_business__team', $expand)) {
-            $data['teams'] = TeamResource::collection($this->user->teams);
+            $data['teams'] = TeamResource::collection(optional(optional($this->user)->teams));
         }
 
         return $data;

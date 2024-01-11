@@ -27,7 +27,7 @@ class SetTeamLeaderRequest extends AbstractRequest
     {
         return [
             'team_uuid' => ['required', 'integer', 'exists:teams,uuid'],
-            'team_member_uuid' => ['required', 'integer', Rule::exists('user_teams', 'user_uuid')
+            'team_member_uuid' => ['required', 'string', Rule::exists('user_teams', 'user_uuid')
                 ->where('team_uuid', $this->request->get('team_uuid'))]
         ];
     }
