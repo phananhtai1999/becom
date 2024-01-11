@@ -107,7 +107,7 @@ class UserProfile extends \Techup\ApiBase\Models\UserProfile
      */
     public function userDetails()
     {
-        return $this->hasOne(UserDetail::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
+        return $this->hasOne(UserDetail::class, 'user_uuid', 'user_uuid')->where('app_id', auth()->appId());
     }
 
     /**
@@ -115,23 +115,16 @@ class UserProfile extends \Techup\ApiBase\Models\UserProfile
      */
     public function userConfig()
     {
-        return $this->hasOne(UserConfig::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
+        return $this->hasOne(UserConfig::class, 'user_uuid', 'user_uuid')->where('app_id', auth()->appId());
     }
 
-    /**
-     * @return HasMany
-     */
-    public function userAccessTokens()
-    {
-        return $this->hasMany(UserAccessToken::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
-    }
 
     /**
      * @return HasMany
      */
     public function sendProjects()
     {
-        return $this->hasMany(SendProject::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
+        return $this->hasMany(SendProject::class, 'user_uuid', 'user_uuid')->where('app_id', auth()->appId());
     }
 
     /**
@@ -139,7 +132,7 @@ class UserProfile extends \Techup\ApiBase\Models\UserProfile
      */
     public function contacts()
     {
-        return $this->hasMany(Contact::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
+        return $this->hasMany(Contact::class, 'user_uuid', 'user_uuid')->where('app_id', auth()->appId());
     }
 
     /**
@@ -147,7 +140,7 @@ class UserProfile extends \Techup\ApiBase\Models\UserProfile
      */
     public function contactLists()
     {
-        return $this->hasMany(ContactList::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
+        return $this->hasMany(ContactList::class, 'user_uuid', 'user_uuid')->where('app_id', auth()->appId());
     }
 
     /**
@@ -155,7 +148,7 @@ class UserProfile extends \Techup\ApiBase\Models\UserProfile
      */
     public function userCreditHistories()
     {
-        return $this->hasMany(UserCreditHistory::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
+        return $this->hasMany(UserCreditHistory::class, 'user_uuid', 'user_uuid')->where('app_id', auth()->appId());
     }
 
     /**
@@ -163,7 +156,7 @@ class UserProfile extends \Techup\ApiBase\Models\UserProfile
      */
     public function creditTransactionHistories()
     {
-        return $this->hasMany(CreditTransactionHistory::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
+        return $this->hasMany(CreditTransactionHistory::class, 'user_uuid', 'user_uuid')->where('app_id', auth()->appId());
     }
 
     /**
@@ -199,17 +192,17 @@ class UserProfile extends \Techup\ApiBase\Models\UserProfile
      */
     public function userPlatformPackage()
     {
-        return $this->hasOne(UserPlatformPackage::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
+        return $this->hasOne(UserPlatformPackage::class, 'user_uuid', 'user_uuid')->where('app_id', auth()->appId());
     }
 
     public function userAddOns()
     {
-        return $this->hasMany(UserAddOn::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
+        return $this->hasMany(UserAddOn::class, 'user_uuid', 'user_uuid')->where('app_id', auth()->appId());
     }
 
     public function userTeams()
     {
-        return $this->hasMany(UserTeam::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
+        return $this->hasMany(UserTeam::class, 'user_uuid', 'user_uuid')->where('app_id', auth()->appId());
     }
 
     /**
@@ -233,7 +226,7 @@ class UserProfile extends \Techup\ApiBase\Models\UserProfile
      */
     public function reminds()
     {
-        return $this->hasMany(Remind::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
+        return $this->hasMany(Remind::class, 'user_uuid', 'user_uuid')->where('app_id', auth()->appId());
     }
 
     /**
@@ -241,7 +234,7 @@ class UserProfile extends \Techup\ApiBase\Models\UserProfile
      */
     public function notes()
     {
-        return $this->hasMany(Note::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
+        return $this->hasMany(Note::class, 'user_uuid', 'user_uuid')->where('app_id', auth()->appId());
     }
 
     /**
@@ -249,7 +242,7 @@ class UserProfile extends \Techup\ApiBase\Models\UserProfile
      */
     public function positions()
     {
-        return $this->hasMany(Position::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
+        return $this->hasMany(Position::class, 'user_uuid', 'user_uuid')->where('app_id', auth()->appId());
     }
 
     /**
@@ -257,7 +250,7 @@ class UserProfile extends \Techup\ApiBase\Models\UserProfile
      */
     public function companies()
     {
-        return $this->hasMany(Company::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
+        return $this->hasMany(Company::class, 'user_uuid', 'user_uuid')->where('app_id', auth()->appId());
     }
 
     /**
@@ -265,7 +258,7 @@ class UserProfile extends \Techup\ApiBase\Models\UserProfile
      */
     public function status()
     {
-        return $this->hasMany(Status::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
+        return $this->hasMany(Status::class, 'user_uuid', 'user_uuid')->where('app_id', auth()->appId());
     }
 
     /**
@@ -273,7 +266,7 @@ class UserProfile extends \Techup\ApiBase\Models\UserProfile
      */
     public function partner()
     {
-        return $this->hasOne(Partner::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
+        return $this->hasOne(Partner::class, 'user_uuid', 'user_uuid')->where('app_id', auth()->appId());
     }
 
     /**
@@ -281,7 +274,7 @@ class UserProfile extends \Techup\ApiBase\Models\UserProfile
      */
     public function businessManagements()
     {
-        return $this->hasMany(BusinessManagement::class, 'owner_uuid', 'uuid')->where('app_id', auth()->appId());
+        return $this->hasMany(BusinessManagement::class, 'owner_uuid', 'user_uuid')->where('app_id', auth()->appId());
     }
 
     /**
@@ -289,22 +282,22 @@ class UserProfile extends \Techup\ApiBase\Models\UserProfile
      */
     public function domains()
     {
-        return $this->hasMany(Domain::class, 'owner_uuid', 'uuid')->where('app_id', auth()->appId());
+        return $this->hasMany(Domain::class, 'owner_uuid', 'user_uuid')->where('app_id', auth()->appId());
     }
 
     public function userTeam()
     {
-        return $this->hasOne(UserTeam::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
+        return $this->hasOne(UserTeam::class, 'user_uuid', 'user_uuid')->where('app_id', auth()->appId());
     }
 
     public function partnerUser()
     {
-        return $this->hasOne(PartnerUser::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
+        return $this->hasOne(PartnerUser::class, 'user_uuid', 'user_uuid')->where('app_id', auth()->appId());
     }
 
     public function invite()
     {
-        return $this->hasOne(Invite::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
+        return $this->hasOne(Invite::class, 'user_uuid', 'user_uuid')->where('app_id', auth()->appId());
     }
 
     public function userTeamContactLists()
@@ -314,7 +307,7 @@ class UserProfile extends \Techup\ApiBase\Models\UserProfile
 
     public function userTrackings()
     {
-        return $this->hasMany(UserTracking::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
+        return $this->hasMany(UserTracking::class, 'user_uuid', 'user_uuid')->where('app_id', auth()->appId());
     }
 
     /**
@@ -322,6 +315,6 @@ class UserProfile extends \Techup\ApiBase\Models\UserProfile
      */
     public function articleSeries()
     {
-        return $this->hasMany(ArticleSeries::class, 'assigned_ids', 'uuid')->where('app_id', auth()->appId());
+        return $this->hasMany(ArticleSeries::class, 'assigned_ids', 'user_uuid')->where('app_id', auth()->appId());
     }
 }
