@@ -53,7 +53,7 @@ class WebsitePageShortCodeController extends AbstractRestAPIController
 
     public function configShortcode(ConfigShortcodeRequest $request)
     {
-        $shortCode = $this->shortCodeGroupService->findOneWhere(['key' => $request->get('type')]);
+        $shortCode = $this->shortCodeGroupService->findOneWhereOrFail(['key' => $request->get('type')]);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData($this->resourceCollectionClass, $shortCode->shortCodes()->where('status', true)->get())

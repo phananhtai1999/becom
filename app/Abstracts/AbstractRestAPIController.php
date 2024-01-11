@@ -143,14 +143,17 @@ class AbstractRestAPIController extends BaseController
         $cacheNames = [PlatformPackage::DEFAULT_PLATFORM_PACKAGE_1, PlatformPackage::DEFAULT_PLATFORM_PACKAGE_2, PlatformPackage::DEFAULT_PLATFORM_PACKAGE_3];
         foreach ($cacheNames as $cacheName) {
             $permissionCaches = Cache::rememberForever($cacheName . '_permission', function () use ($cacheName) {
-                $platformPackage = PlatformPackage::findOrFail($cacheName);
-                return $platformPackage->permissions()->select('api_methods', 'name', 'code', 'uuid')->get();
+                $platformPackage = PlatformPackage::find($cacheName);
+                return $platformPackage ? $platformPackage->permissions()->select('api_methods', 'name', 'code', 'uuid')->get() : collect();
             });
             foreach ($permissionCaches as $permissionCache) {
                 if (in_array($code, $permissionCache->api_methods ?? [])) {
-                    $permissions = Permission::findOrFail($permissionCache->uuid)->platformPackages;
-                    foreach ($permissions as $permission) {
-                        return ['plan' => 'platform_package_' . $permission->uuid];
+                    $permission = Permission::find($permissionCache->uuid);
+                    if ($permission) {
+                        $platformPackages = $permission->platformPackages;
+                        foreach ($platformPackages as $platformPackage) {
+                            return ['plan' => 'platform_package_' . $platformPackage->uuid];
+                        }
                     }
                 }
             }
