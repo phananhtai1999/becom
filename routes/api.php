@@ -96,7 +96,6 @@ use App\Http\Controllers\Api\ArticleSeriesController;
 
 Route::group(['as' => 'auth.'], function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth:api');
-    Route::get('/me', [AuthController::class, 'me'])->name('me')->middleware('auth:api');
     Route::post('/register', [AuthController::class, 'register'])->name('register');
     Route::post('/login', [AuthController::class, 'login'])->name('login');
     Route::post('/forget-password', [AuthController::class, 'forgetPassword'])->name('forget-password');
@@ -107,6 +106,8 @@ Route::group(['as' => 'auth.'], function () {
 
 Route::group(['middleware' => ['apikey']], function () {
     Route::group(['middleware' => ['appid'], 'as' => 'appid.'], function () {
+        Route::get('/my-profile', [AuthController::class, 'myProfile'])->name('myProfile');
+
         Route::group(['as' => 'otp.'], function () {
             Route::get('/otp', [AuthController::class, 'sendOtp'])->name('otp');
             Route::post('/refresh-otp', [AuthController::class, 'refreshOtp'])->name('refreshOtp');
