@@ -224,7 +224,7 @@ class TeamController extends Controller
                     $businessUuid = $businesses->first()->uuid;
                 } else {
 
-                    return $this->sendJsonResponse(false, 'Does not have business', [], 403);
+                    return $this->sendJsonResponse(false, __('business.not_business'), [], 403);
                 }
             }
             if ($request->get('type') == Team::ACCOUNT_INVITE) {
@@ -319,7 +319,7 @@ class TeamController extends Controller
         if (!auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             if (!$this->checkTeamOwner($request->get('team_uuid'))) {
 
-                return $this->sendJsonResponse(false, 'You are not owner of team to set permission', [], 403);
+                return $this->sendJsonResponse(false, __('business.check_permission'), [], 403);
             }
         }
         $model = $this->userTeamService->findOneWhere([
@@ -346,7 +346,7 @@ class TeamController extends Controller
         if (!auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             if (!$this->checkTeamOwner($request->get('team_uuid'))) {
 
-                return $this->sendJsonResponse(false, 'You are not owner of team to set add ons', [], 403);
+                return $this->sendJsonResponse(false, __('business.check_permission'), [], 403);
             }
         }
 
@@ -368,7 +368,7 @@ class TeamController extends Controller
         if (!auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             if (!$this->checkTeamOwner($request->get('team_uuid'))) {
 
-                return $this->sendJsonResponse(false, 'You are not owner of team to set add ons', [], 403);
+                return $this->sendJsonResponse(false, __('business.check_permission'), [], 403);
             }
         }
 
@@ -394,7 +394,7 @@ class TeamController extends Controller
         if (!auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             if (!$this->checkTeamOwner($request->get('team_uuid'))) {
 
-                return $this->sendJsonResponse(false, 'You are not owner of team to set contact list', [], 403);
+                return $this->sendJsonResponse(false, __('business.check_permission'), [], 403);
             }
         }
         $user = $this->userService->findOrFailById($request->get('user_uuid'));
@@ -463,7 +463,7 @@ class TeamController extends Controller
     {
         if (!$this->checkTeamOwner($id)) {
 
-            return $this->sendJsonResponse(false, 'You are not owner of team to set permission', [], 403);
+            return $this->sendJsonResponse(false, __('business.check_permission'), [], 403);
         }
         $team = $this->service->findOrFailById($id);
         $permissions = $this->permissionService->getPermissionOfTeam($team->owner);
@@ -486,7 +486,7 @@ class TeamController extends Controller
     {
         if (!$this->checkTeamOwner($id)) {
 
-            return $this->sendJsonResponse(false, 'You are not owner of team to set permission', [], 403);
+            return $this->sendJsonResponse(false, __('business.check_permission'), [], 403);
         }
         $team = $this->service->findOrFailById($id);
         $contactLists = $this->contactListService->findAllWhere([
@@ -540,7 +540,7 @@ class TeamController extends Controller
         if (!auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             if (!$this->checkTeamOwner($request->get('team_uuid'))) {
 
-                return $this->sendJsonResponse(false, 'You are not owner of team to delete member', [], 403);
+                return $this->sendJsonResponse(false, __('business.check_permission'), [], 403);
             }
         }
         $user = $this->userService->findOrFailById($id);
@@ -560,7 +560,7 @@ class TeamController extends Controller
         if (!auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             if (!$this->checkTeamOwner($model->team_uuid)) {
 
-                return $this->sendJsonResponse(false, 'You are not owner of team to block member', [], 403);
+                return $this->sendJsonResponse(false, __('business.check_permission'), [], 403);
             }
         }
         $this->userTeamService->update($model, ['is_blocked' => true]);
@@ -574,7 +574,7 @@ class TeamController extends Controller
         if (!auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             if (!$this->checkTeamOwner($model->team_uuid)) {
 
-                return $this->sendJsonResponse(false, 'You are not owner of team to set permission', [], 403);
+                return $this->sendJsonResponse(false, __('business.check_permission'), [], 403);
             }
         }
         $this->userTeamService->update($model, ['is_blocked' => false]);
@@ -617,7 +617,7 @@ class TeamController extends Controller
             $businesses = $this->getBusiness();
             if (!$businesses) {
 
-                return $this->sendJsonResponse(false, 'You do not have access', [], 403);
+                return $this->sendJsonResponse(false, __('business.not_business'), [], 403);
             }
             $businessUuid = $businesses->uuid;
         }
@@ -656,7 +656,7 @@ class TeamController extends Controller
         if (!auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             if (!$this->checkTeamOwner($id)) {
 
-                return $this->sendJsonResponse(false, 'You are not owner of team to edit', [], 403);
+                return $this->sendJsonResponse(false, __('business.check_permission'), [], 403);
             }
         }
         $department = $this->departmentService->findOrFailById($request->get('department_uuid'));
@@ -687,7 +687,7 @@ class TeamController extends Controller
         if (!auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             if (!$this->checkTeamOwner($id)) {
 
-                return $this->sendJsonResponse(false, 'You are not owner of team to edit', [], 403);
+                return $this->sendJsonResponse(false, __('business.check_permission'), [], 403);
             }
         }
         $model = $this->myService->findOneWhereOrFail([
@@ -727,7 +727,7 @@ class TeamController extends Controller
         if (!auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             if (!$this->checkTeamOwner($request->get('team_uuid'))) {
 
-                return $this->sendJsonResponse(false, 'You are not owner of team to unset add-on', [], 403);
+                return $this->sendJsonResponse(false, __('business.check_permission'), [], 403);
             }
         }
         $team = $this->service->findOrFailById($request->get('team_uuid'));
