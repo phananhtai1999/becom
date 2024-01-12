@@ -36,6 +36,7 @@ use App\Services\CampaignLinkTrackingService;
 use App\Services\CampaignScenarioService;
 use App\Services\CampaignService;
 use App\Services\CampaignTrackingService;
+use App\Services\UserProfileService;
 use Techup\ApiConfig\Services\ConfigService;
 use App\Services\ContactService;
 use App\Services\EmailService;
@@ -166,11 +167,13 @@ class CampaignController extends AbstractRestAPIController
         UserService                      $userService,
         ConfigService                    $configService,
         CampaignScenarioService          $campaignScenarioService,
-        UserTeamService                  $userTeamService
+        UserTeamService                  $userTeamService,
+        UserProfileService $userProfileService
     )
     {
         $this->service = $service;
         $this->myService = $myService;
+        $this->userProfileService = $userProfileService;
         $this->resourceCollectionClass = CampaignResourceCollection::class;
         $this->resourceClass = CampaignResource::class;
         $this->storeRequest = CampaignRequest::class;
@@ -344,7 +347,7 @@ class CampaignController extends AbstractRestAPIController
      */
     public function storeMyCampaign(MyCampaignRequest $request)
     {
-        $user = $this->userService->findOrFailById(auth()->userId());
+        $user = $this->userProfileService->findOneWhereOrFail(['user_uuid' => auth()->userId()]);
         $configSmtpAuto = $this->configService->findConfigByKey('smtp_auto');
 
         if ($request->get('type') === "scenario" && count($request->get('contact_list')) > 1) {
@@ -404,7 +407,7 @@ class CampaignController extends AbstractRestAPIController
     {
         $model = $this->myService->findMyCampaignByKeyOrAbort($id);
 
-        $user = $this->userService->findOrFailById(auth()->userId());
+        $user = $this->userProfileService->findOneWhereOrFail(['user_uuid' => auth()->userId()]);
         $config = $this->configService->findConfigByKey('smtp_auto');
 
         if ($request->get('type') === "scenario" && count($request->get('contact_list')) > 1) {
