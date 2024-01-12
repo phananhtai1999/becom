@@ -89,7 +89,6 @@ class ArticleCategory extends AbstractModel
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
-        'user_uuid' => 'integer',
         'parent_uuid' => 'integer',
         'title' => 'array',
         'keyword' => 'array',

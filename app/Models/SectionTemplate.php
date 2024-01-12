@@ -51,7 +51,6 @@ class SectionTemplate extends AbstractModel
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
-        'user_uuid' =>  'integer',
         'section_category_uuid' => 'integer',
         'is_default' => 'boolean',
         'reject_reason' => 'array',

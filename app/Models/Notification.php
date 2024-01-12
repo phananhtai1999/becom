@@ -37,7 +37,6 @@ class Notification extends Model
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
         'read' => 'boolean',
-        'user_uuid' => 'integer',
         'type_uuid' => 'integer',
         'content' => 'array'
     ];

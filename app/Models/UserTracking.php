@@ -28,7 +28,6 @@ class UserTracking extends AbstractModel
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
-        'user_uuid' => 'integer'
     ];
 
     protected $appends = [

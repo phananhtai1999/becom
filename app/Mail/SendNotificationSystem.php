@@ -3,6 +3,7 @@
 namespace App\Mail;
 
 use App\Models\User;
+use App\Models\UserProfile;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -33,7 +34,7 @@ class SendNotificationSystem extends Mailable
      *
      * @return void
      */
-    public function __construct(User $user, $type, $action, $model = null)
+    public function __construct(UserProfile $user, $type, $action, $model = null)
     {
         $this->user = $user;
         $this->type = $type;

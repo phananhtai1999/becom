@@ -57,7 +57,6 @@ class Partner extends AbstractModel
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
         'partner_category_uuid' => 'integer',
-        'user_uuid' => 'integer',
     ];
 
     /**

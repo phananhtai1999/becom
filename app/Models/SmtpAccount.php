@@ -49,7 +49,6 @@ class SmtpAccount extends AbstractModel
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
         'send_project_uuid' =>  'integer',
-        'user_uuid' =>  'integer',
         'publish' => 'boolean'
     ];
 

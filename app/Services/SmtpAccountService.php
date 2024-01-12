@@ -11,8 +11,8 @@ use Illuminate\Support\Facades\DB;
 use Swift_SmtpTransport;
 use Swift_Mailer;
 use Illuminate\Support\Facades\Mail;
-use Techup\ApiConfig\Models\Config;
-
+use Techup\ApiConfig\Models\Config as ConfigModel;
+use Config;
 class SmtpAccountService extends AbstractService
 {
     protected $modelClass = SmtpAccount::class;
@@ -90,14 +90,15 @@ class SmtpAccountService extends AbstractService
      */
     public function getRandomSmtpAccountAdmin($sendTypeCampaign)
     {
+        // TODO: change logic get smtp account random
         return $this->model->select('smtp_accounts.*')
             ->join('becom_user_profiles', 'becom_user_profiles.user_uuid', '=', 'smtp_accounts.user_uuid')
-            ->join('role_user', 'role_user.user_uuid', '=', 'users.uuid')
+     
             ->where(function ($query) use ($sendTypeCampaign) {
                 if ($sendTypeCampaign == 'email') {
 
                     return $query->where([
-                        ['role_user.role_uuid', config('user.default_admin_role_uuid')],
+                      
                         ['smtp_accounts.mail_mailer', 'smtp'],
                         ['smtp_accounts.status', 'work'],
                         ['smtp_accounts.publish', true],
@@ -106,7 +107,7 @@ class SmtpAccountService extends AbstractService
                 } else {
 
                     return $query->where([
-                        ['role_user.role_uuid', config('user.default_admin_role_uuid')],
+                
                         ['smtp_accounts.mail_mailer', $sendTypeCampaign],
                         ['smtp_accounts.status', 'work'],
                         ['smtp_accounts.publish', true],
@@ -337,7 +338,7 @@ class SmtpAccountService extends AbstractService
      * @return void
      */
     public function sendEmailNotificationSystem($user, $mail, $email = null) {
-        $smtpAccount = Config::where(['key' => 'smtp_account'])->first();
+        $smtpAccount = ConfigModel::where(['key' => 'smtp_account'])->first();
         $this->setSwiftSmtpAccountForSendEmail($smtpAccount->value);
 
         Mail::to($user->email ?? $email)->send($mail);

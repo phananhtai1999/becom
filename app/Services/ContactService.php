@@ -818,24 +818,24 @@ class ContactService extends AbstractService
                 if ($value[1] == '=') {
                     $query->whereExists(function ($user) use ($value) {
                         $user->from('becom_user_profiles')
-                            ->whereRaw('contacts.user_uuid = users.uuid')
-                            ->whereIn('users.username', array_slice($value, 3));
+                            ->whereRaw('contacts.user_uuid = becom_user_profiles.user_uuid')
+                            ->whereIn('becom_user_profiles.email', array_slice($value, 3));
                     });
                 } elseif ($value[1] == '!=') {
                     $query->whereExists(function ($user) use ($value) {
                         $user->from('becom_user_profiles')
                             ->whereRaw('contacts.user_uuid = becom_user_profiles.user_uuid')
-                            ->whereNotIn('users.username', array_slice($value, 3));
+                            ->whereNotIn('becom_user_profiles.email', array_slice($value, 3));
                     });
                 } elseif ($value[1] == 'like') {
                     if (count($value) > 4) {
                         $query->where(function ($query) use ($value) {
                             for ($i = 4; $i <= count($value); $i++) {
                                 $query->orWhereExists(function ($query) use ($value, $i) {
-                                    $query->select("users.uuid")
+                                    $query->select("becom_user_profiles.user_uuid")
                                         ->from('becom_user_profiles')
                                         ->whereRaw('contacts.user_uuid = becom_user_profiles.user_uuid')
-                                        ->where('users.username', 'like', '%' . $value[$i - 1] . '%');
+                                        ->where('becom_user_profiles.email', 'like', '%' . $value[$i - 1] . '%');
                                 });
                             }
                         });
@@ -844,7 +844,7 @@ class ContactService extends AbstractService
                             $user->select("becom_user_profiles.user_uuid")
                                 ->from('becom_user_profiles')
                                 ->whereRaw('contacts.user_uuid = becom_user_profiles.user_uuid')
-                                ->where('users.username', 'like', '%' . $value[3] . '%');
+                                ->where('becom_user_profiles.email', 'like', '%' . $value[3] . '%');
                         });
                     }
                 }

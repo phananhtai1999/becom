@@ -34,7 +34,6 @@ class CreditTransactionHistory extends AbstractModel
 
     protected $casts = [
         'created_at' => 'datetime',
-        'user_uuid' => 'integer',
         'scenario_uuid' => 'integer',
         'campaign_uuid' => 'integer',
     ];
@@ -82,18 +81,18 @@ class CreditTransactionHistory extends AbstractModel
         $query->where(function ($query) use ($data){
             $query->whereNotNull('add_by_uuid')
                 ->whereIn('add_by_uuid', function ($query) use ($data){
-                    $query->select('users.uuid')
+                    $query->select('becom_user_profiles.user_uuid')
                         ->from('becom_user_profiles')
-                        ->whereColumn('add_by_uuid', 'users.uuid')
-                        ->where('users.email', $data);
+                        ->whereColumn('add_by_uuid', 'becom_user_profiles.user_uuid')
+                        ->where('becom_user_profiles.email', $data);
                 });
         })->orWhere(function ($query) use ($data){
             $query->whereNull('add_by_uuid')
                 ->whereIn('user_uuid', function ($query) use ($data){
-                    $query->select('users.uuid')
+                    $query->select('becom_user_profiles.user_uuid')
                         ->from('becom_user_profiles')
-                        ->whereColumn('user_uuid', 'users.uuid')
-                        ->where('users.email', $data);
+                        ->whereColumn('user_uuid', 'becom_user_profiles.user_uuid')
+                        ->where('becom_user_profiles.email', $data);
                 });
         });
     }

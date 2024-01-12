@@ -80,7 +80,6 @@ class Article extends AbstractModel
         'content' => 'array',
         'keyword' => 'array',
         'description' => 'array',
-        'user_uuid' => 'integer',
         'article_category_uuid' => 'integer',
         'single_purpose_uuid' => 'integer',
         'paragraph_type_uuid' => 'integer',
