@@ -78,6 +78,7 @@ use App\Http\Controllers\Api\WebsitePageController;
 use App\Http\Controllers\Api\WebsitePageShortCodeController;
 use App\Http\Controllers\Api\WebsiteVerificationController;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\ShopController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\SinglePurposeController;
 use App\Http\Controllers\Api\ParagraphTypeController;
@@ -941,6 +942,10 @@ Route::group(['middleware' => ['apikey']], function () {
             Route::post('business/add-department', [DepartmentController::class, 'addDepartmentForBusiness'])->name('addDepartmentForBusiness');
             Route::post('location/add-department', [DepartmentController::class, 'addDepartmentForLocation'])->name('addDepartmentForLocation');
             Route::get('toggle-default-department', [DepartmentController::class, 'toggleDefaultDepartment'])->name('toggleDefaultDepartment');
+        });
+        Route::group(['middleware' => ['userid'], 'as' => 'shop.'], function () {
+                Route::get('/my/products', [ShopController::class, 'myProduct'])->name('myProduct');
+                Route::get('/my/product-categories', [ShopController::class, 'myCategory'])->name('myCategory');
         });
 });
 

@@ -2,15 +2,9 @@
 
 namespace App\Services;
 
-use App\Abstracts\AbstractService;
-use App\Models\QueryBuilders\WebsitePageQueryBuilder;
-use App\Models\Website;
-use App\Models\WebsitePage;
-use Carbon\Carbon;
-use GuzzleHttp\Client;
-use Illuminate\Support\Str;
+use Techup\ApiBase\Services\AppCallService;
 
-class ShopService extends AbstractService
+class ShopService extends AppCallService
 {
 
     public function getProductDetailData($productUuid) {
@@ -70,6 +64,16 @@ class ShopService extends AbstractService
         $res = $client->get(config('shop.shop_url') . 'product-by-parent-category/' . $categoryUuid);
 
         return json_decode($res->getBody()->getContents(), true);
+    }
+
+    public function myProduct($request)
+    {
+        return $this->callService('ecom', 'get', '/my/products', $request->all(), auth()->appId(), auth()->userId());
+    }
+
+    public function myCategory($request)
+    {
+        return $this->callService('ecom', 'get', '/my/categories', $request->all(), auth()->appId(), auth()->userId());
     }
 
 }
