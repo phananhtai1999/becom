@@ -216,6 +216,7 @@ class BaseNotification
     {
 
         $user = $this->campaign->user;
+
         $mailTemplate = $this->campaign->mailTemplate;
         $creditNumberSendByCampaign = $creditTotal;
         $configPrice = $this->getNotificationPrice();
@@ -323,7 +324,7 @@ class BaseNotification
      */
     public function mapVariablelForSendCampaign($contact, $campaign, $mailSendingHistory, $footerTemplateSubscribe)
     {
-        $timezone = $this->configService->getConfigByKeyInCache('timezone')->value;
+        $timezone = $this->configService->findConfigByKey('timezone')->value;
         $current = Carbon::now($timezone);
         return [
             'to_email' => $contact->email,

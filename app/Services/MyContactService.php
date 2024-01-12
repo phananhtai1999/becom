@@ -650,13 +650,13 @@ class MyContactService extends AbstractService
                     $query->whereExists(function ($user) use ($value) {
                         $user->from('becom_user_profiles')
                             ->whereRaw('contacts.user_uuid = becom_user_profiles.user_uuid')
-                            ->whereIn('users.username', array_slice($value, 3));
+                            ->whereIn('becom_user_profiles.email', array_slice($value, 3));
                     });
                 } elseif ($value[1] == '!=') {
                     $query->whereExists(function ($user) use ($value) {
                         $user->from('becom_user_profiles')
                             ->whereRaw('contacts.user_uuid = becom_user_profiles.user_uuid')
-                            ->whereNotIn('becom_user_profiles.username', array_slice($value, 3));
+                            ->whereNotIn('becom_user_profiles.email', array_slice($value, 3));
                     });
                 } elseif ($value[1] == 'like') {
                     if (count($value) > 4) {
@@ -666,7 +666,7 @@ class MyContactService extends AbstractService
                                     $query->select("becom_user_profiles.user_uuid")
                                         ->from('becom_user_profiles')
                                         ->whereRaw('contacts.user_uuid = becom_user_profiles.user_uuid')
-                                        ->where('users.username', 'like', '%' . $value[$i - 1] . '%');
+                                        ->where('becom_user_profiles.email', 'like', '%' . $value[$i - 1] . '%');
                                 });
                             }
                         });
@@ -675,7 +675,7 @@ class MyContactService extends AbstractService
                             $user->select("becom_user_profiles.user_uuid")
                                 ->from('becom_user_profiles')
                                 ->whereRaw('contacts.user_uuid = becom_user_profiles.user_uuid')
-                                ->where('users.username', 'like', '%' . $value[3] . '%');
+                                ->where('becom_user_profiles.email', 'like', '%' . $value[3] . '%');
                         });
                     }
                 }

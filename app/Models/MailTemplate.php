@@ -56,7 +56,6 @@ class MailTemplate extends AbstractModel
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
         'send_project_uuid' => 'integer',
-        'user_uuid' => 'integer',
         'business_category_uuid' => 'integer',
         'purpose_uuid' => 'integer',
         'reject_reason' => 'array',

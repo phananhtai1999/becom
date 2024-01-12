@@ -59,7 +59,6 @@ class Website extends AbstractModel
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
-        'user_uuid' => 'integer',
         'footer_section_uuid' => 'integer',
         'header_section_uuid' => 'integer',
         'domain_uuid' => 'integer',

@@ -302,7 +302,7 @@ class UserProfile extends \Techup\ApiBase\Models\UserProfile
 
     public function userTeamContactLists()
     {
-        return $this->belongsToMany(ContactList::class, 'user_team_contact_lists', 'user_uuid', 'contact_list_uuid')->withTimestamps('created_at')->where('app_id', auth()->appId());
+        return $this->belongsToMany(ContactList::class, 'user_team_contact_lists', 'user_uuid', 'contact_list_uuid')->withTimestamps('created_at')->where('user_team_contact_lists.app_id', auth()->appId());
     }
 
     public function userTrackings()

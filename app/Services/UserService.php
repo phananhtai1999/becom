@@ -3,9 +3,9 @@
 namespace App\Services;
 
 use App\Abstracts\AbstractService;
-use App\Models\QueryBuilders\UserQueryBuilder;
+use App\Models\QueryBuilders\UserProfileQueryBuilder;
 use App\Models\Role;
-use App\Models\User;
+use App\Models\UserProfile;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
@@ -13,9 +13,9 @@ use Illuminate\Support\Facades\Hash;
 
 class UserService extends AbstractService
 {
-    protected $modelClass = User::class;
+    protected $modelClass = UserProfile::class;
 
-    protected $modelQueryBuilderClass = UserQueryBuilder::class;
+    protected $modelQueryBuilderClass = UserProfileQueryBuilder::class;
 
     /**
      * @return User|null
@@ -30,6 +30,14 @@ class UserService extends AbstractService
 
         return null;
     }
+
+    public function findOneById($uuid){
+        return $this->findOneWhere(['user_uuid' => $uuid]);
+    }
+    public function findOrFailById($uuid){
+        return $this->findOneWhereOrFail(['user_uuid' => $uuid]);
+    }
+    
 
     /**
      * @param $key

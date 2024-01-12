@@ -67,8 +67,8 @@ class Campaign extends AbstractModel
         'was_stopped_by_owner' => 'boolean',
         'mail_template_uuid' =>  'integer',
         'smtp_account_uuid' =>  'integer',
-        'send_project_uuid' =>  'integer',
-        'user_uuid' =>  'integer',
+        'send_project_uuid' =>  'integer'
+
     ];
 
     /**

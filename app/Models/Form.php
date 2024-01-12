@@ -49,7 +49,6 @@ class Form extends AbstractModel
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
         'contact_list_uuid' => 'integer',
-        'user_uuid' => 'integer',
         'template_json' => 'array',
         'reject_reason' => 'array',
     ];
