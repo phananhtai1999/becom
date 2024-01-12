@@ -14,11 +14,11 @@ class ReplaceProductService extends ShopService
         preg_match('/product-sort="(.*?)"/', $template, $sortName);
         preg_match('/product-sort-order="(.*?)"/', $template, $sortOrder);
         $productsData = $this->getListProductByCategoryUuid($productCategory['uuid'], $sortName[1] ?? 'created_at', $sortOrder[1] ?? 'desc', $productCount ?? 10);
-        $productsData = $productsData['data'];
+        $productsData = $productsData['data']['data'];
         $pattern = '/<product.*?>(.*?)<\/product>/s';
 
         return preg_replace_callback($pattern, function ($matches) use ($productsData, $websitePage) {
-            $productData = $productsData->shift();
+            $productData = array_shift($productsData);
             if (!$productData) {
                 return $matches[0];
             }
@@ -42,12 +42,13 @@ class ReplaceProductService extends ShopService
         preg_match('/product-sort-order="(.*?)"/', $template, $sortOrder);
         preg_match('/data-filter-product-by-category="(.*?)"/', $template, $sortFilterByCategory);
         if ($sortFilterByCategory) {
-            $productsData = $this->getListProductByCategoryUuid($sortFilterByCategory, $sortName[1] ?? 'created_at', $sortOrder[1] ?? 'desc', $productCount ?? 10);
+            $productsData = $this->getListProductByCategoryUuid($sortFilterByCategory[1], $sortName[1] ?? 'created_at', $sortOrder[1] ?? 'desc', $productCount ?? 10);
         } else {
             $productsData = $this->getListProductByCategoryUuid(null, $sortName[1] ?? 'created_at', $sortOrder[1] ?? 'desc', $productCount ?? 10);
         }
         $productsData = $productsData['data']['data'];
         $pattern = '/<product-element.*?>(.*?)<\/product-element>/s';
+
         return preg_replace_callback($pattern, function ($matches) use ($productsData, $websitePage) {
             $productData = array_shift($productsData);
 

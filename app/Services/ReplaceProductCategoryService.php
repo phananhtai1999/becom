@@ -67,11 +67,11 @@ class ReplaceProductCategoryService extends ReplaceChildrenProductCategoryServic
     public function searchReplaceMapForCategory($articleCategory = null): array
     {
         return [
-            '{category.uuid}' => $articleCategory['uuid'] ?? null,
-            '{category.slug}' => $articleCategory['slug'] ?? null,
-            '{category.title}' => array_values($articleCategory['title'])[0] ?? null,
-            '{category.image}' => $articleCategory['image'] ?? null,
-            '{category.parent_uuid}' => $articleCategory['short_content'] ?? null,
+            '{product_category.uuid}' => $articleCategory['uuid'] ?? null,
+            '{product_category.slug}' => $articleCategory['slug'] ?? null,
+            '{product_category.title}' => array_values($articleCategory['title'])[0] ?? null,
+            '{product_category.image}' => $articleCategory['image'] ?? null,
+            '{product_category.parent_uuid}' => $articleCategory['short_content'] ?? null,
         ];
     }
 
