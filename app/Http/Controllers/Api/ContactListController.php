@@ -17,7 +17,6 @@ use App\Services\ContactListService;
 use App\Services\ContactService;
 use App\Services\MyContactListService;
 use App\Services\UserProfileService;
-use App\Services\UserService;
 use App\Services\UserTeamService;
 use Illuminate\Http\JsonResponse;
 use function PHPUnit\Framework\isEmpty;

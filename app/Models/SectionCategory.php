@@ -6,6 +6,7 @@ use App\Abstracts\AbstractModel;
 use App\Http\Controllers\Traits\ModelFilterExactTitleCategoryLanguageTrait;
 use App\Http\Controllers\Traits\ModelFilterLanguageTrait;
 use App\Http\Controllers\Traits\ModelFilterTitleCategoryLanguageTrait;
+use App\Services\UserProfileService;
 use App\Services\UserService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -68,6 +69,6 @@ class SectionCategory extends AbstractModel
      */
     public function getTitlesAttribute()
     {
-        return app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('title') : $this->title;
+        return app(UserProfileService::class)->checkLanguagesPermission() ? $this->getTranslations('title') : $this->title;
     }
 }

@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Abstracts\AbstractModel;
 use App\Http\Controllers\Traits\ModelFilterExactNameLanguageTrait;
 use App\Http\Controllers\Traits\ModelFilterNameLanguageTrait;
+use App\Services\UserProfileService;
 use App\Services\UserService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -56,7 +57,7 @@ class Permission extends AbstractModel
      */
     public function getNamesAttribute()
     {
-        return app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('name') : $this->name;
+        return app(UserProfileService::class)->checkLanguagesPermission() ? $this->getTranslations('name') : $this->name;
     }
 
     public function addOns() {

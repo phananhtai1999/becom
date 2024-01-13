@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Abstracts\AbstractModel;
 use App\Http\Controllers\Traits\ModelFilterExactNameLanguageTrait;
 use App\Http\Controllers\Traits\ModelFilterNameLanguageTrait;
+use App\Services\UserProfileService;
 use App\Services\UserService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -74,7 +75,7 @@ class Status extends AbstractModel
      */
     public function user()
     {
-        return $this->belongsTo(UserProfile::class, 'user_uuid', 'user_uuid');
+        return $this->belongsTo(UserProfileService::class, 'user_uuid', 'user_uuid');
     }
 
     /**

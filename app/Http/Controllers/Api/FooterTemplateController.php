@@ -17,7 +17,6 @@ use App\Models\FooterTemplate;
 use App\Services\FooterTemplateService;
 use App\Services\MyFooterTemplateService;
 use App\Services\UserProfileService;
-use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
