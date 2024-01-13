@@ -17,6 +17,7 @@ use App\Models\Notification;
 use App\Models\Scenario;
 use App\Services\CampaignScenarioService;
 use App\Services\CampaignService;
+use App\Services\UserProfileService;
 use Techup\ApiConfig\Services\ConfigService;
 use App\Services\ContactService;
 use App\Services\MailSendingHistoryService;
@@ -60,9 +61,9 @@ class ScenarioController extends AbstractRestAPIController
         CampaignScenarioService $campaignScenarioService,
         MailSendingHistoryService $mailSendingHistoryService,
         CampaignService $campaignService,
-        UserService  $userService,
         ConfigService $configService,
-        ContactService $contactService
+        ContactService $contactService,
+        UserProfileService $userProfileService
     )
     {
         $this->service = $service;
@@ -71,7 +72,7 @@ class ScenarioController extends AbstractRestAPIController
         $this->resourceCollectionClass = ScenarioResourceCollection::class;
         $this->mailSendingHistoryService = $mailSendingHistoryService;
         $this->campaignService = $campaignService;
-        $this->userService = $userService;
+        $this->userProfileService = $userProfileService;
         $this->configService = $configService;
         $this->contactService = $contactService;
     }
@@ -453,7 +454,7 @@ class ScenarioController extends AbstractRestAPIController
         $campaign = $this->campaignService->checkActiveCampaignScenario($campaignRootScenario->campaign_uuid);
 
         $creditNumberSendEmail = $scenario->number_credit;
-        if ($this->userService->checkCredit($creditNumberSendEmail, $campaign->user_uuid)) {
+        if ($this->userProfileService->checkCredit($creditNumberSendEmail, $campaign->user_uuid)) {
             SendNotificationSystemEvent::dispatch($scenario->user, Notification::SCENARIO_TYPE, Notification::START_ACTION, $scenario);
             SendByCampaignRootScenarioEvent::dispatch($campaign, $creditNumberSendEmail, $campaignRootScenario);
             return ['status' => true,

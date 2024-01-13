@@ -13,7 +13,6 @@ use App\Services\MailSendingHistoryService;
 use App\Services\MailTemplateVariableService;
 use App\Services\SendEmailScheduleLogService;
 use App\Services\SmtpAccountService;
-use App\Services\UserService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
 class SendByCampaignRootScenarioListener implements ShouldQueue
@@ -54,11 +53,6 @@ class SendByCampaignRootScenarioListener implements ShouldQueue
     private $contactService;
 
     /**
-     * @var UserService
-     */
-    private $userService;
-
-    /**
      * @var CreditHistoryService
      */
     private $creditHistoryService;
@@ -91,7 +85,6 @@ class SendByCampaignRootScenarioListener implements ShouldQueue
      * @param EmailService $emailService
      * @param SendEmailScheduleLogService $sendEmailScheduleLogService
      * @param ContactService $contactService
-     * @param UserService $userService
      * @param CreditHistoryService $creditHistoryService
      * @param ConfigService $configService
      */
@@ -103,7 +96,6 @@ class SendByCampaignRootScenarioListener implements ShouldQueue
         EmailService $emailService,
         SendEmailScheduleLogService $sendEmailScheduleLogService,
         ContactService $contactService,
-        UserService $userService,
         CreditHistoryService $creditHistoryService,
         ConfigService $configService
     )
@@ -115,7 +107,6 @@ class SendByCampaignRootScenarioListener implements ShouldQueue
         $this->emailService = $emailService;
         $this->sendEmailScheduleLogService = $sendEmailScheduleLogService;
         $this->contactService = $contactService;
-        $this->userService = $userService;
         $this->creditHistoryService = $creditHistoryService;
         $this->configService = $configService;
     }

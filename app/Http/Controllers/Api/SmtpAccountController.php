@@ -23,7 +23,6 @@ use App\Models\MailTemplate;
 use Techup\ApiConfig\Services\ConfigService;
 use App\Services\MySmtpAccountService;
 use App\Services\SmtpAccountService;
-use App\Services\UserService;
 use App\Services\SendProjectService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
@@ -40,10 +39,6 @@ class SmtpAccountController extends AbstractRestAPIController
      */
     protected $myService;
 
-    /**
-     * @var UserService
-     */
-    protected $userService;
 
     /**
      * @var ConfigService
@@ -58,21 +53,18 @@ class SmtpAccountController extends AbstractRestAPIController
     /**
      * @param SmtpAccountService $service
      * @param MySmtpAccountService $myService
-     * @param UserService $userService
      * @param ConfigService $configService
      * @param SendProjectService $sendProjectService
      */
     public function __construct(
         SmtpAccountService   $service,
         MySmtpAccountService $myService,
-        UserService          $userService,
         ConfigService        $configService,
         SendProjectService   $sendProjectService
     )
     {
         $this->service = $service;
         $this->myService = $myService;
-        $this->userService = $userService;
         $this->configService = $configService;
         $this->resourceCollectionClass = SmtpAccountResourceCollection::class;
         $this->resourceClass = SmtpAccountResource::class;

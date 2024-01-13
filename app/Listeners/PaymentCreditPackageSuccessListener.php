@@ -6,7 +6,7 @@ use App\Models\CreditPackageHistory;
 use App\Models\Invoice;
 use App\Services\CreditPackageService;
 use App\Services\UserCreditHistoryService;
-use App\Services\UserService;
+use App\Services\UserProfileService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -17,9 +17,12 @@ class PaymentCreditPackageSuccessListener
      *
      * @return void
      */
-    public function __construct(UserService $userService, UserCreditHistoryService $userCreditHistoryService)
+    public function __construct(
+        UserCreditHistoryService $userCreditHistoryService,
+        UserProfileService $userProfileService
+    )
     {
-        $this->userService = $userService;
+        $this->userProfileService = $userProfileService;
         $this->userCreditHistoryService = $userCreditHistoryService;
     }
 
@@ -45,7 +48,7 @@ class PaymentCreditPackageSuccessListener
                 'credit' => $creditPackageHistory->creditPackage->credit,
                 'add_by_uuid' => $event->userUuid,
             ]);
-            $this->userService->update($model->user, ['credit' => $model->user->credit + $model->credit]);
+            $this->userProfileService->update($model->user, ['credit' => $model->user->credit + $model->credit]);
 
             DB::commit();
         } catch (\Exception $exception) {

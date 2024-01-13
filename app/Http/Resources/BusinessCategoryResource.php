@@ -3,7 +3,6 @@
 namespace App\Http\Resources;
 
 use App\Abstracts\AbstractJsonResource;
-use App\Services\UserService;
 
 class BusinessCategoryResource extends AbstractJsonResource
 {

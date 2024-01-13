@@ -16,6 +16,7 @@ use App\Http\Resources\FooterTemplateResourceCollection;
 use App\Models\FooterTemplate;
 use App\Services\FooterTemplateService;
 use App\Services\MyFooterTemplateService;
+use App\Services\UserProfileService;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -32,17 +33,17 @@ class FooterTemplateController extends AbstractRestAPIController
     public function __construct(
         FooterTemplateService $service,
         MyFooterTemplateService $myService,
-        UserService $userService
+        UserProfileService $userProfileService
     )
     {
         $this->service = $service;
+        $this->userProfileService = $userProfileService;
         $this->resourceCollectionClass = FooterTemplateResourceCollection::class;
         $this->resourceClass = FooterTemplateResource::class;
         $this->indexRequest = IndexRequest::class;
         $this->storeRequest = FooterTemplateRequest::class;
         $this->editRequest = UpdateFooterTemplateRequest::class;
         $this->myService = $myService;
-        $this->userService = $userService;
     }
 
     /**
@@ -205,8 +206,8 @@ class FooterTemplateController extends AbstractRestAPIController
         if (!Gate::allows('permission', config('api.footer.remove'))) {
             return $this->sendJsonResponse(false, 'You need to buy platform/add-on', ['data' => $this->getPlatformByPermission(config('api.footer.remove'))], 403);
         }
-        $user = auth()->userId();
-        $this->userService->update($user, [
+        $user = $this->userProfileService->findOneWhereOrFail(['user_uuid' => auth()->userId()]);
+        $this->userProfileService->update($user, [
            'can_remove_footer_template' => $request->get('can_remove_footer_template')
         ]);
         return $this->sendOkJsonResponse();

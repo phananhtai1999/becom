@@ -7,6 +7,7 @@ use App\Http\Requests\UploadImgRequest;
 use App\Http\Requests\UploadMailBoxFileRequest;
 use App\Http\Requests\UploadVideoRequest;
 use App\Services\UploadService;
+use App\Services\UserProfileService;
 use App\Services\UserService;
 use Aws\Exception\CredentialsException;
 use Aws\S3\Exception\S3Exception;
@@ -28,15 +29,14 @@ class UploadController extends AbstractRestAPIController
 
     /**
      * @param UploadService $uploadService
-     * @param UserService $userService
      */
     public function __construct(
         UploadService $uploadService,
-        UserService   $userService
+        UserProfileService $userProfileService
     )
     {
         $this->uploadService = $uploadService;
-        $this->userService = $userService;
+        $this->userProfileService = $userProfileService;
     }
 
     /**
@@ -71,7 +71,7 @@ class UploadController extends AbstractRestAPIController
     {
         try {
             //File structure by role
-            $char = $this->userService->getCurrentUserRole();
+            $char = $this->userProfileService->getCurrentUserRole();
 
             $fileName = Str::uuid() . '_' . time() . '.' . $uploadType->getClientOriginalExtension();
             $imageName = $char . '-' . $fileName;

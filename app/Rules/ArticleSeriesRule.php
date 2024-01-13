@@ -4,7 +4,7 @@ namespace App\Rules;
 
 use App\Models\Role;
 use App\Services\ParagraphTypeService;
-use App\Services\UserService;
+use App\Services\UserProfileService;
 use Illuminate\Contracts\Validation\Rule;
 
 class ArticleSeriesRule implements Rule
@@ -26,7 +26,7 @@ class ArticleSeriesRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        $user = (new  UserService())->findOneById($value);
+        $user = (new  UserProfileService())->findOneWhereOrFail(['user_uuid' => $value]);
         $role = optional(optional(optional($user)->roles)->whereIn('slug', [Role::ROLE_ADMIN, Role::ROLE_ROOT]))->count();
         $roleEditor = optional(optional(optional($user)->roles)->whereIn('slug', [Role::ROLE_EDITOR]))->count();
 

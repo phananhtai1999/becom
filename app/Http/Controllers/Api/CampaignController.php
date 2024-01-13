@@ -164,7 +164,6 @@ class CampaignController extends AbstractRestAPIController
         SendEmailScheduleLogService      $sendEmailScheduleLogService,
         MailSendingHistoryService        $mailSendingHistoryService,
         ContactService                   $contactService,
-        UserService                      $userService,
         ConfigService                    $configService,
         CampaignScenarioService          $campaignScenarioService,
         UserTeamService                  $userTeamService,
@@ -190,7 +189,6 @@ class CampaignController extends AbstractRestAPIController
         $this->sendEmailScheduleLogService = $sendEmailScheduleLogService;
         $this->mailSendingHistoryService = $mailSendingHistoryService;
         $this->contactService = $contactService;
-        $this->userService = $userService;
         $this->configService = $configService;
         $this->campaignScenarioService = $campaignScenarioService;
         $this->userTeamService = $userTeamService;

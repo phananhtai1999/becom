@@ -3,7 +3,6 @@
 namespace App\Http\Resources;
 
 use App\Abstracts\AbstractJsonResource;
-use App\Services\UserService;
 
 class ArticleSeriesResource extends AbstractJsonResource
 {

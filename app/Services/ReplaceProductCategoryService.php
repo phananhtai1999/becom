@@ -41,7 +41,7 @@ class ReplaceProductCategoryService extends ReplaceChildrenProductCategoryServic
         $sortName = $this->searchCategorySort($template);
         $sortOrder = $this->searchCategorySortOrder($template);
 
-        $categoriesData = $this->getChildrenByCategoryUuid(null, $sortName, $sortOrder, $childrenCategoryCount);
+        $categoriesData = $this->getProductHeader($sortName, $sortOrder, $childrenCategoryCount);
         $categoriesData = $categoriesData['data']['data'];
         return preg_replace_callback('/<product-category-element.*?>(.*?)<\/product-category-element>/s', function ($matches) use ($categoriesData) {
             $categoryData = array_shift($categoriesData);
@@ -51,7 +51,6 @@ class ReplaceProductCategoryService extends ReplaceChildrenProductCategoryServic
 
             $searchReplaceMap = $this->searchReplaceMapForCategory($categoryData);
             $matches[0] = str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $matches[0]);
-            $matches[0] = $this->replacechildrenProductCategory($matches[0], $categoryData);
 
             return $matches[0];
         }, $template);

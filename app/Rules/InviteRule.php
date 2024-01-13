@@ -3,7 +3,7 @@
 namespace App\Rules;
 
 use App\Services\DomainService;
-use App\Services\UserService;
+use App\Services\UserProfileService;
 use Illuminate\Contracts\Validation\Rule;
 
 class InviteRule implements Rule
@@ -27,7 +27,7 @@ class InviteRule implements Rule
     {
         $domain = optional((new DomainService())->findOneWhere([['name', $this->domain]]))->name;
         $email = $value . '@' . $domain;
-        $user = (new UserService())->findOneWhere([['email', $email]]);
+        $user = (new UserProfileService())->findOneWhere([['email', $email]]);
 
         if ($user)
         {
