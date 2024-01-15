@@ -72,4 +72,17 @@ class ScenarioService extends AbstractService
 
         return $this->collectionPagination($result, $request['per_page'], $request['page']);
     }
+
+    public function modifiedNodesScenario($nodes)
+    {
+        $fieldsToCheck = ['type', 'source', 'open_within'];
+        return array_map(function ($object) use ($fieldsToCheck){
+            foreach ($fieldsToCheck as $field) {
+                if (!isset($object[$field])) {
+                    $object[$field] = null;
+                }
+            }
+            return $object;
+        }, $nodes);
+    }
 }

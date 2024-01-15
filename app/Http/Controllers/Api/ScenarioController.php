@@ -109,7 +109,7 @@ class ScenarioController extends AbstractRestAPIController
      */
     public function storeScenario(ScenarioRequest $request)
     {
-        $nodes = $request->get('nodes');
+        $nodes = $this->service->modifiedNodesScenario($request->get('nodes'));
         $NodeIdBySource = array_column($nodes, 'source', 'id');
 
         //Validate
@@ -176,8 +176,8 @@ class ScenarioController extends AbstractRestAPIController
      */
     public function storeMyScenario(ScenarioRequest $request)
     {
+        $nodes = $this->service->modifiedNodesScenario($request->get('nodes'));
 
-        $nodes = $request->get('nodes');
         $NodeIdBySource = array_column($nodes, 'source', 'id');
 
         //Validate
