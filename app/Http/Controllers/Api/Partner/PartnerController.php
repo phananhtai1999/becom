@@ -30,6 +30,7 @@ use App\Models\PartnerUser;
 use App\Models\SubscriptionHistory;
 use App\Models\User;
 use App\Models\UserPaymentByDay;
+use App\Models\UserProfile;
 use App\Services\PartnerLevelService;
 use App\Services\PartnerPayoutService;
 use App\Services\PartnerService;
@@ -38,6 +39,7 @@ use App\Services\PartnerTrackingService;
 use App\Services\PartnerUserService;
 use App\Services\SmtpAccountService;
 use App\Services\UserPaymentByDayService;
+use App\Services\UserProfileService;
 use App\Services\UserService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -75,7 +77,8 @@ class PartnerController extends AbstractRestAPIController
         PartnerTrackingService $partnerTrackingService,
         UserPaymentByDayService $userPaymentByDayService,
         PartnerTrackingByYearService $partnerTrackingByYearService,
-        PartnerPayoutService $partnerPayoutService
+        PartnerPayoutService $partnerPayoutService,
+        UserProfileService $userProfileService
     )
     {
         $this->service = $service;
@@ -92,6 +95,7 @@ class PartnerController extends AbstractRestAPIController
         $this->userPaymentByDayService = $userPaymentByDayService;
         $this->partnerTrackingByYearService = $partnerTrackingByYearService;
         $this->partnerPayoutService = $partnerPayoutService;
+        $this->userProfileService = $userProfileService;
     }
 
     /**

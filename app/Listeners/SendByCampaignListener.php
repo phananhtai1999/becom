@@ -5,6 +5,7 @@ namespace App\Listeners;
 use App\Events\SendByCampaignEvent;
 use App\Notifications\BaseNotification;
 use App\Services\CampaignService;
+use App\Services\UserProfileService;
 use Techup\ApiConfig\Services\ConfigService;
 use App\Services\ContactService;
 use App\Services\CreditHistoryService;
@@ -96,7 +97,8 @@ class SendByCampaignListener implements ShouldQueue {
 		SendEmailScheduleLogService $sendEmailScheduleLogService,
 		ContactService $contactService,
 		CreditHistoryService $creditHistoryService,
-		ConfigService $configService
+		ConfigService $configService,
+        UserProfileService $userProfileService
 	) {
 		$this->mailTemplateVariableService = $mailTemplateVariableService;
 		$this->mailSendingHistoryService = $mailSendingHistoryService;
@@ -107,6 +109,7 @@ class SendByCampaignListener implements ShouldQueue {
 		$this->contactService = $contactService;
 		$this->creditHistoryService = $creditHistoryService;
 		$this->configService = $configService;
+		$this->userProfileService = $userProfileService;
 	}
 
 	/**
@@ -119,7 +122,7 @@ class SendByCampaignListener implements ShouldQueue {
 		$emailNotification = app()->makeWith(BaseNotification::class, ['campaign' => $campaign])->getAdapter();
 		$creditNumberSendByCampaign = $emailNotification->calculatorCredit();
 
-		if (!$this->userService->checkCredit($creditNumberSendByCampaign, $campaign->user_uuid)) {
+		if (!$this->userProfileService->checkCredit($creditNumberSendByCampaign, $campaign->user_uuid)) {
 			$this->campaignService->update($campaign, [
 				'was_stopped_by_owner' => true,
 			]);
