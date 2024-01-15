@@ -20,17 +20,17 @@ use App\Models\Asset;
 use App\Models\Role;
 use App\Services\AssetService;
 use App\Services\UploadService;
-use App\Services\UserService;
+use App\Services\UserProfileService;
 use Carbon\Carbon;
 
 class AssetController extends AbstractRestAPIController
 {
     use RestShowTrait, RestDestroyTrait, RestIndexTrait;
 
-    public function __construct(AssetService $service, UserService $userService, UploadService $uploadService)
+    public function __construct(AssetService $service, UploadService $uploadService, UserProfileService $userProfileService)
     {
         $this->service = $service;
-        $this->userService = $userService;
+        $this->userProfileService = $userProfileService;
         $this->uploadService = $uploadService;
         $this->resourceCollectionClass = AssetResourceCollection::class;
         $this->resourceClass = AssetResource::class;
@@ -41,7 +41,7 @@ class AssetController extends AbstractRestAPIController
 
     public function store(AssetRequest $request)
     {
-        $uploadUrl = $this->uploadFile($request->file, $this->userService->getCurrentUserRole(), $this->uploadService);
+        $uploadUrl = $this->uploadFile($request->file, $this->userProfileService->getCurrentUserRole(), $this->uploadService);
         $filename = $uploadUrl['absolute_slug'];
         if ($request->get('type') == 'image') {
             if (getimagesize($filename)['mime'] == 'image/gif') {
@@ -70,7 +70,7 @@ class AssetController extends AbstractRestAPIController
     {
         $model = $this->service->findOrFailById($id);
         if ($request->file) {
-            $uploadUrl = $this->uploadFile($request->file, $this->userService->getCurrentUserRole(), $this->uploadService);
+            $uploadUrl = $this->uploadFile($request->file, $this->userProfileService->getCurrentUserRole(), $this->uploadService);
             $filename = $uploadUrl['absolute_slug'];
             if ($request->get('type') == 'image') {
                 if (getimagesize($filename)['mime'] == 'image/gif') {
@@ -190,7 +190,7 @@ class AssetController extends AbstractRestAPIController
 
     public function storePendingAsset(UnpublishedAssetRequest $request)
     {
-        $uploadUrl = $this->uploadFile($request->file, $this->userService->getCurrentUserRole(), $this->uploadService);
+        $uploadUrl = $this->uploadFile($request->file, $this->userProfileService->getCurrentUserRole(), $this->uploadService);
         $filename = $uploadUrl['absolute_slug'];
         if ($request->get('type') == 'image') {
             if (getimagesize($filename)['mime'] == 'image/gif') {
@@ -255,7 +255,7 @@ class AssetController extends AbstractRestAPIController
     {
         $model = $this->service->showAssetForEditorById($id);
         if ($request->file) {
-            $uploadUrl = $this->uploadFile($request->file, $this->userService->getCurrentUserRole(), $this->uploadService);
+            $uploadUrl = $this->uploadFile($request->file, $this->userProfileService->getCurrentUserRole(), $this->uploadService);
             $filename = $uploadUrl['absolute_slug'];
             if ($request->get('type') == 'image') {
                 if (getimagesize($filename)['mime'] == 'image/gif') {

@@ -91,7 +91,7 @@ class UserProfile extends \Techup\ApiBase\Models\UserProfile
 
     public function teams()
     {
-        return $this->belongsToMany(Team::class, 'user_teams', 'user_uuid', 'team_uuid')->withTimestamps()->where('user_teams.app_id', auth()->appId());
+        return $this->belongsToMany(Team::class, 'user_teams', 'user_uuid', 'team_uuid', 'user_uuid')->withTimestamps()->where('user_teams.app_id', auth()->appId());
     }
 
     /**
@@ -99,7 +99,7 @@ class UserProfile extends \Techup\ApiBase\Models\UserProfile
      */
     public function roles()
     {
-        return $this->belongsToMany(Role::class, 'role_user', 'user_uuid', 'role_uuid')->withTimestamps();
+        return $this->belongsToMany(Role::class, 'role_user', 'user_uuid', 'role_uuid', 'user_uuid')->withTimestamps();
     }
 
     /**
@@ -302,7 +302,10 @@ class UserProfile extends \Techup\ApiBase\Models\UserProfile
 
     public function userTeamContactLists()
     {
-        return $this->belongsToMany(ContactList::class, 'user_team_contact_lists', 'user_uuid', 'contact_list_uuid')->withTimestamps('created_at')->where('user_team_contact_lists.app_id', auth()->appId());
+        return $this->belongsToMany(ContactList::class, 'user_team_contact_lists', 'user_uuid', 'contact_list_uuid', 'user_uuid')
+            ->withTimestamps('created_at')
+//            ->withPivot(['app_id'])
+            ->where('user_team_contact_lists.app_id', auth()->appId());
     }
 
     public function userTrackings()

@@ -5,7 +5,6 @@ namespace App\Models;
 use App\Abstracts\AbstractModel;
 use App\Http\Controllers\Traits\ModelFilterDescriptionLanguageTrait;
 use App\Http\Controllers\Traits\ModelFilterKeywordLanguageTrait;
-use App\Services\UserService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;

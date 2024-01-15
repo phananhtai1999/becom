@@ -9,7 +9,6 @@ use App\Mail\SendRecoveryPasswordEmailToUser;
 use Techup\ApiConfig\Services\ConfigService;
 use App\Services\PasswordResetService;
 use App\Services\SmtpAccountService;
-use App\Services\UserService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Carbon;
@@ -19,11 +18,6 @@ use Illuminate\Support\Str;
 class SendAccountForNewPartnerListener implements ShouldQueue
 {
     /**
-     * @var UserService
-     */
-    private $userService;
-
-    /**
      * @var PasswordResetService
      */
     private $passwordResetService;
@@ -32,16 +26,13 @@ class SendAccountForNewPartnerListener implements ShouldQueue
     /**
      * Create the event listener.
      *
-     * @param UserService $userService
      * @param PasswordResetService $passwordResetService
      */
     public function __construct(
-        UserService $userService,
         PasswordResetService $passwordResetService,
         SmtpAccountService $smtpAccountService
     )
     {
-        $this->userService = $userService;
         $this->passwordResetService = $passwordResetService;
         $this->smtpAccountService = $smtpAccountService;
     }

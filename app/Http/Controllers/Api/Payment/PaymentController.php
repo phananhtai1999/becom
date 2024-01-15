@@ -38,7 +38,6 @@ class PaymentController extends AbstractRestAPIController
     public function __construct(
         PaypalService               $paypalService,
         StripeService               $stripeService,
-        UserService                 $userService,
         SubscriptionPlanService     $subscriptionPlanService,
         PlatformPackageService      $platformPackageService,
         CreditPackageService        $creditPackageService,
@@ -52,7 +51,6 @@ class PaymentController extends AbstractRestAPIController
     {
         $this->paypalService = $paypalService;
         $this->stripeService = $stripeService;
-        $this->userService = $userService;
         $this->service = $service;
         $this->subscriptionPlanService = $subscriptionPlanService;
         $this->platformPackageService = $platformPackageService;

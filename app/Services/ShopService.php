@@ -39,6 +39,16 @@ class ShopService extends AppCallService
         return $this->callService('ecom', 'get', 'children-category', $data, auth()->appId(), auth()->userId());
     }
 
+    public function getProductHeader($sortName = 'created_at', $sortOrder = 'desc', $childrenCategoryCount = 10) {
+        $data = [
+            'per_page' => $childrenCategoryCount,
+            'sorted_by' => $sortOrder,
+            'sort' => $sortName
+        ];
+
+        return $this->callService('ecom', 'get', 'product-header', $data, auth()->appId(), auth()->userId());
+    }
+
     public function getListProductByCategoryUuid($categoryUuid, $sortName = 'created_at', $sortOrder = 'desc', $childrenCategoryCount = 10) {
         if (empty($categoryUuid)) {
             $data = [

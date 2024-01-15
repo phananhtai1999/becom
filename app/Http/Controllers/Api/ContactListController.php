@@ -16,7 +16,7 @@ use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Services\ContactListService;
 use App\Services\ContactService;
 use App\Services\MyContactListService;
-use App\Services\UserService;
+use App\Services\UserProfileService;
 use App\Services\UserTeamService;
 use Illuminate\Http\JsonResponse;
 use function PHPUnit\Framework\isEmpty;
@@ -45,14 +45,14 @@ class ContactListController extends AbstractRestAPIController
         MyContactListService $myService,
         ContactService       $contactService,
         UserTeamService      $userTeamService,
-        UserService          $userService
+        UserProfileService $userProfileService
     )
     {
         $this->service = $service;
         $this->myService = $myService;
         $this->contactService = $contactService;
         $this->userTeamService = $userTeamService;
-        $this->userService = $userService;
+        $this->userProfileService = $userProfileService;
         $this->resourceCollectionClass = ContactListResourceCollection::class;
         $this->resourceClass = ContactListResource::class;
         $this->storeRequest = ContactListRequest::class;
@@ -229,8 +229,8 @@ class ContactListController extends AbstractRestAPIController
                     ]));
                     //need function userteamcontaclist here
                     if ($userUuid != auth()->userId()) {
-                        $user = $this->userService->findOrFailById(auth()->userId());
-                        $user->userTeamContactLists()->attach($model->uuid);
+                        $user = $this->userProfileService->findOneWhereOrFail(['user_uuid' => auth()->userId()]);
+                        $user->userTeamContactLists()->attach($model->uuid, ['app_id' => auth()->appId()]);
                     }
                     $model->contacts()->attach(array_merge($request->get('contact', []), $import['data']));
                     if ($import['have_error_data'] === true) {
@@ -263,8 +263,8 @@ class ContactListController extends AbstractRestAPIController
         $model->contacts()->attach($request->get('contact', []));
         if ($userUuid != auth()->userId()) {
             //need function userteamcontaclist here
-            $user = $this->userService->findOrFailById(auth()->userId());
-            $user->userTeamContactLists()->attach($model->uuid);
+            $user = $this->userProfileService->findOneWhereOrFail(['user_uuid' => auth()->userId()]);
+            $user->userTeamContactLists()->attach($model->uuid, ['app_id' => auth()->appId()]);
         }
 
         return $this->sendCreatedJsonResponse(

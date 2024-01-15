@@ -156,7 +156,7 @@ class PartnerController extends AbstractRestAPIController
         $userUuid = $model->user_uuid;
         if (!$model->code && $request->get('publish_status') === 'active') {
             //Random code partner
-            $minCode = $this->userService->getMinCodeByNumberOfUser();
+            $minCode = $this->userProfileService->getMinCodeByNumberOfUser();
             do {
                 $code = $this->generateRandomString($minCode);
                 $modelCode = $this->service->findOneWhere(['code' => $code]);

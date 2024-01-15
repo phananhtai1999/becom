@@ -164,7 +164,6 @@ class CampaignController extends AbstractRestAPIController
         SendEmailScheduleLogService      $sendEmailScheduleLogService,
         MailSendingHistoryService        $mailSendingHistoryService,
         ContactService                   $contactService,
-        UserService                      $userService,
         ConfigService                    $configService,
         CampaignScenarioService          $campaignScenarioService,
         UserTeamService                  $userTeamService,
@@ -190,7 +189,6 @@ class CampaignController extends AbstractRestAPIController
         $this->sendEmailScheduleLogService = $sendEmailScheduleLogService;
         $this->mailSendingHistoryService = $mailSendingHistoryService;
         $this->contactService = $contactService;
-        $this->userService = $userService;
         $this->configService = $configService;
         $this->campaignScenarioService = $campaignScenarioService;
         $this->userTeamService = $userTeamService;
@@ -737,7 +735,7 @@ class CampaignController extends AbstractRestAPIController
         }
         if ($this->sendEmailScheduleLogService->checkActiveCampaignbyCampaignUuid($campaignUuid)) {
             $creditNumberSendEmail = $campaign->number_credit_needed_to_start_campaign;
-            if ($this->userService->checkCredit($creditNumberSendEmail, $campaign->user_uuid)) {
+            if ($this->userProfileService->checkCredit($creditNumberSendEmail, $campaign->user_uuid)) {
                 SendNotificationSystemEvent::dispatch($campaign->user, Notification::CAMPAIGN_TYPE, Notification::START_ACTION, $campaign);
                 SendByCampaignEvent::dispatch($campaign, $creditNumberSendEmail);
                 return ['status' => true,

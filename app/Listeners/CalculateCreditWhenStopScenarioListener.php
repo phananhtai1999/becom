@@ -9,7 +9,7 @@ use App\Services\ContactService;
 use App\Services\CreditHistoryService;
 use App\Services\MailSendingHistoryService;
 use App\Services\UserCreditHistoryService;
-use App\Services\UserService;
+use App\Services\UserProfileService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\DB;
@@ -26,10 +26,6 @@ class CalculateCreditWhenStopScenarioListener
      */
     private $configService;
     /**
-     * @var UserService
-     */
-    private $userService;
-    /**
      * @var UserCreditHistoryService
      */
     private $userCreditHistoryService;
@@ -42,15 +38,15 @@ class CalculateCreditWhenStopScenarioListener
     public function __construct(
         MailSendingHistoryService $mailSendingHistoryService,
         ConfigService $configService,
-        UserService $userService,
-        UserCreditHistoryService $userCreditHistoryService
+        UserCreditHistoryService $userCreditHistoryService,
+        UserProfileService $userProfileService
 
     )
     {
         $this->mailSendingHistoryService = $mailSendingHistoryService;
         $this->configService = $configService;
-        $this->userService = $userService;
         $this->userCreditHistoryService = $userCreditHistoryService;
+        $this->userProfileService = $userProfileService;
     }
 
     /**
@@ -73,14 +69,14 @@ class CalculateCreditWhenStopScenarioListener
             DB::beginTransaction();
             try {
                 $creditRefund = $scenario->number_credit - $sumCreditUsed;
-                $user = $this->userService->findOneById($scenario->user_uuid);
+                $user = $this->userProfileService->findOneWhere(['user_uuid' => $scenario->user_uuid]);
                 $this->userCreditHistoryService->create([
                     'user_uuid' => $scenario->user_uuid,
                     'credit' => $creditRefund,
                     'add_by_uuid' => $scenario->user_uuid
                 ]);
 
-                $this->userService->update($user, [
+                $this->userProfileService->update($user, [
                     'credit' => $user->credit + $creditRefund
                 ]);
 

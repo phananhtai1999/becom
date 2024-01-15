@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Abstracts\AbstractModel;
 use App\Http\Controllers\Traits\ModelFilterExactTitleCategoryLanguageTrait;
 use App\Http\Controllers\Traits\ModelFilterLanguageTrait;
+use App\Services\UserProfileService;
 use App\Services\UserService;
 use Baum\NestedSet\Node as WorksAsNestedSet;
 use Illuminate\Database\Eloquent\Builder;
@@ -177,7 +178,7 @@ class ArticleSeries extends AbstractModel
      */
     public function getTitlesAttribute()
     {
-        return app(UserService::class)->checkLanguagesPermission() ? $this->getTranslations('title') : $this->title;
+        return app(UserProfileService::class)->checkLanguagesPermission() ? $this->getTranslations('title') : $this->title;
     }
 
     /**

@@ -57,6 +57,7 @@ use App\Services\SendProjectService;
 use App\Services\SmtpAccountService;
 use App\Services\TeamService;
 use App\Services\UserBusinessService;
+use App\Services\UserProfileService;
 use App\Services\UserService;
 use App\Services\UserTeamService;
 use Illuminate\Http\Client\ConnectionException;
@@ -90,7 +91,8 @@ class TeamController extends Controller
         DepartmentService $departmentService,
         LocationService $locationService,
         SendProjectService $sendProjectService,
-        CstoreService $cstoreService
+        CstoreService $cstoreService,
+        UserProfileService $userProfileService
     )
     {
         $this->service = $service;
@@ -98,6 +100,7 @@ class TeamController extends Controller
         $this->smtpAccountService = $smtpAccountService;
         $this->userTeamService = $userTeamService;
         $this->userService = $userService;
+        $this->userProfileService = $userProfileService;
         $this->inviteService = $inviteService;
         $this->businessManagementService = $businessManagementService;
         $this->permissionService = $permissionService;
@@ -397,7 +400,7 @@ class TeamController extends Controller
                 return $this->sendJsonResponse(false, __('business.check_permission'), [], 403);
             }
         }
-        $user = $this->userService->findOrFailById($request->get('user_uuid'));
+        $user = $this->userProfileService->findOneWhereOrFail(['user_uuid' => $request->get('user_uuid')]);
         $model = $this->userTeamService->findOneWhere([
             'user_uuid' => $request->get('user_uuid'),
             'team_uuid' => $request->get('team_uuid'),
@@ -543,7 +546,7 @@ class TeamController extends Controller
                 return $this->sendJsonResponse(false, __('business.check_permission'), [], 403);
             }
         }
-        $user = $this->userService->findOrFailById($id);
+        $user = $this->userProfileService->findOneWhereOrFail(['user_uuid' => $id]);
         //need function userteamcontaclist here
         $user->userTeamContactLists()->detach();
         $this->userTeamService->destroy($model->uuid);
@@ -588,8 +591,7 @@ class TeamController extends Controller
      */
     public function resetPassword(ResetPasswordEmailTeamMemberRequest $request)
     {
-        $user = $this->userService
-            ->findOneWhere(['uuid' => $request->user_uuid]);
+        $user = $this->userProfileService->findOneWhereOrFail(['user_uuid' => $request->user_uuid]);
 
         if ($user) {
             $user->update([
