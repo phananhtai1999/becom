@@ -43,10 +43,12 @@ class ScenarioRequest extends AbstractRequest
         ];
 
         foreach ($this->request->get('nodes') as $key => $node) {
-            if ($node['type'] === 'not_open') {
-                $validate['nodes.' . $key . '.open_within'] = ['required', 'numeric', 'min:1'];
-            } else {
-                $validate['nodes.' . $key . '.open_within'] = [new OpenWithinByTypeRule($node['type'])];
+            if(isset($node['type'])){
+                if ($node['type'] === 'not_open') {
+                    $validate['nodes.' . $key . '.open_within'] = ['required', 'numeric', 'min:1'];
+                } else {
+                    $validate['nodes.' . $key . '.open_within'] = [new OpenWithinByTypeRule($node['type'])];
+                }
             }
         }
 
