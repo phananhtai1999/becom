@@ -75,7 +75,7 @@ class Status extends AbstractModel
      */
     public function user()
     {
-        return $this->belongsTo(UserProfileService::class, 'user_uuid', 'user_uuid');
+        return $this->belongsTo(UserProfile::class, 'user_uuid', 'user_uuid');
     }
 
     /**
@@ -83,6 +83,6 @@ class Status extends AbstractModel
      */
     public function getNamesAttribute()
     {
-        return app(UserService::class)->checkLanguagesPermissionWithAdminAndRootRole() ? $this->getTranslations('name') : $this->name;
+        return app(UserProfileService::class)->checkLanguagesPermissionWithAdminAndRootRole() ? $this->getTranslations('name') : $this->name;
     }
 }
