@@ -18,6 +18,7 @@ use App\Models\Invite;
 use App\Models\PasswordReset;
 use App\Models\PlatformPackage;
 use App\Models\User;
+use App\Services\UserProfileService;
 use Techup\ApiConfig\Services\ConfigService;
 use App\Services\InviteService;
 use App\Services\OtpService;
@@ -90,7 +91,8 @@ class AuthController extends AbstractRestAPIController
         InviteService          $inviteService,
         UserTeamService        $userTeamService,
         PartnerService         $partnerService,
-        PartnerUserService     $partnerUserService
+        PartnerUserService     $partnerUserService,
+        UserProfileService $userProfileService
     )
     {
         $this->userService = $userService;
@@ -105,6 +107,7 @@ class AuthController extends AbstractRestAPIController
         $this->userTeamService = $userTeamService;
         $this->partnerService = $partnerService;
         $this->partnerUserService = $partnerUserService;
+        $this->userProfileService = $userProfileService;
     }
 
     /**
@@ -159,7 +162,7 @@ class AuthController extends AbstractRestAPIController
     public function myProfile(): JsonResponse
     {
         /** @var User $user */
-        $user = auth()->user();
+        $user = $this->userProfileService->findOneWhereOrFail(['user_uuid' => auth()->userId(), 'app_id' => auth()->appId()]);
         if ($user) {
             return $this->sendOkJsonResponse(
                 app(UserResource::class, ['resource' => $user])

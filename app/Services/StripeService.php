@@ -22,7 +22,81 @@ class StripeService extends AbstractService
      */
     public function getStripeClient(): StripeClient
     {
-        return new StripeClient($this->getConfigByKeyInCache('stripe_secret_key')->value);
+        return new StripeClient($this->getConfigByKeyInCache('stripe_secret_key')->default_value);
+    }
+
+    private function getCallbackSuccessPaymentUrl($request, $userUuid, $creditPackage)
+    {
+        $url = env('DOMAIN') . '/' . auth()->appId() . '/' . env('SERVICE_NAME') . '/' . route('stripe.successPayment', [
+                'goBackUrl=' . $request['go_back_url'],
+                'userUuid=' . $userUuid,
+                'creditPackageUuid=' . $creditPackage->uuid,
+                'billingAddressUuid=' . $request['billing_address_uuid'],
+            ], false) . '&session_id={CHECKOUT_SESSION_ID}';
+
+        return str_replace('/api/', '', $url);
+    }
+
+    private function getCallbackCancelPaymentUrl($request, $userUuid, $creditPackage)
+    {
+        $url = env('DOMAIN') . '/' . auth()->appId() . '/' . env('SERVICE_NAME') . '/' . route('stripe.cancelPayment', [
+                'goBackUrl=' . $request['go_back_url'],
+                'userUuid=' . $userUuid,
+                'creditPackageUuid=' . $creditPackage->uuid,
+            ], false);
+
+        return str_replace('/api/', '', $url);
+    }
+
+    //subscription
+    private function getCallbackSuccessSubscriptionUrl($request, $subscriptionPlan, $subscriptionDate, $expirationDate)
+    {
+        $url = env('DOMAIN') . '/' . auth()->appId() . '/' . env('SERVICE_NAME') . '/' . route('stripe.successPaymentSubscription', [
+                'goBackUrl=' . $request['go_back_url'],
+                'subscriptionPlanUuid=' . $subscriptionPlan->uuid,
+                'subscriptionDate=' . $subscriptionDate,
+                'userUuid=' . auth()->userId(),
+                'expirationDate=' . $expirationDate,
+                'platformPackageUuid=' . $subscriptionPlan->platform_package_uuid,
+                'billingAddressUuid=' . $request['billing_address_uuid'],
+            ], false) . '&session_id={CHECKOUT_SESSION_ID}';
+
+        return str_replace('/api/', '', $url);
+    }
+
+    private function getCallbackCancelSubscriptionUrl($request, $subscriptionPlan)
+    {
+        $url = env('DOMAIN') . '/' . auth()->appId() . '/' . env('SERVICE_NAME') . '/' . route('stripe.cancelPaymentSubscription', [
+                'goBackUrl=' . $request['go_back_url'],
+                'subscriptionPlanUuid=' . $subscriptionPlan->uuid
+            ], false);
+
+        return str_replace('/api/', '', $url);
+    }
+
+    //subscription add-on
+    private function getCallbackSuccessSubscriptionAddOnUrl($request, $addOnSubscriptionPlan, $subscriptionDate, $expirationDate)
+    {
+        $url = env('DOMAIN') . '/' . auth()->appId() . '/' . env('SERVICE_NAME') . '/' . route('stripe.successPaymentSubscriptionAddOn', [
+                'goBackUrl=' . $request['go_back_url'],
+                'subscriptionDate=' . $subscriptionDate,
+                'userUuid=' . auth()->userId(),
+                'expirationDate=' . $expirationDate,
+                'addOnSubscriptionPlanUuid=' . $addOnSubscriptionPlan->uuid,
+                'billingAddressUuid=' . $request['billing_address_uuid']
+            ], false) . '&session_id={CHECKOUT_SESSION_ID}';
+
+        return str_replace('/api/', '', $url);
+    }
+
+    private function getCallbackCancelSubscriptionAddOnUrl($request, $addOnSubscriptionPlan)
+    {
+        $url = env('DOMAIN') . '/' . auth()->appId() . '/' . env('SERVICE_NAME') . '/' . route('stripe.cancelPaymentSubscriptionAddOn', [
+                'goBackUrl=' . $request['go_back_url'],
+                'addOnSubscriptionPlanUuid=' . $addOnSubscriptionPlan->uuid
+            ], false);
+
+        return str_replace('/api/', '', $url);
     }
 
     /**
@@ -36,6 +110,8 @@ class StripeService extends AbstractService
         $stripe = $this->getStripeClient();
 
         try {
+            $callbackSuccessUrl = $this->getCallbackSuccessPaymentUrl($request, $userUuid, $creditPackage);
+            $callbackCancelUrl = $this->getCallbackCancelPaymentUrl($request, $userUuid, $creditPackage);
             $checkout_session = $stripe->checkout->sessions->create([
                 'line_items' => [[
                     'price_data' => [
@@ -48,13 +124,8 @@ class StripeService extends AbstractService
                     'quantity' => 1,
                 ]],
                 'mode' => 'payment',
-                "success_url" => route('stripe.successPayment', [
-                    'goBackUrl=' . $request['go_back_url'],
-                    'userUuid=' . $userUuid,
-                    'creditPackageUuid=' . $creditPackage->uuid,
-                    'billingAddressUuid=' . $request['billing_address_uuid'],
-                ]) . '&session_id={CHECKOUT_SESSION_ID}',
-                "cancel_url" => route('stripe.cancelPayment', ['goBackUrl=' . $request['go_back_url'], 'userUuid=' . $userUuid, 'creditPackageUuid=' . $creditPackage->uuid]),
+                'success_url' => $callbackSuccessUrl,
+                'cancel_url' => $callbackCancelUrl,
             ]);
             if (isset($checkout_session)) {
 
@@ -63,12 +134,6 @@ class StripeService extends AbstractService
                     'redirect_url' => $checkout_session->url
                 ];
             }
-
-            return [
-                'status' => true,
-                'redirect_url' => env('FRONTEND_URL') . 'my/profile/top-up/success?go_back_url=' . $request['go_back_url'] . '&package_id=' . $creditPackage->uuid
-            ];
-
         } catch (InvalidRequestException|Exception $e) {
 
             return [
@@ -118,21 +183,15 @@ class StripeService extends AbstractService
     {
         $stripe = $this->getStripeClient();
         try {
+            $successUrl = $this->getCallbackSuccessSubscriptionUrl($request, $subscriptionPlan, $subscriptionDate, $expirationDate);
+            $cancelUrl = $this->getCallbackCancelSubscriptionUrl($request, $subscriptionPlan);
             $checkout_session = $stripe->checkout->sessions->create([
                 'line_items' => [[
                     'price' => $plan,
                     'quantity' => 1,
                 ]],
                 'mode' => 'subscription',
-                'success_url' => route('stripe.successPaymentSubscription', [
-                        'goBackUrl=' . $request['go_back_url'],
-                        'subscriptionPlanUuid=' . $subscriptionPlan->uuid,
-                        'subscriptionDate=' . $subscriptionDate,
-                        'userUuid=' . auth()->userId(),
-                        'expirationDate=' . $expirationDate,
-                        'platformPackageUuid=' . $subscriptionPlan->platform_package_uuid,
-                        'billingAddressUuid=' . $request['billing_address_uuid'],
-                    ]) . '&session_id={CHECKOUT_SESSION_ID}',
+                'success_url' => $successUrl,
 //                'success_url' => $this->getConfigByKeyInCache('success_url')->value . '?' . http_build_query([
 //                        'goBackUrl' => $request['go_back_url'],
 //                        'subscriptionPlanUuid' => $subscriptionPlan->uuid,
@@ -142,7 +201,7 @@ class StripeService extends AbstractService
 //                        'platformPackageUuid' => $subscriptionPlan->platform_package_uuid,
 //                        'billingAddressUuid' => $request['billing_address_uuid'],
 //                    ]) . '&session_id={CHECKOUT_SESSION_ID}',
-                "cancel_url" => route('stripe.cancelPaymentSubscription', ['goBackUrl=' . $request['go_back_url'], 'subscriptionPlanUuid=' . $subscriptionPlan->uuid,]),
+                "cancel_url" => $cancelUrl,
             ]);
             if (isset($checkout_session)) {
 
@@ -164,21 +223,16 @@ class StripeService extends AbstractService
     {
         $stripe = $this->getStripeClient();
         try {
+            $successUrl = $this->getCallbackSuccessSubscriptionAddOnUrl($request, $addOnSubscriptionPlan, $subscriptionDate, $expirationDate);
+            $cancelUrl = $this->getCallbackCancelSubscriptionAddOnUrl($request, $addOnSubscriptionPlan);
             $checkout_session = $stripe->checkout->sessions->create([
                 'line_items' => [[
                     'price' => $plan,
                     'quantity' => 1,
                 ]],
                 'mode' => 'subscription',
-                'success_url' => route('stripe.successPaymentSubscriptionAddOn', [
-                        'goBackUrl=' . $request['go_back_url'],
-                        'subscriptionDate=' . $subscriptionDate,
-                        'userUuid=' . auth()->userId(),
-                        'expirationDate=' . $expirationDate,
-                        'addOnSubscriptionPlanUuid=' . $addOnSubscriptionPlan->uuid,
-                        'billingAddressUuid=' . $request['billing_address_uuid']
-                    ]) . '&session_id={CHECKOUT_SESSION_ID}',
-                "cancel_url" => route('paypal.cancelPaymentSubscriptionAddOn', ['goBackUrl=' . $request['go_back_url'], 'addOnSubscriptionPlanUuid=' . $addOnSubscriptionPlan->uuid,]),
+                'success_url' => $successUrl,
+                'cancel_url' => $cancelUrl,
             ]);
             if (isset($checkout_session)) {
 

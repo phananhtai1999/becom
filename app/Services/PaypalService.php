@@ -19,9 +19,9 @@ class PaypalService extends AbstractService
         $paypalConfig = [
             'mode' => $this->getConfigByKeyInCache('payment_mode')->value, // Can only be 'sandbox' Or 'live'. If empty or invalid, 'live' will be used.
             'sandbox' => [
-                'client_id' => $this->getConfigByKeyInCache('paypal_client_id')->value,
-                'client_secret' => $this->getConfigByKeyInCache('paypal_client_secret')->value,
-                'app_id' => $this->getConfigByKeyInCache('paypal_app_id')->value,
+                'client_id' => $this->getConfigByKeyInCache('paypal_client_id')->default_value,
+                'client_secret' => $this->getConfigByKeyInCache('paypal_client_secret')->default_value,
+                'app_id' => $this->getConfigByKeyInCache('paypal_app_id')->default_value,
             ],
             'live' => [
                 'client_id' => $this->getConfigByKeyInCache('paypal_client_id')->value,
@@ -42,6 +42,80 @@ class PaypalService extends AbstractService
         return $provider;
     }
 
+    private function getCallbackSuccessPaymentUrl($request, $userUuid, $creditPackage)
+    {
+        $url = env('DOMAIN') . '/' . auth()->appId() . '/' . env('SERVICE_NAME') . '/' . route('paypal.successPayment', [
+            'goBackUrl=' . $request['go_back_url'],
+                'userUuid=' . $userUuid,
+                'creditPackageUuid=' . $creditPackage->uuid,
+                'billingAddressUuid=' . $request['billing_address_uuid']
+            ], false);
+
+        return str_replace('/api/', '', $url);
+    }
+
+    private function getCallbackCancelPaymentUrl($request, $userUuid, $creditPackage)
+    {
+        $url = env('DOMAIN') . '/' . auth()->appId() . '/' . env('SERVICE_NAME') . '/' . route('paypal.cancelPayment', [
+                'goBackUrl=' . $request['go_back_url'],
+                'userUuid=' . $userUuid,
+                'creditPackageUuid=' . $creditPackage->uuid,
+            ], false);
+
+        return str_replace('/api/', '', $url);
+    }
+
+    //subscription
+    private function getCallbackSuccessSubscriptionUrl($request, $subscriptionPlan, $subscriptionDate, $expirationDate)
+    {
+        $url = env('DOMAIN') . '/' . auth()->appId() . '/' . env('SERVICE_NAME') . '/' . route('paypal.successPaymentSubscription', [
+                'goBackUrl=' . $request['go_back_url'],
+                'subscriptionPlanUuid=' . $subscriptionPlan->uuid,
+                'subscriptionDate=' . $subscriptionDate,
+                'userUuid=' . auth()->userId(),
+                'expirationDate=' . $expirationDate,
+                'platformPackageUuid=' . $subscriptionPlan->platform_package_uuid,
+                'billingAddressUuid=' . $request['billing_address_uuid']
+            ], false);
+
+        return str_replace('/api/', '', $url);
+    }
+
+    private function getCallbackCancelSubscriptionUrl($request, $subscriptionPlan)
+    {
+        $url = env('DOMAIN') . '/' . auth()->appId() . '/' . env('SERVICE_NAME') . '/' . route('paypal.cancelPaymentSubscription', [
+                'goBackUrl=' . $request['go_back_url'],
+                'subscriptionPlanUuid=' . $subscriptionPlan->uuid
+            ], false);
+
+        return str_replace('/api/', '', $url);
+    }
+
+    //subscription add-on
+    private function getCallbackSuccessSubscriptionAddOnUrl($request, $addOnSubscriptionPlan, $subscriptionDate, $expirationDate)
+    {
+        $url = env('DOMAIN') . '/' . auth()->appId() . '/' . env('SERVICE_NAME') . '/' . route('paypal.successPaymentSubscriptionAddOn', [
+                'goBackUrl=' . $request['go_back_url'],
+                'subscriptionDate=' . $subscriptionDate,
+                'userUuid=' . auth()->userId(),
+                'expirationDate=' . $expirationDate,
+                'addOnSubscriptionPlanUuid=' . $addOnSubscriptionPlan->uuid,
+                'billingAddressUuid=' . $request['billing_address_uuid']
+            ], false);
+
+        return str_replace('/api/', '', $url);
+    }
+
+    private function getCallbackCancelSubscriptionAddOnUrl($request, $addOnSubscriptionPlan)
+    {
+        $url = env('DOMAIN') . '/' . auth()->appId() . '/' . env('SERVICE_NAME') . '/' . route('paypal.cancelPaymentSubscriptionAddOn', [
+                'goBackUrl=' . $request['go_back_url'],
+                'addOnSubscriptionPlanUuid=' . $addOnSubscriptionPlan->uuid
+            ], false);
+
+        return str_replace('/api/', '', $url);
+    }
+
     /**
      * @param $creditPackage
      * @param $userUuid
@@ -53,11 +127,13 @@ class PaypalService extends AbstractService
     {
         try {
             $provider = $this->accessServer();
+            $callbackSuccessUrl = $this->getCallbackSuccessPaymentUrl($request, $userUuid, $creditPackage);
+            $callbackCancelUrl = $this->getCallbackCancelPaymentUrl($request, $userUuid, $creditPackage);
             $response = $provider->createOrder([
                 "intent" => "CAPTURE",
                 "application_context" => [
-                    "return_url" => route('paypal.successPayment', ['goBackUrl=' . $request['go_back_url'], 'userUuid=' . $userUuid, 'creditPackageUuid=' . $creditPackage->uuid, 'billingAddressUuid=' . $request['billing_address_uuid']]),
-                    "cancel_url" => route('paypal.cancelPayment', ['goBackUrl=' . $request['go_back_url'], 'userUuid=' . $userUuid, 'creditPackageUuid=' . $creditPackage->uuid]),
+                    "return_url" => $callbackSuccessUrl,
+                    "cancel_url" => $callbackCancelUrl,
                 ],
                 "purchase_units" => [
                     0 => [
@@ -105,7 +181,7 @@ class PaypalService extends AbstractService
         return $provider->createProduct([
             'name' => $request->uuid,
             'type' => 'SERVICE',
-        ], 'create-product-'.time());
+        ], 'create-product-' . time());
     }
 
     /**
@@ -145,7 +221,7 @@ class PaypalService extends AbstractService
                     ]
                 ]
             ]],
-        ], 'create-plan-'.time());
+        ], 'create-plan-' . time());
 
         return [
             'plan_id' => $plan['id'],
@@ -159,6 +235,8 @@ class PaypalService extends AbstractService
     {
         try {
             $provider = $this->accessServer();
+            $successUrl = $this->getCallbackSuccessSubscriptionUrl($request, $subscriptionPlan, $subscriptionDate, $expirationDate);
+            $cancelUrl = $this->getCallbackCancelSubscriptionUrl($request, $subscriptionPlan);
             $subscription = $provider->createSubscription([
                 "plan_id" => $plan,
                 "shipping_amount" => [
@@ -166,15 +244,7 @@ class PaypalService extends AbstractService
                     "value" => "0"
                 ],
                 "application_context" => [
-                    "return_url" => route('paypal.successPaymentSubscription', [
-                            'goBackUrl=' . $request['go_back_url'],
-                            'subscriptionPlanUuid=' . $subscriptionPlan->uuid,
-                            'subscriptionDate=' . $subscriptionDate,
-                            'userUuid=' . auth()->userId(),
-                            'expirationDate=' . $expirationDate,
-                            'platformPackageUuid=' . $subscriptionPlan->platform_package_uuid,
-                            'billingAddressUuid=' . $request['billing_address_uuid']
-                    ]),
+                    "return_url" => $successUrl,
 //                    "return_url" => $this->getConfigByKeyInCache('success_url')->value . '?' . http_build_query([
 //                            'goBackUrl' => $request['go_back_url'],
 //                            'subscriptionPlanUuid' => $subscriptionPlan->uuid,
@@ -184,7 +254,7 @@ class PaypalService extends AbstractService
 //                            'platformPackageUuid' => $subscriptionPlan->platform_package_uuid,
 //                            'billingAddressUuid' => $request['billing_address_uuid'],
 //                        ]),
-                    "cancel_url" => route('paypal.cancelPaymentSubscription', ['goBackUrl=' . $request['go_back_url'], 'subscriptionPlanUuid=' . $subscriptionPlan->uuid,]),
+                    "cancel_url" => $cancelUrl,
                 ],
             ]);
             if (isset($subscription['id']) && $subscription['id'] != null) {
@@ -229,7 +299,8 @@ class PaypalService extends AbstractService
     {
         try {
             $provider = $this->accessServer();
-
+            $successUrl = $this->getCallbackSuccessSubscriptionAddOnUrl($request, $addOnSubscriptionPlan, $subscriptionDate, $expirationDate);
+            $cancelUrl = $this->getCallbackCancelSubscriptionAddOnUrl($request, $addOnSubscriptionPlan);
             $subscription = $provider->createSubscription([
                 "plan_id" => $plan,
                 "shipping_amount" => [
@@ -237,15 +308,8 @@ class PaypalService extends AbstractService
                     "value" => "0"
                 ],
                 "application_context" => [
-                    "return_url" => route('paypal.successPaymentSubscriptionAddOn', [
-                        'goBackUrl=' . $request['go_back_url'],
-                        'subscriptionDate=' . $subscriptionDate,
-                        'userUuid=' . auth()->userId(),
-                        'expirationDate=' . $expirationDate,
-                        'addOnSubscriptionPlanUuid=' . $addOnSubscriptionPlan->uuid,
-                        'billingAddressUuid=' . $request['billing_address_uuid']
-                    ]),
-                    "cancel_url" => route('paypal.cancelPaymentSubscriptionAddOn', ['goBackUrl=' . $request['go_back_url'], 'addOnSubscriptionPlanUuid=' . $addOnSubscriptionPlan->uuid,]),
+                    "return_url" => $successUrl,
+                    "cancel_url" => $cancelUrl,
                 ],
             ]);
             if (isset($subscription['id']) && $subscription['id'] != null) {
