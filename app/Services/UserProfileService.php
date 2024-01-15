@@ -59,4 +59,13 @@ class UserProfileService extends AbstractService
 
         return auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN, Role::ROLE_EDITOR]);
     }
+
+    public function checkLanguagesPermissionWithAdminAndRootRole()
+    {
+        if (auth()->guest()) {
+            return false;
+        }
+
+        return auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN]);
+    }
 }
