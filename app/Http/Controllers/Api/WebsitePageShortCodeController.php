@@ -10,6 +10,7 @@ use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestStoreTrait;
 use App\Http\Requests\ConfigShortcodeRequest;
 use App\Http\Requests\IndexRequest;
+use App\Http\Requests\IndexUnlimitRequest;
 use App\Http\Requests\UpdateWebsitePageShortCodeRequest;
 use App\Http\Requests\WebsitePageShortCodeRequest;
 use App\Http\Resources\WebsitePageShortCodeResource;
@@ -29,7 +30,7 @@ class WebsitePageShortCodeController extends AbstractRestAPIController
         $this->resourceClass = WebsitePageShortCodeResource::class;
         $this->storeRequest = WebsitePageShortCodeRequest::class;
         $this->editRequest = UpdateWebsitePageShortCodeRequest::class;
-        $this->indexRequest = IndexRequest::class;
+        $this->indexRequest = IndexUnlimitRequest::class;
     }
 
     public function store(WebsitePageShortCodeRequest $request)
