@@ -68,7 +68,7 @@ class SendProjectQueryBuilder extends AbstractQueryBuilder
                 'user.username',
                 AllowedFilter::exact('exact__user.username', 'user.username'),
                 'user.email',
-                AllowedFilter::exact('exact__user.username', 'user.username'),
+                AllowedFilter::exact('exact__user.email', 'user.email'),
                 'locations.uuid',
                 AllowedFilter::exact('exact__locations.uuid', 'locations.uuid'),
                 'departments.uuid',
