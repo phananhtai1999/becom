@@ -12,6 +12,7 @@ class PaymentService extends AbstractService
     public function getSubscriptionHistoryData($request, $paymentMethod, $subscriptionData) {
         return [
             'user_uuid' => $request->userUuid,
+            'app_id' => auth()->appId(),
             'subscription_plan_uuid' => $request->subscriptionPlanUuid,
             'subscription_date' => $request->subscriptionDate,
             'billing_address_uuid' => $request->billingAddressUuid,
@@ -26,6 +27,7 @@ class PaymentService extends AbstractService
     {
         return [
             'user_uuid' => $request->userUuid,
+            'app_id' => auth()->appId(),
             'platform_package_uuid' => $request->platformPackageUuid,
             'subscription_plan_uuid' => $request->subscriptionPlanUuid,
             'expiration_date' => $request->expirationDate,
@@ -36,6 +38,7 @@ class PaymentService extends AbstractService
     public function getAddOnSubscriptionHistoryData($request, $paymentMethod, $subscriptionData) {
         return [
             'user_uuid' => $request->userUuid,
+            'app_id' => auth()->appId(),
             'add_on_subscription_plan_uuid' => $request->addOnSubscriptionPlanUuid,
             'subscription_date' => $request->subscriptionDate,
             'billing_address_uuid' => $request->billingAddressUuid,
@@ -49,6 +52,7 @@ class PaymentService extends AbstractService
     {
         return [
             'user_uuid' => $request->userUuid,
+            'app_id' => auth()->appId(),
             'add_on_subscription_plan_uuid' => $request->addOnSubscriptionPlanUuid,
             'expiration_date' => $request->expirationDate,
             'auto_renew' => true
@@ -110,6 +114,7 @@ class PaymentService extends AbstractService
         return [
             'billing_address_uuid' => $request->billingAddressUuid,
             'user_uuid' => $request->userUuid,
+            'app_id' => auth()->appId(),
             'product_data' => $productData,
             'payment_method_uuid' => $paymentMethod
         ];

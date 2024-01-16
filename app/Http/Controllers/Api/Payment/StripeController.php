@@ -115,7 +115,7 @@ class StripeController extends AbstractRestAPIController
             $userPlatformPackageData = $this->paymentService->getUserPlatformPackageData($request);
             $subscriptionPlan = $this->subscriptionPlanService->findOrFailById($request->subscriptionPlanUuid);
             $invoiceData = $this->paymentService->getInvoiceDataForPlatformPackage($request, $subscriptionPlan, PaymentMethod::STRIPE);
-            $invoice = $this->invoiceService->create($invoiceData);
+            $invoice = $this->invoiceService->create(array_merge($invoiceData, ['app_id' => auth()->appId()]));
 
             Event::dispatch(new SubscriptionSuccessEvent($request->userUuid, $subscriptionHistoryData, $userPlatformPackageData, $invoice));
             Event::dispatch(new SendNotificationSystemForPaymentEvent($subscriptionHistoryData, Notification::PACKAGE_TYPE));
@@ -144,8 +144,7 @@ class StripeController extends AbstractRestAPIController
             $userAddOnData = $this->paymentService->getUserAddOnData($request);
             $addOnSubscriptionPlan = $this->addOnSubscriptionPlanService->findOrFailById($request->addOnSubscriptionPlanUuid);
             $invoiceData = $this->paymentService->getInvoiceDataForAddOn($request, $addOnSubscriptionPlan, PaymentMethod::STRIPE);
-            $invoice = $this->invoiceService->create($invoiceData);
-
+            $invoice = $this->invoiceService->create(array_merge($invoiceData, ['app_id' => auth()->appId()]));
             Event::dispatch(new SubscriptionAddOnSuccessEvent($request->userUuid, $addOnSubscriptionHistoryData, $userAddOnData, $invoice));
             Event::dispatch(new SendNotificationSystemForPaymentEvent($addOnSubscriptionHistoryData, Notification::ADDON_TYPE));
 
@@ -184,11 +183,12 @@ class StripeController extends AbstractRestAPIController
 
         if (isset($response['status']) && $response['status'] == 'complete') {
             $invoiceData = $this->paymentService->getInvoiceDataForCreditPackage($request, $creditPackage, PaymentMethod::STRIPE);
-            $invoice = $this->invoiceService->create($invoiceData);
+            $invoice = $this->invoiceService->create(array_merge($invoiceData, ['app_id' => auth()->appId()]));
             Event::dispatch(new PaymentCreditPackageSuccessEvent($request->creditPackageUuid, $paymentData, $request->userUuid, PaymentMethod::STRIPE, $invoice));
             Event::dispatch(new SendNotificationSystemForPaymentEvent([
                 'credit_package_uuid' => $request->creditPackageUuid,
                 'user_uuid' => $request->userUuid,
+                'app_id' => auth()->appId(),
                 'payment_method_uuid' => PaymentMethod::STRIPE
             ], Notification::CREDIT_TYPE));
 

@@ -106,6 +106,7 @@ class SendNotificationSystemForPaymentListener implements ShouldQueue
             'type_uuid' => null,
             'content' => $content,
             'user_uuid' => $dataPayment['user_uuid'],
+            'app_id' => $dataPayment['app_id'],
         ]);
     }
 }

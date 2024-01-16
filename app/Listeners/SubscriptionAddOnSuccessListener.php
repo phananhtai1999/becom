@@ -28,8 +28,8 @@ class SubscriptionAddOnSuccessListener
      */
     public function handle($event)
     {
-            AddOnSubscriptionHistory::create(array_merge($event->subscriptionHistoryData, ['invoice_uuid' => $event->invoice->uuid]));
-            UserAddOn::create($event->userAddOnData);
+            AddOnSubscriptionHistory::create(array_merge($event->subscriptionHistoryData, ['invoice_uuid' => $event->invoice->uuid, 'app_id' => auth()->appId()]));
+            UserAddOn::create(array_merge($event->userAddOnData, ['app_id' => auth()->appId()]));
             Cache::forget('add_on_permission_' . $event->userAddOnData['user_uuid']);
     }
 }
