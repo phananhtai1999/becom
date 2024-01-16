@@ -49,7 +49,7 @@ class PartnerRequest extends AbstractRequest
                 $query->where([
                     ['email', $this->request->get('partner_email')],
                     ['app_id', auth()->appId()],
-                    ['uuid', $this->request->get('user_uuid')],
+                    ['user_uuid', $this->request->get('user_uuid')],
                 ]);
             });
         }
