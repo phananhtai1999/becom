@@ -118,7 +118,7 @@ class ContactController extends AbstractRestAPIController
         ]));
 
         //Add Pivot contact_company_position
-        $pivot = $this->addPivotContactCompanyPosition($request->get('contact_company_position', []) ?? []);
+        $pivot = $this->addPivotContactCompanyPosition($request->all());
 
         $model->contactLists()->attach($request->get('contact_list', []));
         $model->reminds()->attach($request->get('remind', []));
@@ -147,11 +147,11 @@ class ContactController extends AbstractRestAPIController
         ]));
 
         //Add Pivot contact_company_position
-        $pivot = $this->addPivotContactCompanyPosition($request->get('contact_company_position', []) ?? []);
+        $pivot = $this->addPivotContactCompanyPosition($request->all());
 
         $model->contactLists()->sync($request->contact_list ?? $model->contactLists);
         $model->reminds()->sync($request->remind ?? $model->reminds);
-        $model->companies()->sync($request->contact_company_position ? $pivot : $model->companies);
+        $model->companies()->sync($pivot);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -206,7 +206,7 @@ class ContactController extends AbstractRestAPIController
         ]));
 
         //Add Pivot contact_company_position
-        $pivot = $this->addPivotContactCompanyPosition($request->get('contact_company_position', []) ?? []);
+        $pivot = $this->addPivotContactCompanyPosition($request->all());
 
         $model->contactLists()->attach($request->get('contact_list', []));
         $model->reminds()->attach($request->get('remind', []));
@@ -251,11 +251,11 @@ class ContactController extends AbstractRestAPIController
         ]));
 
         //Add Pivot contact_company_position
-        $pivot = $this->addPivotContactCompanyPosition($request->get('contact_company_position', []) ?? []);
+        $pivot = $this->addPivotContactCompanyPosition($request->all());
 
         $model->contactLists()->sync($request->contact_list ?? $model->contactLists);
         $model->reminds()->sync($request->remind ?? $model->reminds);
-        $model->companies()->sync($request->contact_company_position ? $pivot : $model->companies);
+        $model->companies()->sync($pivot);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -474,18 +474,23 @@ class ContactController extends AbstractRestAPIController
      */
     public function addPivotContactCompanyPosition($arrayContactCompanyPosition)
     {
-        //Add Pivot contact_company_position
-        $array = [];
-        $arrayPivot = array_unique($arrayContactCompanyPosition, SORT_REGULAR);
-        foreach ($arrayPivot as $value) {
-            $arrayPush = [
-                'company_uuid' => $value['company_uuid'],
-                'position_uuid' => $value['position_uuid'] ?? null,
-                'department_uuid' => $value['department_uuid'] ?? null
+        $arrayData = [];
+        if (!empty($arrayContactCompanyPosition['positions'])) {
+            foreach ($arrayContactCompanyPosition['positions'] as $position) {
+                $arrayData[] = [
+                    "company_uuid" => $arrayContactCompanyPosition['company_uuid'],
+                    "position_uuid" => $position,
+                    "department_uuid" => !empty($arrayContactCompanyPosition['department_uuid']) ? $arrayContactCompanyPosition['department_uuid'] : null,
+                ];
+            }
+        } elseif (!empty($arrayContactCompanyPosition['company_uuid'])) {
+            $arrayData[] = [
+                "company_uuid" => $arrayContactCompanyPosition['company_uuid'],
+                "position_uuid" => null,
+                "department_uuid" => !empty($arrayContactCompanyPosition['department_uuid']) ? $arrayContactCompanyPosition['department_uuid'] : null,
             ];
-            array_push($array, $arrayPush);
         }
 
-        return $array;
+        return $arrayData;
     }
 }

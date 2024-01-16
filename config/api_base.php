@@ -1,7 +1,5 @@
 <?php
 
-use App\Models\UserProfile;
-
 return [
     'api_key' => env('API_KEY', ''),
     'token_key' => env('TOKEN_KEY', ''),
@@ -10,5 +8,5 @@ return [
         'root_system_role' => env('ROLE_ROOT_SYSTEM', 'root_system'),
         'system_role' => env('ROLE_APP_SYSTEM', 'app_system'),
     ],
-    'customer_profile_model' => UserProfile::class
+    'customer_profile_model' => \Techup\ApiBase\Models\UserProfile::class
 ];

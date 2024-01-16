@@ -24,7 +24,7 @@ class ContactRequest extends AbstractRequest
      */
     public function rules()
     {
-        $validate = [
+        return [
             'email' => ['required', 'string'],
             'first_name' => ['required', 'string'],
             'last_name' => ['required', 'string'],
@@ -36,45 +36,44 @@ class ContactRequest extends AbstractRequest
             'country' => ['nullable', 'string'],
             'avatar' => ['nullable', 'string'],
             'contact_list' => ['nullable', 'array', 'min:1'],
-            'contact_list.*' => ['numeric', 'min:1', Rule::exists('contact_lists', 'uuid')->where(function ($query) {
+            'contact_list.*' => ['integer', 'min:1', Rule::exists('contact_lists', 'uuid')->where(function ($query) {
                 return $query->where([
                     ['user_uuid', $this->request->get('user_uuid') ?? auth()->userId()],
                     ['app_id', auth()->appId()]
                 ]);
             })->whereNull('deleted_at')],
             'remind' => ['nullable', 'array', 'min:1'],
-            'remind.*' => ['numeric', 'min:1', Rule::exists('reminds', 'uuid')->where(function ($query) {
+            'remind.*' => ['integer', 'min:1', Rule::exists('reminds', 'uuid')->where(function ($query) {
                 return $query->where([
                     ['user_uuid', $this->request->get('user_uuid') ?? auth()->userId()],
                     ['app_id', auth()->appId()],
                 ]);
             })->whereNull('deleted_at')],
-            'contact_company_position' => ['nullable', 'array', 'min:1'],
-            'contact_company_position.*.company_uuid' => ['required', 'numeric', Rule::exists('companies', 'uuid')->where(function ($query) {
+            'company_uuid' => ['required_with:positions', 'integer', Rule::exists('companies', 'uuid')->where(function ($query) {
                 return $query->where([
                     ['user_uuid', $this->request->get('user_uuid') ?? auth()->userId()],
                     ['app_id', auth()->appId()]
                 ])
                     ->orWhereNull('user_uuid');
             })->whereNull('deleted_at')],
-            'contact_company_position.*.position_uuid' => ['nullable', 'numeric', Rule::exists('positions', 'uuid')->where(function ($query) {
+            'position_ids' => ['array'],
+            'position_ids.*' => ['integer', 'min:1', Rule::exists('positions', 'uuid')->where(function ($query) {
                 return $query->where([
                     ['user_uuid', $this->request->get('user_uuid') ?? auth()->userId()],
                     ['app_id', auth()->appId()]
                 ])
                     ->orWhereNull('user_uuid');
             })->whereNull('deleted_at')],
-            'contact_company_position.*.department_uuid' => ['nullable', 'numeric', Rule::exists('departments', 'uuid')->where(function ($query) {
+            'department_uuid' => ['nullable', 'integer', 'min:1', Rule::exists('departments', 'uuid')->where(function ($query) {
                 return $query->where([
                     ['user_uuid', $this->request->get('user_uuid') ?? auth()->userId()],
                     ['app_id', auth()->appId()]
-                ])
-                    ->orWhereNull('user_uuid');
+                ]);
             })->whereNull('deleted_at')],
             'user_uuid' => ['nullable', 'string', 'min:1', Rule::exists('becom_user_profiles', 'user_uuid')->where(function ($q) {
                 return $q->where('app_id', auth()->appId());
             })->whereNull('deleted_at')],
-            'status_uuid' => ['nullable', 'numeric', 'min:1', Rule::exists('status', 'uuid')->where(function ($query) {
+            'status_uuid' => ['nullable', 'integer', 'min:1', Rule::exists('status', 'uuid')->where(function ($query) {
                 return $query->where([
                     ['user_uuid', $this->request->get('user_uuid') ?? auth()->userId()],
                     ['app_id', auth()->appId()]
@@ -82,15 +81,5 @@ class ContactRequest extends AbstractRequest
                     ->orWhereNull('user_uuid');
             })->whereNull('deleted_at')],
         ];
-
-        if (is_array($this->request->get('contact_company_position'))) {
-            foreach ($this->request->get('contact_company_position') as $key => $value) {
-                if (!is_integer($key)) {
-                    $validate['contact_company_position.*'] = ['numeric', 'min:0'];
-                }
-            }
-        }
-
-        return $validate;
     }
 }
