@@ -22,7 +22,7 @@ class StripeService extends AbstractService
      */
     public function getStripeClient(): StripeClient
     {
-        return new StripeClient($this->getConfigByKeyInCache('stripe_secret_key')->default_value);
+        return new StripeClient($this->getConfigByKeyInCache('stripe_secret_key')->value);
     }
 
     private function getCallbackSuccessPaymentUrl($request, $userUuid, $creditPackage)

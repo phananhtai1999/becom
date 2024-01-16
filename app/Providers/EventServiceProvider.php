@@ -49,6 +49,7 @@ use App\Models\User;
 use App\Models\UserAccessToken;
 use App\Models\UserConfig;
 use App\Models\UserDetail;
+use App\Models\UserProfile;
 use App\Observers\ContactObserver;
 use App\Observers\RoleObserver;
 use App\Observers\StatusObserver;
@@ -56,6 +57,7 @@ use App\Observers\UserAccessTokenObserver;
 use App\Observers\UserConfigObserver;
 use App\Observers\UserDetailObserver;
 use App\Observers\UserObserver;
+use App\Observers\UserProfileObserver;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -147,5 +149,6 @@ class EventServiceProvider extends ServiceProvider
         Role::observe(RoleObserver::class);
         Contact::observe(ContactObserver::class);
         Status::observe(StatusObserver::class);
+        UserProfile::observe(UserProfileObserver::class);
     }
 }
