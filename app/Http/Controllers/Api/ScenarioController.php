@@ -427,7 +427,7 @@ class ScenarioController extends AbstractRestAPIController
                 'last_stopped_at' => Carbon::now(),
             ]);
 
-            SendNotificationSystemEvent::dispatch($scenario->user, Notification::SCENARIO_TYPE, Notification::STOP_ACTION, $scenario);
+            SendNotificationSystemEvent::dispatch(null, Notification::SCENARIO_TYPE, Notification::STOP_ACTION, $scenario);
             return $this->sendOkJsonResponse();
         }
 
@@ -455,7 +455,7 @@ class ScenarioController extends AbstractRestAPIController
 
         $creditNumberSendEmail = $scenario->number_credit;
         if ($this->userProfileService->checkCredit($creditNumberSendEmail, $campaign->user_uuid)) {
-            SendNotificationSystemEvent::dispatch($scenario->user, Notification::SCENARIO_TYPE, Notification::START_ACTION, $scenario);
+            SendNotificationSystemEvent::dispatch(null, Notification::SCENARIO_TYPE, Notification::START_ACTION, $scenario);
             SendByCampaignRootScenarioEvent::dispatch($campaign, $creditNumberSendEmail, $campaignRootScenario);
             return ['status' => true,
                 'messages' => __('messages.send_scenario_success')];

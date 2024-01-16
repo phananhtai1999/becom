@@ -9,6 +9,7 @@ use App\Services\SmtpAccountService;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Log;
 
 class SendNotificationSystemListener implements ShouldQueue
 {
@@ -40,20 +41,31 @@ class SendNotificationSystemListener implements ShouldQueue
         $action = $event->action;
         $model = $event->model;
 
-        $mail = new SendNotificationSystem($user, $type, $action, $model);
-        $this->smtpAccountService->sendEmailNotificationSystem($user, $mail);
-        $timezone = optional($this->smtpAccountService->getConfigByKeyInCache('timezone'))->value;
-        if ($type === 'campaign') {
-            $content = ['langkey' => $type.'_'.$action, 'type' => $type , 'name' => $model->tracking_key  , 'date' => Carbon::now($timezone)->toDateTimeString()];
-        } else {
-            $content = ['langkey' => $type.'_'.$action, 'type' => $type , 'name' => $model->name, 'date' => Carbon::now($timezone)->toDateTimeString()];
+        if (!$user){
+            $user = $model->user;
         }
 
-        $this->notificationService->create([
-            'type' => $type,
-            'type_uuid' => $model->uuid,
-            'content' => $content,
-            'user_uuid' => $user->uuid,
-        ]);
+
+        try {
+            $mail = new SendNotificationSystem($user, $type, $action, $model);
+            $this->smtpAccountService->sendEmailNotificationSystem($user, $mail);
+            $timezone = optional($this->smtpAccountService->getConfigByKeyInCache('timezone'))->value;
+            if ($type === 'campaign') {
+                $content = ['langkey' => $type.'_'.$action, 'type' => $type , 'name' => $model->tracking_key  , 'date' => Carbon::now($timezone)->toDateTimeString()];
+            } else {
+                $content = ['langkey' => $type.'_'.$action, 'type' => $type , 'name' => $model->name, 'date' => Carbon::now($timezone)->toDateTimeString()];
+            }
+
+
+            $this->notificationService->create([
+                'type' => $type,
+                'type_uuid' => $model->uuid,
+                'content' => $content,
+                'user_uuid' => $user->uuid,
+                'app_id' => $user->app_id,
+            ]);
+        }catch (\Exception $e) {
+            Log::error('Error Queue: ' . $e->getMessage());
+        }
     }
 }
