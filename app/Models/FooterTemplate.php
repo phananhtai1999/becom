@@ -51,7 +51,6 @@ class FooterTemplate extends AbstractModel
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
-        'active_by_uuid' =>  'integer',
         'is_default' => 'boolean',
     ];
 
