@@ -660,7 +660,7 @@ class CampaignController extends AbstractRestAPIController
             $this->service->update($campaign, [
                 'was_stopped_by_owner' => $request->get('was_stopped_by_owner')
             ]);
-            SendNotificationSystemEvent::dispatch($campaign->user, Notification::CAMPAIGN_TYPE, Notification::STOP_ACTION, $campaign);
+            SendNotificationSystemEvent::dispatch(null, Notification::CAMPAIGN_TYPE, Notification::STOP_ACTION, $campaign);
             return $this->sendOkJsonResponse();
         }
 
@@ -695,7 +695,7 @@ class CampaignController extends AbstractRestAPIController
             $this->service->update($campaign, [
                 'was_stopped_by_owner' => $request->get('was_stopped_by_owner')
             ]);
-            SendNotificationSystemEvent::dispatch($campaign->user, Notification::CAMPAIGN_TYPE, Notification::STOP_ACTION, $campaign);
+            SendNotificationSystemEvent::dispatch(null, Notification::CAMPAIGN_TYPE, Notification::STOP_ACTION, $campaign);
             return $this->sendOkJsonResponse();
         }
 
@@ -736,7 +736,7 @@ class CampaignController extends AbstractRestAPIController
         if ($this->sendEmailScheduleLogService->checkActiveCampaignbyCampaignUuid($campaignUuid)) {
             $creditNumberSendEmail = $campaign->number_credit_needed_to_start_campaign;
             if ($this->userProfileService->checkCredit($creditNumberSendEmail, $campaign->user_uuid)) {
-                SendNotificationSystemEvent::dispatch($campaign->user, Notification::CAMPAIGN_TYPE, Notification::START_ACTION, $campaign);
+                SendNotificationSystemEvent::dispatch(null, Notification::CAMPAIGN_TYPE, Notification::START_ACTION, $campaign);
                 SendByCampaignEvent::dispatch($campaign, $creditNumberSendEmail);
                 return ['status' => true,
                     'messages' => __('messages.send_campaign_success')];
