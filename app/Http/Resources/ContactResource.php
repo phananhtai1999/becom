@@ -55,7 +55,7 @@ class ContactResource extends AbstractJsonResource
         }
 
         if (\in_array('contact__companies', $expand)) {
-            $data['companies'] = CompanyResource::collection($this->companies);
+            $data['company'] = new CompanyResource($this->company->first());
         }
 
         if (\in_array('contact__positions', $expand)) {
@@ -63,7 +63,7 @@ class ContactResource extends AbstractJsonResource
         }
 
         if (\in_array('contact__departments', $expand)) {
-            $data['departments'] = DepartmentResource::collection($this->departments);
+            $data['department'] = new DepartmentResource($this->department->first());
         }
 
         if (\in_array('contact__notes', $expand)) {

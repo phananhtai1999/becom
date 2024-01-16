@@ -155,6 +155,11 @@ class Contact extends AbstractModel
         return $this->belongsToMany(Company::class, 'company_contact', 'contact_uuid', 'company_uuid')->withTimestamps();
     }
 
+    public function company()
+    {
+        return $this->belongsToMany(Company::class, 'company_contact', 'contact_uuid', 'company_uuid');
+    }
+
     /**
      * @return BelongsToMany
      */
@@ -166,6 +171,11 @@ class Contact extends AbstractModel
     public function departments()
     {
         return $this->belongsToMany(Department::class, 'company_contact', 'contact_uuid', 'department_uuid')->withTimestamps();
+    }
+
+    public function department()
+    {
+        return $this->belongsToMany(Department::class, 'company_contact', 'contact_uuid', 'department_uuid');
     }
 
     /**

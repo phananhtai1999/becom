@@ -476,7 +476,7 @@ class ContactController extends AbstractRestAPIController
     {
         $arrayData = [];
         if (!empty($arrayContactCompanyPosition['positions'])) {
-            foreach ($arrayContactCompanyPosition['positions'] as $position) {
+            foreach (array_unique($arrayContactCompanyPosition['positions']) as $position) {
                 $arrayData[] = [
                     "company_uuid" => $arrayContactCompanyPosition['company_uuid'],
                     "position_uuid" => $position,
