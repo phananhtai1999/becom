@@ -49,8 +49,8 @@ class AuthServiceProvider extends ServiceProvider
             }
 
             //check team leader
-            if (isset($user->userTeam) && $user->userTeam->team->leader_uuid == $user->uuid) {
-                $cacheTeamLeaderAddOns = Cache::rememberForever('team_leader_add_on_permission_' . $user->uuid, function () use ($user) {
+            if (isset($user->userTeam) && $user->userTeam->team->leader_uuid == auth()->userId()) {
+                $cacheTeamLeaderAddOns = Cache::rememberForever('team_leader_add_on_permission_' . auth()->userId(), function () use ($user) {
                     $permissions = [];
                     foreach ($user->userTeam->team->addOns as $addOn) {
                         $permissions[] = $addOn->permissions ?? [];
@@ -68,7 +68,7 @@ class AuthServiceProvider extends ServiceProvider
             }
             //check team
             if (isset($user->userTeam->permission_uuids) && !$user->userTeam->is_blocked) {
-                $cacheTeams = Cache::rememberForever('team_permission_' . $user->uuid, function () use ($user) {
+                $cacheTeams = Cache::rememberForever('team_permission_' . auth()->userId(), function () use ($user) {
 
                     return Permission::whereIn('uuid', $user->userTeam->permission_uuids)->get();
                 });
@@ -79,7 +79,7 @@ class AuthServiceProvider extends ServiceProvider
                 }
 
                 //team add on
-                $cacheUserTeamAddOns = Cache::rememberForever('team_add_on_permission_' . $user->uuid, function () use ($user) {
+                $cacheUserTeamAddOns = Cache::rememberForever('team_add_on_permission_' . auth()->userId(), function () use ($user) {
                     $permissions = [];
                     foreach ($user->userTeam->addOns as $userTeamAddOn) {
                         $permissions[] = $userTeamAddOn->addOn->permissions ?? [];
@@ -96,7 +96,7 @@ class AuthServiceProvider extends ServiceProvider
             }
             //check platform
             if (isset($user->userPlatformPackage->platform_package_uuid)) {
-                $permissions = Cache::rememberForever('platform_permission_' . $user->uuid, function () use ($user) {
+                $permissions = Cache::rememberForever('platform_permission_' . auth()->userId(), function () use ($user) {
                     $platformPackage = PlatformPackage::findOrFail($user->userPlatformPackage->platform_package_uuid);
                     return $platformPackage->permissions()->select('api_methods', 'name', 'code', 'uuid')->get();
                 });
@@ -108,7 +108,7 @@ class AuthServiceProvider extends ServiceProvider
             }
             //check add-on
             if (isset($user->userAddOns)) {
-                $cacheAddOns = Cache::rememberForever('add_on_permission_' . $user->uuid, function () use ($user) {
+                $cacheAddOns = Cache::rememberForever('add_on_permission_' . auth()->userId(), function () use ($user) {
                     $permissions = [];
                     foreach ($user->userAddOns as $userAddOn) {
                         $permissions[] = $userAddOn->addOnSubscriptionPlan->addOn->permissions ?? [];
