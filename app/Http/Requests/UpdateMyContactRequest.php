@@ -50,7 +50,7 @@ class UpdateMyContactRequest extends AbstractRequest
                     ['app_id', auth()->appId()]
                 ]);
             })->whereNull('deleted_at')],
-            'company_uuid' => ['required_with:positions', 'integer', Rule::exists('companies', 'uuid')->where(function ($query) {
+            'company_uuid' => ['required_with:position_ids', 'integer', Rule::exists('companies', 'uuid')->where(function ($query) {
                 return $query->where([
                     ['user_uuid', auth()->userId()],
                     ['app_id', auth()->appId()]

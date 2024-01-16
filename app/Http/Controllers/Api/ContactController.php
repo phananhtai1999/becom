@@ -475,8 +475,8 @@ class ContactController extends AbstractRestAPIController
     public function addPivotContactCompanyPosition($arrayContactCompanyPosition)
     {
         $arrayData = [];
-        if (!empty($arrayContactCompanyPosition['positions'])) {
-            foreach (array_unique($arrayContactCompanyPosition['positions']) as $position) {
+        if (!empty($arrayContactCompanyPosition['position_ids'])) {
+            foreach (array_unique($arrayContactCompanyPosition['position_ids']) as $position) {
                 $arrayData[] = [
                     "company_uuid" => $arrayContactCompanyPosition['company_uuid'],
                     "position_uuid" => $position,
