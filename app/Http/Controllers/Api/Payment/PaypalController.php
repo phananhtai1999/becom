@@ -69,11 +69,12 @@ class PaypalController extends AbstractRestAPIController
 
         if (isset($response['status']) && $response['status'] == 'COMPLETED') {
             $invoiceData = $this->paymentService->getInvoiceDataForCreditPackage($request, $creditPackage, PaymentMethod::PAYPAL);
-            $invoice = $this->invoiceService->create($invoiceData);
+            $invoice = $this->invoiceService->create(array_merge($invoiceData, ['app_id' => auth()->appId()]));
             Event::dispatch(new PaymentCreditPackageSuccessEvent($request->creditPackageUuid, $paymentData, $request->userUuid, PaymentMethod::PAYPAL, $invoice));
             Event::dispatch(new SendNotificationSystemForPaymentEvent([
                 'credit_package_uuid' => $request->creditPackageUuid,
                 'user_uuid' => $request->userUuid,
+                'app_id' => $request->app_id,
                 'payment_method_uuid' => PaymentMethod::PAYPAL
             ], Notification::CREDIT_TYPE));
 
@@ -98,7 +99,7 @@ class PaypalController extends AbstractRestAPIController
             $userPlatformPackageData = $this->paymentService->getUserPlatformPackageData($request);
             $subscriptionPlan = $this->subscriptionPlanService->findOrFailById($request->subscriptionPlanUuid);
             $invoiceData = $this->paymentService->getInvoiceDataForPlatformPackage($request, $subscriptionPlan, PaymentMethod::STRIPE);
-            $invoice = $this->invoiceService->create($invoiceData);
+            $invoice = $this->invoiceService->create(array_merge($invoiceData, ['app_id' => auth()->appId()]));
 
             Event::dispatch(new SubscriptionSuccessEvent($request->userUuid, $subscriptionHistoryData, $userPlatformPackageData, $invoice));
             Event::dispatch(new SendNotificationSystemForPaymentEvent($subscriptionHistoryData, Notification::PACKAGE_TYPE));
@@ -128,7 +129,7 @@ class PaypalController extends AbstractRestAPIController
             $userAddOnData = $this->paymentService->getUserAddOnData($request);
             $addOnSubscriptionPlan = $this->addOnSubscriptionPlanService->findOrFailById($request->addOnSubscriptionPlanUuid);
             $invoiceData = $this->paymentService->getInvoiceDataForAddOn($request, $addOnSubscriptionPlan, PaymentMethod::PAYPAL);
-            $invoice = $this->invoiceService->create($invoiceData);
+            $invoice = $this->invoiceService->create(array_merge($invoiceData, ['app_id' => auth()->appId()]));
             Event::dispatch(new SubscriptionAddOnSuccessEvent($request->userUuid, $addOnSubscriptionHistoryData, $userAddOnData, $invoice));
             Event::dispatch(new SendNotificationSystemForPaymentEvent($addOnSubscriptionHistoryData, Notification::ADDON_TYPE));
 

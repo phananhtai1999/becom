@@ -39,12 +39,14 @@ class PaymentCreditPackageSuccessListener
             $creditPackageHistory = CreditPackageHistory::create([
                 'credit_package_uuid' => $event->creditPackageUuid,
                 'user_uuid' => $event->userUuid,
+                'app_id' => auth()->appId(),
                 'logs' => json_encode($event->paymentData),
                 'payment_method_uuid' => $event->paymentMethodUuid,
                 'invoice_uuid' => $event->invoice->uuid
             ]);
             $model = $this->userCreditHistoryService->create([
                 'user_uuid' => $event->userUuid,
+                'app_id' => auth()->appId(),
                 'credit' => $creditPackageHistory->creditPackage->credit,
                 'add_by_uuid' => $event->userUuid,
             ]);
