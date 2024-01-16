@@ -28,7 +28,7 @@ class UpdateMyFooterTemplateRequest extends AbstractRequest
             'template' => ['string'],
             'template_json' => ['string'],
             'type' => ['string', 'in:sms,email,telegram,viber'],
-            'active_by_uuid' => ['nullable','numeric', "in:".auth()->userId()]
+            'active_by_uuid' => ['nullable','string', "in:".auth()->userId()]
         ];
     }
 }

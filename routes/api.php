@@ -105,6 +105,10 @@ Route::group(['as' => 'auth.'], function () {
     Route::post('/refresh-token', [AuthController::class, 'refreshToken'])->name('refresh-token');
 });
 
+
+// Mail Open Tracking
+Route::get('/mail-open-tracking/{id}', [MailSendingHistoryController::class, 'mailOpenTracking'])->name('mail-open-tracking');
+
 Route::group(['middleware' => ['apikey']], function () {
     Route::group(['middleware' => ['appid'], 'as' => 'appid.'], function () {
         Route::get('/my-profile', [AuthController::class, 'myProfile'])->name('myProfile');
@@ -502,8 +506,6 @@ Route::group(['middleware' => ['apikey']], function () {
     });
 
 
-// Mail Open Tracking
-    Route::get('/mail-open-tracking/{id}', [MailSendingHistoryController::class, 'mailOpenTracking'])->name('mail-open-tracking');
 //Chart
     Route::group(['middleware' => ['userid'], 'as' => 'chart.'], function () {
         Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
