@@ -35,7 +35,7 @@ class InvoiceController extends AbstractRestAPIController
         $paymentMethod = $invoice->paymentMethod;
         $date = new DateTime($invoice->created_at);
         $time = $this->service->getConfigByKeyInCache('timezone')->value;
-        $timezone = new DateTimeZone($time->value);
+        $timezone = new DateTimeZone($time);
         $date->setTimezone($timezone);
         $invoice->created_date = $date->format('d/m/Y H:i:s');
 
