@@ -81,7 +81,8 @@ class FormController extends AbstractRestAPIController
 
         $model = $this->service->create(array_merge($request->all(), [
             'publish_status' => Form::PUBLISHED_PUBLISH_STATUS,
-            'user_uuid' => $userUuid
+            'user_uuid' => $userUuid,
+            'app_id' => auth()->appId(),
         ]));
 
         return $this->sendCreatedJsonResponse(
@@ -143,7 +144,7 @@ class FormController extends AbstractRestAPIController
     {
         $model = $this->myService->create( array_merge($request->all(), [
             'publish_status' => Form::PUBLISHED_PUBLISH_STATUS,
-             'user_uuid' => auth()->userId(),
+            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ]));
 
@@ -232,7 +233,8 @@ class FormController extends AbstractRestAPIController
         }
 
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => $userUuid
+            'user_uuid' => $userUuid,
+            'app_id' => auth()->appId(),
         ]));
 
         return $this->sendCreatedJsonResponse(

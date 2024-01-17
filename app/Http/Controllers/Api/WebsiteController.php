@@ -182,15 +182,15 @@ class WebsiteController extends AbstractRestAPIController
             DB::beginTransaction();
             try {
                 $website = $this->service->findOneById($websiteUuid);
-                if (
-                    $request->get("publish_status") ==
-                    Website::PUBLISHED_PUBLISH_STATUS
-                ) {
-                    SiteController::postDeployments(
-                        $website->domain->name,
-                        $websiteUuid
-                    );
-                }
+//                if (
+//                    $request->get("publish_status") ==
+//                    Website::PUBLISHED_PUBLISH_STATUS
+//                ) {
+//                    SiteController::postDeployments(
+//                        $website->domain->name,
+//                        $websiteUuid
+//                    );
+//                }
 
                 $this->changeStatusTemplateByStatusWebsite($website, $request->get("publish_status"));
                 $this->service->update($website, [
