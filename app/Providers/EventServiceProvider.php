@@ -26,6 +26,7 @@ use App\Listeners\ActiveStatusListener;
 use App\Listeners\ActivityHistoryListener;
 use App\Listeners\ActivityHistoryOfSendByCampaignListener;
 use App\Listeners\CalculateCreditWhenStopScenarioListener;
+use App\Listeners\InvitePartnerAfterUserRegisterListener;
 use App\Listeners\PaymentCreditPackageSuccessListener;
 use App\Listeners\PaymentSuccessfullyListener;
 use App\Listeners\SendAccountForNewPartnerListener;
@@ -61,6 +62,7 @@ use App\Observers\UserProfileObserver;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use Techup\ApiBase\Events\AfterUserRegister;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -132,6 +134,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         CalculateCreditWhenStopScenarioEvent::class => [
             CalculateCreditWhenStopScenarioListener::class
+        ],
+        AfterUserRegister::class => [
+            InvitePartnerAfterUserRegisterListener::class
         ]
     ];
 
