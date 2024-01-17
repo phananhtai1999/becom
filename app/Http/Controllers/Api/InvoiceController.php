@@ -37,7 +37,7 @@ class InvoiceController extends AbstractRestAPIController
         $time = $this->service->getConfigByKeyInCache('timezone')->value;
         $timezone = new DateTimeZone($time);
         $date->setTimezone($timezone);
-        $invoice->created_date = $date->format('d/m/Y H:i:s');
+        $invoice->created_date = $date->format('Y-m-d H:i:s');
 
         $data = [
             'invoice' => $invoice,
