@@ -147,7 +147,8 @@ class PartnerController extends AbstractRestAPIController
     public function registerPartner(RegisterPartnerRequest $request)
     {
         $model = $this->service->create(array_merge($request->except('code'), [
-            'publish_status' => 'pending'
+            'publish_status' => 'pending',
+            'app_id' => auth()->appId()
         ]));
 
         return $this->sendOkJsonResponse($this->service->resourceToData($this->resourceClass, $model));
@@ -182,7 +183,10 @@ class PartnerController extends AbstractRestAPIController
                 Event::dispatch(new SendAccountForNewPartnerEvent($newUser));
             }
             //Kiểm tra partner_user nếu có thì update, k có thì create
-            $partnerUser = $this->partnerUserService->findOneWhere(['user_uuid' => $userUuid]);
+            $partnerUser = $this->partnerUserService->findOneWhere([
+                'user_uuid' => $userUuid,
+                'app_id' => $model->app_id
+            ]);
             if ($partnerUser) {
                 $this->partnerUserService->update($partnerUser, [
                     'partner_code' => $code,
@@ -191,6 +195,7 @@ class PartnerController extends AbstractRestAPIController
             }else {
                 $this->partnerUserService->create([
                     'user_uuid' => $userUuid,
+                    'app_id' => $model->app_id,
                     'partner_code' => $code,
                     'partnered_at' => Carbon::now()
                 ]);
