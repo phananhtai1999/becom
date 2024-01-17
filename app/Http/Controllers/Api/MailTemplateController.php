@@ -225,7 +225,8 @@ class MailTemplateController extends AbstractRestAPIController
         }
 
         $model = $this->service->create(array_merge($request->all(), [
-            'user_uuid' => $userUuid
+            'user_uuid' => $userUuid,
+            'app_id' => auth()->appId()
         ]));
 
         return $this->sendCreatedJsonResponse(

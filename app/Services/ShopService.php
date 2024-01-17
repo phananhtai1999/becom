@@ -9,7 +9,7 @@ class ShopService extends AppCallService
 
     public function getProductDetailData($productUuid) {
 
-        return $this->callService('ecom', 'get', 'data-product-detail/' . $productUuid, '', auth()->appId(), auth()->userId());
+        return $this->callService(env('SHOP_SERVICE_NAME'), 'get', 'data-product-detail/' . $productUuid, '', auth()->appId(), auth()->userId());
     }
 
     public function getProductCategoryData($categorySlug) {
@@ -17,7 +17,7 @@ class ShopService extends AppCallService
             'product_category_slug' => $categorySlug
         ];
 
-        return $this->callService('ecom', 'get', 'data-product-category', $data, auth()->appId(), auth()->userId());
+        return $this->callService(env('SHOP_SERVICE_NAME'), 'get', 'data-product-category', $data, auth()->appId(), auth()->userId());
     }
 
     public function getListProductByCategoryData($categorySlug) {
@@ -25,7 +25,7 @@ class ShopService extends AppCallService
             'product_category_slug' => $categorySlug
         ];
 
-        return $this->callService('ecom', 'get', 'data-product-category', $data, auth()->appId(), auth()->userId());
+        return $this->callService(env('SHOP_SERVICE_NAME'), 'get', 'data-product-category', $data, auth()->appId(), auth()->userId());
     }
 
     public function getChildrenByCategoryUuid($categoryUuid, $sortName = 'created_at', $sortOrder = 'desc', $childrenCategoryCount = 10) {
@@ -36,7 +36,7 @@ class ShopService extends AppCallService
             'sort' => $sortName
         ];
 
-        return $this->callService('ecom', 'get', 'children-category', $data, auth()->appId(), auth()->userId());
+        return $this->callService(env('SHOP_SERVICE_NAME'), 'get', 'children-category', $data, auth()->appId(), auth()->userId());
     }
 
     public function getProductHeader($sortName = 'created_at', $sortOrder = 'desc', $childrenCategoryCount = 10) {
@@ -46,7 +46,7 @@ class ShopService extends AppCallService
             'sort' => $sortName
         ];
 
-        return $this->callService('ecom', 'get', 'product-header', $data, auth()->appId(), auth()->userId());
+        return $this->callService(env('SHOP_SERVICE_NAME'), 'get', 'product-header', $data, auth()->appId(), auth()->userId());
     }
 
     public function getListProductByCategoryUuid($categoryUuid, $sortName = 'created_at', $sortOrder = 'desc', $childrenCategoryCount = 10) {
@@ -65,26 +65,26 @@ class ShopService extends AppCallService
             ];
         }
 
-        return $this->callService('ecom', 'get', 'products-by-category', $data, auth()->appId(), auth()->userId());
+        return $this->callService(env('SHOP_SERVICE_NAME'), 'get', 'products-by-category', $data, auth()->appId(), auth()->userId());
     }
 
     public function getProductByUuid($productUuid) {
 
-        return $this->callService('ecom', 'get', 'product/' . $productUuid, '', auth()->appId(), auth()->userId());
+        return $this->callService(env('SHOP_SERVICE_NAME'), 'get', 'product/' . $productUuid, '', auth()->appId(), auth()->userId());
     }
 
     public function getProductByParentCategoryUuid($categoryUuid) {
-        return $this->callService('ecom', 'get', 'product-by-parent-category/' . $categoryUuid, '', auth()->appId(), auth()->userId());
+        return $this->callService(env('SHOP_SERVICE_NAME'), 'get', 'product-by-parent-category/' . $categoryUuid, '', auth()->appId(), auth()->userId());
     }
 
     public function myProduct($request)
     {
-        return $this->callService('ecom', 'get', '/my/products', $request->all(), auth()->appId(), auth()->userId());
+        return $this->callService(env('SHOP_SERVICE_NAME'), 'get', '/my/products', $request->all(), auth()->appId(), auth()->userId());
     }
 
     public function myCategory($request)
     {
-        return $this->callService('ecom', 'get', '/my/categories', $request->all(), auth()->appId(), auth()->userId());
+        return $this->callService(env('SHOP_SERVICE_NAME'), 'get', '/my/categories', $request->all(), auth()->appId(), auth()->userId());
     }
 
 }
