@@ -236,6 +236,7 @@ class BaseNotification
 
                 $creditHistory = $this->creditHistoryService->create([
                     'user_uuid' => $this->campaign->user_uuid,
+                    'app_id' => $this->campaign->app_id,
                     'campaign_uuid' => !$campaignScenario ? $this->campaign->uuid : null,
                     'credit' => $creditNumberSendByCampaign,
                     'type' => !$campaignScenario ? $this->campaign->send_type : null,

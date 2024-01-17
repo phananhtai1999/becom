@@ -36,7 +36,10 @@ class UserProfileQueryBuilder extends AbstractQueryBuilder
                 'cover_img',
                 'credit',
                 'can_add_smtp_account',
-                'can_remove_footer_template'
+                'can_remove_footer_template',
+                'first_name',
+                'last_name',
+                'email'
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -48,7 +51,10 @@ class UserProfileQueryBuilder extends AbstractQueryBuilder
                 'cover_img',
                 'credit',
                 'can_add_smtp_account',
-                'can_remove_footer_template'
+                'can_remove_footer_template',
+                'first_name',
+                'last_name',
+                'email'
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -67,6 +73,12 @@ class UserProfileQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__roles.name', 'roles.name'),
                 'credit',
                 AllowedFilter::exact('exact__credit', 'credit'),
+                'first_name',
+                AllowedFilter::exact('exact__first_name', 'first_name'),
+                'last_name',
+                AllowedFilter::exact('exact__last_name', 'last_name'),
+                'email',
+                AllowedFilter::exact('exact__email', 'email'),
                 'can_add_smtp_account',
                 AllowedFilter::exact('exact__can_add_smtp_account', 'can_add_smtp_account'),
                 'can_remove_footer_template',
