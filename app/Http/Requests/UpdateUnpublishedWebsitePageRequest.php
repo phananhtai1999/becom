@@ -30,7 +30,12 @@ class UpdateUnpublishedWebsitePageRequest extends AbstractRequest
         return [
             'title' => ['string'],
             'slug' => ['string'],
-            'template' => ['string'],
+            'html_template' => ['string'],
+            'css_template' => ['string'],
+            'js_template' => ['string'],
+            'type' => ['string', Rule::in(
+                (new WebsitePage())->getTypeWebsitePage()
+            )],
             'template_json' => ['string'],
             'website_page_category_uuid' => ['numeric', Rule::exists('website_page_categories', 'uuid')->whereNull('deleted_at')],
             'is_default' => ['boolean'],
