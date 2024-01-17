@@ -32,7 +32,8 @@ class UpdateArticleSeriesRequest extends AbstractRequest
             'list_keywords' => ['nullable', 'in:NULL'],
             'article_category_uuid' => ['nullable', 'numeric', 'min:1', Rule::exists('article_categories', 'uuid')->whereNull('deleted_at')],
             'parent_uuid' => ['nullable', 'numeric', Rule::exists('article_series', 'uuid')->whereNull('deleted_at')],
-            'assigned_ids' => ['nullable', 'numeric', new ArticleSeriesRule($this->request->get('assigned_ids'))],
+//            'assigned_ids' => ['nullable', 'string', new ArticleSeriesRule($this->request->get('assigned_ids'))],
+            'assigned_ids' => ['nullable', 'string']
         ];
 
         if ($this->request->get('parent_uuid')) {
