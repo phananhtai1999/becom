@@ -53,36 +53,34 @@ class ReplaceArticleService
 
     public function replaceListArticleForPageHome($template, $websitePage) {
 
-        //get number article need to parse
-        $pattern = '/data-article-count="(\d+)"/';
-        preg_match_all($pattern, $template, $matches);
-        $numbers = array_map('intval', $matches[1]);
-        $articleCount = array_sum($numbers);
-        $articleCount = isset($articleCount) ? (int)$articleCount : 10;
-
-        //get orderby
-        preg_match('/article-sort="(.*?)"/', $template, $sortName);
-        preg_match('/article-sort-order="(.*?)"/', $template, $sortOrder);
-        preg_match('/data-filter-article-by-category="(.*?)"/', $template, $sortFilterByCategory);
-        if ($sortFilterByCategory) {
-            $articlesData = Article::where('article_category_uuid', $sortFilterByCategory[1])->orderBy($sortName[1] ?? 'created_at', $sortOrder[1] ?? 'DESC')->paginate($articleCount);
-        } else {
-            $articlesData = Article::orderBy($sortName[1] ?? 'created_at', $sortOrder[1] ?? 'DESC')->paginate($articleCount);
-        }
-        $pattern = '/<article-element.*?>(.*?)<\/article-element>/s';
-        return preg_replace_callback($pattern, function ($matches) use ($articlesData, $websitePage) {
-            $articlesData = $articlesData->shift();
-            if (!$articlesData) {
-                return $matches[0];
+        $pattern = '/<article-list.*?>(.*?)<\/article-list>/s';
+        return preg_replace_callback($pattern, function ($matches) use ($websitePage){
+            preg_match('/article-sort="(.*?)"/', $matches[0], $sortName);
+            preg_match('/article-sort-order="(.*?)"/', $matches[0], $sortOrder);
+            preg_match('/data-filter-article-by-category="(.*?)"/', $matches[0], $sortFilterByCategory);
+            preg_match('/data-article-count="(\d+)"/', $matches[0], $articleCount);
+            $articleCount = isset($articleCount) ? (int)$articleCount[1] : 10;
+            if ($sortFilterByCategory) {
+                $articlesData = Article::where('article_category_uuid', $sortFilterByCategory[1])->orderBy($sortName[1] ?? 'created_at', $sortOrder[1] ?? 'DESC')->paginate($articleCount);
+            } else {
+                $articlesData = Article::orderBy($sortName[1] ?? 'created_at', $sortOrder[1] ?? 'DESC')->paginate($articleCount);
             }
-            //replace slug
-            $matches[0] = $this->replaceRedirectTag($articlesData, $websitePage, $matches[0]);
-            $category = $articlesData->articleCategory;
-            $replaceCategoryService = new ReplaceCategoryService();
-            $replaceCategoryService->replaceCategoryInArticle($matches[0], $category);
+            $pattern = '/<article-element.*?>(.*?)<\/article-element>/s';
 
-            $searchReplaceMap = $this->searchReplaceMapForArticle($articlesData);
-            return str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $matches[0]);
+            return preg_replace_callback($pattern, function ($matchesArticle) use ($articlesData, $websitePage) {
+                $articlesData = $articlesData->shift();
+                if (!$articlesData) {
+                    return $matchesArticle[0];
+                }
+
+                $category = $articlesData->articleCategory;
+                $replaceCategoryService = new ReplaceCategoryService();
+                $replaceCategoryService->replaceCategoryInArticle($matchesArticle[0], $category);
+
+                $searchReplaceMap = $this->searchReplaceMapForArticle($articlesData);
+                return str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $matchesArticle[0]);
+            }, $matches[0]);
+
         }, $template);
     }
 
