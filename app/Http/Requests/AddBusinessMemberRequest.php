@@ -52,7 +52,7 @@ class AddBusinessMemberRequest extends AbstractRequest
                 'domain' => ['required', 'string', 'regex:/^(?!(www|http|https)\.)\w+(\.\w+)+$/', Rule::exists('domains', 'name')->where(function ($query) {
                     return $query->where([
                         ['verified_at', '<>', null],
-                        ['active_mailbox', true]
+//                        ['active_mailbox', true]
                     ])->whereNull('deleted_at');
                 })],
                 'password' => ['required', 'string', 'regex:/^\S*$/',
