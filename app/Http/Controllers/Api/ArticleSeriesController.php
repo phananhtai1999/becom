@@ -52,7 +52,7 @@ class ArticleSeriesController extends AbstractRestAPIController
             return $this->sendValidationFailedJsonResponse();
         }
 
-        $model = $this->service->create(array_merge($request->except(['article_uuid']), ['app_id' => auth()->appId]));
+        $model = $this->service->create(array_merge($request->except(['article_uuid']), ['app_id' => auth()->appId()]));
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -72,7 +72,7 @@ class ArticleSeriesController extends AbstractRestAPIController
         }
         $model = $this->service->findOrFailById($id);
 
-        $this->service->update($model, array_merge($request->except(['article_uuid']), ['app_id' => auth()->appId]));
+        $this->service->update($model, array_merge($request->except(['article_uuid']), ['app_id' => auth()->appId()]));
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
