@@ -339,7 +339,7 @@ class BusinessManagementController extends AbstractRestAPIController
                         'user_uuid' => $userProfile->user_uuid,
                         'app_id' => auth()->appId()
                     ]);
-//                    Mailbox::postEmailAccountcreate($user->user_uuid, $email, $password);
+//                    Mailbox::postEmailAccountcreate($userProfile->user_uuid, $email, $password);
                 }
                 DB::commit();
 

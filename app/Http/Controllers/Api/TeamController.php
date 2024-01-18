@@ -237,31 +237,28 @@ class TeamController extends Controller
                 }
             }
             if ($request->get('type') == Team::ACCOUNT_INVITE) {
-                $passwordRandom = $this->generateRandomString(10);
-                $email = $request->get('username') . '@' . $request->get('domain');
-                $user = $this->userService->create([
-                    'email' => $email,
-                    'first_name' => $request->get('first_name'),
-                    'last_name' => $request->get('last_name'),
-                    'username' => $request->get('username'),
-                    'can_add_smtp_account' => 0,
-                    'password' => Hash::make($request->get('password'))
-                ]);
-                $user->roles()->attach([config('user.default_role_uuid')]);
-                $user->userPlatformPackage()->create(['platform_package_uuid' => PlatformPackage::DEFAULT_PLATFORM_PACKAGE_1]);
-                $this->userTeamService->create(array_merge($request->all(), [
-                    'user_uuid' => $user->uuid,
-                    'app_id' => auth()->appId()
-                ]));
+                $password = Hash::make($request->get('password'));
+                $email = $request->get('email') . '@' . $request->get('domain');
+                $addUser = app(UserManagerService::class)->addUser($email, $password, $request->get('first_name'), $request->get('last_name'), auth()->appId());
+                if ($addUser) {
+                    $userProfile = $this->userProfileService->findOneWhereOrFail(['email' => $email]);
+                    $userProfile->userPlatformPackage()->create(['platform_package_uuid' => PlatformPackage::DEFAULT_PLATFORM_PACKAGE_1, 'app_id' => $userProfile->app_id]);
 
-                $this->userBusinessService->create([
-                    'business_uuid' => $businessUuid,
-                    'user_uuid' => $user->uuid,
-                    'app_id' => auth()->appId()
-                ]);
-//                Mailbox::postEmailAccountcreate($user->uuid, $email, $passwordRandom);
+                    $this->userTeamService->create(array_merge($request->all(), [
+                        'user_uuid' => $userProfile->user_uuid,
+                        'app_id' => auth()->appId()
+                    ]));
 
-                $this->cstoreService->storeFolderByType($request->get('email'), $user->uuid, config('foldertypecstore.USER'), $request->get('team_uuid'));
+                    $this->userBusinessService->create([
+                        'business_uuid' => $businessUuid,
+                        'user_uuid' => $userProfile->user_uuid,
+                        'app_id' => auth()->appId()
+                    ]);
+                    $this->cstoreService->storeFolderByType($email, $userProfile->user_uuid, config('foldertypecstore.USER'), $request->get('team_uuid'));
+
+//                    Mailbox::postEmailAccountcreate($userProfile->user_uuid, $email, $password);
+                }
+
 
                 DB::commit();
 
