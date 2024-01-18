@@ -413,8 +413,7 @@ class TeamController extends Controller
             //need function userteamcontaclist here
             return $this->sendBadRequestJsonResponse(['message' => 'This user is not in the team']);
         }
-
-        $user->userTeamContactLists()->sync($request->get('contact_list_uuids', []));
+        $user->userTeamContactLists()->syncWithPivotValues($request->get('contact_list_uuids', []), ['app_id' => auth()->appId()]);
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->userResourceClass, $user)
