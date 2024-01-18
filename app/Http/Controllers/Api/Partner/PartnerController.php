@@ -179,6 +179,8 @@ class PartnerController extends AbstractRestAPIController
                     ]);
                     if ($userProfile){
                         app(UserManagerService::class)->addRoleToUser($userProfile->user_uuid, $request->get('partner_role'), auth()->appId(), auth()->userId(), auth()->token());
+                        app(UserManagerService::class)->addRoleToUser($model->user_uuid, Role::ROLE_PARTNER, auth()->appId(), auth()->userId(), auth()->token());
+
                         $userUuid = $userProfile->user_uuid;
                         SendAccountForNewPartnerEvent::dispatch($userProfile->email, $password);
                     }
@@ -186,6 +188,8 @@ class PartnerController extends AbstractRestAPIController
                     return $this->sendValidationFailedJsonResponse(["message" => "Something wrong when create account user"]);
                 }
 
+            }else{
+                app(UserManagerService::class)->addRoleToUser($model->user_uuid, Role::ROLE_PARTNER, auth()->appId(), auth()->userId(), auth()->token());
             }
             //Kiểm tra partner_user nếu có thì update, k có thì create
             $partnerUser = $this->partnerUserService->findOneWhere([
