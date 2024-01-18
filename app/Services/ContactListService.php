@@ -27,7 +27,10 @@ class ContactListService extends AbstractService
      */
     public function checkExistsContactListInTables($id)
     {
-        $contactList = $this->findOrFailById($id);
+        $contactList = $this->findOneWhereOrFail([
+            'uuid' => $id,
+            'app_id' => auth()->appId()
+        ]);
 
         $campaigns = $contactList->campaigns->toArray();
 
@@ -44,7 +47,7 @@ class ContactListService extends AbstractService
      */
     public function checkContactListByUuid($id)
     {
-        $contactList = $this->findOneWhere(['uuid' => $id ]);
+        $contactList = $this->findOneWhere(['uuid' => $id]);
 
         if (!empty($contactList)) {
             return true;
@@ -63,7 +66,7 @@ class ContactListService extends AbstractService
         $contactList = $this->findOrFailById($contactListUuid);
         $contacts = $contactList->contacts->pluck('email');
         if ($contacts->contains($email)) {
-           return true;
+            return true;
         }
 
         return false;

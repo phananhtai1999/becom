@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Abstracts\AbstractRestAPIController;
-use App\Http\Controllers\Traits\RestIndexTrait;
+use App\Http\Controllers\Traits\RestIndexByAppIdTrait;
+use App\Http\Controllers\Traits\RestShowByAppIdTrait;
 use App\Http\Requests\ContactListRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyContactListRequest;
@@ -11,8 +12,6 @@ use App\Http\Requests\UpdateContactListRequest;
 use App\Http\Requests\UpdateMyContactListRequest;
 use App\Http\Resources\ContactListResource;
 use App\Http\Resources\ContactListResourceCollection;
-use App\Http\Controllers\Traits\RestShowTrait;
-use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Services\ContactListService;
 use App\Services\ContactService;
 use App\Services\MyContactListService;
@@ -23,7 +22,7 @@ use function PHPUnit\Framework\isEmpty;
 
 class ContactListController extends AbstractRestAPIController
 {
-    use RestIndexTrait, RestShowTrait, RestDestroyTrait;
+    use RestIndexByAppIdTrait, RestShowByAppIdTrait;
 
     /**
      * @var MyContactListService
@@ -45,7 +44,7 @@ class ContactListController extends AbstractRestAPIController
         MyContactListService $myService,
         ContactService       $contactService,
         UserTeamService      $userTeamService,
-        UserProfileService $userProfileService
+        UserProfileService   $userProfileService
     )
     {
         $this->service = $service;
@@ -57,6 +56,7 @@ class ContactListController extends AbstractRestAPIController
         $this->resourceClass = ContactListResource::class;
         $this->storeRequest = ContactListRequest::class;
         $this->editRequest = UpdateContactListRequest::class;
+        $this->indexRequest = IndexRequest::class;
     }
 
     /**
@@ -112,15 +112,10 @@ class ContactListController extends AbstractRestAPIController
             }
         }
 
-        if (empty($request->user_uuid)) {
-            $data = array_merge($request->all(), [
-                'user_uuid' => auth()->userId(),
-                'app_id' => auth()->appId(),
-            ]);
-        } else {
-            $data = $request->all();
-        }
-        $model = $this->service->create($data);
+        $model = $this->service->create(array_merge($request->all(), [
+            'user_uuid' => $request->get('user_uuid') ?? auth()->userId(),
+            'app_id' => auth()->appId()
+        ]));
         $model->contacts()->attach($request->get('contact', []));
 
         return $this->sendCreatedJsonResponse(
@@ -175,7 +170,7 @@ class ContactListController extends AbstractRestAPIController
                 return $this->sendValidationFailedJsonResponse();
             }
         }
-        $this->service->update($model, $request->all());
+        $this->service->update($model, array_merge($request->except(['app_id'])));
         $contactUuid = $this->service->findContactKeyByContactList($model);
         $model->contacts()->sync($request->get('contact', $contactUuid));
 
