@@ -28,7 +28,12 @@ class UpdateContactListRequest extends AbstractRequest
             'file' => ['nullable', 'mimes:xlsx,csv,json,js'],
             'name' => ['string'],
             'contact' => ['nullable', 'array', 'min:1'],
-            'contact.*' => ['numeric', 'min:1', Rule::exists('contacts', 'uuid')->whereNull('deleted_at')],
+            'contact.*' => ['integer', 'min:1', Rule::exists('contacts', 'uuid')->where(function ($query) {
+                return $query->where([
+                    ['user_uuid', $this->request->get('user_uuid') ?? auth()->userId()],
+                    ['app_id', auth()->appId()]
+                ])->whereNull('deleted_at');
+            })],
             'user_uuid' => ['nullable', 'string', 'min:1', Rule::exists('becom_user_profiles', 'user_uuid')->where(function ($q) {
                 return $q->where('app_id', auth()->appId());
             })->whereNull('deleted_at')],
