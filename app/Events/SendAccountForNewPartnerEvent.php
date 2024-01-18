@@ -3,6 +3,7 @@
 namespace App\Events;
 
 use App\Models\User;
+use App\Models\UserProfile;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -15,19 +16,19 @@ class SendAccountForNewPartnerEvent
 {
     use Dispatchable, SerializesModels;
 
-    /**
-     * @var string
-     */
-    public $user;
+    public $email;
+
+    public $password;
 
     /**
      * Create a new event instance.
      *
-     * @param $user
+     * @param $email
      */
-    public function __construct(User $user)
+    public function __construct($email, $password)
     {
-        $this->user = $user;
+        $this->email = $email;
+        $this->password = $password;
     }
 
     /**

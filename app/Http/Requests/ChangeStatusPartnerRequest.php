@@ -36,7 +36,7 @@ class ChangeStatusPartnerRequest extends AbstractRequest
         ];
 
         if ($this->request->get('publish_status') === 'active') {
-            $validate['partner_role'] = ['required_if:user_uuid,null', 'numeric','not_in:'.config('user.default_admin_role_uuid'),Rule::exists('roles', 'uuid')->whereNull('deleted_at')];
+            $validate['partner_role'] = ['required_if:user_uuid,null', 'string'];
         }
 
         return $validate;

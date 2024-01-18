@@ -6,6 +6,7 @@ use App\Events\SendAccountForNewPartnerEvent;
 use App\Events\SendEmailRecoveryPasswordEvent;
 use App\Mail\SendAccountForNewPartner;
 use App\Mail\SendRecoveryPasswordEmailToUser;
+use Illuminate\Support\Facades\Log;
 use Techup\ApiConfig\Services\ConfigService;
 use App\Services\PasswordResetService;
 use App\Services\SmtpAccountService;
@@ -46,22 +47,23 @@ class SendAccountForNewPartnerListener implements ShouldQueue
      */
     public function handle(SendAccountForNewPartnerEvent $event)
     {
-        $user = $event->user;
+        $email = $event->email;
+        $password = $event->password;
 
-        $passwordReset = $this->passwordResetService->findOneWhere([[
-            'email', $user->email
-        ]]);
+//        $passwordReset = $this->passwordResetService->findOneWhere([[
+//            'email', $user->email
+//        ]]);
+//
+//        if ($passwordReset) {
+//            $passwordReset->delete();
+//        }
+//
+//        $passwordReset = $this->passwordResetService->create([
+//            'email' => $user->email,
+//            'token' => Str::random(60),
+//            'created_at' => Carbon::now()
+//        ]);
 
-        if ($passwordReset) {
-            $passwordReset->delete();
-        }
-
-        $passwordReset = $this->passwordResetService->create([
-            'email' => $user->email,
-            'token' => Str::random(60),
-            'created_at' => Carbon::now()
-        ]);
-
-        $this->smtpAccountService->sendEmailNotificationSystem($user, new SendAccountForNewPartner($user, $passwordReset));
+        $this->smtpAccountService->sendEmailNotificationSystem(null, new SendAccountForNewPartner($email, $password), $email);
     }
 }

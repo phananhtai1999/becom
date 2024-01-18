@@ -5,6 +5,7 @@ namespace App\Listeners;
 use App\Events\SendByBirthdayCampaignEvent;
 use App\Notifications\BaseNotification;
 use App\Services\CampaignService;
+use App\Services\UserProfileService;
 use Techup\ApiConfig\Services\ConfigService;
 use App\Services\ContactService;
 use App\Services\CreditHistoryService;
@@ -63,6 +64,8 @@ class SendByBirthdayCampaignListener implements ShouldQueue
      */
     private $configService;
 
+    private $userProfileService;
+
     /**
      * @var int
      */
@@ -88,7 +91,8 @@ class SendByBirthdayCampaignListener implements ShouldQueue
         SendEmailScheduleLogService $sendEmailScheduleLogService,
         ContactService $contactService,
         CreditHistoryService $creditHistoryService,
-        ConfigService $configService
+        ConfigService $configService,
+        UserProfileService $userProfileService
     )
     {
         $this->mailTemplateVariableService = $mailTemplateVariableService;
@@ -100,6 +104,7 @@ class SendByBirthdayCampaignListener implements ShouldQueue
         $this->contactService = $contactService;
         $this->creditHistoryService = $creditHistoryService;
         $this->configService = $configService;
+        $this->userProfileService = $userProfileService;
     }
 
     /**
@@ -117,7 +122,7 @@ class SendByBirthdayCampaignListener implements ShouldQueue
             $contacts = $emailNotification->getBirthdayContacts();
             $creditNumberSendByCampaign = count($contacts) * $emailNotification->getNotificationPrice();
 
-            if (!$this->userService->checkCredit($creditNumberSendByCampaign, $campaign->user_uuid)){
+            if (!$this->userProfileService->checkCredit($creditNumberSendByCampaign, $campaign->user_uuid)){
                 $this->campaignService->update($campaign, [
                     'was_stopped_by_owner' => true
                 ]);
