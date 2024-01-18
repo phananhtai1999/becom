@@ -391,9 +391,10 @@ class ContactListController extends AbstractRestAPIController
     public function indexMyContactList(IndexRequest $request)
     {
         $userTeam = $this->userTeamService->getUserTeamByUserAndAppId(auth()->userId(), auth()->appId());
-        //need function userteamcontaclist here
-        if (($userTeam && !$userTeam['is_blocked']) && !empty(auth()->user()->userTeamContactLists)) {
-            $contactLists = $this->myService->myContactLists($request, auth()->user()->userTeamContactLists()->pluck('contact_list_uuid'));
+        $user = $this->userProfileService->findOneWhereOrFail(['user_uuid' => auth()->userId(), 'app_id' => auth()->appId()]);
+
+        if (($userTeam && !$userTeam['is_blocked']) && !empty($user->userTeamContactLists)) {
+            $contactLists = $this->myService->myContactLists($request, $user->userTeamContactLists()->pluck('contact_list_uuid'));
         } else {
             $contactLists = $this->myService->myContactLists($request);
         }
