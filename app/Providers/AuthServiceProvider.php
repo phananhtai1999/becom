@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\Permission;
 use App\Models\PlatformPackage;
+use App\Services\UserProfileService;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -44,6 +45,7 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         Gate::define('permission', function ($user, $code) {
+            $user = app(UserProfileService::class)->findOneWhereOrFail(['user_uuid' => auth()->userId(), 'app_id' => \auth()->appId()]);
             if (!isset($user->userPlatformPackage->platform_package_uuid) && !isset($user->userAddOns) && !isset($user->userTeam->permission_uuids)) {
                 return false;
             }
