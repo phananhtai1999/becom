@@ -27,6 +27,7 @@ use App\Models\Partner;
 use App\Models\PartnerLevel;
 use App\Models\PartnerTrackingByYear;
 use App\Models\PartnerUser;
+use App\Models\Role;
 use App\Models\SubscriptionHistory;
 use App\Models\User;
 use App\Models\UserPaymentByDay;
@@ -47,6 +48,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Techup\ApiBase\Services\UserManagerService;
 
 class PartnerController extends AbstractRestAPIController
 {
@@ -71,7 +73,7 @@ class PartnerController extends AbstractRestAPIController
     public function __construct(
         PartnerService $service,
         PartnerLevelService $partnerLevelService,
-        UserService $userService,
+        UserProfileService $userService,
         SmtpAccountService $smtpAccountService,
         PartnerUserService $partnerUserService,
         PartnerTrackingService $partnerTrackingService,
@@ -170,17 +172,24 @@ class PartnerController extends AbstractRestAPIController
             //Tạo User khi partner chưa có tài khoản hệ thống
             if (!$model->user_uuid) {
                 $password = $this->generateRandomString(6);
-                $newUser = $this->userService->create([
-                    'email' => $model->partner_email,
-                    'username' => $model->partner_email,
-                    'first_name' => $model->first_name,
-                    'last_name' => $model->last_name,
-                    'can_add_smtp_account' => 0,
-                    'password' => Hash::make($password)
-                ]);
-                $newUser->roles()->attach($request->get('partner_role'));
-                $userUuid = $newUser->uuid;
-                Event::dispatch(new SendAccountForNewPartnerEvent($newUser));
+                $addUser = app(UserManagerService::class)->addUser($model->partner_email, $password,$model->first_name,$model->last_name, auth()->appId());
+                if ($addUser){
+                    $userProfile = $this->userProfileService->findOneWhere([
+                        "email" => $model->partner_email,
+                    ]);
+                    if ($userProfile){
+                        app(UserManagerService::class)->addRoleToUser($userProfile->user_uuid, $request->get('partner_role'), auth()->appId(), auth()->userId(), auth()->token());
+                        app(UserManagerService::class)->addRoleToUser($model->user_uuid, Role::ROLE_PARTNER, auth()->appId(), auth()->userId(), auth()->token());
+
+                        $userUuid = $userProfile->user_uuid;
+                        SendAccountForNewPartnerEvent::dispatch($userProfile->email, $password);
+                    }
+                }else{
+                    return $this->sendValidationFailedJsonResponse(["message" => "Something wrong when create account user"]);
+                }
+
+            }else{
+                app(UserManagerService::class)->addRoleToUser($model->user_uuid, Role::ROLE_PARTNER, auth()->appId(), auth()->userId(), auth()->token());
             }
             //Kiểm tra partner_user nếu có thì update, k có thì create
             $partnerUser = $this->partnerUserService->findOneWhere([

@@ -4,6 +4,7 @@ namespace App\Mail;
 
 use App\Models\PasswordReset;
 use App\Models\User;
+use App\Models\UserProfile;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -13,20 +14,20 @@ class SendAccountForNewPartner extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $user;
+    public $email;
 
-    public $passwordReset;
+    public $password;
 
     /**
      * Create a new message instance.
      *
-     * @param $user
+     * @param $email
      * @param $passwordReset
      */
-    public function __construct(User $user, PasswordReset $passwordReset)
+    public function __construct($email, $password)
     {
-        $this->user = $user;
-        $this->passwordReset = $passwordReset;
+        $this->email = $email;
+        $this->password = $password;
     }
 
     /**

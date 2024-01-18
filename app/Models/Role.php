@@ -20,6 +20,8 @@ class Role extends AbstractModel
     const ROLE_USER_MANAGER = 'user_manager';
     const ROLE_USER_OWNER = 'user_owner';
     const ROLE_USER_LEADER = 'user_leader';
+    const ROLE_PARTNER = 'app_partner';
+
     /**
      * @var string
      */
