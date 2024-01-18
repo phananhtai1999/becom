@@ -56,4 +56,5 @@ return array(
     'campaign_in_scenario' => 'Chiến dịch nằm trong chiến dịch kịch bản.',
     'send_scenario_success' => 'Gửi Email Theo Kịch Bản Thành Công.',
     'domain_must_active' => 'Domain phải được kích hoạt.',
+    'contact_must_have_phone' => 'Liên hệ phải có số điện thoại.',
 );

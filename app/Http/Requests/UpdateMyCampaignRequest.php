@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
+use App\Models\Campaign;
+use App\Models\ContactList;
 use Illuminate\Validation\Rule;
 
 class UpdateMyCampaignRequest extends AbstractRequest
@@ -27,7 +29,7 @@ class UpdateMyCampaignRequest extends AbstractRequest
         $sendType = $this->request->get('send_type');
         $validate = [
             'tracking_key' => ['string'],
-            'mail_template_uuid' => ['numeric', 'min:1', Rule::exists('mail_templates', 'uuid')->where(function ($query) use ($sendType) {
+            'mail_template_uuid' => ['integer', 'min:1', Rule::exists('mail_templates', 'uuid')->where(function ($query) use ($sendType) {
                 return $query->where([
                     ['user_uuid', auth()->userId()],
                     ['app_id', auth()->appId()],
@@ -42,7 +44,7 @@ class UpdateMyCampaignRequest extends AbstractRequest
             'status' => ['string', 'in:active,banned'],
             'type' => ['string', 'in:simple,birthday,scenario'],
             'send_type' => ['string', 'in:sms,email,telegram,viber'],
-            'smtp_account_uuid' => ['nullable', 'numeric', 'min:1', Rule::exists('smtp_accounts', 'uuid')->where(function ($query) use ($sendType) {
+            'smtp_account_uuid' => ['nullable', 'integer', 'min:1', Rule::exists('smtp_accounts', 'uuid')->where(function ($query) use ($sendType) {
                 if ($sendType == 'email') {
                     return $query->where([
                         ['send_project_uuid', $this->request->get('send_project_uuid')],
@@ -71,7 +73,7 @@ class UpdateMyCampaignRequest extends AbstractRequest
                     ])->whereNull('deleted_at');
                 }
             })],
-            'send_project_uuid' => ['numeric', 'min:1', Rule::exists('send_projects', 'uuid')->where(function ($query) {
+            'send_project_uuid' => ['integer', 'min:1', Rule::exists('send_projects', 'uuid')->where(function ($query) {
 
                 return $query->where([
                     ['user_uuid', auth()->userId()],
@@ -84,14 +86,24 @@ class UpdateMyCampaignRequest extends AbstractRequest
             'send_from_name' => ['nullable', 'string'],
             'was_finished' => ['boolean'],
             'was_stopped_by_owner' => ['boolean'],
-            'contact_list' => ['nullable', 'array', 'min:1'],
-            'contact_list.*' => ['numeric', 'min:1', Rule::exists('contact_lists', 'uuid')->where(function ($query) {
+            'contact_list' => ['array', 'min:1'],
+            'contact_list.*' => ['integer', 'min:1', Rule::exists('contact_lists', 'uuid')->where(function ($query) {
 
                 return $query->where([
                     ['user_uuid', auth()->userId()],
                     ['app_id', auth()->appId()]
                 ])->whereNull('deleted_at');
-            })]
+            }), function ($attribute, $value, $fail) use ($sendType) {
+                if ($sendType === Campaign::CAMPAIGN_SMS_SEND_TYPE ||
+                    Campaign::CAMPAIGN_TELEGRAM_SEND_TYPE ||
+                    Campaign::CAMPAIGN_VIBER_SEND_TYPE
+                ) {
+                    $contactList = ContactList::find($value);
+                    if ($contactList && $contactList->contacts()->whereNull('phone')->exists()) {
+                        $fail(__('messages.contact_must_have_phone'));
+                    }
+                }
+            }]
         ];
 
         return $validate;

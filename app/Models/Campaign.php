@@ -20,6 +20,10 @@ class Campaign extends AbstractModel
     CONST CAMPAIGN_BIRTHDAY_TYPE = 'birthday';
     CONST CAMPAIGN_SIMPLE_TYPE = 'simple';
     CONST CAMPAIGN_SCENARIO_TYPE = 'scenario';
+    CONST CAMPAIGN_EMAIL_SEND_TYPE = 'email';
+    CONST CAMPAIGN_SMS_SEND_TYPE = 'sms';
+    CONST CAMPAIGN_TELEGRAM_SEND_TYPE = 'telegram';
+    CONST CAMPAIGN_VIBER_SEND_TYPE = 'viber';
 
     /**
      * @var string
