@@ -172,9 +172,9 @@ class WebsitePageService extends AbstractService
             ->firstOrFail();
 
         if ($websitePageSlug) {
-            $websitePage = $website->websitePagesPublic()->where(['slug' => $websitePageSlug])->firstOrFail();
+            $websitePage = $website->websitePages()->where(['slug' => $websitePageSlug])->firstOrFail();
         } else {
-            $websitePage = $website->websitePagesPublic()->wherePivot('is_homepage', 1)->firstOrFail();
+            $websitePage = $website->websitePages()->wherePivot('is_homepage', 1)->firstOrFail();
         }
 
         return $websitePage;
@@ -185,9 +185,9 @@ class WebsitePageService extends AbstractService
         $website = (new Website())->where('uuid', $websiteUuid)->firstOrFail();
 
         if ($websitePageUuid) {
-            $websitePage = $website->websitePagesPublic()->where(['uuid' => $websitePageUuid])->firstOrFail();
+            $websitePage = $website->websitePages()->where(['uuid' => $websitePageUuid])->firstOrFail();
         } else {
-            $websitePage = $website->websitePagesPublic()->wherePivot('is_homepage', 1)->firstOrFail();
+            $websitePage = $website->websitePages()->wherePivot('is_homepage', 1)->firstOrFail();
         }
 
         return $websitePage;
@@ -204,7 +204,7 @@ class WebsitePageService extends AbstractService
             ->where('publish_status', Website::PUBLISHED_PUBLISH_STATUS)
             ->firstOrFail();
 
-        return $website->websitePagesPublic()
+        return $website->websitePages()
             ->whereIn('type', [WebsitePage::ARTICLE_CATEGORY_TYPE, WebsitePage::HOME_ARTICLES_TYPE, WebsitePage::ARTICLE_DETAIL_TYPE])
             ->get();
     }
