@@ -43,6 +43,7 @@ use App\Models\Invite;
 use App\Models\PlatformPackage;
 use App\Models\Role;
 use App\Models\Team;
+use App\Models\UserBusiness;
 use App\Services\AddOnService;
 use App\Services\BusinessManagementService;
 use App\Services\BusinessTeamService;
@@ -65,6 +66,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Techup\ApiBase\Services\UserManagerService;
 use Techup\Mailbox\Facades\Mailbox;
 
 class TeamController extends Controller
@@ -181,33 +183,37 @@ class TeamController extends Controller
 
     public function inviteUser(InviteUserRequest $request)
     {
-        $invite = $this->inviteService->create(array_merge($request->all(), [
-            'status' => Invite::NEW_STATUS
-        ]));
-        if ($request->get('type') == Team::LINK_INVITE) {
-            $url = env('FRONTEND_URL') . 'auth/register?invite_uuid=' . $invite->uuid;
-            $this->smtpAccountService->sendEmailNotificationSystem(null, new SendInviteToTeam($invite, $url), $request->get('email'));
-        } elseif ($request->get('type') == Team::ACCOUNT_INVITE) {
-            $password = $this->generateRandomString(10);
-            $user = $this->userService->create([
-                'email' => $request->get('email'),
-                'first_name' => $request->get('first_name'),
-                'last_name' => $request->get('last_name'),
-                'username' => $request->get('email'),
-                'can_add_smtp_account' => 0,
-                'password' => Hash::make($password)
-            ]);
-            $user->roles()->attach([config('user.default_role_uuid')]);
-            $user->userPlatformPackage()->create(['platform_package_uuid' => PlatformPackage::DEFAULT_PLATFORM_PACKAGE_1]);
-            $this->userTeamService->create(array_merge($request->all(), [
-                'user_uuid' => $user->uuid,
-                'app_id' => auth()->appId()
+        DB::beginTransaction();
+        try{
+            $invite = $this->inviteService->create(array_merge($request->all(), [
+                'status' => Invite::NEW_STATUS
             ]));
-            $this->cstoreService->storeFolderByType($request->get('username'), $user->uuid, config('foldertypecstore.USER'), $request->get('team_uuid'));
-            $this->smtpAccountService->sendEmailNotificationSystem($user, new SendInviteToTeamByAccount($user, $password));
+            if ($request->get('type') == Team::LINK_INVITE) {
+                $url = env('FRONTEND_URL') . 'auth/register?invite_uuid=' . $invite->uuid;
+                $this->smtpAccountService->sendEmailNotificationSystem(null, new SendInviteToTeam($invite, $url), $request->get('email'));
+            } elseif ($request->get('type') == Team::ACCOUNT_INVITE) {
+                $password = $this->generateRandomString(10);
+                $addUser = app(UserManagerService::class)->addUser($request->get('email'), $password, $request->get('first_name'), $request->get('last_name'), auth()->appId());
+                if ($addUser) {
+                    $userProfile = $this->userProfileService->findOneWhereOrFail(['email' => $request->get('email')]);
+                    $userProfile->userPlatformPackage()->create(['platform_package_uuid' => PlatformPackage::DEFAULT_PLATFORM_PACKAGE_1, 'app_id' => $userProfile->app_id]);
+
+                    $this->userTeamService->create(array_merge($request->all(), [
+                        'user_uuid' => $userProfile->user_uuid,
+                        'app_id' => auth()->appId()
+                    ]));
+                    $this->cstoreService->storeFolderByType($request->get('email'), $userProfile->user_uuid, config('foldertypecstore.USER'), $request->get('team_uuid'));
+                    $this->smtpAccountService->sendEmailNotificationSystem($userProfile, new SendInviteToTeamByAccount($userProfile, $password));
+//              Mailbox::postEmailAccountcreate($user->user_uuid, $email, $password);
+                }
+                DB::commit();
+            }
+            return $this->sendCreatedJsonResponse();
+        } catch (ConnectionException $exception) {
+            DB::rollBack();
+            return $this->sendInternalServerErrorJsonResponse();
         }
 
-        return $this->sendCreatedJsonResponse();
     }
 
     /**
@@ -702,12 +708,23 @@ class TeamController extends Controller
 
     public function setTeamLeader(SetTeamLeaderRequest $request)
     {
-        $team = $this->service->findOrFailById($request->get('team_uuid'));
-        $team->update(['leader_uuid' => $request->get('team_member_uuid')]);
+        DB::beginTransaction();
+        try{
+            $team = $this->service->findOrFailById($request->get('team_uuid'));
+            $team->update(['leader_uuid' => $request->get('team_member_uuid')]);
+            $setRole = app(UserManagerService::class)->addRoleToUser($request->get('team_member_uuid'), Role::ROLE_USER_LEADER, auth()->appId(), auth()->userId(), auth()->token());
+            if (!$setRole) {
+                DB::rollBack();
+                return $this->sendInternalServerErrorJsonResponse();
+            }
 
-        return $this->sendOkJsonResponse(
-            $this->service->resourceToData($this->resourceClass, $team)
-        );
+            return $this->sendOkJsonResponse(
+                $this->service->resourceToData($this->resourceClass, $team)
+            );
+        } catch (ConnectionException $exception) {
+            DB::rollBack();
+            return $this->sendInternalServerErrorJsonResponse();
+        }
     }
 
     /**

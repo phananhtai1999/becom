@@ -30,6 +30,7 @@ use App\Models\PlatformPackage;
 use App\Models\Role;
 use App\Models\Team;
 use App\Models\UserBusiness;
+use App\Observers\UserProfileObserver;
 use App\Services\AddOnService;
 use App\Services\BusinessManagementService;
 use App\Services\DepartmentService;
@@ -41,12 +42,13 @@ use App\Services\MyDomainService;
 use App\Services\SendProjectService;
 use App\Services\UserAddOnService;
 use App\Services\UserBusinessService;
-use App\Services\UserService;
+use App\Services\UserProfileService;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Techup\Mailbox\Facades\Mailbox;
+use Techup\ApiBase\Services\UserManagerService;
 
 class BusinessManagementController extends AbstractRestAPIController
 {
@@ -68,11 +70,6 @@ class BusinessManagementController extends AbstractRestAPIController
     protected $myDomainService;
 
     /**
-     * @var UserService
-     */
-    protected $userService;
-
-    /**
      * @var CstoreService
      */
     protected $cstoreService;
@@ -90,13 +87,13 @@ class BusinessManagementController extends AbstractRestAPIController
         MyDomainService             $myDomainService,
         BusinessManagementService $businessManagementService,
         UserBusinessService $userBusinessService,
-        UserService $userService,
         UserAddOnService $userAddOnService,
         AddOnService $addOnService,
         SendProjectService          $sendProjectService,
         CstoreService               $cstoreService,
         DepartmentService $departmentService,
-        LocationService $locationService
+        LocationService $locationService,
+        UserProfileService $userProfileService
     )
     {
         $this->service = $service;
@@ -116,10 +113,10 @@ class BusinessManagementController extends AbstractRestAPIController
         $this->storeRequest = BusinessManagementRequest::class;
         $this->editRequest = UpdateBusinessManagementRequest::class;
         $this->indexRequest = IndexRequest::class;
-        $this->userService = $userService;
         $this->userAddOnService = $userAddOnService;
         $this->addOnService = $addOnService;
         $this->cstoreService = $cstoreService;
+        $this->userProfileService = $userProfileService;
     }
 
     /**
@@ -330,22 +327,20 @@ class BusinessManagementController extends AbstractRestAPIController
                 DB::commit();
                 return $this->sendCreatedJsonResponse();
             } elseif ($request->get('type') == UserBusiness::ACCOUNT_INVITE) {
-                $passwordRandom = $this->generateRandomString(10);
-                $email = $request->get('username') . '@' . $request->get('domain');
-                $user = $this->userService->create([
-                    'email' => $email,
-                    'first_name' => $request->get('first_name'),
-                    'last_name' => $request->get('last_name'),
-                    'can_add_smtp_account' => 0,
-                    'password' => Hash::make($request->get('password'))
-                ]);
-                $user->roles()->attach([config('user.default_role_uuid')]);
-                $user->userPlatformPackage()->create(['platform_package_uuid' => PlatformPackage::DEFAULT_PLATFORM_PACKAGE_1]);
-                $this->userBusinessService->create([
-                    'business_uuid' => $businessUuid,
-                    'user_uuid' => $user->uuid
-                ]);
-//                Mailbox::postEmailAccountcreate($user->uuid, $email, $passwordRandom);
+                $password = Hash::make($request->get('password'));
+                $email = $request->get('email') . '@' . $request->get('domain');
+                $addUser = app(UserManagerService::class)->addUser($email, $password, $request->get('first_name'), $request->get('last_name'), auth()->appId());
+                if ($addUser) {
+                    $userProfile = $this->userProfileService->findOneWhereOrFail(['email' => $email]);
+                    $userProfile->userPlatformPackage()->create(['platform_package_uuid' => PlatformPackage::DEFAULT_PLATFORM_PACKAGE_1, 'app_id' => $userProfile->app_id]);
+
+                    $this->userBusinessService->create([
+                        'business_uuid' => $businessUuid,
+                        'user_uuid' => $userProfile->user_uuid,
+                        'app_id' => auth()->appId()
+                    ]);
+//                    Mailbox::postEmailAccountcreate($user->user_uuid, $email, $password);
+                }
                 DB::commit();
 
                 return $this->sendCreatedJsonResponse();
