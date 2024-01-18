@@ -319,12 +319,12 @@ class CampaignController extends AbstractRestAPIController
     {
         $sortTotalCredit = explode(',', $request->sort);
         $userTeam = $this->userTeamService->getUserTeamByUserAndAppId(auth()->userId(), auth()->appId());
-        //need function userteamcontaclist here
-        if (($userTeam && !$userTeam['is_blocked']) && !empty(auth()->user()->userTeamContactLists)) {
+        $user = $this->userProfileService->findOneWhereOrFail(['user_uuid' => auth()->userId(), 'app_id' => auth()->appId()]);
+        if (($userTeam && !$userTeam['is_blocked']) && !empty($user->userTeamContactLists)) {
             if ($sortTotalCredit[0] == 'number_credit_needed_to_start_campaign' || $sortTotalCredit[0] == '-number_credit_needed_to_start_campaign') {
-                $models = $this->myService->sortMyTotalCredit($request->get('per_page', '15'), $sortTotalCredit[0], $request->search, $request->search_by, auth()->user()->userTeamContactLists()->pluck('contact_list_uuid'));
+                $models = $this->myService->sortMyTotalCredit($request->get('per_page', '15'), $sortTotalCredit[0], $request->search, $request->search_by, $user->userTeamContactLists()->pluck('contact_list_uuid'));
             } else {
-                $models = $this->myService->myCampaigns($request, auth()->user()->userTeamContactLists()->pluck('contact_list_uuid'));
+                $models = $this->myService->myCampaigns($request, $user->userTeamContactLists()->pluck('contact_list_uuid'));
             }
         } else {
             if ($sortTotalCredit[0] == 'number_credit_needed_to_start_campaign' || $sortTotalCredit[0] == '-number_credit_needed_to_start_campaign') {

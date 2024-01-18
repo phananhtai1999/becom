@@ -85,15 +85,15 @@ class BusinessManagementController extends AbstractRestAPIController
         MyBusinessManagementService $myService,
         DomainService               $domainService,
         MyDomainService             $myDomainService,
-        BusinessManagementService $businessManagementService,
-        UserBusinessService $userBusinessService,
-        UserAddOnService $userAddOnService,
-        AddOnService $addOnService,
+        BusinessManagementService   $businessManagementService,
+        UserBusinessService         $userBusinessService,
+        UserAddOnService            $userAddOnService,
+        AddOnService                $addOnService,
         SendProjectService          $sendProjectService,
         CstoreService               $cstoreService,
-        DepartmentService $departmentService,
-        LocationService $locationService,
-        UserProfileService $userProfileService
+        DepartmentService           $departmentService,
+        LocationService             $locationService,
+        UserProfileService          $userProfileService
     )
     {
         $this->service = $service;
@@ -146,7 +146,7 @@ class BusinessManagementController extends AbstractRestAPIController
         $this->sendProjectService->create([
             'domain' => $request->get('domain'),
             'business_uuid' => $model->uuid,
-            'user_uuid' =>  $request->get('owner_uuid') ?? auth()->userId(),
+            'user_uuid' => $request->get('owner_uuid') ?? auth()->userId(),
             'name' => $request->get('name'),
             'logo' => $request->get('avatar'),
             'description' => $request->get('introduce'),
@@ -225,7 +225,7 @@ class BusinessManagementController extends AbstractRestAPIController
             'domain_uuid' => $domain->uuid,
         ]);
 
-        if($this->cstoreService->storeS3Config($request)){
+        if ($this->cstoreService->storeS3Config($request)) {
             $this->cstoreService->storeFolderByType($request->get('name'), $model->uuid, config('foldertypecstore.BUSINESS'));
         }
 
@@ -280,7 +280,7 @@ class BusinessManagementController extends AbstractRestAPIController
      * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroyMyBusinessManagement($id,OptionDeleteBusinuessRequest $request)
+    public function destroyMyBusinessManagement($id, OptionDeleteBusinuessRequest $request)
     {
         $this->myService->deleteMyBusinessManagement($id);
         $this->cstoreService->deleteFolderType($id, config('foldertypecstore.BUSINESS'),
@@ -295,62 +295,53 @@ class BusinessManagementController extends AbstractRestAPIController
      */
     public function addBusinessMember(AddBusinessMemberRequest $request)
     {
-        DB::beginTransaction();
-        try{
-            if (auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
-                $businessUuid = $request->get("business_uuid");
+        if (auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
+            $businessUuid = $request->get("business_uuid");
+        } else {
+            $businesses = $this->businessManagementService->findAllWhere([['owner_uuid', auth()->userId()], ['app_id', auth()->appId()]]);
+            if ($businesses->toArray()) {
+                $businessUuid = $businesses->first()->uuid;
             } else {
-                $businesses = $this->businessManagementService->findAllWhere([['owner_uuid', auth()->userId()], ['app_id', auth()->appId()]]);
-                if ($businesses->toArray()) {
-                    $businessUuid = $businesses->first()->uuid;
-                } else {
 
-                    return $this->sendJsonResponse(false, 'Does not have business', [], 403);
-                }
+                return $this->sendJsonResponse(false, 'Does not have business', [], 403);
             }
-            if ($request->get('type') == UserBusiness::ALREADY_EXISTS_ACCOUNT) {
-                foreach ($request->get('user_uuids') as $userUuid) {
-                    $existingRecord = $this->userBusinessService->findOneWhere([
+        }
+        if ($request->get('type') == UserBusiness::ALREADY_EXISTS_ACCOUNT) {
+            foreach ($request->get('user_uuids') as $userUuid) {
+                $existingRecord = $this->userBusinessService->findOneWhere([
+                    'business_uuid' => $businessUuid,
+                    'user_uuid' => $userUuid,
+                    'app_id' => auth()->appId(),
+                ]);
+
+                if (!$existingRecord) {
+                    $this->userBusinessService->create([
                         'business_uuid' => $businessUuid,
                         'user_uuid' => $userUuid,
                         'app_id' => auth()->appId(),
                     ]);
-
-                    if (!$existingRecord) {
-                        $this->userBusinessService->create([
-                            'business_uuid' => $businessUuid,
-                            'user_uuid' => $userUuid,
-                            'app_id' => auth()->appId(),
-                        ]);
-                    }
                 }
-                DB::commit();
-                return $this->sendCreatedJsonResponse();
-            } elseif ($request->get('type') == UserBusiness::ACCOUNT_INVITE) {
-                $password = Hash::make($request->get('password'));
-                $email = $request->get('email') . '@' . $request->get('domain');
-                $addUser = app(UserManagerService::class)->addUser($email, $password, $request->get('first_name'), $request->get('last_name'), auth()->appId());
-                if ($addUser) {
-                    $userProfile = $this->userProfileService->findOneWhereOrFail(['email' => $email]);
-                    $userProfile->userPlatformPackage()->create(['platform_package_uuid' => PlatformPackage::DEFAULT_PLATFORM_PACKAGE_1, 'app_id' => $userProfile->app_id]);
+            }
+            DB::commit();
+            return $this->sendCreatedJsonResponse();
+        } elseif ($request->get('type') == UserBusiness::ACCOUNT_INVITE) {
+            $password = Hash::make($request->get('password'));
+            $email = $request->get('email') . '@' . $request->get('domain');
+            $addUser = app(UserManagerService::class)->addUser($email, $password, $request->get('first_name'), $request->get('last_name'), auth()->appId());
+            if ($addUser) {
+                $userProfile = $this->userProfileService->findOneWhereOrFail(['email' => $email]);
+                $userProfile->userPlatformPackage()->create(['platform_package_uuid' => PlatformPackage::DEFAULT_PLATFORM_PACKAGE_1, 'app_id' => $userProfile->app_id]);
 
-                    $this->userBusinessService->create([
-                        'business_uuid' => $businessUuid,
-                        'user_uuid' => $userProfile->user_uuid,
-                        'app_id' => auth()->appId()
-                    ]);
+                $this->userBusinessService->create([
+                    'business_uuid' => $businessUuid,
+                    'user_uuid' => $userProfile->user_uuid,
+                    'app_id' => auth()->appId()
+                ]);
 //                    Mailbox::postEmailAccountcreate($userProfile->user_uuid, $email, $password);
-                }
-                DB::commit();
-
-                return $this->sendCreatedJsonResponse();
             }
 
-        } catch (ConnectionException $exception) {
-            DB::rollBack();
-            return $this->sendInternalServerErrorJsonResponse();
+            return $this->sendCreatedJsonResponse();
         }
-
     }
 
     public function getAddOns(GetAddOnOfBusinessRequest $request)
@@ -433,7 +424,8 @@ class BusinessManagementController extends AbstractRestAPIController
         return $this->sendCreatedJsonResponse();
     }
 
-    public function setManager(SetManagerRequest $request) {
+    public function setManager(SetManagerRequest $request)
+    {
         if ($request->get('entity') == BusinessManagement::DEPARTMENT_ENTITY) {
             if (!$this->checkDepartmentOwner($request->get('entity_uuid'))) {
                 return $this->sendBadRequestJsonResponse(['message' => 'You are not owner to set']);

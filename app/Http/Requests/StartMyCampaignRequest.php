@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
 use App\Models\Campaign;
+use App\Services\UserProfileService;
 use App\Services\UserTeamService;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
@@ -30,11 +31,12 @@ class StartMyCampaignRequest extends AbstractRequest
         $campaignUuid = [];
         $userTeamService = new UserTeamService();
         $userTeam = $userTeamService->getUserTeamByUserAndAppId(auth()->userId(), auth()->appId());
-        //need function userteamcontaclist here
-        if (($userTeam && !$userTeam['is_blocked']) && !empty(auth()->user()->userTeamContactLists)) {
+        $userProfileService = new UserProfileService();
+        $user = $userProfileService->findOneWhereOrFail(['user_uuid' => auth()->userId(), 'app_id' => auth()->appId()]);
+        if (($userTeam && !$userTeam['is_blocked']) && !empty($user->userTeamContactLists)) {
             $campaignUuid = app(Campaign::class)->select('campaigns.*')
                 ->join('campaign_contact_list', 'campaigns.uuid', '=', 'campaign_contact_list.campaign_uuid')
-                ->WhereIn('campaign_contact_list.contact_list_uuid', auth()->user()->userTeamContactLists()->pluck('contact_list_uuid'))->get()->pluck('uuid');
+                ->WhereIn('campaign_contact_list.contact_list_uuid', $user->userTeamContactLists()->pluck('contact_list_uuid'))->get()->pluck('uuid');
         }
         return [
             'campaign_uuid' => ['required', 'numeric', 'min:1', Rule::exists('campaigns', 'uuid')->where(function ($query) use ($campaignUuid) {
