@@ -213,7 +213,7 @@ class WebsitePageService extends AbstractService
     {
         $website = (new Website())->where('uuid', $websiteUuid)->firstOrFail();
 
-        return $website->websitePagesPublic()
+        return $website->websitePages()
             ->whereIn('type', [WebsitePage::ARTICLE_CATEGORY_TYPE, WebsitePage::HOME_ARTICLES_TYPE, WebsitePage::ARTICLE_DETAIL_TYPE])
             ->get();
     }
