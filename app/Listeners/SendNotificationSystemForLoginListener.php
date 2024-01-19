@@ -10,6 +10,7 @@ use App\Services\UserTrackingService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
+use Techup\ApiBase\Events\AfterUserLogin;
 
 class SendNotificationSystemForLoginListener implements ShouldQueue
 {
@@ -38,48 +39,50 @@ class SendNotificationSystemForLoginListener implements ShouldQueue
     /**
      * Handle the event.
      *
-     * @param SendNotificationSystemForLoginEvent $event
+     * @param AfterUserLogin $event
      * @return void
      */
-    public function handle(SendNotificationSystemForLoginEvent $event)
+    public function handle(AfterUserLogin $event)
     {
-        $user = $event->user;
-        $ip = $event->ip;
-        $userAgent = $event->userAgent;
+        $model = $event->model;
+        $data = $event->data;
         $type = "account";
 
-//        $ip = geoip()->getClientIP();
-//        // 92.38.148.61, 171.248.187.0
         try {
-            $geoIp = geoip()->getLocation($ip);
-            $country = $geoIp->country;
+            if(isset($data['ip'])){
+                $ip = $data['ip'];
+                $geoIp = geoip()->getLocation($ip);
+                $country = $geoIp->country;
 
-            $userTracking = $this->service->findAllWhere([
-                'user_uuid' => $user->uuid,
-            ]);
-            if (!$userTracking->isEmpty()) {
-                $lastUserTracking = $userTracking->last();
-                if ($lastUserTracking->location != $country){
-                    $this->smtpAccountService->sendEmailNotificationSystem($user, new SendNotificationSystem($user, $type, $country));
-                    $this->notificationService->create([
-                        'type' => $type,
-                        'type_uuid' => null,
-                        'content' => ['langkey' => $type.'_login', 'country' => $country],
-                        'user_uuid' => $user->uuid,
-                    ]);
+                $userTracking = $this->service->findAllWhere([
+                    'user_uuid' => $model->uuid,
+                ]);
+                if (!$userTracking->isEmpty()) {
+                    $lastUserTracking = $userTracking->last();
+                    if ($lastUserTracking->location != $country){
+//                        $this->smtpAccountService->sendEmailNotificationSystem($model, new SendNotificationSystem($model, $type, $country));
+                        $this->notificationService->create([
+                            'type' => $type,
+                            'type_uuid' => null,
+                            'content' => ['langkey' => $type.'_login', 'country' => $country],
+                            'user_uuid' => $model->uuid,
+                        ]);
+                    }
                 }
-            }
-            $this->service->create([
-                'ip' => $ip,
-                'user_uuid' => $user->uuid,
-                'location' => $country,
-                'postal_code' => $geoIp->postal_code,
-                'user_agent' => $userAgent
-            ]);
 
-        } catch (\Exception $e) {
+                $this->service->create([
+                    'ip' => $ip,
+                    'user_uuid' => $model->uuid,
+                    'location' => $country,
+                    'postal_code' => $geoIp->postal_code,
+                    'user_agent' => isset($data['user_agent']) ? $data['user_agent']: null
+                ]);
+
+            }else{
+                Log::debug("Not found ip");
+            }
+        }catch (\Exception $e) {
             Log::error($e->getMessage());
         }
-
-}
+    }
 }

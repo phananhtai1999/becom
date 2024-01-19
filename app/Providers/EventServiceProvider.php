@@ -63,6 +63,7 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Techup\ApiBase\Events\AfterUserRegister;
+use Techup\ApiBase\Events\AfterUserLogin;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -114,7 +115,7 @@ class EventServiceProvider extends ServiceProvider
         SendNotificationSystemEvent::class => [
             SendNotificationSystemListener::class
         ],
-        SendNotificationSystemForLoginEvent::class => [
+        AfterUserLogin::class => [
             SendNotificationSystemForLoginListener::class
         ],
         SubscriptionAddOnSuccessEvent::class => [
