@@ -9,30 +9,35 @@ use Illuminate\Support\Str;
 class ReplaceProductCategoryService extends ReplaceChildrenProductCategoryService
 {
     public function replaceListProductCategory($template) {
-        $childrenCategoryCount = $this->searchCategoryCount($template);
-        $sortName = $this->searchCategorySort($template);
-        $sortOrder = $this->searchCategorySortOrder($template);
+        $pattern = '/<product-category-list.*?>(.*?)<\/product-category-list>/s';
 
-        $categoriesData = $this->getChildrenByCategoryUuid(null, $sortName, $sortOrder, $childrenCategoryCount);
-        $categoriesData = $categoriesData['data']['data'];
-        return preg_replace_callback('/<product-category-element.*?>(.*?)<\/product-category-element>/s', function ($matches) use ($categoriesData) {
-            $categoryData = array_shift($categoriesData);
-            if (!$categoryData) {
-                return $matches[0];
-            }
+        return preg_replace_callback($pattern, function ($matches) use ($template){
+            $childrenCategoryCount = $this->searchCategoryCount($matches[0]);
+            $sortName = $this->searchCategorySort($matches[0]);
+            $sortOrder = $this->searchCategorySortOrder($matches[0]);
 
-            $searchReplaceMap = $this->searchReplaceMapForCategory($categoryData);
-            $matches[0] = str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $matches[0]);
-            $matches[0] = $this->replacechildrenProductCategory($matches[0], $categoryData);
-            if ($categoryData['product']) {
-                $replaceProductService = new ReplaceProductService();
-                $searchReplaceProductMap = $replaceProductService->searchReplaceMapForProduct($categoryData['product']);
-                $matches[0] = Str::replace(array_keys($searchReplaceProductMap), $searchReplaceProductMap, $matches[0]);
-            }
+            $categoriesData = $this->getChildrenByCategoryUuid(null, $sortName, $sortOrder, $childrenCategoryCount);
+            $categoriesData = $categoriesData['data']['data'];
 
-            return $matches[0];
+            return preg_replace_callback('/<product-category-element.*?>(.*?)<\/product-category-element>/s', function ($matchProductCategory) use ($categoriesData) {
+                $categoryData = array_shift($categoriesData);
+                if (!$categoryData) {
 
+                    return $matchProductCategory[0];
+                }
+                $searchReplaceMap = $this->searchReplaceMapForCategory($categoryData);
+                $matchProductCategory[0] = str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $matchProductCategory[0]);
+                $matchProductCategory[0] = $this->replacechildrenProductCategory($matchProductCategory[0], $categoryData);
+                if ($categoryData['product']) {
+                    $replaceProductService = new ReplaceProductService();
+                    $searchReplaceProductMap = $replaceProductService->searchReplaceMapForProduct($categoryData['product']);
+                    $matchProductCategory[0] = Str::replace(array_keys($searchReplaceProductMap), $searchReplaceProductMap, $matchProductCategory[0]);
+                }
+
+                return $matchProductCategory[0];
+            }, $matches[0]);
         }, $template);
+
     }
 
     public function replaceListProductCategoryMenu($template)
