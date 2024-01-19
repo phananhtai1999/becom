@@ -44,7 +44,6 @@ class Team extends AbstractModel
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
-        'leader_uuid' => 'integer'
     ];
     /**
      * @var string[]
