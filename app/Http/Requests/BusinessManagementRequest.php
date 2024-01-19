@@ -27,10 +27,10 @@ class BusinessManagementRequest extends AbstractRequest
         $validate = [
             'name' => ['required', 'string'],
             'introduce' => ['required', 'string'],
-            'products_services' => ['required', 'array'],
-            'products_services.products' => ['required', 'array'],
+            'products_services' => ['array'],
+            'products_services.products' => ['array'],
             'products_services.products.*' => ['nullable', 'string'],
-            'products_services.services' => ['required', 'array'],
+            'products_services.services' => ['array'],
             'products_services.services.*' => ['nullable', 'string'],
             'customers' => ['required', 'array'],
             'customers.*' => ['string'],
