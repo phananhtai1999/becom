@@ -182,7 +182,7 @@ class PartnerController extends AbstractRestAPIController
                         if ($request->get('partner_role') != Role::ROLE_USER_OWNER){
                             app(UserManagerService::class)->addRoleToUser($userProfile->user_uuid, $request->get('partner_role'), auth()->appId(), auth()->userId(), auth()->token());
                         }
-                        app(UserManagerService::class)->addRoleToUser($model->user_uuid, Role::ROLE_PARTNER, auth()->appId(), auth()->userId(), auth()->token());
+                        app(UserManagerService::class)->addRoleToUser($userProfile->user_uuid, Role::ROLE_PARTNER, auth()->appId(), auth()->userId(), auth()->token());
 
                         $userUuid = $userProfile->user_uuid;
 //                        Mailbox::postEmailAccountcreate($userProfile->user_uuid, $userProfile->email, $password);
