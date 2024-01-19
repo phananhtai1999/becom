@@ -22,6 +22,7 @@ use App\Models\UserConfig;
 use App\Services\BusinessManagementService;
 use App\Services\CstoreService;
 use App\Services\DepartmentService;
+use App\Services\UserProfileService;
 use Techup\ApiConfig\Services\LanguageService;
 use App\Services\MyDepartmentService;
 use App\Services\SendProjectService;
@@ -58,7 +59,7 @@ class DepartmentController extends AbstractRestAPIController
         LanguageService     $languageService,
         TeamService         $teamService,
         SendProjectService $sendProjectService,
-        UserConfigService $userConfigService,
+        UserProfileService $userProfileService,
         CstoreService $cstoreService
     )
     {
@@ -67,7 +68,7 @@ class DepartmentController extends AbstractRestAPIController
         $this->languageService = $languageService;
         $this->teamService = $teamService;
         $this->sendProjectService = $sendProjectService;
-        $this->userConfigService = $userConfigService;
+        $this->userProfileService = $userProfileService;
         $this->resourceCollectionClass = DepartmentResourceCollection::class;
         $this->resourceClass = DepartmentResource::class;
         $this->storeRequest = DepartmentRequest::class;
@@ -130,8 +131,8 @@ class DepartmentController extends AbstractRestAPIController
 
     public function indexMy(IndexRequest $request)
     {
-        $userConfig = $this->userConfigService->findOneWhereOrFail(['user_uuid' => auth()->userId()]);
-        if ($userConfig->default_department) {
+        $user = $this->userProfileService->findOneWhereOrFail(['user_uuid' => auth()->userId(), 'app_id' => auth()->appId()]);
+        if ($user->default_department) {
             $models = $this->service->getIndexMyWithDefault($request, true);
         } else {
             $models = $this->service->getIndexMyWithDefault($request, false);
@@ -281,8 +282,8 @@ class DepartmentController extends AbstractRestAPIController
 
     public function toggleDefaultDepartment(): JsonResponse
     {
-        $userConfig = $this->userConfigService->findOneWhereOrFail(['user_uuid' => auth()->userId()]);
-        $userConfig->update(['default_department' => !$userConfig->default_department]);
+        $user = $this->userProfileService->findOneWhereOrFail(['user_uuid' => auth()->userId(), 'app_id' => auth()->appId()]);
+        $user->update(['default_department' => !$user->default_department]);
 
         return $this->sendOkJsonResponse();
     }
