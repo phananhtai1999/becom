@@ -109,10 +109,10 @@ class UpdateUserPaymentAndPartnerTrackingSeeder extends Seeder
             }
             $userPayments = UserPaymentByDay::whereIn('user_uuid', $item->pluck('user_uuid')->toArray())
                 ->get()->groupBy('year')->map(function ($item, $keyYear) use ($commissions){
-                    $today = Carbon::today();
-                    if ($today->year === $keyYear && !$today->isLastOfMonth()){
-                        $item = $item->where('month', '<>', $today->month);
-                    }
+//                    $today = Carbon::today();
+//                    if ($today->year === $keyYear && !$today->isLastOfMonth()){
+//                        $item = $item->where('month', '<>', $today->month);
+//                    }
                     $commission = $item->sortBy('month')->groupBy('month')->map(function ($item, $keyMonth) use ($keyYear, $commissions){
                         return $item->sum('total_payment') * $commissions[$keyYear][$keyMonth] / 100;
                     });
