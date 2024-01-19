@@ -2,34 +2,36 @@
 
 namespace App\Services;
 
+use App\Models\Article;
+
 class ReplaceProductService extends ShopService
 {
     public function replaceListProduct($template, $productCategory, $websitePage)
     {
-        $pattern = '/data-product-count="(\d+)"/';
-        preg_match_all($pattern, $template, $productCount);
-        $productCount = !empty($productCount[1]) ? array_sum($productCount[1]) : 10;
-        preg_match('/product-sort="(.*?)"/', $template, $sortName);
-        preg_match('/product-sort-order="(.*?)"/', $template, $sortOrder);
-        $productsData = $this->getListProductByCategoryUuid($productCategory['uuid'], $sortName[1] ?? 'created_at', $sortOrder[1] ?? 'desc', $productCount ?? 10);
-        $productsData = $productsData['data']['data'];
-        $pattern = '/<product.*?>(.*?)<\/product>/s';
+        $pattern = '/<product-list.*?>(.*?)<\/product-list>/s';
 
-        return preg_replace_callback($pattern, function ($matches) use ($productsData, $websitePage) {
-            $productData = array_shift($productsData);
-            if (!$productData) {
-                return $matches[0];
-            }
+        return preg_replace_callback($pattern, function ($matches) use ($websitePage, $productCategory){
+            preg_match('/product-sort="(.*?)"/', $matches[0], $sortName);
+            preg_match('/product-sort-order="(.*?)"/', $matches[0], $sortOrder);
+            preg_match('/data-product-count="(\d+)"/', $matches[0], $productCount);
+            $productCount = !empty($productCount[1]) ? $productCount[1] : 10;
+            $productsData = $this->getListProductByCategoryUuid($productCategory['uuid'], $sortName[1] ?? 'created_at', $sortOrder[1] ?? 'desc', $productCount);
+            $productsData = $productsData['data']['data'];
+            $pattern = '/<product-element.*?>(.*?)<\/product-element>/s';
+            return preg_replace_callback($pattern, function ($matchProduct) use ($productsData, $websitePage) {
+                $productData = array_shift($productsData);
+                if (!$productData) {
+                    return $matchProduct[0];
+                }
+                $searchReplaceMap = $this->searchReplaceMapForproduct($productData);
 
-            $searchReplaceMap = $this->searchReplaceMapForproduct($productData);
-
-            return str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $matches[0]);
+                return str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $matchProduct[0]);
+            }, $matches[0]);
         }, $template);
     }
 
     public function replaceListProductForPageHome($template, $websitePage) {
-
-        $pattern = '/<article-list.*?>(.*?)<\/article-list>/s';
+        $pattern = '/<product-list.*?>(.*?)<\/product-list>/s';
 
         return preg_replace_callback($pattern, function ($matches) use ($websitePage){
             preg_match('/product-sort="(.*?)"/', $matches[0], $sortName);

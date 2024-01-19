@@ -33,6 +33,10 @@ class ShowWebsitePageRequest extends AbstractRequest
         } elseif ($websitePage->type == WebsitePage::ARTICLE_CATEGORY_TYPE) {
             $validate['article_category_slug'] = ['nullable', 'exists:article_categories,slug'];
             $validate['article_category_id'] = ['nullable', 'exists:article_categories,uuid'];
+        }elseif ($websitePage->type == WebsitePage::PRODUCT_DETAIL_TYPE) {
+            $validate['product_uuid'] = ['required'];
+        } elseif ($websitePage->type == WebsitePage::PRODUCT_CATEGORY_TYPE) {
+            $validate['article_product_category_uuid'] = ['nullable'];
         }
 
         return $validate;
