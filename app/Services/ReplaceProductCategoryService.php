@@ -12,9 +12,9 @@ class ReplaceProductCategoryService extends ReplaceChildrenProductCategoryServic
         $pattern = '/<product-category-list.*?>(.*?)<\/product-category-list>/s';
 
         return preg_replace_callback($pattern, function ($matches) use ($template){
-            $childrenCategoryCount = $this->searchCategoryCount($template);
-            $sortName = $this->searchCategorySort($template);
-            $sortOrder = $this->searchCategorySortOrder($template);
+            $childrenCategoryCount = $this->searchCategoryCount($matches[0]);
+            $sortName = $this->searchCategorySort($matches[0]);
+            $sortOrder = $this->searchCategorySortOrder($matches[0]);
 
             $categoriesData = $this->getChildrenByCategoryUuid(null, $sortName, $sortOrder, $childrenCategoryCount);
             $categoriesData = $categoriesData['data']['data'];
