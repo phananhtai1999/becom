@@ -12,8 +12,8 @@ class TransferAuthDataToBody
         if (!$request->get('app_id') && auth()->appId()) {
             $request->merge(['app_id' => auth()->appId()]);
         }
-        if (!$request->get('user_id') && auth()->userId()) {
-            $request->merge(['user_id' => auth()->userId()]);
+        if (!$request->has('user_uuid') && auth()->userId()) {
+            $request->merge(['user_uuid' => auth()->userId()]);
         }
 
         return $next($request);

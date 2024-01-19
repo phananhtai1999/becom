@@ -2,6 +2,7 @@
 
 namespace App\Abstracts;
 
+use App\Models\Scopes\AppIdScope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasAttributes;
 use Illuminate\Database\Eloquent\Model;
@@ -9,6 +10,11 @@ use Illuminate\Database\Eloquent\Model;
 abstract class AbstractModel extends Model
 {
     use HasAttributes;
+
+    protected static function booted()
+    {
+        static::addGlobalScope(new AppIdScope);
+    }
 
     public function scopeFromCreatedAt(Builder $query, $date): Builder
     {
