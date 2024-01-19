@@ -52,6 +52,8 @@ class LocationQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__name', 'name'),
                 'user_uuid',
                 AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
+                'user.email',
+                AllowedFilter::exact('exact__user.email', 'user.email'),
                 'address',
                 AllowedFilter::exact('exact__address', 'address'),
                 'business_uuid',

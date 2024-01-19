@@ -506,8 +506,8 @@ class MyContactService extends AbstractService
                 AllowedFilter::scope('exact__status.name', 'statusName'),
                 'user_uuid',
                 AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
-                'user.username',
-                AllowedFilter::exact('exact__user.username', 'user.username'),
+                'user.email',
+                AllowedFilter::exact('exact__user.email', 'user.email'),
                 AllowedFilter::scope('uuids_in'),
                 AllowedFilter::scope('uuids_not_in'),
                 AllowedFilter::scope('from__dob'),
@@ -550,7 +550,7 @@ class MyContactService extends AbstractService
                 $this->getMyDuplicateFiltersByNumeric('points'),
                 $this->getMyDuplicateFiltersByNumeric('dob'),
                 $this->getMyDuplicateFiltersByNumeric('user_uuid'),
-                $this->getMyFilterRelationshipWithUser('user.username'),
+                $this->getMyFilterRelationshipWithUser('user.email'),
                 AllowedFilter::scope('exact__positions.name', 'positionName'),
             ]);
     }
