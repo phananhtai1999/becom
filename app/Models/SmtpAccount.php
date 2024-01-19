@@ -10,6 +10,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class SmtpAccount extends AbstractModel
 {
     use HasFactory, SoftDeletes;
+    CONST SMTP_ACCOUNT_SMTP_MAIL_MAILER = 'smtp';
+    CONST SMTP_ACCOUNT_TELEGRAM_MAIL_MAILER = 'telegram';
+    CONST SMTP_ACCOUNT_VIBER_MAIL_MAILER = 'viber';
 
     /**
      * @var string
