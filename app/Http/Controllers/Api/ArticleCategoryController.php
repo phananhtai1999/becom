@@ -54,10 +54,10 @@ class ArticleCategoryController extends AbstractRestAPIController
      */
     public function storeMy(ArticleCategoryRequest $request)
     {
-        if ($this->checkLanguageArticleCategory($request)) {
-
-            return $this->sendValidationFailedJsonResponse();
-        }
+//        if ($this->checkLanguageArticleCategory($request)) {
+//
+//            return $this->sendValidationFailedJsonResponse();
+//        }
         $user_uuid = $this->getUserUuid();
         $model = $this->service->create(array_merge($request->all(), [
             'user_uuid' => $user_uuid,

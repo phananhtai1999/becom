@@ -76,8 +76,7 @@ class ReplaceArticleService
 
                 $category = $articlesData->articleCategory;
                 $replaceCategoryService = new ReplaceCategoryService();
-                $replaceCategoryService->replaceCategoryInArticle($matchesArticle[0], $category);
-
+                $matchesArticle[0] = $replaceCategoryService->replaceCategoryInArticle($matchesArticle[0], $category);
                 $searchReplaceMap = $this->searchReplaceMapForArticle($articlesData);
                 return str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $matchesArticle[0]);
             }, $matches[0]);
