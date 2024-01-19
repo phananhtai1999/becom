@@ -93,9 +93,9 @@ class PaymentController extends AbstractRestAPIController
         $checkPurchasedPlatform = $this->userPlatformPackageService->checkPurchasedPlatform($subscriptionPlan->platform_package_uuid);
         $checkIncludePlatform = $this->platformPackageService->checkIncludePlatform($subscriptionPlan->platform_package_uuid);
 
-//        if($checkPurchasedPlatform || $checkIncludePlatform) {
-//            return $this->sendOkJsonResponse(['message' => 'You already have this platform package Or your platform package include this package']);
-//        }
+        if($checkPurchasedPlatform || $checkIncludePlatform) {
+            return $this->sendOkJsonResponse(['message' => 'You already have this platform package Or your platform package include this package']);
+        }
         $fromDate = Carbon::now();
         if ($subscriptionPlan->duration_type == 'year') {
             $toDate = Carbon::now()->addYears($subscriptionPlan->duration);
