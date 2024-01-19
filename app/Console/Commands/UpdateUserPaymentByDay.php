@@ -92,6 +92,13 @@ class UpdateUserPaymentByDay extends Command
                         'payment' => $payment,
                         'total_payment' => $userPayment->total_payment + $paymentInDay
                     ]);
+                }else{
+                    $total_payment_remaining = $paymentInDay - $payment[$time->day];
+                    $payment[$time->day] = $paymentInDay;
+                    $userPayment->update([
+                        'payment' => $payment,
+                        'total_payment' => $userPayment->total_payment + $total_payment_remaining
+                    ]);
                 }
             }else{
                 UserPaymentByDay::create([

@@ -100,6 +100,13 @@ class UpdatePartnerTrackingByYear extends Command
                         'commission' => $earning,
                         'total_commission' => $partnerEarning->total_commission + $userPartner['commission']
                     ]);
+                }else{
+                    $total_earning_remaining = $userPartner['commission'] - $earning[$time->month];
+                    $earning[$time->month] = $userPartner['commission'];
+                    $partnerEarning->update([
+                        'commission' => $earning,
+                        'total_commission' => $partnerEarning->total_commission + $total_earning_remaining
+                    ]);
                 }
             }else{
                 PartnerTrackingByYear::create([
