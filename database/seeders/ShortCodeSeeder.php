@@ -715,6 +715,10 @@ class ShortCodeSeeder extends Seeder
                     'name' => 'uuid',
                     'key' => 'product.uuid',
                     'short_code' => 'product.uuid',
+                ],                [
+                    'name' => 'name',
+                    'key' => 'product.name',
+                    'short_code' => 'product.name',
                 ],
                 [
                     'name' => 'user uuid',
@@ -888,6 +892,11 @@ class ShortCodeSeeder extends Seeder
                     'name' => 'sort by uuid',
                     'key' => 'product_sort.uuid',
                     'short_code' => 'uuid',
+                ],
+                [
+                    'name' => 'name',
+                    'key' => 'product_sort.name',
+                    'short_code' => 'product_sort.name',
                 ],
                 [
                     'name' => 'sort by slug',
