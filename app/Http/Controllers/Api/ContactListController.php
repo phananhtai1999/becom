@@ -83,7 +83,9 @@ class ContactListController extends AbstractRestAPIController
                             'app_id' => auth()->appId(),
                         ]);
                     } else {
-                        $data = $request->all();
+                        $data = array_merge($request->all(), [
+                            'app_id' => auth()->appId()
+                        ]);
                     }
 
                     $model = $this->service->create($data);

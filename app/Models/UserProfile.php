@@ -24,7 +24,8 @@ class UserProfile extends \Techup\ApiBase\Models\UserProfile
     /**
      * @var string
      */
-    protected $primaryKey = 'uuid';
+    protected $primaryKey = 'user_uuid';
+    public $incrementing = false;
 
     /**
      * @var string[]

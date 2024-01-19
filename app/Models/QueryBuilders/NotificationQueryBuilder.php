@@ -56,6 +56,8 @@ class NotificationQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__content', 'content'),
                 'user_uuid',
                 AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
+                'user.email',
+                AllowedFilter::exact('exact__user.email', 'user.email'),
                 'read',
                 AllowedFilter::exact('exact__read', 'read'),
             ]);

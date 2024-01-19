@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
+use App\Models\Campaign;
+use App\Models\ContactList;
 use Illuminate\Validation\Rule;
 
 class CampaignRequest extends AbstractRequest
@@ -27,7 +29,7 @@ class CampaignRequest extends AbstractRequest
         $sendType = $this->request->get('send_type');
         $validate = [
             'tracking_key' => ['required', 'string'],
-            'mail_template_uuid' => ['required', 'numeric', 'min:1', Rule::exists('mail_templates', 'uuid')->where(function ($query) use ($sendType) {
+            'mail_template_uuid' => ['required', 'integer', 'min:1', Rule::exists('mail_templates', 'uuid')->where(function ($query) use ($sendType) {
 
                 return $query->where([
                     ['user_uuid', $this->request->get('user_uuid') ?? auth()->userId()],
@@ -43,8 +45,8 @@ class CampaignRequest extends AbstractRequest
             'status' => ['required', 'string', 'in:active,banned'],
             'type' => ['required', 'string', 'in:simple,birthday,scenario'],
             'send_type' => ['required', 'string', 'in:sms,email,telegram,viber'],
-            'smtp_account_uuid' => ['nullable', 'numeric', 'min:1', Rule::exists('smtp_accounts', 'uuid')->where(function ($query) use ($sendType) {
-                if ($sendType == 'email') {
+            'smtp_account_uuid' => ['nullable', 'integer', 'min:1', Rule::exists('smtp_accounts', 'uuid')->where(function ($query) use ($sendType) {
+                if ($sendType == Campaign::CAMPAIGN_EMAIL_SEND_TYPE) {
                     return $query->where([
                         ['send_project_uuid', $this->request->get('send_project_uuid')],
                         ['user_uuid', $this->request->get('user_uuid') ?? auth()->userId()],
@@ -53,7 +55,7 @@ class CampaignRequest extends AbstractRequest
                         ['status', 'work'],
                         ['publish', true],
                     ])->whereNull('deleted_at');
-                } elseif ($sendType == 'sms') {
+                } elseif ($sendType == Campaign::CAMPAIGN_SMS_SEND_TYPE) {
                     return $query->where([
                         ['send_project_uuid', $this->request->get('send_project_uuid')],
                         ['user_uuid', $this->request->get('user_uuid') ?? auth()->userId()],
@@ -72,7 +74,7 @@ class CampaignRequest extends AbstractRequest
                     ])->whereNull('deleted_at');
                 }
             })],
-            'send_project_uuid' => ['required', 'numeric', 'min:1', Rule::exists('send_projects', 'uuid')->where(function ($query) {
+            'send_project_uuid' => ['required', 'integer', 'min:1', Rule::exists('send_projects', 'uuid')->where(function ($query) {
                 return $query->where([
                     ['user_uuid', $this->request->get('user_uuid') ?? auth()->userId()],
                     ['app_id', auth()->appId()]
@@ -80,7 +82,7 @@ class CampaignRequest extends AbstractRequest
             })],
             'was_finished' => ['required', 'boolean'],
             'was_stopped_by_owner' => ['required', 'boolean'],
-            'user_uuid' => ['nullable', 'string', 'min:1',  Rule::exists('becom_user_profiles', 'user_uuid')->where(function ($q) {
+            'user_uuid' => ['nullable', 'string', 'min:1', Rule::exists('becom_user_profiles', 'user_uuid')->where(function ($q) {
                 return $q->where('app_id', auth()->appId());
             })->whereNull('deleted_at')],
             'reply_to_email' => ['nullable', 'required_if:send_type,email', 'string', 'email:rfc,dns'],
@@ -88,12 +90,22 @@ class CampaignRequest extends AbstractRequest
             'send_from_email' => ['nullable', 'string', 'email:rfc,dns'],
             'send_from_name' => ['nullable', 'string'],
             'contact_list' => ['required', 'array', 'min:1'],
-            'contact_list.*' => ['required', 'numeric', 'min:1', Rule::exists('contact_lists', 'uuid')->where(function ($query) {
+            'contact_list.*' => ['required', 'integer', 'min:1', Rule::exists('contact_lists', 'uuid')->where(function ($query) {
                 return $query->where([
                     ['user_uuid', $this->request->get('user_uuid') ?? auth()->userId()],
                     ['app_id', auth()->appId()]
                 ])->whereNull('deleted_at');
-            })]
+            }), function ($attribute, $value, $fail) use ($sendType) {
+                if ($sendType === Campaign::CAMPAIGN_SMS_SEND_TYPE ||
+                    Campaign::CAMPAIGN_TELEGRAM_SEND_TYPE ||
+                    Campaign::CAMPAIGN_VIBER_SEND_TYPE
+                ) {
+                    $contactList = ContactList::find($value);
+                    if ($contactList && $contactList->contacts()->whereNull('phone')->exists()) {
+                        $fail(__('messages.contact_must_have_phone'));
+                    }
+                }
+            }]
         ];
         return $validate;
 

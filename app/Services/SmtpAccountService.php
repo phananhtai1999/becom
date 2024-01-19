@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Abstracts\AbstractService;
 use App\Mail\SendEmails;
+use App\Models\Campaign;
 use App\Models\QueryBuilders\SmtpAccountQueryBuilder;
 use App\Models\SmtpAccount;
 use Carbon\Carbon;
@@ -13,6 +14,7 @@ use Swift_Mailer;
 use Illuminate\Support\Facades\Mail;
 use Techup\ApiConfig\Models\Config as ConfigModel;
 use Config;
+
 class SmtpAccountService extends AbstractService
 {
     protected $modelClass = SmtpAccount::class;
@@ -91,30 +93,20 @@ class SmtpAccountService extends AbstractService
     public function getRandomSmtpAccountAdmin($sendTypeCampaign)
     {
         // TODO: change logic get smtp account random
-        return $this->model->select('smtp_accounts.*')
-            ->join('becom_user_profiles', 'becom_user_profiles.user_uuid', '=', 'smtp_accounts.user_uuid')
-     
-            ->where(function ($query) use ($sendTypeCampaign) {
-                if ($sendTypeCampaign == 'email') {
+        return $this->model->where(function ($query) use ($sendTypeCampaign) {
+            $query->where([
+                ['smtp_accounts.status', 'work'],
+                ['smtp_accounts.publish', true],
+                ['smtp_accounts.send_project_uuid', null]
+            ]);
 
-                    return $query->where([
-                      
-                        ['smtp_accounts.mail_mailer', 'smtp'],
-                        ['smtp_accounts.status', 'work'],
-                        ['smtp_accounts.publish', true],
-                        ['smtp_accounts.send_project_uuid', null]
-                    ]);
-                } else {
-
-                    return $query->where([
-                
-                        ['smtp_accounts.mail_mailer', $sendTypeCampaign],
-                        ['smtp_accounts.status', 'work'],
-                        ['smtp_accounts.publish', true],
-                        ['smtp_accounts.send_project_uuid', null]
-                    ]);
-                }
-            })->inRandomOrder()->first();
+            if ($sendTypeCampaign == 'email') {
+                $query->where('smtp_accounts.mail_mailer', SmtpAccount::SMTP_ACCOUNT_SMTP_MAIL_MAILER);
+            } else {
+                $query->where('smtp_accounts.mail_mailer', $sendTypeCampaign);
+            }
+        })->whereNull('user_uuid')->inRandomOrder()
+            ->first();
     }
 
     /**
@@ -295,7 +287,7 @@ class SmtpAccountService extends AbstractService
                 Mail::to(config('user.email_test'))->send(new SendEmails($subject, $body));
 
                 return true;
-            }catch (\Exception $e){
+            } catch (\Exception $e) {
                 return false;
             }
         }
@@ -337,7 +329,8 @@ class SmtpAccountService extends AbstractService
      * @param $mail
      * @return void
      */
-    public function sendEmailNotificationSystem($user, $mail, $email = null) {
+    public function sendEmailNotificationSystem($user, $mail, $email = null)
+    {
         $smtpAccount = ConfigModel::where(['key' => 'smtp_account'])->first();
         $this->setSwiftSmtpAccountForSendEmail($smtpAccount->value);
 

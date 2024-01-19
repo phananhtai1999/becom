@@ -25,7 +25,7 @@ class UserProfileService extends AbstractService
     public function getMinCodeByNumberOfUser()
     {
         $min = $power = 6;
-        $lastUser = optional($this->model->orderBy('uuid', 'DESC')->first())->user_uuid;
+        $lastUser = $this->model->count();
         $nextPower = pow(10, $power + 1);
         while ($lastUser >= $nextPower) {
             $min++;

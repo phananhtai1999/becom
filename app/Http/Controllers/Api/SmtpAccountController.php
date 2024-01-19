@@ -6,8 +6,6 @@ use App\Abstracts\AbstractRestAPIController;
 use App\Http\Controllers\Traits\RestIndexMyTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
-use App\Http\Controllers\Traits\RestDestroyTrait;
-use App\Http\Controllers\Traits\RestEditTrait;
 use App\Http\Requests\ChartRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MySmtpAccountRequest;
@@ -20,6 +18,7 @@ use App\Http\Resources\SmtpAccountResourceCollection;
 use App\Http\Resources\SmtpAccountResource;
 use App\Mail\SendEmails;
 use App\Models\MailTemplate;
+use App\Services\UserProfileService;
 use Techup\ApiConfig\Services\ConfigService;
 use App\Services\MySmtpAccountService;
 use App\Services\SmtpAccountService;
@@ -49,18 +48,21 @@ class SmtpAccountController extends AbstractRestAPIController
      * @var SendProjectService
      */
     protected $sendProjectService;
+    protected $userProfileService;
 
     /**
      * @param SmtpAccountService $service
      * @param MySmtpAccountService $myService
      * @param ConfigService $configService
      * @param SendProjectService $sendProjectService
+     * @param UserProfileService $userProfileService
      */
     public function __construct(
         SmtpAccountService   $service,
         MySmtpAccountService $myService,
         ConfigService        $configService,
-        SendProjectService   $sendProjectService
+        SendProjectService   $sendProjectService,
+        UserProfileService $userProfileService
     )
     {
         $this->service = $service;
@@ -106,7 +108,7 @@ class SmtpAccountController extends AbstractRestAPIController
             $website = $this->sendProjectService->findOneById($request->get('send_project_uuid'));
             $userUuid = $website->user_uuid;
         } else {
-            $userUuid = auth()->userId();
+            $userUuid = $request->get('user_uuid');
         }
 
         if (!$this->service->checkMailUserNameUnique($request->get('mail_username'), $userUuid)) {
@@ -203,7 +205,7 @@ class SmtpAccountController extends AbstractRestAPIController
      */
     public function storeMySmtpAccount(MySmtpAccountRequest $request)
     {
-        $user = $this->userService->findOrFailById(auth()->userId());
+        $user = $this->userProfileService->findOrFailById(auth()->userId());
         $config = $this->configService->findConfigByKey('smtp_auto');
 
         if ($user->can_add_smtp_account == 1 || $config->value == 0) {
