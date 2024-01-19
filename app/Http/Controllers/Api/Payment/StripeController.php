@@ -69,10 +69,26 @@ class StripeController extends AbstractRestAPIController
 
     public function allCardStripe()
     {
-        $customer = $this->getCustomer();
-        $allCard = $this->service->allCard($customer->id);
+        $subscriptionHistory = $this->subscriptionHistoryService->findOneWhere([
+            'payment_method_uuid' => PaymentMethod::STRIPE,
+            'user_uuid' => auth()->userId(),
+            'app_id' => auth()->appId(),
+        ]);
 
-        return $this->sendOkJsonResponse(['data' => $allCard]);
+        if (empty($subscriptionHistory)) {
+            return $this->sendOkJsonResponse(['message' => 'Does not have card before']);
+        }
+
+        $stripe = $this->service->getStripeClient();
+        $subscription = $stripe->subscriptions->retrieve($subscriptionHistory->logs['id']);
+        $paymentMethods = $stripe->paymentMethods->all([
+            'customer' => $subscription->customer,
+            'type' => 'card',
+        ]);
+        foreach ($paymentMethods->data as $paymentMethod) {
+            $card[] = $paymentMethod['card'];
+        }
+        return $this->sendOkJsonResponse(['data' => $card]);
     }
 
     public function updateCard(UpdateCardStripeRequest $request, $id)
@@ -92,7 +108,7 @@ class StripeController extends AbstractRestAPIController
     {
         $subscriptionHistory = $this->subscriptionHistoryService->findOneWhere([
             'payment_method_uuid' => PaymentMethod::STRIPE,
-             'user_uuid' => auth()->userId(),
+            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ]);
         if (empty($subscriptionHistory)) {
