@@ -74,6 +74,7 @@ class PartnerPayoutController extends AbstractRestAPIController
             'partner_uuid' => $partner->uuid,
             'amount'=> $amountWantWithdrawn,
             'payout_method_uuid'=> $request->get('payout_method_uuid'),
+            'app_id' => auth()->appId()
         ]);
         return $this->sendOkJsonResponse();
     }
