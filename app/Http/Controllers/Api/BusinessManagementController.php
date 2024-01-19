@@ -325,7 +325,8 @@ class BusinessManagementController extends AbstractRestAPIController
             DB::commit();
             return $this->sendCreatedJsonResponse();
         } elseif ($request->get('type') == UserBusiness::ACCOUNT_INVITE) {
-            $password = Hash::make($request->get('password'));
+//            $password = Hash::make($request->get('password'));
+            $password = $request->get('password');
             $email = $request->get('email') . '@' . $request->get('domain');
             $addUser = app(UserManagerService::class)->addUser($email, $password, $request->get('first_name'), $request->get('last_name'), auth()->appId());
             if ($addUser) {

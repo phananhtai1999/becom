@@ -41,7 +41,6 @@ class PartnerPayout extends AbstractModel
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'time' => 'datetime',
-        'by_user_uuid' => 'integer',
         'partner_uuid' => 'integer',
         'amount' => 'float'
     ];
