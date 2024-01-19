@@ -49,6 +49,11 @@ class Location extends Model
         return $this->belongsTo(BusinessManagement::class, 'business_uuid', 'uuid');
     }
 
+    public function departments()
+    {
+        return $this->hasMany(Department::class, 'location_uuid', 'uuid');
+    }
+
     public function sendProjects()
     {
         return $this->belongsToMany(SendProject::class, 'location_send_project', 'location_uuid', 'send_project_uuid')->withTimestamps();

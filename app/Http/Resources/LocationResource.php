@@ -39,6 +39,10 @@ class LocationResource extends JsonResource
             $data['teams'] = TeamResource::collection($this->teams);
         }
 
+        if (\in_array('location__departments', $expand)) {
+            $data['departments'] = DepartmentResource::collection($this->departments);
+        }
+
         if (\in_array('location__send_projects', $expand)) {
             $data['send_projects'] = SendProjectResource::collection($this->sendProjects);
         }
