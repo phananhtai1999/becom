@@ -66,6 +66,7 @@ class SendNotificationSystemForLoginListener implements ShouldQueue
                             'type_uuid' => null,
                             'content' => ['langkey' => $type.'_login', 'country' => $country],
                             'user_uuid' => $model->uuid,
+                            'app_id' => $model->app_id
                         ]);
                     }
                 }
@@ -75,7 +76,8 @@ class SendNotificationSystemForLoginListener implements ShouldQueue
                     'user_uuid' => $model->uuid,
                     'location' => $country,
                     'postal_code' => $geoIp->postal_code,
-                    'user_agent' => isset($data['user_agent']) ? $data['user_agent']: null
+                    'user_agent' => isset($data['user_agent']) ? $data['user_agent']: null,
+                    'app_id' => $model->app_id
                 ]);
 
             }else{
