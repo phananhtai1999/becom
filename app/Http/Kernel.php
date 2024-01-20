@@ -73,5 +73,6 @@ class Kernel extends HttpKernel
         'apikey' => \App\Http\Middleware\CheckApiKey::class,
         'appid' => \App\Http\Middleware\CheckAppId::class,
         'userid' => \App\Http\Middleware\CheckUserId::class,
+        'exclude_app_id' => \App\Http\Middleware\ExcludeAppIdScope::class,
     ];
 }

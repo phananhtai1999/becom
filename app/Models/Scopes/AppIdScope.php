@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Scope;
 
 class AppIdScope implements Scope
 {
+    public static $isEnabled = true;
+
     /**
      * Apply the scope to a given Eloquent query builder.
      *
@@ -17,7 +19,7 @@ class AppIdScope implements Scope
      */
     public function apply(Builder $builder, Model $model)
     {
-        if (in_array('app_id', $model->getFillable())) {
+        if (self::$isEnabled && in_array('app_id', $model->getFillable())) {
             $builder->where("{$model->getTable()}.app_id", auth()->appId());
         }
     }

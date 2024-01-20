@@ -511,7 +511,7 @@ Route::group(['middleware' => ['apikey']], function () {
         Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
             Route::get('/user-chart', [UserController::class, 'userChart'])->name('user-chart');
             Route::get('/email-chart', [MailSendingHistoryController::class, 'emailChart'])->name('email-chart');
-            Route::get('/campaign-chart', [CampaignController::class, 'campaignChart'])->name('campaign-chart');
+            Route::get('/campaign-chart', [CampaignController::class, 'campaignChart'])->middleware('exclude_app_id')->name('campaign-chart');
             Route::get('/credit-chart', [CreditHistoryController::class, 'creditChart'])->name('credit-chart');
             Route::get('/smtp-account-chart', [SmtpAccountController::class, 'smtpAccountChart'])->name('smtpAccountChart');
             Route::get('/point-contact-chart', [ContactController::class, 'pointsContactChart'])->name('pointsContactChart');
@@ -528,7 +528,7 @@ Route::group(['middleware' => ['apikey']], function () {
 
         Route::group(['as' => 'my.'], function () {
             Route::get('/my/credit-chart', [CreditHistoryController::class, 'myCreditChart'])->name('myCreditChart');
-            Route::get('/my/campaign-chart', [CampaignController::class, 'myCampaignChart'])->name('my-campaign-chart');
+            Route::get('/my/campaign-chart', [CampaignController::class, 'myCampaignChart'])->middleware('exclude_app_id')->name('my-campaign-chart');
             Route::get('/my/email-chart', [MailSendingHistoryController::class, 'myEmailChart'])->name('email-chart');
             Route::get('/my/contact-chart', [ContactController::class, 'myContactChart'])->name('myContactChart');
             Route::get('/my/point-contact-chart', [ContactController::class, 'myPointsContactChart'])->name('myPointsContactChart');
