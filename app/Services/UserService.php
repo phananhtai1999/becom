@@ -31,13 +31,16 @@ class UserService extends AbstractService
         return null;
     }
 
-    public function findOneById($uuid){
+    public function findOneById($uuid)
+    {
         return $this->findOneWhere(['user_uuid' => $uuid]);
     }
-    public function findOrFailById($uuid){
+
+    public function findOrFailById($uuid)
+    {
         return $this->findOneWhereOrFail(['user_uuid' => $uuid]);
     }
-    
+
 
     /**
      * @param $key
@@ -93,6 +96,7 @@ class UserService extends AbstractService
             ->whereDate('created_at', '>=', $startDate)
             ->whereDate('created_at', '<=', $endDate)
             ->whereNull('deleted_at')
+            ->where('app_id', auth()->appId())
             ->get();
     }
 
@@ -108,6 +112,7 @@ class UserService extends AbstractService
             ->whereDate('created_at', '>=', $startDate)
             ->whereDate('created_at', '<=', $endDate)
             ->whereNull('deleted_at')
+            ->where('app_id', auth()->appId())
             ->orderBy('label', 'ASC')
             ->groupby('label')
             ->get()->toArray();
@@ -123,9 +128,10 @@ class UserService extends AbstractService
     public function createQueryGetIncrease($startDate, $endDate, $dateFormat, $type)
     {
         $string = $type === "month" ? "-01" : "";
+        $appId = auth()->appId();
         $todayUserTableSubQuery = $yesterdayUserTableSubQuery = "(SELECT date_format(created_at, '{$dateFormat}') as date_field, COUNT(uuid) as createUser
                   from becom_user_profiles
-                  where date(created_at) >= '{$startDate}' and date(created_at) <= '{$endDate}' and deleted_at is NULL
+                  where app_id = '{$appId}' and date(created_at) >= '{$startDate}' and date(created_at) <= '{$endDate}' and deleted_at is NULL
                   GROUP By date_field)";
 
         return DB::table(DB::raw("$todayUserTableSubQuery as today"))->selectRaw("today.date_field, today.createUser, (today.createUser - yest.createUser) as increase")

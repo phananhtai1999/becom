@@ -35,7 +35,7 @@ class ActivityHistoryService extends AbstractService
         if ($type == Note::NOTE_TYPE || $type == Remind::REMIND_TYPE) {
             return null;
         } else {
-            $bodyMailTemplate = $this->findActivityHistory($uuid)->mailsendingHistory->campaign->mailTemplate->body;
+            $bodyMailTemplate = optional(optional(optional(optional($this->findActivityHistory($uuid))->mailsendingHistory)->campaign)->mailTemplate)->body;
             $contact = $this->findActivityHistory($uuid)->contact;
 
             if ($type === 'email') {
