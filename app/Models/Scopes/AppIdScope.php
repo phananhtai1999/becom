@@ -19,7 +19,7 @@ class AppIdScope implements Scope
      */
     public function apply(Builder $builder, Model $model)
     {
-        if (self::$isEnabled && in_array('app_id', $model->getFillable())) {
+        if (self::$isEnabled && in_array('app_id', $model->getFillable()) && auth()->appId()) {
             $builder->where("{$model->getTable()}.app_id", auth()->appId());
         }
     }
