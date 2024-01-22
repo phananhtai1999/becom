@@ -59,7 +59,7 @@ class ReplaceProductService extends ShopService
 
                     return $matchesProduct[0];
                 }
-                $category = $productData['categories'];
+                $category = $productData['categories'][0];
                 $brand = $productData['brand'];
                 $dimension = $productData['dimension'];
                 $matchesProduct[0] = $replaceProductCategoryService->replaceCategoryInProduct($matchesProduct[0], $category);
