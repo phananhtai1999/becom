@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Abstracts\AbstractRequest;
 use App\Models\Campaign;
 use App\Models\ContactList;
+use App\Services\UserTeamService;
 use Illuminate\Validation\Rule;
 
 class UpdateCampaignRequest extends AbstractRequest
@@ -90,11 +91,19 @@ class UpdateCampaignRequest extends AbstractRequest
             })->whereNull('deleted_at')],
             'contact_list' => ['array', 'min:1'],
             'contact_list.*' => ['integer', 'min:1', Rule::exists('contact_lists', 'uuid')->where(function ($query) {
+                //Check team
+                $userUuid = $this->request->get('user_uuid') ?? auth()->userId();
+                $userTeam = (new UserTeamService())->getUserTeamByUserAndAppId($userUuid, auth()->appId());
+                if ($userTeam) {
+                    $userUuid = $userTeam->team->owner_uuid;
+                }
                 return $query->where([
-                    ['user_uuid', $this->request->get('user_uuid') ?? auth()->userId()],
+                    ['user_uuid', $userUuid],
                     ['app_id', auth()->appId()]
                 ])->whereNull('deleted_at');
-            }), function ($attribute, $value, $fail) use ($sendType) {
+            }),
+                //Check contact phone
+                function ($attribute, $value, $fail) use ($sendType) {
                 if ($sendType === Campaign::CAMPAIGN_SMS_SEND_TYPE ||
                     Campaign::CAMPAIGN_TELEGRAM_SEND_TYPE ||
                     Campaign::CAMPAIGN_VIBER_SEND_TYPE

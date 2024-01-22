@@ -167,7 +167,7 @@ class CampaignController extends AbstractRestAPIController
         ConfigService                    $configService,
         CampaignScenarioService          $campaignScenarioService,
         UserTeamService                  $userTeamService,
-        UserProfileService $userProfileService
+        UserProfileService               $userProfileService
     )
     {
         $this->service = $service;
@@ -228,14 +228,10 @@ class CampaignController extends AbstractRestAPIController
             return $this->sendValidationFailedJsonResponse(["errors" => ['campaign' => __('messages.scenario_campaign_only_one_contact_list')]]);
         }
 
-        if (empty($request->get('user_uuid'))) {
-            $data = array_merge($request->all(), [
-                'user_uuid' => auth()->userId(),
-                'app_id' => auth()->appId(),
-            ]);
-        } else {
-            $data = $request->all();
-        }
+        $data = array_merge($request->all(), [
+            'user_uuid' => $request->get('user_uuid') ?? auth()->userId(),
+            'app_id' => auth()->appId(),
+        ]);
 
         $model = $this->service->create($data);
 
