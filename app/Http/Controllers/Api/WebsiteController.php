@@ -188,7 +188,8 @@ class WebsiteController extends AbstractRestAPIController
                ) {
                    SiteController::postDeployments(
                        $website->domain->name,
-                       $websiteUuid
+                       $websiteUuid,
+                       auth()->appId()
                    );
                }
 
