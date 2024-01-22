@@ -14,10 +14,11 @@ class SiteController {
     }
 
 
-	public function postDeployments($domain, $website_id) {
+	public function postDeployments($domain, $website_id, $app_id) {
 		$data = [
 			'domain' => $domain,
 			'website_id' => $website_id,
+			'app_id' => $app_id,
 		];
 		return Http::accept('application/json')->post($this->getRequestUrl('deployments'), $data);
 	}   
