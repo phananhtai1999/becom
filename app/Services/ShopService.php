@@ -29,11 +29,11 @@ class ShopService extends AppCallService
     }
 
     public function getChildrenByCategoryUuid($categoryUuid, $sortName = 'created_at', $sortOrder = 'desc', $childrenCategoryCount = 10) {
+        $sort = $this->getSort($sortOrder, $sortName);
         $data = [
             'product_category_uuid' => $categoryUuid,
             'per_page' => $childrenCategoryCount,
-            'sorted_by' => $sortOrder,
-            'sort' => $sortName
+            'sort' => $sort
         ];
 
         return $this->callService(env('SHOP_SERVICE_NAME'), 'get', 'children-category', $data, auth()->appId(), auth()->userId());
@@ -49,19 +49,21 @@ class ShopService extends AppCallService
         return $this->callService(env('SHOP_SERVICE_NAME'), 'get', 'product-header', $data, auth()->appId(), auth()->userId());
     }
 
-    public function getListProductByCategoryUuid($categoryUuid, $sortName = 'created_at', $sortOrder = 'desc', $childrenCategoryCount = 10) {
+    public function getListProductByCategoryUuid($categoryUuid, $sortName = 'created_at', $sortOrder = 'desc', $childrenCategoryCount = 10, $expand = []) {
         if (empty($categoryUuid)) {
             $data = [
                 'per_page' => $childrenCategoryCount,
                 'sorted_by' => $sortOrder,
-                'sort' => $sortName
+                'sort' => $sortName,
+                'expand' => $expand
             ];
         } else {
             $data = [
                 'product_category_uuid' => $categoryUuid,
                 'per_page' => $childrenCategoryCount,
                 'sorted_by' => $sortOrder,
-                'sort' => $sortName
+                'sort' => $sortName,
+                'expand' => $expand
             ];
         }
 
@@ -85,6 +87,16 @@ class ShopService extends AppCallService
     public function myCategory($request)
     {
         return $this->callService(env('SHOP_SERVICE_NAME'), 'get', '/my/categories', $request->all(), auth()->appId(), auth()->userId());
+    }
+
+    public function getSort($sortOrder, $sortName): string
+    {
+        if ($sortOrder == 'desc') {
+            $sort = '-' . $sortName;
+        } else {
+            $sort = $sortName;
+        }
+        return $sort;
     }
 
 }
