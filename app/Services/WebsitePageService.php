@@ -253,7 +253,7 @@ class WebsitePageService extends AbstractService
     {
         $replaceArticleService = new ReplaceArticleService();
         $replaceCategoryService = new ReplaceCategoryService();
-        $websitePage->html_template = $replaceCategoryService->replaceListCategory($websitePage->html_template);
+        $websitePage->html_template = $replaceCategoryService->replaceListCategory($websitePage->html_template, $websitePage);
         $websitePage->html_template = $replaceArticleService->replaceListArticleForPageHome($websitePage->html_template, $websitePage);
 
         return $websitePage;
