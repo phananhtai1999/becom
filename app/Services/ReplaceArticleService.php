@@ -11,11 +11,10 @@ class ReplaceArticleService
         $pattern = '/<article-list.*?>(.*?)<\/article-list>/s';
 
         return preg_replace_callback($pattern, function ($matches) use ($websitePage, $articleCategory){
-            preg_match('/article-sort="(.*?)"/', $matches[0], $sortName);
-            preg_match('/article-sort-order="(.*?)"/', $matches[0], $sortOrder);
-            preg_match('/data-article-count="(\d+)"/', $matches[0], $articleCount);
-            $articleCount = isset($articleCount) ? (int)$articleCount[1] : 10;
-            $articlesData = Article::where('article_category_uuid', $articleCategory->uuid)->orderBy($sortName[1] ?? 'created_at', $sortOrder[1] ?? 'DESC')->paginate($articleCount);
+            $articleCount = $this->searchArticleCount($matches[0]);
+            $sortName = $this->searchArticleSort($matches[0]);
+            $sortOrder = $this->searchArticleSortOrder($matches[0]);
+            $articlesData = Article::where('article_category_uuid', $articleCategory->uuid)->orderBy($sortName, $sortOrder)->paginate($articleCount);
             $pattern = '/<article-element.*?>(.*?)<\/article-element>/s';
 
             return preg_replace_callback($pattern, function ($matchesArticle) use ($articlesData, $websitePage) {
@@ -23,7 +22,7 @@ class ReplaceArticleService
                 if (!$articleData) {
                     return $matchesArticle[0];
                 }
-                $matchesArticle[0] = $this->replaceRedirectTag($articleData, $websitePage, $matchesArticle[0]);
+//                $matchesArticle[0] = $this->replaceRedirectTag($articleData, $websitePage, $matchesArticle[0]);
                 $searchReplaceMap = $this->searchReplaceMapForArticle($articleData);
 
                 return str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $matchesArticle[0]);
@@ -134,4 +133,24 @@ class ReplaceArticleService
 
     }
 
+    public function searchArticleCount($template): int
+    {
+        preg_match('/data-article-count="(\d+)"/', $template, $categoryCount);
+
+        return isset($categoryCount[1]) ? (int)$categoryCount[1] : 10;
+    }
+
+    public function searchArticleSort($template)
+    {
+        preg_match('/article-sort="(.*?)"/', $template, $sortName);
+
+        return $sortName[1] ?? 'created_at';
+    }
+
+    public function searchArticleSortOrder($template)
+    {
+        preg_match('/article-sort-order="(.*?)"/', $template, $sortOrder);
+
+        return $sortOrder[1] ?? 'DESC';
+    }
 }

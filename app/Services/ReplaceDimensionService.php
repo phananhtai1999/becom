@@ -17,7 +17,7 @@ class ReplaceDimensionService
     {
         return [
             '{product.dimension.uuid}' => $dimension['uuid'] ?? null,
-            '{product.dimension.length}' => $dimension['name'] ?? null,
+            '{product.dimension.length}' => $dimension['length'] ?? null,
             '{product.dimension.width}' => $dimension['width'] ?? null,
             '{product.dimension.height}' => $dimension['height'] ?? null,
             '{product.dimension.weight}' => $dimension['weight'] ?? null,

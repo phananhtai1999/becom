@@ -8,15 +8,16 @@ use Illuminate\Support\Str;
 
 class ReplaceCategoryService extends ReplaceChildrenCategoryService
 {
-    public function replaceListCategory($template) {
+    public function replaceListCategory($template, $websitePage) {
+        $replaceArticleService = new ReplaceArticleService();
         $pattern = '/<category-list.*?>(.*?)<\/category-list>/s';
 
-        return preg_replace_callback($pattern, function ($matches) use ($template){
+        return preg_replace_callback($pattern, function ($matches) use ($template, $replaceArticleService, $websitePage){
             $categoryCount = $this->searchCategoryCount($template);
             $sortName = $this->searchCategorySort($template);
             $sortOrder = $this->searchCategorySortOrder($template);
             $categoriesData = ArticleCategory::where('parent_uuid', null)->orderBy($sortName, $sortOrder)->paginate($categoryCount);
-            return preg_replace_callback('/<category-element.*?>(.*?)<\/category-element>/s', function ($matchCategory) use ($categoriesData) {
+            return preg_replace_callback('/<category-element.*?>(.*?)<\/category-element>/s', function ($matchCategory) use ($categoriesData, $replaceArticleService, $websitePage) {
                 $categoryData = $categoriesData->shift();
                 if (!$categoryData) {
 
@@ -25,13 +26,9 @@ class ReplaceCategoryService extends ReplaceChildrenCategoryService
                 $searchReplaceMap = $this->searchReplaceMapForCategory($categoryData);
                 $matchCategory[0] = str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $matchCategory[0]);
                 $matchCategory[0] = $this->replacechildrenCategory($matchCategory[0], $categoryData);
-
-                $childrenCategoriesUuid = ArticleCategory::where('parent_uuid', $categoryData->uuid)->get()->pluck('uuid');
-                $article = Article::whereIn('article_category_uuid', array_merge($childrenCategoriesUuid->toArray(), [$categoryData->uuid]))->orderBy('created_at', 'DESC')->first();
-                if ($article) {
-                    $replaceArticleService = new ReplaceArticleService();
-                    $searchReplaceArticleMap = $replaceArticleService->searchReplaceMapForArticle($article);
-                    $matchCategory[0] = Str::replace(array_keys($searchReplaceArticleMap), $searchReplaceArticleMap, $matchCategory[0]);
+                $childrenCategoriesUuid = ArticleCategory::where('parent_uuid', $categoryData->uuid)->first();
+                if (!empty($childrenCategoriesUuid)) {
+                    $matchCategory[0] = $replaceArticleService->replaceListArticle($matchCategory[0], $childrenCategoriesUuid, $websitePage);
                 }
 
                 return $matchCategory[0];

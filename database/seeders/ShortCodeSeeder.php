@@ -132,6 +132,16 @@ class ShortCodeSeeder extends Seeder
                 'key' => 'grand_children_product_category_element',
                 'short_code' => 'grand_children_product_category_element',
             ],
+            'dimension' => [
+                'name' => 'dimension of product',
+                'key' => 'dimension_element',
+                'short_code' => 'dimension_element',
+            ],
+            'brand' => [
+                'name' => 'brand of product',
+                'key' => 'brand_element',
+                'short_code' => 'brand_element',
+            ],
         ];
         $filters = [
             'article_filter' => [
@@ -1133,6 +1143,64 @@ class ShortCodeSeeder extends Seeder
                     'short_code' => 'asc',
                 ]
             ],
+            'brand' => [
+                [
+                    'name' => 'uuid',
+                    'key' => 'product.brand.uuid',
+                    'short_code' => 'product.brand.uuid',
+                ],                [
+                    'name' => 'name',
+                    'key' => 'product.brand.name',
+                    'short_code' => 'product.brand.name',
+                ],
+                [
+                    'name' => 'url',
+                    'key' => 'product.brand.url',
+                    'short_code' => 'product.brand.url',
+                ],
+            ],
+            'dimension' => [
+                [
+                    'name' => 'uuid',
+                    'key' => 'product.dimension.uuid',
+                    'short_code' => 'product.brand.uuid',
+                ],
+                [
+                    'name' => 'length',
+                    'key' => 'product.dimension.length',
+                    'short_code' => 'product.dimension.length',
+                ],
+                [
+                    'name' => 'width',
+                    'key' => 'product.dimension.width',
+                    'short_code' => 'product.dimension.width',
+                ],
+                [
+                    'name' => 'height',
+                    'key' => 'product.dimension.height',
+                    'short_code' => 'product.dimension.height',
+                ],                [
+                    'name' => 'height',
+                    'key' => 'product.dimension.height',
+                    'short_code' => 'product.dimension.height',
+                ],
+                [
+                    'name' => 'weight',
+                    'key' => 'product.dimension.weight',
+                    'short_code' => 'product.dimension.weight',
+                ],
+                [
+                    'name' => 'unit_type_weight',
+                    'key' => 'product.dimension.unit_type_weight',
+                    'short_code' => 'product.dimension.unit_type_weight',
+                ],
+                [
+                    'name' => 'unit_type_dimension',
+                    'key' => 'product.dimension.unit_type_dimension',
+                    'short_code' => 'product.dimension.unit_type_dimension',
+                ],
+            ],
+
         ];
 
         //create parent first
@@ -1237,6 +1305,10 @@ class ShortCodeSeeder extends Seeder
             } elseif ($key == 'grand_children_product_category') {
                 $parent = WebsitePageShortCode::where(['key' => 'grand_children_product_category_list'])->first();
                 WebsitePageShortCode::updateOrCreate(['key' => $element['key']], array_merge(['parent_uuids' => [$parent->uuid]], $element));
+            } elseif ($key == 'dimension') {
+                $dimensionElement = WebsitePageShortCode::updateOrCreate(['key' => $element['key']], array_merge(['parent_uuids' => [$productElement->uuid]], $element));
+            } elseif ($key == 'brand') {
+                $brandElement = WebsitePageShortCode::updateOrCreate(['key' => $element['key']], array_merge(['parent_uuids' => [$productElement->uuid]], $element));
             }
         }
         $articleList->update(['parent_uuids' => [$categoryElement->uuid, $childrenCategoryElement->uuid]]);
@@ -1423,6 +1495,14 @@ class ShortCodeSeeder extends Seeder
                 foreach ($shortCode as $grandChildrenSortOrder) {
                     $parent = WebsitePageShortCode::where(['key' => 'grand_children_product_category_sort_order'])->first();
                     WebsitePageShortCode::updateOrCreate(['key' => $grandChildrenSortOrder['key']], array_merge(['parent_uuids' => [$parent->uuid]], $grandChildrenSortOrder));
+                }
+            } elseif ($key == 'dimension') {
+                foreach ($shortCode as $grandChildrenSortOrder) {
+                    WebsitePageShortCode::updateOrCreate(['key' => $grandChildrenSortOrder['key']], array_merge(['parent_uuids' => [$dimensionElement->uuid]], $grandChildrenSortOrder));
+                }
+            } elseif ($key == 'brand') {
+                foreach ($shortCode as $grandChildrenSortOrder) {
+                    WebsitePageShortCode::updateOrCreate(['key' => $grandChildrenSortOrder['key']], array_merge(['parent_uuids' => [$brandElement->uuid]], $grandChildrenSortOrder));
                 }
             }
         }
