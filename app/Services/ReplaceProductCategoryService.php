@@ -15,7 +15,6 @@ class ReplaceProductCategoryService extends ReplaceChildrenProductCategoryServic
             $childrenCategoryCount = $this->searchCategoryCount($matches[0]);
             $sortName = $this->searchCategorySort($matches[0]);
             $sortOrder = $this->searchCategorySortOrder($matches[0]);
-
             $categoriesData = $this->getChildrenByCategoryUuid(null, $sortName, $sortOrder, $childrenCategoryCount);
             $categoriesData = $categoriesData['data']['data'];
 
@@ -73,7 +72,7 @@ class ReplaceProductCategoryService extends ReplaceChildrenProductCategoryServic
         return [
             '{product_category.uuid}' => $articleCategory['uuid'] ?? null,
             '{product_category.slug}' => $articleCategory['slug'] ?? null,
-            '{product_category.title}' => array_values($articleCategory['title'])[0] ?? null,
+            '{product_category.title}' => array_values($articleCategory['titles'])[0] ?? null,
             '{product_category.image}' => $articleCategory['image'] ?? null,
             '{product_category.parent_uuid}' => $articleCategory['short_content'] ?? null,
         ];
