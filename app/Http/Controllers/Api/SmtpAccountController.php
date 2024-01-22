@@ -62,7 +62,7 @@ class SmtpAccountController extends AbstractRestAPIController
         MySmtpAccountService $myService,
         ConfigService        $configService,
         SendProjectService   $sendProjectService,
-        UserProfileService $userProfileService
+        UserProfileService   $userProfileService
     )
     {
         $this->service = $service;
@@ -108,7 +108,7 @@ class SmtpAccountController extends AbstractRestAPIController
             $website = $this->sendProjectService->findOneById($request->get('send_project_uuid'));
             $userUuid = $website->user_uuid;
         } else {
-            $userUuid = $request->get('user_uuid');
+            $userUuid = $request->has('user_uuid') ? $request->get('user_uuid') : auth()->userId();
         }
 
         if (!$this->service->checkMailUserNameUnique($request->get('mail_username'), $userUuid)) {
