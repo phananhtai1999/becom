@@ -6,18 +6,18 @@ use App\Models\Article;
 
 class ReplaceProductService extends ShopService
 {
-    public function replaceListProduct($template, $productCategory, $websitePage)
+    public function replaceListProduct($template, $productCategory)
     {
         $pattern = '/<product-list.*?>(.*?)<\/product-list>/s';
 
-        return preg_replace_callback($pattern, function ($matches) use ($websitePage, $productCategory) {
+        return preg_replace_callback($pattern, function ($matches) use ($productCategory) {
             $productCount = $this->searchProductCount($matches[0]);
             $sortName = $this->searchProductSort($matches[0]);
             $sortOrder = $this->searchProductSortOrder($matches[0]);
             $productsData = $this->getListProductByCategoryUuid($productCategory['uuid'], $sortName, $sortOrder, $productCount);
             $productsData = $productsData['data']['data'];
             $pattern = '/<product-element.*?>(.*?)<\/product-element>/s';
-            return preg_replace_callback($pattern, function ($matchProduct) use ($productsData, $websitePage) {
+            return preg_replace_callback($pattern, function ($matchProduct) use ($productsData) {
                 $productData = array_shift($productsData);
                 if (!$productData) {
                     return $matchProduct[0];
