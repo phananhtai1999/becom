@@ -108,10 +108,10 @@ class PlatformPackageController extends AbstractRestAPIController
 
     public function edit(UpdatePlatformPackageRequest $request, $id) {
         $platformPackage = $this->service->findOrFailById($id);
-        if ($platformPackage->status == PlatformPackage::PLATFORM_PACKAGE_DISABLE) {
+        if ($platformPackage->status == PlatformPackage::PLATFORM_PACKAGE_PUBLISH) {
             return $this->sendJsonResponse(false, 'Can not edit this platform', [], 403);
         }
-        $this->service->update($platformPackage, $request->all());
+        $this->service->update($platformPackage, array_merge($request->all(), ['uuid' => $request->get('name')]));
         Cache::flush();
 
         return $this->sendCreatedJsonResponse(
