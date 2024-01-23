@@ -50,10 +50,9 @@ class MyContactService extends AbstractService
      */
     public function myTotalContact($startDate, $endDate)
     {
-        $totalMyContact = DB::table('contacts')->selectRaw('count(uuid) as contact')
+        $totalMyContact = $this->model->selectRaw('count(uuid) as contact')
             ->whereDate('created_at', '>=', $startDate)
             ->whereDate('created_at', '<=', $endDate)
-            ->whereNull('deleted_at')
             ->where([
                 ['user_uuid', auth()->userId()],
                 ['app_id', auth()->appId()]
@@ -71,31 +70,9 @@ class MyContactService extends AbstractService
      */
     public function queryMyContact($startDate, $endDate, $dateTime)
     {
-        return DB::table('contacts')->selectRaw("DATE_FORMAT(created_at, '{$dateTime}') as label, count(uuid) as contact, 0 as list")
+        return $this->model->selectRaw("DATE_FORMAT(created_at, '{$dateTime}') as label, count(uuid) as contact, 0 as list")
             ->whereDate('created_at', '>=', $startDate)
             ->whereDate('created_at', '<=', $endDate)
-            ->whereNull('deleted_at')
-            ->where([
-                ['user_uuid', auth()->userId()],
-                ['app_id', auth()->appId()]
-            ])
-            ->orderBy('label', 'ASC')
-            ->groupby('label')
-            ->get()->toArray();
-    }
-
-    /**
-     * @param $startDate
-     * @param $endDate
-     * @param $dateTime
-     * @return array
-     */
-    public function queryMyContactList($startDate, $endDate, $dateTime)
-    {
-        return DB::table('contact_lists')->selectRaw("DATE_FORMAT(created_at, '{$dateTime}') as label, 0 as contact, count(uuid) as list")
-            ->whereDate('created_at', '>=', $startDate)
-            ->whereDate('created_at', '<=', $endDate)
-            ->whereNull('deleted_at')
             ->where([
                 ['user_uuid', auth()->userId()],
                 ['app_id', auth()->appId()]
@@ -115,10 +92,12 @@ class MyContactService extends AbstractService
     public function createQueryGetIncrease($startDate, $endDate, $dateFormat, $type)
     {
         $currentUser = auth()->userId();
+        $appId = auth()->appId();
         $string = $type === "month" ? "-01" : "";
         $todaySmtpAccountTableSubQuery = $yesterdaySmtpAccountTableSubQuery = "(SELECT date_format(created_at, '{$dateFormat}') as date_field, COUNT(uuid) as createContact
                   from contacts
-                  where date(created_at) >= '{$startDate}' and date(created_at) <= '{$endDate}' and deleted_at is NULL and user_uuid = '{$currentUser}'
+                  where date(created_at) >= '{$startDate}' and date(created_at) <= '{$endDate}' and deleted_at is NULL
+                  and user_uuid = '{$currentUser}' and app_id = '{$appId}'
                   GROUP By date_field)";
 
         return DB::table(DB::raw("$todaySmtpAccountTableSubQuery as today"))->selectRaw("today.date_field, today.createContact, (today.createContact - yest.createContact) as increase")
@@ -139,7 +118,7 @@ class MyContactService extends AbstractService
         if ($groupBy === 'hour') {
             $dateFormat = "%Y-%m-%d %H:00:00";
             $subDate = Carbon::parse($startDate)->subDay();
-            $myContactLists = $this->queryMyContactList($startDate, $endDate, "%Y-%m-%d %H:00:00");
+            $myContactLists = (new MyContactListService())->queryMyContactList($startDate, $endDate, "%Y-%m-%d %H:00:00");
             $parseEndDate = Carbon::parse($endDate)->endOfDay();
             while ($parseStartDate <= $parseEndDate) {
                 $dateTime[] = [
@@ -150,7 +129,7 @@ class MyContactService extends AbstractService
         } elseif ($groupBy === 'date') {
             $dateFormat = "%Y-%m-%d";
             $subDate = Carbon::parse($startDate)->subDay();
-            $myContactLists = $this->queryMyContactList($startDate, $endDate, "%Y-%m-%d");
+            $myContactLists = (new MyContactListService())->queryMyContactList($startDate, $endDate, "%Y-%m-%d");
             $parseEndDate = Carbon::parse($endDate);
             while ($parseStartDate <= $parseEndDate) {
                 $dateTime[] = [
@@ -161,7 +140,7 @@ class MyContactService extends AbstractService
         } elseif ($groupBy === 'month') {
             $dateFormat = "%Y-%m";
             $subDate = Carbon::parse($startDate)->subMonth();
-            $myContactLists = $this->queryMyContactList($startDate, $endDate, "%Y-%m");
+            $myContactLists = (new MyContactListService())->queryMyContactList($startDate, $endDate, "%Y-%m");
             $parseEndDate = Carbon::parse($endDate);
             while ($parseStartDate <= $parseEndDate) {
                 $dateTime[] = [
@@ -173,14 +152,15 @@ class MyContactService extends AbstractService
 
         $myContacts = $this->queryMyContact($subDate, $parseEndDate, $dateFormat);
         $myContactsIncrease = $this->createQueryGetIncrease($subDate, $endDate, $dateFormat, $groupBy === 'date' ? 'day' : $groupBy);
+
         if (!empty($myContacts)) {
             foreach ($myContacts as $myContact) {
                 foreach ($myContactsIncrease as $myContactIncrease) {
-                    if (in_array($myContactIncrease->date_field, [$myContact->label])) {
+                    if (in_array($myContactIncrease->date_field, [$myContact['label']])) {
                         $chartResult[] = [
-                            'label' => $myContact->label,
-                            'contact' => $myContact->contact,
-                            'list' => $myContact->list,
+                            'label' => $myContact['label'],
+                            'contact' => $myContact['contact'],
+                            'list' => $myContact['list'],
                             'increase' => $myContactIncrease->increase
                         ];
                     }
@@ -240,12 +220,12 @@ class MyContactService extends AbstractService
         foreach ($data as $item) {
             if (!empty($myContactLists)) {
                 foreach ($myContactLists as $myContactList) {
-                    if (in_array($myContactList->label, [$item['label']])) {
+                    if (in_array($myContactList['label'], [$item['label']])) {
                         $check = true;
                         $result [] = [
                             'label' => $item['label'],
                             'contact' => $item['contact'],
-                            'list' => $myContactList->list,
+                            'list' => $myContactList['list'],
                             'increase' => $item['increase'],
                         ];
                         break;
@@ -321,6 +301,7 @@ class MyContactService extends AbstractService
 //GROUP By label) yest On yest.label = today.label - INTERVAL 1 day;
         $queryContactList = !empty($contactListUuid) ? "and cl.uuid = '{$contactListUuid}'" : "";
         $currentUser = auth()->userId();
+        $appId = auth()->appId();
         $string = $type === "month" ? "-01" : "";
         $todayPointsContactTableSubQuery = $yesterdayPointsContactTableSubQuery = "(SELECT date_format(c.updated_at, '{$dateFormat}') as label, sum(c.points) as points
                   from contacts c, contact_contact_list ccl, contact_lists cl
@@ -328,6 +309,7 @@ class MyContactService extends AbstractService
                   date(c.updated_at) >= '{$startDate}' and date(c.updated_at) <= '{$endDate}'
                   {$queryContactList}
                   and cl.user_uuid = '{$currentUser}'
+                  and cl.app_id = '{$appId}'
                   and c.deleted_at is NULL and cl.deleted_at is NULL
                   GROUP By label)";
 

@@ -33,10 +33,9 @@ class UserCreditHistoryService extends AbstractService
      */
     public function totalCreditAdded($startDate, $endDate)
     {
-        $totalCreditAdded = DB::table('user_credit_histories')->selectRaw('SUM(credit) as sum')
+        $totalCreditAdded = $this->model->selectRaw('SUM(credit) as sum')
             ->whereDate('created_at', '>=', $startDate)
             ->whereDate('created_at', '<=', $endDate)
-            ->whereNull('deleted_at')
             ->get();
 
         return !empty($totalCreditAdded['0']->sum) ? $totalCreditAdded['0']->sum : 0;

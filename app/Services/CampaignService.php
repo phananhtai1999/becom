@@ -237,10 +237,15 @@ class CampaignService extends AbstractService
             GROUP By date_field) yest On yest.date_field = today.date_field - INTERVAL 1 day) as B on A.date_field = B.date_field;
         */
         $string = $type === "month" ? "-01" : "";
-        $todayCampaignTableSubQuery = $yesterdayCampaignTableSubQuery = $this->model->selectRaw("date_format(updated_at, '{$dateFormat}') as label, COUNT(uuid) as createCampaign")
+        $todayCampaignTableSubQuery = $yesterdayCampaignTableSubQuery = $this->model
+            ->selectRaw("date_format(updated_at, '{$dateFormat}') as label, COUNT(uuid) as createCampaign")
+            ->whereRaw('app_id = "' . auth()->appId() . '"')
             ->whereRaw('date(updated_at) >= "' . $startDate . '"')
             ->whereRaw('date(updated_at) <= "' . $endDate . '"')->groupBy('label')->toSql();
-        $campaignStatusTable = $this->model->selectRaw("date_format(updated_at, '{$dateFormat}') as label,  COUNT(IF( status = 'active', 1, NULL ) ) as active, COUNT(IF( status <> 'active', 1, NULL ) ) as other")
+
+        $campaignStatusTable = $this->model
+            ->selectRaw("date_format(updated_at, '{$dateFormat}') as label,  COUNT(IF( status = 'active', 1, NULL ) ) as active, COUNT(IF( status <> 'active', 1, NULL ) ) as other")
+            ->whereRaw('app_id = "' . auth()->appId() . '"')
             ->whereRaw('date(updated_at) >= "' . $startDate . '"')
             ->whereRaw('date(updated_at) <= "' . $endDate . '"')
             ->groupBy('label')

@@ -70,10 +70,9 @@ class MyCreditHistoryService extends AbstractService
      */
     public function myTotalCreditUsed($startDate, $endDate)
     {
-        $totalMyCreditUsed = DB::table('user_use_credit_histories')->selectRaw('SUM(credit) as sum')
+        $totalMyCreditUsed = $this->model->selectRaw('SUM(credit) as sum')
             ->whereDate('created_at', '>=', $startDate)
             ->whereDate('created_at', '<=', $endDate)
-            ->whereNull('deleted_at')
             ->where([
                 ['user_uuid', auth()->userId()],
                 ['app_id', auth()->appId()]
@@ -91,10 +90,9 @@ class MyCreditHistoryService extends AbstractService
      */
     public function queryMyUseCreditHistory($startDate, $endDate, $dateTime)
     {
-        return DB::table('user_use_credit_histories')->selectRaw("DATE_FORMAT(created_at, '{$dateTime}') as label, '0' as 'add', SUM(credit) as used ")
+        return $this->model->selectRaw("DATE_FORMAT(created_at, '{$dateTime}') as label, '0' as 'add', SUM(credit) as used ")
             ->whereDate('created_at', '>=', $startDate)
             ->whereDate('created_at', '<=', $endDate)
-            ->whereNull('deleted_at')
             ->where([
                 ['user_uuid', auth()->userId()],
                 ['app_id', auth()->appId()]
@@ -112,10 +110,9 @@ class MyCreditHistoryService extends AbstractService
      */
     public function queryMyAddCreditHistory($startDate, $endDate, $dateTime)
     {
-        return DB::table('user_credit_histories')->selectRaw("DATE_FORMAT(created_at, '{$dateTime}') as label, SUM(credit) as 'add', '0' as used")
+        return $this->model->selectRaw("DATE_FORMAT(created_at, '{$dateTime}') as label, SUM(credit) as 'add', '0' as used")
             ->whereDate('created_at', '>=', $startDate)
             ->whereDate('created_at', '<=', $endDate)
-            ->whereNull('deleted_at')
             ->where([
                 ['user_uuid', auth()->userId()],
                 ['app_id', auth()->appId()]
@@ -173,12 +170,12 @@ class MyCreditHistoryService extends AbstractService
         foreach ($dateTime as $value) {
             if (!empty($userCreditHistories)) {
                 foreach ($userCreditHistories as $userCreditHistory) {
-                    if (in_array($userCreditHistory->label, $value)) {
+                    if (in_array($userCreditHistory['label'], $value)) {
                         $check = true;
                         $data [] = [
-                            'label' => $userCreditHistory->label,
-                            'add' => $userCreditHistory->add,
-                            'used' => $userCreditHistory->used,
+                            'label' => $userCreditHistory['label'],
+                            'add' => $userCreditHistory['add'],
+                            'used' => $userCreditHistory['used'],
                         ];
                         break;
                     } else {
@@ -204,12 +201,12 @@ class MyCreditHistoryService extends AbstractService
         foreach ($data as $item) {
             if (!empty($userUseCreditHistories)) {
                 foreach ($userUseCreditHistories as $userUseCreditHistory) {
-                    if (in_array($userUseCreditHistory->label, [$item['label']])) {
+                    if (in_array($userUseCreditHistory['label'], [$item['label']])) {
                         $check = true;
                         $result [] = [
                             'label' => $item['label'],
                             'add' => (int)$item['add'],
-                            'used' => (int)$userUseCreditHistory->used,
+                            'used' => (int)$userUseCreditHistory['used'],
                         ];
                         break;
                     } else {

@@ -210,7 +210,7 @@ class UserController extends AbstractRestAPIController
 
         return $this->sendOkJsonResponse([
             'data' => $userChart,
-            'total' => $totalBannedAndActive['0']
+            'total' => $totalBannedAndActive
         ]);
     }
 

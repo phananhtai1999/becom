@@ -421,12 +421,13 @@ class ContactService extends AbstractService
 //GROUP By label) yest On yest.label = today.label - INTERVAL 1 day;
         $queryContactList = !empty($contactListUuid) ? "and cl.uuid = '{$contactListUuid}'" : "";
         $string = $type === "month" ? "-01" : "";
+        $appId = auth()->appId();
         $todayPointsContactTableSubQuery = $yesterdayPointsContactTableSubQuery = "(SELECT date_format(c.updated_at, '{$dateFormat}') as label, sum(c.points) as points
                   from contacts c, contact_contact_list ccl, contact_lists cl
                   where c.uuid = ccl.contact_uuid AND ccl.contact_list_uuid = cl.uuid and
                   date(c.updated_at) >= '{$startDate}' and date(c.updated_at) <= '{$endDate}'
                   {$queryContactList}
-                  and c.deleted_at is NULL and cl.deleted_at is NULL
+                  and c.deleted_at is NULL and cl.app_id = '{$appId}' and c.app_id = '{$appId}' and cl.deleted_at is NULL
                   GROUP By label)";
 
         return DB::table(DB::raw("$todayPointsContactTableSubQuery as today"))->selectRaw("today.label, today.points, (today.points - yest.points) as increase")
