@@ -217,11 +217,15 @@ class MyCampaignService extends AbstractService
     public function createQueryGetIncrease($dateFormat, $startDate, $endDate, $type)
     {
         $string = $type === "month" ? "-01" : "";
-        $todayCampaignTableSubQuery = $yesterdayCampaignTableSubQuery = $this->model->selectRaw("date_format(updated_at, '{$dateFormat}') as label, COUNT(uuid) as createCampaign")
-            ->whereRaw('date(updated_at) >= "' . $startDate . '" and date(updated_at) <= "' . $endDate . '" and user_uuid = "' . auth()->userId() . '"')
+        $todayCampaignTableSubQuery = $yesterdayCampaignTableSubQuery = $this->model
+            ->selectRaw("date_format(updated_at, '{$dateFormat}') as label, COUNT(uuid) as createCampaign")
+            ->whereRaw('date(updated_at) >= "' . $startDate . '" and date(updated_at) <= "' . $endDate . '"
+            and user_uuid = "' . auth()->userId() . '" and app_id = "' . auth()->appId(). '"')
             ->groupBy('label')->toSql();
-        $campaignStatusTable = $this->model->selectRaw("date_format(updated_at, '{$dateFormat}') as label,  COUNT(IF( status = 'active', 1, NULL ) ) as active, COUNT(IF( status <> 'active', 1, NULL ) ) as other")
-            ->whereRaw('date(updated_at) >= "' . $startDate . '" and date(updated_at) <= "' . $endDate . '" and user_uuid = "' . auth()->userId() . '"')
+        $campaignStatusTable = $this->model
+            ->selectRaw("date_format(updated_at, '{$dateFormat}') as label,  COUNT(IF( status = 'active', 1, NULL ) ) as active, COUNT(IF( status <> 'active', 1, NULL ) ) as other")
+            ->whereRaw('date(updated_at) >= "' . $startDate . '" and date(updated_at) <= "' . $endDate . '"
+            and user_uuid = "' . auth()->userId() . '" and app_id = "' . auth()->appId(). '"')
             ->groupBy('label')
             ->orderBy('label', 'ASC')->toSql();
 

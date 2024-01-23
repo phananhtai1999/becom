@@ -75,10 +75,9 @@ class MyUserCreditHistoryService extends AbstractService
      */
     public function myTotalCreditAdded($startDate, $endDate)
     {
-        $totalMyCreditAdded = DB::table('user_credit_histories')->selectRaw('SUM(credit) as sum')
+        $totalMyCreditAdded = $this->model->selectRaw('SUM(credit) as sum')
             ->whereDate('created_at', '>=', $startDate)
             ->whereDate('created_at', '<=', $endDate)
-            ->whereNull('deleted_at')
             ->where([
                 ['user_uuid', auth()->userId()],
                 ['app_id', auth()->appId()]

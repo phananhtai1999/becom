@@ -63,10 +63,9 @@ class MyContactListService extends AbstractService
      */
     public function myTotalContactList($startDate, $endDate)
     {
-        $totalMyContactList = DB::table('contact_lists')->selectRaw('count(uuid) as list')
+        $totalMyContactList = $this->model->selectRaw('count(uuid) as list')
             ->whereDate('created_at', '>=', $startDate)
             ->whereDate('created_at', '<=', $endDate)
-            ->whereNull('deleted_at')
             ->where([
                 ['user_uuid', auth()->userId()],
                 ['app_id', auth()->appId()]
@@ -74,6 +73,26 @@ class MyContactListService extends AbstractService
             ->get();
 
         return $totalMyContactList['0']->list;
+    }
+
+    /**
+     * @param $startDate
+     * @param $endDate
+     * @param $dateTime
+     * @return array
+     */
+    public function queryMyContactList($startDate, $endDate, $dateTime)
+    {
+        return $this->model->selectRaw("DATE_FORMAT(created_at, '{$dateTime}') as label, 0 as contact, count(uuid) as list")
+            ->whereDate('created_at', '>=', $startDate)
+            ->whereDate('created_at', '<=', $endDate)
+            ->where([
+                ['user_uuid', auth()->userId()],
+                ['app_id', auth()->appId()]
+            ])
+            ->orderBy('label', 'ASC')
+            ->groupby('label')
+            ->get()->toArray();
     }
 
     public function myContactLists($request, $contactLists = [])

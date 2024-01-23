@@ -92,12 +92,11 @@ class UserService extends AbstractService
      */
     public function totalBannedAndActive($startDate, $endDate)
     {
-        return DB::table('becom_user_profiles')->selectRaw("count(uuid) - count(banned_at) as active, count(banned_at) as banned")
+        return $this->model->selectRaw("count(uuid) - count(banned_at) as active, count(banned_at) as banned")
             ->whereDate('created_at', '>=', $startDate)
             ->whereDate('created_at', '<=', $endDate)
-            ->whereNull('deleted_at')
             ->where('app_id', auth()->appId())
-            ->get();
+            ->get()[0]->getAttributes();
     }
 
     /**
@@ -108,10 +107,9 @@ class UserService extends AbstractService
      */
     public function queryUser($startDate, $endDate, $dateTime)
     {
-        return DB::table('becom_user_profiles')->selectRaw("DATE_FORMAT(created_at, '{$dateTime}') as label, count(uuid) - count(banned_at) as active, count(banned_at) as banned")
+        return $this->model->selectRaw("DATE_FORMAT(created_at, '{$dateTime}') as label, count(uuid) - count(banned_at) as active, count(banned_at) as banned")
             ->whereDate('created_at', '>=', $startDate)
             ->whereDate('created_at', '<=', $endDate)
-            ->whereNull('deleted_at')
             ->where('app_id', auth()->appId())
             ->orderBy('label', 'ASC')
             ->groupby('label')
@@ -188,11 +186,11 @@ class UserService extends AbstractService
         if (!empty($users)) {
             foreach ($users as $user) {
                 foreach ($usersIncrease as $userIncrease) {
-                    if (in_array($userIncrease->date_field, [$user->label])) {
+                    if (in_array($userIncrease->date_field, [$user['label']])) {
                         $chartResult[] = [
-                            'label' => $user->label,
-                            'active' => $user->active,
-                            'banned' => $user->banned,
+                            'label' => $user['label'],
+                            'active' => $user['active'],
+                            'banned' => $user['banned'],
                             'increase' => $userIncrease->increase
                         ];
                     }
