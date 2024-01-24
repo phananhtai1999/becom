@@ -43,6 +43,7 @@ use App\Listeners\SendNextByScenarioCampaignListener;
 use App\Listeners\SubscriptionAddOnSuccessListener;
 use App\Listeners\SubscriptionSuccessListener;
 use App\Listeners\UpdateContactByStatusListener;
+use App\Models\BusinessManagement;
 use App\Models\Contact;
 use App\Models\Role;
 use App\Models\Status;
@@ -51,6 +52,7 @@ use App\Models\UserAccessToken;
 use App\Models\UserConfig;
 use App\Models\UserDetail;
 use App\Models\UserProfile;
+use App\Observers\BusinessObserver;
 use App\Observers\ContactObserver;
 use App\Observers\RoleObserver;
 use App\Observers\StatusObserver;
@@ -156,5 +158,6 @@ class EventServiceProvider extends ServiceProvider
         Contact::observe(ContactObserver::class);
         Status::observe(StatusObserver::class);
         UserProfile::observe(UserProfileObserver::class);
+        BusinessManagement::observe(BusinessObserver::class);
     }
 }

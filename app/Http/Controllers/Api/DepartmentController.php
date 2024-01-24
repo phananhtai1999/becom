@@ -131,12 +131,9 @@ class DepartmentController extends AbstractRestAPIController
 
     public function indexMy(IndexRequest $request)
     {
-        $user = $this->userProfileService->findOneWhereOrFail(['user_uuid' => auth()->userId(), 'app_id' => auth()->appId()]);
-        if ($user->default_department) {
-            $models = $this->service->getIndexMyWithDefault($request, true);
-        } else {
-            $models = $this->service->getIndexMyWithDefault($request, false);
-        }
+        $business = $this->getBusiness();
+        $businessUuid = $business ? $business->uuid : null;
+        $models = $this->service->getIndexMyWithDefault($request, $businessUuid);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
@@ -280,10 +277,10 @@ class DepartmentController extends AbstractRestAPIController
         );
     }
 
-    public function toggleDefaultDepartment(): JsonResponse
+    public function toggleDefaultDepartment($id): JsonResponse
     {
-        $user = $this->userProfileService->findOneWhereOrFail(['user_uuid' => auth()->userId(), 'app_id' => auth()->appId()]);
-        $user->update(['default_department' => !$user->default_department]);
+        $model = $this->service->findOrFailById($id);
+        $model->update(['status' => !$model->status]);
 
         return $this->sendOkJsonResponse();
     }
