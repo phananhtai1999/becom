@@ -173,16 +173,17 @@ class PartnerController extends AbstractRestAPIController
             if (!$model->user_uuid) {
 //                $password = $this->generateRandomString(6);
                 $password = "111@222";
-                $addUser = app(UserManagerService::class)->addUser($model->partner_email, $password,$model->first_name,$model->last_name, auth()->appId());
+                $roles = [Role::ROLE_PARTNER, Role::ROLE_USER_OWNER];
+                if ($request->get('partner_role') != Role::ROLE_USER_OWNER){
+                     $roles = [Role::ROLE_USER_OWNER, $request->get('partner_role')];
+                }
+                $addUser = app(UserManagerService::class)->addUser($model->partner_email, $password,$model->first_name,$model->last_name, $roles, auth()->appId(), auth()->userId(), auth()->token());
                 if ($addUser){
                     $userProfile = $this->userProfileService->findOneWhere([
                         "email" => $model->partner_email,
                     ]);
                     if ($userProfile){
-                        if ($request->get('partner_role') != Role::ROLE_USER_OWNER){
-                            app(UserManagerService::class)->addRoleToUser($userProfile->user_uuid, $request->get('partner_role'), auth()->appId(), auth()->userId(), auth()->token());
-                        }
-                        app(UserManagerService::class)->addRoleToUser($userProfile->user_uuid, Role::ROLE_PARTNER, auth()->appId(), auth()->userId(), auth()->token());
+                       
 
                         $userUuid = $userProfile->user_uuid;
 //                        Mailbox::postEmailAccountcreate($userProfile->user_uuid, $userProfile->email, $password);

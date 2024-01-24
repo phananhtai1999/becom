@@ -193,7 +193,7 @@ class TeamController extends Controller
                 $this->smtpAccountService->sendEmailNotificationSystem(null, new SendInviteToTeam($invite, $url), $request->get('email'));
             } elseif ($request->get('type') == Team::ACCOUNT_INVITE) {
                 $password = $this->generateRandomString(10);
-                $addUser = app(UserManagerService::class)->addUser($request->get('email'), $password, $request->get('first_name'), $request->get('last_name'), auth()->appId());
+                $addUser = app(UserManagerService::class)->addUser($request->get('email'), $password, $request->get('first_name'), $request->get('last_name'), [Role::ROLE_USER_MEMBER], auth()->appId(), auth()->userId(), auth()->token());
                 if ($addUser) {
                     $userProfile = $this->userProfileService->findOneWhereOrFail(['email' => $request->get('email')]);
                     $userProfile->userPlatformPackage()->create(['platform_package_uuid' => PlatformPackage::DEFAULT_PLATFORM_PACKAGE_1, 'app_id' => $userProfile->app_id]);
@@ -240,7 +240,7 @@ class TeamController extends Controller
 //                $password = Hash::make($request->get('password'));
                 $password = $request->get('password');
                 $email = $request->get('email') . '@' . $request->get('domain');
-                $addUser = app(UserManagerService::class)->addUser($email, $password, $request->get('first_name'), $request->get('last_name'), auth()->appId());
+                $addUser = app(UserManagerService::class)->addUser($email, $password, $request->get('first_name'), $request->get('last_name'), [Role::ROLE_USER_MEMBER], auth()->appId(), auth()->userId(), auth()->token());
                 if ($addUser) {
                     $userProfile = $this->userProfileService->findOneWhereOrFail(['email' => $email]);
                     $userProfile->userPlatformPackage()->create(['platform_package_uuid' => PlatformPackage::DEFAULT_PLATFORM_PACKAGE_1, 'app_id' => $userProfile->app_id]);
