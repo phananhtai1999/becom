@@ -15,7 +15,7 @@ use Spatie\Translatable\HasTranslations;
 class Department extends AbstractModel
 {
     use HasFactory, SoftDeletes, HasTranslations, ModelFilterNameLanguageTrait, ModelFilterExactNameLanguageTrait;
-
+    const DEFAULT_NAME = ['hr', 'marketing', 'it'];
     /**
      * @var string
      */
@@ -37,6 +37,7 @@ class Department extends AbstractModel
         'app_id',
         'manager_uuid',
         'is_default',
+        'status',
     ];
 
     /**
