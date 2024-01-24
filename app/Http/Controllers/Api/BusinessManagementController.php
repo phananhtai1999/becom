@@ -23,6 +23,7 @@ use App\Http\Resources\BusinessManagementResource;
 use App\Http\Resources\BusinessManagementResourceCollection;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
+use App\Http\Resources\DomainResourceCollection;
 use App\Http\Resources\UserBusinessResource;
 use App\Http\Resources\UserBusinessResourceCollection;
 use App\Models\BusinessManagement;
@@ -110,6 +111,7 @@ class BusinessManagementController extends AbstractRestAPIController
         $this->userBusinessResourceClass = UserBusinessResource::class;
         $this->userBusinessResourceCollectionClass = UserBusinessResourceCollection::class;
         $this->addOnResourceCollectionClass = AddOnResourceCollection::class;
+        $this->domainResourceCollectionClass = DomainResourceCollection::class;
         $this->storeRequest = BusinessManagementRequest::class;
         $this->editRequest = UpdateBusinessManagementRequest::class;
         $this->indexRequest = IndexRequest::class;
@@ -444,5 +446,18 @@ class BusinessManagementController extends AbstractRestAPIController
         }
 
         return $this->sendOkJsonResponse();
+    }
+
+    public function domainByBusiness(IndexRequest $request)
+    {
+        $business = $this->getBusiness();
+        if (!$business) {
+            return $this->sendJsonResponse(false, 'Does not have business', [], 403);
+        }
+        $domains = $this->domainService->getCollectionWithPaginationByCondition($request, ['business_uuid' => $business->uuid]);
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->domainResourceCollectionClass, $domains)
+        );
     }
 }

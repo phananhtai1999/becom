@@ -1103,6 +1103,7 @@ Route::group(['middleware' => ['apikey']], function () {
             Route::get('business/add-on-of-team/{id}', [TeamController::class, 'getAddOnOfTeam'])->name('getAddOnForTeam');
             Route::get('business/assigned-of-teams/{id}', [TeamController::class, 'assignedBusinessTeam'])->name('assignedBusinessTeam');
             Route::get('business/assigned-of-team-members/{id}', [TeamController::class, 'assignedTeamMember'])->name('assignedTeamMember');
+            Route::get('business/domains', [BusinessManagementController::class, 'domainByBusiness'])->name('domainByBusiness');
 
             Route::post('department/add-team', [TeamController::class, 'addTeamForDepartment'])->name('addTeamForDepartment');
 
