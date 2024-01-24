@@ -55,8 +55,6 @@ class MyDomainQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__' . $modelKeyName, $modelKeyName),
                 'name',
                 AllowedFilter::exact('exact__name', 'name'),
-                'verified_at',
-                AllowedFilter::exact('exact__verified_at', 'verified_at'),
                 'business_uuid',
                 AllowedFilter::exact('exact__business_uuid', 'business_uuid'),
                 'owner_uuid',
@@ -71,6 +69,13 @@ class MyDomainQueryBuilder extends AbstractQueryBuilder
                             $query->whereNotNull('domain_uuid')
                                 ->whereColumn('user_uuid', 'domains.owner_uuid');
                         });
+                    }
+                }),
+                AllowedFilter::callback('verified_at', function (Builder $query, $values) {
+                    if ($values) {
+                        $query->whereNotNull('verified_at');
+                    } else {
+                        $query->whereNull('verified_at');
                     }
                 }),
             ]);

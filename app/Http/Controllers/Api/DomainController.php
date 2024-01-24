@@ -121,9 +121,12 @@ class DomainController extends AbstractRestAPIController
      */
     public function storeMyDomain(MyDomainRequest $request)
     {
+        $business = $this->getBusiness();
+        $businessUuid = $business ? $business->uuid : null;
         $model = $this->service->create(array_merge($request->except(['active_mailbox_status']), [
             'owner_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
+            'business_uuid' => $businessUuid,
             'active_mailbox' => false,
         ]));
 

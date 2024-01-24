@@ -134,13 +134,18 @@ class ShortCodeSeeder extends Seeder
             ],
             'dimension' => [
                 'name' => 'dimension of product',
-                'key' => 'dimension_element',
-                'short_code' => 'dimension_element',
+                'key' => 'product.dimension',
+                'short_code' => 'product.dimension',
             ],
             'brand' => [
                 'name' => 'brand of product',
-                'key' => 'brand_element',
-                'short_code' => 'brand_element',
+                'key' => 'product.brand',
+                'short_code' => 'product.brand',
+            ],
+            'product.category' => [
+                'name' => 'category of product',
+                'key' => 'product.category',
+                'short_code' => 'product.category',
             ],
         ];
         $filters = [
@@ -1145,7 +1150,7 @@ class ShortCodeSeeder extends Seeder
             ],
             'brand' => [
                 [
-                    'name' => 'uuid',
+                    'name' => 'uuid of brand',
                     'key' => 'product.brand.uuid',
                     'short_code' => 'product.brand.uuid',
                 ],                [
@@ -1198,6 +1203,33 @@ class ShortCodeSeeder extends Seeder
                     'name' => 'unit_type_dimension',
                     'key' => 'product.dimension.unit_type_dimension',
                     'short_code' => 'product.dimension.unit_type_dimension',
+                ],
+            ],
+            'product.category' => [
+                [
+                    'name' => 'uuid of category',
+                    'key' => 'product.category.uuid',
+                    'short_code' => 'product.category.image',
+                ],
+                [
+                    'name' => 'image  of category',
+                    'key' => 'product.category.image',
+                    'short_code' => 'product.category.image',
+                ],
+                [
+                    'name' => 'slug  of category',
+                    'key' => 'product.category.slug',
+                    'short_code' => 'product.category.slug',
+                ],
+                [
+                    'name' => 'parent uuid  of category',
+                    'key' => 'product.category.parent_uuid',
+                    'short_code' => 'product.category.parent_uuid',
+                ],
+                [
+                    'name' => 'title  of category',
+                    'key' => 'product.category.title',
+                    'short_code' => 'product.category.title',
                 ],
             ],
 
@@ -1309,6 +1341,8 @@ class ShortCodeSeeder extends Seeder
                 $dimensionElement = WebsitePageShortCode::updateOrCreate(['key' => $element['key']], array_merge(['parent_uuids' => [$productElement->uuid]], $element));
             } elseif ($key == 'brand') {
                 $brandElement = WebsitePageShortCode::updateOrCreate(['key' => $element['key']], array_merge(['parent_uuids' => [$productElement->uuid]], $element));
+            } elseif ($key == 'product.category') {
+                $ProductCategoryElement = WebsitePageShortCode::updateOrCreate(['key' => $element['key']], array_merge(['parent_uuids' => [$productElement->uuid]], $element));
             }
         }
         $articleList->update(['parent_uuids' => [$categoryElement->uuid, $childrenCategoryElement->uuid]]);
@@ -1503,6 +1537,10 @@ class ShortCodeSeeder extends Seeder
             } elseif ($key == 'brand') {
                 foreach ($shortCode as $grandChildrenSortOrder) {
                     WebsitePageShortCode::updateOrCreate(['key' => $grandChildrenSortOrder['key']], array_merge(['parent_uuids' => [$brandElement->uuid]], $grandChildrenSortOrder));
+                }
+            } elseif ($key == 'product.category') {
+                foreach ($shortCode as $grandChildrenSortOrder) {
+                    WebsitePageShortCode::updateOrCreate(['key' => $grandChildrenSortOrder['key']], array_merge(['parent_uuids' => [$ProductCategoryElement->uuid]], $grandChildrenSortOrder));
                 }
             }
         }
