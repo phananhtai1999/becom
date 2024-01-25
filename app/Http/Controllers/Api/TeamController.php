@@ -609,11 +609,8 @@ class TeamController extends Controller
 
     public function storeBusinessTeam(BusinessTeamRequest $request)
     {
-        $department = $this->departmentService->findOrFailById($request->get('department_uuid'));
-        $location = $this->locationService->findOrFailById($department->uuid);
         $teamModel = $this->service->create(array_merge($request->all(), [
             'owner_uuid' => auth()->userId(),
-            'location_uuid' => $location->uuid,
             'app_id' => auth()->appId(),
         ]));
         if (auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {

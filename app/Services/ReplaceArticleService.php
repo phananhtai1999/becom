@@ -36,16 +36,17 @@ class ReplaceArticleService
             return $template;
         }
         $pattern = '/<article-element.*?>(.*?)<\/article-element>/s';
+        $replaceCategoryService = new ReplaceCategoryService();
 
-        return preg_replace_callback($pattern, function ($matches) use ($websitePage) {
+        return preg_replace_callback($pattern, function ($matches) use ($websitePage, $replaceCategoryService) {
             preg_match('/data-article-specific="(.*?)"/', $matches[0], $articleUuid);
-            $article = Article::find($articleUuid);
+            $article = Article::where(['uuid' => $articleUuid[1]])->first();
             if (!$article) {
                 return $matches[0];
             }
             $searchReplaceMap = $this->searchReplaceMapForArticle($article);
-
-            $matches[0] = $this->replaceRedirectTag($article, $websitePage, $matches[0]);
+            $category = $article->articleCategory;
+            $matches[0] = $replaceCategoryService->replaceCategoryInArticle($matches[0], $category);
 
             return str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $matches[0]);
         }, $specificArticleList);
