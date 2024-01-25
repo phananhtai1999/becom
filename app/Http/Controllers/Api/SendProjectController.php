@@ -10,6 +10,7 @@ use App\Http\Requests\AddChildrenProjectRequest;
 use App\Http\Requests\AssignProjectForDepartmentRequest;
 use App\Http\Requests\AssignProjectForLocationRequest;
 use App\Http\Requests\AssignProjectForTeamRequest;
+use App\Http\Requests\IndexProjectRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MySendProjectRequest;
 use App\Http\Requests\UpdateMySendProjectRequest;
@@ -64,9 +65,9 @@ class SendProjectController extends AbstractRestAPIController
         WebsiteVerificationService $websiteVerificationService,
         FileVerificationService    $fileVerificationService,
         MySendProjectService       $myService,
-        DepartmentService $departmentService,
-        LocationService $locationService,
-        CstoreService $cstoreService
+        DepartmentService          $departmentService,
+        LocationService            $locationService,
+        CstoreService              $cstoreService
     )
     {
         $this->service = $service;
@@ -102,11 +103,34 @@ class SendProjectController extends AbstractRestAPIController
         );
     }
 
-    public function indexMy(IndexRequest $request)
+    public function indexMy(IndexProjectRequest $request)
     {
-        $teams = auth()->user()->teams->pluck('uuid');
-        $teams = $teams->toArray() ?? [];
-        $models = $this->service->getMyProjectWithTeams($request, $teams);
+        if (auth()->hasRole([Role::ROLE_USER_OWNER])) {
+            $business = $this->getBusiness();
+            if ($business) {
+                $models = $this->service->getCollectionWithPaginationByCondition($request, ['business_uuid' => $business->uuid]);
+                if ($request->get('type')) {
+                    $models = $this->service->getProjectScope($request, $business);
+                }
+            } else {
+                $models = $this->service->getCollectionWithPaginationByCondition($request, ['owner_uuid' => auth()->userId()]);
+            }
+        } elseif (auth()->hasRole([Role::ROLE_USER_MANAGER])) {
+            $department = $this->departmentService->findOneWhere(['manager_uuid' => auth()->userId()]);
+            $location = $this->locationService->findOneWhere(['manager_uuid' => auth()->userId()]);
+            if ($department) {
+                $models = $this->service->getMyProjectWithDepartment($request, $department->uuid);
+            }
+
+            if ($location) {
+                $models = $this->service->getMyProjectWithDLocation($request, $location->uuid);
+            }
+        } else {
+            $teams = auth()->user()->teams->pluck('uuid');
+            $teams = $teams->toArray() ?? [];
+            $models = $this->service->getMyProjectWithTeams($request, $teams);
+        }
+
 
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
@@ -396,7 +420,8 @@ class SendProjectController extends AbstractRestAPIController
      * @param $id
      * @return JsonResponse
      */
-    public function getAssignableForTeam(IndexRequest $request, $id) {
+    public function getAssignableForTeam(IndexRequest $request, $id)
+    {
         $departments = $this->departmentService->getByTeam($id);
         $locations = $this->locationService->getByTeam($id);
         $locationUuids = $locations->pluck('uuid')->toArray();
