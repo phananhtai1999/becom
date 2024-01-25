@@ -7,6 +7,7 @@ use App\Models\QueryBuilders\WebsitePageQueryBuilder;
 use App\Models\Website;
 use App\Models\WebsitePage;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class WebsitePageService extends AbstractService
@@ -227,7 +228,7 @@ class WebsitePageService extends AbstractService
 
         $searchReplaceMap = $replaceArticleService->searchReplaceMapForArticle($article);
         $websitePage->html_template = Str::replace(array_keys($searchReplaceMap), $searchReplaceMap, $websitePage->html_template);
-        $replaceCategoryService->replaceCategoryInArticle($websitePage->html_template, $category);
+        $websitePage->html_template = $replaceCategoryService->replaceCategoryInArticle($websitePage->html_template, $category);
 
         return $websitePage;
     }

@@ -44,12 +44,13 @@ class ReplaceArticleService
             if (!$article) {
                 return $matches[0];
             }
+
             $searchReplaceMap = $this->searchReplaceMapForArticle($article);
             $category = $article->articleCategory;
             $matches[0] = $replaceCategoryService->replaceCategoryInArticle($matches[0], $category);
 
             return str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $matches[0]);
-        }, $specificArticleList);
+        }, $template);
     }
 
     public function replaceListArticleForPageHome($template, $websitePage) {
