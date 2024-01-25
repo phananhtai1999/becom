@@ -106,10 +106,11 @@ class SendProjectService extends AbstractService
             ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
     }
 
-    public function getProjectScope($request)
+    public function getProjectScope($request, $business)
     {
         $indexRequest = $this->getIndexRequest($request);
-        $query = SendProjectQueryBuilder::searchQuery($indexRequest['search'], $indexRequest['search_by']);
+        $query = SendProjectQueryBuilder::searchQuery($indexRequest['search'], $indexRequest['search_by'])
+            ->where(['business_uuid' => $business->uuid]);
         if ($request->get('condition') == 'or') {
             if (isset($request->get('type')['departments'])) {
                 $departmentUuids = array_values($request->get('type')['departments']);

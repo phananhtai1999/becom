@@ -37,7 +37,6 @@ class IndexProjectRequest extends AbstractRequest
             'search_by' => ['array'],
             'search_by.*' => ['nullable', 'string'],
             'type' => ['array'],
-            'type.*' => [Rule::in(['departments', 'locations', 'teams'])],
         ];
     }
 }

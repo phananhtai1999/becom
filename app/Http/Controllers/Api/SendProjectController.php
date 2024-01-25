@@ -110,7 +110,7 @@ class SendProjectController extends AbstractRestAPIController
             if ($business) {
                 $models = $this->service->getCollectionWithPaginationByCondition($request, ['business_uuid' => $business->uuid]);
                 if ($request->get('type')) {
-                    $models = $this->service->getProjectScope($request);
+                    $models = $this->service->getProjectScope($request, $business);
                 }
             } else {
                 $models = $this->service->getCollectionWithPaginationByCondition($request, ['owner_uuid' => auth()->userId()]);
