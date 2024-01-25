@@ -227,7 +227,6 @@ class WebsitePageService extends AbstractService
 
         $searchReplaceMap = $replaceArticleService->searchReplaceMapForArticle($article);
         $websitePage->html_template = Str::replace(array_keys($searchReplaceMap), $searchReplaceMap, $websitePage->html_template);
-        $websitePage->html_template = $replaceArticleService->replaceRedirectTag($article, $websitePage, $websitePage->html_template);
         $replaceCategoryService->replaceCategoryInArticle($websitePage->html_template, $category);
 
         return $websitePage;
