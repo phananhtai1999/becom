@@ -37,6 +37,9 @@ class IndexProjectRequest extends AbstractRequest
             'search_by' => ['array'],
             'search_by.*' => ['nullable', 'string'],
             'type' => ['array'],
+            'type.departments.*' => ['exists:departments,uuid'],
+            'type.locations.*' => ['exists:locations,uuid'],
+            'type.teams.*' => ['exists:teams,uuid'],
         ];
     }
 }
