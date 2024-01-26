@@ -39,7 +39,12 @@ class GetBusinessMemberRequest extends AbstractRequest
             'search' =>  ['nullable', 'string'],
             'search_by' => ['array'],
             'search_by.*' => ['nullable', 'string'],
-            'exclude_team_uuid' => ['integer', 'exists:teams,uuid']
+            'exclude_team_uuid' => ['integer', 'exists:teams,uuid'],
+            'type' => ['array'],
+            'type.departments.*' => ['exists:departments,uuid'],
+            'type.locations.*' => ['exists:locations,uuid'],
+            'type.teams.*' => ['exists:teams,uuid'],
+
         ];
         if (auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             $validates['business_uuid'] = ['required', 'integer', Rule::exists('business_managements', 'uuid')->whereNull('deleted_at')];
