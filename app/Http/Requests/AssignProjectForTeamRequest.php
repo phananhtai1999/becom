@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
+use App\Models\SendProject;
 use App\Rules\CheckTeamBeLongToBusinessRule;
 use App\Rules\TeamsBelongToSameBusinessRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -33,7 +34,8 @@ class AssignProjectForTeamRequest extends AbstractRequest
                     ->whereNull('deleted_at');
             })],
             'team_uuids' => ['required', 'array'],
-            'team_uuids.*' => ['required', 'integer', 'exists:teams,uuid', new CheckTeamBeLongToBusinessRule()]
+            'team_uuids.*' => ['required', 'integer', 'exists:teams,uuid', new CheckTeamBeLongToBusinessRule()],
+            'status' => ['string', Rule::in([SendProject::STATUS_PRIVATE, SendProject::STATUS_PROTECTED])]
         ];
     }
 }

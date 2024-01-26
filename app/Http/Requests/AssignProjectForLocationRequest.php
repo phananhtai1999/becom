@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
+use App\Models\SendProject;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -31,7 +32,8 @@ class AssignProjectForLocationRequest extends AbstractRequest
                     ->whereNull('deleted_at');
             })],
             'location_uuids' => ['required', 'array'],
-            'location_uuids.*' => ['required', 'integer', 'exists:locations,uuid']
+            'location_uuids.*' => ['required', 'integer', 'exists:locations,uuid'],
+            'status' => ['string', Rule::in([SendProject::STATUS_PRIVATE, SendProject::STATUS_PROTECTED])]
         ];
     }
 }

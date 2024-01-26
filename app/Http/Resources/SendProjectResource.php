@@ -28,6 +28,7 @@ class SendProjectResource extends AbstractJsonResource
             'description' => $this->description,
             'logo' => $this->logo,
             'parent_uuid' => $this->parent_uuid,
+            'status' => $this->status,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
