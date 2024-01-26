@@ -34,6 +34,7 @@ class SendProjectQueryBuilder extends AbstractQueryBuilder
                 'description',
                 'logo',
                 'business_uuid',
+                'status',
                 'parent_uuid',
                 'domain_uuid'
             ])
@@ -45,6 +46,7 @@ class SendProjectQueryBuilder extends AbstractQueryBuilder
                 'description',
                 'logo',
                 'business_uuid',
+                'status',
                 'parent_uuid',
                 'domain_uuid'
             ])
@@ -65,6 +67,8 @@ class SendProjectQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__domain_uuid', 'domain_uuid'),
                 'parent_uuid',
                 AllowedFilter::exact('exact__parent_uuid', 'parent_uuid'),
+                'status',
+                AllowedFilter::exact('exact_status', 'status'),
                 'user.username',
                 AllowedFilter::exact('exact__user.username', 'user.username'),
                 'user.email',

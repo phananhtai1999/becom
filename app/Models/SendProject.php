@@ -14,7 +14,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class SendProject extends AbstractModel
 {
     use HasFactory, SoftDeletes, ModelFilterFieldTrait, ModelFilterExactFieldTrait;
-
+    const STATUS_PUBLIC = 'public';
+    const STATUS_PROTECTED = 'protected';
+    const STATUS_PRIVATE = 'private';
     /**
      * @var string
      */
@@ -36,6 +38,7 @@ class SendProject extends AbstractModel
         'domain_uuid',
         'app_id',
         'parent_uuid',
+        'status',
         'business_uuid'
     ];
 

@@ -60,19 +60,32 @@ class SendProjectService extends AbstractService
         })->get();
     }
 
-    public function getMyProjectWithTeams($request, $teams)
+    public function getMyProjectWithTeams($request, $teams, $departmentUuid, $location, $businessUuid = null)
     {
-
         $indexRequest = $this->getIndexRequest($request);
 
         return SendProjectQueryBuilder::searchQuery($indexRequest['search'], $indexRequest['search_by'])
-            ->where(function ($query) use ($teams) {
-                $query->where('user_uuid', auth()->userId())
-                    ->orWhereHas('teams', function ($q) use ($teams) {
+            ->where(function ($query) use ($teams, $departmentUuid, $businessUuid, $location) {
+                $query = $query->orWhereHas('teams', function ($q) use ($teams) {
                         $q->whereIn('teams.uuid', $teams);
+                    })
+                    ->orWhereHas('departments', function ($q) use ($departmentUuid) {
+                        $q->whereIn('departments.uuid', [])
+                        ->where(['send_projects.status' => SendProject::STATUS_PROTECTED]);
+                    })
+                    ->orWhereHas('locations', function ($q) use ($location) {
+                        $q->whereIn('locations.uuid', $location)
+                            ->where(['send_projects.status' => SendProject::STATUS_PROTECTED]);
                     });
-            })
-            ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
+
+                if (!empty($businessUuid)) {
+                    $query->orWhereHas('business', function ($q) use ($businessUuid) {
+                        $q->where('business_managements.uuid', $businessUuid)
+                            ->where(['status' => SendProject::STATUS_PROTECTED]);
+                    });
+                }
+
+            })->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
     }
 
     public function showMyWebsite($id)
@@ -95,15 +108,31 @@ class SendProjectService extends AbstractService
         return $this->destroy($website->getKey());
     }
 
-    public function getMyProjectWithDepartment($request, $departmentUuid)
+    public function getMyProjectWithDepartment($request, $departmentUuid, $businessUuid, $locationUuid, $teamOfDepartment)
     {
         $indexRequest = $this->getIndexRequest($request);
 
-        return SendProjectQueryBuilder::searchQuery($indexRequest['search'], $indexRequest['search_by'])
+        $query = SendProjectQueryBuilder::searchQuery($indexRequest['search'], $indexRequest['search_by'])
             ->whereHas('departments', function ($q) use ($departmentUuid) {
                 $q->where('departments.uuid', $departmentUuid);
             })
-            ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
+            ->orWhereHas('teams', function ($q) use ($teamOfDepartment) {
+                $q->whereIn('teams.uuid', $teamOfDepartment);
+            });
+        if (!empty($businessUuid)) {
+            $query = $query->orWhereHas('business', function ($q) use ($businessUuid) {
+                $q->where('business_managements.uuid', $businessUuid)
+                    ->where(['status' => SendProject::STATUS_PROTECTED]);
+            });
+        }
+
+        if (!empty($locationUuid)) {
+            $query = $query->orWhereHas('locations', function ($q) use ($businessUuid) {
+                $q->where('locations.uuid', $businessUuid)
+                    ->where(['status' => SendProject::STATUS_PROTECTED]);
+            });
+        }
+        return $query->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
     }
 
     public function getProjectScope($request, $business)
@@ -167,13 +196,24 @@ class SendProjectService extends AbstractService
         return $query->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
     }
 
-    public function getMyProjectWithDLocation($request, $uuid)
+    public function getMyProjectWithDLocation($request, $uuid, $businessUuid, $departmentOfLocation, $teamOfLocation)
     {
         $indexRequest = $this->getIndexRequest($request);
 
         return SendProjectQueryBuilder::searchQuery($indexRequest['search'], $indexRequest['search_by'])
             ->whereHas('locations', function ($q) use ($uuid) {
                 $q->where('locations.uuid', $uuid);
+            })
+            ->orWhereHas('departments', function ($q) use ($departmentOfLocation) {
+                $q->whereIn('departments.uuid', $departmentOfLocation);
+            })
+            ->orWhereHas('teams', function ($q) use ($teamOfLocation) {
+                $q->whereIn('teams.uuid', $teamOfLocation);
+            })
+            ->orWhereHas('business', function ($q) use ($businessUuid) {
+                $q->where('business_managements.uuid', $businessUuid)
+                    ->where(['status' => SendProject::STATUS_PROTECTED]);
+
             })
             ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
     }

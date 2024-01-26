@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
+use App\Models\SendProject;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -31,7 +32,8 @@ class AssignProjectForDepartmentRequest extends AbstractRequest
                     ->whereNull('deleted_at');
             })],
             'department_uuids' => ['required', 'array'],
-            'department_uuids.*' => ['required', 'integer', 'exists:departments,uuid']
+            'department_uuids.*' => ['required', 'integer', 'exists:departments,uuid'],
+            'status' => ['string', Rule::in([SendProject::STATUS_PRIVATE, SendProject::STATUS_PROTECTED])]
         ];
     }
 }

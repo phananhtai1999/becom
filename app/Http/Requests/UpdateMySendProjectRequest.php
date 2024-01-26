@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
+use App\Models\SendProject;
 use Illuminate\Validation\Rule;
 
 class UpdateMySendProjectRequest extends AbstractRequest
@@ -47,6 +48,7 @@ class UpdateMySendProjectRequest extends AbstractRequest
                     ->whereNull('deleted_at');
             })],
             'parent_uuid' => ['numeric', 'exists:send_projects,uuid'],
+            'status' => ['string', Rule::in([SendProject::STATUS_PRIVATE, SendProject::STATUS_PROTECTED, SendProject::STATUS_PUBLIC])]
         ];
     }
 }

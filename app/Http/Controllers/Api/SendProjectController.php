@@ -119,18 +119,48 @@ class SendProjectController extends AbstractRestAPIController
             $department = $this->departmentService->findOneWhere(['manager_uuid' => auth()->userId()]);
             $location = $this->locationService->findOneWhere(['manager_uuid' => auth()->userId()]);
             if ($department) {
-                $models = $this->service->getMyProjectWithDepartment($request, $department->uuid);
+                $teamOfDepartment = $department->teams->pluck('uuid')->toArray() ?? [];
+                if (!empty($department->location)) {
+                    $locationUuid = $department->location->uuid;
+                    $businessUuid = $department->location->business_uuid;
+                }
+                $models = $this->service->getMyProjectWithDepartment($request, $department->uuid, $businessUuid ?? null, $locationUuid ?? null, $teamOfDepartment);
             }
 
             if ($location) {
-                $models = $this->service->getMyProjectWithDLocation($request, $location->uuid);
+                $departmentOfLocation = $location->departments->pluck('uuid')->toArray() ?? [];
+                if (!empty($departmentOfLocation)) {
+                    $teams = [];
+                    foreach ($location->departments as $department) {
+                        if (!empty($department->teams->toArray())) {
+                            $teams[] = $department->teams->pluck('uuid')->toArray();
+                        }
+                    }
+                }
+
+                $models = $this->service->getMyProjectWithDLocation($request, $location->uuid, $location->business_uuid, $departmentOfLocation, $teams ?? []);
             }
         } else {
             $teams = auth()->user()->teams->pluck('uuid');
-            $teams = $teams->toArray() ?? [];
-            $models = $this->service->getMyProjectWithTeams($request, $teams);
-        }
+            $departments = [];
+            $locations = [];
+            if ($teams){
+                $teams = $teams->toArray() ?? [];
+                foreach (auth()->user()->teams as $team) {
+                    if (!empty($team->department)) {
+                        $department = $team->department;
+                        $departments[] = $department->uuid;
+                        if (!empty($department->location)) {
+                            $location = $department->location;
+                            $locations[] = $location->uuid;
+                            $business = $location->business_uuid;
+                        }
+                    }
+                }
+            }
 
+            $models = $this->service->getMyProjectWithTeams($request, $teams, $departments, $locations, $business ?? null);
+        }
 
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
@@ -340,7 +370,13 @@ class SendProjectController extends AbstractRestAPIController
             return $this->sendJsonResponse(false, 'You do not have access', [], 403);
         }
         $sendProject = $this->service->findOrFailById($request->get('send_project_uuid'));
-        $sendProject->teams()->syncWithoutDetaching($request->get('team_uuids', []));
+        $childProject = $this->service->create(array_merge($sendProject->toArray(),
+            [
+                'parent_uuid' => $sendProject->uuid,
+                'status' => $request->get('status', $sendProject->status)
+            ]
+        ));
+        $childProject->teams()->syncWithoutDetaching($request->get('team_uuids', []));
 
         return $this->sendOkJsonResponse();
     }
@@ -364,7 +400,13 @@ class SendProjectController extends AbstractRestAPIController
             return $this->sendJsonResponse(false, 'You do not have access', [], 403);
         }
         $sendProject = $this->service->findOrFailById($request->get('send_project_uuid'));
-        $sendProject->departments()->syncWithoutDetaching($request->get('department_uuids', []));
+        $childProject = $this->service->create(array_merge($sendProject->toArray(),
+            [
+                'parent_uuid' => $sendProject->uuid,
+                'status' => $request->get('status', $sendProject->status)
+            ]
+        ));
+        $childProject->departments()->syncWithoutDetaching($request->get('department_uuids', []));
 
         return $this->sendOkJsonResponse();
     }
@@ -388,7 +430,13 @@ class SendProjectController extends AbstractRestAPIController
             return $this->sendJsonResponse(false, 'You do not have access', [], 403);
         }
         $sendProject = $this->service->findOrFailById($request->get('send_project_uuid'));
-        $sendProject->locations()->syncWithoutDetaching($request->get('location_uuids', []));
+        $childProject = $this->service->create(array_merge($sendProject->toArray(),
+            [
+                'parent_uuid' => $sendProject->uuid,
+                'status' => $request->get('status', $sendProject->status)
+            ]
+        ));
+        $childProject->locations()->syncWithoutDetaching($request->get('location_uuids', []));
 
         return $this->sendOkJsonResponse();
     }
