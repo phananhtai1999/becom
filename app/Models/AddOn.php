@@ -37,7 +37,8 @@ class AddOn extends Model
         'description',
         'thumbnail',
         'status',
-        'payment_product_id'
+        'payment_product_id',
+        'platform_package_uuid'
     ];
 
     /**
@@ -80,5 +81,9 @@ class AddOn extends Model
         $userUuidInBusiness = BusinessManagement::findOrFail($businessUuid)->userBusiness->pluck('user_uuid')->toArray();
 
         return $this->userTeams->whereIn('user_uuid', $userUuidInBusiness);
+    }
+
+    public function platformPackage() {
+        return $this->belongsTo(PlatformPackage::class, 'platform_package_uuid', 'uuid');
     }
 }

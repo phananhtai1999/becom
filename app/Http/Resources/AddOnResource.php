@@ -25,6 +25,7 @@ class AddOnResource extends JsonResource
             'thumbnail' => $this->thumbnail,
             'payment_product_id' => $this->payment_product_id,
             'status' => $this->status,
+            'platform_package_uuid' => $this->platform_package_uuid,
             'monthly' => $this->monthly,
             'yearly' => $this->yearly
         ];
@@ -45,6 +46,10 @@ class AddOnResource extends JsonResource
 
         if (\in_array('add_on__members_in_business', $expand)) {
             $data['members'] = UserTeamResource::collection($this->inBusiness());
+        }
+
+        if (\in_array('add_on__platform_package', $expand)) {
+            $data['platform_package'] = new PlatformPackageResource($this->platformPackage);
         }
         return $data;
     }
