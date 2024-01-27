@@ -27,7 +27,9 @@ class UpdateUnpublishedSectionTemplateRequest extends AbstractRequest
     {
         return [
             'title' => ['string'],
-            'template' => ['string'],
+            'html_template' => ['string'],
+            'css_template' => ['string'],
+            'js_template' => ['string'],
             'template_json' => ['string'],
             'section_category_uuid' => ['numeric', Rule::exists('section_categories','uuid')->whereNull('deleted_at')],
             'is_default' => ['boolean'],

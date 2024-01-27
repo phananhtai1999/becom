@@ -27,13 +27,14 @@ class UpdateWebsitePageRequest extends AbstractRequest
      */
     public function rules()
     {
-        return [
+        $validate = [
             'title' => ['string'],
             'slug' => ['string'],
             'html_template' => ['string'],
             'css_template' => ['string'],
             'js_template' => ['string'],
             'template_json' => ['string'],
+            'menu_level' => ['integer'],
             'website_page_category_uuid' => ['numeric', Rule::exists('website_page_categories','uuid')->whereNull('deleted_at')],
             'type' => ['string', Rule::in(WebsitePage::STATIC_TYPE,WebsitePage::ARTICLE_DETAIL_TYPE, WebsitePage::ARTICLE_CATEGORY_TYPE, WebsitePage::HOME_ARTICLES_TYPE)],
             'publish_status' => ['numeric', 'min:1', 'max:4'],
@@ -45,5 +46,11 @@ class UpdateWebsitePageRequest extends AbstractRequest
             'description' => ['nullable', 'array', new CustomDescriptionRule($this->id, $this->request->get('keyword'), $this->request->get('description'), 'website_page')],
             'description.*' => ['nullable', 'string', 'not_in:0'],
         ];
+
+        if ($this->request->get('type') == WebsitePage::NEWS_HEADER_TYPE || $this->request->get('type') == WebsitePage::PRODUCT_HEADER_TYPE) {
+            $validate['menu_level'] = array_merge($validate['menu_level'], ['required']);
+        }
+
+        return $validate;
     }
 }

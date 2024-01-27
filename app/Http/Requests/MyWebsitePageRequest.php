@@ -27,12 +27,13 @@ class MyWebsitePageRequest extends AbstractRequest
     {
         $website = new WebsitePage();
 
-        return [
+        $validate = [
             'title' => ['required', 'string'],
             'slug' => ['nullable', 'string'],
             'html_template' => ['required', 'string'],
             'css_template' => ['required', 'string'],
             'js_template' => ['required', 'string'],
+            'menu_level' => ['integer'],
             'template_json' => ['required', 'string'],
             'type' => ['required', 'string', Rule::in(
                 $website->getTypeWebsitePage()
@@ -48,5 +49,10 @@ class MyWebsitePageRequest extends AbstractRequest
             'description.en' => ['required_with:description', 'string', 'not_in:0'],
             'description.*' => ['required_with:description', 'string'],
         ];
+        if ($this->request->get('type') == WebsitePage::NEWS_HEADER_TYPE || $this->request->get('type') == WebsitePage::PRODUCT_HEADER_TYPE) {
+            $validate['menu_level'] = array_merge($validate['menu_level'], ['required']);
+        }
+
+        return $validate;
     }
 }
