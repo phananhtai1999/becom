@@ -36,6 +36,7 @@ class AddOnQueryBuilder extends AbstractQueryBuilder
                 'thumbnail',
                 'status',
                 'price',
+                'platform_package_uuid',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -44,7 +45,8 @@ class AddOnQueryBuilder extends AbstractQueryBuilder
                 'description',
                 'thumbnail',
                 'status',
-                'price'
+                'price',
+                'platform_package_uuid',
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -59,6 +61,8 @@ class AddOnQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__status', 'status'),
                 'price',
                 AllowedFilter::exact('exact__price', 'price'),
+                'platform_package_uuid',
+                AllowedFilter::exact('exact__platform_package_uuid', 'platform_package_uuid'),
             ]);
 
     }
