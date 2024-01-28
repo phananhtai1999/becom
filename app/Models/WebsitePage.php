@@ -67,6 +67,7 @@ class WebsitePage extends AbstractModel
         'feature_image',
         'slug',
         'app_id',
+        'menu_level',
     ];
 
     /**

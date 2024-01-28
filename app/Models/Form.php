@@ -31,7 +31,9 @@ class Form extends AbstractModel
      */
     protected $fillable = [
         'title',
-        'template',
+        'html_template',
+        'css_template',
+        'js_template',
         'template_json',
         'contact_list_uuid',
         'user_uuid',

@@ -36,7 +36,10 @@ class FormQueryBuilder extends AbstractQueryBuilder
                 'template_json',
                 'publish_status',
                 'display_type',
-                'reject_reason'
+                'reject_reason',
+                'html_template',
+                'css_template',
+                'js_template',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -48,7 +51,10 @@ class FormQueryBuilder extends AbstractQueryBuilder
                 'template_json',
                 'publish_status',
                 'display_type',
-                'reject_reason'
+                'reject_reason',
+                'html_template',
+                'css_template',
+                'js_template',
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -75,6 +81,12 @@ class FormQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__reject_reason', 'reject_reason'),
                 'display_type',
                 AllowedFilter::exact('exact__display_type', 'display_type'),
+                'html_template',
+                AllowedFilter::exact('exact__html_template', 'html_template'),
+                'css_template',
+                AllowedFilter::exact('exact__css_template', 'css_template'),
+                'js_template',
+                AllowedFilter::exact('exact__js_template', 'js_template'),
             ]);
     }
 
