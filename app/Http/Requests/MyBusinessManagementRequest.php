@@ -45,10 +45,7 @@ class MyBusinessManagementRequest extends AbstractRequest
             'domain' => ['required', 'string', 'regex:/^(?!(www|http|https)\.)\w+(\.\w+)+$/'],
             'avatar' => ['required', 'string'],
             'slogan' => ['required', 'string'],
-//            'access_key' => ['required', 'string'],
-//            'secret_access_key' => ['required', 'string'],
-//            'default_region' => ['required', 'string'],
-//            'bucket' => ['required', 'string'],
+            's3_option' => ['nullable', 'boolean']
         ];
 
         if (is_array($this->request->get('products_services'))) {
@@ -57,6 +54,13 @@ class MyBusinessManagementRequest extends AbstractRequest
                     $validate["products_services.$key"] = ['in:products,services'];
                 }
             }
+        }
+
+        if ($this->request->get('s3_option')){
+            $validate['access_key'] = ['required', 'string'];
+            $validate['secret_access_key'] = ['required', 'string'];
+            $validate['default_region'] = ['required', 'string'];
+            $validate['bucket'] = ['required', 'string'];
         }
 
         return $validate;
