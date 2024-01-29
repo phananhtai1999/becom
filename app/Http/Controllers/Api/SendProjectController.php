@@ -475,7 +475,7 @@ class SendProjectController extends AbstractRestAPIController
 
             $this->cstoreService->storeFolderByType($childProject->name, $childProject->uuid, BusinessManagement::PROJECT_ENTITY, $locationUuid, BusinessManagement::LOCATION_ENTITY);
 
-            $childProject->departments()->syncWithoutDetaching([$locationUuid]);
+            $childProject->locations()->syncWithoutDetaching([$locationUuid]);
         }
 //        $childProject = $this->service->create(array_merge($sendProject->toArray(),
 //            [
