@@ -272,4 +272,12 @@ class SectionTemplateController extends AbstractRestAPIController
         );
     }
 
+    public function getHeader($id)
+    {
+        $sectionHeader = $this->service->findOneWhereOrFail([['uuid', $id]]);
+        $sectionHeader = $this->service->renderContentForHeader($sectionHeader);
+
+        return $this->sendOkJsonResponse(['data' => $sectionHeader]);
+    }
+
 }

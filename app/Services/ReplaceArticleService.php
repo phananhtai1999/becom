@@ -37,9 +37,11 @@ class ReplaceArticleService
         }
         $pattern = '/<article-element.*?>(.*?)<\/article-element>/s';
         $replaceCategoryService = new ReplaceCategoryService();
-
         return preg_replace_callback($pattern, function ($matches) use ($websitePage, $replaceCategoryService) {
             preg_match('/data-article-specific="(.*?)"/', $matches[0], $articleUuid);
+            if (!$articleUuid) {
+                return $matches[0];
+            }
             $article = Article::where(['uuid' => $articleUuid[1]])->first();
             if (!$article) {
                 return $matches[0];
@@ -50,7 +52,7 @@ class ReplaceArticleService
             $matches[0] = $replaceCategoryService->replaceCategoryInArticle($matches[0], $category);
 
             return str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $matches[0]);
-        }, $template);
+        }, $specificArticleList[0]);
     }
 
     public function replaceListArticleForPageHome($template, $websitePage) {
