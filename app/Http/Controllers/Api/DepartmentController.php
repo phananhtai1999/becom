@@ -12,6 +12,7 @@ use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyDepartmentRequest;
 use App\Http\Requests\OptionDeleteBusinuessRequest;
 use App\Http\Requests\RemoveTeamFromDepartmentRequest;
+use App\Http\Requests\SetAppForDepartmentRequest;
 use App\Http\Requests\UpdateDepartmentRequest;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
@@ -288,6 +289,24 @@ class DepartmentController extends AbstractRestAPIController
     {
         $model = $this->service->findOrFailById($id);
         $model->update(['status' => !$model->status]);
+
+        return $this->sendOkJsonResponse();
+    }
+
+    public function setAppForDepartment(SetAppForDepartmentRequest $request)
+    {
+        $business = $this->getBusiness();
+        if (!$business) {
+            return $this->sendJsonResponse(false, __('business.not_business'), [], 403);
+        }
+        foreach ($request->get('department_uuids') as $departmentUuid) {
+            $department = $this->service->findOrFailById($departmentUuid);
+            if ($request->get('type', 'assign') === 'assign') {
+                $department->platformPackage()->syncWithoutDetaching($request->get('app_uuids'), []);
+            } else {
+                $department->platformPackage()->detach($request->get('app_uuids'), []);
+            }
+        }
 
         return $this->sendOkJsonResponse();
     }

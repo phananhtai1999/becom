@@ -944,6 +944,7 @@ Route::group(['middleware' => ['apikey']], function () {
             Route::post('business/add-department', [DepartmentController::class, 'addDepartmentForBusiness'])->name('addDepartmentForBusiness');
             Route::post('location/add-department', [DepartmentController::class, 'addDepartmentForLocation'])->name('addDepartmentForLocation');
             Route::get('toggle-default-department/{id}', [DepartmentController::class, 'toggleDefaultDepartment'])->name('toggleDefaultDepartment');
+            Route::post('assign-app-for-department', [DepartmentController::class, 'setAppForDepartment'])->name('setAppForDepartment');
         });
         Route::group(['middleware' => ['userid'], 'as' => 'shop.'], function () {
                 Route::get('/my/products', [ShopController::class, 'myProduct'])->name('myProduct');
