@@ -111,4 +111,8 @@ class Department extends AbstractModel
         return $this->belongsToMany(SendProject::class, 'department_send_project', 'department_uuid', 'send_project_uuid')->withTimestamps();
     }
 
+    public function platformPackage() {
+        return $this->belongsToMany(PlatformPackage::class, 'department_app', 'department_uuid', 'app_uuid');
+    }
+
 }
