@@ -160,7 +160,7 @@ class SectionTemplateService extends AbstractService
         $section->html_template = $replaceCategoryService->replaceListCategoryMenu($section->html_template);
 
         $replaceProductCategoryService = new ReplaceProductCategoryService();
-        $section->html_template = $replaceProductCategoryService->replaceListProductCategoryMenu($section->template);
+        $section->html_template = $replaceProductCategoryService->replaceListProductCategoryMenu($section->html_template);
 
         return $section;
     }

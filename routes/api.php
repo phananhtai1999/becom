@@ -769,6 +769,7 @@ Route::group(['middleware' => ['apikey']], function () {
 
             Route::get('/section-templates-default', [SectionTemplateController::class, 'getSectionTemplatesDefault'])->name('getWebsitePagesDefault');
             Route::get('/section-template-default/{id}', [SectionTemplateController::class, 'showSectionTemplateDefault'])->name('showSectionTemplateDefault');
+            Route::get('/section-template-header/{id}', [SectionTemplateController::class, 'getHeader'])->name('getHeader');
         });
 
 //Form
