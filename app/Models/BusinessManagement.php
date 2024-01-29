@@ -14,6 +14,12 @@ class BusinessManagement extends AbstractModel
 
     const DEPARTMENT_ENTITY = 'department';
     const LOCATION_ENTITY = 'location';
+    const BUSINESS_ENTITY = 'business';
+    const TEAM_ENTITY = 'team';
+    const USER_ENTITY = 'user';
+    const PROJECT_ENTITY = 'project';
+
+
 
     /**
      * @var string
