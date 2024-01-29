@@ -153,4 +153,15 @@ class SectionTemplateService extends AbstractService
             ->whereIn('uuid', $isCanUseSectionTemplates)
             ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
     }
+
+    public function renderContentForHeader($section)
+    {
+        $replaceCategoryService = new ReplaceCategoryService();
+        $section->html_template = $replaceCategoryService->replaceListCategoryMenu($section->html_template);
+
+        $replaceProductCategoryService = new ReplaceProductCategoryService();
+        $section->html_template = $replaceProductCategoryService->replaceListProductCategoryMenu($section->template);
+
+        return $section;
+    }
 }

@@ -25,6 +25,8 @@ class SectionTemplateResource extends AbstractJsonResource
             'type' => $this->type,
             'html_template' => $this->html_template,
             'css_template' => $this->css_template,
+            'display_mode' => $this->display_mode,
+            'menu_level' => $this->menu_level,
             'js_template' => $this->js_template,
             'is_default' => $this->is_default,
             'template_json' => $this->template_json,
