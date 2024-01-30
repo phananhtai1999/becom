@@ -108,6 +108,7 @@ Route::group(['as' => 'auth.'], function () {
 
 // Mail Open Tracking
 Route::get('/mail-open-tracking/{id}', [MailSendingHistoryController::class, 'mailOpenTracking'])->name('mail-open-tracking');
+Route::get('cstge/my/send-projects', [SendProjectController::class, 'indexMyCstge'])->name('indexMyCstge')->middleware('app_to_app');
 
 Route::group(['middleware' => ['apikey']], function () {
     Route::group(['middleware' => ['appid'], 'as' => 'appid.'], function () {
