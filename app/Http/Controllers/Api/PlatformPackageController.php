@@ -57,7 +57,7 @@ class PlatformPackageController extends AbstractRestAPIController
             'monthly' => $request->get('monthly'),
             'yearly' => $request->get('yearly')
         ]);
-        $model->permissions()->attach($request->get('permission_uuid'));
+        $model->groupApis()->syncWithoutDetaching($request->get('group_api_uuids'));
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -111,7 +111,13 @@ class PlatformPackageController extends AbstractRestAPIController
         if ($platformPackage->status == PlatformPackage::PLATFORM_PACKAGE_PUBLISH) {
             return $this->sendJsonResponse(false, 'Can not edit this platform', [], 403);
         }
-        $this->service->update($platformPackage, array_merge($request->all(), ['uuid' => $request->get('name')]));
+        $data = $request->all();
+        if ($request->get('name')) {
+            $data = array_merge($request->all(), ['uuid' => $request->get('name')]);
+        }
+        $this->service->update($platformPackage, $data);
+        $platformPackage->groupApis()->syncWithoutDetaching($request->get('group_api_uuids'));
+
         Cache::flush();
 
         return $this->sendCreatedJsonResponse(

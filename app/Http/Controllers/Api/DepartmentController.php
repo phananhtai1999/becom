@@ -295,9 +295,9 @@ class DepartmentController extends AbstractRestAPIController
         foreach ($request->get('department_uuids') as $departmentUuid) {
             $department = $this->service->findOrFailById($departmentUuid);
             if ($request->get('type', 'assign') === 'assign') {
-                $department->platformPackage()->syncWithoutDetaching($request->get('app_uuids'), []);
+                $department->app()->syncWithoutDetaching($request->get('app_uuids'), []);
             } else {
-                $department->platformPackage()->detach($request->get('app_uuids'), []);
+                $department->app()->detach($request->get('app_uuids'), []);
             }
         }
 

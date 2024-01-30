@@ -6,6 +6,7 @@ use Techup\ApiConfig\Services\ConfigService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Techup\ApiList\Models\GroupApiList;
 
 class AddOn extends Model
 {
@@ -56,6 +57,11 @@ class AddOn extends Model
         return $this->belongsToMany(Permission::class, 'add_on_permissions', 'add_on_uuid', 'permission_uuid');
     }
 
+    public function groupApis()
+    {
+        return $this->belongsToMany(GroupApiList::class, 'add_on_group_api', 'add_on_uuid', 'group_api_uuid');
+    }
+
     public function addOnSubscriptionPlans()
     {
         return $this->hasMany(AddOnSubscriptionPlan::class, 'add_on_uuid', 'uuid');
@@ -83,7 +89,7 @@ class AddOn extends Model
         return $this->userTeams->whereIn('user_uuid', $userUuidInBusiness);
     }
 
-    public function platformPackage() {
+    public function app() {
         return $this->belongsTo(PlatformPackage::class, 'platform_package_uuid', 'uuid');
     }
 }
