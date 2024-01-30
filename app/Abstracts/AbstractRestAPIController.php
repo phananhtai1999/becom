@@ -324,4 +324,15 @@ class AbstractRestAPIController extends BaseController
 
         return false;
     }
+
+    public function getCstgeBusiness()
+    {
+        $businesses = auth('app_to_app')->user()->businessManagements;
+        if ($businesses->toArray()) {
+
+            return $businesses->first();
+        }
+
+        return false;
+    }
 }
