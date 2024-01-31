@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\AddOn;
 use App\Models\Permission;
 use App\Models\PlatformPackage;
 use App\Services\UserProfileService;
@@ -14,6 +15,7 @@ use App\Services\UserService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Techup\ApiList\Models\GroupApiList;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -45,26 +47,22 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         Gate::define('permission', function ($user, $code) {
+            Cache::flush();
             $user = app(UserProfileService::class)->findOneWhereOrFail(['user_uuid' => auth()->userId(), 'app_id' => \auth()->appId()]);
             if (!isset($user->userPlatformPackage->platform_package_uuid) && !isset($user->userAddOns) && !isset($user->userTeam->permission_uuids)) {
                 return false;
             }
-
             //check team leader
             if (isset($user->userTeam) && $user->userTeam->team->leader_uuid == auth()->userId()) {
                 $cacheTeamLeaderAddOns = Cache::rememberForever('team_leader_add_on_permission_' . auth()->userId(), function () use ($user) {
                     $permissions = [];
                     foreach ($user->userTeam->team->addOns as $addOn) {
-                        $permissions[] = $addOn->permissions ?? [];
+                        $permissions = array_merge($permissions, $addOn->groupApis()->pluck('code')->toArray() ?? []);
                     }
                     return $permissions;
                 });
-                foreach ($cacheTeamLeaderAddOns as $permissions) {
-                    foreach ($permissions as $permission) {
-                        if (in_array($code, $permission->api_methods ?? [])) {
-                            return true;
-                        }
-                    }
+                if (in_array($code, $cacheTeamLeaderAddOns ?? [])) {
+                    return true;
                 }
 
             }
@@ -72,40 +70,32 @@ class AuthServiceProvider extends ServiceProvider
             if (isset($user->userTeam->permission_uuids) && !$user->userTeam->is_blocked) {
                 $cacheTeams = Cache::rememberForever('team_permission_' . auth()->userId(), function () use ($user) {
 
-                    return Permission::whereIn('uuid', $user->userTeam->permission_uuids)->get();
+                    return GroupApiList::whereIn('uuid', $user->userTeam->permission_uuids)->get();
                 });
-                foreach ($cacheTeams as $permission) {
-                    if (in_array($code, $permission->api_methods ?? [])) {
-                        return true;
-                    }
+                if (in_array($code, $cacheTeams->pluck('code')->toArray() ?? [])) {
+                    return true;
                 }
 
                 //team add on
                 $cacheUserTeamAddOns = Cache::rememberForever('team_add_on_permission_' . auth()->userId(), function () use ($user) {
                     $permissions = [];
                     foreach ($user->userTeam->addOns as $userTeamAddOn) {
-                        $permissions[] = $userTeamAddOn->addOn->permissions ?? [];
+                        $permissions = array_merge($permissions, $userTeamAddOn->groupApis()->pluck('code')->toArray() ?? []);
                     }
                     return $permissions;
                 });
-                foreach ($cacheUserTeamAddOns as $permissions) {
-                    foreach ($permissions as $permission) {
-                        if (in_array($code, $permission->api_methods ?? [])) {
-                            return true;
-                        }
-                    }
+                if (in_array($code, $cacheUserTeamAddOns ?? [])) {
+                    return true;
                 }
             }
             //check platform
             if (isset($user->userPlatformPackage->platform_package_uuid)) {
                 $permissions = Cache::rememberForever('platform_permission_' . auth()->userId(), function () use ($user) {
                     $platformPackage = PlatformPackage::findOrFail($user->userPlatformPackage->platform_package_uuid);
-                    return $platformPackage->permissions()->select('api_methods', 'name', 'code', 'uuid')->get();
+                    return $platformPackage->groupApis()->pluck('code')->toArray();
                 });
-                foreach ($permissions as $permission) {
-                    if (in_array($code, $permission->api_methods ?? [])) {
-                        return true;
-                    }
+                if (in_array($code, $permissions ?? [])) {
+                    return true;
                 }
             }
             //check add-on
@@ -113,16 +103,13 @@ class AuthServiceProvider extends ServiceProvider
                 $cacheAddOns = Cache::rememberForever('add_on_permission_' . auth()->userId(), function () use ($user) {
                     $permissions = [];
                     foreach ($user->userAddOns as $userAddOn) {
-                        $permissions[] = $userAddOn->addOnSubscriptionPlan->addOn->permissions ?? [];
+                        $permissions = array_merge($permissions, $userAddOn->addOnSubscriptionPlan->addOn->groupApis()->pluck('code')->toArray() ?? []);
                     }
+
                     return $permissions;
                 });
-                foreach ($cacheAddOns as $permissions) {
-                    foreach ($permissions as $permission) {
-                        if (in_array($code, $permission->api_methods ?? [])) {
-                            return true;
-                        }
-                    }
+                if (in_array($code, $cacheAddOns ?? [])) {
+                    return true;
                 }
             }
 

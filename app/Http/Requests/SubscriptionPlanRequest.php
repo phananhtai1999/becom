@@ -28,7 +28,7 @@ class SubscriptionPlanRequest extends AbstractRequest
         return [
             'duration_type' => ['required', Rule::in(['month', 'year'])],
             'duration' => ['integer', 'min:1', 'max:12'],
-            'platform_package_uuid' => ['required', 'exists:platform_packages,uuid'],
+            'platform_package_uuid' => ['required', 'exists:apps,uuid'],
         ];
     }
 }
