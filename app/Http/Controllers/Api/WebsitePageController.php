@@ -131,7 +131,7 @@ class WebsitePageController extends AbstractRestAPIController
         //product webpage
         if ($websitePage->type == WebsitePage::PRODUCT_DETAIL_TYPE) {
             $productDetailData = $this->shopService->getProductDetailData($request->product_uuid);
-            $websitePage = $this->service->renderContentForProductDetail($websitePage, $productDetailData);
+            $websitePage = $this->service->renderContentForProductDetail($websitePage, $productDetailData['data']);
             $response = $this->sendOkJsonResponse(['data' => $websitePage]);
         } elseif ($websitePage->type == WebsitePage::PRODUCT_CATEGORY_TYPE) {
             $productCategoryData = $this->shopService->getProductCategoryData($request->get('product_category_slug'));
@@ -156,7 +156,7 @@ class WebsitePageController extends AbstractRestAPIController
         $response = $this->sendOkJsonResponse(['data' => $websitePage]);
         if ($websitePage->type == WebsitePage::PRODUCT_DETAIL_TYPE) {
             $productDetailData = $this->shopService->getProductDetailData($request->product_uuid);
-            $websitePage = $this->service->renderContentForProductDetail($websitePage, $productDetailData);
+            $websitePage = $this->service->renderContentForProductDetail($websitePage, $productDetailData['data']);
             $response = $this->sendOkJsonResponse(['data' => $websitePage]);
         } elseif ($websitePage->type == WebsitePage::PRODUCT_CATEGORY_TYPE) {
             $productCategoryData = $this->shopService->getProductCategoryData($request->get('product_category_slug'));
@@ -182,40 +182,85 @@ class WebsitePageController extends AbstractRestAPIController
             $websitePage = $this->service->getWebsitePageByWebsiteAndWebsitePageUuid($request->get('website_uuid'), $request->get('website_page_uuid'));
         }
 
-        if (!$request->get('article_slug') && !$request->get('article_uuid')
-            && !$request->get('article_category_slug') && !$request->get('article_category_uuid')) {
-            $websitePage = $this->service->renderContentForHomeArticles($websitePage);
-        } else {
-            if (!$request->get('domain')) {
-                $newsWebsitePages = $this->service->getNewsWebsitePagesByWebsite($request->get('website_uuid'));
+        if(in_array($websitePage->type, app(WebsitePage::class)->getTypeNewsWebsitePage())) {
+            if (!$request->get('article_slug') && !$request->get('article_uuid')
+                && !$request->get('article_category_slug') && !$request->get('article_category_uuid')) {
+                $websitePage = $this->service->renderContentForHomeArticles($websitePage);
             } else {
-                $newsWebsitePages = $this->service->getNewsWebsitePagesByDomain($request->get('domain'));
-            }
-            if (($request->get('article_uuid') || $request->get('article_slug'))
-                && ($request->get('article_category_uuid') || $request->get('article_category_slug'))) {
-                $websitePage = $newsWebsitePages->where('type', WebsitePage::ARTICLE_DETAIL_TYPE)->first();
-                if ($request->get('article_uuid')) {
-                    $article = $this->articleService->findOrFailById($request->get('article_uuid'));
+                if (!$request->get('domain')) {
+                    $newsWebsitePages = $this->service->getNewsWebsitePagesByWebsite($request->get('website_uuid'));
                 } else {
-                    $article = $this->articleService->findOneWhereOrFail(['slug' => $request->get('article_slug')]);
+                    $newsWebsitePages = $this->service->getNewsWebsitePagesByDomain($request->get('domain'));
                 }
-                $websitePage = $this->service->renderContent($websitePage, $article);
+                if (($request->get('article_uuid') || $request->get('article_slug'))
+                    && ($request->get('article_category_uuid') || $request->get('article_category_slug'))) {
+                    $websitePage = $newsWebsitePages->where('type', WebsitePage::ARTICLE_DETAIL_TYPE)->first();
+                    if ($request->get('article_uuid')) {
+                        $article = $this->articleService->findOrFailById($request->get('article_uuid'));
+                    } else {
+                        $article = $this->articleService->findOneWhereOrFail(['slug' => $request->get('article_slug')]);
+                    }
+                    $websitePage = $this->service->renderContent($websitePage, $article);
 
-            } elseif (!($request->get('article_uuid') || $request->get('article_slug'))
-                && ($request->get('article_category_uuid') || $request->get('article_category_slug'))) {
-                $websitePage = $newsWebsitePages->where('type', WebsitePage::ARTICLE_CATEGORY_TYPE)->first();
-                if ($request->get('article_category_uuid')) {
-                    $articleCategory = $this->articleCategoryService->findOrFailById($request->get('article_category_uuid'));
-                } else {
-                    $articleCategory = $this->articleCategoryService->findOneWhereOrFail(['slug' => $request->get('article_category_slug')]);
+                } elseif (!($request->get('article_uuid') || $request->get('article_slug'))
+                    && ($request->get('article_category_uuid') || $request->get('article_category_slug'))) {
+                    $websitePage = $newsWebsitePages->where('type', WebsitePage::ARTICLE_CATEGORY_TYPE)->first();
+                    if ($request->get('article_category_uuid')) {
+                        $articleCategory = $this->articleCategoryService->findOrFailById($request->get('article_category_uuid'));
+                    } else {
+                        $articleCategory = $this->articleCategoryService->findOneWhereOrFail(['slug' => $request->get('article_category_slug')]);
+                    }
+                    $websitePage = $this->service->renderContentForArticleCategory($websitePage, $articleCategory);
                 }
-                $websitePage = $this->service->renderContentForArticleCategory($websitePage, $articleCategory);
             }
+        } else {
+            $websitePage = $this->replaceWebsitePageProduct($request, $websitePage);
         }
+
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $websitePage)
         );
+    }
+
+    public function replaceWebsitePageProduct($request, $websitePage) {
+        if (!$request->get('product_slug') && !$request->get('product_uuid')
+            && !$request->get('product_category_slug') && !$request->get('product_category_uuid')) {
+            $websitePage = $this->service->renderContentForHomeProducts($websitePage);
+        } else {
+            if (!$request->get('domain')) {
+                $productWebsitePages = $this->service->getProductWebsitePagesByWebsite($request->get('website_uuid'));
+            } else {
+                $productWebsitePages = $this->service->getProductWebsitePagesByDomain($request->get('domain'));
+            }
+            if (($request->get('product_uuid') || $request->get('product_slug'))
+                && ($request->get('product_category_uuid') || $request->get('product_category_slug'))) {
+                $websitePage = $productWebsitePages->where('type', WebsitePage::PRODUCT_DETAIL_TYPE)->first();
+                try {
+                    if ($request->get('product_uuid')) {
+                        $productDetailData = $this->shopService->getProductDetailData($request->product_uuid);
+                    } else {
+                        $productDetailData = $this->shopService->getProductDetailData(null, $request->get('product_slug'));
+                    }
+                    $websitePage = $this->service->renderContentForProductDetail($websitePage, $productDetailData['data']);
+                } catch (\Exception $exception) {
+                }
+
+            } elseif (!($request->get('product_uuid') || $request->get('product_slug'))
+                && ($request->get('product_category_uuid') || $request->get('product_category_slug'))) {
+                $websitePage = $productWebsitePages->where('type', WebsitePage::PRODUCT_CATEGORY_TYPE)->first();
+                if ($request->get('product_category_uuid')) {
+                    $productCategoryData = $this->shopService->getProductCategoryData(null, $request->get('product_category_uuid'));
+                } else {
+                    $productCategoryData = $this->shopService->getProductCategoryData($request->get('product_category_slug'));
+                }
+                if (!empty($productCategoryData['category'])) {
+                    $websitePage = $this->service->renderContentForProductCategory($websitePage, $productCategoryData);
+                }
+            }
+        }
+
+        return $websitePage;
     }
 
     /**

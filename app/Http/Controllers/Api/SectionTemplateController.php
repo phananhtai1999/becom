@@ -23,6 +23,7 @@ use App\Services\SectionTemplateService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class SectionTemplateController extends AbstractRestAPIController
 {
@@ -274,7 +275,8 @@ class SectionTemplateController extends AbstractRestAPIController
 
     public function getHeader($id)
     {
-        $sectionHeader = $this->service->findOneWhereOrFail(['uuid' => $id]);
+        $sectionHeader = $this->service->findOneWhere(['uuid' => $id]);
+
         $sectionHeader = $this->service->renderContentForHeader($sectionHeader);
 
         return $this->sendOkJsonResponse(['data' => $sectionHeader]);

@@ -210,12 +210,36 @@ class WebsitePageService extends AbstractService
             ->get();
     }
 
+    public function getProductWebsitePagesByDomain($domainName)
+    {
+        $website = (new Website())->whereHas('domain', function ($query) use ($domainName) {
+            $query->where([
+                ['name', $domainName],
+                ['verified_at', '!=', null]
+            ]);
+        })
+            ->where('publish_status', Website::PUBLISHED_PUBLISH_STATUS)
+            ->firstOrFail();
+        return $website->websitePages()
+            ->whereIn('type', [WebsitePage::PRODUCT_CATEGORY_TYPE, WebsitePage::PRODUCT_DETAIL_TYPE, WebsitePage::HOME_PRODUCTS_TYPE])
+            ->get();
+    }
+
     public function getNewsWebsitePagesByWebsite($websiteUuid)
     {
         $website = (new Website())->where('uuid', $websiteUuid)->firstOrFail();
 
         return $website->websitePages()
             ->whereIn('type', [WebsitePage::ARTICLE_CATEGORY_TYPE, WebsitePage::HOME_ARTICLES_TYPE, WebsitePage::ARTICLE_DETAIL_TYPE])
+            ->get();
+    }
+
+    public function getProductWebsitePagesByWebsite($websiteUuid)
+    {
+        $website = (new Website())->where('uuid', $websiteUuid)->firstOrFail();
+
+        return $website->websitePages()
+            ->whereIn('type', [WebsitePage::PRODUCT_CATEGORY_TYPE, WebsitePage::PRODUCT_DETAIL_TYPE, WebsitePage::HOME_PRODUCTS_TYPE])
             ->get();
     }
 
@@ -272,8 +296,13 @@ class WebsitePageService extends AbstractService
     {
         $replaceProductService = new ReplaceProductService();
         $replaceProductCategoryService = new ReplaceProductCategoryService();
-        $product = $productDetailData['product'];
-        $category = $productDetailData['category'];
+        $replaceBrandService = new ReplaceBrandService();
+        $product = $productDetailData;
+        $category = $productDetailData['categories'][0];
+        $brand = $productDetailData['brand'];
+        if (!empty($brand)) {
+            $websitePage->html_template = $replaceBrandService->replaceBrand($websitePage->html_template, $brand);
+        }
         $searchReplaceMap = $replaceProductService->searchReplaceMapForProduct($product);
 
         $websitePage->html_template = Str::replace(array_keys($searchReplaceMap), $searchReplaceMap, $websitePage->html_template);

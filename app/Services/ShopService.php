@@ -7,15 +7,29 @@ use Techup\ApiBase\Services\AppCallService;
 class ShopService extends AppCallService
 {
 
-    public function getProductDetailData($productUuid) {
-
-        return $this->callService(env('SHOP_SERVICE_NAME'), 'get', 'data-product-detail/' . $productUuid, '', auth()->appId(), auth()->userId());
+    public function getProductDetailData($productUuid, $productSlug = null) {
+        $expand = ['product__categories', 'product__brand'];
+        $data = [
+            'product_slug' => $productSlug
+        ];
+        if(empty($productSlug)) {
+            $data = [
+                'product_uuid' => $productUuid
+            ];
+        }
+        $data = array_merge($data, ['expand' => $expand]);
+        return $this->callService(env('SHOP_SERVICE_NAME'), 'get', 'data-product-detail', $data, auth()->appId(), auth()->userId());
     }
 
-    public function getProductCategoryData($categorySlug) {
+    public function getProductCategoryData($categorySlug, $categoryUuid = null) {
         $data = [
             'product_category_slug' => $categorySlug
         ];
+        if(empty($categorySlug)) {
+            $data = [
+                'product_category_uuid' => $categoryUuid
+            ];
+        }
 
         return $this->callService(env('SHOP_SERVICE_NAME'), 'get', 'data-product-category', $data, auth()->appId(), auth()->userId());
     }
