@@ -158,9 +158,11 @@ class SectionTemplateService extends AbstractService
     {
         $replaceCategoryService = new ReplaceCategoryService();
         $section->html_template = $replaceCategoryService->replaceListCategoryMenu($section->html_template);
+        $section->js_template = $replaceCategoryService->replaceListCategoryMenu($section->js_template);
 
         $replaceProductCategoryService = new ReplaceProductCategoryService();
         $section->html_template = $replaceProductCategoryService->replaceListProductCategoryMenu($section->html_template);
+        $section->js_template = $replaceProductCategoryService->replaceListProductCategoryMenu($section->js_template);
 
         return $section;
     }
