@@ -90,8 +90,8 @@ class PaymentController extends AbstractRestAPIController
     public function upgradeUser(UpgradeUserRequest $request)
     {
         $subscriptionPlan = $this->subscriptionPlanService->findOrFailById($request->get('subscription_plan_uuid'));
-        $checkPurchasedPlatform = $this->userAppService->checkPurchasedPlatform($subscriptionPlan->platform_package_uuid);
-        $checkIncludePlatform = $this->platformPackageService->checkIncludePlatform($subscriptionPlan->platform_package_uuid);
+        $checkPurchasedPlatform = $this->userAppService->checkPurchasedPlatform($subscriptionPlan->app_uuid);
+        $checkIncludePlatform = $this->platformPackageService->checkIncludePlatform($subscriptionPlan->app_uuid);
 
         if($checkPurchasedPlatform || $checkIncludePlatform) {
             return $this->sendOkJsonResponse(['message' => 'You already have this platform package Or your platform package include this package']);
@@ -211,7 +211,7 @@ class PaymentController extends AbstractRestAPIController
 
             $userApp = [
                 'user_uuid' => $subscriptionHistory->user_uuid,
-                'platform_package_uuid' => $subscriptionPlan->platform_package_uuid,
+                'app_uuid' => $subscriptionPlan->app_uuid,
                 'subscription_plan_uuid' => $subscriptionPlan->uuid,
                 'expiration_date' => $expirationDate,
                 'auto_renew' => true
@@ -249,7 +249,7 @@ class PaymentController extends AbstractRestAPIController
 
             $userPlatformPackage = [
                 'user_uuid' => $subscriptionHistory->user_uuid,
-                'platform_package_uuid' => $subscriptionPlan->platform_package_uuid,
+                'app_uuid' => $subscriptionPlan->app_uuid,
                 'subscription_plan_uuid' => $subscriptionPlan->uuid,
                 'expiration_date' => $expirationDate,
                 'auto_renew' => true

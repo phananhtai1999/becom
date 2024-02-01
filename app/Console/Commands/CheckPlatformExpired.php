@@ -51,12 +51,12 @@ class CheckPlatformExpired extends Command
             }
         }
 
-        $userPlatformPackages = $this->userPlatformPackageService->findAllWhere([['platform_package_uuid' , '!=', 'starter']]);
+        $userPlatformPackages = $this->userPlatformPackageService->findAllWhere([['app_uuid' , '!=', 'starter']]);
         foreach ($userPlatformPackages as $userPlatformPackage) {
             if($userPlatformPackage->expiration_date < Carbon::now()) {
                 $this->userPlatformPackageService->destroy($userPlatformPackage->uuid);
                 $this->userPlatformPackageService->create([
-                    'platform_package_uuid' => App::DEFAULT_PLATFORM_PACKAGE_1,
+                    'app_uuid' => App::DEFAULT_PLATFORM_PACKAGE_1,
                     'user_uuid' => $userPlatformPackage->user_uuid
                 ]);
             }

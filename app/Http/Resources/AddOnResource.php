@@ -25,7 +25,7 @@ class AddOnResource extends JsonResource
             'thumbnail' => $this->thumbnail,
             'payment_product_id' => $this->payment_product_id,
             'status' => $this->status,
-            'platform_package_uuid' => $this->platform_package_uuid,
+            'app_uuid' => $this->app_uuid,
             'monthly' => $this->monthly,
             'yearly' => $this->yearly
         ];

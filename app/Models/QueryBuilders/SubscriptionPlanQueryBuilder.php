@@ -32,7 +32,7 @@ class SubscriptionPlanQueryBuilder extends AbstractQueryBuilder
         return static::for(static::baseQuery())
             ->allowedFields([
                 $modelKeyName,
-                'platform_package_uuid',
+                'app_uuid',
                 'duration',
                 'duration_type',
                 'payment_plan_id',
@@ -40,7 +40,7 @@ class SubscriptionPlanQueryBuilder extends AbstractQueryBuilder
             ->defaultSort('-created_at')
             ->allowedSorts([
                 $modelKeyName,
-                'platform_package_uuid',
+                'app_uuid',
                 'duration',
                 'duration_type',
                 'payment_plan_id',
@@ -48,8 +48,8 @@ class SubscriptionPlanQueryBuilder extends AbstractQueryBuilder
             ->allowedFilters([
                 $modelKeyName,
                 AllowedFilter::exact('exact__' . $modelKeyName, $modelKeyName),
-                'platform_package_uuid',
-                AllowedFilter::exact('exact__platform_package_uuid', 'platform_package_uuid'),
+                'app_uuid',
+                AllowedFilter::exact('exact__app_uuid', 'app_uuid'),
                 'duration',
                 AllowedFilter::exact('exact__duration', 'duration'),
                 'duration_type',

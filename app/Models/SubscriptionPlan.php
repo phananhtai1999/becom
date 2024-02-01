@@ -24,7 +24,7 @@ class SubscriptionPlan extends AbstractModel
      * @var string[]
      */
     protected $fillable = [
-        'platform_package_uuid',
+        'app_uuid',
         'duration',
         'duration_type',
         'payment_plan_id',
@@ -43,11 +43,11 @@ class SubscriptionPlan extends AbstractModel
 
     public function platformPackage()
     {
-        return $this->belongsTo(App::class, 'platform_package_uuid', 'uuid')->withTrashed();
+        return $this->belongsTo(App::class, 'app_uuid', 'uuid')->withTrashed();
     }
 
     public function app()
     {
-        return $this->belongsTo(App::class, 'platform_package_uuid', 'uuid')->withTrashed();
+        return $this->belongsTo(App::class, 'app_uuid', 'uuid')->withTrashed();
     }
 }

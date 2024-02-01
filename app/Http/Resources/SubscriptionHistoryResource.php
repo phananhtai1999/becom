@@ -29,7 +29,7 @@ class SubscriptionHistoryResource extends JsonResource
         ];
         if (\in_array('subscription_history__subscription_plan', $expand)) {
             $data['subscription_plan'] = new SubscriptionPlanResource($this->subscriptionPlan);
-            $data['platform_package'] = new PlatformPackageResource(optional($this->subscriptionPlan)->platformPackage);
+            $data['app'] = new AppResource(optional($this->subscriptionPlan)->app);
         }
         if (\in_array('subscription_history__payment_method', $expand)) {
             $data['payment_method'] = new PaymentMethodResource($this->paymentMethod);

@@ -18,13 +18,13 @@ class SubscriptionPlanResource extends JsonResource
 
         $data = [
             'uuid' => $this->uuid,
-            'platform_package_uuid' => $this->platform_package_uuid,
+            'app_uuid' => $this->app_uuid,
             'payment_plan_id' => $this->payment_plan_id,
             'duration_type' => $this->duration_type,
             'duration' => $this->duration,
         ];
-        if (\in_array('subscription_plan__platform_package', $expand)) {
-            $data['platform_package'] = new PlatformPackageResource($this->platformPackage);
+        if (\in_array('subscription_plan__app', $expand)) {
+            $data['app'] = new AppResource($this->app);
         }
 
         return $data;

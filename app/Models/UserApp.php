@@ -25,7 +25,7 @@ class UserApp extends Model
      */
     protected $fillable = [
         'user_uuid',
-        'platform_package_uuid',
+        'app_uuid',
         'subscription_plan_uuid',
         'expiration_date',
         'auto_renew',
@@ -42,7 +42,11 @@ class UserApp extends Model
     ];
 
     public function platformPackage() {
-        return $this->belongsTo(App::class, 'platform_package_uuid', 'uuid');
+        return $this->belongsTo(App::class, 'app_uuid', 'uuid');
+    }
+
+    public function app() {
+        return $this->belongsTo(App::class, 'app_uuid', 'uuid');
     }
     public function subscriptionPlan() {
         return $this->belongsTo(SubscriptionPlan::class, 'subscription_plan_uuid', 'uuid');

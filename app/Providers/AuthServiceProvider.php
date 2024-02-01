@@ -49,7 +49,7 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('permission', function ($user, $code) {
 //            Cache::flush();
             $user = app(UserProfileService::class)->findOneWhereOrFail(['user_uuid' => auth()->userId(), 'app_id' => \auth()->appId()]);
-            if (!isset($user->userApp->platform_package_uuid) && !isset($user->userAddOns) && !isset($user->userTeam->permission_uuids)) {
+            if (!isset($user->userApp->app_uuid) && !isset($user->userAddOns) && !isset($user->userTeam->permission_uuids)) {
                 return false;
             }
             //check team leader
@@ -89,9 +89,9 @@ class AuthServiceProvider extends ServiceProvider
                 }
             }
             //check platform
-            if (isset($user->userApp->platform_package_uuid)) {
+            if (isset($user->userApp->app_uuid)) {
                 $permissions = Cache::rememberForever('platform_permission_' . auth()->userId(), function () use ($user) {
-                    $platformPackage = App::findOrFail($user->userApp->platform_package_uuid);
+                    $platformPackage = App::findOrFail($user->userApp->app_uuid);
                     return $platformPackage->groupApis()->pluck('code')->toArray();
                 });
                 if (in_array($code, $permissions ?? [])) {

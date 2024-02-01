@@ -39,7 +39,7 @@ class AddOn extends Model
         'thumbnail',
         'status',
         'payment_product_id',
-        'platform_package_uuid'
+        'app_uuid'
     ];
 
     /**
@@ -90,6 +90,6 @@ class AddOn extends Model
     }
 
     public function app() {
-        return $this->belongsTo(App::class, 'platform_package_uuid', 'uuid');
+        return $this->belongsTo(App::class, 'app_uuid', 'uuid');
     }
 }

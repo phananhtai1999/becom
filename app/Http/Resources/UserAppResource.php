@@ -20,7 +20,7 @@ class UserAppResource extends JsonResource
         $data = [
             'uuid' => $this->uuid,
             'user_uuid' => $this->user_uuid ,
-            'platform_package_uuid' => $this->platform_package_uuid,
+            'app_uuid' => $this->app_uuid,
             'subscription_plan_uuid' => $this->subscription_plan_uuid,
             'expiration_date' => $this->expiration_date,
             'auto_renew' => $this->auto_renew,
@@ -28,10 +28,10 @@ class UserAppResource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
-        if (\in_array('user_platform_package__platform_package', $expand)) {
-            $data['platform_package'] = new PlatformPackageResource($this->platformPackage);
+        if (\in_array('user_app__app', $expand)) {
+            $data['platform_package'] = new AppResource($this->platformPackage);
         }
-        if (\in_array('user_platform_package__subscription_plan', $expand)) {
+        if (\in_array('user_app__subscription_plan', $expand)) {
             $data['subscription_plan'] = new SubscriptionPlanResource($this->subscriptionPlan);
         }
 

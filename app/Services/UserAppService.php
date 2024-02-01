@@ -18,7 +18,7 @@ class UserAppService extends AbstractService
         return $this->model->where([
            'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
-            'platform_package_uuid' => $platformPackageUuid,
+            'app_uuid' => $platformPackageUuid,
         ])->first();
     }
 }

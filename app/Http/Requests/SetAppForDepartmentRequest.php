@@ -2,11 +2,12 @@
 
 namespace App\Http\Requests;
 
+use App\Abstracts\AbstractRequest;
 use App\Rules\CheckDepartmentBelongToBusiness;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class SetAppForDepartmentRequest extends FormRequest
+class SetAppForDepartmentRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -29,7 +30,7 @@ class SetAppForDepartmentRequest extends FormRequest
             'department_uuids'=> ['required', 'array'],
             'department_uuids.*' => ['required', 'string', 'min:1', 'distinct',Rule::exists('departments', 'uuid'), new CheckDepartmentBelongToBusiness()],
             'app_uuids'=> ['required', 'array'],
-            'app_uuids.*' => ['required', 'string', Rule::exists('user_platform_package', 'platform_package_uuid')
+            'app_uuids.*' => ['required', 'string', Rule::exists('user_app', 'app_uuid')
                 ->where('user_uuid', auth()->userId())->whereNull('deleted_at')],
             'type' => [Rule::in(['assign', 'unsassign'])]
         ];
