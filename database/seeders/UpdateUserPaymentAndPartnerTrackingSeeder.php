@@ -27,7 +27,7 @@ class UpdateUserPaymentAndPartnerTrackingSeeder extends Seeder
             ->selectRaw("add_on_subscription_histories.user_uuid, DATE(add_on_subscription_histories.created_at) as created_at,IF(a.duration_type = 'month', ao.monthly, ao.yearly) as payment")
             ->whereNull('add_on_subscription_histories.deleted_at');
         $platfromPackage = SubscriptionHistory::join('subscription_plans as s', 's.uuid', '=', 'subscription_histories.subscription_plan_uuid')
-            ->join('platform_packages as pp', 'pp.uuid', '=', 's.platform_package_uuid')
+            ->join('apps as pp', 'pp.uuid', '=', 's.platform_package_uuid')
             ->selectRaw("subscription_histories.user_uuid, DATE(subscription_histories.created_at) as created_at,IF(s.duration_type = 'month', pp.monthly, pp.yearly) as payment")
             ->whereNull('subscription_histories.deleted_at');
 

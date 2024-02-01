@@ -25,7 +25,7 @@ class UpdatePermissionRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'platform_package_uuid' => ['exists:platform_packages,uuid'],
+            'platform_package_uuid' => ['exists:apps,uuid'],
         ];
     }
 }

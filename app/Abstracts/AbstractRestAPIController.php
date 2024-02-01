@@ -140,30 +140,18 @@ class AbstractRestAPIController extends BaseController
 
     protected function getPlatformByPermission($code)
     {
-        $cacheNames = [PlatformPackage::DEFAULT_PLATFORM_PACKAGE_1, PlatformPackage::DEFAULT_PLATFORM_PACKAGE_2, PlatformPackage::DEFAULT_PLATFORM_PACKAGE_3];
-        foreach ($cacheNames as $cacheName) {
-            $permissionCaches = Cache::rememberForever($cacheName . '_permission', function () use ($cacheName) {
-                $platformPackage = PlatformPackage::find($cacheName);
-                return $platformPackage ? $platformPackage->permissions()->select('api_methods', 'name', 'code', 'uuid')->get() : collect();
-            });
-            foreach ($permissionCaches as $permissionCache) {
-                if (in_array($code, $permissionCache->api_methods ?? [])) {
-                    $permission = Permission::find($permissionCache->uuid);
-                    if ($permission) {
-                        $platformPackages = $permission->platformPackages;
-                        foreach ($platformPackages as $platformPackage) {
-                            return ['plan' => 'platform_package_' . $platformPackage->uuid];
-                        }
-                    }
-                }
+        $platformPackages = PlatformPackage::all();
+        foreach ($platformPackages as $platformPackage) {
+            $groupApi = $platformPackage->groupApis()->pluck('code')->toArray() ?? [];
+            if (in_array($code, $groupApi)) {
+                return ['plan' => 'platform_package_' . $platformPackage->uuid];
             }
         }
         $addOns = AddOn::all();
         foreach ($addOns as $addOn) {
-            foreach ($addOn->permissions as $permission) {
-                if (in_array($code, $permission->api_methods ?? [])) {
-                    return ['plan' => 'add_on_' . $addOn->uuid];
-                }
+            $groupApi = $addOn->groupApis()->pluck('code')->toArray() ?? [];
+            if (in_array($code, $groupApi)) {
+                return ['plan' => 'add_on_' . $addOn->uuid];
             }
         }
 
