@@ -90,6 +90,6 @@ class AddOn extends Model
     }
 
     public function app() {
-        return $this->belongsTo(PlatformPackage::class, 'platform_package_uuid', 'uuid');
+        return $this->belongsTo(App::class, 'platform_package_uuid', 'uuid');
     }
 }

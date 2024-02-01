@@ -16,7 +16,7 @@ use App\Http\Resources\UserResource;
 use App\Mail\SendActiveCode;
 use App\Models\Invite;
 use App\Models\PasswordReset;
-use App\Models\PlatformPackage;
+use App\Models\App;
 use App\Models\User;
 use App\Services\UserProfileService;
 use Techup\ApiConfig\Services\ConfigService;
@@ -232,7 +232,7 @@ class AuthController extends AbstractRestAPIController
                 ]);
             }
             $user->roles()->attach([config('user.default_role_uuid')]);
-            $user->userPlatformPackage()->create(['platform_package_uuid' => PlatformPackage::DEFAULT_PLATFORM_PACKAGE_1]);
+            $user->userPlatformPackage()->create(['platform_package_uuid' => App::DEFAULT_PLATFORM_PACKAGE_1]);
             $otpConfig = $this->configService->findOneWhereOrFail(['key' => 'otp_status']);
             if ($otpConfig->value) {
 

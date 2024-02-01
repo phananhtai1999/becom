@@ -6,7 +6,7 @@ use App\Models\AddOn;
 use App\Models\Department;
 use App\Models\Location;
 use App\Models\Permission;
-use App\Models\PlatformPackage;
+use App\Models\App;
 use App\Models\Role;
 use App\Models\Team;
 use App\Models\UserTeam;
@@ -140,7 +140,7 @@ class AbstractRestAPIController extends BaseController
 
     protected function getPlatformByPermission($code)
     {
-        $platformPackages = PlatformPackage::all();
+        $platformPackages = App::all();
         foreach ($platformPackages as $platformPackage) {
             $groupApi = $platformPackage->groupApis()->pluck('code')->toArray() ?? [];
             if (in_array($code, $groupApi)) {
@@ -285,6 +285,16 @@ class AbstractRestAPIController extends BaseController
     public function removeTeamPermissionCache($userUuid)
     {
         Cache::forget('team_permission_' . $userUuid);
+    }
+
+    public function removeTeamLeaderPermissionCache($userUuid)
+    {
+        Cache::forget('team_leader_add_on_permission_' . $userUuid);
+    }
+
+    public function removeTeamAddOnPermissionCache($userUuid)
+    {
+        Cache::forget('team_add_on_permission_' . $userUuid);
     }
 
     public function checkExistBusiness()

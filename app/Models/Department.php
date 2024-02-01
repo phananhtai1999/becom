@@ -112,11 +112,11 @@ class Department extends AbstractModel
     }
 
     public function platformPackage() {
-        return $this->belongsToMany(PlatformPackage::class, 'department_app', 'department_uuid', 'app_uuid');
+        return $this->belongsToMany(App::class, 'department_app', 'department_uuid', 'app_uuid');
     }
 
     public function app() {
-        return $this->belongsToMany(PlatformPackage::class, 'department_app', 'department_uuid', 'app_uuid');
+        return $this->belongsToMany(App::class, 'department_app', 'department_uuid', 'app_uuid');
     }
 
 }

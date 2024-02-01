@@ -19,11 +19,11 @@ use App\Services\PaymentService;
 use App\Services\SubscriptionHistoryService;
 use App\Services\CreditPackageService;
 use App\Services\PaypalService;
-use App\Services\PlatformPackageService;
+use App\Services\AppService;
 use App\Services\StripeService;
 use App\Services\SubscriptionPlanService;
 use App\Services\UserCreditHistoryService;
-use App\Services\UserPlatformPackageService;
+use App\Services\UserAppService;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
@@ -39,14 +39,14 @@ class PaymentController extends AbstractRestAPIController
         PaypalService               $paypalService,
         StripeService               $stripeService,
         SubscriptionPlanService     $subscriptionPlanService,
-        PlatformPackageService      $platformPackageService,
+        AppService                  $platformPackageService,
         CreditPackageService        $creditPackageService,
         CreditPackageHistoryService $creditPackageHistoryService,
         SubscriptionHistoryService  $subscriptionHistoryService,
         UserCreditHistoryService    $userCreditHistoryService,
-        UserPlatformPackageService  $userPlatformPackageService,
+        UserAppService              $userAppService,
         ConfigService               $configService,
-        PaymentService $service
+        PaymentService              $service
     )
     {
         $this->paypalService = $paypalService;
@@ -61,7 +61,7 @@ class PaymentController extends AbstractRestAPIController
         $this->creditPackageHistoryResourceCollection = CreditPackageHistoryResourceCollection::class;
         $this->subscriptionPlanResourceCollection = SubscriptionHistoryResourceCollection::class;
         $this->userCreditHistoryService = $userCreditHistoryService;
-        $this->userPlatformPackageService = $userPlatformPackageService;
+        $this->userAppService = $userAppService;
     }
 
     public function topUp(PaymentRequest $request)
@@ -90,7 +90,7 @@ class PaymentController extends AbstractRestAPIController
     public function upgradeUser(UpgradeUserRequest $request)
     {
         $subscriptionPlan = $this->subscriptionPlanService->findOrFailById($request->get('subscription_plan_uuid'));
-        $checkPurchasedPlatform = $this->userPlatformPackageService->checkPurchasedPlatform($subscriptionPlan->platform_package_uuid);
+        $checkPurchasedPlatform = $this->userAppService->checkPurchasedPlatform($subscriptionPlan->platform_package_uuid);
         $checkIncludePlatform = $this->platformPackageService->checkIncludePlatform($subscriptionPlan->platform_package_uuid);
 
         if($checkPurchasedPlatform || $checkIncludePlatform) {
@@ -152,7 +152,7 @@ class PaymentController extends AbstractRestAPIController
     public function cancelSubscription()
     {
         $currentSubscriptionHistory = $this->subscriptionHistoryService->currentSubscriptionHistory();
-        $userPlatformPackage = $this->userPlatformPackageService->findOneWhere([
+        $userPlatformPackage = $this->userAppService->findOneWhere([
             'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ]);
@@ -162,7 +162,7 @@ class PaymentController extends AbstractRestAPIController
             } else {
                 $this->stripeService->cancelSubscription($currentSubscriptionHistory->logs['id']);
             }
-            $this->userPlatformPackageService->update($userPlatformPackage, ['auto_renew' => false]);
+            $this->userAppService->update($userPlatformPackage, ['auto_renew' => false]);
 
             return $this->sendOkJsonResponse(['message' => 'Successfully']);
         } catch (\Exception $exception) {
@@ -209,7 +209,7 @@ class PaymentController extends AbstractRestAPIController
                 'status' => 'success'
             ];
 
-            $userPlatformPackage = [
+            $userApp = [
                 'user_uuid' => $subscriptionHistory->user_uuid,
                 'platform_package_uuid' => $subscriptionPlan->platform_package_uuid,
                 'subscription_plan_uuid' => $subscriptionPlan->uuid,
@@ -217,7 +217,7 @@ class PaymentController extends AbstractRestAPIController
                 'auto_renew' => true
             ];
 
-            Event::dispatch(new SubscriptionSuccessEvent($subscriptionHistory->user_uuid, $subscriptionHistoryData, $userPlatformPackage));
+            Event::dispatch(new SubscriptionSuccessEvent($subscriptionHistory->user_uuid, $subscriptionHistoryData, $userApp));
         }
     }
 

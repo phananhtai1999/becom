@@ -2,7 +2,7 @@
 
 namespace App\Observers;
 
-use App\Models\PlatformPackage;
+use App\Models\App;
 use App\Models\UserProfile;
 
 class UserProfileObserver
@@ -15,7 +15,7 @@ class UserProfileObserver
      */
     public function created(UserProfile $userProfile)
     {
-        $userProfile->userPlatformPackage()->create(['platform_package_uuid' => PlatformPackage::DEFAULT_PLATFORM_PACKAGE_1, 'app_id' => $userProfile->app_id]);
+        $userProfile->userApp()->create(['platform_package_uuid' => App::DEFAULT_PLATFORM_PACKAGE_1, 'app_id' => $userProfile->app_id]);
     }
 
     /**

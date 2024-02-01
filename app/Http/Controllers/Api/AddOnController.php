@@ -24,7 +24,7 @@ use App\Services\PaymentService;
 use App\Services\PaypalService;
 use App\Services\StripeService;
 use App\Services\UserAddOnService;
-use App\Services\UserPlatformPackageService;
+use App\Services\UserAppService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;

@@ -6,14 +6,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class UserPlatformPackage extends Model
+class UserApp extends Model
 {
     use HasFactory, SoftDeletes;
 
     /**
      * @var string
      */
-    protected $table = "user_platform_package";
+    protected $table = "user_app";
 
     /**
      * @var string
@@ -42,7 +42,7 @@ class UserPlatformPackage extends Model
     ];
 
     public function platformPackage() {
-        return $this->belongsTo(PlatformPackage::class, 'platform_package_uuid', 'uuid');
+        return $this->belongsTo(App::class, 'platform_package_uuid', 'uuid');
     }
     public function subscriptionPlan() {
         return $this->belongsTo(SubscriptionPlan::class, 'subscription_plan_uuid', 'uuid');

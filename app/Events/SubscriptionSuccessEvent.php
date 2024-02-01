@@ -15,7 +15,7 @@ class SubscriptionSuccessEvent
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $subscriptionHistory;
-    public $userPlatformPackage;
+    public $userApp;
     public $userUuid;
 
     /**
@@ -26,13 +26,13 @@ class SubscriptionSuccessEvent
     public function __construct(
         $userUuid,
         $subscriptionHistory,
-        $userPlatformPackage,
+        $userApp,
         $invoice
     )
     {
         $this->userUuid = $userUuid;
         $this->subscriptionHistory = $subscriptionHistory;
-        $this->userPlatformPackage = $userPlatformPackage;
+        $this->userApp = $userApp;
         $this->invoice = $invoice;
     }
 

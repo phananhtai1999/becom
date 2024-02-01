@@ -233,9 +233,9 @@ class User extends Authenticatable implements JWTSubject
     /**
      * @return HasOne
      */
-    public function userPlatformPackage()
+    public function userApp()
     {
-        return $this->hasOne(UserPlatformPackage::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
+        return $this->hasOne(UserApp::class, 'user_uuid', 'uuid')->where('app_id', auth()->appId());
     }
 
     public function userAddOns()

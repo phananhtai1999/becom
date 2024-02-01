@@ -5,11 +5,11 @@ namespace App\Services;
 use App\Abstracts\AbstractService;
 use App\Models\Article;
 use App\Models\QueryBuilders\ArticleQueryBuilder;
-use App\Models\UserPlatformPackage;
+use App\Models\UserApp;
 
-class UserPlatformPackageService extends AbstractService
+class UserAppService extends AbstractService
 {
-    protected $modelClass = UserPlatformPackage::class;
+    protected $modelClass = UserApp::class;
 
     protected $modelQueryBuilderClass = ArticleQueryBuilder::class;
 

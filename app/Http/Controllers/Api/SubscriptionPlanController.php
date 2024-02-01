@@ -10,7 +10,7 @@ use App\Http\Requests\SubscriptionPlanRequest;
 use App\Http\Resources\SubscriptionPlanResource;
 use App\Http\Resources\SubscriptionPlanResourceCollection;
 use App\Services\PaypalService;
-use App\Services\PlatformPackageService;
+use App\Services\AppService;
 use App\Services\StripeService;
 use App\Services\SubscriptionPlanService;
 
@@ -21,7 +21,7 @@ class SubscriptionPlanController extends AbstractRestAPIController
         SubscriptionPlanService $subscriptionPlanService,
         PaypalService           $paypalService,
         StripeService           $stripeService,
-        PlatformPackageService  $platformPackageService
+        AppService $platformPackageService
     )
     {
         $this->service = $subscriptionPlanService;
