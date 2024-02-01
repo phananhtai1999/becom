@@ -25,8 +25,8 @@ class UpdateAddOnRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'permission_uuid' => ['array'],
-            'permission_uuid.*' => ['integer', 'exists:permissions,uuid'],
+            'group_api_uuids' => ['array'],
+            'group_api_uuids.*' => ['integer', 'exists:group_api_lists,uuid'],
         ];
     }
 }

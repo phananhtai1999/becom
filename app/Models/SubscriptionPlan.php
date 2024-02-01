@@ -45,4 +45,9 @@ class SubscriptionPlan extends AbstractModel
     {
         return $this->belongsTo(PlatformPackage::class, 'platform_package_uuid', 'uuid')->withTrashed();
     }
+
+    public function app()
+    {
+        return $this->belongsTo(PlatformPackage::class, 'platform_package_uuid', 'uuid')->withTrashed();
+    }
 }

@@ -29,8 +29,8 @@ class PlatformPackageRequest extends AbstractRequest
             'description' => ['required'],
             'monthly' => ['required', 'min:-1', 'integer'],
             'yearly' => ['required', 'min:-1', 'integer'],
-            'permission_uuid' => ['required', 'array'],
-            'permission_uuid.*' => ['required', 'integer', 'exists:permissions,uuid'],
+            'group_api_uuids' => ['required', 'array'],
+            'group_api_uuids.*' => ['required', 'integer', 'exists:group_api_lists,uuid'],
         ];
     }
 }

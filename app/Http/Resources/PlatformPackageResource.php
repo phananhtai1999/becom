@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Techup\ApiList\Http\Resources\GroupApiListResource;
 
 class PlatformPackageResource extends JsonResource
 {
@@ -26,6 +27,9 @@ class PlatformPackageResource extends JsonResource
         ];
         if (\in_array('platform_package__permissions', $expand)) {
             $data['permissions'] = PermissionResource::collection($this->permissions);
+        }
+        if (\in_array('platform_package__group_apis', $expand)) {
+            $data['group_apis'] = GroupApiListResource::collection($this->groupApis);
         }
         if (\in_array('platform_package__subscription_plan', $expand)) {
             $data['subscription_plan'] = SubscriptionPlanResource::collection($this->subscriptionPlans);
