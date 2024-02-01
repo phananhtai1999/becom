@@ -57,7 +57,7 @@ class StripeService extends AbstractService
                 'subscriptionDate=' . $subscriptionDate,
                 'userUuid=' . auth()->userId(),
                 'expirationDate=' . $expirationDate,
-                'platformPackageUuid=' . $subscriptionPlan->platform_package_uuid,
+                'platformPackageUuid=' . $subscriptionPlan->app_uuid,
                 'billingAddressUuid=' . $request['billing_address_uuid'],
             ], false) . '&session_id={CHECKOUT_SESSION_ID}';
 

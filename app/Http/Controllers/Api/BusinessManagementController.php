@@ -341,7 +341,7 @@ class BusinessManagementController extends AbstractRestAPIController
             $addUser = app(UserManagerService::class)->addUser($email, $password, $request->get('first_name'), $request->get('last_name'), [Role::ROLE_USER_MEMBER], auth()->appId(), auth()->userId(), auth()->token());
             if ($addUser) {
                 $userProfile = $this->userProfileService->findOneWhereOrFail(['email' => $email]);
-                $userProfile->userApp()->create(['platform_package_uuid' => App::DEFAULT_PLATFORM_PACKAGE_1, 'app_id' => $userProfile->app_id]);
+                $userProfile->userApp()->create(['app_uuid' => App::DEFAULT_PLATFORM_PACKAGE_1, 'app_id' => $userProfile->app_id]);
 
                 $this->userBusinessService->create([
                     'business_uuid' => $businessUuid,

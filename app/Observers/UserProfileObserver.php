@@ -15,7 +15,7 @@ class UserProfileObserver
      */
     public function created(UserProfile $userProfile)
     {
-        $userProfile->userApp()->create(['platform_package_uuid' => App::DEFAULT_PLATFORM_PACKAGE_1, 'app_id' => $userProfile->app_id]);
+        $userProfile->userApp()->create(['app_uuid' => App::DEFAULT_PLATFORM_PACKAGE_1, 'app_id' => $userProfile->app_id]);
     }
 
     /**

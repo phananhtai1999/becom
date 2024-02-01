@@ -28,7 +28,7 @@ class PaymentService extends AbstractService
         return [
             'user_uuid' => $request->userUuid,
             'app_id' => auth()->appId(),
-            'platform_package_uuid' => $request->platformPackageUuid,
+            'app_uuid' => $request->platformPackageUuid,
             'subscription_plan_uuid' => $request->subscriptionPlanUuid,
             'expiration_date' => $request->expirationDate,
             'auto_renew' => true

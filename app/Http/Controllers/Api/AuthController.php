@@ -232,7 +232,7 @@ class AuthController extends AbstractRestAPIController
                 ]);
             }
             $user->roles()->attach([config('user.default_role_uuid')]);
-            $user->userPlatformPackage()->create(['platform_package_uuid' => App::DEFAULT_PLATFORM_PACKAGE_1]);
+            $user->userPlatformPackage()->create(['app_uuid' => App::DEFAULT_PLATFORM_PACKAGE_1]);
             $otpConfig = $this->configService->findOneWhereOrFail(['key' => 'otp_status']);
             if ($otpConfig->value) {
 

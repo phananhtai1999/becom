@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Techup\ApiList\Http\Resources\GroupApiListResource;
 
-class PlatformPackageResource extends JsonResource
+class AppResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -25,14 +25,17 @@ class PlatformPackageResource extends JsonResource
             'payment_product_id' => $this->payment_product_id,
             'status' => $this->status,
         ];
-        if (\in_array('platform_package__permissions', $expand)) {
+        if (\in_array('app__permissions', $expand)) {
             $data['permissions'] = PermissionResource::collection($this->permissions);
         }
-        if (\in_array('platform_package__group_apis', $expand)) {
+        if (\in_array('app__group_apis', $expand)) {
             $data['group_apis'] = GroupApiListResource::collection($this->groupApis);
         }
-        if (\in_array('platform_package__subscription_plan', $expand)) {
+        if (\in_array('app__subscription_plan', $expand)) {
             $data['subscription_plan'] = SubscriptionPlanResource::collection($this->subscriptionPlans);
+        }
+        if (\in_array('app__add_on', $expand)) {
+            $data['add_on'] = AddOnResource::collection($this->addOns);
         }
 
         return $data;

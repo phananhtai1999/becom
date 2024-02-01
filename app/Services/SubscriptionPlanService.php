@@ -14,7 +14,7 @@ class SubscriptionPlanService extends AbstractService
     protected $modelQueryBuilderClass = SubscriptionPlanQueryBuilder::class;
     public function checkExist($request)
     {
-        return $this->model->where('platform_package_uuid', $request->get('platform_package_uuid'))
+        return $this->model->where('app_uuid', $request->get('app_uuid'))
             ->where('duration', $request->get('duration'))
             ->where('duration_type', $request->get('duration_type'))
             ->exists();

@@ -32,7 +32,7 @@ class AddOnSubscriptionPlanQueryBuilder extends AbstractQueryBuilder
         return static::for(static::baseQuery())
             ->allowedFields([
                 $modelKeyName,
-                'platform_package_uuid',
+                'add_on_uuid',
                 'duration',
                 'duration_type',
                 'payment_plan_id',
@@ -40,7 +40,7 @@ class AddOnSubscriptionPlanQueryBuilder extends AbstractQueryBuilder
             ->defaultSort('-created_at')
             ->allowedSorts([
                 $modelKeyName,
-                'platform_package_uuid',
+                'add_on_uuid',
                 'duration',
                 'duration_type',
                 'payment_plan_id',

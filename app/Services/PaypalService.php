@@ -74,7 +74,7 @@ class PaypalService extends AbstractService
                 'subscriptionDate=' . $subscriptionDate,
                 'userUuid=' . auth()->userId(),
                 'expirationDate=' . $expirationDate,
-                'platformPackageUuid=' . $subscriptionPlan->platform_package_uuid,
+                'platformPackageUuid=' . $subscriptionPlan->app_uuid,
                 'billingAddressUuid=' . $request['billing_address_uuid']
             ], false);
 

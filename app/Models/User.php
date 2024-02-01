@@ -258,7 +258,7 @@ class User extends Authenticatable implements JWTSubject
      */
     public function getPlatformPackageAttribute()
     {
-        return $this->userPlatformPackage->platform_package_uuid ?? null;
+        return $this->userApp->app_uuid ?? null;
     }
 
     /**

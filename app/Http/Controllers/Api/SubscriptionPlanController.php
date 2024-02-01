@@ -38,14 +38,14 @@ class SubscriptionPlanController extends AbstractRestAPIController
         if ($isExist) {
             return $this->sendJsonResponse(false, 'This plan for this platform package already exists', [], 400);
         }
-        $platformPackage = $this->platformPacakageService->findOrFailById($request->get('platform_package_uuid'));
+        $platformPackage = $this->platformPacakageService->findOrFailById($request->get('app_uuid'));
         $product = json_decode($platformPackage->payment_product_id);
         if ($request->get('duration_type') == "month") {
             $price = $platformPackage->monthly;
         } else {
             $price = $platformPackage->yearly;
         }
-        $paypalPlan = $this->paypalService->createPlan($product->paypal, $request, $price, $request->get('platform_package_uuid') . ' platform package');
+        $paypalPlan = $this->paypalService->createPlan($product->paypal, $request, $price, $request->get('app_uuid') . ' platform package');
         $stripePlan = $this->stripeService->createPlan($product->stripe, $request, $price);
         $product = [
             'paypal' => $paypalPlan['plan_id'],

@@ -58,7 +58,7 @@ class App extends Model
 
     public function subscriptionPlans()
     {
-        return $this->hasMany(SubscriptionPlan::class, 'platform_package_uuid', 'uuid');
+        return $this->hasMany(SubscriptionPlan::class, 'app_uuid', 'uuid');
     }
 
     public function permissions() {

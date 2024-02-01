@@ -9,8 +9,8 @@ use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\PlatformPackageRequest;
 use App\Http\Requests\PublishPlatformRequest;
 use App\Http\Requests\UpdatePlatformPackageRequest;
-use App\Http\Resources\PlatformPackageResource;
-use App\Http\Resources\PlatformPackageResourceCollection;
+use App\Http\Resources\AppResource;
+use App\Http\Resources\AppResourceCollection;
 use App\Http\Resources\UserAppResource;
 use App\Models\App;
 use App\Models\UserApp;
@@ -39,9 +39,9 @@ class AppController extends AbstractRestAPIController
         $this->stripeService = $stripeService;
         $this->paypalService = $paypalService;
         $this->userAppService = $userAppService;
-        $this->resourceClass = PlatformPackageResource::class;
+        $this->resourceClass = AppResource::class;
         $this->userPlatformResourceClass = UserAppResource::class;
-        $this->resourceCollectionClass = PlatformPackageResourceCollection::class;
+        $this->resourceCollectionClass = AppResourceCollection::class;
         $this->configService = $configService;
     }
 
