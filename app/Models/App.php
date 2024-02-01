@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Techup\ApiList\Models\GroupApiList;
 
-class PlatformPackage extends Model
+class App extends Model
 {
     use HasFactory,SoftDeletes;
     const DEFAULT_PLATFORM_PACKAGE_1 = 'starter';

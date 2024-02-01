@@ -26,7 +26,7 @@ use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Resources\UserBusinessResource;
 use App\Http\Resources\UserBusinessResourceCollection;
 use App\Models\BusinessManagement;
-use App\Models\PlatformPackage;
+use App\Models\App;
 use App\Models\Role;
 use App\Models\Team;
 use App\Models\UserBusiness;
@@ -333,7 +333,7 @@ class BusinessManagementController extends AbstractRestAPIController
             $addUser = app(UserManagerService::class)->addUser($email, $password, $request->get('first_name'), $request->get('last_name'), auth()->appId());
             if ($addUser) {
                 $userProfile = $this->userProfileService->findOneWhereOrFail(['email' => $email]);
-                $userProfile->userPlatformPackage()->create(['platform_package_uuid' => PlatformPackage::DEFAULT_PLATFORM_PACKAGE_1, 'app_id' => $userProfile->app_id]);
+                $userProfile->userApp()->create(['platform_package_uuid' => App::DEFAULT_PLATFORM_PACKAGE_1, 'app_id' => $userProfile->app_id]);
 
                 $this->userBusinessService->create([
                     'business_uuid' => $businessUuid,

@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Abstracts\AbstractService;
 use App\Models\AddOn;
 use App\Models\AddOnSubscriptionPlan;
-use App\Models\PlatformPackage;
+use App\Models\App;
 
 class PaymentService extends AbstractService
 {
@@ -79,7 +79,7 @@ class PaymentService extends AbstractService
 
     public function getInvoiceDataForPlatformPackage($request, $subscriptionPlan, $paymentMethod)
     {
-        if ($subscriptionPlan->duration_type == PlatformPackage::DURATION_MONTH) {
+        if ($subscriptionPlan->duration_type == App::DURATION_MONTH) {
             $price = $subscriptionPlan->platformPackage->monthly;
         }else {
             $price = $subscriptionPlan->platformPackage->yearly;

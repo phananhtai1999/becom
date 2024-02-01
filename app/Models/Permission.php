@@ -49,7 +49,7 @@ class Permission extends AbstractModel
     ];
 
     public function platformPackages() {
-        return $this->belongsToMany(PlatformPackage::class, 'platform_package_permission', 'permission_uuid', 'platform_package_uuid');
+        return $this->belongsToMany(App::class, 'platform_package_permission', 'permission_uuid', 'platform_package_uuid');
     }
 
     /**

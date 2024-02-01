@@ -4,20 +4,20 @@ namespace App\Models\QueryBuilders;
 
 use App\Abstracts\AbstractQueryBuilder;
 use App\Models\Campaign;
-use App\Models\PlatformPackage;
+use App\Models\App;
 use App\Models\SearchQueryBuilders\SearchQueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\Concerns\SortsQuery;
 use Spatie\QueryBuilder\QueryBuilder;
 
-class PlatformPackageQueryBuilder extends AbstractQueryBuilder
+class AppQueryBuilder extends AbstractQueryBuilder
 {
     /**
      * @return string
      */
     public static function baseQuery()
     {
-        return PlatformPackage::class;
+        return App::class;
     }
 
     /**
@@ -25,7 +25,7 @@ class PlatformPackageQueryBuilder extends AbstractQueryBuilder
      */
     public static function initialQuery()
     {
-        $modelKeyName = (new PlatformPackage())->getKeyName();
+        $modelKeyName = (new App())->getKeyName();
 
         return static::for(static::baseQuery())
             ->allowedFields([
@@ -60,7 +60,7 @@ class PlatformPackageQueryBuilder extends AbstractQueryBuilder
      */
     public static function fillAble()
     {
-        return PlatformPackage::class;
+        return App::class;
     }
 
     /**

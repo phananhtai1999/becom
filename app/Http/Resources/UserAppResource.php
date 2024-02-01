@@ -2,10 +2,10 @@
 
 namespace App\Http\Resources;
 
-use App\Models\PlatformPackage;
+use App\Models\App;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class UserPlatformPackageResource extends JsonResource
+class UserAppResource extends JsonResource
 {
     /**
      * Transform the resource into an array.

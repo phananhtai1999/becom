@@ -17,7 +17,7 @@ use App\Models\AddOnSubscriptionPlan;
 use App\Services\AddOnService;
 use App\Services\AddOnSubscriptionPlanService;
 use App\Services\PaypalService;
-use App\Services\PlatformPackageService;
+use App\Services\AppService;
 use App\Services\StripeService;
 use App\Services\SubscriptionPlanService;
 

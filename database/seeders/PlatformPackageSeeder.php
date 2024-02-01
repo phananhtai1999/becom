@@ -2,16 +2,16 @@
 
 namespace Database\Seeders;
 
-use App\Models\PlatformPackage;
+use App\Models\App;
 use App\Services\PaypalService;
-use App\Services\PlatformPackageService;
+use App\Services\AppService;
 use App\Services\StripeService;
 use Illuminate\Database\Seeder;
 use Illuminate\Http\Request;
 
 class PlatformPackageSeeder extends Seeder
 {
-    public function __construct(StripeService $stripeService, PaypalService $paypalService, PlatformPackageService $platformPackageService)
+    public function __construct(StripeService $stripeService, PaypalService $paypalService, AppService $platformPackageService)
     {
         $this->stripeService = $stripeService;
         $this->paypalService = $paypalService;
@@ -57,7 +57,7 @@ class PlatformPackageSeeder extends Seeder
                 'paypal' => $paypalProduct['id'],
                 'stripe' => $stripeProduct['id']
             ];
-            $model = PlatformPackage::updateOrCreate(['uuid' => $request->get('uuid')], [
+            $model = App::updateOrCreate(['uuid' => $request->get('uuid')], [
                 'uuid' => $request->get('uuid'),
                 'description' => $request->get('description'),
                 'monthly' => $request->get('monthly'),

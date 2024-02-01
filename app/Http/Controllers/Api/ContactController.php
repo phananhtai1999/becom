@@ -16,7 +16,7 @@ use App\Http\Resources\ContactResourceCollection;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Models\Permission;
-use App\Models\PlatformPackage;
+use App\Models\App;
 use App\Services\ContactListService;
 use App\Services\ContactService;
 use App\Services\MyContactListService;

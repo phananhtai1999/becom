@@ -6,7 +6,7 @@ use App\Abstracts\AbstractQueryBuilder;
 use App\Models\Campaign;
 use App\Models\CreditPackage;
 use App\Models\CreditPackageHistory;
-use App\Models\PlatformPackage;
+use App\Models\App;
 use App\Models\SearchQueryBuilders\SearchQueryBuilder;
 use App\Models\SubscriptionHistory;
 use Spatie\QueryBuilder\AllowedFilter;
