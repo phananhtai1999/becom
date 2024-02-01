@@ -27,7 +27,7 @@ use App\Http\Resources\DomainResourceCollection;
 use App\Http\Resources\UserBusinessResource;
 use App\Http\Resources\UserBusinessResourceCollection;
 use App\Models\BusinessManagement;
-use App\Models\PlatformPackage;
+use App\Models\App;
 use App\Models\Role;
 use App\Models\Team;
 use App\Models\UserBusiness;
@@ -229,9 +229,10 @@ class BusinessManagementController extends AbstractRestAPIController
             'domain_uuid' => $domain->uuid,
         ]);
 
-        if ($this->cstoreService->storeS3Config($request)) {
-            $this->cstoreService->storeFolderByType($request->get('name'), $model->uuid, config('foldertypecstore.BUSINESS'));
+        if ($request->get('s3_option')){
+            $this->cstoreService->storeS3Config($request);
         }
+        $this->cstoreService->storeFolderByType($request->get('name'), $model->uuid, BusinessManagement::BUSINESS_ENTITY);
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -287,7 +288,7 @@ class BusinessManagementController extends AbstractRestAPIController
     public function destroyMyBusinessManagement($id, OptionDeleteBusinuessRequest $request)
     {
         $this->myService->deleteMyBusinessManagement($id);
-        $this->cstoreService->deleteFolderType($id, config('foldertypecstore.BUSINESS'),
+        $this->cstoreService->deleteFolderType($id, BusinessManagement::BUSINESS_ENTITY,
             $request->get('option', 'keep'));
 
         return $this->sendOkJsonResponse();
@@ -324,9 +325,14 @@ class BusinessManagementController extends AbstractRestAPIController
                         'user_uuid' => $userUuid,
                         'app_id' => auth()->appId(),
                     ]);
+
+                    $userProfile = $this->userProfileService->findOneWhere([
+                        ['user_uuid', $userUuid],
+                        ['app_id', auth()->appId()]
+                    ]);
+                    $this->cstoreService->storeFolderByType($userProfile->email, $userProfile->user_uuid, BusinessManagement::USER_ENTITY, $businessUuid);
                 }
             }
-            DB::commit();
             return $this->sendCreatedJsonResponse();
         } elseif ($request->get('type') == UserBusiness::ACCOUNT_INVITE) {
 //            $password = Hash::make($request->get('password'));
@@ -335,13 +341,15 @@ class BusinessManagementController extends AbstractRestAPIController
             $addUser = app(UserManagerService::class)->addUser($email, $password, $request->get('first_name'), $request->get('last_name'), [Role::ROLE_USER_MEMBER], auth()->appId(), auth()->userId(), auth()->token());
             if ($addUser) {
                 $userProfile = $this->userProfileService->findOneWhereOrFail(['email' => $email]);
-                $userProfile->userPlatformPackage()->create(['platform_package_uuid' => PlatformPackage::DEFAULT_PLATFORM_PACKAGE_1, 'app_id' => $userProfile->app_id]);
+                $userProfile->userApp()->create(['platform_package_uuid' => App::DEFAULT_PLATFORM_PACKAGE_1, 'app_id' => $userProfile->app_id]);
 
                 $this->userBusinessService->create([
                     'business_uuid' => $businessUuid,
                     'user_uuid' => $userProfile->user_uuid,
                     'app_id' => auth()->appId()
                 ]);
+                $this->cstoreService->storeFolderByType($userProfile->email, $userProfile->user_uuid, BusinessManagement::USER_ENTITY, $businessUuid);
+
 //                    Mailbox::postEmailAccountcreate($userProfile->user_uuid, $email, $password);
             }
 
@@ -425,6 +433,7 @@ class BusinessManagementController extends AbstractRestAPIController
         }
         $userBusiness = $this->userBusinessService->findOneWhereOrFail(['business_uuid' => $businessUuid, 'user_uuid' => $id]);
         $userBusiness->delete();
+        $this->cstoreService->deleteFolderType($id,BusinessManagement::USER_ENTITY, $request->get('option', 'keep'));
 
         return $this->sendCreatedJsonResponse();
     }

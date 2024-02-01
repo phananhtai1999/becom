@@ -15,7 +15,7 @@ use Spatie\Translatable\HasTranslations;
 class Department extends AbstractModel
 {
     use HasFactory, SoftDeletes, HasTranslations, ModelFilterNameLanguageTrait, ModelFilterExactNameLanguageTrait;
-
+    const DEFAULT_NAME = ['hr', 'marketing', 'it'];
     /**
      * @var string
      */
@@ -37,6 +37,7 @@ class Department extends AbstractModel
         'app_id',
         'manager_uuid',
         'is_default',
+        'status',
     ];
 
     /**
@@ -108,6 +109,14 @@ class Department extends AbstractModel
     public function sendProjects()
     {
         return $this->belongsToMany(SendProject::class, 'department_send_project', 'department_uuid', 'send_project_uuid')->withTimestamps();
+    }
+
+    public function platformPackage() {
+        return $this->belongsToMany(App::class, 'department_app', 'department_uuid', 'app_uuid');
+    }
+
+    public function app() {
+        return $this->belongsToMany(App::class, 'department_app', 'department_uuid', 'app_uuid');
     }
 
 }

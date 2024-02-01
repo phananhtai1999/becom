@@ -5,8 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Techup\ApiList\Models\GroupApiList;
 
-class PlatformPackage extends Model
+class App extends Model
 {
     use HasFactory,SoftDeletes;
     const DEFAULT_PLATFORM_PACKAGE_1 = 'starter';
@@ -25,7 +26,7 @@ class PlatformPackage extends Model
     /**
      * @var string
      */
-    protected $table = "platform_packages";
+    protected $table = "apps";
 
     /**
      * @var string
@@ -62,5 +63,9 @@ class PlatformPackage extends Model
 
     public function permissions() {
         return $this->belongsToMany(Permission::class, 'platform_package_permission', 'platform_package_uuid', 'permission_uuid');
+    }
+
+    public function groupApis() {
+        return $this->belongsToMany(GroupApiList::class, 'app_group_api', 'app_uuid', 'group_api_uuid');
     }
 }

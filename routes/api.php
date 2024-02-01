@@ -49,7 +49,7 @@ use App\Http\Controllers\Api\Payment\StripeController;
 use App\Http\Controllers\Api\PaymentMethodController;
 use App\Http\Controllers\Api\PayoutMethodController;
 use App\Http\Controllers\Api\PermissionController;
-use App\Http\Controllers\Api\PlatformPackageController;
+use App\Http\Controllers\Api\AppController;
 use App\Http\Controllers\Api\PositionController;
 use App\Http\Controllers\Api\PurposeController;
 use App\Http\Controllers\Api\RemindController;
@@ -108,6 +108,7 @@ Route::group(['as' => 'auth.'], function () {
 
 // Mail Open Tracking
 Route::get('/mail-open-tracking/{id}', [MailSendingHistoryController::class, 'mailOpenTracking'])->name('mail-open-tracking');
+Route::get('cstge/my/send-projects', [SendProjectController::class, 'indexMyCstge'])->name('indexMyCstge')->middleware('app_to_app');
 
 Route::group(['middleware' => ['apikey']], function () {
     Route::group(['middleware' => ['appid'], 'as' => 'appid.'], function () {
@@ -658,18 +659,18 @@ Route::group(['middleware' => ['apikey']], function () {
         Route::get('public/website-page', [WebsitePageController::class, 'publicWebsitePageByDomainAndSlug'])->name('website_page.public');
 
 //Platform Package
-        Route::get('/platform-packages', [PlatformPackageController::class, 'index']);
+        Route::get('/platform-packages', [AppController::class, 'index']);
         Route::group(['middleware' => ['userid'], 'as' => 'platformPackage.'], function () {
             Route::group(['middleware' => ['role:root'], 'as' => 'root.'], function () {
-                Route::post('/platform-package', [PlatformPackageController::class, 'store']);
-                Route::delete('/platform-package/{id}', [PlatformPackageController::class, 'destroy']);
-                Route::put('/publish-platform-package/{id}', [PlatformPackageController::class, 'publishPlatformPackage']);
-                Route::put('/platform-package/{id}', [PlatformPackageController::class, 'edit']);
-                Route::put('/disable-platform-package/{id}', [PlatformPackageController::class, 'disablePlatformPackage']);
+                Route::post('/platform-package', [AppController::class, 'store']);
+                Route::delete('/platform-package/{id}', [AppController::class, 'destroy']);
+                Route::put('/publish-platform-package/{id}', [AppController::class, 'publishPlatformPackage']);
+                Route::put('/platform-package/{id}', [AppController::class, 'edit']);
+                Route::put('/disable-platform-package/{id}', [AppController::class, 'disablePlatformPackage']);
             });
 
-            Route::get('/platform-package/{id}', [PlatformPackageController::class, 'show']);
-            Route::get('/my-platform-package', [PlatformPackageController::class, 'myPlatformPackage']);
+            Route::get('/platform-package/{id}', [AppController::class, 'show']);
+            Route::get('/my-platform-package', [AppController::class, 'myPlatformPackage']);
         });
 
 //Credit Package
@@ -944,7 +945,8 @@ Route::group(['middleware' => ['apikey']], function () {
             Route::post('department/remove-team', [DepartmentController::class, 'removeTeam'])->name('removeTeam');
             Route::post('business/add-department', [DepartmentController::class, 'addDepartmentForBusiness'])->name('addDepartmentForBusiness');
             Route::post('location/add-department', [DepartmentController::class, 'addDepartmentForLocation'])->name('addDepartmentForLocation');
-            Route::get('toggle-default-department', [DepartmentController::class, 'toggleDefaultDepartment'])->name('toggleDefaultDepartment');
+            Route::get('toggle-default-department/{id}', [DepartmentController::class, 'toggleDefaultDepartment'])->name('toggleDefaultDepartment');
+            Route::post('assign-app-for-department', [DepartmentController::class, 'setAppForDepartment'])->name('setAppForDepartment');
         });
         Route::group(['middleware' => ['userid'], 'as' => 'shop.'], function () {
                 Route::get('/my/products', [ShopController::class, 'myProduct'])->name('myProduct');

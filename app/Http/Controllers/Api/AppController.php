@@ -11,36 +11,36 @@ use App\Http\Requests\PublishPlatformRequest;
 use App\Http\Requests\UpdatePlatformPackageRequest;
 use App\Http\Resources\PlatformPackageResource;
 use App\Http\Resources\PlatformPackageResourceCollection;
-use App\Http\Resources\UserPlatformPackageResource;
-use App\Models\PlatformPackage;
-use App\Models\UserPlatformPackage;
+use App\Http\Resources\UserAppResource;
+use App\Models\App;
+use App\Models\UserApp;
 use Techup\ApiConfig\Services\ConfigService;
 use App\Services\PaypalService;
-use App\Services\PlatformPackageService;
+use App\Services\AppService;
 use App\Services\StripeService;
-use App\Services\UserPlatformPackageService;
+use App\Services\UserAppService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redis;
 
-class PlatformPackageController extends AbstractRestAPIController
+class AppController extends AbstractRestAPIController
 {
     use RestIndexTrait, RestShowTrait, RestDestroyTrait;
 
     public function __construct(
-        PlatformPackageService $service,
-        PaypalService          $paypalService,
-        StripeService          $stripeService,
-        UserPlatformPackageService $userPlatformPackageService,
-        ConfigService $configService
+        AppService     $service,
+        PaypalService  $paypalService,
+        StripeService  $stripeService,
+        UserAppService $userAppService,
+        ConfigService  $configService
     )
     {
         $this->service = $service;
         $this->stripeService = $stripeService;
         $this->paypalService = $paypalService;
-        $this->userPlatformPackageService = $userPlatformPackageService;
+        $this->userAppService = $userAppService;
         $this->resourceClass = PlatformPackageResource::class;
-        $this->userPlatformResourceClass = UserPlatformPackageResource::class;
+        $this->userPlatformResourceClass = UserAppResource::class;
         $this->resourceCollectionClass = PlatformPackageResourceCollection::class;
         $this->configService = $configService;
     }
@@ -57,7 +57,7 @@ class PlatformPackageController extends AbstractRestAPIController
             'monthly' => $request->get('monthly'),
             'yearly' => $request->get('yearly')
         ]);
-        $model->permissions()->attach($request->get('permission_uuid'));
+        $model->groupApis()->syncWithoutDetaching($request->get('group_api_uuids'));
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -68,7 +68,7 @@ class PlatformPackageController extends AbstractRestAPIController
      * @return JsonResponse
      */
     public function myPlatformPackage() {
-        $myPlatformPackage = $this->userPlatformPackageService->findOneWhere([
+        $myPlatformPackage = $this->userAppService->findOneWhere([
             'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ]);
@@ -88,7 +88,7 @@ class PlatformPackageController extends AbstractRestAPIController
         ];
         $this->service->update($platformPackage,[
             'payment_product_id' => json_encode($product),
-            'status' => PlatformPackage::PLATFORM_PACKAGE_PUBLISH
+            'status' => App::PLATFORM_PACKAGE_PUBLISH
         ]);
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $platformPackage)
@@ -98,7 +98,7 @@ class PlatformPackageController extends AbstractRestAPIController
         $platformPackage = $this->service->findOrFailById($id);
         $this->stripeService->disableProduct(json_decode($platformPackage->payment_product_id)->stripe);
         $this->service->update($platformPackage,[
-            'status' => PlatformPackage::PLATFORM_PACKAGE_DISABLE
+            'status' => App::PLATFORM_PACKAGE_DISABLE
         ]);
 
         return $this->sendCreatedJsonResponse(
@@ -108,10 +108,16 @@ class PlatformPackageController extends AbstractRestAPIController
 
     public function edit(UpdatePlatformPackageRequest $request, $id) {
         $platformPackage = $this->service->findOrFailById($id);
-        if ($platformPackage->status == PlatformPackage::PLATFORM_PACKAGE_PUBLISH) {
+        if ($platformPackage->status == App::PLATFORM_PACKAGE_PUBLISH) {
             return $this->sendJsonResponse(false, 'Can not edit this platform', [], 403);
         }
-        $this->service->update($platformPackage, array_merge($request->all(), ['uuid' => $request->get('name')]));
+        $data = $request->all();
+        if ($request->get('name')) {
+            $data = array_merge($request->all(), ['uuid' => $request->get('name')]);
+        }
+        $this->service->update($platformPackage, $data);
+        $platformPackage->groupApis()->syncWithoutDetaching($request->get('group_api_uuids'));
+
         Cache::flush();
 
         return $this->sendCreatedJsonResponse(

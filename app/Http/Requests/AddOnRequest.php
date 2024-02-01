@@ -31,8 +31,9 @@ class AddOnRequest extends AbstractRequest
             'monthly' => ['required', 'integer', 'min:1'],
             'yearly' => ['required', 'integer', 'min:1'],
             'status' => ['in:draft'],
-            'permission_uuid' => ['required', 'array'],
-            'permission_uuid.*' => ['required', 'integer', 'exists:permissions,uuid'],
+            'platform_package_uuid' => ['exists:apps,uuid'],
+            'group_api_uuids' => ['required', 'array'],
+            'group_api_uuids.*' => ['required', 'integer', 'exists:group_api_lists,uuid'],
         ];
     }
 }

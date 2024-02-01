@@ -24,7 +24,7 @@ use App\Services\PaymentService;
 use App\Services\PaypalService;
 use App\Services\StripeService;
 use App\Services\UserAddOnService;
-use App\Services\UserPlatformPackageService;
+use App\Services\UserAppService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -67,7 +67,7 @@ class AddOnController extends AbstractRestAPIController
     public function store(AddOnRequest $request): JsonResponse
     {
         $model = $this->service->create($request->all());
-        $model->permissions()->attach($request->get('permission_uuid'));
+        $model->groupApis()->syncWithoutDetaching($request->get('group_api_uuids'));
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -110,7 +110,7 @@ class AddOnController extends AbstractRestAPIController
             return $this->sendJsonResponse(false, 'Can not edit price this platform', [], 403);
         }
         $this->service->update($addOn, $request->all());
-        $addOn->permissions()->sync($request->get('permission_uuid'));
+        $addOn->groupApis()->sync($request->get('group_api_uuids'));
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $addOn)

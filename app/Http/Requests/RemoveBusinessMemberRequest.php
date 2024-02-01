@@ -32,6 +32,8 @@ class RemoveBusinessMemberRequest extends AbstractRequest
             $validates['business_uuid'] = ['required', 'integer', Rule::exists('business_managements', 'uuid')->whereNull('deleted_at')];
         }
 
+        $validates['option'] = ['nullable', 'string',Rule::in(['keep', 'delete', 'destroy'])];
+
         return $validates;
     }
 }

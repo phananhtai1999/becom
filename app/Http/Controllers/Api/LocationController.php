@@ -21,6 +21,7 @@ use App\Http\Requests\UpdateLocationRequest;
 use App\Http\Requests\MyLocationRequest;
 use App\Http\Resources\LocationResource;
 use App\Http\Resources\LocationResourceCollection;
+use App\Models\BusinessManagement;
 use App\Services\BusinessManagementService;
 use App\Services\CstoreService;
 use App\Services\LocationService;
@@ -108,7 +109,7 @@ class LocationController extends AbstractRestAPIController
             'business_uuid' => $business->uuid
         ]));
 
-        $this->cstoreService->storeFolderByType($request->get('name'), $model->uuid, config('foldertypecstore.LOCATION'), $business->uuid);
+        $this->cstoreService->storeFolderByType($request->get('name'), $model->uuid, BusinessManagement::LOCATION_ENTITY, $business->uuid);
 
         return $this->sendCreatedJsonResponse(
             $this->myService->resourceToData($this->resourceClass, $model)
@@ -122,7 +123,7 @@ class LocationController extends AbstractRestAPIController
     public function destroyMy($id, OptionDeleteBusinuessRequest $request)
     {
         $this->service->destroyByUserIdAndAppId($id);
-        $this->cstoreService->deleteFolderType($id, config('foldertypecstore.LOCATION'),
+        $this->cstoreService->deleteFolderType($id, BusinessManagement::LOCATION_ENTITY,
             $request->get('option', 'keep'));
 
         return $this->sendOkJsonResponse();

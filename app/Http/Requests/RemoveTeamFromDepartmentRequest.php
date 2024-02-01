@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Abstracts\AbstractRequest;
 use App\Rules\CheckDepartmentOwnerRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class RemoveTeamFromDepartmentRequest extends AbstractRequest
 {
@@ -28,7 +29,8 @@ class RemoveTeamFromDepartmentRequest extends AbstractRequest
         return [
             'team_uuids' => ['required', 'array'],
             'department_uuid' => ['required', 'integer', 'exists:departments,uuid', new CheckDepartmentOwnerRule()],
-            'team_uuids.*' => ['required', 'integer', 'exists:teams,uuid']
+            'team_uuids.*' => ['required', 'integer', 'exists:teams,uuid'],
+            'option' => ['nullable', 'string',Rule::in(['keep', 'delete', 'destroy'])]
         ];
     }
 }

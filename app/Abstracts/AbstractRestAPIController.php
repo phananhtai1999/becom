@@ -6,7 +6,7 @@ use App\Models\AddOn;
 use App\Models\Department;
 use App\Models\Location;
 use App\Models\Permission;
-use App\Models\PlatformPackage;
+use App\Models\App;
 use App\Models\Role;
 use App\Models\Team;
 use App\Models\UserTeam;
@@ -140,30 +140,18 @@ class AbstractRestAPIController extends BaseController
 
     protected function getPlatformByPermission($code)
     {
-        $cacheNames = [PlatformPackage::DEFAULT_PLATFORM_PACKAGE_1, PlatformPackage::DEFAULT_PLATFORM_PACKAGE_2, PlatformPackage::DEFAULT_PLATFORM_PACKAGE_3];
-        foreach ($cacheNames as $cacheName) {
-            $permissionCaches = Cache::rememberForever($cacheName . '_permission', function () use ($cacheName) {
-                $platformPackage = PlatformPackage::find($cacheName);
-                return $platformPackage ? $platformPackage->permissions()->select('api_methods', 'name', 'code', 'uuid')->get() : collect();
-            });
-            foreach ($permissionCaches as $permissionCache) {
-                if (in_array($code, $permissionCache->api_methods ?? [])) {
-                    $permission = Permission::find($permissionCache->uuid);
-                    if ($permission) {
-                        $platformPackages = $permission->platformPackages;
-                        foreach ($platformPackages as $platformPackage) {
-                            return ['plan' => 'platform_package_' . $platformPackage->uuid];
-                        }
-                    }
-                }
+        $platformPackages = App::all();
+        foreach ($platformPackages as $platformPackage) {
+            $groupApi = $platformPackage->groupApis()->pluck('code')->toArray() ?? [];
+            if (in_array($code, $groupApi)) {
+                return ['plan' => 'platform_package_' . $platformPackage->uuid];
             }
         }
         $addOns = AddOn::all();
         foreach ($addOns as $addOn) {
-            foreach ($addOn->permissions as $permission) {
-                if (in_array($code, $permission->api_methods ?? [])) {
-                    return ['plan' => 'add_on_' . $addOn->uuid];
-                }
+            $groupApi = $addOn->groupApis()->pluck('code')->toArray() ?? [];
+            if (in_array($code, $groupApi)) {
+                return ['plan' => 'add_on_' . $addOn->uuid];
             }
         }
 
@@ -299,6 +287,16 @@ class AbstractRestAPIController extends BaseController
         Cache::forget('team_permission_' . $userUuid);
     }
 
+    public function removeTeamLeaderPermissionCache($userUuid)
+    {
+        Cache::forget('team_leader_add_on_permission_' . $userUuid);
+    }
+
+    public function removeTeamAddOnPermissionCache($userUuid)
+    {
+        Cache::forget('team_add_on_permission_' . $userUuid);
+    }
+
     public function checkExistBusiness()
     {
         if (!auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
@@ -317,6 +315,17 @@ class AbstractRestAPIController extends BaseController
     public function getBusiness()
     {
         $businesses = $this->user()->businessManagements;
+        if ($businesses->toArray()) {
+
+            return $businesses->first();
+        }
+
+        return false;
+    }
+
+    public function getCstgeBusiness()
+    {
+        $businesses = auth('app_to_app')->user()->businessManagements;
         if ($businesses->toArray()) {
 
             return $businesses->first();

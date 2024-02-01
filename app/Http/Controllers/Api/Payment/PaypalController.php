@@ -96,12 +96,12 @@ class PaypalController extends AbstractRestAPIController
         $subscriptionHistoryData = $this->paymentService->getSubscriptionHistoryData($request, PaymentMethod::PAYPAL, $subscriptionData);
 
         if (isset($response['status']) && $response['status'] == 'ACTIVE') {
-            $userPlatformPackageData = $this->paymentService->getUserPlatformPackageData($request);
+            $userAppData = $this->paymentService->getUserPlatformPackageData($request);
             $subscriptionPlan = $this->subscriptionPlanService->findOrFailById($request->subscriptionPlanUuid);
             $invoiceData = $this->paymentService->getInvoiceDataForPlatformPackage($request, $subscriptionPlan, PaymentMethod::STRIPE);
             $invoice = $this->invoiceService->create(array_merge($invoiceData, ['app_id' => auth()->appId()]));
 
-            Event::dispatch(new SubscriptionSuccessEvent($request->userUuid, $subscriptionHistoryData, $userPlatformPackageData, $invoice));
+            Event::dispatch(new SubscriptionSuccessEvent($request->userUuid, $subscriptionHistoryData, $userAppData, $invoice));
             Event::dispatch(new SendNotificationSystemForPaymentEvent($subscriptionHistoryData, Notification::PACKAGE_TYPE));
 
             return $this->paymentService->successPaymentSubscriptionUrl($request, $invoice);

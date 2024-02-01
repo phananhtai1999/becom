@@ -25,11 +25,11 @@ class UpdatePlatformPackageRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'name' => ['unique:platform_packages,uuid'],
+            'name' => ['unique:apps,uuid'],
             'monthly' => ['min:-1', 'integer'],
             'yearly' => ['min:-1', 'integer'],
-            'permission_uuid' => ['array'],
-            'permission_uuid.*' => ['integer', 'exists:permissions,uuid'],
+            'group_api_uuids' => ['array'],
+            'group_api_uuids.*' => ['integer', 'exists:group_api_lists,uuid'],
         ];
 
     }

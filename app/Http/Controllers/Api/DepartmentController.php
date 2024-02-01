@@ -12,12 +12,14 @@ use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MyDepartmentRequest;
 use App\Http\Requests\OptionDeleteBusinuessRequest;
 use App\Http\Requests\RemoveTeamFromDepartmentRequest;
+use App\Http\Requests\SetAppForDepartmentRequest;
 use App\Http\Requests\UpdateDepartmentRequest;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\UpdateMyDepartmentRequest;
 use App\Http\Resources\DepartmentResource;
 use App\Http\Resources\DepartmentResourceCollection;
+use App\Models\BusinessManagement;
 use App\Models\UserConfig;
 use App\Services\BusinessManagementService;
 use App\Services\CstoreService;
@@ -131,12 +133,9 @@ class DepartmentController extends AbstractRestAPIController
 
     public function indexMy(IndexRequest $request)
     {
-        $user = $this->userProfileService->findOneWhereOrFail(['user_uuid' => auth()->userId(), 'app_id' => auth()->appId()]);
-        if ($user->default_department) {
-            $models = $this->service->getIndexMyWithDefault($request, true);
-        } else {
-            $models = $this->service->getIndexMyWithDefault($request, false);
-        }
+        $business = $this->getBusiness();
+        $businessUuid = $business ? $business->uuid : null;
+        $models = $this->service->getIndexMyWithDefault($request, $businessUuid);
 
         return $this->sendOkJsonResponse(
             $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
@@ -161,7 +160,7 @@ class DepartmentController extends AbstractRestAPIController
             'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ]));
-        $this->cstoreService->storeFolderByType($model->name, $model->uuid, config('foldertypecstore.DEPARTMENT'), $request->get('location_uuid'));
+        $this->cstoreService->storeFolderByType($model->name, $model->uuid, BusinessManagement::DEPARTMENT_ENTITY, $request->get('location_uuid'));
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -195,10 +194,15 @@ class DepartmentController extends AbstractRestAPIController
             return $this->sendValidationFailedJsonResponse();
         }
 
+        if ($request->get('location_uuid') and $request->get('location_uuid') != $model->location_uuid){
+            $this->cstoreService->storeFolderByType($model->name, $model->uuid, BusinessManagement::DEPARTMENT_ENTITY, $request->get('location_uuid'));
+        }
+
         $this->service->update($model, array_merge($request->all(), [
             'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ]));
+
 
         return $this->sendOkJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -212,7 +216,7 @@ class DepartmentController extends AbstractRestAPIController
     public function destroyMyDepartment($id, OptionDeleteBusinuessRequest $request)
     {
         $this->service->deleteMyDepartment($id);
-        $this->cstoreService->deleteFolderType($id, config('foldertypecstore.DEPARTMENT'),
+        $this->cstoreService->deleteFolderType($id, BusinessManagement::DEPARTMENT_ENTITY,
             $request->get('option', 'keep'));
 
         return $this->sendOkJsonResponse();
@@ -242,7 +246,7 @@ class DepartmentController extends AbstractRestAPIController
         foreach ($request->get('department_uuids') as $departmentUuid) {
             $department = $this->service->findOrFailById($departmentUuid);
             $department->update(['location_uuid' => $request->get('location_uuid')]);
-            $this->cstoreService->storeFolderByType($department->name, $department->uuid, config('foldertypecstore.DEPARTMENT'), $request->get('location_uuid'));
+            $this->cstoreService->storeFolderByType($department->name, $department->uuid, BusinessManagement::DEPARTMENT_ENTITY, $request->get('location_uuid'));
         }
 
         return $this->sendOkJsonResponse();
@@ -258,6 +262,7 @@ class DepartmentController extends AbstractRestAPIController
             $team = $this->teamService->findOneWhere(['uuid' => $teamUuid, 'department_uuid' => $request->get('department_uuid')]);
             if ($team) {
                 $team->update(['department_uuid' => null]);
+                $this->cstoreService->deleteFolderType($team->uuid, BusinessManagement::TEAM_ENTITY, $request->get('option', 'keep'));
             }
         }
 
@@ -280,10 +285,28 @@ class DepartmentController extends AbstractRestAPIController
         );
     }
 
-    public function toggleDefaultDepartment(): JsonResponse
+    public function toggleDefaultDepartment($id): JsonResponse
     {
-        $user = $this->userProfileService->findOneWhereOrFail(['user_uuid' => auth()->userId(), 'app_id' => auth()->appId()]);
-        $user->update(['default_department' => !$user->default_department]);
+        $model = $this->service->findOrFailById($id);
+        $model->update(['status' => !$model->status]);
+
+        return $this->sendOkJsonResponse();
+    }
+
+    public function setAppForDepartment(SetAppForDepartmentRequest $request)
+    {
+        $business = $this->getBusiness();
+        if (!$business) {
+            return $this->sendJsonResponse(false, __('business.not_business'), [], 403);
+        }
+        foreach ($request->get('department_uuids') as $departmentUuid) {
+            $department = $this->service->findOrFailById($departmentUuid);
+            if ($request->get('type', 'assign') === 'assign') {
+                $department->app()->syncWithoutDetaching($request->get('app_uuids'), []);
+            } else {
+                $department->app()->detach($request->get('app_uuids'), []);
+            }
+        }
 
         return $this->sendOkJsonResponse();
     }

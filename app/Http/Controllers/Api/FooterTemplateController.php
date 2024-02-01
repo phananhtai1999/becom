@@ -143,8 +143,8 @@ class FooterTemplateController extends AbstractRestAPIController
 
     public function storeMyFooterTemplate(MyFooterTemplateRequest $request)
     {
-        if (!Gate::allows('permission', config('api.footer.create'))) {
-            return $this->sendJsonResponse(false, 'You need to buy platform/add-on', ['data' => $this->getPlatformByPermission(config('api.footer.create'))], 403);
+        if (!Gate::allows('permission', 'footer_template')) {
+            return $this->sendJsonResponse(false, 'You need to buy platform/add-on', ['data' => $this->getPlatformByPermission('footer_template')], 403);
         }
         $model = $this->service->create(array_merge($request->except('active_by_uuid'), [
             'user_uuid' => auth()->userId(),
@@ -171,8 +171,8 @@ class FooterTemplateController extends AbstractRestAPIController
 
     public function editMyFooterTemplate(UpdateMyFooterTemplateRequest $request, $id)
     {
-        if (!Gate::allows('permission', config('api.footer.edit'))) {
-            return $this->sendJsonResponse(false, 'You need to buy platform/add-on', ['data' => $this->getPlatformByPermission(config('api.footer.edit'))], 403);
+        if (!Gate::allows('permission', 'footer_template')) {
+            return $this->sendJsonResponse(false, 'You need to buy platform/add-on', ['data' => $this->getPlatformByPermission('footer_template')], 403);
         }
         $model = $this->myService->showMyFooterTemplate($id);
 
@@ -188,8 +188,8 @@ class FooterTemplateController extends AbstractRestAPIController
 
     public function destroyMyFooterTemplate($id)
     {
-        if (!Gate::allows('permission', config('api.footer.delete'))) {
-            return $this->sendJsonResponse(false, 'You need to buy platform/add-on', ['data' => $this->getPlatformByPermission(config('api.footer.delete'))], 403);
+        if (!Gate::allows('permission', 'footer_template')) {
+            return $this->sendJsonResponse(false, 'You need to buy platform/add-on', ['data' => $this->getPlatformByPermission('footer_template')], 403);
         }
         $model = $this->myService->showMyFooterTemplate($id);
         if (!$model->active_by_uuid) {
@@ -202,8 +202,8 @@ class FooterTemplateController extends AbstractRestAPIController
 
     public function removeFooterTemplate(RemoveFooterTemplateRequest $request)
     {
-        if (!Gate::allows('permission', config('api.footer.remove'))) {
-            return $this->sendJsonResponse(false, 'You need to buy platform/add-on', ['data' => $this->getPlatformByPermission(config('api.footer.remove'))], 403);
+        if (!Gate::allows('permission', 'footer_template')) {
+            return $this->sendJsonResponse(false, 'You need to buy platform/add-on', ['data' => $this->getPlatformByPermission('footer_template')], 403);
         }
         $user = $this->userProfileService->findOneWhereOrFail(['user_uuid' => auth()->userId()]);
         $this->userProfileService->update($user, [
