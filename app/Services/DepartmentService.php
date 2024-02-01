@@ -53,7 +53,7 @@ class DepartmentService extends AbstractService
             return $this->modelQueryBuilderClass::searchQuery($indexRequest['search'], $indexRequest['search_by'])
                 ->where('user_uuid', auth()->userId())
                 ->orwhere('manager_uuid', auth()->userId())
-                ->get();
+                ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
         } else {
             return $this->modelQueryBuilderClass::searchQuery($indexRequest['search'], $indexRequest['search_by'])
                 ->where('user_uuid', auth()->userId())
@@ -63,7 +63,7 @@ class DepartmentService extends AbstractService
                         ->where('is_default', true)
                         ->where('status', true);
                 })
-                ->get();
+                ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
         }
 
     }

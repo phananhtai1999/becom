@@ -2,6 +2,7 @@
 
 namespace App\Rules;
 
+use App\Models\UserProfile;
 use Illuminate\Contracts\Validation\Rule;
 
 class CheckDepartmentBelongToBusiness implements Rule
@@ -24,8 +25,8 @@ class CheckDepartmentBelongToBusiness implements Rule
      */
     public function passes($attribute, $value)
     {
-
-        $businesses = auth()->user()->businessManagements;
+        $user = UserProfile::where(['user_uuid' => auth()->userId(), 'app_id' => auth()->appId()])->first();
+        $businesses = $user->businessManagements;
         if ($businesses->isNotEmpty()) {
             if ($businesses->first()->locations->isNotEmpty()) {
                 foreach ($businesses->first()->locations as $location) {

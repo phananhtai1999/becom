@@ -68,4 +68,8 @@ class App extends Model
     public function groupApis() {
         return $this->belongsToMany(GroupApiList::class, 'app_group_api', 'app_uuid', 'group_api_uuid');
     }
+
+    public function addOns() {
+        return $this->hasMany(AddOn::class, 'app_uuid', 'uuid');
+    }
 }
