@@ -108,6 +108,7 @@ Route::group(['as' => 'auth.'], function () {
 
 // Mail Open Tracking
 Route::get('/mail-open-tracking/{id}', [MailSendingHistoryController::class, 'mailOpenTracking'])->name('mail-open-tracking');
+Route::get('cstge/my/send-projects', [SendProjectController::class, 'indexMyCstge'])->name('indexMyCstge')->middleware('app_to_app');
 
 Route::group(['middleware' => ['apikey']], function () {
     Route::group(['middleware' => ['appid'], 'as' => 'appid.'], function () {
@@ -770,6 +771,7 @@ Route::group(['middleware' => ['apikey']], function () {
             Route::get('/section-templates-default', [SectionTemplateController::class, 'getSectionTemplatesDefault'])->name('getWebsitePagesDefault');
             Route::get('/section-template-default/{id}', [SectionTemplateController::class, 'showSectionTemplateDefault'])->name('showSectionTemplateDefault');
         });
+    Route::get('/section-template-header/{id}', [SectionTemplateController::class, 'getHeader'])->name('getHeader');
 
 //Form
         Route::group(['middleware' => ['userid'], 'as' => 'form.'], function () {
@@ -1104,6 +1106,7 @@ Route::group(['middleware' => ['apikey']], function () {
             Route::get('business/add-on-of-team/{id}', [TeamController::class, 'getAddOnOfTeam'])->name('getAddOnForTeam');
             Route::get('business/assigned-of-teams/{id}', [TeamController::class, 'assignedBusinessTeam'])->name('assignedBusinessTeam');
             Route::get('business/assigned-of-team-members/{id}', [TeamController::class, 'assignedTeamMember'])->name('assignedTeamMember');
+            Route::get('business/domains', [BusinessManagementController::class, 'domainByBusiness'])->name('domainByBusiness');
 
             Route::post('department/add-team', [TeamController::class, 'addTeamForDepartment'])->name('addTeamForDepartment');
 

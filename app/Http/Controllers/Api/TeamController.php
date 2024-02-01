@@ -38,6 +38,7 @@ use App\Http\Resources\UserTeamResource;
 use App\Http\Resources\UserTeamResourceCollection;
 use App\Mail\SendInviteToTeam;
 use App\Mail\SendInviteToTeamByAccount;
+use App\Models\BusinessManagement;
 use App\Models\Email;
 use App\Models\Invite;
 use App\Models\App;
@@ -169,12 +170,12 @@ class TeamController extends Controller
 
         if($request->get('parent_team_uuid')){
             $parentUuid = $request->get('parent_team_uuid');
-            $parentType = config('foldertypecstore.TEAM');
+            $parentType = BusinessManagement::TEAM_ENTITY;
         }else{
             $parentUuid = $request->get('department_uuid');
-            $parentType = config('foldertypecstore.DEPARTMENT');
+            $parentType = BusinessManagement::DEPARTMENT_ENTITY;
         }
-        $this->cstoreService->storeFolderByType($model->name, $model->uuid, config('foldertypecstore.TEAM'), $parentUuid, $parentType);
+        $this->cstoreService->storeFolderByType($model->name, $model->uuid, BusinessManagement::TEAM_ENTITY, $parentUuid, $parentType);
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -193,7 +194,7 @@ class TeamController extends Controller
                 $this->smtpAccountService->sendEmailNotificationSystem(null, new SendInviteToTeam($invite, $url), $request->get('email'));
             } elseif ($request->get('type') == Team::ACCOUNT_INVITE) {
                 $password = $this->generateRandomString(10);
-                $addUser = app(UserManagerService::class)->addUser($request->get('email'), $password, $request->get('first_name'), $request->get('last_name'), auth()->appId());
+                $addUser = app(UserManagerService::class)->addUser($request->get('email'), $password, $request->get('first_name'), $request->get('last_name'), [Role::ROLE_USER_MEMBER], auth()->appId(), auth()->userId(), auth()->token());
                 if ($addUser) {
                     $userProfile = $this->userProfileService->findOneWhereOrFail(['email' => $request->get('email')]);
                     $userProfile->userApp()->create(['platform_package_uuid' => App::DEFAULT_PLATFORM_PACKAGE_1, 'app_id' => $userProfile->app_id]);
@@ -202,7 +203,7 @@ class TeamController extends Controller
                         'user_uuid' => $userProfile->user_uuid,
                         'app_id' => auth()->appId()
                     ]));
-                    $this->cstoreService->storeFolderByType($request->get('email'), $userProfile->user_uuid, config('foldertypecstore.USER'), $request->get('team_uuid'));
+                    $this->cstoreService->storeFolderByType($request->get('email'), $userProfile->user_uuid, BusinessManagement::USER_ENTITY, $request->get('team_uuid'));
                     $this->smtpAccountService->sendEmailNotificationSystem($userProfile, new SendInviteToTeamByAccount($userProfile, $password));
 //              Mailbox::postEmailAccountcreate($user->user_uuid, $email, $password);
                 }
@@ -240,7 +241,7 @@ class TeamController extends Controller
 //                $password = Hash::make($request->get('password'));
                 $password = $request->get('password');
                 $email = $request->get('email') . '@' . $request->get('domain');
-                $addUser = app(UserManagerService::class)->addUser($email, $password, $request->get('first_name'), $request->get('last_name'), auth()->appId());
+                $addUser = app(UserManagerService::class)->addUser($email, $password, $request->get('first_name'), $request->get('last_name'), [Role::ROLE_USER_MEMBER], auth()->appId(), auth()->userId(), auth()->token());
                 if ($addUser) {
                     $userProfile = $this->userProfileService->findOneWhereOrFail(['email' => $email]);
                     $userProfile->userApp()->create(['platform_package_uuid' => App::DEFAULT_PLATFORM_PACKAGE_1, 'app_id' => $userProfile->app_id]);
@@ -255,7 +256,7 @@ class TeamController extends Controller
                         'user_uuid' => $userProfile->user_uuid,
                         'app_id' => auth()->appId()
                     ]);
-                    $this->cstoreService->storeFolderByType($email, $userProfile->user_uuid, config('foldertypecstore.USER'), $request->get('team_uuid'));
+                    $this->cstoreService->storeFolderByType($userProfile->email, $userProfile->user_uuid, BusinessManagement::USER_ENTITY, $businessUuid);
 
 //                    Mailbox::postEmailAccountcreate($userProfile->user_uuid, $email, $password);
                 }
@@ -290,8 +291,13 @@ class TeamController extends Controller
                                 'user_uuid' => $userUuid,
                                 'app_id' => auth()->appId()
                             ]);
+
+                            $userProfile = $this->userProfileService->findOneWhere([
+                                ['user_uuid', $userUuid],
+                                ['app_id', auth()->appId()]
+                            ]);
+                            $this->cstoreService->storeFolderByType($userProfile->email, $userUuid, BusinessManagement::USER_ENTITY,$businessUuid);
                         }
-                        $this->cstoreService->storeFolderByType("user_{$userUuid}", $userUuid, config('foldertypecstore.USER'),$request->get('team_uuid'), config('foldertypecstore.TEAM'));
 
                     }
                 }
@@ -312,9 +318,6 @@ class TeamController extends Controller
             'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
         ]));
-
-        $this->cstoreService->storeFolderByType(auth()->user()->email, auth()->userId(), config('foldertypecstore.USER'), $request->get('team_uuid'));
-
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->userTeamResourceClass, $model)
@@ -515,6 +518,18 @@ class TeamController extends Controller
             'uuid' => $id
         ]);
 
+        if($request->get('department_uuid') and $request->get('department_uuid') != $model->department_uuid){
+            $parentUuid = $request->get('department_uuid');
+            $parentType = BusinessManagement::DEPARTMENT_ENTITY;
+            $this->cstoreService->storeFolderByType($model->name, $model->uuid, BusinessManagement::TEAM_ENTITY, $parentUuid, $parentType);
+        }
+
+        if($request->get('parent_team_uuid') and $request->get('parent_team_uuid') != $model->parent_team_uuid){
+            $parentUuid = $request->get('parent_team_uuid');
+            $parentType = BusinessManagement::TEAM_ENTITY;
+            $this->cstoreService->storeFolderByType($model->name, $model->uuid, BusinessManagement::TEAM_ENTITY, $parentUuid, $parentType);
+        }
+
         $this->service->update($model, $request->all());
 
         return $this->sendOkJsonResponse(
@@ -531,7 +546,7 @@ class TeamController extends Controller
         ]);
 
         $this->destroy($model->uuid);
-        $this->cstoreService->deleteFolderType($id, config('foldertypecstore.TEAM'),
+        $this->cstoreService->deleteFolderType($id, BusinessManagement::TEAM_ENTITY,
             $request->get('option', 'keep'));
 
         return $this->sendOkJsonResponse();
@@ -556,7 +571,7 @@ class TeamController extends Controller
         $user->userTeamContactLists()->detach();
         $this->userTeamService->destroy($model->uuid);
         $this->removeTeamPermissionCache($model->user_uuid);
-        $this->cstoreService->deleteFolderType($model->user_uuid, config('foldertypecstore.USER'),
+        $this->cstoreService->deleteFolderType($model->user_uuid, BusinessManagement::USER_ENTITY,
             $request->get('option', 'destroy'));
 
         return $this->sendOkJsonResponse();
@@ -611,11 +626,8 @@ class TeamController extends Controller
 
     public function storeBusinessTeam(BusinessTeamRequest $request)
     {
-        $department = $this->departmentService->findOrFailById($request->get('department_uuid'));
-        $location = $this->locationService->findOrFailById($department->uuid);
         $teamModel = $this->service->create(array_merge($request->all(), [
             'owner_uuid' => auth()->userId(),
-            'location_uuid' => $location->uuid,
             'app_id' => auth()->appId(),
         ]));
         if (auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
@@ -689,7 +701,7 @@ class TeamController extends Controller
      * @param $id
      * @return JsonResponse
      */
-    public function destroyBusinessTeam($id)
+    public function destroyBusinessTeam($id, OptionDeleteBusinuessRequest $request)
     {
         if (!auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
             if (!$this->checkTeamOwner($id)) {
@@ -701,6 +713,8 @@ class TeamController extends Controller
             'uuid' => $id
         ]);
         $this->destroy($model->uuid);
+        $this->cstoreService->deleteFolderType($id, BusinessManagement::TEAM_ENTITY,
+            $request->get('option', 'keep'));
 
         return $this->sendOkJsonResponse();
     }
@@ -770,8 +784,8 @@ class TeamController extends Controller
             $childTeam = $this->service->findOrFailById($childTeamUuid);
             $childTeam->update(['parent_team_uuid' => $request->get('team_uuid')]);
             $this->cstoreService->storeFolderByType(
-                $childTeam->name, $childTeam->uuid, config('foldertypecstore.TEAM'),
-                $request->get('team_uuid'), config('foldertypecstore.TEAM'));
+                $childTeam->name, $childTeam->uuid, BusinessManagement::TEAM_ENTITY,
+                $request->get('team_uuid'), BusinessManagement::TEAM_ENTITY);
         }
 
         return $this->sendOkJsonResponse();
@@ -842,7 +856,7 @@ class TeamController extends Controller
         foreach ($request->get('team_uuids') as $childTeamUuid) {
             $childTeam = $this->service->findOrFailById($childTeamUuid);
             $childTeam->update(['department_uuid' => $request->get('department_uuid')]);
-            $this->cstoreService->storeFolderByType($childTeam->name, $childTeam->uuid, config('foldertypecstore.TEAM'), $request->get('department_uuid'));
+            $this->cstoreService->storeFolderByType($childTeam->name, $childTeam->uuid, BusinessManagement::TEAM_ENTITY, $request->get('department_uuid'), BusinessManagement::DEPARTMENT_ENTITY);
         }
 
         return $this->sendOkJsonResponse();

@@ -27,12 +27,13 @@ class UpdateMyWebsitePageRequest extends AbstractRequest
      */
     public function rules()
     {
-        return [
+        $validate = [
             'title' => ['string'],
             'slug' => ['string'],
             'html_template' => ['string'],
             'css_template' => ['string'],
             'js_template' => ['string'],
+            'menu_level' => ['integer'],
             'type' => ['string', Rule::in(
                 (new WebsitePage())->getTypeWebsitePage()
             )],
@@ -46,5 +47,11 @@ class UpdateMyWebsitePageRequest extends AbstractRequest
             'description' => ['nullable', 'array', new CustomDescriptionRule($this->id, $this->request->get('keyword'), $this->request->get('description'), 'website_page')],
             'description.*' => ['nullable', 'string', 'not_in:0'],
         ];
+
+        if ($this->request->get('type') == WebsitePage::NEWS_HEADER_TYPE || $this->request->get('type') == WebsitePage::PRODUCT_HEADER_TYPE) {
+            $validate['menu_level'] = array_merge($validate['menu_level'], ['required']);
+        }
+
+        return $validate;
     }
 }

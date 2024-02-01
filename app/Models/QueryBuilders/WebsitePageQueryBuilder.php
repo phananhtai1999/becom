@@ -45,6 +45,7 @@ class WebsitePageQueryBuilder extends AbstractQueryBuilder
                 'description',
                 'feature_image',
                 'slug',
+                'menu_level',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -65,6 +66,7 @@ class WebsitePageQueryBuilder extends AbstractQueryBuilder
                 'description',
                 'feature_image',
                 'slug',
+                'menu_level',
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -81,6 +83,8 @@ class WebsitePageQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__template_json', 'template_json'),
                 'user_uuid',
                 AllowedFilter::exact('exact__user_uuid', 'user_uuid'),
+                'type',
+                AllowedFilter::exact('exact__type', 'type'),
                 'type',
                 AllowedFilter::exact('exact__type', 'type'),
                 'website_page_category_uuid',

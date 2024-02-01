@@ -26,7 +26,9 @@ class UpdateMyFormRequest extends AbstractRequest
     {
         return [
             'title' => ['string'],
-            'template' => ['string'],
+            'html_template' => ['string'],
+            'css_template' => ['string'],
+            'js_template' => ['string'],
             'template_json' => ['string'],
             'contact_list_uuid' => ['numeric', 'min:1', Rule::exists('contact_lists', 'uuid')->where(function ($query) {
                 return $query->where([

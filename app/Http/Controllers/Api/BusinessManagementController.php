@@ -23,6 +23,7 @@ use App\Http\Resources\BusinessManagementResource;
 use App\Http\Resources\BusinessManagementResourceCollection;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestDestroyTrait;
+use App\Http\Resources\DomainResourceCollection;
 use App\Http\Resources\UserBusinessResource;
 use App\Http\Resources\UserBusinessResourceCollection;
 use App\Models\BusinessManagement;
@@ -110,6 +111,7 @@ class BusinessManagementController extends AbstractRestAPIController
         $this->userBusinessResourceClass = UserBusinessResource::class;
         $this->userBusinessResourceCollectionClass = UserBusinessResourceCollection::class;
         $this->addOnResourceCollectionClass = AddOnResourceCollection::class;
+        $this->domainResourceCollectionClass = DomainResourceCollection::class;
         $this->storeRequest = BusinessManagementRequest::class;
         $this->editRequest = UpdateBusinessManagementRequest::class;
         $this->indexRequest = IndexRequest::class;
@@ -227,9 +229,10 @@ class BusinessManagementController extends AbstractRestAPIController
             'domain_uuid' => $domain->uuid,
         ]);
 
-        if ($this->cstoreService->storeS3Config($request)) {
-            $this->cstoreService->storeFolderByType($request->get('name'), $model->uuid, config('foldertypecstore.BUSINESS'));
+        if ($request->get('s3_option')){
+            $this->cstoreService->storeS3Config($request);
         }
+        $this->cstoreService->storeFolderByType($request->get('name'), $model->uuid, BusinessManagement::BUSINESS_ENTITY);
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -285,7 +288,7 @@ class BusinessManagementController extends AbstractRestAPIController
     public function destroyMyBusinessManagement($id, OptionDeleteBusinuessRequest $request)
     {
         $this->myService->deleteMyBusinessManagement($id);
-        $this->cstoreService->deleteFolderType($id, config('foldertypecstore.BUSINESS'),
+        $this->cstoreService->deleteFolderType($id, BusinessManagement::BUSINESS_ENTITY,
             $request->get('option', 'keep'));
 
         return $this->sendOkJsonResponse();
@@ -322,15 +325,20 @@ class BusinessManagementController extends AbstractRestAPIController
                         'user_uuid' => $userUuid,
                         'app_id' => auth()->appId(),
                     ]);
+
+                    $userProfile = $this->userProfileService->findOneWhere([
+                        ['user_uuid', $userUuid],
+                        ['app_id', auth()->appId()]
+                    ]);
+                    $this->cstoreService->storeFolderByType($userProfile->email, $userProfile->user_uuid, BusinessManagement::USER_ENTITY, $businessUuid);
                 }
             }
-            DB::commit();
             return $this->sendCreatedJsonResponse();
         } elseif ($request->get('type') == UserBusiness::ACCOUNT_INVITE) {
 //            $password = Hash::make($request->get('password'));
             $password = $request->get('password');
             $email = $request->get('email') . '@' . $request->get('domain');
-            $addUser = app(UserManagerService::class)->addUser($email, $password, $request->get('first_name'), $request->get('last_name'), auth()->appId());
+            $addUser = app(UserManagerService::class)->addUser($email, $password, $request->get('first_name'), $request->get('last_name'), [Role::ROLE_USER_MEMBER], auth()->appId(), auth()->userId(), auth()->token());
             if ($addUser) {
                 $userProfile = $this->userProfileService->findOneWhereOrFail(['email' => $email]);
                 $userProfile->userApp()->create(['platform_package_uuid' => App::DEFAULT_PLATFORM_PACKAGE_1, 'app_id' => $userProfile->app_id]);
@@ -340,6 +348,8 @@ class BusinessManagementController extends AbstractRestAPIController
                     'user_uuid' => $userProfile->user_uuid,
                     'app_id' => auth()->appId()
                 ]);
+                $this->cstoreService->storeFolderByType($userProfile->email, $userProfile->user_uuid, BusinessManagement::USER_ENTITY, $businessUuid);
+
 //                    Mailbox::postEmailAccountcreate($userProfile->user_uuid, $email, $password);
             }
 
@@ -423,6 +433,7 @@ class BusinessManagementController extends AbstractRestAPIController
         }
         $userBusiness = $this->userBusinessService->findOneWhereOrFail(['business_uuid' => $businessUuid, 'user_uuid' => $id]);
         $userBusiness->delete();
+        $this->cstoreService->deleteFolderType($id,BusinessManagement::USER_ENTITY, $request->get('option', 'keep'));
 
         return $this->sendCreatedJsonResponse();
     }
@@ -444,5 +455,18 @@ class BusinessManagementController extends AbstractRestAPIController
         }
 
         return $this->sendOkJsonResponse();
+    }
+
+    public function domainByBusiness(IndexRequest $request)
+    {
+        $business = $this->getBusiness();
+        if (!$business) {
+            return $this->sendJsonResponse(false, 'Does not have business', [], 403);
+        }
+        $domains = $this->domainService->getCollectionWithPaginationByCondition($request, ['business_uuid' => $business->uuid]);
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->domainResourceCollectionClass, $domains)
+        );
     }
 }

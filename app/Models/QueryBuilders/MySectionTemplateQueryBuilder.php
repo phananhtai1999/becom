@@ -33,7 +33,9 @@ class MySectionTemplateQueryBuilder extends AbstractQueryBuilder
             ->allowedFields([
                 $modelKeyName,
                 'title',
-                'template',
+                'html_template',
+                'css_template',
+                'js_template',
                 'template_json',
                 'user_uuid',
                 'section_category_uuid',
@@ -46,7 +48,9 @@ class MySectionTemplateQueryBuilder extends AbstractQueryBuilder
             ->allowedSorts([
                 $modelKeyName,
                 'title',
-                'template',
+                'html_template',
+                'css_template',
+                'js_template',
                 'template_json',
                 'user_uuid',
                 'section_category_uuid',
@@ -60,8 +64,6 @@ class MySectionTemplateQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__' . $modelKeyName, $modelKeyName),
                 'title',
                 AllowedFilter::exact('exact__title', 'title'),
-                'template',
-                AllowedFilter::exact('exact__template', 'template'),
                 'template_json',
                 AllowedFilter::exact('exact__template_json', 'template_json'),
                 'user_uuid',
@@ -82,6 +84,12 @@ class MySectionTemplateQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__user.email', 'user.email'),
                 'type',
                 AllowedFilter::exact('exact__type', 'type'),
+                'html_template',
+                AllowedFilter::exact('exact__html_template', 'html_template'),
+                'css_template',
+                AllowedFilter::exact('exact__css_template', 'css_template'),
+                'js_template',
+                AllowedFilter::exact('exact__js_template', 'js_template'),
             ]);
     }
 

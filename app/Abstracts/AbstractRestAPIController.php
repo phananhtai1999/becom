@@ -326,6 +326,17 @@ class AbstractRestAPIController extends BaseController
         return false;
     }
 
+    public function getCstgeBusiness()
+    {
+        $businesses = auth('app_to_app')->user()->businessManagements;
+        if ($businesses->toArray()) {
+
+            return $businesses->first();
+        }
+
+        return false;
+    }
+
     public function getUser() {
         return UserProfile::where(['user_uuid' => auth()->userId(), 'app_id' => auth()->appId()])->first();
     }

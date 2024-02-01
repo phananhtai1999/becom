@@ -5,22 +5,22 @@ namespace App\Services;
 use App\Abstracts\AbstractService;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Log;
+use Techup\ApiBase\Services\AppCallService;
 
-class CstoreService extends AbstractService
+class CstoreService extends AppCallService
 {
     public function storeS3Config($request)
     {
         try{
-            $client = $this->createRequest();
-            $client->post(config('shop.cstore_url') . 's3-config', [
-                'json' => [
-                    "access_key" => $request->get('access_key'),
-                    "secret_access_key" => $request->get('secret_access_key'),
-                    "default_region" => $request->get('default_region'),
-                    "bucket" => $request->get('bucket'),
-                    "name" => $request->get('name')
-                ]
-            ]);
+            $data = [
+                "access_key" => $request->get('access_key'),
+                "secret_access_key" => $request->get('secret_access_key'),
+                "default_region" => $request->get('default_region'),
+                "bucket" => $request->get('bucket'),
+                "name" => $request->get('name')
+            ];
+
+            $this->callService(env('CSTORE_SERVICE_NAME'), 'post', 'sem-s3-config', $data, auth()->appId(), auth()->userId());
 
             return true;
         }catch (\Exception  $e){
@@ -32,17 +32,14 @@ class CstoreService extends AbstractService
     public function storeFolderByType($name, $uuid, $type, $parentUuid = null, $parentType = null)
     {
         try{
-            $client = $this->createRequest();
-            $client->post(config('shop.cstore_url') . 'folder-type', [
-                'json' => [
-                    "name" => $name,
-                    "owner_uuid" => $uuid,
-                    "owner_type" => $type,
-                    "parent_owner_uuid" => $parentUuid,
-                    "parent_owner_type" => $parentType,
-                ]
-            ]);
-
+            $data = [
+                "name" => $name,
+                "owner_uuid" => $uuid,
+                "owner_type" => $type,
+                "parent_owner_uuid" => $parentUuid,
+                "parent_owner_type" => $parentType,
+            ];
+            $this->callService(env('CSTORE_SERVICE_NAME'), 'post', 'sem-folder-type', $data, auth()->appId(), auth()->userId());
             return true;
         }catch (\Exception $e){
             Log::error($e->getMessage());
@@ -53,15 +50,13 @@ class CstoreService extends AbstractService
     public function deleteFolderType($uuid, $type, $option)
     {
         try{
-            $client = $this->createRequest();
-            $client->post(config('shop.cstore_url') . 'delete-folder-type', [
-                'json' => [
-                    "owner_uuid" => $uuid,
-                    "owner_type" => $type,
-                    "option" => $option
-                ]
-            ]);
+            $data = [
+                "owner_uuid" => $uuid,
+                "owner_type" => $type,
+                "option" => $option
+            ];
 
+            $this->callService(env('CSTORE_SERVICE_NAME'), 'post', 'sem-delete-folder-type', $data, auth()->appId(), auth()->userId());
             return true;
         }catch (\Exception $e){
             Log::error($e->getMessage());

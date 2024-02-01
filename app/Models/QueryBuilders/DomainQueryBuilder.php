@@ -5,6 +5,7 @@ namespace App\Models\QueryBuilders;
 use App\Abstracts\AbstractQueryBuilder;
 use App\Models\Domain;
 use App\Models\SearchQueryBuilders\SearchQueryBuilder;
+use Illuminate\Database\Eloquent\Builder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\Concerns\SortsQuery;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -51,8 +52,6 @@ class DomainQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__' . $modelKeyName, $modelKeyName),
                 'name',
                 AllowedFilter::exact('exact__name', 'name'),
-                'verified_at',
-                AllowedFilter::exact('exact__verified_at', 'verified_at'),
                 'business_uuid',
                 AllowedFilter::exact('exact__business_uuid', 'business_uuid'),
                 'owner_uuid',
@@ -60,7 +59,14 @@ class DomainQueryBuilder extends AbstractQueryBuilder
                 'active_mailbox',
                 AllowedFilter::exact('exact__active_mailbox', 'active_mailbox'),
                 'active_mailbox_status',
-                AllowedFilter::exact('exact__active_mailbox_status', 'active_mailbox_status')
+                AllowedFilter::exact('exact__active_mailbox_status', 'active_mailbox_status'),
+                AllowedFilter::callback('verified_at', function (Builder $query, $values) {
+                    if ($values) {
+                        $query->whereNull('verified_at');
+                    } else {
+                        $query->whereNotNull('verified_at');
+                    }
+                }),
             ]);
     }
 

@@ -32,7 +32,9 @@ class SectionTemplate extends AbstractModel
      */
     protected $fillable = [
         'title',
-        'template',
+        'html_template',
+        'css_template',
+        'js_template',
         'template_json',
         'user_uuid',
         'publish_status',
@@ -41,6 +43,8 @@ class SectionTemplate extends AbstractModel
         'reject_reason',
         'type',
         'app_id',
+        'display_mode',
+        'menu_level'
     ];
 
     /**

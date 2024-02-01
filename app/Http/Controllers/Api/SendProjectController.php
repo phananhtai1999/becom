@@ -13,6 +13,7 @@ use App\Http\Requests\AssignProjectForTeamRequest;
 use App\Http\Requests\IndexProjectRequest;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\MySendProjectRequest;
+use App\Http\Requests\OptionDeleteBusinuessRequest;
 use App\Http\Requests\UpdateMySendProjectRequest;
 use App\Http\Requests\UpdateSendProjectRequest;
 use App\Http\Requests\VerifyDomainWebsiteVerificationRequest;
@@ -21,6 +22,7 @@ use App\Http\Requests\WebsiteVerificationRequest;
 use App\Http\Resources\SendProjectResourceCollection;
 use App\Http\Resources\SendProjectResource;
 use App\Http\Resources\WebsiteVerificationResource;
+use App\Models\BusinessManagement;
 use App\Models\Role;
 use App\Services\DepartmentService;
 use App\Services\CstoreService;
@@ -167,6 +169,70 @@ class SendProjectController extends AbstractRestAPIController
         );
     }
 
+    public function indexMyCstge(IndexProjectRequest $request)
+    {
+        if (auth('app_to_app')->hasRole([Role::ROLE_USER_OWNER])) {
+            $business = $this->getCstgeBusiness();
+            if ($business) {
+                $models = $this->service->getCollectionWithPaginationByCondition($request, ['business_uuid' => $business->uuid]);
+                if ($request->get('type')) {
+                    $models = $this->service->getProjectScope($request, $business);
+                }
+            } else {
+                $models = $this->service->getCollectionWithPaginationByCondition($request, ['owner_uuid' => auth('app_to_app')->userId()]);
+            }
+        } elseif (auth('app_to_app')->hasRole([Role::ROLE_USER_MANAGER])) {
+            $department = $this->departmentService->findOneWhere(['manager_uuid' => auth('app_to_app')->userId()]);
+            $location = $this->locationService->findOneWhere(['manager_uuid' => auth('app_to_app')->userId()]);
+            if ($department) {
+                $teamOfDepartment = $department->teams->pluck('uuid')->toArray() ?? [];
+                if (!empty($department->location)) {
+                    $locationUuid = $department->location->uuid;
+                    $businessUuid = $department->location->business_uuid;
+                }
+                $models = $this->service->getMyProjectWithDepartment($request, $department->uuid, $businessUuid ?? null, $locationUuid ?? null, $teamOfDepartment);
+            }
+
+            if ($location) {
+                $departmentOfLocation = $location->departments->pluck('uuid')->toArray() ?? [];
+                if (!empty($departmentOfLocation)) {
+                    $teams = [];
+                    foreach ($location->departments as $department) {
+                        if (!empty($department->teams->toArray())) {
+                            $teams[] = $department->teams->pluck('uuid')->toArray();
+                        }
+                    }
+                }
+
+                $models = $this->service->getMyProjectWithDLocation($request, $location->uuid, $location->business_uuid, $departmentOfLocation, $teams ?? []);
+            }
+        } else {
+            $teams = auth('app_to_app')->user()->teams->pluck('uuid');
+            $departments = [];
+            $locations = [];
+            if ($teams){
+                $teams = $teams->toArray() ?? [];
+                foreach (auth('app_to_app')->user()->teams as $team) {
+                    if (!empty($team->department)) {
+                        $department = $team->department;
+                        $departments[] = $department->uuid;
+                        if (!empty($department->location)) {
+                            $location = $department->location;
+                            $locations[] = $location->uuid;
+                            $business = $location->business_uuid;
+                        }
+                    }
+                }
+            }
+
+            $models = $this->service->getMyProjectWithTeams($request, $teams, $departments, $locations, $business ?? null);
+        }
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+        );
+    }
+
     /**
      * @param $id
      * @return JsonResponse
@@ -230,7 +296,7 @@ class SendProjectController extends AbstractRestAPIController
             'business_uuid' => $business->uuid
         ]));
 
-        $this->cstoreService->storeFolderByType($request->get('name'), $model->uuid, config('foldertypecstore.PROJECT'), $business->uuid);
+        $this->cstoreService->storeFolderByType($request->get('name'), $model->uuid, BusinessManagement::PROJECT_ENTITY, $business->uuid, BusinessManagement::BUSINESS_ENTITY);
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
@@ -259,6 +325,10 @@ class SendProjectController extends AbstractRestAPIController
     {
         $model = $this->service->showMyWebsite($id);
 
+        if($request->get('parent_uuid') and $request->get('parent_uuid') != $model->parent_uuid){
+            $this->cstoreService->storeFolderByType($model->name, $model->uuid, BusinessManagement::PROJECT_ENTITY, $request->get('parent_uuid'), BusinessManagement::PROJECT_ENTITY);
+        }
+
         $this->service->update($model, array_merge($request->all(), [
             'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
@@ -273,10 +343,13 @@ class SendProjectController extends AbstractRestAPIController
      * @param $id
      * @return JsonResponse
      */
-    public function destroyMySendProject($id)
+    public function destroyMySendProject($id, OptionDeleteBusinuessRequest $request)
     {
         if (!$this->service->checkExistsWebisteInTables($id)) {
             $this->service->deleteMyWebsite($id);
+
+            $this->cstoreService->deleteFolderType($id, BusinessManagement::PROJECT_ENTITY, $request->get('option', 'keep'));
+
 
             return $this->sendOkJsonResponse();
         }
@@ -370,13 +443,25 @@ class SendProjectController extends AbstractRestAPIController
             return $this->sendJsonResponse(false, 'You do not have access', [], 403);
         }
         $sendProject = $this->service->findOrFailById($request->get('send_project_uuid'));
-        $childProject = $this->service->create(array_merge($sendProject->toArray(),
-            [
-                'parent_uuid' => $sendProject->uuid,
-                'status' => $request->get('status', $sendProject->status)
-            ]
-        ));
-        $childProject->teams()->syncWithoutDetaching($request->get('team_uuids', []));
+        foreach ($request->get('team_uuids') as $teamUuid){
+            $childProject = $this->service->create(array_merge($sendProject->toArray(),
+                [
+                    'parent_uuid' => $sendProject->uuid,
+                    'status' => $request->get('status', $sendProject->status)
+                ]
+            ));
+
+            $this->cstoreService->storeFolderByType($childProject->name, $childProject->uuid, BusinessManagement::PROJECT_ENTITY, $teamUuid, BusinessManagement::TEAM_ENTITY);
+
+            $childProject->teams()->syncWithoutDetaching([$teamUuid]);
+        }
+//        $childProject = $this->service->create(array_merge($sendProject->toArray(),
+//            [
+//                'parent_uuid' => $sendProject->uuid,
+//                'status' => $request->get('status', $sendProject->status)
+//            ]
+//        ));
+//        $childProject->teams()->syncWithoutDetaching($request->get('team_uuids', []));
 
         return $this->sendOkJsonResponse();
     }
@@ -389,6 +474,8 @@ class SendProjectController extends AbstractRestAPIController
         }
         $sendProject = $this->service->findOrFailById($request->get('send_project_uuid'));
         $sendProject->teams()->detach($request->get('team_uuids', []));
+        $this->cstoreService->storeFolderByType($sendProject->name, $sendProject->uuid, BusinessManagement::PROJECT_ENTITY, $sendProject->business_uuid, BusinessManagement::BUSINESS_ENTITY);
+
 
         return $this->sendOkJsonResponse();
     }
@@ -400,13 +487,25 @@ class SendProjectController extends AbstractRestAPIController
             return $this->sendJsonResponse(false, 'You do not have access', [], 403);
         }
         $sendProject = $this->service->findOrFailById($request->get('send_project_uuid'));
-        $childProject = $this->service->create(array_merge($sendProject->toArray(),
-            [
-                'parent_uuid' => $sendProject->uuid,
-                'status' => $request->get('status', $sendProject->status)
-            ]
-        ));
-        $childProject->departments()->syncWithoutDetaching($request->get('department_uuids', []));
+        foreach ($request->get('department_uuids') as $departmentUuid){
+            $childProject = $this->service->create(array_merge($sendProject->toArray(),
+                [
+                    'parent_uuid' => $sendProject->uuid,
+                    'status' => $request->get('status', $sendProject->status)
+                ]
+            ));
+
+            $this->cstoreService->storeFolderByType($childProject->name, $childProject->uuid, BusinessManagement::PROJECT_ENTITY, $departmentUuid, BusinessManagement::DEPARTMENT_ENTITY);
+
+            $childProject->departments()->syncWithoutDetaching([$departmentUuid]);
+        }
+//        $childProject = $this->service->create(array_merge($sendProject->toArray(),
+//            [
+//                'parent_uuid' => $sendProject->uuid,
+//                'status' => $request->get('status', $sendProject->status)
+//            ]
+//        ));
+//        $childProject->departments()->syncWithoutDetaching($request->get('department_uuids', []));
 
         return $this->sendOkJsonResponse();
     }
@@ -430,13 +529,25 @@ class SendProjectController extends AbstractRestAPIController
             return $this->sendJsonResponse(false, 'You do not have access', [], 403);
         }
         $sendProject = $this->service->findOrFailById($request->get('send_project_uuid'));
-        $childProject = $this->service->create(array_merge($sendProject->toArray(),
-            [
-                'parent_uuid' => $sendProject->uuid,
-                'status' => $request->get('status', $sendProject->status)
-            ]
-        ));
-        $childProject->locations()->syncWithoutDetaching($request->get('location_uuids', []));
+        foreach ($request->get('location_uuids') as $locationUuid){
+            $childProject = $this->service->create(array_merge($sendProject->toArray(),
+                [
+                    'parent_uuid' => $sendProject->uuid,
+                    'status' => $request->get('status', $sendProject->status)
+                ]
+            ));
+
+            $this->cstoreService->storeFolderByType($childProject->name, $childProject->uuid, BusinessManagement::PROJECT_ENTITY, $locationUuid, BusinessManagement::LOCATION_ENTITY);
+
+            $childProject->locations()->syncWithoutDetaching([$locationUuid]);
+        }
+//        $childProject = $this->service->create(array_merge($sendProject->toArray(),
+//            [
+//                'parent_uuid' => $sendProject->uuid,
+//                'status' => $request->get('status', $sendProject->status)
+//            ]
+//        ));
+//        $childProject->locations()->syncWithoutDetaching($request->get('location_uuids', []));
 
         return $this->sendOkJsonResponse();
     }
@@ -458,6 +569,7 @@ class SendProjectController extends AbstractRestAPIController
         foreach ($request->get('children_send_project_uuids') as $childProject) {
             $childTeam = $this->service->findOrFailById($childProject);
             $childTeam->update(['parent_uuid' => $request->get('send_project_uuid')]);
+            $this->cstoreService->storeFolderByType($childTeam->name, $childTeam->uuid, BusinessManagement::PROJECT_ENTITY, $request->get('send_project_uuid'), BusinessManagement::PROJECT_ENTITY);
         }
 
         return $this->sendOkJsonResponse();

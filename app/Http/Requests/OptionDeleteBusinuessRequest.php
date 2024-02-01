@@ -26,7 +26,7 @@ class OptionDeleteBusinuessRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'option' => ['required', 'string', Rule::in(['keep', 'delete', 'destroy'])],
+            'option' => ['nullable', 'string', Rule::in(['keep', 'delete', 'destroy'])],
         ];
     }
 }

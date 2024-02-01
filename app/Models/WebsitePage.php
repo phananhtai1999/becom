@@ -137,12 +137,20 @@ class WebsitePage extends AbstractModel
             self::ARTICLE_DETAIL_TYPE,
             self::ARTICLE_CATEGORY_TYPE,
             self::HOME_ARTICLES_TYPE,
-            self::HOME_ARTICLES_TYPE,
             self::NEWS_HEADER_TYPE,
             self::PRODUCT_DETAIL_TYPE,
             self::PRODUCT_CATEGORY_TYPE,
             self::HOME_PRODUCTS_TYPE,
             self::PRODUCT_HEADER_TYPE
+        ];
+    }
+
+    public function getTypeNewsWebsitePage() {
+        return [
+            self::ARTICLE_DETAIL_TYPE,
+            self::ARTICLE_CATEGORY_TYPE,
+            self::HOME_ARTICLES_TYPE,
+            self::NEWS_HEADER_TYPE,
         ];
     }
 }
