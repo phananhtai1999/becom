@@ -287,6 +287,16 @@ class AbstractRestAPIController extends BaseController
         Cache::forget('team_permission_' . $userUuid);
     }
 
+    public function removeTeamLeaderPermissionCache($userUuid)
+    {
+        Cache::forget('team_leader_add_on_permission_' . $userUuid);
+    }
+
+    public function removeTeamAddOnPermissionCache($userUuid)
+    {
+        Cache::forget('team_add_on_permission_' . $userUuid);
+    }
+
     public function checkExistBusiness()
     {
         if (!auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
