@@ -9,6 +9,7 @@ use App\Models\Permission;
 use App\Models\App;
 use App\Models\Role;
 use App\Models\Team;
+use App\Models\UserProfile;
 use App\Models\UserTeam;
 use Aws\Exception\CredentialsException;
 use Aws\S3\Exception\S3Exception;
@@ -300,7 +301,8 @@ class AbstractRestAPIController extends BaseController
     public function checkExistBusiness()
     {
         if (!auth()->hasRole([Role::ROLE_ROOT, Role::ROLE_ADMIN])) {
-            $businesses = $this->user()->businessManagements;
+            $user = $this->getUser();
+            $businesses = $user->businessManagements;
             if (!$businesses->toArray()) {
 
                 return false;
@@ -314,12 +316,17 @@ class AbstractRestAPIController extends BaseController
 
     public function getBusiness()
     {
-        $businesses = $this->user()->businessManagements;
+        $user = $this->getUser();
+        $businesses = $user->businessManagements;
         if ($businesses->toArray()) {
 
             return $businesses->first();
         }
 
         return false;
+    }
+
+    public function getUser() {
+        return UserProfile::where(['user_uuid' => auth()->userId(), 'app_id' => auth()->appId()])->first();
     }
 }
