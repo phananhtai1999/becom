@@ -14,6 +14,7 @@ use App\Http\Resources\AppResourceCollection;
 use App\Http\Resources\UserAppResource;
 use App\Models\App;
 use App\Models\UserApp;
+use Illuminate\Support\Str;
 use Techup\ApiConfig\Services\ConfigService;
 use App\Services\PaypalService;
 use App\Services\AppService;
@@ -51,12 +52,8 @@ class AppController extends AbstractRestAPIController
      */
     public function store(PlatformPackageRequest $request)
     {
-        $model = $this->service->create([
-            'uuid' => $request->get('name'),
-            'description' => $request->get('description'),
-            'monthly' => $request->get('monthly'),
-            'yearly' => $request->get('yearly')
-        ]);
+        $uuid = strtolower(str_replace(' ', '_', Str::snake($request->get('name'))));
+        $model = $this->service->create(array_merge($request->all(), ['uuid' => $uuid]));
         $model->groupApis()->syncWithoutDetaching($request->get('group_api_uuids'));
 
         return $this->sendCreatedJsonResponse(

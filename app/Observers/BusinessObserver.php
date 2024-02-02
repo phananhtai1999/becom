@@ -5,6 +5,7 @@ namespace App\Observers;
 use App\Models\BusinessManagement;
 use App\Models\Department;
 use App\Services\DepartmentService;
+use Techup\ApiConfig\Services\ConfigService;
 
 class BusinessObserver
 {
@@ -16,15 +17,20 @@ class BusinessObserver
      */
     public function created(BusinessManagement $businessManagement)
     {
-        $departmentService = new DepartmentService();
-        foreach (Department::DEFAULT_NAME as $value) {
-            $departmentService->create([
-                'business_uuid' => $businessManagement->uuid,
-                'is_default' => true,
-                'app_id' => auth()->appId(),
-                'name' => $value
-            ]);
+        $configService = new ConfigService();
+        $defaultDepartment = $configService->findConfigByKey('default_department');
+        if ($defaultDepartment) {
+            $departmentService = new DepartmentService();
+            foreach (json_decode($defaultDepartment->default_value) as $value) {
+                $departmentService->create([
+                    'business_uuid' => $businessManagement->uuid,
+                    'is_default' => true,
+                    'app_id' => auth()->appId(),
+                    'name' => $value
+                ]);
+            }
         }
+
     }
 
     /**

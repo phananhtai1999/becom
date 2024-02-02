@@ -33,6 +33,9 @@ class AppQueryBuilder extends AbstractQueryBuilder
                 'monthly',
                 'yearly',
                 'payment_product_id',
+                'name',
+                'description',
+                'status'
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -40,6 +43,9 @@ class AppQueryBuilder extends AbstractQueryBuilder
                 'monthly',
                 'yearly',
                 'payment_product_id',
+                'name',
+                'description',
+                'status'
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -48,6 +54,12 @@ class AppQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__monthly', 'monthly'),
                 'yearly',
                 AllowedFilter::exact('exact__yearly', 'yearly'),
+                'name',
+                AllowedFilter::exact('exact__name', 'name'),
+                'description',
+                AllowedFilter::exact('exact__description', 'description'),
+                'status',
+                AllowedFilter::exact('exact__status', 'status'),
                 'payment_product_id',
                 AllowedFilter::exact('exact__payment_product_id', 'payment_product_id'),
                 'permissions.uuid',
