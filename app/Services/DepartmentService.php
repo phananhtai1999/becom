@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Abstracts\AbstractService;
 use App\Models\Department;
 use App\Models\QueryBuilders\DepartmentQueryBuilder;
+use Illuminate\Support\Facades\DB;
 
 class DepartmentService extends AbstractService
 {
@@ -26,8 +27,10 @@ class DepartmentService extends AbstractService
         $departmentRemoveUuids = $departmentRemoves->pluck('uuid')->toArray();
 
         return DepartmentQueryBuilder::searchQuery($indexRequest['search'], $indexRequest['search_by'])
-            ->whereNotIn('uuid', $departmentRemoveUuids)
-            ->whereIn('location_uuid', $locationUuids)
+            ->where(function ($query) use ($departmentRemoveUuids, $locationUuids){
+                $query->whereNotIn('uuid', $departmentRemoveUuids)
+                    ->whereIn('location_uuid', $locationUuids);
+            })
             ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
     }
 
@@ -51,17 +54,19 @@ class DepartmentService extends AbstractService
         $indexRequest = $this->getIndexRequest($request);
         if (!$businessUuid) {
             return $this->modelQueryBuilderClass::searchQuery($indexRequest['search'], $indexRequest['search_by'])
-                ->where('user_uuid', auth()->userId())
-                ->orwhere('manager_uuid', auth()->userId())
+                ->where(function ($query) {
+                    $query->where('user_uuid', auth()->userId())
+                        ->orwhere('manager_uuid', auth()->userId());
+                })
                 ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
         } else {
-            return $this->modelQueryBuilderClass::searchQuery($indexRequest['search'], $indexRequest['search_by'])
-                ->where('user_uuid', auth()->userId())
-                ->orwhere('manager_uuid', auth()->userId())
-                ->orWhere(function ($query) use ($businessUuid) {
-                    $query->where('business_uuid', $businessUuid)
-                        ->where('is_default', true)
-                        ->where('status', true);
+            return  $this->modelQueryBuilderClass::searchQuery($indexRequest['search'], $indexRequest['search_by'])
+                ->where(function ($query) use ($businessUuid) {
+                    $query->where('user_uuid', auth()->userId())->orwhere('manager_uuid', auth()->userId())
+                        ->orWhere(function ($query) use ($businessUuid) {
+                            $query->where('business_uuid', $businessUuid)
+                                ->where('is_default', true);
+                        });
                 })
                 ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
         }
