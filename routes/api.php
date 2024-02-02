@@ -670,7 +670,7 @@ Route::group(['middleware' => ['apikey']], function () {
             });
 
             Route::get('/app/{id}', [AppController::class, 'show']);
-            Route::get('/my-app', [AppController::class, 'myPlatformPackage']);
+            Route::get('/my/apps', [AppController::class, 'myPlatformPackage']);
         });
 
 //Credit Package
