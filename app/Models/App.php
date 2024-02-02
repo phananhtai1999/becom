@@ -40,6 +40,8 @@ class App extends Model
      */
     protected $fillable = [
         'uuid',
+        'name',
+        'parent_uuid',
         'monthly',
         'yearly',
         'payment_product_id',
@@ -71,5 +73,15 @@ class App extends Model
 
     public function addOns() {
         return $this->hasMany(AddOn::class, 'app_uuid', 'uuid');
+    }
+
+    public function parentApp()
+    {
+        return $this->belongsTo(__CLASS__, 'parent_uuid');
+    }
+
+    public function childrenApp()
+    {
+        return $this->hasMany(__CLASS__, 'parent_uuid');
     }
 }

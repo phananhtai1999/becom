@@ -20,6 +20,8 @@ class AppResource extends JsonResource
         $data = [
             'uuid' => $this->uuid,
             'monthly' => $this->monthly,
+            'name' => $this->name,
+            'parent_uuid' => $this->parent_uuid,
             'yearly' => $this->yearly,
             'description' => $this->description,
             'payment_product_id' => $this->payment_product_id,
@@ -37,7 +39,13 @@ class AppResource extends JsonResource
         if (\in_array('app__add_on', $expand)) {
             $data['add_on'] = AddOnResource::collection($this->addOns);
         }
+        if (\in_array('app__parent', $expand)) {
+            $data['parent'] = new AppResource($this->parentApp);
+        }
 
+        if (\in_array('app__children', $expand)) {
+            $data['children'] = self::collection($this->childrenApp);
+        }
         return $data;
     }
 }

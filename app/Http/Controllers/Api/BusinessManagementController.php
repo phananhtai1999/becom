@@ -202,10 +202,10 @@ class BusinessManagementController extends AbstractRestAPIController
     public function storeMyBusinessManagement(MyBusinessManagementRequest $request)
     {
         // User only have one Business Management
-        $businessManagement = $this->service->checkBusinessManagementOfUser(auth()->userId(), auth()->appId());
-        if ($businessManagement) {
-            return $this->sendValidationFailedJsonResponse();
-        }
+//        $businessManagement = $this->service->checkBusinessManagementOfUser(auth()->userId(), auth()->appId());
+//        if ($businessManagement) {
+//            return $this->sendValidationFailedJsonResponse();
+//        }
 
         $model = $this->service->create(array_merge($request->except('domain_uuid'), [
             'owner_uuid' => auth()->userId(),
@@ -229,10 +229,10 @@ class BusinessManagementController extends AbstractRestAPIController
             'domain_uuid' => $domain->uuid,
         ]);
 
-        if ($request->get('s3_option')){
-            $this->cstoreService->storeS3Config($request);
-        }
-        $this->cstoreService->storeFolderByType($request->get('name'), $model->uuid, BusinessManagement::BUSINESS_ENTITY);
+//        if ($request->get('s3_option')){
+//            $this->cstoreService->storeS3Config($request);
+//        }
+//        $this->cstoreService->storeFolderByType($request->get('name'), $model->uuid, BusinessManagement::BUSINESS_ENTITY);
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)

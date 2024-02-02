@@ -25,7 +25,8 @@ class PlatformPackageRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'name' => ['required', 'unique:apps,uuid'],
+            'name' => ['required', 'unique:apps,name'],
+            'parent_uuid' => ['exists:apps,uuid'],
             'description' => ['required'],
             'monthly' => ['required', 'min:-1', 'integer'],
             'yearly' => ['required', 'min:-1', 'integer'],
