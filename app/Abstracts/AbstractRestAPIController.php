@@ -338,6 +338,6 @@ class AbstractRestAPIController extends BaseController
     }
 
     public function getUser() {
-        return UserProfile::where(['user_uuid' => auth()->userId(), 'app_id' => auth()->appId()])->first();
+        return UserProfile::where(['user_uuid' => auth()->userId(), 'app_id' => auth()->appId()])->firstOrFail();
     }
 }

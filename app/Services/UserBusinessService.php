@@ -57,26 +57,27 @@ class UserBusinessService extends AbstractService
         if (isset($request->get('type')['teams'])) {
             $teamUuids = array_merge($teamUuids, array_values($request->get('type')['teams']));
         }
-        if (!empty($teamUuids)) {
-            if ($request->get('condition') == 'or') {
-                $query = $query->whereHas('user', function ($q) use ($teamUuids) {
-                    $q->whereHas('teams', function ($q) use ($teamUuids) {
-                        $q->whereIn('teams.uuid', $teamUuids);
-                    });
-                });
-            } else {
-                $query = $query->whereHas('user', function ($q) use ($teamUuids) {
-                    $q->whereHas('teams', function ($q) use ($teamUuids) {
-                        $q->where(function ($subQuery) use ($teamUuids) {
-                            foreach ($teamUuids as $teamUuid) {
-                                $subQuery->where('teams.uuid', $teamUuid);
-                            }
+        $query = $query->where(function ($query) use ($request) {
+            if (!empty($teamUuids)) {
+                if ($request->get('condition') == 'or') {
+                    $query->whereHas('user', function ($q) use ($teamUuids) {
+                        $q->whereHas('teams', function ($q) use ($teamUuids) {
+                            $q->whereIn('teams.uuid', $teamUuids);
                         });
                     });
-                });
+                } else {
+                    $query->whereHas('user', function ($q) use ($teamUuids) {
+                        $q->whereHas('teams', function ($q) use ($teamUuids) {
+                            $q->where(function ($subQuery) use ($teamUuids) {
+                                foreach ($teamUuids as $teamUuid) {
+                                    $subQuery->where('teams.uuid', $teamUuid);
+                                }
+                            });
+                        });
+                    });
+                }
             }
-        }
-
+        });
 
         return $query->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
     }

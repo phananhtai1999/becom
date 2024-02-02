@@ -143,59 +143,62 @@ class SendProjectService extends AbstractService
     {
         $indexRequest = $this->getIndexRequest($request);
         $query = SendProjectQueryBuilder::searchQuery($indexRequest['search'], $indexRequest['search_by'])
-            ->where(['business_uuid' => $business->uuid]);
-        if ($request->get('condition') == 'or') {
-            if (isset($request->get('type')['departments'])) {
-                $departmentUuids = array_values($request->get('type')['departments']);
-                $query = $query->orWhereHas('departments', function ($q) use ($departmentUuids) {
-                    $q->whereIn('departments.uuid', $departmentUuids);
-                });
-            }
-            if (isset($request->get('type')['teams'])) {
-                $teamUuids = array_values($request->get('type')['teams']);
-                $query = $query->orWhereHas('teams', function ($q) use ($teamUuids) {
-                    $q->whereIn('teams.uuid', $teamUuids);
-                });
-            }
+            ->where(['business_uuid' => $business->uuid])
+        ->where(function ($query) use ($request) {
+            if ($request->get('condition') == 'or') {
+                if (isset($request->get('type')['departments'])) {
+                    $departmentUuids = array_values($request->get('type')['departments']);
+                    $query->orWhereHas('departments', function ($q) use ($departmentUuids) {
+                        $q->whereIn('departments.uuid', $departmentUuids);
+                    });
+                }
+                if (isset($request->get('type')['teams'])) {
+                    $teamUuids = array_values($request->get('type')['teams']);
+                    $query->orWhereHas('teams', function ($q) use ($teamUuids) {
+                        $q->whereIn('teams.uuid', $teamUuids);
+                    });
+                }
 
-            if (isset($request->get('type')['locations'])) {
-                $locationUuids = array_values($request->get('type')['locations']);
-                $query = $query->orWhereHas('locations', function ($q) use ($locationUuids) {
-                    $q->whereIn('locations.uuid', $locationUuids);
-                });
-            }
-        } else {
-            if (isset($request->get('type')['departments'])) {
-                $departmentUuids = array_values($request->get('type')['departments']);
-                $query = $query->whereHas('departments', function ($q) use ($departmentUuids) {
-                    $q->where(function ($subQuery) use ($departmentUuids) {
-                        foreach ($departmentUuids as $departmentUuid) {
-                            $subQuery->orWhere('departments.uuid', $departmentUuid);
-                        }
+                if (isset($request->get('type')['locations'])) {
+                    $locationUuids = array_values($request->get('type')['locations']);
+                    $query->orWhereHas('locations', function ($q) use ($locationUuids) {
+                        $q->whereIn('locations.uuid', $locationUuids);
                     });
-                });
-            }
-            if (isset($request->get('type')['teams'])) {
-                $teamUuids = array_values($request->get('type')['teams']);
-                $query = $query->whereHas('teams', function ($q) use ($teamUuids) {
-                    $q->where(function ($subQuery) use ($teamUuids) {
-                        foreach ($teamUuids as $teamUuid) {
-                            $subQuery->orWhere('teams.uuid', $teamUuid);
-                        }
+                }
+            } else {
+                if (isset($request->get('type')['departments'])) {
+                    $departmentUuids = array_values($request->get('type')['departments']);
+                    $query->whereHas('departments', function ($q) use ($departmentUuids) {
+                        return $q->where(function ($subQuery) use ($departmentUuids) {
+                            foreach ($departmentUuids as $departmentUuid) {
+                                $subQuery->orWhere('departments.uuid', $departmentUuid);
+                            }
+                        });
                     });
-                });
-            }
-            if (isset($request->get('type')['locations'])) {
-                $locationUuids = array_values($request->get('type')['locations']);
-                $query = $query->whereHas('locations', function ($q) use ($locationUuids) {
-                    $q->where(function ($subQuery) use ($locationUuids) {
-                        foreach ($locationUuids as $locationUuid) {
-                            $subQuery->orWhere('locations.uuid', $locationUuid);
-                        }
+                }
+                if (isset($request->get('type')['teams'])) {
+                    $teamUuids = array_values($request->get('type')['teams']);
+                    $query->whereHas('teams', function ($q) use ($teamUuids) {
+                        return $q->where(function ($subQuery) use ($teamUuids) {
+                            foreach ($teamUuids as $teamUuid) {
+                                $subQuery->orWhere('teams.uuid', $teamUuid);
+                            }
+                        });
                     });
-                });
+                }
+                if (isset($request->get('type')['locations'])) {
+                    $locationUuids = array_values($request->get('type')['locations']);
+                    $query->whereHas('locations', function ($q) use ($locationUuids) {
+                        return $q->where(function ($subQuery) use ($locationUuids) {
+                            foreach ($locationUuids as $locationUuid) {
+                                $subQuery->orWhere('locations.uuid', $locationUuid);
+                            }
+                        });
+                    });
+                }
             }
-        }
+        });
+
 
         return $query->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
     }
@@ -205,19 +208,21 @@ class SendProjectService extends AbstractService
         $indexRequest = $this->getIndexRequest($request);
 
         return SendProjectQueryBuilder::searchQuery($indexRequest['search'], $indexRequest['search_by'])
-            ->whereHas('locations', function ($q) use ($uuid) {
-                $q->where('locations.uuid', $uuid);
-            })
-            ->orWhereHas('departments', function ($q) use ($departmentOfLocation) {
-                $q->whereIn('departments.uuid', $departmentOfLocation);
-            })
-            ->orWhereHas('teams', function ($q) use ($teamOfLocation) {
-                $q->whereIn('teams.uuid', $teamOfLocation);
-            })
-            ->orWhereHas('business', function ($q) use ($businessUuid) {
-                $q->where('business_managements.uuid', $businessUuid)
-                    ->where(['status' => SendProject::STATUS_PROTECTED]);
+            ->where(function ($query) use ($uuid, $departmentOfLocation, $teamOfLocation, $businessUuid) {
+                $query->whereHas('locations', function ($q) use ($uuid) {
+                    $q->where('locations.uuid', $uuid);
+                })
+                    ->orWhereHas('departments', function ($q) use ($departmentOfLocation) {
+                        $q->whereIn('departments.uuid', $departmentOfLocation);
+                    })
+                    ->orWhereHas('teams', function ($q) use ($teamOfLocation) {
+                        $q->whereIn('teams.uuid', $teamOfLocation);
+                    })
+                    ->orWhereHas('business', function ($q) use ($businessUuid) {
+                        $q->where('business_managements.uuid', $businessUuid)
+                            ->where(['status' => SendProject::STATUS_PROTECTED]);
 
+                    });
             })
             ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
     }
