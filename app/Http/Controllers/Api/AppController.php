@@ -78,7 +78,7 @@ class AppController extends AbstractRestAPIController
         );
     }
 
-    public function publishPlatformPackage($id) {
+    public function publishApp($id) {
         $platformPackage = $this->service->findOrFailById($id);
         $paypalProduct = $this->paypalService->createProduct($platformPackage);
         $stripeProduct = $this->stripeService->createProduct($platformPackage->uuid . ' platform package');
@@ -94,7 +94,7 @@ class AppController extends AbstractRestAPIController
             $this->service->resourceToData($this->resourceClass, $platformPackage)
         );
     }
-    public function disablePlatformPackage($id) {
+    public function disableApp($id) {
         $platformPackage = $this->service->findOrFailById($id);
         $this->stripeService->disableProduct(json_decode($platformPackage->payment_product_id)->stripe);
         $this->service->update($platformPackage,[

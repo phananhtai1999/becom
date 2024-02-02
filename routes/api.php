@@ -659,18 +659,18 @@ Route::group(['middleware' => ['apikey']], function () {
         Route::get('public/website-page', [WebsitePageController::class, 'publicWebsitePageByDomainAndSlug'])->name('website_page.public');
 
 //Platform Package
-        Route::get('/platform-packages', [AppController::class, 'index']);
+        Route::get('/apps', [AppController::class, 'index']);
         Route::group(['middleware' => ['userid'], 'as' => 'platformPackage.'], function () {
             Route::group(['middleware' => ['role:root'], 'as' => 'root.'], function () {
-                Route::post('/platform-package', [AppController::class, 'store']);
-                Route::delete('/platform-package/{id}', [AppController::class, 'destroy']);
-                Route::put('/publish-platform-package/{id}', [AppController::class, 'publishPlatformPackage']);
-                Route::put('/platform-package/{id}', [AppController::class, 'edit']);
-                Route::put('/disable-platform-package/{id}', [AppController::class, 'disablePlatformPackage']);
+                Route::post('/app', [AppController::class, 'store']);
+                Route::delete('/app/{id}', [AppController::class, 'destroy']);
+                Route::put('/publish-app/{id}', [AppController::class, 'publishApp']);
+                Route::put('/app/{id}', [AppController::class, 'edit']);
+                Route::put('/disable-app/{id}', [AppController::class, 'disableApp']);
             });
 
-            Route::get('/platform-package/{id}', [AppController::class, 'show']);
-            Route::get('/my-platform-package', [AppController::class, 'myPlatformPackage']);
+            Route::get('/app/{id}', [AppController::class, 'show']);
+            Route::get('/my/apps', [AppController::class, 'myPlatformPackage']);
         });
 
 //Credit Package
@@ -1158,8 +1158,8 @@ Route::group(['middleware' => ['apikey']], function () {
         Route::get('/paypal/cancel-payment-subscription-add-on', [PaypalController::class, 'cancelPaymentSubscriptionAddOn'])->name('paypal.cancelPaymentSubscriptionAddOn');
 
 //renew membership package
-        Route::post('/platform-packages/renew-by-stripe', [PaymentController::class, 'renewByStripe'])->name('renewByStripe');
-        Route::post('/platform-packages/renew-by-paypal', [PaymentController::class, 'renewByPaypal'])->name('renewByPaypal');
+        Route::post('/apps/renew-by-stripe', [PaymentController::class, 'renewByStripe'])->name('renewByStripe');
+        Route::post('/apps/renew-by-paypal', [PaymentController::class, 'renewByPaypal'])->name('renewByPaypal');
 
         Route::group(['middleware' => ['userid'], 'as' => 'notification.'], function () {
             Route::group(['middleware' => ['role:root,admin'], 'as' => 'admin.'], function () {
