@@ -5,6 +5,7 @@ namespace App\Http\Resources;
 use App\Models\BusinessManagement;
 use App\Models\Role;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Techup\ApiList\Http\Resources\GroupApiListResource;
 
 class AddOnResource extends JsonResource
 {
@@ -29,8 +30,8 @@ class AddOnResource extends JsonResource
             'monthly' => $this->monthly,
             'yearly' => $this->yearly
         ];
-        if (\in_array('add_on__permissions', $expand)) {
-            $data['permissions'] = PermissionResource::collection($this->permissions);
+        if (\in_array('add_on__group_apis', $expand)) {
+            $data['group_apis'] = GroupApiListResource::collection($this->groupApis);
         }
         if (\in_array('add_on__add_on_subscription_plan', $expand)) {
             $data['add_on_subscription_plan'] = AddOnSubscriptionPlanResource::collection($this->addOnSubscriptionPlans);
