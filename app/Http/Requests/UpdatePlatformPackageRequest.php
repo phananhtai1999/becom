@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Abstracts\AbstractRequest;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdatePlatformPackageRequest extends AbstractRequest
 {
@@ -25,7 +26,7 @@ class UpdatePlatformPackageRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'name' => ['required', 'unique:apps,name'],
+            'name' => [Rule::unique('articles')->ignore($this->id, 'uuid')->whereNull('deleted_at')],
             'parent_uuid' => ['exists:apps,uuid'],
             'monthly' => ['min:-1', 'integer'],
             'yearly' => ['min:-1', 'integer'],

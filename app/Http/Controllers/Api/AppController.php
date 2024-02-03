@@ -108,11 +108,7 @@ class AppController extends AbstractRestAPIController
         if ($platformPackage->status == App::PLATFORM_PACKAGE_PUBLISH) {
             return $this->sendJsonResponse(false, 'Can not edit this platform', [], 403);
         }
-        $data = $request->all();
-        if ($request->get('name')) {
-            $data = array_merge($request->all(), ['uuid' => $request->get('name')]);
-        }
-        $this->service->update($platformPackage, $data);
+        $this->service->update($platformPackage, $request->all());
         $platformPackage->groupApis()->syncWithoutDetaching($request->get('group_api_uuids'));
 
         Cache::flush();
