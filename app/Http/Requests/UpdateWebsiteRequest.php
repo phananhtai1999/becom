@@ -83,6 +83,7 @@ class UpdateWebsiteRequest extends AbstractRequest
             })->whereNull('deleted_at')],
             'is_active_news_page' => ['boolean'],
             'is_active_product_page' => ['boolean'],
+            'menu_properties' => ['array'],
         ];
     }
 }

@@ -46,6 +46,7 @@ class Website extends AbstractModel
         'app_id',
         'is_active_product_page',
         'is_default',
+        'menu_properties',
     ];
 
     /**
@@ -62,6 +63,7 @@ class Website extends AbstractModel
         'header_section_uuid' => 'integer',
         'domain_uuid' => 'integer',
         'tracking_ids' => 'array',
+        'menu_properties' => 'array'
     ];
 
     /**

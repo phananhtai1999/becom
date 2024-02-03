@@ -77,6 +77,9 @@ class MyWebsiteRequest extends AbstractRequest
             'tracking_ids' => ['nullable', 'array'],
             'tracking_ids.*' => ['nullable', 'string', 'max:300'],
             'publish_status' => ['required', 'numeric', Rule::in(Website::BLOCKED_PUBLISH_STATUS, Website::DRAFT_PUBLISH_STATUS)],
+            'is_active_news_page' => ['boolean'],
+            'is_active_product_page' => ['boolean'],
+            'menu_properties' => ['array'],
         ];
     }
 }

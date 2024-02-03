@@ -43,6 +43,10 @@ class MyWebsiteQueryBuilder extends AbstractQueryBuilder
                 'logo',
                 'domain_uuid',
                 'tracking_ids',
+                'is_active_news_page',
+                'is_active_product_page',
+                'is_default',
+                'menu_properties',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -56,6 +60,10 @@ class MyWebsiteQueryBuilder extends AbstractQueryBuilder
                 'logo',
                 'domain_uuid',
                 'tracking_ids',
+                'is_active_news_page',
+                'is_active_product_page',
+                'is_default',
+                'menu_properties',
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -68,6 +76,12 @@ class MyWebsiteQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__logo', 'logo'),
                 'header_section_uuid',
                 AllowedFilter::exact('exact__header_section_uuid', 'header_section_uuid'),
+                'is_active_news_page',
+                AllowedFilter::exact('exact__is_active_news_page', 'is_active_news_page'),
+                'is_active_product_page',
+                AllowedFilter::exact('exact__is_active_product_page', 'is_active_product_page'),
+                'is_default',
+                AllowedFilter::exact('exact__is_default', 'is_default'),
                 'headerSection.title',
                 AllowedFilter::exact('exact__headerSection.title', 'headerSection.title'),
                 'footer_section_uuid',
