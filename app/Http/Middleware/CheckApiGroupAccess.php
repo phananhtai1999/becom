@@ -19,7 +19,6 @@ class CheckApiGroupAccess
         $uri = $request->route()->uri();
         $method = $request->route()->methods()[0];
 
-        Cache::flush();
         foreach (auth()->apps() as $myApp) {
             $permissions = Cache::rememberForever('app_permission_' . $myApp, function () use ($myApp) {
                 $permissions = collect();
