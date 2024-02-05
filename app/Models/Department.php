@@ -115,7 +115,7 @@ class Department extends AbstractModel
         return $this->belongsToMany(App::class, 'department_app', 'department_uuid', 'app_uuid');
     }
 
-    public function app() {
+    public function apps() {
         return $this->belongsToMany(App::class, 'department_app', 'department_uuid', 'app_uuid');
     }
 

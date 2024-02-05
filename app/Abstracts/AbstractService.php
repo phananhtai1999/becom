@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Abstracts;
+use App\Models\UserProfile;
 use Techup\ApiConfig\Services\ConfigService;
 use GuzzleHttp\Client;
 use Techup\ApiConfig\Models\Config;
@@ -279,5 +280,9 @@ abstract class AbstractService
         return new Client([
             'headers' => $this->header()
         ]);
+    }
+
+    public function getUser() {
+        return UserProfile::where(['user_uuid' => auth()->userId(), 'app_id' => auth()->appId()])->firstOrFail();
     }
 }
