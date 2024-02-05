@@ -416,7 +416,7 @@ Route::group(['middleware' => ['apikey']], function () {
             Route::get('/select-all-contact', [ContactController::class, 'selectAllContact'])->name('select-all-contact');
         });
 
-        Route::group(['as' => 'my.'], function () {
+        Route::group(['middleware' => ['group_api'], 'as' => 'my.'], function () {
             Route::get('/my/contacts', [ContactController::class, 'indexMyContact'])->name('index');
             Route::post('/my/contact', [ContactController::class, 'storeMyContact'])->name('store');
             Route::get('/my/contact/{id}', [ContactController::class, 'showMyContact'])->name('show');
@@ -1057,7 +1057,7 @@ Route::group(['middleware' => ['apikey']], function () {
                 Route::delete('/footer-template/{id}', [FooterTemplateController::class, 'destroy'])->name('destroy');
             });
 
-            Route::group(['as' => 'my.'], function () {
+            Route::group(['middleware' => ['group_api'], 'as' => 'my.'], function () {
                 Route::get('/my/footer-templates', [FooterTemplateController::class, 'indexMyFooterTemplate'])->name('index');
                 Route::post('/my/footer-template', [FooterTemplateController::class, 'storeMyFooterTemplate'])->name('store');
                 Route::get('/my/footer-template/{id}', [FooterTemplateController::class, 'showMyFooterTemplate'])->name('show');

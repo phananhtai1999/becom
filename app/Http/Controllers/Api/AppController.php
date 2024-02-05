@@ -109,7 +109,7 @@ class AppController extends AbstractRestAPIController
             return $this->sendJsonResponse(false, 'Can not edit this platform', [], 403);
         }
         $this->service->update($platformPackage, $request->all());
-        $platformPackage->groupApis()->syncWithoutDetaching($request->get('group_api_uuids'));
+        $platformPackage->groupApis()->sync($request->get('group_api_uuids'));
 
         Cache::flush();
 

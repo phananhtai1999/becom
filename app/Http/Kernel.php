@@ -2,6 +2,7 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\CheckApiGroupAccess;
 use App\Http\Middleware\CheckCanRemoveFooterTemplate;
 use App\Http\Middleware\TransferAuthDataToBody;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
