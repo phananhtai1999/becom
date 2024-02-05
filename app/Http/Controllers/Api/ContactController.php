@@ -25,6 +25,7 @@ use App\Services\StatusService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Route;
 
 class ContactController extends AbstractRestAPIController
 {
@@ -164,9 +165,6 @@ class ContactController extends AbstractRestAPIController
      */
     public function indexMyContact(IndexRequest $request)
     {
-        if (!Gate::allows('permission', 'contact')) {
-            return $this->sendJsonResponse(false, 'You need to upgrade platform package', ['data' => $this->getPlatformByPermission('contact')], 403);
-        }
         try {
             $models = $this->myService->search($request->search, $request->search_by)->paginate(
                 $request->get('per_page', '15'),
@@ -195,10 +193,6 @@ class ContactController extends AbstractRestAPIController
      */
     public function storeMyContact(MyContactRequest $request)
     {
-        if (!Gate::allows('permission', 'contact')) {
-            return $this->sendJsonResponse(false, 'You need to upgrade platform package', ['data' => $this->getPlatformByPermission('contact')], 403);
-        }
-
         $model = $this->service->create(array_merge($request->all(), [
             'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
@@ -223,9 +217,6 @@ class ContactController extends AbstractRestAPIController
      */
     public function showMyContact($id)
     {
-        if (!Gate::allows('permission', 'contact')) {
-            return $this->sendJsonResponse(false, 'You need to upgrade platform package', ['data' => $this->getPlatformByPermission('contact')], 403);
-        }
         $model = $this->myService->findMyContactByKeyOrAbort($id);
 
         return $this->sendOkJsonResponse(
@@ -240,9 +231,6 @@ class ContactController extends AbstractRestAPIController
      */
     public function editMyContact(UpdateMyContactRequest $request, $id)
     {
-        if (!Gate::allows('permission', 'contact')) {
-            return $this->sendJsonResponse(false, 'You need to upgrade platform package', ['data' => $this->getPlatformByPermission('contact')], 403);
-        }
         $model = $this->myService->findMyContactByKeyOrAbort($id);
 
         $this->service->update($model, array_merge($request->except("points"), [
@@ -268,9 +256,6 @@ class ContactController extends AbstractRestAPIController
      */
     public function destroyMyContact($id)
     {
-        if (!Gate::allows('permission', 'contact')) {
-            return $this->sendJsonResponse(false, 'You need to upgrade platform package', ['data' => $this->getPlatformByPermission('contact')], 403);
-        }
         $this->myService->deleteMyContactByKey($id);
 
         return $this->sendOkJsonResponse();

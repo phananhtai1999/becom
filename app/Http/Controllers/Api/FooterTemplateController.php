@@ -143,9 +143,6 @@ class FooterTemplateController extends AbstractRestAPIController
 
     public function storeMyFooterTemplate(MyFooterTemplateRequest $request)
     {
-        if (!Gate::allows('permission', 'footer_template')) {
-            return $this->sendJsonResponse(false, 'You need to buy platform/add-on', ['data' => $this->getPlatformByPermission('footer_template')], 403);
-        }
         $model = $this->service->create(array_merge($request->except('active_by_uuid'), [
             'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
@@ -171,9 +168,6 @@ class FooterTemplateController extends AbstractRestAPIController
 
     public function editMyFooterTemplate(UpdateMyFooterTemplateRequest $request, $id)
     {
-        if (!Gate::allows('permission', 'footer_template')) {
-            return $this->sendJsonResponse(false, 'You need to buy platform/add-on', ['data' => $this->getPlatformByPermission('footer_template')], 403);
-        }
         $model = $this->myService->showMyFooterTemplate($id);
 
         if ($request->get('active_by_uuid')) {
@@ -188,9 +182,6 @@ class FooterTemplateController extends AbstractRestAPIController
 
     public function destroyMyFooterTemplate($id)
     {
-        if (!Gate::allows('permission', 'footer_template')) {
-            return $this->sendJsonResponse(false, 'You need to buy platform/add-on', ['data' => $this->getPlatformByPermission('footer_template')], 403);
-        }
         $model = $this->myService->showMyFooterTemplate($id);
         if (!$model->active_by_uuid) {
             $this->service->destroy($id);
@@ -202,9 +193,6 @@ class FooterTemplateController extends AbstractRestAPIController
 
     public function removeFooterTemplate(RemoveFooterTemplateRequest $request)
     {
-        if (!Gate::allows('permission', 'footer_template')) {
-            return $this->sendJsonResponse(false, 'You need to buy platform/add-on', ['data' => $this->getPlatformByPermission('footer_template')], 403);
-        }
         $user = $this->userProfileService->findOneWhereOrFail(['user_uuid' => auth()->userId()]);
         $this->userProfileService->update($user, [
            'can_remove_footer_template' => $request->get('can_remove_footer_template')

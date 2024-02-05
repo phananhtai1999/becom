@@ -30,6 +30,7 @@ class WebsiteResource extends AbstractJsonResource
             'logo' => $this->logo,
             'description' => $this->description,
             'is_default' => $this->is_default,
+            'menu_properties' => $this->menu_properties,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
         ];
