@@ -84,4 +84,8 @@ class App extends Model
     {
         return $this->hasMany(__CLASS__, 'parent_uuid');
     }
+
+    public function departments() {
+        return $this->belongsToMany(Department::class, 'department_app', 'app_uuid', 'department_uuid');
+    }
 }
