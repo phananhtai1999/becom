@@ -46,4 +46,17 @@ class AppService extends AbstractService
             });
         })->get();
     }
+
+    public function getAppByDepartment($request, $id)
+    {
+        $indexRequest = $this->getIndexRequest($request);
+
+        return $this->modelQueryBuilderClass::searchQuery($indexRequest['search'], $indexRequest['search_by'])
+            ->where(function ($query) use ($id) {
+                $query->whereHas('departments', function ($query) use ($id) {
+                    $query->where('departments.uuid', $id);
+                });
+            })
+            ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
+    }
 }
