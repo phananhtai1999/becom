@@ -28,9 +28,9 @@ class AppService extends AbstractService
     }
 
 
-    public function myApps()
+    public function myApps($userId)
     {
-        $user = $this->getUser();
+        $user = UserProfile::where(['user_uuid' => $userId, 'app_id' => auth()->appId()])->firstOrFail();
         $teams = $user->teams;
         $departments = [];
         if ($teams) {
