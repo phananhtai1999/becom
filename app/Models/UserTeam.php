@@ -61,4 +61,9 @@ class UserTeam extends Model
     {
         return $this->belongsToMany(AddOn::class, 'user_team_add_on', 'user_team_uuid', 'add_on_uuid');
     }
+
+    public function apps()
+    {
+        return $this->belongsToMany(AddOn::class, 'user_team_app', 'user_team_uuid', 'app_uuid');
+    }
 }

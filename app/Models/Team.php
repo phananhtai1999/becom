@@ -94,6 +94,10 @@ class Team extends AbstractModel
         return $this->belongsToMany(AddOn::class, 'team_add_on', 'team_uuid','add_on_uuid')->withTimestamps();
     }
 
+    public function apps() {
+        return $this->belongsToMany(AddOn::class, 'team_app', 'team_uuid','app_uuid')->withTimestamps();
+    }
+
     public function getNumOfTeamMemberAttribute()
     {
         return count($this->userTeam);
