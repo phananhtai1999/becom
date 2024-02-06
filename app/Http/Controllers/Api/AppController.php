@@ -6,6 +6,7 @@ use App\Abstracts\AbstractRestAPIController;
 use App\Http\Controllers\Traits\RestDestroyTrait;
 use App\Http\Controllers\Traits\RestIndexTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
+use App\Http\Requests\IndexRequest;
 use App\Http\Requests\PlatformPackageRequest;
 use App\Http\Requests\PublishPlatformRequest;
 use App\Http\Requests\UpdatePlatformPackageRequest;
@@ -115,6 +116,16 @@ class AppController extends AbstractRestAPIController
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $platformPackage)
+        );
+    }
+
+    public function getAppOfDepartment(IndexRequest $request, $id): JsonResponse
+    {
+
+        $apps = $this->service->getAppByDepartment($request, $id);
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceCollectionClass, $apps)
         );
     }
 }
