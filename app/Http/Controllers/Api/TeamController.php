@@ -366,7 +366,7 @@ class TeamController extends Controller
                 'user_uuid' => $userUuid,
                 'app_id' => auth()->appId()
             ]);
-            $userTeam->addOns()->syncWithoutDetaching($request->get('add_on_uuids'), []);
+            $userTeam->apps()->syncWithoutDetaching($request->get('app_uuids'), []);
             $this->removeCache($userUuid);
         }
         $this->removeTeamAddOnPermissionCache($request->get('user_uuids'));
@@ -389,7 +389,7 @@ class TeamController extends Controller
                 'user_uuid' => $userUuid,
                 'app_id' => auth()->appId()
             ]);
-            $userTeam->addOns()->detach($request->get('add_on_uuids'), []);
+            $userTeam->apps()->detach($request->get('app_uuids'), []);
             $this->removeCache($userUuid);
         }
         $this->removeTeamAddOnPermissionCache($request->get('user_uuids'));
@@ -749,7 +749,7 @@ class TeamController extends Controller
     public function setAddOnForTeam(SetTeamAddOnRequest $request)
     {
         $team = $this->service->findOrFailById($request->get('team_uuid'));
-        $team->addons()->syncWithoutDetaching($request->get('add_on_uuids', []));
+        $team->apps()->syncWithoutDetaching($request->get('app_uuids', []));
         $this->removeTeamLeaderPermissionCache($team->leader_uuid);
 
         return $this->sendOkJsonResponse(
@@ -766,7 +766,7 @@ class TeamController extends Controller
             }
         }
         $team = $this->service->findOrFailById($request->get('team_uuid'));
-        $team->addons()->detach($request->get('add_on_uuids', []));
+        $team->apps()->detach($request->get('app_uuids', []));
         $this->removeTeamLeaderPermissionCache($team->leader_uuid);
 
         return $this->sendOkJsonResponse(

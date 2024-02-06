@@ -26,8 +26,8 @@ class SetTeamAddOnRequest extends AbstractRequest
     {
         return [
             'team_uuid' => ['required', 'exists:teams,uuid'],
-            'add_on_uuids' => ['required', 'array'],
-            'add_on_uuids.*' => ['required', 'integer', 'exists:add_ons,uuid']
+            'app_uuids' => ['required', 'array'],
+            'app_uuids.*' => ['required', 'string', 'exists:apps,uuid']
         ];
     }
 }
