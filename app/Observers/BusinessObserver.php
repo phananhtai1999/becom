@@ -17,11 +17,11 @@ class BusinessObserver
      */
     public function created(BusinessManagement $businessManagement)
     {
-//        $configService = new ConfigService();
-//        $defaultDepartment = $configService->findConfigByKey('default_department');
-//        if ($defaultDepartment) {
+        $configService = new ConfigService();
+        $defaultDepartment = $configService->findConfigByKey('default_department');
+        if ($defaultDepartment) {
             $departmentService = new DepartmentService();
-            foreach (Department::DEFAULT_NAME as $value) {
+            foreach ($defaultDepartment as $value) {
                 $departmentService->create([
                     'business_uuid' => $businessManagement->uuid,
                     'is_default' => true,
@@ -29,7 +29,7 @@ class BusinessObserver
                     'name' => $value
                 ]);
             }
-//        }
+        }
 
     }
 
