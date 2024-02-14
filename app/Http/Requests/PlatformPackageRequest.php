@@ -27,11 +27,11 @@ class PlatformPackageRequest extends AbstractRequest
         return [
             'name' => ['required', 'unique:apps,name'],
             'parent_uuid' => ['exists:apps,uuid'],
+            'service' => ['required'],
+            'group_api_codes' => ['required', 'array'],
             'description' => ['required'],
             'monthly' => ['required', 'min:-1', 'integer'],
-            'yearly' => ['required', 'min:-1', 'integer'],
-            'group_api_uuids' => ['required', 'array'],
-            'group_api_uuids.*' => ['required', 'integer', 'exists:group_api_lists,uuid'],
+            'yearly' => ['required', 'min:-1', 'integer']
         ];
     }
 }

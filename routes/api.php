@@ -670,7 +670,9 @@ Route::group(['middleware' => ['apikey']], function () {
             });
 
             Route::get('/app/{id}', [AppController::class, 'show']);
+            Route::get('/user-apps', [AppController::class, 'userApps']);
             Route::get('/my/apps', [AppController::class, 'myPlatformPackage']);
+            
             Route::get('/app-of-department/{id}', [AppController::class, 'getAppOfDepartment']);
         });
 

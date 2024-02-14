@@ -41,6 +41,8 @@ class App extends Model
     protected $fillable = [
         'uuid',
         'name',
+        'service',
+        'group_api_codes',
         'parent_uuid',
         'monthly',
         'yearly',
@@ -56,6 +58,7 @@ class App extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
+        'group_api_codes' => 'array',
     ];
 
     public function subscriptionPlans()
@@ -65,10 +68,6 @@ class App extends Model
 
     public function permissions() {
         return $this->belongsToMany(Permission::class, 'platform_package_permission', 'platform_package_uuid', 'permission_uuid');
-    }
-
-    public function groupApis() {
-        return $this->belongsToMany(GroupApiList::class, 'app_group_api', 'app_uuid', 'group_api_uuid')->withTimestamps();
     }
 
     public function addOns() {

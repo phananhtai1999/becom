@@ -26,7 +26,7 @@ class UpdatePlatformPackageRequest extends AbstractRequest
     public function rules()
     {
         return [
-            'name' => [Rule::unique('articles')->ignore($this->id, 'uuid')->whereNull('deleted_at')],
+            'name' => [Rule::unique('apps')->ignore($this->id, 'uuid')->whereNull('deleted_at')],
             'parent_uuid' => ['exists:apps,uuid'],
             'monthly' => ['min:-1', 'integer'],
             'yearly' => ['min:-1', 'integer'],
