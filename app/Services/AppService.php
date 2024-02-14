@@ -30,8 +30,8 @@ class AppService extends AbstractService
 
     public function myApps($userId)
     {
-        $user = UserProfile::where(['user_uuid' => $userId, 'app_id' => auth()->appId()])->firstOrFail();
-        $teams = $user->teams;
+        $user = UserProfile::where(['user_uuid' => $userId])->firstOrFail();
+        $teams = $user->user_teams;
         $departments = [];
         if ($teams) {
             foreach ($teams as $team) {
@@ -44,7 +44,7 @@ class AppService extends AbstractService
             $query->whereHas('departments', function ($query) use ($departments) {
                 $query->whereIn('departments.uuid', $departments);
             });
-        })->get();
+        })->pluck('uuid');
     }
 
     public function getAppByDepartment($request, $id)

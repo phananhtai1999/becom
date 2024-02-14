@@ -55,8 +55,7 @@ class AppController extends AbstractRestAPIController
     {
         $uuid = strtolower(str_replace(' ', '_', Str::snake($request->get('name'))));
         $model = $this->service->create(array_merge($request->all(), ['uuid' => $uuid]));
-        $model->groupApis()->syncWithoutDetaching($request->get('group_api_uuids'));
-
+       
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
         );
@@ -73,6 +72,16 @@ class AppController extends AbstractRestAPIController
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->userPlatformResourceClass, $myPlatformPackage)
+        );
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function userApps() {
+
+        $myApps = $this->service->myApps(auth()->userId());
+        return $this->sendCreatedJsonResponse(['apps' => $myApps ]  
         );
     }
 
@@ -110,13 +119,29 @@ class AppController extends AbstractRestAPIController
             return $this->sendJsonResponse(false, 'Can not edit this platform', [], 403);
         }
         $this->service->update($platformPackage, $request->all());
-        $platformPackage->groupApis()->sync($request->get('group_api_uuids'));
 
-        Cache::flush();
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $platformPackage)
         );
+    }
+
+
+     /**
+     * @param $id
+     * @return JsonResponse
+     */
+    public function destroy($id)
+    {
+        
+        $platformPackage = $this->service->findOrFailById($id);
+        if ($platformPackage->status == App::PLATFORM_PACKAGE_PUBLISH) {
+            return $this->sendJsonResponse(false, 'Can not delete this platform', [], 403);
+        }
+
+        $this->service->destroy($id);
+
+        return $this->sendOkJsonResponse();
     }
 
     public function getAppOfDepartment(IndexRequest $request, $id): JsonResponse

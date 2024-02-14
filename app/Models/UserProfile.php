@@ -101,6 +101,10 @@ class UserProfile extends \Techup\ApiBase\Models\UserProfile
     {
         return $this->belongsToMany(Team::class, 'user_teams', 'user_uuid', 'team_uuid', 'user_uuid')->withTimestamps()->where('user_teams.app_id', auth()->appId());
     }
+    public function user_teams()
+    {
+        return $this->belongsToMany(Team::class, 'user_teams', 'user_uuid', 'team_uuid', 'user_uuid')->withTimestamps();
+    }
 
     /**
      * @return BelongsToMany
