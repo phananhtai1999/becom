@@ -15,7 +15,7 @@ class AddServiceColumnToAppsTable extends Migration
     {
         Schema::table('apps', function (Blueprint $table) {
             $table->string('service')->nullable();
-            $table->json('group_api_codes')->nullable()->default('[]');
+            $table->json('group_api_codes')->nullable();
         });
     }
 
