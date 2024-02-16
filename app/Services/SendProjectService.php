@@ -67,16 +67,19 @@ class SendProjectService extends AbstractService
         return SendProjectQueryBuilder::searchQuery($indexRequest['search'], $indexRequest['search_by'])
             ->where(function ($query) use ($teams, $departmentUuid, $businessUuid, $location) {
                 $query = $query->orWhereHas('teams', function ($q) use ($teams) {
-                        $q->whereIn('teams.uuid', $teams);
-                    })
-                    ->orWhereHas('departments', function ($q) use ($departmentUuid) {
-                        $q->whereIn('departments.uuid', [])
-                        ->where(['send_projects.status' => SendProject::STATUS_PROTECTED]);
-                    })
-                    ->orWhereHas('locations', function ($q) use ($location) {
+                    $q->whereIn('teams.uuid', $teams);
+                })->when($departmentUuid, function ($q, $departmentUuid) {
+                    return $q->orWhereHas('departments', function ($q) use ($departmentUuid) {
+                        $q->whereIn('departments.uuid', $departmentUuid)
+                            ->where(['send_projects.status' => SendProject::STATUS_PROTECTED]);
+                    });
+                })
+                ->when($location, function ($q, $location) {
+                    return $q->orWhereHas('locations', function ($q) use ($location) {
                         $q->whereIn('locations.uuid', $location)
                             ->where(['send_projects.status' => SendProject::STATUS_PROTECTED]);
                     });
+                });
 
                 if (!empty($businessUuid)) {
                     $query->orWhereHas('business', function ($q) use ($businessUuid) {
@@ -209,7 +212,7 @@ class SendProjectService extends AbstractService
 
         return SendProjectQueryBuilder::searchQuery($indexRequest['search'], $indexRequest['search_by'])
             ->where(function ($query) use ($uuid, $departmentOfLocation, $teamOfLocation, $businessUuid) {
-                $query->whereHas('locations', function ($q) use ($uuid) {
+                $query = $query->whereHas('locations', function ($q) use ($uuid) {
                     $q->where('locations.uuid', $uuid);
                 })
                     ->orWhereHas('departments', function ($q) use ($departmentOfLocation) {
@@ -217,12 +220,14 @@ class SendProjectService extends AbstractService
                     })
                     ->orWhereHas('teams', function ($q) use ($teamOfLocation) {
                         $q->whereIn('teams.uuid', $teamOfLocation);
-                    })
-                    ->orWhereHas('business', function ($q) use ($businessUuid) {
-                        $q->where('business_managements.uuid', $businessUuid)
-                            ->where(['status' => SendProject::STATUS_PROTECTED]);
-
                     });
+
+                    if(!empty($businessUuid)){
+                        $query->orWhereHas('business', function ($q) use ($businessUuid) {
+                            $q->where('business_managements.uuid', $businessUuid)
+                                ->where(['status' => SendProject::STATUS_PROTECTED]);
+                        });
+                    }
             })
             ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
     }
