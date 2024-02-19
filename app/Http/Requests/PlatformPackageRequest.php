@@ -30,6 +30,7 @@ class PlatformPackageRequest extends AbstractRequest
             'service' => ['required'],
             'group_api_codes' => ['required', 'array'],
             'description' => ['required'],
+            'avatar' => ['string'],
             'monthly' => ['required', 'min:-1', 'integer'],
             'yearly' => ['required', 'min:-1', 'integer']
         ];

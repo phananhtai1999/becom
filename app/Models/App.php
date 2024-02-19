@@ -48,7 +48,8 @@ class App extends Model
         'yearly',
         'payment_product_id',
         'description',
-        'status'
+        'status',
+        'avatar'
     ];
 
     /**
@@ -86,5 +87,9 @@ class App extends Model
 
     public function departments() {
         return $this->belongsToMany(Department::class, 'department_app', 'app_uuid', 'department_uuid');
+    }
+
+    public function userApps() {
+        return $this->hasMany(UserApp::class, 'app_uuid', 'uuid');
     }
 }
