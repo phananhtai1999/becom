@@ -155,7 +155,7 @@ class SendProjectController extends AbstractRestAPIController
                         if (!empty($department->location)) {
                             $location = $department->location;
                             $locations[] = $location->uuid;
-                            $business = $location->business_uuid;
+                             $business = $location->business_uuid;
                         }
                     }
                 }
@@ -226,6 +226,59 @@ class SendProjectController extends AbstractRestAPIController
             }
 
             $models = $this->service->getMyProjectWithTeams($request, $teams, $departments, $locations, $business ?? null);
+        }
+
+        return $this->sendOkJsonResponse(
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $models)
+        );
+    }
+
+    public function indexMySendProjectsEditable(IndexProjectRequest $request)
+    {
+        if (auth('app_to_app')->hasRole([Role::ROLE_USER_OWNER])) {
+            $business = $this->getCstgeBusiness();
+            if ($business) {
+                $models = $this->service->getCollectionWithPaginationByCondition($request, ['business_uuid' => $business->uuid]);
+                if ($request->get('type')) {
+                    $models = $this->service->getProjectScope($request, $business);
+                }
+            } else {
+                $models = $this->service->getCollectionWithPaginationByCondition($request, ['owner_uuid' => auth('app_to_app')->userId()]);
+            }
+        } elseif (auth('app_to_app')->hasRole([Role::ROLE_USER_MANAGER])) {
+            $department = $this->departmentService->findOneWhere(['manager_uuid' => auth('app_to_app')->userId()]);
+            $location = $this->locationService->findOneWhere(['manager_uuid' => auth('app_to_app')->userId()]);
+            if ($department) {
+                $teamOfDepartment = $department->teams->pluck('uuid')->toArray() ?? [];
+
+                $models = $this->service->getMyProjectWithDepartment($request, $department->uuid, null, null, $teamOfDepartment);
+            }
+
+            if ($location) {
+                $departmentOfLocation = $location->departments->pluck('uuid')->toArray() ?? [];
+                if (!empty($departmentOfLocation)) {
+                    $teams = [];
+                    foreach ($location->departments as $department) {
+                        if (!empty($department->teams->toArray())) {
+                            $teams[] = $department->teams->pluck('uuid')->toArray();
+                        }
+                    }
+                }
+
+                $models = $this->service->getMyProjectWithDLocation($request, $location->uuid, null, $departmentOfLocation, $teams ?? []);
+            }
+        } else {
+            $teams = [];
+            $models = [];
+            foreach (auth('app_to_app')->user()->teams as $team) {
+                if ($team->leader_uuid == auth()->userId()){
+                    $teams[] = $team->uuid;
+                }
+            }
+
+            if($teams){
+                $models = $this->service->getMyProjectWithTeams($request, $teams, null, null);
+            }
         }
 
         return $this->sendOkJsonResponse(
