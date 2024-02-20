@@ -35,8 +35,7 @@ class PaypalService extends AbstractService
             'locale' => env('PAYPAL_LOCALE', 'en_US'), // force gateway language  i.e. it_IT, es_ES, en_US ... (for express paypal only)
             'validate_ssl' => env('PAYPAL_VALIDATE_SSL', true), // Validate SSL when creating api client.
         ];
-        $provider = new PayPalClient();
-        $provider->setApiCredentials($paypalConfig);
+        $provider = new PayPalClient($paypalConfig);
         $provider->getAccessToken();
 
         return $provider;
