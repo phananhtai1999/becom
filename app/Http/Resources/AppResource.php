@@ -26,6 +26,7 @@ class AppResource extends JsonResource
             'group_api_codes' => $this->group_api_codes,
             'parent_uuid' => $this->parent_uuid,
             'yearly' => $this->yearly,
+            'department_code' => $this->department_code,
             'description' => $this->description,
             'avatar' => $this->avatar,
             'payment_product_id' => $this->payment_product_id,

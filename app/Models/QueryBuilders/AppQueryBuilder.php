@@ -37,6 +37,7 @@ class AppQueryBuilder extends AbstractQueryBuilder
                 'description',
                 'status',
                 'service',
+                'department_code',
                 'avatar'
             ])
             ->defaultSort('-created_at')
@@ -49,6 +50,7 @@ class AppQueryBuilder extends AbstractQueryBuilder
                 'description',
                 'avatar',
                 'service',
+                'department_code',
                 'status'
             ])
             ->allowedFilters([
@@ -66,6 +68,8 @@ class AppQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__status', 'status'),
                 'avatar',
                 AllowedFilter::exact('exact__avatar', 'avatar'),
+                'department_code',
+                AllowedFilter::exact('exact__department_code', 'department_code'),
                 'service',
                 AllowedFilter::exact('exact__service', 'service'),
                 'payment_product_id',

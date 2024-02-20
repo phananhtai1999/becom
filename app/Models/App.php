@@ -49,6 +49,7 @@ class App extends Model
         'payment_product_id',
         'description',
         'status',
+        'department_code',
         'avatar'
     ];
 
