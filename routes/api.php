@@ -672,7 +672,7 @@ Route::group(['middleware' => ['apikey']], function () {
             Route::get('/app/{id}', [AppController::class, 'show']);
             Route::get('/user-apps', [AppController::class, 'userApps']);
             Route::get('/my/apps', [AppController::class, 'myPlatformPackage']);
-            
+
             Route::get('/app-of-department/{id}', [AppController::class, 'getAppOfDepartment']);
         });
 
@@ -1409,6 +1409,7 @@ Route::group(['middleware' => ['apikey']], function () {
                 Route::put('my/website/{id}', [WebsiteController::class, 'editMy'])->name('edit');
                 Route::delete('my/website/{id}', [WebsiteController::class, 'destroyMy'])->name('destroy');
                 Route::post('my/websites/change-status', [WebsiteController::class, 'changeStatusMyWebsite'])->name('changeStatusMyWebsite');
+                Route::put('my/website/edit-menu/{id}', [WebsiteController::class, 'changeMenuProperties'])->name('changeMenuProperties');
             });
 
             Route::group(['middleware' => ['role:root,admin,editor']], function () {

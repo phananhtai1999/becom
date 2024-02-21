@@ -149,8 +149,7 @@ class WebsitePage extends AbstractModel
         return [
             self::ARTICLE_DETAIL_TYPE,
             self::ARTICLE_CATEGORY_TYPE,
-            self::HOME_ARTICLES_TYPE,
-            self::NEWS_HEADER_TYPE,
+            self::HOME_ARTICLES_TYPE
         ];
     }
 }

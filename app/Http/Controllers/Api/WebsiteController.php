@@ -10,6 +10,7 @@ use App\Http\Controllers\Traits\RestMyDestroyTrait;
 use App\Http\Controllers\Traits\RestMyShowTrait;
 use App\Http\Controllers\Traits\RestShowTrait;
 use App\Http\Requests\Article\ChangeStatusArticleRequest;
+use App\Http\Requests\ChangeMenuPropertiesRequest;
 use App\Http\Requests\ChangeStatusDefaultWebsiteRequest;
 use App\Http\Requests\ChangeStatusMyWebsite;
 use App\Http\Requests\ChangeStatusWebsite;
@@ -420,6 +421,31 @@ class WebsiteController extends AbstractRestAPIController
     {
         $website = $this->service->findOrFailById($id);
         $website->update(['is_active_news_page' => !$website->is_active_news_page]);
+        if ($website->is_active_news_page) {
+            $newsPage = $this->websitePageService->getNewsWebsitePagesByWebsite($id)->pluck('type')->toArray();
+            $pageTypes = [
+                WebsitePage::ARTICLE_DETAIL_TYPE => 'news-detail-',
+                WebsitePage::ARTICLE_CATEGORY_TYPE => 'news-category-',
+                WebsitePage::HOME_ARTICLES_TYPE => 'news-home-',
+            ];
+            foreach ($pageTypes as $type => $slugPrefix) {
+                if (!in_array($type, $newsPage)) {
+                    $detailWebpage = $this->websitePageService->create([
+                        'user_uuid' => auth()->userId(),
+                        'app_id' => auth()->appId(),
+                        'title' => 'This is title of page ' . $type,
+                        'slug' => $slugPrefix . $id,
+                        'html_template' => '',
+                        'css_template' => '',
+                        'js_template' => '',
+                        'template_json' => '',
+                        'website_page_category_uuid' => 1,
+                        'type' => $type
+                    ]);
+                    $website->websitePages()->attach($detailWebpage);
+                }
+            }
+        }
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $website)
@@ -430,6 +456,43 @@ class WebsiteController extends AbstractRestAPIController
     {
         $website = $this->service->findOrFailById($id);
         $website->update(['is_active_product_page' => !$website->is_active_product_page]);
+        if ($website->is_active_product_page) {
+            $newsPage = $this->websitePageService->getProductWebsitePagesByWebsite($id)->pluck('type')->toArray();
+            $pageTypes = [
+                WebsitePage::PRODUCT_DETAIL_TYPE => 'product-detail-',
+                WebsitePage::PRODUCT_CATEGORY_TYPE => 'product-category-',
+                WebsitePage::HOME_PRODUCTS_TYPE => 'product-home-',
+            ];
+            foreach ($pageTypes as $type => $slugPrefix) {
+                if (!in_array($type, $newsPage)) {
+                    $detailWebpage = $this->websitePageService->create([
+                        'user_uuid' => auth()->userId(),
+                        'app_id' => auth()->appId(),
+                        'title' => 'This is title of page ' . $type,
+                        'slug' => $slugPrefix . $id,
+                        'html_template' => '',
+                        'css_template' => '',
+                        'js_template' => '',
+                        'template_json' => '',
+                        'website_page_category_uuid' => 1,
+                        'type' => $type
+                    ]);
+                    $website->websitePages()->attach($detailWebpage);
+                }
+            }
+        }
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $website)
+        );
+    }
+
+    public function changeMenuProperties($id, ChangeMenuPropertiesRequest $request): JsonResponse
+    {
+        $website = $this->service->findOneWhereOrFail([
+            ['user_uuid', auth()->userId()],
+            ['uuid', $id]
+        ]);
+        $website->update(['menu_properties' => $request->get('menu_properties')]);
 
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $website)
