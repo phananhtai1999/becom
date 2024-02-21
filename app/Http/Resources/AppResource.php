@@ -3,6 +3,8 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Techup\ApiList\Http\Resources\GroupApiListResource;
+use Techup\ApiList\Models\GroupApiList;
 
 class AppResource extends JsonResource
 {
@@ -25,13 +27,21 @@ class AppResource extends JsonResource
             'parent_uuid' => $this->parent_uuid,
             'yearly' => $this->yearly,
             'description' => $this->description,
+            'avatar' => $this->avatar,
             'payment_product_id' => $this->payment_product_id,
             'status' => $this->status,
         ];
         if (\in_array('app__permissions', $expand)) {
             $data['permissions'] = PermissionResource::collection($this->permissions);
         }
-     
+
+        if (\in_array('app__groups', $expand)) {
+            $groupApis = $this->group_api_codes ?? [];
+            foreach ($groupApis as $groupApi) {
+                $data['group_apis'][] = new GroupApiListResource(GroupApiList::where('code', $groupApi)->first() ?? []);
+            }
+        }
+
         if (\in_array('app__subscription_plan', $expand)) {
             $data['subscription_plan'] = SubscriptionPlanResource::collection($this->subscriptionPlans);
         }

@@ -35,7 +35,9 @@ class AppQueryBuilder extends AbstractQueryBuilder
                 'payment_product_id',
                 'name',
                 'description',
-                'status'
+                'status',
+                'service',
+                'avatar'
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -45,6 +47,8 @@ class AppQueryBuilder extends AbstractQueryBuilder
                 'payment_product_id',
                 'name',
                 'description',
+                'avatar',
+                'service',
                 'status'
             ])
             ->allowedFilters([
@@ -60,6 +64,10 @@ class AppQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__description', 'description'),
                 'status',
                 AllowedFilter::exact('exact__status', 'status'),
+                'avatar',
+                AllowedFilter::exact('exact__avatar', 'avatar'),
+                'service',
+                AllowedFilter::exact('exact__service', 'service'),
                 'payment_product_id',
                 AllowedFilter::exact('exact__payment_product_id', 'payment_product_id'),
                 'permissions.uuid',

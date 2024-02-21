@@ -55,7 +55,7 @@ class AppController extends AbstractRestAPIController
     {
         $uuid = strtolower(str_replace(' ', '_', Str::snake($request->get('name'))));
         $model = $this->service->create(array_merge($request->all(), ['uuid' => $uuid]));
-       
+
         return $this->sendCreatedJsonResponse(
             $this->service->resourceToData($this->resourceClass, $model)
         );
@@ -64,14 +64,11 @@ class AppController extends AbstractRestAPIController
     /**
      * @return JsonResponse
      */
-    public function myPlatformPackage() {
-        $myPlatformPackage = $this->userAppService->findOneWhere([
-            'user_uuid' => auth()->userId(),
-            'app_id' => auth()->appId(),
-        ]);
+    public function myPlatformPackage(IndexRequest $request) {
+        $myApps = $this->service->myOwnerApps($request, auth()->userId());
 
         return $this->sendCreatedJsonResponse(
-            $this->service->resourceToData($this->userPlatformResourceClass, $myPlatformPackage)
+            $this->service->resourceCollectionToData($this->resourceCollectionClass, $myApps)
         );
     }
 
@@ -81,7 +78,7 @@ class AppController extends AbstractRestAPIController
     public function userApps() {
 
         $myApps = $this->service->myApps(auth()->userId());
-        return $this->sendCreatedJsonResponse(['apps' => $myApps ]  
+        return $this->sendCreatedJsonResponse(['apps' => $myApps ]
         );
     }
 
@@ -133,7 +130,7 @@ class AppController extends AbstractRestAPIController
      */
     public function destroy($id)
     {
-        
+
         $platformPackage = $this->service->findOrFailById($id);
         if ($platformPackage->status == App::PLATFORM_PACKAGE_PUBLISH) {
             return $this->sendJsonResponse(false, 'Can not delete this platform', [], 403);

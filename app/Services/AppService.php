@@ -7,6 +7,8 @@ use App\Models\App;
 use App\Models\QueryBuilders\CampaignQueryBuilder;
 use App\Models\QueryBuilders\SubscriptionPlanQueryBuilder;
 use App\Models\QueryBuilders\AppQueryBuilder;
+use App\Models\Role;
+use App\Models\UserApp;
 use App\Models\UserProfile;
 
 class AppService extends AbstractService
@@ -45,6 +47,20 @@ class AppService extends AbstractService
                 $query->whereIn('departments.uuid', $departments);
             });
         })->pluck('uuid');
+    }
+
+    public function myOwnerApps($request, $userId)
+    {
+        $user = UserProfile::where(['user_uuid' => $userId])->firstOrFail();
+        $indexRequest = $this->getIndexRequest($request);
+
+        return AppQueryBuilder::initialQuery()->where(function ($query) use ($user) {
+            $query->whereHas('userApps', function ($query) use ($user) {
+                $query->where('user_app.user_uuid', $user->user_uuid)
+                ->where('app_id', auth()->appId());
+            });
+        }) ->paginate($indexRequest['per_page'], $indexRequest['columns'], $indexRequest['page_name'], $indexRequest['page']);
+
     }
 
     public function getAppByDepartment($request, $id)
