@@ -115,7 +115,7 @@ class SendProjectController extends AbstractRestAPIController
                     $models = $this->service->getProjectScope($request, $business);
                 }
             } else {
-                $models = $this->service->getCollectionWithPaginationByCondition($request, ['owner_uuid' => auth()->userId()]);
+                $models = $this->service->getCollectionWithPaginationByCondition($request, ['user_uuid' => auth()->userId()]);
             }
         } elseif (auth()->hasRole([Role::ROLE_USER_MANAGER])) {
             $department = $this->departmentService->findOneWhere(['manager_uuid' => auth()->userId()]);
