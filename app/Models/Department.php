@@ -38,6 +38,7 @@ class Department extends AbstractModel
         'manager_uuid',
         'is_default',
         'status',
+        'department_code',
     ];
 
     /**

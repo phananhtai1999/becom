@@ -21,12 +21,13 @@ class BusinessObserver
         $defaultDepartment = $configService->findConfigByKey('default_department');
         if ($defaultDepartment) {
             $departmentService = new DepartmentService();
-            foreach ($defaultDepartment as $value) {
+            foreach ($defaultDepartment->value as $value) {
                 $departmentService->create([
                     'business_uuid' => $businessManagement->uuid,
                     'is_default' => true,
                     'app_id' => auth()->appId(),
-                    'name' => $value
+                    'name' => $value,
+                    'user_uuid' => auth()->userId()
                 ]);
             }
         }

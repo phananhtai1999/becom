@@ -25,6 +25,7 @@ use App\Services\BusinessManagementService;
 use App\Services\CstoreService;
 use App\Services\DepartmentService;
 use App\Services\UserProfileService;
+use Techup\ApiConfig\Services\ConfigService;
 use Techup\ApiConfig\Services\LanguageService;
 use App\Services\MyDepartmentService;
 use App\Services\SendProjectService;
@@ -62,7 +63,8 @@ class DepartmentController extends AbstractRestAPIController
         TeamService         $teamService,
         SendProjectService $sendProjectService,
         UserProfileService $userProfileService,
-        CstoreService $cstoreService
+        CstoreService $cstoreService,
+        ConfigService $configService
     )
     {
         $this->service = $service;
@@ -77,6 +79,7 @@ class DepartmentController extends AbstractRestAPIController
         $this->editRequest = UpdateDepartmentRequest::class;
         $this->indexRequest = IndexRequest::class;
         $this->cstoreService = $cstoreService;
+        $this->configService = $configService;
     }
 
     /**
@@ -309,5 +312,20 @@ class DepartmentController extends AbstractRestAPIController
         }
 
         return $this->sendOkJsonResponse();
+    }
+
+    public function getDepartmentDefault()
+    {
+//        $this->configService->create(['group_uuid' => 1,
+//            'key' => 'default_department',
+//            'type' => 'default_department',
+//        'value' => [
+//            ['name' => "HR", 'code' => 'HR'],
+//            ['name' => "IT", 'code' => 'IT'],
+//            ['name' => "Marketing", 'code' => 'MAG']
+//        ]]);
+        $defaultDepartment = $this->configService->findConfigByKey('default_department');
+
+        return $this->sendOkJsonResponse(['data' => $defaultDepartment->value]);
     }
 }

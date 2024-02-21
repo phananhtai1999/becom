@@ -936,6 +936,7 @@ Route::group(['middleware' => ['apikey']], function () {
                 Route::get('/department/{id}', [DepartmentController::class, 'show'])->name('show');
                 Route::put('/department/{id}', [DepartmentController::class, 'edit'])->name('edit');
                 Route::delete('/department/{id}', [DepartmentController::class, 'destroy'])->name('destroy');
+                Route::get('/default-department', [DepartmentController::class, 'getDepartmentDefault'])->name('getDepartmentDefault');
             });
 
             Route::group(['as' => 'my.'], function () {
