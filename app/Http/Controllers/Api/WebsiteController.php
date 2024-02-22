@@ -435,8 +435,10 @@ class WebsiteController extends AbstractRestAPIController
                 WebsitePage::ARTICLE_CATEGORY_TYPE => 'news-category-',
                 WebsitePage::HOME_ARTICLES_TYPE => 'news-home-',
             ];
+            $currentOrdering = $website->websitePages->count();
             foreach ($pageTypes as $type => $slugPrefix) {
                 if (!in_array($type, $newsPage)) {
+                    $currentOrdering += 1;
                     $detailWebpage = $this->websitePageService->create([
                         'user_uuid' => auth()->userId(),
                         'app_id' => auth()->appId(),
@@ -449,7 +451,7 @@ class WebsiteController extends AbstractRestAPIController
                         'website_page_category_uuid' => $category->uuid,
                         'type' => $type
                     ]);
-                    $website->websitePages()->attach($detailWebpage);
+                    $website->websitePages()->attach($detailWebpage, ['ordering' => $currentOrdering]);
                 }
             }
         }
@@ -474,8 +476,10 @@ class WebsiteController extends AbstractRestAPIController
                 WebsitePage::PRODUCT_CATEGORY_TYPE => 'product-category-',
                 WebsitePage::HOME_PRODUCTS_TYPE => 'product-home-',
             ];
+            $currentOrdering = $website->websitePages->count();
             foreach ($pageTypes as $type => $slugPrefix) {
                 if (!in_array($type, $newsPage)) {
+                    $currentOrdering += 1;
                     $detailWebpage = $this->websitePageService->create([
                         'user_uuid' => auth()->userId(),
                         'app_id' => auth()->appId(),
@@ -488,7 +492,7 @@ class WebsiteController extends AbstractRestAPIController
                         'website_page_category_uuid' => $category->uuid,
                         'type' => $type
                     ]);
-                    $website->websitePages()->attach($detailWebpage);
+                    $website->websitePages()->attach($detailWebpage, ['ordering' => $currentOrdering]);
                 }
             }
         }

@@ -326,6 +326,6 @@ class DepartmentController extends AbstractRestAPIController
 //        ]]);
         $defaultDepartment = $this->configService->findConfigByKey('default_department');
 
-        return $this->sendOkJsonResponse(['data' => $defaultDepartment->value]);
+        return $this->sendOkJsonResponse(['data' => $defaultDepartment->value ?? []]);
     }
 }
