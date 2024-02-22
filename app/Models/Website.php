@@ -47,6 +47,7 @@ class Website extends AbstractModel
         'is_active_product_page',
         'is_default',
         'menu_properties',
+        'category_uuid',
     ];
 
     /**
@@ -104,5 +105,10 @@ class Website extends AbstractModel
         $modelKeyName = (new WebsitePage())->getKeyName();
 
         return array_diff(array_merge((new WebsitePage())->getFillable(), ["website_pages.$modelKeyName", 'website_pages.deleted_at', 'website_pages.created_at', 'website_pages.updated_at']), request()->get('exclude_website_page', []));
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(WebsitePageCategory::class, 'category_uuid', 'uuid',);
     }
 }

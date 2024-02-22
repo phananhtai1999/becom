@@ -31,6 +31,7 @@ class WebsiteResource extends AbstractJsonResource
             'description' => $this->description,
             'is_default' => $this->is_default,
             'menu_properties' => $this->menu_properties,
+            'category_uuid' => $this->category_uuid,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
         ];
@@ -59,6 +60,10 @@ class WebsiteResource extends AbstractJsonResource
                 $data['ordering'] = $webPage->pivot->ordering;
                 return $data;
             });
+        }
+
+        if (\in_array('website__category', $expand)) {
+            $data['category'] = new WebsitePageCategoryResource($this->category);
         }
 
         if (\in_array('website_public__website_pages_public', $expand)) {

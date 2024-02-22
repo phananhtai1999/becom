@@ -47,6 +47,7 @@ class MyWebsiteQueryBuilder extends AbstractQueryBuilder
                 'is_active_product_page',
                 'is_default',
                 'menu_properties',
+                'category_uuid',
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -64,6 +65,7 @@ class MyWebsiteQueryBuilder extends AbstractQueryBuilder
                 'is_active_product_page',
                 'is_default',
                 'menu_properties',
+                'category_uuid',
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -82,6 +84,8 @@ class MyWebsiteQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__is_active_product_page', 'is_active_product_page'),
                 'is_default',
                 AllowedFilter::exact('exact__is_default', 'is_default'),
+                'category_uuid',
+                AllowedFilter::exact('exact__category_uuid', 'category_uuid'),
                 'headerSection.title',
                 AllowedFilter::exact('exact__headerSection.title', 'headerSection.title'),
                 'footer_section_uuid',
