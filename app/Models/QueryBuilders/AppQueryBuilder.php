@@ -5,7 +5,9 @@ namespace App\Models\QueryBuilders;
 use App\Abstracts\AbstractQueryBuilder;
 use App\Models\Campaign;
 use App\Models\App;
+use App\Models\CustomFilter\AppFilterNullParent;
 use App\Models\SearchQueryBuilders\SearchQueryBuilder;
+use Illuminate\Database\Eloquent\Builder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\Concerns\SortsQuery;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -38,6 +40,7 @@ class AppQueryBuilder extends AbstractQueryBuilder
                 'status',
                 'service',
                 'department_code',
+                'parent_uuid',
                 'avatar'
             ])
             ->defaultSort('-created_at')
@@ -51,6 +54,7 @@ class AppQueryBuilder extends AbstractQueryBuilder
                 'avatar',
                 'service',
                 'department_code',
+                'parent_uuid',
                 'status'
             ])
             ->allowedFilters([
@@ -72,6 +76,8 @@ class AppQueryBuilder extends AbstractQueryBuilder
                 AllowedFilter::exact('exact__department_code', 'department_code'),
                 'service',
                 AllowedFilter::exact('exact__service', 'service'),
+                AllowedFilter::exact('exact__parent_uuid', 'parent_uuid'),
+                AllowedFilter::custom('parent_uuid', new AppFilterNullParent()),
                 'payment_product_id',
                 AllowedFilter::exact('exact__payment_product_id', 'payment_product_id'),
                 'permissions.uuid',
