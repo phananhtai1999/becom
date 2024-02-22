@@ -417,14 +417,12 @@ Route::group(['middleware' => ['apikey']], function () {
             Route::get('/select-all-contact', [ContactController::class, 'selectAllContact'])->name('select-all-contact');
         });
 
-        Route::group(['middleware' => ['group_api'], 'as' => 'my.'], function () {
-            Route::get('/my/contacts', [ContactController::class, 'indexMyContact'])->name('index');
-            Route::post('/my/contact', [ContactController::class, 'storeMyContact'])->name('store');
-            Route::get('/my/contact/{id}', [ContactController::class, 'showMyContact'])->name('show');
-            Route::put('/my/contact/{id}', [ContactController::class, 'editMyContact'])->name('edit');
-            Route::delete('/my/contact/{id}', [ContactController::class, 'destroyMyContact'])->name('destroy');
-            Route::get('/my/select-all-contact', [ContactController::class, 'selectAllMyContact'])->name('select-all-contact');
-        });
+        Route::get('/my/contacts', [ContactController::class, 'indexMyContact'])->name('index');
+        Route::post('/my/contact', [ContactController::class, 'storeMyContact'])->name('store');
+        Route::get('/my/contact/{id}', [ContactController::class, 'showMyContact'])->name('show');
+        Route::put('/my/contact/{id}', [ContactController::class, 'editMyContact'])->name('edit');
+        Route::delete('/my/contact/{id}', [ContactController::class, 'destroyMyContact'])->name('destroy');
+        Route::get('/my/select-all-contact', [ContactController::class, 'selectAllMyContact'])->name('select-all-contact');
 
         Route::group(['middleware' => ['role:root,admin,editor'], 'as' => 'editor.'], function () {
             Route::get('/dynamic-content-contact', [ContactController::class, 'dynamicContentContact'])->name('dynamic-content-contact');
@@ -1062,14 +1060,14 @@ Route::group(['middleware' => ['apikey']], function () {
                 Route::delete('/footer-template/{id}', [FooterTemplateController::class, 'destroy'])->name('destroy');
             });
 
-            Route::group(['middleware' => ['group_api'], 'as' => 'my.'], function () {
-                Route::get('/my/footer-templates', [FooterTemplateController::class, 'indexMyFooterTemplate'])->name('index');
-                Route::post('/my/footer-template', [FooterTemplateController::class, 'storeMyFooterTemplate'])->name('store');
-                Route::get('/my/footer-template/{id}', [FooterTemplateController::class, 'showMyFooterTemplate'])->name('show');
-                Route::put('/my/footer-template/{id}', [FooterTemplateController::class, 'editMyFooterTemplate'])->name('edit');
-                Route::delete('/my/footer-template/{id}', [FooterTemplateController::class, 'destroyMyFooterTemplate'])->name('destroy');
-                Route::post('my/remove-footer-template', [FooterTemplateController::class, 'removeFooterTemplate'])->name('removeFooterTemplate');
-            });
+
+            Route::get('/my/footer-templates', [FooterTemplateController::class, 'indexMyFooterTemplate'])->name('index');
+            Route::post('/my/footer-template', [FooterTemplateController::class, 'storeMyFooterTemplate'])->name('store');
+            Route::get('/my/footer-template/{id}', [FooterTemplateController::class, 'showMyFooterTemplate'])->name('show');
+            Route::put('/my/footer-template/{id}', [FooterTemplateController::class, 'editMyFooterTemplate'])->name('edit');
+            Route::delete('/my/footer-template/{id}', [FooterTemplateController::class, 'destroyMyFooterTemplate'])->name('destroy');
+            Route::post('my/remove-footer-template', [FooterTemplateController::class, 'removeFooterTemplate'])->name('removeFooterTemplate');
+
 
         });
 
