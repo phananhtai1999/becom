@@ -85,6 +85,7 @@ class WebsiteRequest extends AbstractRequest
             'is_active_news_page' => ['boolean'],
             'is_active_product_page' => ['boolean'],
             'menu_properties' => ['array'],
+            'category_uuid' => ['numeric', Rule::exists('website_page_categories', 'uuid')->whereNull('deleted_at')],
         ];
     }
 }

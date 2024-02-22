@@ -49,10 +49,6 @@ class WebsitePageRequest extends AbstractRequest
             'description.*' => ['required_with:description', 'string'],
         ];
 
-        if ($this->request->get('type') == WebsitePage::NEWS_HEADER_TYPE || $this->request->get('type') == WebsitePage::PRODUCT_HEADER_TYPE) {
-            $validate['menu_level'] = array_merge($validate['menu_level'], ['required']);
-        }
-
         return $validate;
     }
 }

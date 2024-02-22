@@ -33,6 +33,7 @@ use App\Models\Website;
 use App\Models\WebsitePage;
 use App\Services\MyWebsiteService;
 use App\Services\SectionTemplateService;
+use App\Services\WebsitePageCategoryService;
 use App\Services\WebsitePageService;
 use App\Services\WebsiteService;
 use Carbon\Carbon;
@@ -62,7 +63,8 @@ class WebsiteController extends AbstractRestAPIController
         WebsiteService         $service,
         MyWebsiteService       $myService,
         SectionTemplateService $sectionTemplateService,
-        WebsitePageService     $websitePageService
+        WebsitePageService     $websitePageService,
+        WebsitePageCategoryService $categoryService
     )
     {
         $this->resourceClass = WebsiteResource::class;
@@ -72,6 +74,7 @@ class WebsiteController extends AbstractRestAPIController
         $this->indexRequest = IndexRequest::class;
         $this->sectionTemplateService = $sectionTemplateService;
         $this->websitePageService = $websitePageService;
+        $this->categoryService = $categoryService;
     }
 
     public function store(WebsiteRequest $request)
@@ -423,6 +426,10 @@ class WebsiteController extends AbstractRestAPIController
         $website->update(['is_active_news_page' => !$website->is_active_news_page]);
         if ($website->is_active_news_page) {
             $newsPage = $this->websitePageService->getNewsWebsitePagesByWebsite($id)->pluck('type')->toArray();
+            $category = $this->categoryService->findOneWhere([]);
+            if (!$category) {
+                $this->sendBadRequestJsonResponse(['message' => 'You need to have category first']);
+            }
             $pageTypes = [
                 WebsitePage::ARTICLE_DETAIL_TYPE => 'news-detail-',
                 WebsitePage::ARTICLE_CATEGORY_TYPE => 'news-category-',
@@ -439,7 +446,7 @@ class WebsiteController extends AbstractRestAPIController
                         'css_template' => '',
                         'js_template' => '',
                         'template_json' => '',
-                        'website_page_category_uuid' => 1,
+                        'website_page_category_uuid' => $category->uuid,
                         'type' => $type
                     ]);
                     $website->websitePages()->attach($detailWebpage);
@@ -458,6 +465,10 @@ class WebsiteController extends AbstractRestAPIController
         $website->update(['is_active_product_page' => !$website->is_active_product_page]);
         if ($website->is_active_product_page) {
             $newsPage = $this->websitePageService->getProductWebsitePagesByWebsite($id)->pluck('type')->toArray();
+            $category = $this->categoryService->findOneWhere([]);
+            if (!$category) {
+                $this->sendBadRequestJsonResponse(['message' => 'You need to have category first']);
+            }
             $pageTypes = [
                 WebsitePage::PRODUCT_DETAIL_TYPE => 'product-detail-',
                 WebsitePage::PRODUCT_CATEGORY_TYPE => 'product-category-',
@@ -474,7 +485,7 @@ class WebsiteController extends AbstractRestAPIController
                         'css_template' => '',
                         'js_template' => '',
                         'template_json' => '',
-                        'website_page_category_uuid' => 1,
+                        'website_page_category_uuid' => $category->uuid,
                         'type' => $type
                     ]);
                     $website->websitePages()->attach($detailWebpage);
