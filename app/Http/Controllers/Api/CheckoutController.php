@@ -11,6 +11,7 @@ use App\Services\OrderService;
 use App\Services\PaypalService;
 use App\Services\StripeService;
 use Illuminate\Http\JsonResponse;
+use Techup\ApiConfig\Services\ConfigService;
 use Throwable;
 
 class CheckoutController extends AbstractRestAPIController
@@ -45,13 +46,15 @@ class CheckoutController extends AbstractRestAPIController
         OrderService $orderService,
         MomoService $momoService,
         PaypalService $paypalService,
-        StripeService $stripeService
+        StripeService $stripeService,
+        ConfigService $configService
     )
     {
         $this->orderService = $orderService;
         $this->momoService = $momoService;
         $this->paypalService = $paypalService;
         $this->stripeService = $stripeService;
+        $this->configService = $configService;
     }
 
     /**
@@ -98,10 +101,11 @@ class CheckoutController extends AbstractRestAPIController
         }
 
         if ($processResult['status'] == false) {
+            $frontendUrl = $this->configService->findConfigByKey('front_end_url')->value ?? 'default.techup/';
 
             return $this->sendOkJsonResponse(['data' => [
                 'message' => $processResult['message'],
-                'redirect_url' => env('FRONTEND_URL') . '/checkout/payment-error' . '?orderId=' . $order->getKey()
+                'redirect_url' => $frontendUrl . '/checkout/payment-error' . '?orderId=' . $order->getKey()
             ]]);
         } else {
 
@@ -128,10 +132,11 @@ class CheckoutController extends AbstractRestAPIController
         }
 
         if ($processResult['status'] == false) {
+            $frontendUrl = $this->configService->findConfigByKey('front_end_url')->value ?? 'default.techup/';
 
             return $this->sendOkJsonResponse(['data' => [
                 'message' => $processResult['message'],
-                'redirect_url' => env('FRONTEND_URL') . '/checkout/payment-error/' . $order->getKey()
+                'redirect_url' => $frontendUrl . '/checkout/payment-error/' . $order->getKey()
             ]]);
         } else {
 

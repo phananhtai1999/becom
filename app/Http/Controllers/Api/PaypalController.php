@@ -11,6 +11,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
 use Srmklive\PayPal\Services\PayPal as PayPalClient;
+use Techup\ApiConfig\Services\ConfigService;
 use Throwable;
 
 class PaypalController extends AbstractRestAPIController
@@ -31,11 +32,13 @@ class PaypalController extends AbstractRestAPIController
      */
     public function __construct(
         OrderService $orderService,
-        PaymentLogsService $paymentLogsService
+        PaymentLogsService $paymentLogsService,
+        ConfigService $configService
     )
     {
         $this->orderService = $orderService;
         $this->paymentLogsService = $paymentLogsService;
+        $this->configService = $configService;
     }
 
     /**
@@ -57,15 +60,16 @@ class PaypalController extends AbstractRestAPIController
             "token" => $request['token'],
             "payerId" => $request['PayerID'],
         ];
+        $frontendUrl = $this->configService->findConfigByKey('front_end_url')->value ?? 'default.techup/';
 
         if (isset($response['status']) && $response['status'] == 'COMPLETED') {
             Event::dispatch(new PaymentSuccessfullyEvent($order, $paymentData, $successStatus));
 
-            return redirect()->to(env('FRONTEND_URL') . '/checkout/payment-completed/' . $orderId);
+            return redirect()->to($frontendUrl . '/checkout/payment-completed/' . $orderId);
         } else {
             Event::dispatch(new PaymentSuccessfullyEvent($order, $paymentData, $pendingStatus));
 
-            return redirect()->to(env('FRONTEND_URL') . '/checkout/payment-error/' . $orderId);
+            return redirect()->to($frontendUrl . '/checkout/payment-error/' . $orderId);
         }
     }
 
@@ -83,7 +87,8 @@ class PaypalController extends AbstractRestAPIController
         ];
         $pendingStatus = Order::ORDER_PENDING_REQUEST_STATUS;
         Event::dispatch(new PaymentSuccessfullyEvent($order, $paymentData, $pendingStatus));
+        $frontendUrl = $this->configService->findConfigByKey('front_end_url')->value ?? 'default.techup/';
 
-        return redirect()->to(env('FRONTEND_URL') . '/checkout/payment-cancel/' . $orderId);
+        return redirect()->to($frontendUrl . '/checkout/payment-cancel/' . $orderId);
     }
 }

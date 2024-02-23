@@ -44,6 +44,10 @@ class BusinessManagementResource extends AbstractJsonResource
             $data['domains'] = DomainResource::collection($this->domains);
         }
 
+        if (\in_array('business_management__domain', $expand)) {
+            $data['domain'] = DomainResource::collection($this->domain);
+        }
+
         if (\in_array('business_management__domain_default', $expand)) {
             $data['domain_default'] = app(DomainService::class)->findDomainByUuid($this->domain_uuid);
         }

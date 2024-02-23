@@ -90,6 +90,7 @@ class MyDomainService extends AbstractService
             'name' => $domain,
             'active_mailbox' => false,
             'owner_uuid' => null,
+            'app_id' => auth()->appId(),
             'business_uuid' => $business->uuid,
             'verified_at' => null
         ]);

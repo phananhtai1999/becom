@@ -738,7 +738,6 @@ Route::group(['middleware' => ['apikey']], function () {
         Route::get('/stripe/cancel-payment', [StripeController::class, 'cancelPayment'])->name('stripe.cancelPayment');
 
         Route::get('/paypal/success-payment', [PaypalController::class, 'successPayment'])->name('paypal.successPayment');
-        Route::get('/paypal/success-payment-subscription', [PaypalController::class, 'successPaymentSubscription'])->name('paypal.successPaymentSubscription');
         Route::get('/paypal/cancel-payment', [PaypalController::class, 'cancelPayment'])->name('paypal.cancelPayment');
         Route::get('/paypal/cancel-payment-subscription', [PaypalController::class, 'cancelPaymentSubscription'])->name('paypal.cancelPaymentSubscription');
 
@@ -1531,3 +1530,4 @@ Route::group(['middleware' => ['apikey']], function () {
                 Route::get('assigned/article-series', [ArticleSeriesController::class, 'indexMyAssigned']);
             });
         });
+Route::get('/paypal/success-payment-subscription', [PaypalController::class, 'successPaymentSubscription'])->name('paypal.successPaymentSubscription');
