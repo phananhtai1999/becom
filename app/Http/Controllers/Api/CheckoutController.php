@@ -101,7 +101,7 @@ class CheckoutController extends AbstractRestAPIController
         }
 
         if ($processResult['status'] == false) {
-            $frontendUrl = $this->configService->findConfigByKey('front_end_url')->value ?? 'default.techup/';
+            $frontendUrl = $this->configService->findConfigByKey('payment_callback_feurl')->value ?? 'default.techup/';
 
             return $this->sendOkJsonResponse(['data' => [
                 'message' => $processResult['message'],
@@ -132,7 +132,7 @@ class CheckoutController extends AbstractRestAPIController
         }
 
         if ($processResult['status'] == false) {
-            $frontendUrl = $this->configService->findConfigByKey('front_end_url')->value ?? 'default.techup/';
+            $frontendUrl = $this->configService->findConfigByKey('payment_callback_feurl')->value ?? 'default.techup/';
 
             return $this->sendOkJsonResponse(['data' => [
                 'message' => $processResult['message'],

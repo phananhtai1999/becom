@@ -60,7 +60,7 @@ class PaypalController extends AbstractRestAPIController
             "token" => $request['token'],
             "payerId" => $request['PayerID'],
         ];
-        $frontendUrl = $this->configService->findConfigByKey('front_end_url')->value ?? 'default.techup/';
+        $frontendUrl = $this->configService->findConfigByKey('payment_callback_feurl')->value ?? 'default.techup/';
 
         if (isset($response['status']) && $response['status'] == 'COMPLETED') {
             Event::dispatch(new PaymentSuccessfullyEvent($order, $paymentData, $successStatus));
@@ -87,7 +87,7 @@ class PaypalController extends AbstractRestAPIController
         ];
         $pendingStatus = Order::ORDER_PENDING_REQUEST_STATUS;
         Event::dispatch(new PaymentSuccessfullyEvent($order, $paymentData, $pendingStatus));
-        $frontendUrl = $this->configService->findConfigByKey('front_end_url')->value ?? 'default.techup/';
+        $frontendUrl = $this->configService->findConfigByKey('payment_callback_feurl')->value ?? 'default.techup/';
 
         return redirect()->to($frontendUrl . '/checkout/payment-cancel/' . $orderId);
     }

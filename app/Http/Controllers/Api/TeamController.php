@@ -194,7 +194,7 @@ class TeamController extends Controller
                 'status' => Invite::NEW_STATUS
             ]));
             if ($request->get('type') == Team::LINK_INVITE) {
-                $frontendUrl = $this->configService->findConfigByKey('front_end_url')->value ?? 'default.techup/';
+                $frontendUrl = $this->configService->findConfigByKey('payment_callback_feurl')->value ?? 'default.techup/';
 
                 $url = $frontendUrl . 'auth/register?invite_uuid=' . $invite->uuid;
                 $this->smtpAccountService->sendEmailNotificationSystem(null, new SendInviteToTeam($invite, $url), $request->get('email'));

@@ -170,7 +170,7 @@ class PaymentService extends AbstractService
 
     public function getFrontEndUrl() {
 
-        return $this->getConfigByKeyInCache('front_end_url')->value ?? 'default.techup/';
+        return $this->getConfigByKeyInCache('payment_callback_feurl')->value ?? 'default.techup/';
     }
 
 }
