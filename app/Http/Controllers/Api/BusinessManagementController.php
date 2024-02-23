@@ -201,11 +201,11 @@ class BusinessManagementController extends AbstractRestAPIController
      */
     public function storeMyBusinessManagement(MyBusinessManagementRequest $request)
     {
-        // User only have one Business Management
-//        $businessManagement = $this->service->checkBusinessManagementOfUser(auth()->userId(), auth()->appId());
-//        if ($businessManagement) {
-//            return $this->sendValidationFailedJsonResponse();
-//        }
+//         User only have one Business Management
+        $businessManagement = $this->service->checkBusinessManagementOfUser(auth()->userId(), auth()->appId());
+        if ($businessManagement) {
+            return $this->sendValidationFailedJsonResponse();
+        }
 
         $model = $this->service->create(array_merge($request->except('domain_uuid'), [
             'owner_uuid' => auth()->userId(),

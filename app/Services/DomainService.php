@@ -65,6 +65,7 @@ class DomainService extends AbstractService
         return $this->model->create([
             'name' => $domain,
             'owner_uuid' => null,
+            'app_id' => auth()->appId(),
             'business_uuid' => $business->uuid,
             'verified_at' => null
         ]);

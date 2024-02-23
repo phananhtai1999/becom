@@ -68,6 +68,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Techup\ApiBase\Services\UserManagerService;
+use Techup\ApiConfig\Services\ConfigService;
 use Techup\Mailbox\Facades\Mailbox;
 
 class TeamController extends Controller
@@ -95,7 +96,9 @@ class TeamController extends Controller
         LocationService $locationService,
         SendProjectService $sendProjectService,
         CstoreService $cstoreService,
-        UserProfileService $userProfileService
+        UserProfileService $userProfileService,
+        ConfigService $configService
+
     )
     {
         $this->service = $service;
@@ -124,6 +127,7 @@ class TeamController extends Controller
         $this->editRequest = UpdateTeamRequest::class;
         $this->indexRequest = IndexRequest::class;
         $this->cstoreService = $cstoreService;
+        $this->configService = $configService;
     }
 
     public function index(IndexRequest $request)
@@ -190,7 +194,9 @@ class TeamController extends Controller
                 'status' => Invite::NEW_STATUS
             ]));
             if ($request->get('type') == Team::LINK_INVITE) {
-                $url = env('FRONTEND_URL') . 'auth/register?invite_uuid=' . $invite->uuid;
+                $frontendUrl = $this->configService->findConfigByKey('front_end_url')->value ?? 'default.techup/';
+
+                $url = $frontendUrl . 'auth/register?invite_uuid=' . $invite->uuid;
                 $this->smtpAccountService->sendEmailNotificationSystem(null, new SendInviteToTeam($invite, $url), $request->get('email'));
             } elseif ($request->get('type') == Team::ACCOUNT_INVITE) {
                 $password = $this->generateRandomString(10);
