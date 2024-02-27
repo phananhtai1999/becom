@@ -261,7 +261,7 @@ class BusinessManagementController extends AbstractRestAPIController
         ]);
 
         $domain = $this->domainService->create([
-            'name' => 'default-domain',
+            'name' => 'defaultdomain' . $model->uuid . '.com',
             'active_mailbox' => false,
             'owner_uuid' => null,
             'app_id' => auth()->appId(),
