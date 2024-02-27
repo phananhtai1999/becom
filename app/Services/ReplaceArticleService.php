@@ -108,10 +108,16 @@ class ReplaceArticleService
     public function searchReplaceMapForArticle($article = null)
     {
         if (!empty($article)) {
+            if (request()->get('is_preview')) {
+                $slug = $article->slug . '-' . $article->uuid;
+            } else {
+                $slug = $article->slug;
+            }
+
             return [
                 '{article.uuid}' => $article->uuid ?? null,
                 '{article.article_category_uuid}' => $article->article_category_uuid ?? null,
-                '{article.slug}' => $article->slug ?? null,
+                '{article.slug}' => $slug,
                 '{article.title}' => $article->title ?? null,
                 '{article.content}' => $article->content ?? null,
                 '{article.video}' => $article->video ?? null,
