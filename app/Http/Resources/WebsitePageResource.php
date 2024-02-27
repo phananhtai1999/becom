@@ -35,8 +35,7 @@ class WebsitePageResource extends AbstractJsonResource
             'description' => $this->description,
             'descriptions' => $this->descriptions,
             'feature_image' => $this->feature_image,
-            'is_default' => $this->is_default,
-            'menu_level' => $this->menu_level,
+            'is_default' => $this->is_default
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at

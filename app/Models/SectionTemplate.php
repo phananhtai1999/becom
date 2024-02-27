@@ -43,8 +43,7 @@ class SectionTemplate extends AbstractModel
         'reject_reason',
         'type',
         'app_id',
-        'display_mode',
-        'menu_level'
+        'display_mode'
     ];
 
     /**

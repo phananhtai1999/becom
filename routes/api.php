@@ -1322,6 +1322,7 @@ Route::group(['middleware' => ['apikey']], function () {
             Route::group(['as' => 'my.'], function () {
                 Route::get('/my/business-managements', [BusinessManagementController::class, 'indexMy'])->name('index');
                 Route::post('/my/business-management', [BusinessManagementController::class, 'storeMyBusinessManagement'])->name('store');
+                Route::post('/my/default-business-management', [BusinessManagementController::class, 'storeMyDefaultBusiness'])->name('storeMyDefaultBusiness');
                 Route::get('/my/business-management/{id}', [BusinessManagementController::class, 'showMyBusinessManagement'])->name('show');
                 Route::put('/my/business-management/{id}', [BusinessManagementController::class, 'editMyBusinessManagement'])->name('edit');
                 Route::delete('/my/business-management/{id}', [BusinessManagementController::class, 'destroyMyBusinessManagement'])->name('destroy');

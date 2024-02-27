@@ -41,8 +41,7 @@ class SectionTemplateQueryBuilder extends AbstractQueryBuilder
                 'html_template',
                 'css_template',
                 'js_template',
-                'display_mode',
-                'menu_level'
+                'display_mode'
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -56,8 +55,7 @@ class SectionTemplateQueryBuilder extends AbstractQueryBuilder
                 'is_default',
                 'reject_reason',
                 'type',
-                'display_mode',
-                'menu_level'
+                'display_mode'
             ])
             ->allowedFilters([
                 $modelKeyName,
@@ -91,9 +89,7 @@ class SectionTemplateQueryBuilder extends AbstractQueryBuilder
                 'js_template',
                 AllowedFilter::exact('exact__js_template', 'js_template'),
                 'display_mode',
-                AllowedFilter::exact('exact__display_mode', 'display_mode'),
-                'menu_level',
-                AllowedFilter::exact('exact__menu_level', 'menu_level'),
+                AllowedFilter::exact('exact__display_mode', 'display_mode')
             ]);
     }
 

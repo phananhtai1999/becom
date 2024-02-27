@@ -44,8 +44,7 @@ class WebsitePageQueryBuilder extends AbstractQueryBuilder
                 'keyword',
                 'description',
                 'feature_image',
-                'slug',
-                'menu_level',
+                'slug'
             ])
             ->defaultSort('-created_at')
             ->allowedSorts([
@@ -65,8 +64,7 @@ class WebsitePageQueryBuilder extends AbstractQueryBuilder
                 'keyword',
                 'description',
                 'feature_image',
-                'slug',
-                'menu_level',
+                'slug'
             ])
             ->allowedFilters([
                 $modelKeyName,

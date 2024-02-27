@@ -33,7 +33,6 @@ class WebsitePageRequest extends AbstractRequest
             'css_template' => ['required', 'string'],
             'js_template' => ['required', 'string'],
             'template_json' => ['required', 'string'],
-            'menu_level' => ['integer'],
             'type' => ['required', 'string', Rule::in(
                 $website->getTypeWebsitePage()
             )],

@@ -48,6 +48,7 @@ use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Techup\ApiConfig\Services\ConfigService;
 use Techup\Mailbox\Facades\Mailbox;
 use Techup\ApiBase\Services\UserManagerService;
 
@@ -94,7 +95,8 @@ class BusinessManagementController extends AbstractRestAPIController
         CstoreService               $cstoreService,
         DepartmentService           $departmentService,
         LocationService             $locationService,
-        UserProfileService          $userProfileService
+        UserProfileService          $userProfileService,
+        ConfigService $configService
     )
     {
         $this->service = $service;
@@ -119,6 +121,7 @@ class BusinessManagementController extends AbstractRestAPIController
         $this->addOnService = $addOnService;
         $this->cstoreService = $cstoreService;
         $this->userProfileService = $userProfileService;
+        $this->configService = $configService;
     }
 
     /**
@@ -226,6 +229,54 @@ class BusinessManagementController extends AbstractRestAPIController
             'name' => $request->get('name'),
             'logo' => $request->get('avatar'),
             'description' => $request->get('introduce'),
+            'domain_uuid' => $domain->uuid,
+        ]);
+
+//        if ($request->get('s3_option')){
+//            $this->cstoreService->storeS3Config($request);
+//        }
+//        $this->cstoreService->storeFolderByType($request->get('name'), $model->uuid, BusinessManagement::BUSINESS_ENTITY);
+
+        return $this->sendCreatedJsonResponse(
+            $this->service->resourceToData($this->resourceClass, $model)
+        );
+    }
+
+    public function storeMyDefaultBusiness()
+    {
+//         User only have one Business Management
+        $businessManagement = $this->service->checkBusinessManagementOfUser(auth()->userId(), auth()->appId());
+        if ($businessManagement) {
+            return $this->sendValidationFailedJsonResponse();
+        }
+
+        $model = $this->service->create([
+            'owner_uuid' => auth()->userId(),
+            'app_id' => auth()->appId(),
+            'name' => 'default business of user ' . auth()->userId(),
+            'introduce' => 'This is default introduce',
+            'slogan' => 'This is default slogan',
+            'avatar' => $this->configService->findConfigByKey('short_logo') ?? 'Default logo',
+            'customers' => ['This is default customer for user '  . auth()->userId()],
+        ]);
+
+        $domain = $this->domainService->create([
+            'name' => 'default-domain',
+            'active_mailbox' => false,
+            'owner_uuid' => null,
+            'app_id' => auth()->appId(),
+            'business_uuid' => $model->uuid,
+            'verified_at' => null
+        ]);        //Set Domain Default for Business
+        $this->service->setDomainDefault($model, $domain->uuid);
+        $this->sendProjectService->create([
+            'domain' => 'default-domain' . $domain->uuid . '.com',
+            'business_uuid' => $model->uuid,
+            'user_uuid' => auth()->userId(),
+            'app_id' => auth()->appId(),
+            'name' => 'default proeject of user' . auth()->userId(),
+            'logo' => $this->configService->findConfigByKey('short_logo') ?? 'Default logo',
+            'description' => 'This is default description',
             'domain_uuid' => $domain->uuid,
         ]);
 
