@@ -256,12 +256,12 @@ class BusinessManagementController extends AbstractRestAPIController
             'name' => 'default business of user ' . $user->first_name . ' ' . $user->last_name,
             'introduce' => 'This is default introduce',
             'slogan' => 'This is default slogan',
-            'avatar' => $this->configService->findConfigByKey('short_logo') ?? 'Default logo',
+            'avatar' => $this->configService->findConfigByKey('short_logo')->value ?? 'Default logo',
             'customers' => ['This is default customer for user ' . $user->first_name . ' ' . $user->last_name],
         ]);
 
         $domain = $this->domainService->create([
-            'name' => $this->generateRandomString(9) . '.' . $this->configService->findConfigByKey('main_domain')->value ?? 'techupzone.com',
+            'name' => $this->generateRandomString(9) . '.' . $this->configService->findConfigByKey('main_url')->value ?? 'techupzone.com',
             'active_mailbox' => false,
             'app_id' => auth()->appId(),
             'business_uuid' => $model->uuid
