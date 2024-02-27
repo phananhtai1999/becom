@@ -249,33 +249,30 @@ class BusinessManagementController extends AbstractRestAPIController
         if ($businessManagement) {
             return $this->sendValidationFailedJsonResponse();
         }
-
+        $user = $this->getUser();
         $model = $this->service->create([
             'owner_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
-            'name' => 'default business of user ' . auth()->userId(),
+            'name' => 'default business of user ' . $user->first_name . ' ' . $user->last_name,
             'introduce' => 'This is default introduce',
             'slogan' => 'This is default slogan',
             'avatar' => $this->configService->findConfigByKey('short_logo') ?? 'Default logo',
-            'customers' => ['This is default customer for user '  . auth()->userId()],
+            'customers' => ['This is default customer for user ' . $user->first_name . ' ' . $user->last_name],
         ]);
 
         $domain = $this->domainService->create([
-            'name' => 'defaultdomain' . $model->uuid . '.com',
+            'name' => $this->generateRandomString(9) . '.' . $this->configService->findConfigByKey('main_domain')->value ?? 'techupzone.com',
             'active_mailbox' => false,
-            'owner_uuid' => null,
             'app_id' => auth()->appId(),
-            'business_uuid' => $model->uuid,
-            'verified_at' => null
+            'business_uuid' => $model->uuid
         ]);        //Set Domain Default for Business
         $this->service->setDomainDefault($model, $domain->uuid);
         $this->sendProjectService->create([
-            'domain' => 'default-domain' . $domain->uuid . '.com',
             'business_uuid' => $model->uuid,
             'user_uuid' => auth()->userId(),
             'app_id' => auth()->appId(),
-            'name' => 'default proeject of user' . auth()->userId(),
-            'logo' => $this->configService->findConfigByKey('short_logo') ?? 'Default logo',
+            'name' => 'default project of user' . $user->first_name . ' ' . $user->last_name,
+            'logo' => $this->configService->findConfigByKey('short_logo')->value ?? 'Default logo',
             'description' => 'This is default description',
             'domain_uuid' => $domain->uuid,
         ]);
