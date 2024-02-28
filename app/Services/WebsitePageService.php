@@ -163,14 +163,26 @@ class WebsitePageService extends AbstractService
 
     public function getWebsitePageByDomainAndWebsitePageSlug($domainName, $websitePageSlug)
     {
-        $website = (new Website())->whereHas('domain', function ($query) use ($domainName) {
-            $query->where([
-                ['name', $domainName],
-                ['verified_at', '!=', null]
-            ]);
-        })
-            ->where('user_uuid', auth()->userId())
-            ->firstOrFail();
+        if(auth()->userId()) {
+            $website = (new Website())->whereHas('domain', function ($query) use ($domainName) {
+                $query->where([
+                    ['name', $domainName],
+                    ['verified_at', '!=', null]
+                ]);
+            })
+                ->where('user_uuid', auth()->userId())
+                ->firstOrFail();
+        } else {
+            $website = (new Website())->whereHas('domain', function ($query) use ($domainName) {
+                $query->where([
+                    ['name', $domainName],
+                    ['verified_at', '!=', null]
+                ]);
+            })
+                ->where('publish_status', Website::PUBLISHED_PUBLISH_STATUS)
+                ->firstOrFail();
+        }
+
 
         if ($websitePageSlug) {
             $websitePage = $website->websitePages()->where(['slug' => $websitePageSlug])->firstOrFail();
