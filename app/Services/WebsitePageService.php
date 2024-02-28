@@ -169,7 +169,7 @@ class WebsitePageService extends AbstractService
                 ['verified_at', '!=', null]
             ]);
         })
-            ->where('publish_status', Website::PUBLISHED_PUBLISH_STATUS)
+            ->where('user_uuid', auth()->userId())
             ->firstOrFail();
 
         if ($websitePageSlug) {
