@@ -111,4 +111,67 @@ class ReplaceChildrenCategoryService
             ];
         }
     }
+
+    public function replaceChildrenCategoryJson($components, $articleCategory)
+    {
+        return $this->processComponents($components);
+    }
+
+    public function processComponents($components) {
+        foreach ($components as $component) {
+            if (isset($component->tagName) && $component->tagName == 'children-category-list') {
+                $replaceCategoryService = new ReplaceCategoryService();
+
+
+                $component->components = $this->replaceChildrenCategoryListJson($component->components);
+//                foreach ($component->components as $categoryElement) {
+//                    dd($categoryElement->components);
+//                }
+            }
+
+            if (isset($component->components)) {
+                $this->processComponents($component->components);
+            }
+        }
+        return $components;
+    }
+
+
+    public function replaceChildrenCategoryListJson($components)
+    {
+        $childrenCategoriesData = ArticleCategory::paginate(7);
+        foreach ($components as $key => $childrenCategoryElement) {
+            $childrenCategoryData = $childrenCategoriesData->shift();
+
+//            $childrenCategoryElement = $this->replaceGrandChildrenCategoryListJson($childrenCategoryElement);
+            $childrenCategoryElementDecode = json_encode($childrenCategoryElement);
+            $childSearchReplaceMap = $this->searchReplaceMapForChildrenCategory($childrenCategoryData);
+
+            $components[$key] = json_decode(str_replace(array_keys($childSearchReplaceMap), $childSearchReplaceMap, $childrenCategoryElementDecode));
+        }
+
+        return $components;
+    }
+
+    public function replaceGrandChildrenCategoryListJson($grandChildrenCategoryElement)
+    {
+        $childrenCategoriesData = ArticleCategory::paginate(7);
+
+        foreach ($grandChildrenCategoryElement->components as $key => $grandChildrenCategoryElementComponent) {
+            if (isset($grandChildrenCategoryElementComponent->tagName) && $grandChildrenCategoryElementComponent->tagName == 'grand_chidlren_category') {
+                $childrenCategoryData = $childrenCategoriesData->shift();
+
+                $grandChildrenCategoryElementDecode = json_encode($grandChildrenCategoryElementComponent);
+
+                $childSearchReplaceMap = $this->searchReplaceMapForGrandChildrenCategory($childrenCategoryData);
+                $grandChildrenCategoryElement->components[$key] = json_decode(str_replace(array_keys($childSearchReplaceMap), $childSearchReplaceMap, $grandChildrenCategoryElementDecode));
+            }
+
+            if (isset($grandChildrenCategoryElementComponent->components)) {
+                $this->replaceGrandChildrenCategoryListJson($grandChildrenCategoryElementComponent);
+            }
+        }
+
+        return $grandChildrenCategoryElement;
+    }
 }

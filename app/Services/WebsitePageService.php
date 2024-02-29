@@ -358,4 +358,53 @@ class WebsitePageService extends AbstractService
 
         return $websitePage;
     }
+
+    public function renderContentForJson($websitePage, $article)
+    {
+        $replaceArticleService = new ReplaceArticleService();
+//        $replaceCategoryService = new ReplaceCategoryService();
+//        $category = $article->articleCategory;
+        $jsonTemplateDecode = json_decode($websitePage->template_json);
+
+//        $websitePage->html_template = $replaceArticleService->replaceListArticleSpecific($websitePage->html_template, $websitePage);
+        $component = $jsonTemplateDecode->pages[0]->frames[0]->component->components;
+        $searchReplaceMap = $replaceArticleService->searchReplaceMapForArticle($article);
+        $newComponent = Str::replace(array_keys($searchReplaceMap), $searchReplaceMap, json_encode($component));
+        $jsonTemplateDecode->pages[0]->frames[0]->component->components = json_decode($newComponent);
+        $websitePage->template_json = json_encode($jsonTemplateDecode);
+//        $component = $replaceCategoryService->replaceCategoryInArticle($component, $category);
+        return $websitePage;
+    }
+
+    public function processComponents($components) {
+        foreach ($components as $component) {
+            if (isset($component->tagName) && $component->tagName == 'category-list') {
+                $replaceCategoryService = new ReplaceCategoryService();
+
+                dd($replaceCategoryService->replaceCategoryListJson($component->components));
+
+                $component->components = $this->replaceCategoryList($component->components);
+                foreach ($component->components as $categoryElement) {
+                    dd($categoryElement->components);
+                }
+            }
+
+            if (isset($component->components)) {
+                $this->processComponents($component->components);
+            }
+        }
+    }
+
+    public function renderContentForArticleCategoryJson($websitePage, $articleCategory)
+    {
+        $replaceChildrenCategoryService = new ReplaceChildrenCategoryService();
+        $replaceCategoryService = new ReplaceCategoryService();
+        $jsonTemplateDecode = json_decode($websitePage->template_json);
+
+        $component = $jsonTemplateDecode->pages[0]->frames[0]->component->components;
+
+        $websitePage->template_json = json_encode($replaceChildrenCategoryService->replaceChildrenCategoryJson($component, $articleCategory));
+
+        return $websitePage;
+    }
 }

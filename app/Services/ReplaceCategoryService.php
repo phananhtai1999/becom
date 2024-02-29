@@ -118,4 +118,18 @@ class ReplaceCategoryService extends ReplaceChildrenCategoryService
         }
 
     }
+
+    public function replaceCategoryListJson($components)
+    {
+        $childrenCategoriesData = ArticleCategory::paginate(7);
+        foreach ($components as $key => $categoryElement) {
+            $a = json_encode($categoryElement);
+            $childrenCategoryData = $childrenCategoriesData->shift();
+            $childSearchReplaceMap = $this->searchReplaceMapForCategory($childrenCategoryData);
+
+            $components[$key] = json_decode(str_replace(array_keys($childSearchReplaceMap), $childSearchReplaceMap, $a));
+        }
+
+        return $components;
+    }
 }

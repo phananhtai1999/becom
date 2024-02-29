@@ -111,7 +111,11 @@ class WebsitePageController extends AbstractRestAPIController
             } else {
                 $article = $this->articleService->getLastArticle();
             }
-            $websitePage = $this->service->renderContent($websitePage, $article);
+            if ($request->get('replace_column') == 'json') {
+                $websitePage = $this->service->renderContentForJson($websitePage, $article);
+            } else {
+                $websitePage = $this->service->renderContent($websitePage, $article);
+            }
             $response = $this->sendOkJsonResponse(['data' => $websitePage]);
         } elseif ($websitePage->type == WebsitePage::ARTICLE_CATEGORY_TYPE) {
             if ($request->get('article_category_slug')) {
@@ -121,7 +125,11 @@ class WebsitePageController extends AbstractRestAPIController
             } else {
                 $articleCategory = $this->articleCategoryService->getLastArticleCategory();
             }
-            $websitePage = $this->service->renderContentForArticleCategory($websitePage, $articleCategory);
+            if ($request->get('replace_column') == 'json') {
+                $websitePage = $this->service->renderContentForArticleCategoryJson($websitePage, $articleCategory);
+            } else {
+                $websitePage = $this->service->renderContentForArticleCategory($websitePage, $articleCategory);
+            }
             $response = $this->sendOkJsonResponse(['data' => $websitePage]);
         } elseif ($websitePage->type == WebsitePage::HOME_ARTICLES_TYPE) {
             $websitePage = $this->service->renderContentForHomeArticles($websitePage);
