@@ -96,9 +96,12 @@ class WebsitePageController extends AbstractRestAPIController
 
     public function getWebsitePage(ShowWebsitePageRequest $request, $id)
     {
-        $websitePage = $this->myService->findOneWhereOrFail($request->publish_status ?
-            [['publish_status', $request->publish_status], ['uuid', $id]]
-            : [['uuid', $id]]);
+        if(auth()->userId()) {
+            $websitePage = $this->myService->findOneWhereOrFail([['uuid', $id], ['user_uuid', auth()->userId()]]);
+        } else {
+            $websitePage = $this->myService->findOneWhereOrFail([['publish_status', WebsitePage::PUBLISHED_PUBLISH_STATUS], ['uuid', $id]]);
+        }
+
         $response = $this->sendOkJsonResponse(['data' => $websitePage]);
         if ($websitePage->type == WebsitePage::ARTICLE_DETAIL_TYPE) {
             if ($request->get('article_slug')) {
