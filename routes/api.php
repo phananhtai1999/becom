@@ -645,7 +645,6 @@ Route::group(['middleware' => ['apikey']], function () {
             Route::get("my/accepted-website-pages", [WebsitePageController::class, 'listMyAcceptedWebsitePages'])->name('listMyAcceptedWebsitePages');
         });
 
-        Route::get('/get-website-page/{id}', [WebsitePageController::class, 'getWebsitePage'])->name('getWebsitePage');
         Route::get('/get-product-website-page/{id}', [WebsitePageController::class, 'getProductWebsitePage'])->name('getProductWebsitePage');
         Route::get('/website-pages-default', [WebsitePageController::class, 'getWebsitePagesDefault'])->name('getWebsitePagesDefault');
         Route::get('/website-page-default/{id}', [WebsitePageController::class, 'showWebsitePagesDefault'])->name('showWebsitePagesDefault');
@@ -653,7 +652,9 @@ Route::group(['middleware' => ['apikey']], function () {
         Route::get('/get-info-by-domain-url', [WebsitePageController::class, 'getInfoByDomainUrl'])->name('getInfoByDomainUrl');
     });
 
-        Route::get('get-website-page', [WebsitePageController::class, 'getWebsitePageWithReplace'])->name('edit');
+    Route::get('/get-website-page/{id}', [WebsitePageController::class, 'getWebsitePage'])->name('getWebsitePage');
+
+    Route::get('get-website-page', [WebsitePageController::class, 'getWebsitePageWithReplace'])->name('edit');
         Route::get('public/website-page/{id}', [WebsitePageController::class, 'show'])->name('website_page_public.show');
         Route::get('public/website-page', [WebsitePageController::class, 'publicWebsitePageByDomainAndSlug'])->name('website_page.public');
 
