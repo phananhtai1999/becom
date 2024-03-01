@@ -132,7 +132,11 @@ class WebsitePageController extends AbstractRestAPIController
             }
             $response = $this->sendOkJsonResponse(['data' => $websitePage]);
         } elseif ($websitePage->type == WebsitePage::HOME_ARTICLES_TYPE) {
-            $websitePage = $this->service->renderContentForHomeArticles($websitePage);
+            if ($request->get('replace_column') == 'json') {
+                $websitePage = $this->service->renderContentForHomeArticlesJson($websitePage);
+            } else {
+                $websitePage = $this->service->renderContentForHomeArticles($websitePage);
+            }
             $response = $this->sendOkJsonResponse(['data' => $websitePage]);
         } elseif ($websitePage->type == WebsitePage::NEWS_HEADER_TYPE) {
             $websitePage = $this->service->renderContentForNewsHeader($websitePage);
@@ -141,11 +145,11 @@ class WebsitePageController extends AbstractRestAPIController
 
         //product webpage
         if ($websitePage->type == WebsitePage::PRODUCT_DETAIL_TYPE) {
-            $productDetailData = $this->shopService->getProductDetailData($request->product_uuid);
+            $productDetailData = $this->shopService->getProductDetailData($request->get('product_uuid'), $request->get('product_slug'));
             $websitePage = $this->service->renderContentForProductDetail($websitePage, $productDetailData['data']);
             $response = $this->sendOkJsonResponse(['data' => $websitePage]);
         } elseif ($websitePage->type == WebsitePage::PRODUCT_CATEGORY_TYPE) {
-            $productCategoryData = $this->shopService->getProductCategoryData($request->get('product_category_slug'));
+            $productCategoryData = $this->shopService->getProductCategoryData($request->get('product_category_slug'), $request->get('product_category_uuid'));
             $websitePage = $this->service->renderContentForProductCategory($websitePage, $productCategoryData);
             $response = $this->sendOkJsonResponse(['data' => $websitePage]);
         } elseif ($websitePage->type == WebsitePage::HOME_PRODUCTS_TYPE) {

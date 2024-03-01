@@ -143,7 +143,7 @@ class ReplaceChildrenCategoryService
         foreach ($components as $key => $childrenCategoryElement) {
             $childrenCategoryData = $childrenCategoriesData->shift();
 
-//            $childrenCategoryElement = $this->replaceGrandChildrenCategoryListJson($childrenCategoryElement);
+            $childrenCategoryElement = $this->replaceGrandChildrenCategoryListJson($childrenCategoryElement, $childrenCategoryData);
             $childrenCategoryElementDecode = json_encode($childrenCategoryElement);
             $childSearchReplaceMap = $this->searchReplaceMapForChildrenCategory($childrenCategoryData);
 
@@ -153,25 +153,33 @@ class ReplaceChildrenCategoryService
         return $components;
     }
 
-    public function replaceGrandChildrenCategoryListJson($grandChildrenCategoryElement)
+
+    public function replaceGrandChildrenCategoryListJson($grandChildrenCategoryElement, $childrenCategoryData)
     {
-        $childrenCategoriesData = ArticleCategory::paginate(7);
-
-        foreach ($grandChildrenCategoryElement->components as $key => $grandChildrenCategoryElementComponent) {
-            if (isset($grandChildrenCategoryElementComponent->tagName) && $grandChildrenCategoryElementComponent->tagName == 'grand_chidlren_category') {
-                $childrenCategoryData = $childrenCategoriesData->shift();
-
-                $grandChildrenCategoryElementDecode = json_encode($grandChildrenCategoryElementComponent);
-
-                $childSearchReplaceMap = $this->searchReplaceMapForGrandChildrenCategory($childrenCategoryData);
-                $grandChildrenCategoryElement->components[$key] = json_decode(str_replace(array_keys($childSearchReplaceMap), $childSearchReplaceMap, $grandChildrenCategoryElementDecode));
-            }
-
-            if (isset($grandChildrenCategoryElementComponent->components)) {
-                $this->replaceGrandChildrenCategoryListJson($grandChildrenCategoryElementComponent);
-            }
-        }
+        $grandChildrenCategoriesData = ArticleCategory::where('parent_uuid', $childrenCategoryData->uuid)->paginate(10);
+        $this->replaceInNestedComponents($grandChildrenCategoryElement->components, $grandChildrenCategoriesData);
 
         return $grandChildrenCategoryElement;
+    }
+
+    private function replaceInNestedComponents(&$components, $data)
+    {
+        foreach ($components as &$component) {
+            if (isset($component->tagName) && $component->tagName === 'grand_chidlren_category') {
+                $categoryData = $data->shift();
+                $this->replaceDataInComponent($component, $categoryData);
+            }
+
+
+            if (isset($component->components)) {
+                $this->replaceInNestedComponents($component->components, $data);
+            }
+        }
+    }
+
+    private function replaceDataInComponent(&$component, $newData)
+    {
+        $searchReplaceMap = $this->searchReplaceMapForGrandChildrenCategory($newData);
+        $component->components = json_decode(str_replace(array_keys($searchReplaceMap), $searchReplaceMap, json_encode($component->components)));
     }
 }

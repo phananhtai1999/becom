@@ -163,4 +163,53 @@ class ReplaceArticleService
 
         return $sortOrder[1] ?? 'DESC';
     }
+
+    public function replaceArticleJson($components, $articleCategory)
+    {
+        foreach ($components as $component) {
+            if (isset($component->tagName) && $component->tagName == 'article-list') {
+                $component->components = $this->replaceArticleListJson($component->components, $articleCategory);
+            }
+
+            if (isset($component->components)) {
+                $this->replaceArticleJson($component->components, $articleCategory);
+            }
+        }
+        return $components;
+    }
+
+    public function replaceArticleListJson($components, $articleCategory = null)
+    {
+        if (!empty($articleCategory)) {
+            $articlesDatas = Article::where('article_category_uuid', $articleCategory->uuid)->paginate(10);
+        } else {
+            $articlesDatas = Article::paginate(10);
+        }
+
+        foreach ($components as $key => $component) {
+            if (isset($component->tagName) && $component->tagName == 'article-element') {
+                $articlesData = $articlesDatas->shift();
+
+                $articleElementDecode = json_encode($component);
+                $childSearchReplaceMap = $this->searchReplaceMapForArticle($articlesData);
+                $components[$key] = json_decode(str_replace(array_keys($childSearchReplaceMap), $childSearchReplaceMap, $articleElementDecode));
+            }
+        }
+
+        return $components;
+    }
+
+    public function replaceListArticleForPageHomeJson($components)
+    {
+        foreach ($components as $component) {
+            if (isset($component->tagName) && $component->tagName == 'article-list') {
+                $component->components = $this->replaceArticleListJson($component->components);
+            }
+
+            if (isset($component->components)) {
+                $this->replaceListArticleForPageHomeJson($component->components);
+            }
+        }
+        return $components;
+    }
 }

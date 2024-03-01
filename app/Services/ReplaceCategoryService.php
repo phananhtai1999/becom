@@ -118,16 +118,33 @@ class ReplaceCategoryService extends ReplaceChildrenCategoryService
         }
 
     }
+    public function findListCategoryJson($components) {
+        foreach ($components as $component) {
+            if (isset($component->tagName) && $component->tagName == 'category-list') {
+                $replaceCategoryService = new ReplaceCategoryService();
 
+
+                $component->components = $this->replaceCategoryListJson($component->components);
+//                foreach ($component->components as $categoryElement) {
+//                    dd($categoryElement->components);
+//                }
+            }
+
+            if (isset($component->components)) {
+                $this->findListCategoryJson($component->components);
+            }
+        }
+        return $components;
+    }
     public function replaceCategoryListJson($components)
     {
-        $childrenCategoriesData = ArticleCategory::paginate(7);
+        $categoriesData = ArticleCategory::paginate(7);
         foreach ($components as $key => $categoryElement) {
-            $a = json_encode($categoryElement);
-            $childrenCategoryData = $childrenCategoriesData->shift();
-            $childSearchReplaceMap = $this->searchReplaceMapForCategory($childrenCategoryData);
+            $categoryElementEncode = json_encode($categoryElement);
+            $categoryData = $categoriesData->shift();
+            $searchReplaceMap = $this->searchReplaceMapForCategory($categoryData);
 
-            $components[$key] = json_decode(str_replace(array_keys($childSearchReplaceMap), $childSearchReplaceMap, $a));
+            $components[$key] = json_decode(str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $categoryElementEncode));
         }
 
         return $components;

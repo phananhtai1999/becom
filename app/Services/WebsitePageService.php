@@ -310,8 +310,8 @@ class WebsitePageService extends AbstractService
         $replaceProductCategoryService = new ReplaceProductCategoryService();
         $replaceBrandService = new ReplaceBrandService();
         $product = $productDetailData;
-        $category = $productDetailData['categories'][0];
-        $brand = $productDetailData['brand'];
+        $category = $productDetailData['categories'][0] ?? null;
+        $brand = $productDetailData['brand'] ?? null;
         if (!empty($brand)) {
             $websitePage->html_template = $replaceBrandService->replaceBrand($websitePage->html_template, $brand);
         }
@@ -319,7 +319,9 @@ class WebsitePageService extends AbstractService
 
         $websitePage->html_template = Str::replace(array_keys($searchReplaceMap), $searchReplaceMap, $websitePage->html_template);
         $websitePage->html_template = $replaceProductService->replaceListProductSpecific($websitePage->html_template, $websitePage);
-        $websitePage->html_template = $replaceProductCategoryService->replaceCategoryInProduct($websitePage->html_template, $category);
+        if (!empty($category)) {
+            $websitePage->html_template = $replaceProductCategoryService->replaceCategoryInProduct($websitePage->html_template, $category);
+        }
 
         return $websitePage;
     }
@@ -400,10 +402,32 @@ class WebsitePageService extends AbstractService
         $replaceChildrenCategoryService = new ReplaceChildrenCategoryService();
         $replaceCategoryService = new ReplaceCategoryService();
         $jsonTemplateDecode = json_decode($websitePage->template_json);
+        $component = $jsonTemplateDecode->pages[0]->frames[0]->component->components;
+        $newComponent = $replaceChildrenCategoryService->replaceChildrenCategoryJson($component, $articleCategory);
 
+        $searchCategoryReplaceMap = $replaceCategoryService->searchReplaceMapForCategory($articleCategory);
+        $newComponent = str_replace(array_keys($searchCategoryReplaceMap), $searchCategoryReplaceMap, json_encode($newComponent));
+
+        $replaceArticleService = new ReplaceArticleService();
+        $newComponent = $replaceArticleService->replaceArticleJson(json_decode($newComponent), $articleCategory);
+
+        $jsonTemplateDecode->pages[0]->frames[0]->component->components = $newComponent;
+        $websitePage->template_json = json_encode($jsonTemplateDecode);
+        return $websitePage;
+    }
+
+
+    public function renderContentForHomeArticlesJson($websitePage)
+    {
+        $jsonTemplateDecode = json_decode($websitePage->template_json);
         $component = $jsonTemplateDecode->pages[0]->frames[0]->component->components;
 
-        $websitePage->template_json = json_encode($replaceChildrenCategoryService->replaceChildrenCategoryJson($component, $articleCategory));
+        $replaceArticleService = new ReplaceArticleService();
+        $replaceCategoryService = new ReplaceCategoryService();
+        $newComponent = $replaceCategoryService->findListCategoryJson($component);
+        $newComponent = $replaceArticleService->replaceListArticleForPageHomeJson($newComponent);
+        $jsonTemplateDecode->pages[0]->frames[0]->component->components = $newComponent;
+        $websitePage->template_json = json_encode($jsonTemplateDecode);
 
         return $websitePage;
     }

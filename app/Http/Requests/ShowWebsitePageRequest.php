@@ -35,9 +35,11 @@ class ShowWebsitePageRequest extends AbstractRequest
             $validate['article_category_slug'] = ['nullable', 'exists:article_categories,slug'];
             $validate['article_category_id'] = ['nullable', 'exists:article_categories,uuid'];
         }elseif ($websitePage->type == WebsitePage::PRODUCT_DETAIL_TYPE) {
-            $validate['product_uuid'] = ['required'];
+            $validate['product_slug'] = ['nullable'];
+            $validate['product_uuid'] = ['nullable'];
         } elseif ($websitePage->type == WebsitePage::PRODUCT_CATEGORY_TYPE) {
-            $validate['article_product_category_uuid'] = ['nullable'];
+            $validate['product_category_slug'] = ['nullable'];
+            $validate['product_category_uuid'] = ['nullable'];
         }
         $validate['replace_column'] = [Rule::in(['html', 'json'])];
 
