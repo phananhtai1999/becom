@@ -167,7 +167,7 @@ class WebsitePageService extends AbstractService
             $website = (new Website())->whereHas('domain', function ($query) use ($domainName) {
                 $query->where([
                     ['name', $domainName],
-                    ['verified_at', '!=', null]
+//                    ['verified_at', '!=', null]
                 ]);
             })
                 ->where('user_uuid', auth()->userId())
@@ -176,7 +176,7 @@ class WebsitePageService extends AbstractService
             $website = (new Website())->whereHas('domain', function ($query) use ($domainName) {
                 $query->where([
                     ['name', $domainName],
-                    ['verified_at', '!=', null]
+//                    ['verified_at', '!=', null]
                 ]);
             })
                 ->where('publish_status', Website::PUBLISHED_PUBLISH_STATUS)
@@ -376,25 +376,6 @@ class WebsitePageService extends AbstractService
         $websitePage->template_json = json_encode($jsonTemplateDecode);
 //        $component = $replaceCategoryService->replaceCategoryInArticle($component, $category);
         return $websitePage;
-    }
-
-    public function processComponents($components) {
-        foreach ($components as $component) {
-            if (isset($component->tagName) && $component->tagName == 'category-list') {
-                $replaceCategoryService = new ReplaceCategoryService();
-
-                dd($replaceCategoryService->replaceCategoryListJson($component->components));
-
-                $component->components = $this->replaceCategoryList($component->components);
-                foreach ($component->components as $categoryElement) {
-                    dd($categoryElement->components);
-                }
-            }
-
-            if (isset($component->components)) {
-                $this->processComponents($component->components);
-            }
-        }
     }
 
     public function renderContentForArticleCategoryJson($websitePage, $articleCategory)
