@@ -168,7 +168,10 @@ class ReplaceArticleService
     {
         foreach ($components as $component) {
             if (isset($component->tagName) && $component->tagName == 'article-list') {
-                $component->components = $this->replaceArticleListJson($component->components, $articleCategory);
+                $childrenCategoryCount = $component->attributes->{'data-category-count'} ?? 10;
+                $sortName = $component->attributes->{'category-sort'} ?? 'created_at';
+                $sortOrder = $component->attributes->{'category-sort-order'} ?? 'DESC';
+                $component->components = $this->replaceArticleListJson($component->components, $childrenCategoryCount, $sortName, $sortOrder, $articleCategory);
             }
 
             if (isset($component->components)) {
@@ -178,12 +181,12 @@ class ReplaceArticleService
         return $components;
     }
 
-    public function replaceArticleListJson($components, $articleCategory = null)
+    public function replaceArticleListJson($components, $childrenCategoryCount, $sortName, $sortOrder, $articleCategory = null)
     {
         if (!empty($articleCategory)) {
-            $articlesDatas = Article::where('article_category_uuid', $articleCategory->uuid)->paginate(10);
+            $articlesDatas = Article::where('article_category_uuid', $articleCategory->uuid)->orderBy($sortName, $sortOrder)->paginate($childrenCategoryCount);
         } else {
-            $articlesDatas = Article::paginate(10);
+            $articlesDatas = Article::orderBy($sortName, $sortOrder)->paginate($childrenCategoryCount);
         }
 
         foreach ($components as $key => $component) {
@@ -203,13 +206,46 @@ class ReplaceArticleService
     {
         foreach ($components as $component) {
             if (isset($component->tagName) && $component->tagName == 'article-list') {
-                $component->components = $this->replaceArticleListJson($component->components);
+                $childrenCategoryCount = $component->attributes->{'data-article-count'} ?? 10;
+                $sortName = $component->attributes->{'article-sort'} ?? 'created_at';
+                $sortOrder = $component->attributes->{'article-sort-order'} ?? 'DESC';
+                $component->components = $this->replaceArticleListJson($component->components, $childrenCategoryCount, $sortName, $sortOrder);
             }
 
             if (isset($component->components)) {
                 $this->replaceListArticleForPageHomeJson($component->components);
             }
         }
+        return $components;
+    }
+
+    public function replaceListArticleSpecificJson($components) {
+        foreach ($components as $component) {
+            if (isset($component->tagName) && $component->tagName == 'specific-article-list') {
+                $component->components = $this->replaceSpecificListJson($component->components);
+            }
+
+            if (isset($component->components)) {
+                $this->replaceListArticleSpecificJson($component->components);
+            }
+        }
+        return $components;
+    }
+
+    private function replaceSpecificListJson($components)
+    {
+        foreach ($components as $key => $component) {
+            if (isset($component->attributes->{'data-article-specific'})) {
+                $article = Article::where(['uuid' => $component->attributes->{'data-article-specific'}])->first();
+                if (!$article) {
+                    continue;
+                }
+                $articleElementDecode = json_encode($component);
+                $childSearchReplaceMap = $this->searchReplaceMapForArticle($article);
+                $components[$key] = json_decode(str_replace(array_keys($childSearchReplaceMap), $childSearchReplaceMap, $articleElementDecode));
+            }
+        }
+
         return $components;
     }
 }

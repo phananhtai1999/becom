@@ -120,29 +120,28 @@ class ReplaceChildrenCategoryService
     public function processComponents($components) {
         foreach ($components as $component) {
             if (isset($component->tagName) && $component->tagName == 'children-category-list') {
-                $replaceCategoryService = new ReplaceCategoryService();
-
-
-                $component->components = $this->replaceChildrenCategoryListJson($component->components);
-//                foreach ($component->components as $categoryElement) {
-//                    dd($categoryElement->components);
-//                }
+                $childrenCategoryCount = $component->attributes->{'data-children-category-count'} ?? 10;
+                $sortName = $component->attributes->{'children-category-sort'} ?? 'created_at';
+                $sortOrder = $component->attributes->{'children-category-sort-order'} ?? 'DESC';
+                $component->components = $this->replaceChildrenCategoryListJson($component->components, $childrenCategoryCount, $sortName, $sortOrder);
             }
-
             if (isset($component->components)) {
                 $this->processComponents($component->components);
             }
         }
+
         return $components;
     }
 
 
-    public function replaceChildrenCategoryListJson($components)
+    public function replaceChildrenCategoryListJson($components, $childrenCategoryCount, $sortName, $sortOrder)
     {
-        $childrenCategoriesData = ArticleCategory::paginate(7);
+        $childrenCategoriesData = ArticleCategory::orderBy($sortName, $sortOrder)->paginate($childrenCategoryCount);
         foreach ($components as $key => $childrenCategoryElement) {
             $childrenCategoryData = $childrenCategoriesData->shift();
-
+            if (!$childrenCategoryData) {
+                continue;
+            }
             $childrenCategoryElement = $this->replaceGrandChildrenCategoryListJson($childrenCategoryElement, $childrenCategoryData);
             $childrenCategoryElementDecode = json_encode($childrenCategoryElement);
             $childSearchReplaceMap = $this->searchReplaceMapForChildrenCategory($childrenCategoryData);
@@ -165,12 +164,10 @@ class ReplaceChildrenCategoryService
     private function replaceInNestedComponents(&$components, $data)
     {
         foreach ($components as &$component) {
-            if (isset($component->tagName) && $component->tagName === 'grand_chidlren_category') {
+            if (isset($component->tagName) && $component->tagName === 'grand_children_category') {
                 $categoryData = $data->shift();
                 $this->replaceDataInComponent($component, $categoryData);
             }
-
-
             if (isset($component->components)) {
                 $this->replaceInNestedComponents($component->components, $data);
             }

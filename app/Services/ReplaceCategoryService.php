@@ -121,13 +121,10 @@ class ReplaceCategoryService extends ReplaceChildrenCategoryService
     public function findListCategoryJson($components) {
         foreach ($components as $component) {
             if (isset($component->tagName) && $component->tagName == 'category-list') {
-                $replaceCategoryService = new ReplaceCategoryService();
-
-
-                $component->components = $this->replaceCategoryListJson($component->components);
-//                foreach ($component->components as $categoryElement) {
-//                    dd($categoryElement->components);
-//                }
+                $childrenCategoryCount = $component->attributes->{'data-category-count'} ?? 10;
+                $sortName = $component->attributes->{'category-sort'} ?? 'created_at';
+                $sortOrder = $component->attributes->{'category-sort-order'} ?? 'DESC';
+                $component->components = $this->replaceCategoryListJson($component->components, $childrenCategoryCount, $sortName, $sortOrder);
             }
 
             if (isset($component->components)) {
@@ -136,9 +133,9 @@ class ReplaceCategoryService extends ReplaceChildrenCategoryService
         }
         return $components;
     }
-    public function replaceCategoryListJson($components)
+    public function replaceCategoryListJson($components, $childrenCategoryCount, $sortName, $sortOrder)
     {
-        $categoriesData = ArticleCategory::paginate(7);
+        $categoriesData = ArticleCategory::orderBy($sortName, $sortOrder)->paginate($childrenCategoryCount);
         foreach ($components as $key => $categoryElement) {
             $categoryElementEncode = json_encode($categoryElement);
             $categoryData = $categoriesData->shift();
