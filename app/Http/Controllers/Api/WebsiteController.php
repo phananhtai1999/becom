@@ -449,7 +449,8 @@ class WebsiteController extends AbstractRestAPIController
                         'js_template' => '',
                         'template_json' => '',
                         'website_page_category_uuid' => $category->uuid,
-                        'type' => $type
+                        'type' => $type,
+                        'publish_status' => $website->publish_status
                     ]);
                     $website->websitePages()->attach($detailWebpage, ['ordering' => $currentOrdering]);
                 }
@@ -490,7 +491,8 @@ class WebsiteController extends AbstractRestAPIController
                         'js_template' => '',
                         'template_json' => '',
                         'website_page_category_uuid' => $category->uuid,
-                        'type' => $type
+                        'type' => $type,
+                        'publish_status' => $website->publish_status
                     ]);
                     $website->websitePages()->attach($detailWebpage, ['ordering' => $currentOrdering]);
                 }
