@@ -218,7 +218,7 @@ class ReplaceArticleService
                 $components[$key] = json_decode(str_replace(array_keys($childSearchReplaceMap), $childSearchReplaceMap, $articleElementDecode));
             } else {
                 if (isset($component->components)) {
-                    $components[$key] = $this->replaceChildrenArticleElementJson($component, $articlesDatas);
+                    $component->components = $this->replaceChildrenArticleElementJson($component->components, $articlesDatas);
                 }
             }
         }
@@ -226,16 +226,21 @@ class ReplaceArticleService
         return $components;
     }
 
-    public function replaceChildrenArticleElementJson($component, $articlesDatas) {
-        foreach ($component->components as $key => $childrenComponent) {
+    public function replaceChildrenArticleElementJson($components, $articlesDatas) {
+        $newComponents = [];
+        foreach ($components as $key => $childrenComponent) {
             if (isset($childrenComponent->tagName) && $childrenComponent->tagName == 'article-element') {
                 $articlesData = $articlesDatas->shift();
                 $articleElementDecode = json_encode($childrenComponent);
                 $childSearchReplaceMap = $this->searchReplaceMapForArticleJson($articlesData);
-                $component->components[$key] = json_decode(str_replace(array_keys($childSearchReplaceMap), $childSearchReplaceMap, $articleElementDecode));
+                $newComponent = json_decode(str_replace(array_keys($childSearchReplaceMap), $childSearchReplaceMap, $articleElementDecode));
+                $newComponents[$key] = $newComponent;
+            } else {
+                $newComponents[$key] = $this->replaceChildrenArticleElementJson($childrenComponent, $articlesDatas);
             }
         }
-        return $component;
+
+        return $newComponents;
     }
     public function replaceListArticleForPageHomeJson($components)
     {

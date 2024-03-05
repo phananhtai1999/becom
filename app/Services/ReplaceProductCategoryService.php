@@ -28,7 +28,7 @@ class ReplaceProductCategoryService extends ReplaceChildrenProductCategoryServic
                 $searchReplaceMap = $this->searchReplaceMapForCategory($categoryData);
                 $matchProductCategory[0] = str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $matchProductCategory[0]);
                 $matchProductCategory[0] = $this->replacechildrenProductCategory($matchProductCategory[0], $categoryData);
-                $matchProductCategory[0] = $replaceProductService->replaceListProduct($matchProductCategory[0], $matchProductCategory);
+                $matchProductCategory[0] = $replaceProductService->replaceListProduct($matchProductCategory[0], $categoryData);
 
                 return $matchProductCategory[0];
             }, $matches[0]);
