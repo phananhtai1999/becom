@@ -214,7 +214,7 @@ class ReplaceArticleService
                 $articlesData = $articlesDatas->shift();
 
                 $articleElementDecode = json_encode($component);
-                $childSearchReplaceMap = $this->searchReplaceMapForArticle($articlesData);
+                $childSearchReplaceMap = $this->searchReplaceMapForArticleJson($articlesData);
                 $components[$key] = json_decode(str_replace(array_keys($childSearchReplaceMap), $childSearchReplaceMap, $articleElementDecode));
             } else {
                 if (isset($component->components)) {
@@ -231,7 +231,7 @@ class ReplaceArticleService
             if (isset($childrenComponent->tagName) && $childrenComponent->tagName == 'article-element') {
                 $articlesData = $articlesDatas->shift();
                 $articleElementDecode = json_encode($childrenComponent);
-                $childSearchReplaceMap = $this->searchReplaceMapForArticle($articlesData);
+                $childSearchReplaceMap = $this->searchReplaceMapForArticleJson($articlesData);
                 $component->components[$key] = json_decode(str_replace(array_keys($childSearchReplaceMap), $childSearchReplaceMap, $articleElementDecode));
             }
         }
