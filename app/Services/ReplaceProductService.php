@@ -15,7 +15,7 @@ class ReplaceProductService extends ShopService
             $sortName = $this->searchProductSort($matches[0]);
             $sortOrder = $this->searchProductSortOrder($matches[0]);
             $productsData = $this->getListProductByCategoryUuid($productCategory['uuid'], $sortName, $sortOrder, $productCount);
-            $productsData = $productsData['data']['data'];
+            $productsData = $productsData['data'];
             $pattern = '/<product-element.*?>(.*?)<\/product-element>/s';
             return preg_replace_callback($pattern, function ($matchProduct) use ($productsData) {
                 $productData = array_shift($productsData);
