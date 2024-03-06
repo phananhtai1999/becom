@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 
 class ReplaceProductCategoryService extends ReplaceChildrenProductCategoryService
 {
-    public function replaceListProductCategory($template, ) {
+    public function replaceListProductCategory($template) {
         $replaceProductService = new ReplaceProductService();
         $pattern = '/<product-category-list.*?>(.*?)<\/product-category-list>/s';
 
