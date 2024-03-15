@@ -17,11 +17,11 @@ class PaypalService extends AbstractService
     public function accessServer()
     {
         $paypalConfig = [
-            'mode' => $this->getConfigByKeyInCache('payment_mode')->value, // Can only be 'sandbox' Or 'live'. If empty or invalid, 'live' will be used.
+            'mode' => 'sandbox', // Can only be 'sandbox' Or 'live'. If empty or invalid, 'live' will be used.
             'sandbox' => [
-                'client_id' => $this->getConfigByKeyInCache('paypal_client_id')->value,
-                'client_secret' => $this->getConfigByKeyInCache('paypal_client_secret')->value,
-                'app_id' => $this->getConfigByKeyInCache('paypal_app_id')->value,
+                'client_id' => $this->getConfigByKeyInCache('paypal_client_id')->default_value,
+                'client_secret' => $this->getConfigByKeyInCache('paypal_client_secret')->default_value,
+                'app_id' => $this->getConfigByKeyInCache('paypal_app_id')->default_value,
             ],
             'live' => [
                 'client_id' => $this->getConfigByKeyInCache('paypal_client_id')->value,

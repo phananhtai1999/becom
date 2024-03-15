@@ -38,6 +38,12 @@ class HeaderGuard implements Guard
         return $this->request->header('x-app-id');
     }
 
+    public function apps()
+    {
+        // Get value 'x-api-key' to header
+        return ['sem2'];
+    }
+
     public function apiKey()
     {
         // Get value 'x-api-key' to header

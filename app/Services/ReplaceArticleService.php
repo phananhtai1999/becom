@@ -190,7 +190,6 @@ class ReplaceArticleService
                 $sortName = $component->attributes->{'category-sort'} ?? 'created_at';
                 $sortOrder = $component->attributes->{'category-sort-order'} ?? 'DESC';
                 $sortFilterByCategory = $component->attributes->{'data-filter-article-by-category'} ?? null;
-
                 $component->components = $this->replaceArticleElementJson($component->components, $childrenCategoryCount, $sortName, $sortOrder, $sortFilterByCategory);
             }
 

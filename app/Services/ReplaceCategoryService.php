@@ -140,8 +140,11 @@ class ReplaceCategoryService extends ReplaceChildrenCategoryService
             $categoryElementEncode = json_encode($categoryElement);
             $categoryData = $categoriesData->shift();
             $searchReplaceMap = $this->searchReplaceMapForCategory($categoryData);
-
             $components[$key] = json_decode(str_replace(array_keys($searchReplaceMap), $searchReplaceMap, $categoryElementEncode));
+            if ($categoryElement->components) {
+                $articleService = new ReplaceArticleService();
+                dd($articleService->replaceArticleJson($categoryElement->components));
+            }
         }
 
         return $components;
